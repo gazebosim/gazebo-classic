@@ -137,8 +137,6 @@ namespace gazebo {
 
     private: event::ConnectionPtr beforePhysicsUpdateConnection;
 
-    private: transport::SubscriberPtr contactsSubscriber;
-
     /// \brief This bitmask will be set to the whole vehicle body.
     protected: unsigned int collideWithoutContactBitmask;
     /// \brief Category for the non-track parts of the robot.
@@ -149,13 +147,6 @@ namespace gazebo {
     protected: static const unsigned int LEFT_CATEGORY = 0x40000000;
 
     private: physics::ContactManager *contactManager;
-
-    /// \brief An empty callback which we need to register to the contacts
-    ///        publisher so that contacts are computed.
-    private: void IgnoreContacts(ConstContactsPtr &/*_unused*/)
-    {
-    }
-
 
     /// \class ContactIterator
     /// \brief An iterator over all contacts between two geometries.
@@ -189,7 +180,7 @@ namespace gazebo {
       // Operators. It is required to implement them in iterators.
       public: bool operator==(const ContactIterator &_rhs);
       public: ContactIterator &operator=(const ContactIterator &_rhs);
-      public: ContactIterator operator++(int /*_unused*/);
+      public: ContactIterator operator++(int _unused);
       public: reference operator*();
       public: pointer operator->();
       public: pointer getPointer();

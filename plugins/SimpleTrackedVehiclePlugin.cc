@@ -105,6 +105,9 @@ void SimpleTrackedVehiclePlugin::Init()
   physics::ModelPtr model = this->body->GetModel();
 
   this->contactManager = model->GetWorld()->Physics()->GetContactManager();
+  // otherwise contact manager would not publish any contacts (since we are not
+  // a real contact subscriber)
+  this->contactManager->SetNeverDropContacts(true);
 
   // set correct categories and collide bitmasks
   this->SetGeomCategories();
@@ -116,15 +119,6 @@ void SimpleTrackedVehiclePlugin::Init()
   // initialize Gazebo node, subscribers and publishers and event connections
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(model->GetWorld()->Name());
-
-  // HACK Contact manager would not publish any contacts unless there is at
-  // least one filter or someone subscribes to the ~/physics/contacts gazebo
-  // topic. We do not handle the received contacts in any way, because we need
-  // to process them earlier than the message is published (which is done in
-  // DriveTracks()).
-  // TODO This hack is no longer needed in Gazebo 9
-  this->contactsSubscriber = this->node->Subscribe("~/physics/contacts",
-      &SimpleTrackedVehiclePlugin::IgnoreContacts, this);
 
   this->beforePhysicsUpdateConnection =
       event::Events::ConnectBeforePhysicsUpdate(
@@ -269,7 +263,8 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       *contact->collision2).GetCollisionId();
 
     bool bodiesSwapped = false;
-    if (body1 == 0) {
+    if (body1 == 0)
+    {
       std::swap(body1, body2);
       std::swap(geom1, geom2);
 
@@ -287,10 +282,10 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
     // speed and geometry of the track in collision
     const auto trackGeom = (isGeom1Track ? geom1 : geom2);
     // the != means XOR here; we basically want to get the collision belonging
-    // to the track, but we might have swapped the ODE bodies in between, 
+    // to the track, but we might have swapped the ODE bodies in between,
     // so we have to account for it
     const physics::Collision* trackCollision =
-      ((isGeom1Track != bodiesSwapped) ? contact->collision1 
+      ((isGeom1Track != bodiesSwapped) ? contact->collision1
                                        : contact->collision2);
     const dReal beltSpeed =
       (dGeomGetCategoryBits(trackGeom) & LEFT_CATEGORY) != 0 ?
@@ -308,24 +303,25 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       foundContact = true;
 
       const ignition::math::Vector3d contactWorldPosition(
-        odeContact->geom.pos[0], 
-        odeContact->geom.pos[1], 
+        odeContact->geom.pos[0],
+        odeContact->geom.pos[1],
         odeContact->geom.pos[2]);
 
       ignition::math::Vector3d contactNormal(
-        odeContact->geom.normal[0], 
-        odeContact->geom.normal[1], 
+        odeContact->geom.normal[0],
+        odeContact->geom.normal[1],
         odeContact->geom.normal[2]);
 
-      // We always want contactNormal to point "inside" the track. 
-      // The dot product is 1 for co-directional vectors and -1 for 
+      // We always want contactNormal to point "inside" the track.
+      // The dot product is 1 for co-directional vectors and -1 for
       // opposite-pointing vectors.
-      // The contact can be flipped either by swapping body1 and body2 above, 
+      // The contact can be flipped either by swapping body1 and body2 above,
       // or by having some flipped faces on collision meshes.
       const double normalToTrackCenterDot =
         contactNormal.Dot(
           trackCollision->WorldPose().Pos() - contactWorldPosition);
-      if (normalToTrackCenterDot < 0) {
+      if (normalToTrackCenterDot < 0)
+      {
         contactNormal = -contactNormal;
       }
 
@@ -376,13 +372,13 @@ ignition::math::Vector3d SimpleTrackedVehiclePlugin::ComputeFrictionDirection(
   const ignition::math::Vector3d &_beltDirection) const
 {
   ignition::math::Vector3d frictionDirection;
-  
+
   if (!_drivingStraight)
   {
     // non-straight drive
 
     // vector pointing from the center of rotation to the contact point
-    const auto COR2Contact = 
+    const auto COR2Contact =
       (_contactWorldPosition - _centerOfRotation).Normalize();
 
     // the friction force should be perpendicular to COR2Contact

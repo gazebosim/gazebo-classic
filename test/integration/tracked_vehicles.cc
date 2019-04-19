@@ -21,7 +21,7 @@ using namespace gazebo;
 
 class TrackedVehiclesTest : public ServerFixture
 {
-  public: TrackedVehiclesTest(const std::string &_worldFilename)
+  public: explicit TrackedVehiclesTest(const std::string &_worldFilename)
   {
     this->Load(_worldFilename, true);
     this->world = physics::get_world();
@@ -177,13 +177,13 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   // The cylinder as at (0, -3, 0), we start at (0, -2, 0), and want to pass
   // at least a bit behind the cylinder (0, -3.5, 0). The driving is a bit wild,
   // so we don't care much about the end X position and yaw.
-  EXPECT_NEAR(model->WorldPose().Pos().X(), 0.0, 0.5); // The driving is wild
+  EXPECT_NEAR(model->WorldPose().Pos().X(), 0.0, 0.5);  // The driving is wild
   EXPECT_LT(model->WorldPose().Pos().Y(), -3.5);
   EXPECT_NEAR(model->WorldPose().Pos().Z(), 0.0, 1e-1);
   EXPECT_NEAR(model->WorldPose().Rot().Roll(), 0.0, 1e-1);
   EXPECT_NEAR(model->WorldPose().Rot().Pitch(), 0.0, 1e-1);
   EXPECT_NEAR(model->WorldPose().Rot().Yaw(),
-              beforeStairsPose.Rot().Yaw(), 0.5); // The driving is wild
+              beforeStairsPose.Rot().Yaw(), 0.5);  // The driving is wild
 }
 
 //// Test that the WheelTracked vehicle is moving as expected.
