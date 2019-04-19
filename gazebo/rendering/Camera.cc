@@ -310,7 +310,7 @@ ignition::math::Matrix4d Camera::BuildProjectionMatrix(
            0, _imageWidth, 0, _imageHeight, _clipNear, _clipFar) *
          Camera::BuildPerspectiveMatrix(
            _intrinsicsFx, _intrinsicsFy,
-           _intrinsicsCx, _intrinsicsCy,
+           _intrinsicsCx, _imageHeight - _intrinsicsCy,
            _intrinsicsS, _clipNear, _clipFar);
 }
 //////////////////////////////////////////////////
