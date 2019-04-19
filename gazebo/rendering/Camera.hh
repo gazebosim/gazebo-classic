@@ -113,9 +113,6 @@ namespace gazebo
           const double _cameraIntrinsicsCx, const double _cameraIntrinsicsCy,
           const double _cameraIntrinsicsS);
 
-      /// \brief Load the camera intrinsics parameters from the sdf
-      private: virtual void LoadCameraIntrinsics();
-
       /// \brief Computes the OpenGL NDC matrix
       /// \param[in] _left Left vertical clipping plane
       /// \param[in] _right Right vertical clipping plane
@@ -832,6 +829,9 @@ namespace gazebo
       protected: virtual void SetFixedYawAxis(const bool _useFixed,
           const ignition::math::Vector3d &_fixedAxis =
             ignition::math::Vector3d::UnitY);
+
+      /// \brief Load the camera intrinsics parameters from the sdf
+      private: void LoadCameraIntrinsics();
 
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats

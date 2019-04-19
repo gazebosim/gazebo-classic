@@ -298,6 +298,7 @@ ignition::math::Matrix4d Camera::BuildPerspectiveMatrix(
            -1.0,
            0.0);
 }
+
 //////////////////////////////////////////////////
 ignition::math::Matrix4d Camera::BuildProjectionMatrix(
     const double _imageWidth, const double _imageHeight,
@@ -313,6 +314,7 @@ ignition::math::Matrix4d Camera::BuildProjectionMatrix(
            _intrinsicsCx, _imageHeight - _intrinsicsCy,
            _intrinsicsS, _clipNear, _clipFar);
 }
+
 //////////////////////////////////////////////////
 void Camera::Init()
 {
