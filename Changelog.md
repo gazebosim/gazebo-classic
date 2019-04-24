@@ -2,6 +2,13 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Fix kinematic loops for DART 6.8, reverting to dart 6.7 behavior
+    * [Pull request 3101](https://bitbucket.org/osrf/gazebo/pull-request/3101)
+
+1. Lens flare: use light world pose at each time step instead of only at initialization
+    * [Pull request 3093](https://bitbucket.org/osrf/gazebo/pull-request/3093)
+
+
 ## Gazebo 10.1.0 (2019-03-28)
 
 1. Refactor ODE gearbox joint implementation to match hinge joint
@@ -105,6 +112,12 @@
 ## Gazebo 9
 
 ## Gazebo 9.X.X (20XX-XX-XX)
+
+1. Fix kinematic loops for DART 6.8, reverting to dart 6.7 behavior
+    * [Pull request 3101](https://bitbucket.org/osrf/gazebo/pull-request/3101)
+
+1. Lens flare: use light world pose at each time step instead of only at initialization
+    * [Pull request 3093](https://bitbucket.org/osrf/gazebo/pull-request/3093)
 
 1. Refactor ODE gearbox joint implementation to match hinge joint
     * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
