@@ -192,11 +192,10 @@ void Master::SendSubscribers(const std::string &_topic,
 void Master::ProcessMessage(const unsigned int _connectionIndex,
                             const std::string &_data)
 {
-  if (!this->dataPtr->connections[_connectionIndex] ||
-      !this->dataPtr->connections[_connectionIndex]->IsOpen())
-    return;
-
   transport::ConnectionPtr conn = this->dataPtr->connections[_connectionIndex];
+
+  if (!conn || !conn->IsOpen())
+    return;
 
   msgs::Packet packet;
   packet.ParseFromString(_data);
