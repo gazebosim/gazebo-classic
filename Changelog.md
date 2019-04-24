@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Master::ProcessMessage: fix race condition in accessing connection
+    * [Pull request 3102](https://bitbucket.org/osrf/gazebo/pull-request/3102)
+
 1. Fix kinematic loops for DART 6.8, reverting to dart 6.7 behavior
     * [Pull request 3101](https://bitbucket.org/osrf/gazebo/pull-request/3101)
 
