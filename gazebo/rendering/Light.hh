@@ -104,6 +104,10 @@ namespace gazebo
       /// \return The rotation of the light
       public: ignition::math::Quaterniond Rotation() const;
 
+      /// \brief Get the world pose of the light
+      /// \return The world pose of the light
+      public: ignition::math::Pose3d WorldPose() const;
+
       /// \brief Set whether this entity has been selected by the user through
       /// the gui.
       /// \param[in] _s Set to True when the light is selected by the user.
