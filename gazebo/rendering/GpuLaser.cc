@@ -395,21 +395,21 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
   autoParamDataSource.setCurrentCamera(this->camera, true);
 
   pass->_updateAutoParams(&autoParamDataSource,
-      Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
+      Ogre::GPV_GLOBAL | Ogre::GPV_PER_OBJECT);
   pass->getFragmentProgramParameters()->setNamedConstant("retro", retro[0]);
   renderSys->bindGpuProgram(
       pass->getVertexProgram()->_getBindingDelegate());
 
   renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
       pass->getVertexProgramParameters(),
-      Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
+      Ogre::GPV_GLOBAL | Ogre::GPV_PER_OBJECT);
 
   renderSys->bindGpuProgram(
       pass->getFragmentProgram()->_getBindingDelegate());
 
   renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM,
       pass->getFragmentProgramParameters(),
-      Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
+      Ogre::GPV_GLOBAL | Ogre::GPV_PER_OBJECT);
 }
 
 //////////////////////////////////////////////////
