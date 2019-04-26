@@ -2,8 +2,17 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Fix kinematic loops for DART 6.8, reverting to dart 6.7 behavior
+    * [Pull request 3101](https://bitbucket.org/osrf/gazebo/pull-request/3101)
+
+1. Lens flare: use light world pose at each time step instead of only at initialization
+    * [Pull request 3093](https://bitbucket.org/osrf/gazebo/pull-request/3093)
+
 1. Refactor ODE gearbox joint implementation to match hinge joint
     * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
+
+1. Make the GPU laser warp artifact transparent
+    * [Pull request 3100](https://bitbucket.org/osrf/gazebo/pull-request/3100)
 
 1. Fix loading sdf with orthographic projection camera
     * [Pull request 3098](https://bitbucket.org/osrf/gazebo/pull-request/3098)

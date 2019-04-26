@@ -28,6 +28,36 @@ class Light_TEST : public RenderingFixture
 };
 
 /////////////////////////////////////////////////
+TEST_F(Light_TEST, LightPoseTest)
+{
+  Load("worlds/empty.world");
+
+  rendering::ScenePtr scene = rendering::get_scene("default");
+
+  if (!scene)
+    scene = rendering::create_scene("default", false);
+
+  EXPECT_TRUE(scene != nullptr);
+
+  // create a visual as light parent
+  rendering::VisualPtr parentVis(
+      new rendering::Visual("light_parent", scene, false));
+  parentVis->Load();
+
+  ignition::math::Pose3d testPose(1, 2, 3, 0, 1.57, 3.14);
+  parentVis->SetWorldPose(testPose);
+
+  // create a light and attach it to parent visual
+  rendering::LightPtr light(new gazebo::rendering::Light(scene));
+  msgs::Light msg;
+  msg.set_name("light_parent::light");
+  light->LoadFromMsg(msg);
+
+  // verify pose
+  EXPECT_EQ(testPose, light->WorldPose());
+}
+
+/////////////////////////////////////////////////
 TEST_F(Light_TEST, LightVisualTest)
 {
   Load("worlds/empty.world");

@@ -389,6 +389,12 @@ ignition::math::Quaterniond Light::Rotation() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Pose3d Light::WorldPose() const
+{
+  return this->dataPtr->visual->WorldPose();
+}
+
+//////////////////////////////////////////////////
 bool Light::SetSelected(const bool _s)
 {
   if (this->dataPtr->light->getType() != Ogre::Light::LT_DIRECTIONAL)
