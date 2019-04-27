@@ -757,8 +757,8 @@ void GpuLaser::CreateCanvas()
 
   this->dataPtr->visual->SetPose(pose);
 
-  this->dataPtr->visual->SetMaterial("Gazebo/Green");
-  this->dataPtr->visual->SetAmbient(ignition::math::Color(0, 1, 0, 1));
+  this->dataPtr->visual->SetDiffuse(ignition::math::Color(0, 1, 0, 0));
+  this->dataPtr->visual->SetAmbient(ignition::math::Color(0, 1, 0, 0));
   this->dataPtr->visual->SetVisible(true);
   this->scene->AddVisual(this->dataPtr->visual);
 }
