@@ -1,0 +1,127 @@
+<?xml version="1.0" ?>
+<%= "<!-- this file was generated using embedded ruby -->" %>
+<sdf version='1.6'>
+  <world name='default'>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <physics type="ode">
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>50</iters>
+          <friction_model>pyramid_model</friction_model>
+        </solver>
+      </ode>
+    </physics>
+<%
+  # Test cone friction model
+  # set equal friction coefficients, but use default directions
+  require 'matrix'
+  def a_to_s(v)
+    Array(v).join(" ")
+  end
+
+  # box dimensions
+  dx = 0.5
+  dy = dx
+  dz = 0.2
+
+  box = {}
+  box[:size] = Vector[dx, dy, dz]
+  box[:mass] = 1
+  box[:ixx] = box[:mass] / 12.0 * (dy**2 + dz**2)
+  box[:iyy] = box[:mass] / 12.0 * (dz**2 + dx**2)
+  box[:izz] = box[:mass] / 12.0 * (dx**2 + dy**2)
+
+  box_count = 32
+  box_angles = 2 * Math::PI * Vector[*(0..box_count-1)] / box_count
+%>
+    <model name="boxes">
+<%
+  radius = 9
+  box_angles.each_with_index do |a,i|
+    name = "box_#{i}"
+    pos_xy = radius * Vector[Math.cos(a), Math.sin(a)]
+    vel_xy = pos_xy
+%>
+      <model name='<%= name %>'>
+        <pose><%= a_to_s(pos_xy) %> 0.1 0 -0 0</pose>
+        <link name='link_1'>
+          <inertial>
+            <mass><%= box[:mass] %></mass>
+            <inertia>
+              <ixx><%= box[:ixx] %></ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy><%= box[:iyy] %></iyy>
+              <iyz>0</iyz>
+              <izz><%= box[:izz] %></izz>
+            </inertia>
+          </inertial>
+          <collision name='collision'>
+            <geometry>
+              <box>
+                <size><%= a_to_s(box[:size]) %></size>
+              </box>
+            </geometry>
+            <surface>
+              <friction>
+                <ode>
+                  <mu>0.3</mu>
+                  <mu2>0.3</mu2>
+                </ode>
+              </friction>
+            </surface>
+          </collision>
+          <visual name='visual'>
+            <geometry>
+              <box>
+                <size><%= a_to_s(box[:size]) %></size>
+              </box>
+            </geometry>
+            <material>
+              <script>
+                <name>Gazebo/Grey</name>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+              </script>
+            </material>
+          </visual>
+        </link>
+        <plugin name="radial_velocity" filename="libInitialVelocityPlugin.so">
+          <linear><%= a_to_s(vel_xy) %> 0</linear>
+          <angular>0 0 0</angular>
+        </plugin>
+      </model>
+<%
+  end
+%>
+      <plugin name="3dplot" filename="libLinkPlot3DPlugin.so">
+        <frequency>10</frequency>
+<%
+  box_angles.each_with_index do |a,i|
+    name = "box_#{i}"
+%>
+        <plot>
+          <model><%= name %></model>
+          <link>link_1</link>
+          <pose>0 0 1 0 0 0</pose>
+          <material>Gazebo/Blue</material>
+        </plot>
+<%
+  end
+%>
+      </plugin>
+    </model>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>0 0 60 0 1.570796 0</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+  </world>
+</sdf>
