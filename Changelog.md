@@ -11,6 +11,9 @@
 1. Refactor ODE gearbox joint implementation to match hinge joint
     * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
 
+1. Make the GPU laser warp artifact transparent
+    * [Pull request 3100](https://bitbucket.org/osrf/gazebo/pull-request/3100)
+
 1. Added support for tracked vehicles
     * [Issue #863](https://bitbucket.org/osrf/gazebo/issues/863)
 
@@ -141,6 +144,8 @@
 
 1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
     * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
+    * [Pull request 2997](https://bitbucket.org/osrf/gazebo/pull-request/2997)
 
 1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
     * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
@@ -1253,7 +1258,16 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
-1. Use new sha1.hpp header location for recent boost
+## Gazebo 7.15.0 (2018-03-26)
+
+1. Don't search for boost signals component (support boost 1.69)
+    * [Pull request 3089](https://bitbucket.org/osrf/gazebo/pull-request/3089)
+    * [Issue 2577](https://bitbucket.org/osrf/gazebo/issues/2577)
+
+1. Refactor ODE gearbox joint implementation to match hinge joint
+    * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
+
+1. Use new sha1.hpp header location for recent boost (support boost 1.68)
     * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
 
 1. Add MisalignmentPlugin which reports alignment between two poses
@@ -1270,6 +1284,8 @@
 
 1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
     * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
+    * [Pull request 2997](https://bitbucket.org/osrf/gazebo/pull-request/2997)
 
 1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
     * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
