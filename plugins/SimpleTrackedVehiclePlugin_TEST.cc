@@ -24,9 +24,6 @@
 #include "test/util.hh"
 
 #include "gazebo/physics/ode/ODECollision.hh"
-#ifdef HAVE_DART
-#include "gazebo/physics/dart/DARTCollision.hh"
-#endif
 
 using namespace gazebo;
 
@@ -144,17 +141,10 @@ uint64_t GetCategoryBits(const std::string& _physicsEngine,
     auto odeID = odeCollision->GetCollisionId();
     return dGeomGetCategoryBits(odeID);
   }
-#ifdef HAVE_DART
-  else if (_physicsEngine == "dart")
-  {
-    auto dartCollision = boost::dynamic_pointer_cast<physics::DARTCollision>(
-      _model->GetLink(_linkName)->GetCollisions()[0]);
-    return dartCollision->GetCategoryBits();
-  }
-#endif
   else
   {
-    ADD_FAILURE() << "Category bits can only be determined for ODE and Dart.";
+    ADD_FAILURE() <<
+      "Category bits can only be determined for ODE in this test.";
     return 0u;
   }
 }
