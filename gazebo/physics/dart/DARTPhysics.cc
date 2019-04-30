@@ -597,7 +597,7 @@ void DARTPhysics::SetSolverType(const std::string &_type)
     this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
         dart::common::make_unique<dart::constraint::DantzigLCPSolver>(
         this->dataPtr->dtWorld->getTimeStep()));
-#elif DART_MAJOR_MINOR_VERSION_AT_MOST(6, 7)
+#else
     auto boxedLCPSolver =
         dynamic_cast<dart::constraint::BoxedLcpConstraintSolver*>(
         this->dataPtr->dtWorld->getConstraintSolver());
@@ -606,11 +606,6 @@ void DARTPhysics::SetSolverType(const std::string &_type)
       boxedLCPSolver->setBoxedLcpSolver(
           std::make_shared<dart::constraint::DantzigBoxedLcpSolver>());
     }
-#else
-    this->dataPtr->dtWorld->setConstraintSolver(
-        dart::common::make_unique<dart::constraint::BoxedLcpConstraintSolver>(
-        this->dataPtr->dtWorld->getTimeStep(),
-        std::make_shared<dart::constraint::DantzigBoxedLcpSolver>()));
 #endif
   }
   else if (_type == "pgs")
@@ -621,7 +616,7 @@ void DARTPhysics::SetSolverType(const std::string &_type)
     this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
         dart::common::make_unique<dart::constraint::PGSLCPSolver>(
         this->dataPtr->dtWorld->getTimeStep()));
-#elif DART_MAJOR_MINOR_VERSION_AT_MOST(6, 7)
+#else
     auto boxedLCPSolver =
         dynamic_cast<dart::constraint::BoxedLcpConstraintSolver*>(
         this->dataPtr->dtWorld->getConstraintSolver());
@@ -630,11 +625,6 @@ void DARTPhysics::SetSolverType(const std::string &_type)
       boxedLCPSolver->setBoxedLcpSolver(
           std::make_shared<dart::constraint::PgsBoxedLcpSolver>());
     }
-#else
-    this->dataPtr->dtWorld->setConstraintSolver(
-        dart::common::make_unique<dart::constraint::BoxedLcpConstraintSolver>(
-        this->dataPtr->dtWorld->getTimeStep(),
-        std::make_shared<dart::constraint::PgsBoxedLcpSolver>()));
 #endif
   }
   else

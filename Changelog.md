@@ -2,6 +2,12 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Fix kinematic loops for DART 6.8, reverting to dart 6.7 behavior
+    * [Pull request 3101](https://bitbucket.org/osrf/gazebo/pull-request/3101)
+
+1. Lens flare: use light world pose at each time step instead of only at initialization
+    * [Pull request 3093](https://bitbucket.org/osrf/gazebo/pull-request/3093)
+
 1. LinkPlot3dPlugin: read optional `<model>` tag to find links in nested models
     * [Pull request 3095](https://bitbucket.org/osrf/gazebo/pull-request/3095)
 
