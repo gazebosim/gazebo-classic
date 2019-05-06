@@ -8,6 +8,9 @@
 1. Lens flare: use light world pose at each time step instead of only at initialization
     * [Pull request 3093](https://bitbucket.org/osrf/gazebo/pull-request/3093)
 
+1. LinkPlot3dPlugin: read optional `<model>` tag to find links in nested models
+    * [Pull request 3095](https://bitbucket.org/osrf/gazebo/pull-request/3095)
+
 1. Refactor ODE gearbox joint implementation to match hinge joint
     * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
 
