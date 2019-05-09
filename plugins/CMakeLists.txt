@@ -2,6 +2,26 @@ if (WIN32)
   add_definitions(-DBUILDING_DLL -DBUILDING_DLL_GZ_PLUGIN)
 endif()
 
+if(WIN32 AND NOT UNIX)
+  # Solves errors about not finding _imp_sprintf and similar on some Windows systems.
+  set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} legacy_stdio_definitions.lib")
+
+  # Include Universal CRT includes. They are sometimes needed by gtest. If not added,
+  # compilation fails not finding symbols like _isatty, write, close etc.
+  get_filename_component(windows_kits_dir
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot10]" ABSOLUTE)
+  set(programfilesx86 "ProgramFiles(x86)")  
+  find_path(WINDOWS_KITS_UCRT_INCLUDE NAMES assert.h
+    PATHS
+    "${windows_kits_dir}/include"
+    "$ENV{ProgramFiles}/Windows Kits/10/include"
+    "$ENV{${programfilesx86}}/Windows Kits/10/include"
+  )  
+
+  message(STATUS "Found Windows SDK Universal CRT include directory: ${WINDOWS_KITS_UCRT_INCLUDE}")
+  include_directories(${WINDOWS_KITS_UCRT_INCLUDE})  
+endif()
+
 include_directories(SYSTEM
   ${CURL_INCLUDEDIR}
   ${PROJECT_SOURCE_DIR}
