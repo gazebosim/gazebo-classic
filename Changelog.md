@@ -17,6 +17,9 @@
 1. Make the GPU laser warp artifact transparent
     * [Pull request 3100](https://bitbucket.org/osrf/gazebo/pull-request/3100)
 
+1. Added support for tracked vehicles
+    * [Issue #863](https://bitbucket.org/osrf/gazebo/issues/863)
+
 ## Gazebo 9.8.0 (2019-XX-XX)
 
 1. Fix kinematic loops for DART 6.7 and later
