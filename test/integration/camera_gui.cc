@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 
@@ -47,6 +48,36 @@ void CameraGUITest::Heightmap()
 
   QVERIFY(camera->WorldPose() ==
       ignition::math::Pose3d(5, -5, 210, 0, 1.53546, 2.35619));
+
+  // Clean up
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void CameraGUITest::OrthoProjection()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/camera_gui.world", false, false, false);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get camera
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+
+  // Check that it is in orthographic projection
+  QVERIFY(!gazebo::gui::g_cameraPerspectiveAct->isChecked());
+  QVERIFY(gazebo::gui::g_cameraOrthoAct->isChecked());
 
   // Clean up
   mainWindow->close();
