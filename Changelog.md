@@ -1,5 +1,7 @@
 ## Gazebo 9
 
+## Gazebo 9.X.X (20XX-XX-XX)
+
 ## Gazebo 9.9.0 (2019-05-23)
 
 1. Backport camera intrinsics feature
