@@ -1,6 +1,6 @@
 ## Gazebo 9
 
-## Gazebo 9.X.X (20XX-XX-XX)
+## Gazebo 9.9.0 (2019-05-23)
 
 1. Backport camera intrinsics feature
     * [Pull request 3099](https://bitbucket.org/osrf/gazebo/pull-request/3099)
@@ -30,7 +30,7 @@
 1. Fix loading sdf with orthographic projection camera
     * [Pull request 3098](https://bitbucket.org/osrf/gazebo/pull-request/3098)
 
-## Gazebo 9.8.0 (2019-XX-XX)
+## Gazebo 9.8.0 (2019-04-10)
 
 1. Fix kinematic loops for DART 6.7 and later
     * [Pull request 3086](https://bitbucket.org/osrf/gazebo/pull-request/3086)
