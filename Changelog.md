@@ -2,6 +2,9 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Fix build with DART 6.9, using 32-bit float for dart heightmap scale.
+    * [Pull request 3106](https://bitbucket.org/osrf/gazebo/pull-request/3106)
+
 1. Fix kinematic loops for DART 6.8, reverting to dart 6.7 behavior
     * [Pull request 3101](https://bitbucket.org/osrf/gazebo/pull-request/3101)
 
