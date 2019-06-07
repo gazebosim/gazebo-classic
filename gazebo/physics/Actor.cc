@@ -668,12 +668,12 @@ void Actor::Update()
 
   if (!this->customTrajectoryInfo)
   {
-    actorPose.Pos() = modelPose.Pos() + modelPose.Rot().RotateVector(rootPos);  
+    actorPose.Pos() = modelPose.Pos() + modelPose.Rot().RotateVector(rootPos);
     actorPose.Rot() = modelPose.Rot() * rootRot;
   }
   else
   {
-    actorPose.Pos() = this->WorldPose().Pos();  
+    actorPose.Pos() = this->WorldPose().Pos();
     actorPose.Rot() = this->WorldPose().Rot();
   }
 
