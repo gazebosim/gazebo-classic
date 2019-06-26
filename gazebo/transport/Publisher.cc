@@ -236,6 +236,11 @@ std::string Publisher::GetMsgType() const
 //////////////////////////////////////////////////
 void Publisher::OnPublishComplete(uint32_t _id)
 {
+  // A null node indicates that the publisher may have been destroyed
+  // so do not do anything
+  if (!this->node)
+    return;
+
   try {
     // This is the deeply unsatisfying way of dealing with a race
     // condition where the publisher is destroyed before all
