@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Fix race conditions in `Master::ProcessMessage` and `Publisher::OnPublishComplete`
+    * [Pull request 3103](https://bitbucket.org/osrf/gazebo/pull-request/3103)
+
 ## Gazebo 9.9.0 (2019-05-23)
 
 1. Backport camera intrinsics feature
