@@ -25,6 +25,7 @@
 #include <ignition/transport.hh>
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/physics/physics.hh"
 #include "plugins/LinkPlot3DPlugin.hh"
 
@@ -107,9 +108,32 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
   int id = 0;
   while (plotElem)
   {
+    physics::ModelPtr model = _model;
+    std::string modelNameUri;
+    if (plotElem->HasElement("model"))
+    {
+      modelNameUri = plotElem->Get<std::string>("model");
+      auto modelNameParts = common::split(modelNameUri, "/");
+      for (auto &modelName : modelNameParts)
+      {
+        model = model->NestedModel(modelName);
+        if (!model)
+        {
+          break;
+        }
+      }
+    }
+
+    if (!model)
+    {
+      gzerr << "Couldn't find model [" << modelNameUri << "] in model [" <<
+          _model->GetName() << "]" << std::endl;
+      continue;
+    }
+
     auto linkName = plotElem->Get<std::string>("link");
 
-    auto link = _model->GetLink(linkName);
+    auto link = model->GetLink(linkName);
 
     if (link)
     {
@@ -148,7 +172,7 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
     else
     {
       gzerr << "Couldn't find link [" << linkName << "] in model [" <<
-          _model->GetName() << "]" << std::endl;
+          model->GetScopedName() << "]" << std::endl;
     }
 
     plotElem = plotElem->GetNextElement("plot");
