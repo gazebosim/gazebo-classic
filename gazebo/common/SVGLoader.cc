@@ -500,6 +500,54 @@ ignition::math::Vector2d SVGLoader::SubpathToPolyline(
           i += 2;
         }
         break;
+      case 'h':
+        while (i < count)
+        {
+          ignition::math::Vector2d p;
+          p.X(cmd.numbers[i+0]);
+          p.Y(0.0);
+          p.X() += _last.X();
+          p.Y() = _last.Y();
+          _polyline.push_back(p);
+          _last = p;
+          i += 1;
+        }
+        break;
+      case 'H':
+        while (i < count)
+        {
+          ignition::math::Vector2d p;
+          p.X(cmd.numbers[i+0]);
+          p.Y(_last.Y());
+          _polyline.push_back(p);
+          _last = p;
+          i += 1;
+        }
+        break;
+      case 'v':
+        while (i < count)
+        {
+          ignition::math::Vector2d p;
+          p.X(0.0);
+          p.Y(cmd.numbers[i+0]);
+          p.X() = _last.X();
+          p.Y() += _last.Y();
+          _polyline.push_back(p);
+          _last = p;
+          i += 1;
+        }
+        break;
+      case 'V':
+        while (i < count)
+        {
+          ignition::math::Vector2d p;
+          p.X(_last.X());
+          p.Y(cmd.numbers[i+0]);
+          _polyline.push_back(p);
+          _last = p;
+          i += 1;
+        }
+        break;
       case 'C':
         while (i < count)
         {
