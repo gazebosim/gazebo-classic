@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. TopicManager: lock subscriberMutex anywhere subscribedNodes is used
+    * [Pull request 3096](https://bitbucket.org/osrf/gazebo/pull-request/3096)
+
 1. Export `OGRE-*` cmake variables in addition to `OGRE_*` variables
     * [Pull request 3109](https://bitbucket.org/osrf/gazebo/pull-request/3109)
 
