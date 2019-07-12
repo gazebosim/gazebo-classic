@@ -643,8 +643,11 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
         frameTransXml->FirstChildElement("technique_common");
       accessor = accessor->FirstChildElement("accessor");
 
-      unsigned int stride =
-        ignition::math::parseInt(accessor->Attribute("stride"));
+      // stride is optional, default to 1
+      unsigned int stride = 1;
+      auto *strideAttribute = accessor->Attribute("stride");
+      if (strideAttribute)
+        stride = static_cast<unsigned int>(ignition::math::parseInt(strideAttribute));
 
       SkeletonNode *targetNode = _skel->GetNodeById(targetBone);
       if (targetNode == nullptr)
