@@ -1,6 +1,6 @@
 ## Gazebo 9
 
-## Gazebo 9.X.X (20XX-XX-XX)
+## Gazebo 9.10.0 (2019-07-12)
 
 1. ColladaLoader: use default value of 1 for stride parameter when unset.
     * [Pull request 3112](https://bitbucket.org/osrf/gazebo/pull-request/3112)
