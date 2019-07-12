@@ -647,7 +647,10 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
       unsigned int stride = 1;
       auto *strideAttribute = accessor->Attribute("stride");
       if (strideAttribute)
-        stride = static_cast<unsigned int>(ignition::math::parseInt(strideAttribute));
+      {
+        stride = static_cast<unsigned int>(
+            ignition::math::parseInt(strideAttribute));
+      }
 
       SkeletonNode *targetNode = _skel->GetNodeById(targetBone);
       if (targetNode == nullptr)
