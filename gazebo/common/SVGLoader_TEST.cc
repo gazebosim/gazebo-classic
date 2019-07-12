@@ -364,6 +364,25 @@ TEST_F(SVGLoader, MultipleFiles)
 }
 
 /////////////////////////////////////////////////
+TEST_F(SVGLoader, Lineto)
+{
+  // check for lineto command support
+  common::SVGLoader loader(3);
+  std::vector<common::SVGPath> paths;
+
+  std::string filePath = std::string(PROJECT_SOURCE_PATH);
+  filePath += "/test/data/svg/lineto.svg";
+
+  bool success = loader.Parse(filePath, paths);
+  EXPECT_EQ(true, success);
+
+  EXPECT_EQ(1u, paths.size());
+  EXPECT_EQ(1u, paths[0].subpaths.size());
+  EXPECT_EQ(1u, paths[0].polylines.size());
+  EXPECT_EQ(7u, paths[0].polylines[0].size());
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
