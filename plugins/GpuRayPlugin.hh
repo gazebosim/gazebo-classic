@@ -31,6 +31,8 @@ namespace gazebo
   {
     public: GpuRayPlugin();
 
+    public: virtual ~GpuRayPlugin();
+
     public: void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
     public: virtual void OnNewLaserFrame(const float *_image,
