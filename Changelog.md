@@ -2,6 +2,9 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Fix compilation of tests without DART installed.
+    * [Pull request 3075](https://bitbucket.org/osrf/gazebo/pull-request/3075)
+
 1. Fix build with DART 6.9, using 32-bit float for dart heightmap scale.
     * [Pull request 3106](https://bitbucket.org/osrf/gazebo/pull-request/3106)
 
