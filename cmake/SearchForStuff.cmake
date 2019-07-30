@@ -161,8 +161,10 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  set(DART_MIN_REQUIRED_VERSION 6)
-  find_package(DART ${DART_MIN_REQUIRED_VERSION} CONFIG OPTIONAL_COMPONENTS utils-urdf)
+  set(DART_MIN_REQUIRED_VERSION 6.10)
+  find_package(DART ${DART_MIN_REQUIRED_VERSION} CONFIG
+      COMPONENTS collision-ode collision-bullet
+      OPTIONAL_COMPONENTS utils-urdf)
   if (DART_FOUND)
     message (STATUS "Looking for DART - found")
     set (HAVE_DART TRUE)

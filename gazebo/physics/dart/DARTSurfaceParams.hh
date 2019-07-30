@@ -56,6 +56,12 @@ namespace gazebo
       // Documentation inherited.
       public: virtual FrictionPyramidPtr FrictionPyramid() const;
 
+      /// Get slip compliance in first friction direction.
+      public: double Slip1() const;
+
+      /// Get slip compliance in second friction direction.
+      public: double Slip2() const;
+
       /// \internal
       /// \brief Pointer to private data
       private: DARTSurfaceParamsPrivate *dataPtr;

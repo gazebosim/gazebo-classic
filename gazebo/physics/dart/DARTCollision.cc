@@ -26,6 +26,7 @@
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTPlaneShape.hh"
 #include "gazebo/physics/dart/DARTSurfaceParams.hh"
+#include "gazebo/physics/dart/DARTTypes.hh"
 
 #include "gazebo/physics/dart/DARTCollisionPrivate.hh"
 
@@ -69,7 +70,7 @@ void DARTCollision::Init()
   // Init(), because the BodyNode will only have been created in Load()
   // and is not guaranteed to exist before.
 
-  // Set the pose offset.
+  // Set the pose offset and friction parameters.
   if (this->dataPtr->dtCollisionShape)
   {
     // TODO: Remove type check once DART completely supports plane shape.
@@ -82,6 +83,20 @@ void DARTCollision::Init()
       Eigen::Isometry3d tf = DARTTypes::ConvPose(this->RelativePose());
       this->dataPtr->dtCollisionShape->setRelativeTransform(tf);
     }
+
+    // Set friction parameters.
+    auto surf = this->DARTSurface();
+    GZ_ASSERT(surf, "Surface pointer is invalid");
+    FrictionPyramidPtr friction = surf->FrictionPyramid();
+    GZ_ASSERT(friction, "Friction pointer is invalid");
+    auto aspect = this->dataPtr->dtCollisionShape->getDynamicsAspect();
+    GZ_ASSERT(aspect, "DynamicsAspect pointer is invalid");
+    aspect->setFrictionCoeff(friction->MuPrimary());
+    aspect->setSecondaryFrictionCoeff(friction->MuSecondary());
+    aspect->setFirstFrictionDirection(
+        DARTTypes::ConvVec3(friction->direction1));
+    aspect->setSlipCompliance(surf->Slip1());
+    aspect->setSecondarySlipCompliance(surf->Slip2());
   }
 }
 

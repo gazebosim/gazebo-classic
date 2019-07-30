@@ -204,49 +204,6 @@ void DARTLink::Init()
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
-  // Friction coefficient
-
-  /// \todo FIXME: Friction Parameters
-  /// Gazebo allows different friction parameters per collision objects,
-  /// while DART stores the friction parameter per link (BodyNode in DART). For
-  /// now, the average friction parameter of all the child collision objects is
-  /// stored in this->dataPtr->dtBodyNode.
-  /// Final friction coefficient is applied in DART's constraint solver by
-  /// taking the lower of the 2 colliding rigidLink's.
-  /// See also:
-  /// - https://github.com/dartsim/dart/issues/141
-  /// - https://github.com/dartsim/dart/issues/266
-
-  double hackAvgMu1 = 0;
-  double hackAvgMu2 = 0;
-  int numCollisions = 0;
-
-  for (auto const &child : this->children)
-  {
-    if (child->HasType(Base::COLLISION))
-    {
-      CollisionPtr collision =
-          boost::static_pointer_cast<Collision>(child);
-
-      SurfaceParamsPtr surface = collision->GetSurface();
-      GZ_ASSERT(surface, "Surface pointer for is invalid");
-      FrictionPyramidPtr friction = surface->FrictionPyramid();
-      GZ_ASSERT(friction, "Friction pointer for is invalid");
-
-      numCollisions++;
-      hackAvgMu1 += friction->MuPrimary();
-      hackAvgMu2 += friction->MuSecondary();
-    }
-  }
-
-  hackAvgMu1 /= static_cast<double>(numCollisions);
-  hackAvgMu2 /= static_cast<double>(numCollisions);
-
-  float coeff = 0.5 * (hackAvgMu1 + hackAvgMu2);
-  // friction coefficient may not be negative in DART
-  coeff = std::max(0.0f, coeff);
-  this->dataPtr->dtBodyNode->setFrictionCoeff(coeff);
-
   // We don't add dart body node to the skeleton here because dart body node
   // should be set its parent joint before being added. This body node will be
   // added to the skeleton in DARTModel::Init().

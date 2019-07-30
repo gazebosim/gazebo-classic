@@ -64,6 +64,11 @@ void DARTSurfaceParams::Load(sdf::ElementPtr _sdf)
           frictionOdeElem->Get<double>("mu"));
         this->dataPtr->frictionPyramid->SetMuSecondary(
           frictionOdeElem->Get<double>("mu2"));
+        this->dataPtr->frictionPyramid->direction1 =
+          frictionOdeElem->Get<ignition::math::Vector3d>("fdir1");
+
+        this->dataPtr->slip1 = frictionOdeElem->Get<double>("slip1");
+        this->dataPtr->slip2 = frictionOdeElem->Get<double>("slip2");
       }
     }
   }
@@ -98,4 +103,16 @@ void DARTSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 FrictionPyramidPtr DARTSurfaceParams::FrictionPyramid() const
 {
   return this->dataPtr->frictionPyramid;
+}
+
+/////////////////////////////////////////////////
+double DARTSurfaceParams::Slip1() const
+{
+  return this->dataPtr->slip1;
+}
+
+/////////////////////////////////////////////////
+double DARTSurfaceParams::Slip2() const
+{
+  return this->dataPtr->slip2;
 }

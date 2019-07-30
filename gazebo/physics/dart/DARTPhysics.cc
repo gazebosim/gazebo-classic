@@ -15,6 +15,9 @@
  *
 */
 
+#include <dart/collision/ode/ode.hpp>
+#include <dart/collision/bullet/bullet.hpp>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -85,6 +88,9 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
   this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
+
+  this->dataPtr->dtWorld->getConstraintSolver()->setCollisionDetector(
+      dart::collision::OdeCollisionDetector::create());
 }
 
 //////////////////////////////////////////////////
