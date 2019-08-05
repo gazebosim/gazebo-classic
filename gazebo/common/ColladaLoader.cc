@@ -1948,7 +1948,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   // indices, used for identifying vertices that can be shared.
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
 
-  unsigned int *values = new unsigned int[offsetSize];
+  std::vector<unsigned int> values(offsetSize);
   std::vector<std::string> strs;
 
   boost::split(strs, pStr, boost::is_any_of(" \t"));
@@ -1956,7 +1956,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
     for (unsigned int i = 0; i < offsetSize; ++i)
-      values[i] = ignition::math::parseInt(strs[j+i]);
+      values.at(i) = ignition::math::parseInt(strs[j+i]);
 
     unsigned int daeVertIndex = 0;
     bool addIndex = !hasVertices;
@@ -1967,7 +1967,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     {
       // Get the vertex position index value. If the position is a duplicate
       // then reset the index to the first instance of the duplicated position
-      daeVertIndex = values[*inputs[VERTEX].begin()];
+      daeVertIndex = values.at(*inputs[VERTEX].begin());
       if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
         daeVertIndex = positionDupMap[daeVertIndex];
 
@@ -1994,7 +1994,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
             // Get the vertex normal index value. If the normal is a duplicate
             // then reset the index to the first instance of the duplicated
             // position
-            unsigned int remappedNormalIndex = values[*inputs[NORMAL].begin()];
+            unsigned int remappedNormalIndex = values.at(*inputs[NORMAL].begin());
             if (normalDupMap.find(remappedNormalIndex) != normalDupMap.end())
               remappedNormalIndex = normalDupMap[remappedNormalIndex];
 
@@ -2007,7 +2007,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
             // duplicate then reset the index to the first instance of the
             // duplicated texcoord
             unsigned int remappedTexcoordIndex =
-                values[*inputs[TEXCOORD].begin()];
+                values.at(*inputs[TEXCOORD].begin());
             if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
               remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
 
@@ -2046,10 +2046,10 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
         {
           Skeleton *skel = _mesh->GetSkeleton();
           for (unsigned int i = 0;
-              i < skel->GetNumVertNodeWeights(values[daeVertIndex]); ++i)
+              i < skel->GetNumVertNodeWeights(daeVertIndex); ++i)
           {
             std::pair<std::string, double> node_weight =
-              skel->GetVertNodeWeight(values[daeVertIndex], i);
+              skel->GetVertNodeWeight(daeVertIndex, i);
             SkeletonNode *node =
                 _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
             subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
@@ -2061,7 +2061,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       }
       if (hasNormals)
       {
-        unsigned int inputRemappedNormalIndex = values[*inputs[NORMAL].begin()];
+        unsigned int inputRemappedNormalIndex = values.at(*inputs[NORMAL].begin());
         if (normalDupMap.find(inputRemappedNormalIndex) != normalDupMap.end())
           inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
         subMesh->AddNormal(norms[inputRemappedNormalIndex]);
@@ -2070,7 +2070,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       if (hasTexcoords)
       {
         unsigned int inputRemappedTexcoordIndex =
-            values[*inputs[TEXCOORD].begin()];
+            values.at(*inputs[TEXCOORD].begin());
         if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
           inputRemappedTexcoordIndex = texDupMap[inputRemappedTexcoordIndex];
         subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].X(),
@@ -2088,7 +2088,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     }
   }
 
-  delete [] values;
   _mesh->AddSubMesh(subMesh.release());
 }
 
