@@ -32,6 +32,19 @@
           <wheel_normal_force>32</wheel_normal_force>
         </wheel>
       </plugin>
+      <plugin name="init_joint_control" filename="libJointControlPlugin.so">
+        <controller type="position">
+          <joint>wheel_front_steer</joint>
+          <target>0.0</target>
+          <pid_gains>9 0 1.0</pid_gains>
+        </controller>
+        <controller type="velocity">
+          <joint>wheel_rear_left_spin</joint>
+          <joint>wheel_rear_right_spin</joint>
+          <target>6.0</target>
+          <pid_gains>9 0 0</pid_gains>
+        </controller>
+      </plugin>
     </include>
 
     <include>
@@ -54,6 +67,19 @@
           <slip_compliance_longitudinal>1</slip_compliance_longitudinal>
           <wheel_normal_force>32</wheel_normal_force>
         </wheel>
+      </plugin>
+      <plugin name="init_joint_control" filename="libJointControlPlugin.so">
+        <controller type="position">
+          <joint>wheel_front_steer</joint>
+          <target>0.0</target>
+          <pid_gains>9 0 1.0</pid_gains>
+        </controller>
+        <controller type="velocity">
+          <joint>wheel_rear_left_spin</joint>
+          <joint>wheel_rear_right_spin</joint>
+          <target>6.0</target>
+          <pid_gains>9 0 0</pid_gains>
+        </controller>
       </plugin>
     </include>
 
