@@ -32,6 +32,8 @@
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/ode/ODESurfaceParams.hh>
 #include <gazebo/physics/ode/ODETypes.hh>
+#include <gazebo/physics/dart/DARTCollision.hh>
+#include <gazebo/physics/dart/DARTSurfaceParams.hh>
 
 #include <gazebo/transport/Node.hh>
 #include <gazebo/transport/Publisher.hh>
@@ -47,6 +49,7 @@ namespace gazebo
     typedef boost::weak_ptr<physics::Link> LinkWeakPtr;
     typedef boost::weak_ptr<physics::Model> ModelWeakPtr;
     typedef boost::weak_ptr<physics::ODESurfaceParams> ODESurfaceParamsWeakPtr;
+    typedef boost::weak_ptr<physics::DARTCollision> DARTCollisionWeakPtr;
   }
 
   class WheelSlipPluginPrivate
@@ -58,6 +61,7 @@ namespace gazebo
 
       /// \brief Pointer to ODESurfaceParams object.
       public: physics::ODESurfaceParamsWeakPtr surface;
+      public: physics::DARTCollisionWeakPtr dartCollision;
 
       /// \brief Unitless wheel slip compliance in lateral direction.
       /// The parameter should be non-negative,
@@ -231,9 +235,11 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     auto surface = collision->GetSurface();
     auto odeSurface =
       boost::dynamic_pointer_cast<physics::ODESurfaceParams>(surface);
-    if (odeSurface == nullptr)
+    auto dartCollision =
+      boost::dynamic_pointer_cast<physics::DARTCollision>(collision);
+    if (odeSurface == nullptr && dartCollision == nullptr)
     {
-      gzerr << "Could not find ODE Surface "
+      gzerr << "Could not find ODE Surface or DART Collsion "
             << "in collision named [" << collision->GetName()
             << "] in link named [" << linkName
             << "] in model [" << _model->GetScopedName() << "]"
@@ -241,6 +247,7 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       continue;
     }
     params.surface = odeSurface;
+    params.dartCollision = dartCollision;
 
     auto joints = link->GetParentJoints();
     if (joints.empty() || joints.size() != 1)
@@ -481,7 +488,8 @@ void WheelSlipPlugin::Update()
     double spinAngularVelocity = wheelAngularVelocity.Dot(jointAxis);
 
     auto surface = params.surface.lock();
-    if (surface)
+    auto dartCollision = params.dartCollision.lock();
+    if (surface || dartCollision)
     {
       // As discussed in WheelSlipPlugin.hh, the ODE slip1 and slip2
       // parameters have units of inverse viscous damping:
@@ -501,8 +509,16 @@ void WheelSlipPlugin::Update()
       // and when the vehicle is at rest than the braking form,
       // so it is used for both slip directions.
       double speed = params.wheelRadius * std::abs(spinAngularVelocity);
-      surface->slip1 = speed / force * params.slipComplianceLateral;
-      surface->slip2 = speed / force * params.slipComplianceLongitudinal;
+      if (surface)
+      {
+        surface->slip1 = speed / force * params.slipComplianceLateral;
+        surface->slip2 = speed / force * params.slipComplianceLongitudinal;
+      }
+      else
+      {
+        dartCollision->SetSlip1(speed / 9.810 / 17.24 * params.slipComplianceLateral);
+        dartCollision->SetSlip2(speed / 9.810 / 17.24 * params.slipComplianceLongitudinal);
+      }
     }
 
     // Try to publish slip data for this wheel

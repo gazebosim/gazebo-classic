@@ -116,3 +116,15 @@ double DARTSurfaceParams::Slip2() const
 {
   return this->dataPtr->slip2;
 }
+
+/////////////////////////////////////////////////
+void DARTSurfaceParams::SetSlip1(double _slip) const
+{
+  this->dataPtr->slip1 = _slip;
+}
+
+/////////////////////////////////////////////////
+void DARTSurfaceParams::SetSlip2(double _slip) const
+{
+  this->dataPtr->slip2 = _slip;
+}

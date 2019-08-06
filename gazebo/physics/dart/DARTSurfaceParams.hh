@@ -62,6 +62,12 @@ namespace gazebo
       /// Get slip compliance in second friction direction.
       public: double Slip2() const;
 
+      /// Set slip compliance in first friction direction.
+      public: void SetSlip1(double _slip) const;
+
+      /// Set slip compliance in second friction direction.
+      public: void SetSlip2(double _slip) const;
+
       /// \internal
       /// \brief Pointer to private data
       private: DARTSurfaceParamsPrivate *dataPtr;

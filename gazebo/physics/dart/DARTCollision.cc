@@ -270,3 +270,25 @@ DARTSurfaceParamsPtr DARTCollision::DARTSurface() const
 {
   return boost::dynamic_pointer_cast<DARTSurfaceParams>(this->surface);
 }
+
+/////////////////////////////////////////////////
+void DARTCollision::SetSlip1(double _slip)
+{
+  auto surf = this->DARTSurface();
+  GZ_ASSERT(surf, "Surface pointer is invalid");
+  auto aspect = this->dataPtr->dtCollisionShape->getDynamicsAspect();
+  GZ_ASSERT(aspect, "DynamicsAspect pointer is invalid");
+  aspect->setSlipCompliance(_slip);
+  surf->SetSlip1(_slip);
+}
+
+/////////////////////////////////////////////////
+void DARTCollision::SetSlip2(double _slip)
+{
+  auto surf = this->DARTSurface();
+  GZ_ASSERT(surf, "Surface pointer is invalid");
+  auto aspect = this->dataPtr->dtCollisionShape->getDynamicsAspect();
+  GZ_ASSERT(aspect, "DynamicsAspect pointer is invalid");
+  aspect->setSecondarySlipCompliance(_slip);
+  surf->SetSlip2(_slip);
+}
