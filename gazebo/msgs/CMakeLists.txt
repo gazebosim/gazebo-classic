@@ -115,6 +115,7 @@ set (msgs
   time.proto
   topic_info.proto
   track_visual.proto
+  twist.proto
   undo_redo.proto
   user_cmd.proto
   user_cmd_stats.proto
