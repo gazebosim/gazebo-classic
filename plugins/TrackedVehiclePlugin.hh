@@ -159,8 +159,8 @@ namespace gazebo
     ///
     /// \param[in] _linear Desired linear velocity of the vehicle.
     /// \param[in] _angular Desired angular velocity of the vehicle.
-    protected: virtual void SetBodyVelocity(
-        double _linear, double _angular);
+    protected: void SetBodyVelocity(
+        double _linear, double _angular);  // TODO peci1: make virtual
 
     /// \brief Callback for setting desired body velocity.
     ///
@@ -176,7 +176,7 @@ namespace gazebo
     /// and calls SetTrackVelocity().
     ///
     /// \param[in] _msg Twist message from external publisher
-    protected: virtual void OnVelMsg(ConstTwistPtr &_msg);
+    protected: void OnVelMsg(ConstTwistPtr &_msg);  // TODO peci1: make virtual
 
     /// \brief Mutex to protect updates
     protected: std::mutex mutex;
