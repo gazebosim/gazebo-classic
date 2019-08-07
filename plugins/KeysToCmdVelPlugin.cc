@@ -68,6 +68,10 @@ class KeysToCmdVelPluginPrivate {
   {
   }
 
+  virtual ~KeysToCmdVelPluginPrivate()
+  {
+  }
+
   /**
    * \brief Get the currently set linear speed.
    * \return The linear speed.
