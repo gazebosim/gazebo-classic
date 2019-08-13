@@ -153,6 +153,32 @@ namespace gazebo
               const double _intrinsicsS,
               const double _clipNear, const double _clipFar);
 
+      /// \brief Computes the OpenGL projection matrix by multiplying
+      ///        the OpenGL Normalized Device Coordinates matrix (NDC) with
+      ///        the OpenGL perspective matrix
+      ///        openglProjectionMatrix = ndcMatrix * perspectiveMatrix
+      /// \param[in] _imageWidth Image width (in pixels)
+      /// \param[in] _imageHeight Image height (in pixels)
+      /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
+      /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
+      /// \param[in] _intrinsicsCx X coordinate of principal point in pixels
+      /// \param[in] _intrinsicsCy Y coordinate of principal point in pixels
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between
+      ///             the x and y pixel axes
+      /// \param[in] _clipNear Distance to the nearer depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \param[in] _clipFar Distance to the farther depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \return OpenGL projection matrix
+      public: static ignition::math::Matrix4d BuildProjectionMatrix(
+              const double _imageWidth, const double _imageHeight,
+              const double _intrinsicsFx, const double _intrinsicsFy,
+              const double _intrinsicsCx, const double _intrinsicsCy,
+              const double _intrinsicsS,
+              const double _clipNear, const double _clipFar);
+
       /// \brief Computes the OpenGL projective matrix by multiplying
       ///        the OpenGL Normalized Device Coordinates matrix (NDC) with
       ///        the OpenGL perspective matrix
@@ -172,6 +198,7 @@ namespace gazebo
       ///            This value is negative if the plane is to be behind
       ///            the camera
       /// \return OpenGL projective matrix
+      /// \deprecated See BuildProjectionMatrix().
       public: static ignition::math::Matrix4d BuildProjectiveMatrix(
               const double _imageWidth, const double _imageHeight,
               const double _intrinsicsFx, const double _intrinsicsFy,
