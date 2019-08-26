@@ -262,6 +262,22 @@ TEST_F(ColladaLoader, LoadBoxNestedAnimation)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadBoxWithDefaultStride)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/box_with_default_stride.dae");
+
+  EXPECT_EQ(36u, mesh->GetIndexCount());
+  EXPECT_EQ(35u, mesh->GetVertexCount());
+  EXPECT_EQ(1u, mesh->GetSubMeshCount());
+  EXPECT_EQ(1u, mesh->GetMaterialCount());
+  EXPECT_EQ(35u, mesh->GetTexCoordCount());
+  ASSERT_EQ(1u, mesh->GetSkeleton()->GetNumAnimations());
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

@@ -107,6 +107,7 @@ set(tests
   surface_properties.cc
   swarm.cc
   touch_plugin.cc
+  tracked_vehicles.cc
   transceiver.cc
   transport.cc
   transporter.cc
@@ -162,6 +163,8 @@ endif()
 add_dependencies(${TEST_TYPE}_joint_control_plugin JointControlPlugin)
 add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 add_dependencies(${TEST_TYPE}_plugin_interface PluginInterfaceTest)
+add_dependencies(${TEST_TYPE}_tracked_vehicles SimpleTrackedVehiclePlugin)
+add_dependencies(${TEST_TYPE}_tracked_vehicles WheelTrackedVehiclePlugin)
 
 set(display_tests
 )

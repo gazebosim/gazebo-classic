@@ -286,20 +286,25 @@ std::string Publisher::GetMsgType() const
 //////////////////////////////////////////////////
 void Publisher::OnPublishComplete(uint32_t _id)
 {
+  // A null node indicates that the publisher may have been destroyed
+  // so do not do anything
+  if (!this->node)
+    return;
+
   try {
     // This is the deeply unsatisfying way of dealing with a race
     // condition where the publisher is destroyed before all
     // OnPublishComplete callbacks are fired.
     boost::mutex::scoped_lock lock(this->mutex);
+
+    std::map<uint32_t, int>::iterator iter = this->pubIds.find(_id);
+    if (iter != this->pubIds.end() && (--iter->second) <= 0)
+      this->pubIds.erase(iter);
   }
   catch(...)
   {
     return;
   }
-
-  std::map<uint32_t, int>::iterator iter = this->pubIds.find(_id);
-  if (iter != this->pubIds.end() && (--iter->second) <= 0)
-    this->pubIds.erase(iter);
 }
 
 //////////////////////////////////////////////////
