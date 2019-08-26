@@ -584,16 +584,6 @@ std::string DARTPhysics::GetSolverType() const
 //////////////////////////////////////////////////
 void DARTPhysics::SetSolverType(const std::string &_type)
 {
-  if (this->sdf->HasElement("dart"))
-  {
-    sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-    if (dartElem->HasElement("solver") &&
-        dartElem->GetElement("solver")->HasElement("solver_type"))
-    {
-      dartElem->GetElement("solver")->GetElement("solver_type")->Set(_type);
-    }
-  }
-
   if (_type == "dantzig")
   {
     // DART constraint solver refactored in 6.7, see issue 2605
@@ -635,6 +625,17 @@ void DARTPhysics::SetSolverType(const std::string &_type)
   else
   {
     gzerr << "Invalid step type[" << _type << "]\n";
+    return;
+  }
+
+  if (this->sdf->HasElement("dart"))
+  {
+    sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
+    if (dartElem->HasElement("solver") &&
+        dartElem->GetElement("solver")->HasElement("solver_type"))
+    {
+      dartElem->GetElement("solver")->GetElement("solver_type")->Set(_type);
+    }
   }
 }
 
