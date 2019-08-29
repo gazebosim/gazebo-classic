@@ -1,5 +1,10 @@
 ## Gazebo 9
 
+## Gazebo 9.XX.X (2019-XX-XX)
+
+1. Add Camera PreRender and PostRender events
+    * [Pull request 3118](https://bitbucket.org/osrf/gazebo/pull-request/3118)
+
 ## Gazebo 9.10.0 (2019-07-12)
 
 1. ColladaLoader: use default value of 1 for stride parameter when unset.
