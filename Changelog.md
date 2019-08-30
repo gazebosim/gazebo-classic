@@ -1,9 +1,13 @@
 ## Gazebo 9
 
-## Gazebo 9.XX.X (2019-XX-XX)
+## Gazebo 9.11.0 (2019-08-29)
 
 1. Add Camera PreRender and PostRender events
     * [Pull request 3118](https://bitbucket.org/osrf/gazebo/pull-request/3118)
+
+1. Fix ColladaLoader wrong node weights caused by buffer overflow bug
+    * [Pull request 3115](https://bitbucket.org/osrf/gazebo/pull-request/3115)
+
 
 ## Gazebo 9.10.0 (2019-07-12)
 
