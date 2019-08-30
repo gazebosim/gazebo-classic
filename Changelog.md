@@ -4,8 +4,8 @@
 
 +## Gazebo 7.XX.X (2019-XX-XX)
 
-1. Add Camera PreRender and PostRender events
-    * [Pull request ](https://bitbucket.org/osrf/gazebo/pull-request/)
+1. Backport Camera PreRender and PostRender events
+    * [Pull request 3119](https://bitbucket.org/osrf/gazebo/pull-request/3119)
 
 ## Gazebo 7.15.0 (2018-03-26)
 
