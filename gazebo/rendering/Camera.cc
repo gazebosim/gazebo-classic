@@ -54,6 +54,7 @@
 #include "gazebo/rendering/Distortion.hh"
 #include "gazebo/rendering/CameraPrivate.hh"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/RenderEvents.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -431,7 +432,9 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
+    Events::cameraPreRender(this->Name());
     this->renderTarget->update();
+    Events::cameraPostRender(this->Name());
   }
 }
 

@@ -2,6 +2,11 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
++## Gazebo 7.XX.X (2019-XX-XX)
+
+1. Add Camera PreRender and PostRender events
+    * [Pull request ](https://bitbucket.org/osrf/gazebo/pull-request/)
+
 ## Gazebo 7.15.0 (2018-03-26)
 
 1. Don't search for boost signals component (support boost 1.69)
