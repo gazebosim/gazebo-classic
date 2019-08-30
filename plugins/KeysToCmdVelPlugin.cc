@@ -72,38 +72,26 @@ class KeysToCmdVelPluginPrivate {
   {
   }
 
-  /**
-   * \brief Get the currently set linear speed.
-   * \return The linear speed.
-   */
-  public: virtual double GetLinear() const = 0;
+  /// \brief Get the currently set linear speed.
+  /// \return The linear speed.
+  public: virtual double Linear() const = 0;
 
-  /**
-   * \brief Get the currently set angular speed.
-   * \return The angular speed.
-   */
-  public: virtual double GetAngular() const = 0;
+  /// \brief Get the currently set angular speed.
+  /// \return The angular speed.
+  public: virtual double Angular() const = 0;
 
-  /**
-   * \brief Set desired linear speed.
-   * \param _linear The desired linear speed.
-   */
+  /// \brief Set desired linear speed.
+  /// \param _linear The desired linear speed.
   public: virtual void SetLinear(double _linear) = 0;
 
-  /**
-   * \brief Set desired angular speed.
-   * \param _angular The desired angular speed.
-   */
+  /// \brief Set desired angular speed.
+  /// \param _angular The desired angular speed.
   public: virtual void SetAngular(double _angular) = 0;
 
-  /**
-   * \brief Initialize the message publisher.
-   */
+  /// \brief Initialize the message publisher.
   public: virtual void InitPublisher() = 0;
 
-  /**
-   * \brief Publish the cmd_vel message.
-   */
+  /// \brief Publish the cmd_vel message.
   public: virtual void Publish() = 0;
 
   /// \brief Stores information about each tracked key.
@@ -150,11 +138,11 @@ class KeysToCmdVelPluginPrivatePose : public KeysToCmdVelPluginPrivate
               ignition::math::Quaterniond::Identity);
   }
 
-  double GetLinear() const override
+  double Linear() const override
   {
     return this->keyboardControlMessage->position().x();
   }
-  double GetAngular() const override
+  double Angular() const override
   {
     return msgs::ConvertIgn(
         this->keyboardControlMessage->orientation()).Euler().Z();
@@ -197,11 +185,11 @@ class KeysToCmdVelPluginPrivateTwist : public KeysToCmdVelPluginPrivate
               ignition::math::Vector3d::Zero);
   }
 
-  double GetLinear() const override
+  double Linear() const override
   {
     return this->keyboardControlMessage->linear().x();
   }
-  double GetAngular() const override
+  double Angular() const override
   {
     return this->keyboardControlMessage->angular().z();
   }
@@ -371,7 +359,7 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
 
     if (linearVelSet)
     {
-      const auto oldLinearVel = this->dataPtr->GetLinear();
+      const auto oldLinearVel = this->dataPtr->Linear();
 
       if (!ignition::math::equal(linearVel, oldLinearVel))
       {
@@ -399,7 +387,7 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
 
     if (angularVelSet)
     {
-      const auto oldAngularVel = this->dataPtr->GetAngular();
+      const auto oldAngularVel = this->dataPtr->Angular();
 
       if (!ignition::math::equal(angularVel, oldAngularVel))
       {
