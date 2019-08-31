@@ -325,7 +325,7 @@ void KeysToCmdVelPlugin::Reset()
 /////////////////////////////////////////////////
 void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
 {
-  const auto key = static_cast<const unsigned int>(_msg->int_value());
+  const auto key = static_cast<unsigned int>(_msg->int_value());
 
   double linearVel = 0., angularVel = 0.;
   bool linearVelSet = false, angularVelSet = false;
