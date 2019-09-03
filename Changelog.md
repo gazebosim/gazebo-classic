@@ -1,6 +1,6 @@
 ## Gazebo 7
 
-+## Gazebo 7.XX.X (2019-XX-XX)
+## Gazebo 7.XX.X (2019-XX-XX)
 
 1. VariableGearboxPlugin: use splines to support arbitrary smooth input-output gearbox profiles
     * [Pull request 3073](https://bitbucket.org/osrf/gazebo/pull-request/3073)
