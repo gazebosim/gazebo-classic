@@ -15,7 +15,6 @@
  *
 */
 
-#include <boost/bind.hpp>
 #include <functional>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Events.hh>
@@ -265,7 +264,7 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
   }
 
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&VariableGearboxPlugin::OnUpdate, this, _1));
+      std::bind(&VariableGearboxPlugin::OnUpdate, this, std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////
