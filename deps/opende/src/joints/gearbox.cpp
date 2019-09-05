@@ -35,6 +35,8 @@ dxJointGearbox::dxJointGearbox(dxWorld* w) :
     dxJoint(w)
 {
     ratio = 1.0;
+    refAngle1 = 0.0;
+    refAngle2 = 0.0;
     flags |= dJOINT_TWOBODIES;
     dSetZero( qrel1, 4 );
     dSetZero( qrel2, 4 );
@@ -75,7 +77,9 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     cumulative_angle2 = dShortestAngularDistanceUpdate(cumulative_angle2,ang2);
 
     double err = dShortestAngularDistance(
-      -ratio * cumulative_angle2, cumulative_angle1);
+      -ratio * (cumulative_angle2 - refAngle2), cumulative_angle1 - refAngle1);
+    // printf("  a2(%f) , %f : %f : %f , a1(%f), e(%f)\n",
+    //   cumulative_angle2, refAngle2, ratio, refAngle1, cumulative_angle1, err);
 
     // FIXME: error calculation is not amenable to reset of poses,
     // cumulative angles might snap to wrong angular value.
@@ -228,12 +232,44 @@ void dJointSetGearboxRatio( dJointID j, dReal value )
     joint->ratio = value;
 }
 
+void dJointSetGearboxReferenceAngle1( dJointID j, dReal value )
+{
+    dxJointGearbox* joint = dynamic_cast<dxJointGearbox*>(j);
+    dUASSERT( joint, "bad joint argument" );
+
+    joint->refAngle1 = value;
+}
+
+void dJointSetGearboxReferenceAngle2( dJointID j, dReal value )
+{
+    dxJointGearbox* joint = dynamic_cast<dxJointGearbox*>(j);
+    dUASSERT( joint, "bad joint argument" );
+
+    joint->refAngle2 = value;
+}
+
 dReal dJointGetGearboxRatio( dJointID j )
 {
     dxJointGearbox* joint = dynamic_cast<dxJointGearbox*>(j);
     dUASSERT( joint, "bad joint argument" );
 
     return joint->ratio;
+}
+
+dReal dJointGetGearboxReferenceAngle1( dJointID j )
+{
+    dxJointGearbox* joint = dynamic_cast<dxJointGearbox*>(j);
+    dUASSERT( joint, "bad joint argument" );
+
+    return joint->refAngle1;
+}
+
+dReal dJointGetGearboxReferenceAngle2( dJointID j )
+{
+    dxJointGearbox* joint = dynamic_cast<dxJointGearbox*>(j);
+    dUASSERT( joint, "bad joint argument" );
+
+    return joint->refAngle2;
 }
 
 void dJointSetGearboxParam( dJointID j, int parameter, dReal value )

@@ -2,7 +2,10 @@
 
 ## Gazebo 7.X.X (2019-XX-XX)
 
-## Gazebo 7.16.0 (2019-09-03)
+## Gazebo 7.16.0 (2019-09-04)
+
+1. VariableGearboxPlugin: use splines to support arbitrary smooth input-output gearbox profiles
+    * [Pull request 3073](https://bitbucket.org/osrf/gazebo/pull-request/3073)
 
 1. Backport Camera PreRender and PostRender events
     * [Pull request 3119](https://bitbucket.org/osrf/gazebo/pull-request/3119)
