@@ -102,6 +102,7 @@ set(tests
   transceiver.cc
   transport.cc
   transporter.cc
+  variable_gearbox_plugin.cc
   wheel_slip.cc
   world.cc
   world_clone.cc
@@ -148,6 +149,7 @@ if (ENABLE_TESTS_COMPILATION)
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+  add_dependencies(${TEST_TYPE}_variable_gearbox_plugin VariableGearboxPlugin)
 
   set_target_properties(${TEST_TYPE}_model_database PROPERTIES
     COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
@@ -194,6 +196,7 @@ set(qt_tests
 gz_build_qt_tests(${qt_tests})
 
 if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
+  add_dependencies(${TEST_TYPE}_heightmap HeightmapLODPlugin)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
