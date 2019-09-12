@@ -50,7 +50,7 @@ UserCmdHistory::UserCmdHistory()
   this->dataPtr->node->TryInit(common::Time::Maximum());
 
   this->dataPtr->undoRedoPub =
-      this->dataPtr->node->Advertise<msgs::UndoRedo>("~/undo_redo");
+      this->dataPtr->node->Advertise<gazebo::msgs::UndoRedo>("~/undo_redo");
   this->dataPtr->userCmdStatsSub =
       this->dataPtr->node->Subscribe("~/user_cmd_stats",
       &UserCmdHistory::OnUserCmdStatsMsg, this);
@@ -98,7 +98,7 @@ void UserCmdHistory::OnUndoCommand(QAction *_action)
   if (!this->dataPtr->active)
     return;
 
-  msgs::UndoRedo msg;
+  gazebo::msgs::UndoRedo msg;
   msg.set_undo(true);
 
   if (_action)
@@ -142,7 +142,7 @@ void UserCmdHistory::OnRedoCommand(QAction *_action)
   if (!this->dataPtr->active)
     return;
 
-  msgs::UndoRedo msg;
+  gazebo::msgs::UndoRedo msg;
   msg.set_undo(false);
 
   if (_action)

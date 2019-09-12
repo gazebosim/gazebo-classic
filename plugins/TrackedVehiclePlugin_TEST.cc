@@ -81,7 +81,7 @@ class TestTrackedVehiclePlugin : public TrackedVehiclePlugin
     return TrackedVehiclePlugin::GetTracksSeparation();
   }
 
-  public: msgs::Vector2d lastTracksVelMsg;
+  public: gazebo::msgs::Vector2d lastTracksVelMsg;
   public: void OnTracksVelReceived(ConstVector2dPtr &_msg)
   {
     this->lastTracksVelMsg = *_msg;

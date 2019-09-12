@@ -92,8 +92,8 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
 
   // Detach message harness via transport topic
   auto detachPub =
-    this->node->Advertise<msgs::GzString>("~/box/harness/detach");
-  msgs::GzString msg;
+    this->node->Advertise<gazebo::msgs::GzString>("~/box/harness/detach");
+  gazebo::msgs::GzString msg;
   msg.set_data("true");
   detachPub->Publish(msg);
 
@@ -131,17 +131,18 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   // Send a velocity command and take some more world steps
   // to confirm it doesn't crash
   auto velocityPub =
-    this->node->Advertise<msgs::GzString>("~/box/harness/velocity");
+    this->node->Advertise<gazebo::msgs::GzString>("~/box/harness/velocity");
   msg.set_data(std::to_string(0.0));
   velocityPub->Publish(msg);
   world->Step(15);
 
   // Now re-attach it at a new location
-  auto attachPub = this->node->Advertise<msgs::Pose>("~/box/harness/attach");
+  auto attachPub = this->node->Advertise<gazebo::msgs::Pose>(
+      "~/box/harness/attach");
   ignition::math::Pose3d newPose(1, 2, 3, 0.1, 0.2, 0.3);
   EXPECT_NE(newPose, model->WorldPose());
-  msgs::Pose msgPose;
-  msgs::Set(&msgPose, newPose);
+  gazebo::msgs::Pose msgPose;
+  gazebo::msgs::Set(&msgPose, newPose);
   attachPub->Publish(msgPose);
   world->Step(150);
 
@@ -209,8 +210,8 @@ void Harness::DetachNonCanonical(const std::string &_physicsEngine)
 
   // Detach message harness via transport topic
   auto detachPub =
-    this->node->Advertise<msgs::GzString>("~/box/harness/detach");
-  msgs::GzString msg;
+    this->node->Advertise<gazebo::msgs::GzString>("~/box/harness/detach");
+  gazebo::msgs::GzString msg;
   msg.set_data("true");
   detachPub->Publish(msg);
 
@@ -228,12 +229,13 @@ void Harness::DetachNonCanonical(const std::string &_physicsEngine)
   EXPECT_EQ(nullptr, model->GetJoint("joint1"));
 
   // Now re-attach it at a new location
-  auto attachPub = this->node->Advertise<msgs::Pose>("~/box/harness/attach");
+  auto attachPub = this->node->Advertise<gazebo::msgs::Pose>(
+      "~/box/harness/attach");
   ignition::math::Pose3d newPose(1, 2, 3, 0.1, 0.2, 0.3);
   auto link = model->GetLink("link2");
   EXPECT_NE(newPose, link->WorldPose());
-  msgs::Pose msgPose;
-  msgs::Set(&msgPose, newPose);
+  gazebo::msgs::Pose msgPose;
+  gazebo::msgs::Set(&msgPose, newPose);
   attachPub->Publish(msgPose);
   world->Step(150);
   EXPECT_NE(model->GetJoint("joint1"), nullptr);
@@ -299,8 +301,8 @@ void Harness::DetachUnpaused(const std::string &_physicsEngine)
 
   // Detach message harness via transport topic
   auto detachPub =
-    this->node->Advertise<msgs::GzString>("~/box/harness/detach");
-  msgs::GzString msg;
+    this->node->Advertise<gazebo::msgs::GzString>("~/box/harness/detach");
+  gazebo::msgs::GzString msg;
   msg.set_data("true");
   detachPub->Publish(msg);
 
@@ -317,11 +319,12 @@ void Harness::DetachUnpaused(const std::string &_physicsEngine)
   EXPECT_EQ(nullptr, model->GetJoint("joint1"));
 
   // Now re-attach it at a new location
-  auto attachPub = this->node->Advertise<msgs::Pose>("~/box/harness/attach");
+  auto attachPub = this->node->Advertise<gazebo::msgs::Pose>(
+      "~/box/harness/attach");
   ignition::math::Pose3d newPose(1, 2, 3, 0.1, 0.2, 0.3);
   EXPECT_NE(newPose, model->WorldPose());
-  msgs::Pose msgPose;
-  msgs::Set(&msgPose, newPose);
+  gazebo::msgs::Pose msgPose;
+  gazebo::msgs::Set(&msgPose, newPose);
   attachPub->Publish(msgPose);
   common::Time::MSleep(150);
   EXPECT_NE(model->GetJoint("joint1"), nullptr);
@@ -378,8 +381,8 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
 
   // Prepare harness publisher
   auto velocityPub =
-    this->node->Advertise<msgs::GzString>("~/box/harness/velocity");
-  msgs::GzString msg;
+    this->node->Advertise<gazebo::msgs::GzString>("~/box/harness/velocity");
+  gazebo::msgs::GzString msg;
 
   // Lower the harness
   // even with a large velocity, it will only fall via gravity

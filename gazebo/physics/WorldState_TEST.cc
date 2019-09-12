@@ -272,7 +272,7 @@ TEST_F(WorldStateTest, InsertionOfMeshModel)
   physics::WorldState worldState0(world);
 
   // Insert a model with a scaled mesh
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"

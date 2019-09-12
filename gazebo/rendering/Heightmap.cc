@@ -108,9 +108,9 @@ Heightmap::~Heightmap()
 void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 {
   this->dataPtr->terrainSize =
-      msgs::ConvertIgn(_msg->geometry().heightmap().size());
+      gazebo::msgs::ConvertIgn(_msg->geometry().heightmap().size());
   this->dataPtr->terrainOrigin =
-      msgs::ConvertIgn(_msg->geometry().heightmap().origin());
+      gazebo::msgs::ConvertIgn(_msg->geometry().heightmap().origin());
 
   for (int i = 0; i < _msg->geometry().heightmap().texture_size(); ++i)
   {
@@ -458,9 +458,9 @@ void Heightmap::Load()
           << "(is it in the GAZEBO_RESOURCE_PATH?)- requesting data from "
           << "the server" << std::endl;
 
-    msgs::Geometry geomMsg;
+    gazebo::msgs::Geometry geomMsg;
 
-    boost::shared_ptr<msgs::Response> response = transport::request(
+    boost::shared_ptr<gazebo::msgs::Response> response = transport::request(
        this->dataPtr->scene->Name(), "heightmap_data");
 
     if (response->response() != "error" &&
@@ -469,7 +469,8 @@ void Heightmap::Load()
       geomMsg.ParseFromString(response->serialized_data());
 
       // Copy the height data.
-      this->dataPtr->terrainSize = msgs::ConvertIgn(geomMsg.heightmap().size());
+      this->dataPtr->terrainSize = gazebo::msgs::ConvertIgn(
+          geomMsg.heightmap().size());
       this->dataPtr->heights.resize(geomMsg.heightmap().heights().size());
       memcpy(&this->dataPtr->heights[0], geomMsg.heightmap().heights().data(),
           sizeof(this->dataPtr->heights[0]) *

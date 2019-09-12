@@ -47,7 +47,7 @@ namespace gazebo
 
       /// \brief Load the visual using a road msg.
       /// \param[in] _msg Message containing road data.
-      public: void Load(msgs::Road _msg);
+      public: void Load(gazebo::msgs::Road _msg);
       using Visual::Load;
     };
     /// \}

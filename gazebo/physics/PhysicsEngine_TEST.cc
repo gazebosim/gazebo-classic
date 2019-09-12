@@ -27,8 +27,8 @@ class PhysicsEngineTest : public ServerFixture,
   public: void OnPhysicsMsgResponse(ConstResponsePtr &_msg);
   public: void PhysicsEngineParam(const std::string &_physicsEngine);
   public: void PhysicsEngineGetParamBool(const std::string &_physicsEngine);
-  public: static msgs::Physics physicsPubMsg;
-  public: static msgs::Physics physicsResponseMsg;
+  public: static gazebo::msgs::Physics physicsPubMsg;
+  public: static gazebo::msgs::Physics physicsResponseMsg;
 };
 
 msgs::Physics PhysicsEngineTest::physicsPubMsg;
@@ -56,23 +56,23 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   physicsNode->Init();
 
   transport::PublisherPtr physicsPub
-       = physicsNode->Advertise<msgs::Physics>("~/physics");
+       = physicsNode->Advertise<gazebo::msgs::Physics>("~/physics");
   transport::PublisherPtr requestPub
-      = physicsNode->Advertise<msgs::Request>("~/request");
+      = physicsNode->Advertise<gazebo::msgs::Request>("~/request");
   transport::SubscriberPtr responsePub = physicsNode->Subscribe("~/response",
       &PhysicsEngineTest::OnPhysicsMsgResponse, this);
 
-  msgs::Physics_Type type;
+  gazebo::msgs::Physics_Type type;
   if (_physicsEngine == "ode")
-    type = msgs::Physics::ODE;
+    type = gazebo::msgs::Physics::ODE;
   else if (_physicsEngine == "bullet")
-    type = msgs::Physics::BULLET;
+    type = gazebo::msgs::Physics::BULLET;
   else if (_physicsEngine == "dart")
-    type = msgs::Physics::DART;
+    type = gazebo::msgs::Physics::DART;
   else if (_physicsEngine == "simbody")
-    type = msgs::Physics::SIMBODY;
+    type = gazebo::msgs::Physics::SIMBODY;
   else
-    type = msgs::Physics::ODE;
+    type = gazebo::msgs::Physics::ODE;
   physicsPubMsg.set_type(type);
   physicsPubMsg.set_max_step_size(0.01);
   physicsPubMsg.set_real_time_update_rate(500);
@@ -80,7 +80,8 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
 
   physicsPub->Publish(physicsPubMsg);
 
-  msgs::Request *requestMsg = msgs::CreateRequest("physics_info", "");
+  gazebo::msgs::Request *requestMsg =
+    gazebo::msgs::CreateRequest("physics_info", "");
   requestPub->Publish(*requestMsg);
 
   int waitCount = 0, maxWaitCount = 3000;

@@ -43,7 +43,7 @@ class PhysicsTest : public ServerFixture,
   private: void ContactCallback(const ConstContactsPtr &_msg);
 
   /// \brief Message to be filled with the latest contacts message.
-  private: msgs::Contacts contactsMsg;
+  private: gazebo::msgs::Contacts contactsMsg;
 
   /// \brief Mutex to protect reads and writes to contactsMsg.
   public: mutable boost::mutex mutex;
@@ -136,7 +136,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   {
     world->Step(1);
     // Copy message to local variable
-    msgs::Contacts contacts;
+    gazebo::msgs::Contacts contacts;
     {
       boost::mutex::scoped_lock lock(this->mutex);
       contacts = this->contactsMsg;

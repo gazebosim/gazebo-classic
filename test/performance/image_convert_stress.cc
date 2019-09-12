@@ -49,11 +49,11 @@ TEST_F(ImageConvertStressTest, ManyConversions)
   for (int i = 0; i < 1000; i++)
   {
     common::Image image;
-    msgs::Image msg;
+    gazebo::msgs::Image msg;
 
     image.SetFromData(u.get(), 400, 400, common::Image::RGB_INT8);
 
-    msgs::Set(&msg, image);
+    gazebo::msgs::Set(&msg, image);
   }
 
   double memAfter = virtMemory();

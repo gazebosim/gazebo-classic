@@ -45,8 +45,8 @@ CessnaGUIPlugin::CessnaGUIPlugin()
   this->gzNode = transport::NodePtr(new transport::Node());
   this->gzNode->Init();
   this->controlPub =
-    this->gzNode->Advertise<msgs::Cessna>("~/cessna_c172/control");
-  this->stateSub = this->gzNode->Subscribe<msgs::Cessna>(
+    this->gzNode->Advertise<gazebo::msgs::Cessna>("~/cessna_c172/control");
+  this->stateSub = this->gzNode->Subscribe<gazebo::msgs::Cessna>(
     "~/cessna_c172/state", &CessnaGUIPlugin::OnState, this);
 
   // Connect hotkeys.
@@ -127,7 +127,7 @@ void CessnaGUIPlugin::OnIncreaseThrust()
     thrust = this->state.cmd_propeller_speed();
   }
 
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   thrust = std::min(thrust + 0.1f, 1.0f);
   msg.set_cmd_propeller_speed(thrust);
   this->controlPub->Publish(msg);
@@ -142,7 +142,7 @@ void CessnaGUIPlugin::OnDecreaseThrust()
     thrust = this->state.cmd_propeller_speed();
   }
 
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   thrust = std::max(thrust - 0.1f, 0.0f);
   msg.set_cmd_propeller_speed(thrust);
   this->controlPub->Publish(msg);
@@ -157,7 +157,7 @@ void CessnaGUIPlugin::OnIncreaseFlaps()
     flap.Radian(this->state.cmd_left_flap());
   }
 
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   if (flap.Degree() < 30)
   {
     flap += this->angleStep;
@@ -176,7 +176,7 @@ void CessnaGUIPlugin::OnDecreaseFlaps()
     flap.Radian(this->state.cmd_left_flap());
   }
 
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   if (flap.Degree() > -30)
   {
     flap -= this->angleStep;
@@ -195,7 +195,7 @@ void CessnaGUIPlugin::OnIncreaseRoll()
     aileron.Radian(this->state.cmd_left_aileron());
   }
 
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   if (aileron.Degree() < 30)
   {
     aileron += this->angleStep;
@@ -214,7 +214,7 @@ void CessnaGUIPlugin::OnDecreaseRoll()
     aileron.Radian(this->state.cmd_left_aileron());
   }
 
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   if (aileron.Degree() > -30)
   {
     aileron -= this->angleStep;
@@ -233,7 +233,7 @@ void CessnaGUIPlugin::OnIncreaseElevators()
     elevators.Radian(this->state.cmd_elevators());
   }
 
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   if (elevators.Degree() < 30)
   {
     elevators += this->angleStep;
@@ -251,7 +251,7 @@ void CessnaGUIPlugin::OnDecreaseElevators()
     elevators.Radian(this->state.cmd_elevators());
   }
 
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   if (elevators.Degree() > -30)
   {
     elevators -= this->angleStep;
@@ -269,7 +269,7 @@ void CessnaGUIPlugin::OnIncreaseRudder()
     rudder.Radian(this->state.cmd_rudder());
   }
 
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   if (rudder.Degree() < 30)
   {
     rudder += this->angleStep;
@@ -287,7 +287,7 @@ void CessnaGUIPlugin::OnDecreaseRudder()
     rudder.Radian(this->state.cmd_rudder());
   }
 
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   if (rudder.Degree() > -30)
   {
     rudder -= this->angleStep;
@@ -299,7 +299,7 @@ void CessnaGUIPlugin::OnDecreaseRudder()
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnPresetTakeOff()
 {
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   msg.set_cmd_propeller_speed(0.8);
   msg.set_cmd_left_aileron(-0.017);
   msg.set_cmd_right_aileron(0.017);
@@ -313,7 +313,7 @@ void CessnaGUIPlugin::OnPresetTakeOff()
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnPresetCruise()
 {
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   msg.set_cmd_propeller_speed(0.6);
   msg.set_cmd_left_aileron(0);
   msg.set_cmd_right_aileron(0);
@@ -327,7 +327,7 @@ void CessnaGUIPlugin::OnPresetCruise()
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnPresetLanding()
 {
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   msg.set_cmd_propeller_speed(0.3);
   msg.set_cmd_left_aileron(0);
   msg.set_cmd_right_aileron(0);

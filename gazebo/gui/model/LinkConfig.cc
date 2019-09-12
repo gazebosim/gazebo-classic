@@ -28,7 +28,7 @@ LinkConfig::LinkConfig()
   this->setObjectName("LinkConfig");
 
   // Message
-  msgs::Link linkMsg;
+  gazebo::msgs::Link linkMsg;
 
   // ConfigWidget
   this->configWidget = new ConfigWidget;
@@ -132,9 +132,9 @@ void LinkConfig::SetInertialPose(const ignition::math::Pose3d &_pose)
 }
 
 /////////////////////////////////////////////////
-msgs::Link *LinkConfig::GetData() const
+gazebo::msgs::Link *LinkConfig::GetData() const
 {
-  return dynamic_cast<msgs::Link *>(this->configWidget->Msg());
+  return dynamic_cast<gazebo::msgs::Link *>(this->configWidget->Msg());
 }
 
 /////////////////////////////////////////////////
@@ -159,8 +159,8 @@ void LinkConfig::OnDensityValueChanged(const double _value)
 /////////////////////////////////////////////////
 void LinkConfig::RestoreOriginalData()
 {
-  msgs::LinkPtr linkPtr;
-  linkPtr.reset(new msgs::Link);
+  gazebo::msgs::LinkPtr linkPtr;
+  linkPtr.reset(new gazebo::msgs::Link);
   linkPtr->CopyFrom(this->originalDataMsg);
 
   // Update default widgets

@@ -46,7 +46,7 @@ namespace gazebo
       public: mutable std::mutex mutex;
 
       /// \brief Contacts message used to output sensor data.
-      public: msgs::Contacts contactsMsg;
+      public: gazebo::msgs::Contacts contactsMsg;
 
       /// \type ContactMsgs_L
       /// List of contact messages

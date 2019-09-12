@@ -66,9 +66,9 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "heightmap_data")
   {
-    msgs::Geometry msg;
+    gazebo::msgs::Geometry msg;
 
-    msgs::Response response;
+    gazebo::msgs::Response response;
     response.set_id(_msg->id());
     response.set_request(_msg->request());
     response.set_response("success");
@@ -226,7 +226,8 @@ void HeightmapShape::Init()
 
   this->requestSub = this->node->Subscribe("~/request",
       &HeightmapShape::OnRequest, this, true);
-  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
+  this->responsePub =
+    this->node->Advertise<gazebo::msgs::Response>("~/response");
 
   ignition::math::Vector3d terrainSize = this->Size();
 
@@ -283,22 +284,22 @@ ignition::math::Vector3d HeightmapShape::Pos() const
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::FillMsg(msgs::Geometry &_msg)
+void HeightmapShape::FillMsg(gazebo::msgs::Geometry &_msg)
 {
-  _msg.set_type(msgs::Geometry::HEIGHTMAP);
+  _msg.set_type(gazebo::msgs::Geometry::HEIGHTMAP);
 
   _msg.mutable_heightmap()->set_width(this->vertSize);
   _msg.mutable_heightmap()->set_height(this->vertSize);
 
-  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->Size());
-  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->Pos());
+  gazebo::msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->Size());
+  gazebo::msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->Pos());
   _msg.mutable_heightmap()->set_filename(this->GetURI());
   _msg.mutable_heightmap()->set_sampling(
       static_cast<unsigned int>(this->subSampling));
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::FillHeights(msgs::Geometry &_msg) const
+void HeightmapShape::FillHeights(gazebo::msgs::Geometry &_msg) const
 {
   for (unsigned int y = 0; y < this->vertSize; ++y)
   {
@@ -311,7 +312,7 @@ void HeightmapShape::FillHeights(msgs::Geometry &_msg) const
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
+void HeightmapShape::ProcessMsg(const gazebo::msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
 }

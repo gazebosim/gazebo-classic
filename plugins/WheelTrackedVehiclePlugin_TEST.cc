@@ -76,17 +76,17 @@ class TestWheelTrackedVehiclePlugin : public WheelTrackedVehiclePlugin
     TrackedVehiclePlugin::SetTrackVelocity(_left, _right);
   }
 
-  public: msgs::Vector2d lastTracksVelMsg;
+  public: gazebo::msgs::Vector2d lastTracksVelMsg;
   public: void OnTracksVelReceived(ConstVector2dPtr &_msg)
   {
     this->lastTracksVelMsg = *_msg;
   }
 };
 
-void AddWheel(msgs::Model &_model, const std::string &_name,
-              const msgs::Link *_body, const double _x, const double _y)
+void AddWheel(gazebo::msgs::Model &_model, const std::string &_name,
+              const gazebo::msgs::Link *_body, const double _x, const double _y)
 {
-  msgs::AddCylinderLink(_model, 1.0, 0.5, 1.0);
+  gazebo::msgs::AddCylinderLink(_model, 1.0, 0.5, 1.0);
   auto link = _model.mutable_link(_model.link_size()-1);
   link->set_name(_name);
   link->mutable_collision(0)->set_name(_name + "_collision");
@@ -94,7 +94,7 @@ void AddWheel(msgs::Model &_model, const std::string &_name,
 
   auto joint = _model.add_joint();
   joint->set_name(_name + "_j");
-  joint->set_type(msgs::Joint_Type::Joint_Type_REVOLUTE);
+  joint->set_type(gazebo::msgs::Joint_Type::Joint_Type_REVOLUTE);
   joint->mutable_pose()->mutable_position()->set_x(_x);
   joint->mutable_pose()->mutable_position()->set_y(_y);
   joint->mutable_axis1()->mutable_xyz()->set_y(1.);
@@ -106,11 +106,11 @@ void AddWheel(msgs::Model &_model, const std::string &_name,
 TEST_F(WheelTrackedVehiclePluginTest, LoadCorrectModel)
 {
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
+  gazebo::msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
@@ -153,11 +153,11 @@ TEST_F(WheelTrackedVehiclePluginTest, LoadCorrectModel)
 TEST_F(WheelTrackedVehiclePluginTest, LoadWheelNotFound)
 {
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
+  gazebo::msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
@@ -200,11 +200,11 @@ TEST_F(WheelTrackedVehiclePluginTest, LoadWheelNotFound)
 TEST_F(WheelTrackedVehiclePluginTest, LoadRequiresRevoluteJoints)
 {
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
+  gazebo::msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
@@ -214,7 +214,7 @@ TEST_F(WheelTrackedVehiclePluginTest, LoadRequiresRevoluteJoints)
   AddWheel(modelMsg, "rr_wheel", bodyLink, 1, -1);
   // Change the joint type to e.g. prismatic, so that it's not revolute.
   modelMsg.mutable_joint(modelMsg.joint_size()-1)->set_type(
-    msgs::Joint_Type::Joint_Type_PRISMATIC);
+    gazebo::msgs::Joint_Type::Joint_Type_PRISMATIC);
 
   this->SpawnModel(modelMsg);
   this->WaitUntilEntitySpawn("model", 10, 100);
@@ -250,11 +250,11 @@ TEST_F(WheelTrackedVehiclePluginTest, LoadRequiresRevoluteJoints)
 TEST_F(WheelTrackedVehiclePluginTest, LoadAtLeastTwoWheels)
 {
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
+  gazebo::msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
@@ -319,11 +319,11 @@ TEST_P(WheelTrackedVehiclePluginTestParametrized, Init)
   }
 
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
+  gazebo::msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
@@ -420,11 +420,11 @@ TEST_P(WheelTrackedVehiclePluginTestParametrized,
   }
 
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
+  gazebo::msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 

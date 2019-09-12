@@ -213,7 +213,7 @@ bool MultiRayShape::SetRay(const unsigned int _rayIndex,
 void MultiRayShape::AddRay(const ignition::math::Vector3d &/*_start*/,
                            const ignition::math::Vector3d &/*_end*/)
 {
-  // msgs::Vector3d *pt = NULL;
+  // gazebo::msgs::Vector3d *pt = NULL;
 
   // FIXME: need to lock this when spawning models with ray.
   // This fails because RaySensor::laserShape->Update()
@@ -301,12 +301,12 @@ ignition::math::Angle MultiRayShape::VerticalMaxAngle() const
 
 
 //////////////////////////////////////////////////
-void MultiRayShape::FillMsg(msgs::Geometry &/*_msg*/)
+void MultiRayShape::FillMsg(gazebo::msgs::Geometry &/*_msg*/)
 {
 }
 
 //////////////////////////////////////////////////
-void MultiRayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
+void MultiRayShape::ProcessMsg(const gazebo::msgs::Geometry &/*_msg*/)
 {
 }
 

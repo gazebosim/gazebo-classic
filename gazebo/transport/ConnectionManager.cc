@@ -49,7 +49,8 @@ class TopicManagerConnectionTask : public tbb::task
 {
   /// \brief Constructor.
   /// \param[in] _pub Publish message
-  public: explicit TopicManagerConnectionTask(msgs::Publish _pub) : pub(_pub) {}
+  public: explicit TopicManagerConnectionTask(
+              gazebo::msgs::Publish _pub) : pub(_pub) {}
 
   /// Implements the necessary execute function
   public: tbb::task *execute()
@@ -59,7 +60,7 @@ class TopicManagerConnectionTask : public tbb::task
           }
 
   /// \brief Publish message
-  private: msgs::Publish pub;
+  private: gazebo::msgs::Publish pub;
 };
 
 //////////////////////////////////////////////////
@@ -138,12 +139,12 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     return false;
   }
 
-  msgs::Packet packet;
+  gazebo::msgs::Packet packet;
   packet.ParseFromString(initData);
 
   if (packet.type() == "version_init")
   {
-    msgs::GzString msg;
+    gazebo::msgs::GzString msg;
     msg.ParseFromString(packet.serialized_data());
     if (msg.data() == std::string("gazebo ") + GAZEBO_VERSION)
     {
@@ -163,7 +164,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   packet.ParseFromString(namespacesData);
   if (packet.type() == "topic_namepaces_init")
   {
-    msgs::GzString_V result;
+    gazebo::msgs::GzString_V result;
     result.ParseFromString(packet.serialized_data());
     boost::mutex::scoped_lock lock(this->namespaceMutex);
 
@@ -179,13 +180,13 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   packet.ParseFromString(publishersData);
   if (packet.type() == "publishers_init")
   {
-    msgs::Publishers pubs;
+    gazebo::msgs::Publishers pubs;
     pubs.ParseFromString(packet.serialized_data());
 
     boost::recursive_mutex::scoped_lock lock(this->listMutex);
     for (int i = 0; i < pubs.publisher_size(); i++)
     {
-      const msgs::Publish &p = pubs.publisher(i);
+      const gazebo::msgs::Publish &p = pubs.publisher(i);
       this->publishers.push_back(p);
     }
   }
@@ -352,21 +353,21 @@ void ConnectionManager::OnMasterRead(const std::string &_data)
 /////////////////////////////////////////////////
 void ConnectionManager::ProcessMessage(const std::string &_data)
 {
-  msgs::Packet packet;
+  gazebo::msgs::Packet packet;
   packet.ParseFromString(_data);
 
   if (packet.type() == "publisher_add")
   {
-    msgs::Publish result;
+    gazebo::msgs::Publish result;
     result.ParseFromString(packet.serialized_data());
     this->publishers.push_back(result);
   }
   else if (packet.type() == "publisher_del")
   {
-    msgs::Publish result;
+    gazebo::msgs::Publish result;
     result.ParseFromString(packet.serialized_data());
 
-    std::list<msgs::Publish>::iterator iter = this->publishers.begin();
+    std::list<gazebo::msgs::Publish>::iterator iter = this->publishers.begin();
     while (iter != this->publishers.end())
     {
       if ((*iter).topic() == result.topic() &&
@@ -379,7 +380,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   }
   else if (packet.type() == "topic_namespace_add")
   {
-    msgs::GzString result;
+    gazebo::msgs::GzString result;
     result.ParseFromString(packet.serialized_data());
 
     boost::mutex::scoped_lock lock(this->namespaceMutex);
@@ -393,7 +394,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   // for gzserver when gzclient connects, is parallelized and made non-blocking.
   else if (packet.type() == "publisher_update")
   {
-    msgs::Publish pub;
+    gazebo::msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
@@ -403,7 +404,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   }
   else if (packet.type() == "publisher_advertise")
   {
-    msgs::Publish pub;
+    gazebo::msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
@@ -418,7 +419,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   // requested topic
   else if (packet.type() == "publisher_subscribe")
   {
-    msgs::Publish pub;
+    gazebo::msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
@@ -428,7 +429,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   }
   else if (packet.type() == "unsubscribe")
   {
-    msgs::Subscribe sub;
+    gazebo::msgs::Subscribe sub;
     sub.ParseFromString(packet.serialized_data());
 
     // Disconnect a local publisher from a remote subscriber
@@ -437,7 +438,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   }
   else if (packet.type() == "unadvertise")
   {
-    msgs::Publish pub;
+    gazebo::msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
 
     // Disconnection all local subscribers from a remote publisher
@@ -475,13 +476,13 @@ void ConnectionManager::OnRead(ConnectionPtr _connection,
     return;
   }
 
-  msgs::Packet packet;
+  gazebo::msgs::Packet packet;
   packet.ParseFromString(_data);
 
   // If we have an incoming (remote) subscription
   if (packet.type() == "sub")
   {
-    msgs::Subscribe sub;
+    gazebo::msgs::Subscribe sub;
     sub.ParseFromString(packet.serialized_data());
 
     // Create a transport link for the publisher to the remote subscriber
@@ -503,13 +504,13 @@ void ConnectionManager::Advertise(const std::string &topic,
   if (!this->initialized)
     return;
 
-  msgs::Publish msg;
+  gazebo::msgs::Publish msg;
   msg.set_topic(topic);
   msg.set_msg_type(msgType);
   msg.set_host(this->serverConn->GetLocalAddress());
   msg.set_port(this->serverConn->GetLocalPort());
 
-  this->masterConn->EnqueueMsg(msgs::Package("advertise", msg));
+  this->masterConn->EnqueueMsg(gazebo::msgs::Package("advertise", msg));
 }
 
 //////////////////////////////////////////////////
@@ -518,15 +519,16 @@ void ConnectionManager::RegisterTopicNamespace(const std::string &_name)
   if (!this->initialized)
     return;
 
-  msgs::GzString msg;
+  gazebo::msgs::GzString msg;
   msg.set_data(_name);
-  this->masterConn->EnqueueMsg(msgs::Package("register_topic_namespace", msg));
+  this->masterConn->EnqueueMsg(
+      gazebo::msgs::Package("register_topic_namespace", msg));
 }
 
 //////////////////////////////////////////////////
 void ConnectionManager::Unadvertise(const std::string &_topic)
 {
-  msgs::Publish msg;
+  gazebo::msgs::Publish msg;
   msg.set_topic(_topic);
   msg.set_msg_type("");
 
@@ -538,15 +540,17 @@ void ConnectionManager::Unadvertise(const std::string &_topic)
 
   if (this->masterConn)
   {
-    this->masterConn->EnqueueMsg(msgs::Package("unadvertise", msg), true);
+    this->masterConn->EnqueueMsg(
+        gazebo::msgs::Package("unadvertise", msg), true);
   }
 }
 
 //////////////////////////////////////////////////
-void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &_publishers)
+void ConnectionManager::GetAllPublishers(
+    std::list<gazebo::msgs::Publish> &_publishers)
 {
   _publishers.clear();
-  std::list<msgs::Publish>::iterator iter;
+  std::list<gazebo::msgs::Publish>::iterator iter;
 
   boost::recursive_mutex::scoped_lock lock(this->listMutex);
   for (iter = this->publishers.begin(); iter != this->publishers.end(); ++iter)
@@ -574,10 +578,11 @@ void ConnectionManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 }
 
 //////////////////////////////////////////////////
-void ConnectionManager::Unsubscribe(const msgs::Subscribe &_sub)
+void ConnectionManager::Unsubscribe(const gazebo::msgs::Subscribe &_sub)
 {
   // Inform the master that we want to unsubscribe from a topic.
-  this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", _sub), true);
+  this->masterConn->EnqueueMsg(
+      gazebo::msgs::Package("unsubscribe", _sub), true);
 }
 
 //////////////////////////////////////////////////
@@ -586,14 +591,15 @@ void ConnectionManager::Unsubscribe(const std::string &_topic,
 {
   if (this->serverConn)
   {
-    msgs::Subscribe msg;
+    gazebo::msgs::Subscribe msg;
     msg.set_topic(_topic);
     msg.set_msg_type(_msgType);
     msg.set_host(this->serverConn->GetLocalAddress());
     msg.set_port(this->serverConn->GetLocalPort());
 
     // Inform the master that we want to unsubscribe from a topic.
-    this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", msg), true);
+    this->masterConn->EnqueueMsg(
+        gazebo::msgs::Package("unsubscribe", msg), true);
   }
 }
 
@@ -616,7 +622,7 @@ void ConnectionManager::Subscribe(const std::string &_topic,
   // to establish a connection.
   // if (!conn)
   {
-    msgs::Subscribe msg;
+    gazebo::msgs::Subscribe msg;
     msg.set_topic(_topic);
     msg.set_msg_type(_msgType);
     msg.set_host(this->serverConn->GetLocalAddress());
@@ -626,7 +632,7 @@ void ConnectionManager::Subscribe(const std::string &_topic,
     // Inform the master that we want to subscribe to a topic.
     // This will result in Connection::OnMasterRead getting called with a
     // packet type of "publisher_update"
-    this->masterConn->EnqueueMsg(msgs::Package("subscribe", msg));
+    this->masterConn->EnqueueMsg(gazebo::msgs::Package("subscribe", msg));
   }
 }
 

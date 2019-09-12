@@ -57,7 +57,7 @@ namespace gazebo
       public: physics::LinkPtr parentEntity;
 
       /// \brief Imu message
-      public: msgs::IMU imuMsg;
+      public: gazebo::msgs::IMU imuMsg;
 
       /// \brief Mutex to protect reads and writes.
       public: mutable std::mutex mutex;

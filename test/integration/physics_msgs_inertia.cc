@@ -72,7 +72,7 @@ void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
   EXPECT_EQ(Ixyxzyz, ignition::math::Vector3d::Zero);
 
   // new inertial values
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
   msg.set_name(modelName);
   msg.add_link();
   auto msgLink = msg.mutable_link(0);
@@ -87,12 +87,12 @@ void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
   msgInertial->set_iyz(0.789);
   msgInertial->set_izz(15.6);
   const ignition::math::Vector3d newCog(1.1, -2.2, 3.3);
-  msgs::Set(msgInertial->mutable_pose(), ignition::math::Pose3d(
+  gazebo::msgs::Set(msgInertial->mutable_pose(), ignition::math::Pose3d(
     newCog, ignition::math::Quaterniond()));
 
   // Set inertial properties by publishing to "~/model/modify"
   transport::PublisherPtr modelPub =
-    this->node->Advertise<msgs::Model>("~/model/modify");
+    this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
   modelPub->WaitForConnection();
   modelPub->Publish(msg, true);
 
@@ -153,7 +153,7 @@ void InertiaMsgsTest::SetCoG(const std::string &_physicsEngine)
   EXPECT_EQ(Ixyxzyz, ignition::math::Vector3d::Zero);
 
   // new center of mass
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
   msg.set_name(modelName);
   msg.add_link();
   auto msgLink = msg.mutable_link(0);
@@ -161,12 +161,12 @@ void InertiaMsgsTest::SetCoG(const std::string &_physicsEngine)
   msgLink->set_id(link->GetId());
   auto msgInertial = msgLink->mutable_inertial();
   const ignition::math::Vector3d newCoG(2.5, 0, 0);
-  msgs::Set(msgInertial->mutable_pose(), ignition::math::Pose3d(
+  gazebo::msgs::Set(msgInertial->mutable_pose(), ignition::math::Pose3d(
       newCoG, ignition::math::Quaterniond()));
 
   // Set inertial properties by publishing to "~/model/modify"
   transport::PublisherPtr modelPub =
-    this->node->Advertise<msgs::Model>("~/model/modify");
+    this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
   modelPub->WaitForConnection();
   modelPub->Publish(msg, true);
 
@@ -227,7 +227,7 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
   EXPECT_EQ(Ixyxzyz, ignition::math::Vector3d::Zero);
 
   // new inertial values
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
   msg.set_name(modelName);
   msg.add_link();
   auto msgLink = msg.mutable_link(0);
@@ -239,7 +239,7 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
 
   // Set inertial properties by publishing to "~/model/modify"
   transport::PublisherPtr modelPub =
-    this->node->Advertise<msgs::Model>("~/model/modify");
+    this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
   modelPub->WaitForConnection();
   modelPub->Publish(msg, true);
 
@@ -393,7 +393,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
     const ignition::math::Vector3d Ixyxzyz = inertial->ProductsOfInertia();
 
     // new inertial values
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
     msg.set_name(modelNames[i]);
     msg.add_link();
     auto msgLink = msg.mutable_link(0);
@@ -406,7 +406,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
 
     // Set inertial properties by publishing to "~/model/modify"
     transport::PublisherPtr modelPub =
-      this->node->Advertise<msgs::Model>("~/model/modify");
+      this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
     modelPub->WaitForConnection();
     modelPub->Publish(msg, true);
 

@@ -140,10 +140,10 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
 
   // Send reset world message
   transport::PublisherPtr worldControlPub =
-    node->Advertise<msgs::WorldControl>("~/world_control");
+    node->Advertise<gazebo::msgs::WorldControl>("~/world_control");
   {
     // Copied from MainWindow::OnResetWorld
-    msgs::WorldControl msg;
+    gazebo::msgs::WorldControl msg;
     msg.mutable_reset()->set_all(true);
     worldControlPub->Publish(msg);
   }

@@ -56,7 +56,7 @@ namespace gazebo
 
       /// \brief Load from a message.
       /// \param[in] _msg Load from a message.
-      public: void Load(const msgs::Projector &_msg);
+      public: void Load(const gazebo::msgs::Projector &_msg);
 
       /// \brief Load the projector.
       /// \param[in] _name Name of the projector.

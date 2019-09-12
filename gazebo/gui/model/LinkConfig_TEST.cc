@@ -47,7 +47,7 @@ void LinkConfig_TEST::Initialization()
 void LinkConfig_TEST::LinkMsgUpdate()
 {
   gazebo::gui::LinkConfig lc;
-  msgs::LinkPtr linkMsgPtr(new msgs::Link);
+  gazebo::msgs::LinkPtr linkMsgPtr(new gazebo::msgs::Link);
   const ConfigWidget *cw = lc.LinkConfigWidget();
 
   QVERIFY(cw != NULL);

@@ -433,13 +433,13 @@ namespace gazebo
       /// \return Pointer to the parent link.
       public: LinkPtr GetParent() const;
 
-      /// \brief Get the joint type as msgs::Joint::Type.
+      /// \brief Get the joint type as gazebo::msgs::Joint::Type.
       /// \return Joint type.
-      public: msgs::Joint::Type GetMsgType() const;
+      public: gazebo::msgs::Joint::Type GetMsgType() const;
 
       /// \brief Fill a joint message.
       /// \param[out] _msg Message to fill with this joint's properties.
-      public: virtual void FillMsg(msgs::Joint &_msg);
+      public: virtual void FillMsg(gazebo::msgs::Joint &_msg);
 
       /// \brief Computes moment of inertia (MOI) across a specified joint axis.
       /// The ratio is given in the form of MOI_child / MOI_parent.

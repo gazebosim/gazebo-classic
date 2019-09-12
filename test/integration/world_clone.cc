@@ -101,13 +101,13 @@ TEST_F(WorldClone, CloneUnknownWorld)
   node->Init();
 
   transport::PublisherPtr serverControlPub =
-    node->Advertise<msgs::ServerControl>("/gazebo/server/control");
+    node->Advertise<gazebo::msgs::ServerControl>("/gazebo/server/control");
 
   transport::SubscriberPtr worldModSub = node->Subscribe("/gazebo/world/modify",
     &OnWorldModifyNoClone);
 
   // Clone the server programmatically.
-  msgs::ServerControl msg;
+  gazebo::msgs::ServerControl msg;
   msg.set_save_world_name("UnknownWorld");
   msg.set_clone(true);
   msg.set_new_port(11346);
@@ -154,13 +154,13 @@ TEST_F(WorldClone, CloneEmptyPort)
   node->Init();
 
   transport::PublisherPtr serverControlPub =
-    node->Advertise<msgs::ServerControl>("/gazebo/server/control");
+    node->Advertise<gazebo::msgs::ServerControl>("/gazebo/server/control");
 
   transport::SubscriberPtr worldModSub = node->Subscribe("/gazebo/world/modify",
     &OnWorldModifyNoClone);
 
   // Clone the server programmatically.
-  msgs::ServerControl msg;
+  gazebo::msgs::ServerControl msg;
   msg.set_save_world_name("");
   msg.set_clone(true);
   serverControlPub->Publish(msg);
@@ -185,13 +185,13 @@ TEST_F(WorldClone, Clone)
   node->Init();
 
   transport::PublisherPtr serverControlPub =
-    node->Advertise<msgs::ServerControl>("/gazebo/server/control");
+    node->Advertise<gazebo::msgs::ServerControl>("/gazebo/server/control");
 
   transport::SubscriberPtr worldModSub = node->Subscribe("/gazebo/world/modify",
     &OnWorldModify);
 
   // Clone the server programmatically.
-  msgs::ServerControl msg;
+  gazebo::msgs::ServerControl msg;
   msg.set_save_world_name("");
   msg.set_clone(true);
   msg.set_new_port(11347);

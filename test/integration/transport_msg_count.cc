@@ -170,7 +170,8 @@ TEST_F(TransportMsgCountTest, MsgCount)
 
   // create the publisher
   transport::PublisherPtr pub =
-    node->Advertise<msgs::PosesStamped>("/gazebo/ttest/test", bufferSize);
+    node->Advertise<gazebo::msgs::PosesStamped>(
+        "/gazebo/ttest/test", bufferSize);
 
   // wait for the connection to the remote subscriber started in the
   // child process
@@ -193,8 +194,8 @@ TEST_F(TransportMsgCountTest, MsgCount)
   transport::SubscriberPtr poseSub =
     node->Subscribe("/gazebo/ttest/test", &ReceivePosesStampedMsgCounter);
 
-  msgs::PosesStamped msg;
-  msgs::Init(msg, "test");
+  gazebo::msgs::PosesStamped msg;
+  gazebo::msgs::Init(msg, "test");
 
   // The "dead-end" of message reception happens randomly due to
   // multi-threading. So send a large numer of messages to increase the
@@ -206,7 +207,7 @@ TEST_F(TransportMsgCountTest, MsgCount)
   numMsgs = std::max(numMsgs, bufferSize);
   for (int i = 0; i < numMsgs; ++i)
   {
-    msgs::Set(msg.mutable_time(), common::Time(i));
+    gazebo::msgs::Set(msg.mutable_time(), common::Time(i));
     // do a direct publishing in which the message should
     // be written out right away: set "blocking" parameter to true.
     pub->Publish(msg, true);

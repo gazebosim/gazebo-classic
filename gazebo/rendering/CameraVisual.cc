@@ -50,12 +50,13 @@ CameraVisual::~CameraVisual()
 }
 
 /////////////////////////////////////////////////
-void CameraVisual::Load(const msgs::CameraSensor &_msg)
+void CameraVisual::Load(const gazebo::msgs::CameraSensor &_msg)
 {
   CameraVisualPrivate *dPtr =
       reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
 
-  ignition::math::Vector2d imageSize = msgs::ConvertIgn(_msg.image_size());
+  ignition::math::Vector2d imageSize =
+    gazebo::msgs::ConvertIgn(_msg.image_size());
 
   double dist = 2.0;
   double width = 1.0;
@@ -63,7 +64,7 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
 
   dPtr->camera = dPtr->scene->CreateCamera(this->Name(), false);
 
-  sdf::ElementPtr cameraElem = msgs::CameraSensorToSDF(_msg);
+  sdf::ElementPtr cameraElem = gazebo::msgs::CameraSensorToSDF(_msg);
   dPtr->camera->Load(cameraElem);
   dPtr->camera->Init();
   dPtr->camera->CreateRenderTexture(this->Name() + "_RTT");

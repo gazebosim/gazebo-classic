@@ -162,10 +162,10 @@ void TopicTime::OnStats(ConstWorldStatisticsPtr &_msg)
     return;
   }
 
-  msgs::Time t = _msg->sim_time();
+  gazebo::msgs::Time t = _msg->sim_time();
 
   std::lock_guard<std::mutex> lock(this->mutex);
-  this->lastSimTime = msgs::Convert(t);
+  this->lastSimTime = gazebo::msgs::Convert(t);
 }
 
 /////////////////////////////////////////////////
@@ -298,7 +298,7 @@ void TopicCurve::OnTopicData(const std::string &_msg)
   if (this->curves.empty())
     return;
 
-  auto msg = msgs::MsgFactory::NewMsg(this->msgType);
+  auto msg = gazebo::msgs::MsgFactory::NewMsg(this->msgType);
   msg->ParseFromString(_msg);
 
   // stores a list of curve iterators and their new values
@@ -367,10 +367,10 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg,
       auto valueMsg = ref->MutableMessage(_msg, field);
       if (field->message_type()->name() == "Time")
       {
-        msgs::Time *msg = dynamic_cast<msgs::Time *>(valueMsg);
+        gazebo::msgs::Time *msg = dynamic_cast<gazebo::msgs::Time *>(valueMsg);
         if (msg)
         {
-          common::Time time = msgs::Convert(*msg);
+          common::Time time = gazebo::msgs::Convert(*msg);
           xData = time.Double();
         }
       }
@@ -443,22 +443,24 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg,
 
           if (field->message_type()->name() == "Time")
           {
-            msgs::Time *msg = dynamic_cast<msgs::Time *>(valueMsg);
+            gazebo::msgs::Time *msg =
+              dynamic_cast<gazebo::msgs::Time *>(valueMsg);
 
             if (!msg)
               continue;
 
-             common::Time time = msgs::Convert(*msg);
+             common::Time time = gazebo::msgs::Convert(*msg);
              data = time.Double();
           }
           else if (field->message_type()->name() == "Vector3d")
           {
-            msgs::Vector3d *msg = dynamic_cast<msgs::Vector3d *>(valueMsg);
+            gazebo::msgs::Vector3d *msg =
+              dynamic_cast<gazebo::msgs::Vector3d *>(valueMsg);
 
             if (!msg)
               continue;
 
-            ignition::math::Vector3d vec = msgs::ConvertIgn(*msg);
+            ignition::math::Vector3d vec = gazebo::msgs::ConvertIgn(*msg);
 
             // parse param to get x, y, or z at leaf of query
             std::string elem = query.substr(query.size()-1);
@@ -479,13 +481,13 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg,
           }
           else if (field->message_type()->name() == "Quaternion")
           {
-            msgs::Quaternion *msg =
-                dynamic_cast<msgs::Quaternion *>(valueMsg);
+            gazebo::msgs::Quaternion *msg =
+                dynamic_cast<gazebo::msgs::Quaternion *>(valueMsg);
 
             if (!msg)
               continue;
 
-            ignition::math::Quaterniond quat = msgs::ConvertIgn(*msg);
+            ignition::math::Quaterniond quat = gazebo::msgs::ConvertIgn(*msg);
 
             // parse query to get roll, pitch, or yaw at leaf of uri
             ignition::math::Vector3d rpy = quat.Euler();

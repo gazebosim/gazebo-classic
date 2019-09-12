@@ -83,7 +83,7 @@ void ContactManager::Init(WorldPtr _world)
   this->node->Init(this->world->Name());
 
   this->contactPub =
-    this->node->Advertise<msgs::Contacts>("~/physics/contacts", 50);
+    this->node->Advertise<gazebo::msgs::Contacts>("~/physics/contacts", 50);
 }
 
 /////////////////////////////////////////////////
@@ -304,17 +304,17 @@ void ContactManager::PublishContacts()
   // publish to default topic, ~/physics/contacts
   if (!transport::getMinimalComms())
   {
-    msgs::Contacts msg;
+    gazebo::msgs::Contacts msg;
     for (unsigned int i = 0; i < this->contactIndex; ++i)
     {
       if (this->contacts[i]->count == 0)
         continue;
 
-      msgs::Contact *contactMsg = msg.add_contact();
+      gazebo::msgs::Contact *contactMsg = msg.add_contact();
       this->contacts[i]->FillMsg(*contactMsg);
     }
 
-    msgs::Set(msg.mutable_time(), this->world->SimTime());
+    gazebo::msgs::Set(msg.mutable_time(), this->world->SimTime());
     this->contactPub->Publish(msg);
   }
 
@@ -325,17 +325,17 @@ void ContactManager::PublishContacts()
       iter != this->customContactPublishers.end(); ++iter)
   {
     ContactPublisher *contactPublisher = iter->second;
-    msgs::Contacts msg2;
+    gazebo::msgs::Contacts msg2;
     for (unsigned int j = 0;
         j < contactPublisher->contacts.size(); ++j)
     {
       if (contactPublisher->contacts[j]->count == 0)
         continue;
 
-      msgs::Contact *contactMsg = msg2.add_contact();
+      gazebo::msgs::Contact *contactMsg = msg2.add_contact();
       contactPublisher->contacts[j]->FillMsg(*contactMsg);
     }
-    msgs::Set(msg2.mutable_time(), this->world->SimTime());
+    gazebo::msgs::Set(msg2.mutable_time(), this->world->SimTime());
     contactPublisher->publisher->Publish(msg2);
     contactPublisher->contacts.clear();
   }
@@ -368,7 +368,8 @@ std::string ContactManager::CreateFilter(const std::string &_name,
   std::string topic = "~/" + name + "/contacts";
 
   ContactPublisher *contactPublisher = new ContactPublisher;
-  contactPublisher->publisher = this->node->Advertise<msgs::Contacts>(topic);
+  contactPublisher->publisher =
+    this->node->Advertise<gazebo::msgs::Contacts>(topic);
 
   std::map<std::string, physics::CollisionPtr>::const_iterator iter;
   for (iter = _collisions.begin(); iter != _collisions.end(); ++iter)

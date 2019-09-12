@@ -153,7 +153,7 @@ namespace gazebo
 
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.
-      public: common::SphericalCoordinatesPtr SphericalCoords() const;
+      public: gazebo::common::SphericalCoordinatesPtr SphericalCoords() const;
 
       /// \brief Return the gravity vector.
       /// \return The gravity vector.
@@ -225,15 +225,15 @@ namespace gazebo
 
       /// \brief Get the amount of time simulation has been paused.
       /// \return The pause time.
-      public: common::Time PauseTime() const;
+      public: gazebo::common::Time PauseTime() const;
 
       /// \brief Get the wall time simulation was started..
       /// \return The start time.
-      public: common::Time StartTime() const;
+      public: gazebo::common::Time StartTime() const;
 
       /// \brief Get the real time (elapsed time).
       /// \return The real time.
-      public: common::Time RealTime() const;
+      public: gazebo::common::Time RealTime() const;
 
       /// \brief Returns the state of the simulation true if paused.
       /// \return True if paused.
@@ -402,7 +402,7 @@ namespace gazebo
 
       /// \brief Get the current scene in message form.
       /// \return The scene state as a protobuf message.
-      public: msgs::Scene SceneMsg() const;
+      public: gazebo::msgs::Scene SceneMsg() const;
 
       /// \brief Run the world. This call blocks.
       /// Run the update loop.
@@ -446,7 +446,7 @@ namespace gazebo
 
       /// \brief Return the URI of the world.
       /// \return URI of this world.
-      public: common::URI URI() const;
+      public: gazebo::common::URI URI() const;
 
       /// \brief Get a model name which doesn't equal any existing
       /// model's name, by appending numbers to the given name. If _name is
@@ -535,7 +535,7 @@ namespace gazebo
       /// \param[out] _scene Scene message to build.
       /// \param[in] _entity Pointer to entity from which to build the scene
       /// message.
-      private: void BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity);
+      private: void BuildSceneMsg(gazebo::msgs::Scene &_scene, BasePtr _entity);
 
       /// \brief Logs joint information.
       /// \param[in] _msg Incoming joint message.
@@ -562,7 +562,7 @@ namespace gazebo
       /// \brief Fills a model message with data from a model
       /// \param[out] _msg Model message to fill.
       /// \param[in] _model Pointer to the model to get the data from.
-      private: void FillModelMsg(msgs::Model &_msg, ModelPtr _model);
+      private: void FillModelMsg(gazebo::msgs::Model &_msg, ModelPtr _model);
 
       /// \brief Process all received entity messages.
       /// Must only be called from the World::ProcessMessages function.

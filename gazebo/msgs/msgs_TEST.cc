@@ -26,7 +26,7 @@ using namespace gazebo;
 
 class MsgsTest : public gazebo::testing::AutoLogFixture { };
 
-void TimeTest(const common::Time &_t, const msgs::Time &_msg)
+void TimeTest(const common::Time &_t, const gazebo::msgs::Time &_msg)
 {
   EXPECT_LE(_t.sec, _msg.sec());
   if (_t.sec == _msg.sec())
@@ -37,9 +37,9 @@ TEST_F(MsgsTest, Msg)
 {
   common::Time t = common::Time::GetWallTime();
 
-  msgs::Test msg, msg2;
-  msgs::Init(msg, "_test_");
-  msgs::Init(msg2);
+  gazebo::msgs::Test msg, msg2;
+  gazebo::msgs::Init(msg, "_test_");
+  gazebo::msgs::Init(msg2);
 
   ASSERT_TRUE(msg.header().has_stamp());
   TimeTest(t, msg.header().stamp());
@@ -49,18 +49,18 @@ TEST_F(MsgsTest, Msg)
   TimeTest(t, msg2.header().stamp());
   EXPECT_FALSE(msg2.header().has_str_id());
 
-  msgs::Header *header = msgs::GetHeader(msg);
+  gazebo::msgs::Header *header = gazebo::msgs::GetHeader(msg);
   EXPECT_STREQ("_test_", header->str_id().c_str());
 
-  msgs::Header testHeader;
+  gazebo::msgs::Header testHeader;
   testHeader.set_str_id("_hello_");
-  header = msgs::GetHeader(testHeader);
+  header = gazebo::msgs::GetHeader(testHeader);
   EXPECT_STREQ("_hello_", header->str_id().c_str());
 }
 
 TEST_F(MsgsTest, Request)
 {
-  msgs::Request *request = msgs::CreateRequest("help", "me");
+  gazebo::msgs::Request *request = gazebo::msgs::CreateRequest("help", "me");
   EXPECT_STREQ("help", request->request().c_str());
   EXPECT_STREQ("me", request->data().c_str());
   EXPECT_GT(request->id(), 0);
@@ -69,8 +69,8 @@ TEST_F(MsgsTest, Request)
 TEST_F(MsgsTest, Time)
 {
   common::Time t = common::Time::GetWallTime();
-  msgs::Time msg;
-  msgs::Stamp(&msg);
+  gazebo::msgs::Time msg;
+  gazebo::msgs::Stamp(&msg);
   TimeTest(t, msg);
 }
 
@@ -78,19 +78,19 @@ TEST_F(MsgsTest, Time)
 TEST_F(MsgsTest, TimeFromHeader)
 {
   common::Time t = common::Time::GetWallTime();
-  msgs::Header msg;
-  msgs::Stamp(&msg);
+  gazebo::msgs::Header msg;
+  gazebo::msgs::Stamp(&msg);
   TimeTest(t, msg.stamp());
 }
 
 
 TEST_F(MsgsTest, Packet)
 {
-  msgs::GzString msg;
+  gazebo::msgs::GzString msg;
   msg.set_data("test_string");
-  std::string data = msgs::Package("test_type", msg);
+  std::string data = gazebo::msgs::Package("test_type", msg);
 
-  msgs::Packet packet;
+  gazebo::msgs::Packet packet;
   packet.ParseFromString(data);
   msg.ParseFromString(packet.serialized_data());
 
@@ -100,47 +100,48 @@ TEST_F(MsgsTest, Packet)
 
 TEST_F(MsgsTest, BadPackage)
 {
-  msgs::GzString msg;
-  EXPECT_THROW(msgs::Package("test_type", msg), common::Exception);
+  gazebo::msgs::GzString msg;
+  EXPECT_THROW(gazebo::msgs::Package("test_type", msg), common::Exception);
 }
 
 TEST_F(MsgsTest, ConvertDoubleToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(1.0);
-  EXPECT_EQ(msg.type(), msgs::Any::DOUBLE);
+  gazebo::msgs::Any msg = gazebo::msgs::ConvertAny(1.0);
+  EXPECT_EQ(msg.type(), gazebo::msgs::Any::DOUBLE);
   ASSERT_TRUE(msg.has_double_value());
   EXPECT_DOUBLE_EQ(1, msg.double_value());
 }
 
 TEST_F(MsgsTest, ConvertIntToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(2);
-  EXPECT_EQ(msg.type(), msgs::Any::INT32);
+  gazebo::msgs::Any msg = gazebo::msgs::ConvertAny(2);
+  EXPECT_EQ(msg.type(), gazebo::msgs::Any::INT32);
   ASSERT_TRUE(msg.has_int_value());
   EXPECT_DOUBLE_EQ(2, msg.int_value());
 }
 
 TEST_F(MsgsTest, ConvertStringToAny)
 {
-  msgs::Any msg = msgs::ConvertAny("test_string");
-  EXPECT_EQ(msg.type(), msgs::Any::STRING);
+  gazebo::msgs::Any msg = gazebo::msgs::ConvertAny("test_string");
+  EXPECT_EQ(msg.type(), gazebo::msgs::Any::STRING);
   ASSERT_TRUE(msg.has_string_value());
   EXPECT_EQ("test_string", msg.string_value());
 }
 
 TEST_F(MsgsTest, ConvertBoolToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(true);
+  gazebo::msgs::Any msg = gazebo::msgs::ConvertAny(true);
 
-  EXPECT_EQ(msg.type(), msgs::Any::BOOLEAN);
+  EXPECT_EQ(msg.type(), gazebo::msgs::Any::BOOLEAN);
   ASSERT_TRUE(msg.has_bool_value());
   EXPECT_TRUE(msg.bool_value());
 }
 
 TEST_F(MsgsTest, ConvertVector3dToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(ignition::math::Vector3d(1, 2, 3));
-  EXPECT_EQ(msg.type(), msgs::Any::VECTOR3D);
+  gazebo::msgs::Any msg = gazebo::msgs::ConvertAny(
+      ignition::math::Vector3d(1, 2, 3));
+  EXPECT_EQ(msg.type(), gazebo::msgs::Any::VECTOR3D);
   ASSERT_TRUE(msg.has_vector3d_value());
 
   EXPECT_DOUBLE_EQ(1, msg.vector3d_value().x());
@@ -150,8 +151,9 @@ TEST_F(MsgsTest, ConvertVector3dToAny)
 
 TEST_F(MsgsTest, ConvertColorToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(ignition::math::Color(.1, .2, .3, 1.0));
-  EXPECT_EQ(msg.type(), msgs::Any::COLOR);
+  gazebo::msgs::Any msg = gazebo::msgs::ConvertAny(
+      ignition::math::Color(.1, .2, .3, 1.0));
+  EXPECT_EQ(msg.type(), gazebo::msgs::Any::COLOR);
   ASSERT_TRUE(msg.has_color_value());
 
   EXPECT_DOUBLE_EQ(0.1f, msg.color_value().r());
@@ -162,11 +164,11 @@ TEST_F(MsgsTest, ConvertColorToAny)
 
 TEST_F(MsgsTest, ConvertPose3dToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(ignition::math::Pose3d(
+  gazebo::msgs::Any msg = gazebo::msgs::ConvertAny(ignition::math::Pose3d(
       ignition::math::Vector3d(1, 2, 3),
       ignition::math::Quaterniond(4, 5, 6, 7)));
 
-  EXPECT_EQ(msg.type(), msgs::Any::POSE3D);
+  EXPECT_EQ(msg.type(), gazebo::msgs::Any::POSE3D);
   ASSERT_TRUE(msg.has_pose3d_value());
 
   EXPECT_DOUBLE_EQ(1, msg.pose3d_value().position().x());
@@ -181,10 +183,10 @@ TEST_F(MsgsTest, ConvertPose3dToAny)
 
 TEST_F(MsgsTest, ConvertQuaternionToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(
+  gazebo::msgs::Any msg = gazebo::msgs::ConvertAny(
       ignition::math::Quaterniond(1, 2, 3, 4));
 
-  EXPECT_EQ(msg.type(), msgs::Any::QUATERNIOND);
+  EXPECT_EQ(msg.type(), gazebo::msgs::Any::QUATERNIOND);
   ASSERT_TRUE(msg.has_quaternion_value());
 
   EXPECT_DOUBLE_EQ(msg.quaternion_value().w(), 1.0);
@@ -195,9 +197,9 @@ TEST_F(MsgsTest, ConvertQuaternionToAny)
 
 TEST_F(MsgsTest, ConvertTimeToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(common::Time(2, 123));
+  gazebo::msgs::Any msg = gazebo::msgs::ConvertAny(common::Time(2, 123));
 
-  EXPECT_EQ(msg.type(), msgs::Any::TIME);
+  EXPECT_EQ(msg.type(), gazebo::msgs::Any::TIME);
   ASSERT_TRUE(msg.has_time_value());
 
   EXPECT_EQ(2, msg.time_value().sec());
@@ -206,7 +208,8 @@ TEST_F(MsgsTest, ConvertTimeToAny)
 
 TEST_F(MsgsTest, CovertMathVector3ToMsgs)
 {
-  msgs::Vector3d msg = msgs::Convert(ignition::math::Vector3d(1, 2, 3));
+  gazebo::msgs::Vector3d msg = gazebo::msgs::Convert(
+      ignition::math::Vector3d(1, 2, 3));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
   EXPECT_DOUBLE_EQ(3, msg.z());
@@ -214,8 +217,9 @@ TEST_F(MsgsTest, CovertMathVector3ToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsVector3dToMath)
 {
-  msgs::Vector3d msg = msgs::Convert(ignition::math::Vector3d(1, 2, 3));
-  ignition::math::Vector3d v = msgs::ConvertIgn(msg);
+  gazebo::msgs::Vector3d msg = gazebo::msgs::Convert(
+      ignition::math::Vector3d(1, 2, 3));
+  ignition::math::Vector3d v = gazebo::msgs::ConvertIgn(msg);
   EXPECT_DOUBLE_EQ(1, v.X());
   EXPECT_DOUBLE_EQ(2, v.Y());
   EXPECT_DOUBLE_EQ(3, v.Z());
@@ -223,8 +227,9 @@ TEST_F(MsgsTest, ConvertMsgsVector3dToMath)
 
 TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
 {
-  msgs::Quaternion msg =
-    msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
+  gazebo::msgs::Quaternion msg =
+    gazebo::msgs::Convert(
+        ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
 
   EXPECT_DOUBLE_EQ(msg.x(), -0.65328148243818818);
   EXPECT_DOUBLE_EQ(msg.y(), 0.27059805007309856);
@@ -234,9 +239,10 @@ TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsQuaternionToMath)
 {
-  msgs::Quaternion msg =
-    msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
-  ignition::math::Quaterniond v = msgs::ConvertIgn(msg);
+  gazebo::msgs::Quaternion msg =
+    gazebo::msgs::Convert(
+        ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
+  ignition::math::Quaterniond v = gazebo::msgs::ConvertIgn(msg);
 
   EXPECT_DOUBLE_EQ(v.X(), -0.65328148243818818);
   EXPECT_DOUBLE_EQ(v.Y(), 0.27059805007309856);
@@ -246,7 +252,7 @@ TEST_F(MsgsTest, ConvertMsgsQuaternionToMath)
 
 TEST_F(MsgsTest, ConvertPoseMathToMsgs)
 {
-  msgs::Pose msg = msgs::Convert(ignition::math::Pose3d(
+  gazebo::msgs::Pose msg = gazebo::msgs::Convert(ignition::math::Pose3d(
         ignition::math::Vector3d(1, 2, 3),
         ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
@@ -262,10 +268,10 @@ TEST_F(MsgsTest, ConvertPoseMathToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgPoseToMath)
 {
-  msgs::Pose msg = msgs::Convert(
+  gazebo::msgs::Pose msg = gazebo::msgs::Convert(
       ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
         ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI)));
-  ignition::math::Pose3d v = msgs::ConvertIgn(msg);
+  ignition::math::Pose3d v = gazebo::msgs::ConvertIgn(msg);
 
   EXPECT_DOUBLE_EQ(1, v.Pos().X());
   EXPECT_DOUBLE_EQ(2, v.Pos().Y());
@@ -278,7 +284,8 @@ TEST_F(MsgsTest, ConvertMsgPoseToMath)
 
 TEST_F(MsgsTest, ConvertCommonColorToMsgs)
 {
-  msgs::Color msg = msgs::Convert(ignition::math::Color(.1, .2, .3, 1.0));
+  gazebo::msgs::Color msg = gazebo::msgs::Convert(
+      ignition::math::Color(.1, .2, .3, 1.0));
 
   EXPECT_FLOAT_EQ(0.1f, msg.r());
   EXPECT_FLOAT_EQ(0.2f, msg.g());
@@ -288,8 +295,9 @@ TEST_F(MsgsTest, ConvertCommonColorToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsColorToCommon)
 {
-  msgs::Color msg = msgs::Convert(ignition::math::Color(.1, .2, .3, 1.0));
-  auto v = msgs::Convert(msg);
+  gazebo::msgs::Color msg = gazebo::msgs::Convert(
+      ignition::math::Color(.1, .2, .3, 1.0));
+  auto v = gazebo::msgs::Convert(msg);
 
   EXPECT_FLOAT_EQ(0.1f, v.R());
   EXPECT_FLOAT_EQ(0.2f, v.G());
@@ -299,11 +307,11 @@ TEST_F(MsgsTest, ConvertMsgsColorToCommon)
 
 TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
 {
-  msgs::Time msg = msgs::Convert(common::Time(2, 123));
+  gazebo::msgs::Time msg = gazebo::msgs::Convert(common::Time(2, 123));
   EXPECT_EQ(2, msg.sec());
   EXPECT_EQ(123, msg.nsec());
 
-  common::Time v = msgs::Convert(msg);
+  common::Time v = gazebo::msgs::Convert(msg);
   EXPECT_EQ(2, v.sec);
   EXPECT_EQ(123, v.nsec);
 }
@@ -311,7 +319,7 @@ TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
 TEST_F(MsgsTest, ConvertMathInertialToMsgs)
 {
   const auto pose = ignition::math::Pose3d(5, 6, 7, 0.4, 0.5, 0.6);
-  msgs::Inertial msg = msgs::Convert(
+  gazebo::msgs::Inertial msg = gazebo::msgs::Convert(
       ignition::math::Inertiald(
         ignition::math::MassMatrix3d(12.0,
           ignition::math::Vector3d(2, 3, 4),
@@ -325,19 +333,19 @@ TEST_F(MsgsTest, ConvertMathInertialToMsgs)
   EXPECT_DOUBLE_EQ(0.1, msg.ixy());
   EXPECT_DOUBLE_EQ(0.2, msg.ixz());
   EXPECT_DOUBLE_EQ(0.3, msg.iyz());
-  EXPECT_EQ(pose, msgs::ConvertIgn(msg.pose()));
+  EXPECT_EQ(pose, gazebo::msgs::ConvertIgn(msg.pose()));
 }
 
 TEST_F(MsgsTest, ConvertMsgsInertialToMath)
 {
   const auto pose = ignition::math::Pose3d(5, 6, 7, 0.4, 0.5, 0.6);
-  msgs::Inertial msg = msgs::Convert(
+  gazebo::msgs::Inertial msg = gazebo::msgs::Convert(
       ignition::math::Inertiald(
         ignition::math::MassMatrix3d(12.0,
           ignition::math::Vector3d(2, 3, 4),
           ignition::math::Vector3d(0.1, 0.2, 0.3)),
         pose));
-  auto inertial = msgs::Convert(msg);
+  auto inertial = gazebo::msgs::Convert(msg);
 
   EXPECT_DOUBLE_EQ(12.0, inertial.MassMatrix().Mass());
   EXPECT_DOUBLE_EQ(2.0, inertial.MassMatrix().IXX());
@@ -351,7 +359,7 @@ TEST_F(MsgsTest, ConvertMsgsInertialToMath)
 
 TEST_F(MsgsTest, ConvertMathMassMatrix3ToMsgs)
 {
-  msgs::Inertial msg = msgs::Convert(
+  gazebo::msgs::Inertial msg = gazebo::msgs::Convert(
       ignition::math::MassMatrix3d(12.0,
         ignition::math::Vector3d(2, 3, 4),
         ignition::math::Vector3d(0.1, 0.2, 0.3)));
@@ -367,7 +375,7 @@ TEST_F(MsgsTest, ConvertMathMassMatrix3ToMsgs)
 
 TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
 {
-  msgs::PlaneGeom msg = msgs::Convert(
+  gazebo::msgs::PlaneGeom msg = gazebo::msgs::Convert(
       ignition::math::Planed(ignition::math::Vector3d(0, 0, 1),
         ignition::math::Vector2d(123, 456), 1.0));
 
@@ -381,10 +389,10 @@ TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
 {
-  msgs::PlaneGeom msg = msgs::Convert(
+  gazebo::msgs::PlaneGeom msg = gazebo::msgs::Convert(
       ignition::math::Planed(ignition::math::Vector3d(0, 0, 1),
         ignition::math::Vector2d(123, 456), 1.0));
-  ignition::math::Planed v = msgs::ConvertIgn(msg);
+  ignition::math::Planed v = gazebo::msgs::ConvertIgn(msg);
 
   EXPECT_DOUBLE_EQ(0, v.Normal().X());
   EXPECT_DOUBLE_EQ(0, v.Normal().Y());
@@ -397,80 +405,102 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
 }
 
 //////////////////////////////////////////////////
-void CompareMsgsShaderTypeToString(const msgs::Material::ShaderType _type)
+void CompareMsgsShaderTypeToString(
+    const gazebo::msgs::Material::ShaderType _type)
 {
-  EXPECT_EQ(_type, msgs::ConvertShaderType(msgs::ConvertShaderType(_type)));
+  EXPECT_EQ(_type, gazebo::msgs::ConvertShaderType(
+        gazebo::msgs::ConvertShaderType(_type)));
 }
 
 //////////////////////////////////////////////////
 TEST_F(MsgsTest, ConvertMsgsShaderTypeToString)
 {
-  CompareMsgsShaderTypeToString(msgs::Material::NORMAL_MAP_OBJECT_SPACE);
-  CompareMsgsShaderTypeToString(msgs::Material::NORMAL_MAP_TANGENT_SPACE);
-  CompareMsgsShaderTypeToString(msgs::Material::PIXEL);
-  CompareMsgsShaderTypeToString(msgs::Material::VERTEX);
+  CompareMsgsShaderTypeToString(
+      gazebo::msgs::Material::NORMAL_MAP_OBJECT_SPACE);
+  CompareMsgsShaderTypeToString(
+      gazebo::msgs::Material::NORMAL_MAP_TANGENT_SPACE);
+  CompareMsgsShaderTypeToString(gazebo::msgs::Material::PIXEL);
+  CompareMsgsShaderTypeToString(gazebo::msgs::Material::VERTEX);
 }
 
 //////////////////////////////////////////////////
-void CompareMsgsJointTypeToString(const msgs::Joint::Type _type)
+void CompareMsgsJointTypeToString(const gazebo::msgs::Joint::Type _type)
 {
-  EXPECT_EQ(_type, msgs::ConvertJointType(msgs::ConvertJointType(_type)));
+  EXPECT_EQ(_type, gazebo::msgs::ConvertJointType(
+        gazebo::msgs::ConvertJointType(_type)));
 }
 
 //////////////////////////////////////////////////
 TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
 {
-  CompareMsgsJointTypeToString(msgs::Joint::REVOLUTE);
-  CompareMsgsJointTypeToString(msgs::Joint::REVOLUTE2);
-  CompareMsgsJointTypeToString(msgs::Joint::PRISMATIC);
-  CompareMsgsJointTypeToString(msgs::Joint::UNIVERSAL);
-  CompareMsgsJointTypeToString(msgs::Joint::BALL);
-  CompareMsgsJointTypeToString(msgs::Joint::SCREW);
-  CompareMsgsJointTypeToString(msgs::Joint::GEARBOX);
-  CompareMsgsJointTypeToString(msgs::Joint::FIXED);
+  CompareMsgsJointTypeToString(gazebo::msgs::Joint::REVOLUTE);
+  CompareMsgsJointTypeToString(gazebo::msgs::Joint::REVOLUTE2);
+  CompareMsgsJointTypeToString(gazebo::msgs::Joint::PRISMATIC);
+  CompareMsgsJointTypeToString(gazebo::msgs::Joint::UNIVERSAL);
+  CompareMsgsJointTypeToString(gazebo::msgs::Joint::BALL);
+  CompareMsgsJointTypeToString(gazebo::msgs::Joint::SCREW);
+  CompareMsgsJointTypeToString(gazebo::msgs::Joint::GEARBOX);
+  CompareMsgsJointTypeToString(gazebo::msgs::Joint::FIXED);
 }
 
 //////////////////////////////////////////////////
-void CompareMsgsGeometryTypeToString(const msgs::Geometry::Type _type)
+void CompareMsgsGeometryTypeToString(const gazebo::msgs::Geometry::Type _type)
 {
-  EXPECT_EQ(_type, msgs::ConvertGeometryType(msgs::ConvertGeometryType(_type)));
+  EXPECT_EQ(_type, gazebo::msgs::ConvertGeometryType(
+        gazebo::msgs::ConvertGeometryType(_type)));
 }
 
 //////////////////////////////////////////////////
 TEST_F(MsgsTest, ConvertMsgsGeometryTypeToString)
 {
-  CompareMsgsGeometryTypeToString(msgs::Geometry::BOX);
-  CompareMsgsGeometryTypeToString(msgs::Geometry::SPHERE);
-  CompareMsgsGeometryTypeToString(msgs::Geometry::CYLINDER);
-  CompareMsgsGeometryTypeToString(msgs::Geometry::PLANE);
-  CompareMsgsGeometryTypeToString(msgs::Geometry::IMAGE);
-  CompareMsgsGeometryTypeToString(msgs::Geometry::HEIGHTMAP);
-  CompareMsgsGeometryTypeToString(msgs::Geometry::MESH);
-  CompareMsgsGeometryTypeToString(msgs::Geometry::POLYLINE);
+  CompareMsgsGeometryTypeToString(gazebo::msgs::Geometry::BOX);
+  CompareMsgsGeometryTypeToString(gazebo::msgs::Geometry::SPHERE);
+  CompareMsgsGeometryTypeToString(gazebo::msgs::Geometry::CYLINDER);
+  CompareMsgsGeometryTypeToString(gazebo::msgs::Geometry::PLANE);
+  CompareMsgsGeometryTypeToString(gazebo::msgs::Geometry::IMAGE);
+  CompareMsgsGeometryTypeToString(gazebo::msgs::Geometry::HEIGHTMAP);
+  CompareMsgsGeometryTypeToString(gazebo::msgs::Geometry::MESH);
+  CompareMsgsGeometryTypeToString(gazebo::msgs::Geometry::POLYLINE);
 
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::BOX), "box");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::SPHERE), "sphere");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::CYLINDER), "cylinder");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::PLANE), "plane");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::IMAGE), "image");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::HEIGHTMAP), "heightmap");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::MESH), "mesh");
-  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::POLYLINE), "polyline");
+  EXPECT_EQ(
+      gazebo::msgs::ConvertGeometryType(gazebo::msgs::Geometry::BOX), "box");
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType(
+        gazebo::msgs::Geometry::SPHERE), "sphere");
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType(
+        gazebo::msgs::Geometry::CYLINDER), "cylinder");
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType(
+        gazebo::msgs::Geometry::PLANE), "plane");
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType(
+        gazebo::msgs::Geometry::IMAGE), "image");
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType(
+        gazebo::msgs::Geometry::HEIGHTMAP), "heightmap");
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType(
+        gazebo::msgs::Geometry::MESH), "mesh");
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType(
+        gazebo::msgs::Geometry::POLYLINE), "polyline");
 
-  EXPECT_EQ(msgs::ConvertGeometryType("box"), msgs::Geometry::BOX);
-  EXPECT_EQ(msgs::ConvertGeometryType("sphere"), msgs::Geometry::SPHERE);
-  EXPECT_EQ(msgs::ConvertGeometryType("cylinder"), msgs::Geometry::CYLINDER);
-  EXPECT_EQ(msgs::ConvertGeometryType("plane"), msgs::Geometry::PLANE);
-  EXPECT_EQ(msgs::ConvertGeometryType("image"), msgs::Geometry::IMAGE);
-  EXPECT_EQ(msgs::ConvertGeometryType("heightmap"), msgs::Geometry::HEIGHTMAP);
-  EXPECT_EQ(msgs::ConvertGeometryType("mesh"), msgs::Geometry::MESH);
-  EXPECT_EQ(msgs::ConvertGeometryType("polyline"), msgs::Geometry::POLYLINE);
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType("box"),
+      gazebo::msgs::Geometry::BOX);
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType("sphere"),
+      gazebo::msgs::Geometry::SPHERE);
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType("cylinder"),
+      gazebo::msgs::Geometry::CYLINDER);
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType("plane"),
+      gazebo::msgs::Geometry::PLANE);
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType("image"),
+      gazebo::msgs::Geometry::IMAGE);
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType("heightmap"),
+      gazebo::msgs::Geometry::HEIGHTMAP);
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType("mesh"),
+      gazebo::msgs::Geometry::MESH);
+  EXPECT_EQ(gazebo::msgs::ConvertGeometryType("polyline"),
+      gazebo::msgs::Geometry::POLYLINE);
 }
 
 TEST_F(MsgsTest, SetVector3)
 {
-  msgs::Vector3d msg;
-  msgs::Set(&msg, ignition::math::Vector3d(1, 2, 3));
+  gazebo::msgs::Vector3d msg;
+  gazebo::msgs::Set(&msg, ignition::math::Vector3d(1, 2, 3));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
   EXPECT_DOUBLE_EQ(3, msg.z());
@@ -478,16 +508,17 @@ TEST_F(MsgsTest, SetVector3)
 
 TEST_F(MsgsTest, SetVector2d)
 {
-  msgs::Vector2d msg;
-  msgs::Set(&msg, ignition::math::Vector2d(1, 2));
+  gazebo::msgs::Vector2d msg;
+  gazebo::msgs::Set(&msg, ignition::math::Vector2d(1, 2));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
 }
 
 TEST_F(MsgsTest, SetQuaternion)
 {
-  msgs::Quaternion msg;
-  msgs::Set(&msg, ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
+  gazebo::msgs::Quaternion msg;
+  gazebo::msgs::Set(&msg,
+      ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
   EXPECT_DOUBLE_EQ(msg.x(), -0.65328148243818818);
   EXPECT_DOUBLE_EQ(msg.y(), 0.27059805007309856);
   EXPECT_DOUBLE_EQ(msg.z(), 0.65328148243818829);
@@ -496,8 +527,9 @@ TEST_F(MsgsTest, SetQuaternion)
 
 TEST_F(MsgsTest, SetPose)
 {
-  msgs::Pose msg;
-  msgs::Set(&msg, ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
+  gazebo::msgs::Pose msg;
+  gazebo::msgs::Set(&msg,
+      ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
         ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
   EXPECT_DOUBLE_EQ(1, msg.position().x());
@@ -512,8 +544,8 @@ TEST_F(MsgsTest, SetPose)
 
 TEST_F(MsgsTest, SetColor)
 {
-  msgs::Color msg;
-  msgs::Set(&msg, ignition::math::Color(.1, .2, .3, 1.0));
+  gazebo::msgs::Color msg;
+  gazebo::msgs::Set(&msg, ignition::math::Color(.1, .2, .3, 1.0));
   EXPECT_FLOAT_EQ(0.1f, msg.r());
   EXPECT_FLOAT_EQ(0.2f, msg.g());
   EXPECT_FLOAT_EQ(0.3f, msg.b());
@@ -522,8 +554,8 @@ TEST_F(MsgsTest, SetColor)
 
 TEST_F(MsgsTest, SetTime)
 {
-  msgs::Time msg;
-  msgs::Set(&msg, common::Time(2, 123));
+  gazebo::msgs::Time msg;
+  gazebo::msgs::Set(&msg, common::Time(2, 123));
   EXPECT_EQ(2, msg.sec());
   EXPECT_EQ(123, msg.nsec());
 }
@@ -531,8 +563,8 @@ TEST_F(MsgsTest, SetTime)
 TEST_F(MsgsTest, SetInertial)
 {
   const auto pose = ignition::math::Pose3d(5, 6, 7, 0.4, 0.5, 0.6);
-  msgs::Inertial msg;
-  msgs::Set(&msg, ignition::math::Inertiald(
+  gazebo::msgs::Inertial msg;
+  gazebo::msgs::Set(&msg, ignition::math::Inertiald(
       ignition::math::MassMatrix3d(
         12.0,
         ignition::math::Vector3d(2, 3, 4),
@@ -546,13 +578,13 @@ TEST_F(MsgsTest, SetInertial)
   EXPECT_DOUBLE_EQ(0.1, msg.ixy());
   EXPECT_DOUBLE_EQ(0.2, msg.ixz());
   EXPECT_DOUBLE_EQ(0.3, msg.iyz());
-  EXPECT_EQ(pose, msgs::ConvertIgn(msg.pose()));
+  EXPECT_EQ(pose, gazebo::msgs::ConvertIgn(msg.pose()));
 }
 
 TEST_F(MsgsTest, SetMassMatrix3)
 {
-  msgs::Inertial msg;
-  msgs::Set(&msg, ignition::math::MassMatrix3d(
+  gazebo::msgs::Inertial msg;
+  gazebo::msgs::Set(&msg, ignition::math::MassMatrix3d(
         12.0,
         ignition::math::Vector3d(2, 3, 4),
         ignition::math::Vector3d(0.1, 0.2, 0.3)));
@@ -568,8 +600,8 @@ TEST_F(MsgsTest, SetMassMatrix3)
 
 TEST_F(MsgsTest, SetPlane)
 {
-  msgs::PlaneGeom msg;
-  msgs::Set(&msg, ignition::math::Planed(
+  gazebo::msgs::PlaneGeom msg;
+  gazebo::msgs::Set(&msg, ignition::math::Planed(
         ignition::math::Vector3d(0, 0, 1),
         ignition::math::Vector2d(123, 456), 1.0));
 
@@ -586,14 +618,14 @@ TEST_F(MsgsTest, SetPlane)
 TEST_F(MsgsTest, Initialization)
 {
   {
-    msgs::Vector3d msg;
+    gazebo::msgs::Vector3d msg;
     EXPECT_DOUBLE_EQ(0, msg.x());
     EXPECT_DOUBLE_EQ(0, msg.y());
     EXPECT_DOUBLE_EQ(0, msg.z());
   }
 
   {
-    msgs::Wrench msg;
+    gazebo::msgs::Wrench msg;
     EXPECT_DOUBLE_EQ(0, msg.force().x());
     EXPECT_DOUBLE_EQ(0, msg.force().y());
     EXPECT_DOUBLE_EQ(0, msg.force().z());
@@ -605,10 +637,10 @@ TEST_F(MsgsTest, Initialization)
 
 /////////////////////////////////////////////////
 /// Helper function for GPSSensorFromSDF
-void CheckGPSSensorMsg(const msgs::GPSSensor &_msg)
+void CheckGPSSensorMsg(const gazebo::msgs::GPSSensor &_msg)
 {
   EXPECT_EQ(_msg.position().horizontal_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
+      gazebo::msgs::SensorNoise::GAUSSIAN);
   EXPECT_NEAR(_msg.position().horizontal_noise().mean(), 0.1, 1e-4);
   EXPECT_NEAR(_msg.position().horizontal_noise().stddev(), 0.2, 1e-4);
   EXPECT_NEAR(_msg.position().horizontal_noise().bias_mean(), 0.3, 1e-4);
@@ -616,14 +648,15 @@ void CheckGPSSensorMsg(const msgs::GPSSensor &_msg)
   EXPECT_NEAR(_msg.position().horizontal_noise().precision(), 0.5, 1e-4);
 
   EXPECT_EQ(_msg.position().vertical_noise().type(),
-      msgs::SensorNoise::GAUSSIAN_QUANTIZED);
+      gazebo::msgs::SensorNoise::GAUSSIAN_QUANTIZED);
   EXPECT_NEAR(_msg.position().vertical_noise().mean(), 0.6, 1e-4);
   EXPECT_NEAR(_msg.position().vertical_noise().stddev(), 0.7, 1e-4);
   EXPECT_NEAR(_msg.position().vertical_noise().bias_mean(), 0.8, 1e-4);
   EXPECT_NEAR(_msg.position().vertical_noise().bias_stddev(), 0.9, 1e-4);
   EXPECT_NEAR(_msg.position().vertical_noise().precision(), 1.0, 1e-4);
 
-  EXPECT_EQ(_msg.velocity().horizontal_noise().type(), msgs::SensorNoise::NONE);
+  EXPECT_EQ(_msg.velocity().horizontal_noise().type(),
+      gazebo::msgs::SensorNoise::NONE);
   EXPECT_NEAR(_msg.velocity().horizontal_noise().mean(), 1.1, 1e-4);
   EXPECT_NEAR(_msg.velocity().horizontal_noise().stddev(), 1.2, 1e-4);
   EXPECT_NEAR(_msg.velocity().horizontal_noise().bias_mean(), 1.3, 1e-4);
@@ -631,7 +664,7 @@ void CheckGPSSensorMsg(const msgs::GPSSensor &_msg)
   EXPECT_NEAR(_msg.velocity().horizontal_noise().precision(), 1.5, 1e-4);
 
   EXPECT_EQ(_msg.velocity().vertical_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
+      gazebo::msgs::SensorNoise::GAUSSIAN);
   EXPECT_NEAR(_msg.velocity().vertical_noise().mean(), 1.6, 1e-4);
   EXPECT_NEAR(_msg.velocity().vertical_noise().stddev(), 1.7, 1e-4);
   EXPECT_NEAR(_msg.velocity().vertical_noise().bias_mean(), 1.8, 1e-4);
@@ -698,7 +731,7 @@ TEST_F(MsgsTest, GPSSensorFromSDF)
          </sensor>\
        </sdf>", sdf));
 
-  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+  gazebo::msgs::Sensor msg = gazebo::msgs::SensorFromSDF(sdf);
 
   EXPECT_EQ(msg.name(), "gps");
   EXPECT_EQ(msg.type(), "gps");
@@ -706,7 +739,7 @@ TEST_F(MsgsTest, GPSSensorFromSDF)
   EXPECT_TRUE(msg.always_on());
   EXPECT_TRUE(msg.visualize());
   EXPECT_NEAR(msg.update_rate(), 15.0, 1e-4);
-  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(msg.pose()),
       ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
 
   EXPECT_TRUE(msg.has_gps());
@@ -715,17 +748,17 @@ TEST_F(MsgsTest, GPSSensorFromSDF)
 
   CheckGPSSensorMsg(msg.gps());
 
-  sdf::ElementPtr elem = msgs::GPSSensorToSDF(msg.gps());
-  msgs::GPSSensor sensorMsg = msgs::GPSSensorFromSDF(elem);
+  sdf::ElementPtr elem = gazebo::msgs::GPSSensorToSDF(msg.gps());
+  gazebo::msgs::GPSSensor sensorMsg = gazebo::msgs::GPSSensorFromSDF(elem);
   CheckGPSSensorMsg(sensorMsg);
 }
 
 /////////////////////////////////////////////////
 /// Helper function for IMUSensorFromSDF
-void CheckIMUSensorMsg(const msgs::IMUSensor &_msg)
+void CheckIMUSensorMsg(const gazebo::msgs::IMUSensor &_msg)
 {
   EXPECT_EQ(_msg.angular_velocity().x_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
+      gazebo::msgs::SensorNoise::GAUSSIAN);
   EXPECT_NEAR(_msg.angular_velocity().x_noise().mean(), 0, 1e-4);
   EXPECT_NEAR(_msg.angular_velocity().x_noise().stddev(), 0.0002, 1e-4);
   EXPECT_NEAR(_msg.angular_velocity().x_noise().bias_mean(), 7.5e-6, 1e-4);
@@ -733,7 +766,7 @@ void CheckIMUSensorMsg(const msgs::IMUSensor &_msg)
   EXPECT_NEAR(_msg.angular_velocity().x_noise().precision(), 0.0, 1e-4);
 
   EXPECT_EQ(_msg.angular_velocity().y_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
+      gazebo::msgs::SensorNoise::GAUSSIAN);
   EXPECT_NEAR(_msg.angular_velocity().y_noise().mean(), 0, 1e-4);
   EXPECT_NEAR(_msg.angular_velocity().y_noise().stddev(), 0.0002, 1e-4);
   EXPECT_NEAR(_msg.angular_velocity().y_noise().bias_mean(), 7.5e-6, 1e-4);
@@ -741,7 +774,7 @@ void CheckIMUSensorMsg(const msgs::IMUSensor &_msg)
   EXPECT_NEAR(_msg.angular_velocity().y_noise().precision(), 0.0, 1e-4);
 
   EXPECT_EQ(_msg.angular_velocity().z_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
+      gazebo::msgs::SensorNoise::GAUSSIAN);
   EXPECT_NEAR(_msg.angular_velocity().z_noise().mean(), 0, 1e-4);
   EXPECT_NEAR(_msg.angular_velocity().z_noise().stddev(), 0.0002, 1e-4);
   EXPECT_NEAR(_msg.angular_velocity().z_noise().bias_mean(), 7.5e-6, 1e-4);
@@ -749,7 +782,7 @@ void CheckIMUSensorMsg(const msgs::IMUSensor &_msg)
   EXPECT_NEAR(_msg.angular_velocity().z_noise().precision(), 0.0, 1e-4);
 
   EXPECT_EQ(_msg.linear_acceleration().x_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
+      gazebo::msgs::SensorNoise::GAUSSIAN);
   EXPECT_NEAR(_msg.linear_acceleration().x_noise().mean(), 0, 1e-4);
   EXPECT_NEAR(_msg.linear_acceleration().x_noise().stddev(), 0.017, 1e-4);
   EXPECT_NEAR(_msg.linear_acceleration().x_noise().bias_mean(), 0.1, 1e-4);
@@ -757,7 +790,7 @@ void CheckIMUSensorMsg(const msgs::IMUSensor &_msg)
   EXPECT_NEAR(_msg.linear_acceleration().x_noise().precision(), 0.0, 1e-4);
 
   EXPECT_EQ(_msg.linear_acceleration().y_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
+      gazebo::msgs::SensorNoise::GAUSSIAN);
   EXPECT_NEAR(_msg.linear_acceleration().y_noise().mean(), 0, 1e-4);
   EXPECT_NEAR(_msg.linear_acceleration().y_noise().stddev(), 0.017, 1e-4);
   EXPECT_NEAR(_msg.linear_acceleration().y_noise().bias_mean(), 0.1, 1e-4);
@@ -765,7 +798,7 @@ void CheckIMUSensorMsg(const msgs::IMUSensor &_msg)
   EXPECT_NEAR(_msg.linear_acceleration().y_noise().precision(), 0.0, 1e-4);
 
   EXPECT_EQ(_msg.linear_acceleration().z_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
+      gazebo::msgs::SensorNoise::GAUSSIAN);
   EXPECT_NEAR(_msg.linear_acceleration().z_noise().mean(), 0, 1e-4);
   EXPECT_NEAR(_msg.linear_acceleration().z_noise().stddev(), 0.017, 1e-4);
   EXPECT_NEAR(_msg.linear_acceleration().z_noise().bias_mean(), 0.1, 1e-4);
@@ -844,7 +877,7 @@ TEST_F(MsgsTest, IMUSensorFromSDF)
          </sensor>\
        </sdf>", sdf));
 
-  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+  gazebo::msgs::Sensor msg = gazebo::msgs::SensorFromSDF(sdf);
 
   EXPECT_EQ(msg.name(), "imu_sensor");
   EXPECT_EQ(msg.type(), "imu");
@@ -852,7 +885,7 @@ TEST_F(MsgsTest, IMUSensorFromSDF)
   EXPECT_TRUE(msg.always_on());
   EXPECT_TRUE(msg.visualize());
   EXPECT_NEAR(msg.update_rate(), 1000.0, 1e-4);
-  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(msg.pose()),
       ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
 
   EXPECT_TRUE(msg.has_imu());
@@ -862,8 +895,8 @@ TEST_F(MsgsTest, IMUSensorFromSDF)
 
   CheckIMUSensorMsg(msg.imu());
 
-  sdf::ElementPtr elem = msgs::IMUSensorToSDF(msg.imu());
-  msgs::IMUSensor sensorMsg = msgs::IMUSensorFromSDF(elem);
+  sdf::ElementPtr elem = gazebo::msgs::IMUSensorToSDF(msg.imu());
+  gazebo::msgs::IMUSensor sensorMsg = gazebo::msgs::IMUSensorFromSDF(elem);
   CheckIMUSensorMsg(sensorMsg);
 }
 
@@ -890,7 +923,7 @@ TEST_F(MsgsTest, LogicalCameraSensorFromSDF)
          </sensor>\
        </sdf>", sdf));
 
-  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+  gazebo::msgs::Sensor msg = gazebo::msgs::SensorFromSDF(sdf);
 
   EXPECT_EQ(msg.name(), "camera");
   EXPECT_EQ(msg.type(), "logical_camera");
@@ -898,7 +931,7 @@ TEST_F(MsgsTest, LogicalCameraSensorFromSDF)
   EXPECT_TRUE(msg.always_on());
   EXPECT_TRUE(msg.visualize());
   EXPECT_NEAR(msg.update_rate(), 15.0, 1e-4);
-  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(msg.pose()),
       ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
 
   EXPECT_TRUE(msg.has_logical_camera());
@@ -911,8 +944,10 @@ TEST_F(MsgsTest, LogicalCameraSensorFromSDF)
   EXPECT_NEAR(msg.logical_camera().aspect_ratio(), 1.43, 1e-4);
   EXPECT_NEAR(msg.logical_camera().horizontal_fov(), 1.23, 1e-4);
 
-  sdf::ElementPtr elem = msgs::LogicalCameraSensorToSDF(msg.logical_camera());
-  msgs::LogicalCameraSensor sensorMsg = msgs::LogicalCameraSensorFromSDF(elem);
+  sdf::ElementPtr elem = gazebo::msgs::LogicalCameraSensorToSDF(
+      msg.logical_camera());
+  gazebo::msgs::LogicalCameraSensor sensorMsg =
+    gazebo::msgs::LogicalCameraSensorFromSDF(elem);
 
   EXPECT_NEAR(sensorMsg.near_clip(), 0.1, 1e-4);
   EXPECT_NEAR(sensorMsg.far_clip(), 100.2, 1e-4);
@@ -960,7 +995,7 @@ TEST_F(MsgsTest, CameraSensorFromSDF)
          </sensor>\
        </sdf>", sdf));
 
-  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+  gazebo::msgs::Sensor msg = gazebo::msgs::SensorFromSDF(sdf);
 
   EXPECT_EQ(msg.name(), "camera");
   EXPECT_EQ(msg.type(), "camera");
@@ -968,7 +1003,7 @@ TEST_F(MsgsTest, CameraSensorFromSDF)
   EXPECT_TRUE(msg.always_on());
   EXPECT_TRUE(msg.visualize());
   EXPECT_NEAR(msg.update_rate(), 15.0, 1e-4);
-  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(msg.pose()),
       ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
 
   EXPECT_TRUE(msg.has_camera());
@@ -1012,7 +1047,7 @@ TEST_F(MsgsTest, ContactSensorFromSDF)
          </sensor>\
        </sdf>", sdf));
 
-  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+  gazebo::msgs::Sensor msg = gazebo::msgs::SensorFromSDF(sdf);
 
   EXPECT_EQ(msg.name(), "contact");
   EXPECT_EQ(msg.type(), "contact");
@@ -1020,7 +1055,7 @@ TEST_F(MsgsTest, ContactSensorFromSDF)
   EXPECT_FALSE(msg.always_on());
   EXPECT_FALSE(msg.visualize());
   EXPECT_NEAR(msg.update_rate(), 5.0, 1e-4);
-  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(msg.pose()),
       ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
 
   EXPECT_FALSE(msg.has_camera());
@@ -1068,7 +1103,7 @@ TEST_F(MsgsTest, RaySensorFromSDF)
          </sensor>\
        </sdf>", sdf));
 
-  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+  gazebo::msgs::Sensor msg = gazebo::msgs::SensorFromSDF(sdf);
 
   EXPECT_EQ(msg.name(), "ray");
   EXPECT_EQ(msg.type(), "ray");
@@ -1076,7 +1111,7 @@ TEST_F(MsgsTest, RaySensorFromSDF)
   EXPECT_FALSE(msg.always_on());
   EXPECT_FALSE(msg.visualize());
   EXPECT_NEAR(msg.update_rate(), 5.0, 1e-4);
-  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(msg.pose()),
       ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
 
   EXPECT_FALSE(msg.has_camera());
@@ -1117,7 +1152,7 @@ TEST_F(MsgsTest, GUIFromSDF)
          </camera>\
          </gui>\
        </sdf>", sdf));
-  msgs::GUI msg = msgs::GUIFromSDF(sdf);
+  gazebo::msgs::GUI msg = gazebo::msgs::GUIFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, GUIFromSDF_EmptyTrackVisual)
@@ -1138,7 +1173,7 @@ TEST_F(MsgsTest, GUIFromSDF_EmptyTrackVisual)
          </camera>\
          </gui>\
        </sdf>", sdf));
-  msgs::GUI msg = msgs::GUIFromSDF(sdf);
+  gazebo::msgs::GUI msg = gazebo::msgs::GUIFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, GUIFromSDF_WithEmptyCamera)
@@ -1152,7 +1187,7 @@ TEST_F(MsgsTest, GUIFromSDF_WithEmptyCamera)
          </camera>\
          </gui>\
        </sdf>", sdf));
-  msgs::GUI msg = msgs::GUIFromSDF(sdf);
+  gazebo::msgs::GUI msg = gazebo::msgs::GUIFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, GUIFromSDF_WithoutCamera)
@@ -1164,7 +1199,7 @@ TEST_F(MsgsTest, GUIFromSDF_WithoutCamera)
          <gui fullscreen='true'>\
          </gui>\
        </sdf>", sdf));
-  msgs::GUI msg = msgs::GUIFromSDF(sdf);
+  gazebo::msgs::GUI msg = gazebo::msgs::GUIFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, GUIFromSDF_WithPlugin)
@@ -1178,7 +1213,7 @@ TEST_F(MsgsTest, GUIFromSDF_WithPlugin)
            </plugin>\
          </gui>\
        </sdf>", sdf));
-  msgs::GUI msg = msgs::GUIFromSDF(sdf);
+  gazebo::msgs::GUI msg = gazebo::msgs::GUIFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, PluginFromSDF)
@@ -1192,7 +1227,7 @@ TEST_F(MsgsTest, PluginFromSDF)
            <param2>true</param2>\
          </plugin>\
        </sdf>", sdf));
-  msgs::Plugin msg = msgs::PluginFromSDF(sdf);
+  gazebo::msgs::Plugin msg = gazebo::msgs::PluginFromSDF(sdf);
 
   EXPECT_TRUE(msg.has_name());
   EXPECT_EQ(msg.name(), "plugin_name");
@@ -1222,7 +1257,7 @@ TEST_F(MsgsTest, LightFromSDF_ListDirectional)
            <direction>1.0 1.0 -1.0</direction>\
          </light>\
        </sdf>", sdf));
-  msgs::Light msg = msgs::LightFromSDF(sdf);
+  gazebo::msgs::Light msg = gazebo::msgs::LightFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, LightFromSDF_LightSpot)
@@ -1249,7 +1284,7 @@ TEST_F(MsgsTest, LightFromSDF_LightSpot)
            <direction>1.0 1.0 -1.0</direction>\
          </light>\
        </sdf>", sdf));
-  msgs::Light msg = msgs::LightFromSDF(sdf);
+  gazebo::msgs::Light msg = gazebo::msgs::LightFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, LightFromSDF_LightPoint)
@@ -1270,7 +1305,7 @@ TEST_F(MsgsTest, LightFromSDF_LightPoint)
            </attenuation>\
          </light>\
        </sdf>", sdf));
-  msgs::Light msg = msgs::LightFromSDF(sdf);
+  gazebo::msgs::Light msg = gazebo::msgs::LightFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, LightFromSDF_LighBadType)
@@ -1282,7 +1317,7 @@ TEST_F(MsgsTest, LightFromSDF_LighBadType)
          <light type='_bad_' name='lamp'>\
          </light>\
        </sdf>", sdf));
-  msgs::Light msg = msgs::LightFromSDF(sdf);
+  gazebo::msgs::Light msg = gazebo::msgs::LightFromSDF(sdf);
 }
 
 // Plane visual
@@ -1300,7 +1335,7 @@ TEST_F(MsgsTest, VisualFromSDF_PlaneVisual)
            <material><script>Gazebo/Grey</script></material>\
          </visual>\
       </sdf>", sdf));
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+  gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, VisualFromSDF_BoxVisual)
@@ -1317,7 +1352,7 @@ TEST_F(MsgsTest, VisualFromSDF_BoxVisual)
            <material><script>Gazebo/Grey'</script></material>\
          </visual>\
       </sdf>", sdf));
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+  gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, VisualFromSDF_SphereVisual)
@@ -1338,7 +1373,7 @@ TEST_F(MsgsTest, VisualFromSDF_SphereVisual)
            </material>\
          </visual>\
       </sdf>", sdf));
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+  gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, VisualFromSDF_CylinderVisual)
@@ -1357,7 +1392,7 @@ TEST_F(MsgsTest, VisualFromSDF_CylinderVisual)
            </material>\
          </visual>\
       </sdf>", sdf));
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+  gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, VisualFromSDF_MeshVisual)
@@ -1376,7 +1411,7 @@ TEST_F(MsgsTest, VisualFromSDF_MeshVisual)
            </material>\
          </visual>\
       </sdf>", sdf));
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+  gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, VisualFromSDF_ImageVisual)
@@ -1407,7 +1442,7 @@ TEST_F(MsgsTest, VisualFromSDF_ImageVisual)
            </material>\
          </visual>\
       </sdf>", sdf));
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+  gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, VisualFromSDF_HeigthmapVisual)
@@ -1431,7 +1466,7 @@ TEST_F(MsgsTest, VisualFromSDF_HeigthmapVisual)
            </material>\
          </visual>\
       </sdf>", sdf));
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+  gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, VisualFromSDF_NoGeometry)
@@ -1443,7 +1478,7 @@ TEST_F(MsgsTest, VisualFromSDF_NoGeometry)
          <visual name='visual'>\
          </visual>\
       </sdf>", sdf));
-  EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
+  EXPECT_THROW(gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(sdf),
       common::Exception);
 }
 
@@ -1467,7 +1502,7 @@ TEST_F(MsgsTest, VisualFromSDF_ShaderTypeThrow)
            </material>\
          </visual>\
       </sdf>", sdf));
-  EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
+  EXPECT_THROW(gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(sdf),
       common::Exception);
 }
 
@@ -1486,7 +1521,7 @@ TEST_F(MsgsTest, VisualFromSDF_BadGeometryVisual)
            </material>\
          </visual>\
       </sdf>", sdf));
-  EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
+  EXPECT_THROW(gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(sdf),
                common::Exception);
 }
 
@@ -1519,7 +1554,7 @@ TEST_F(MsgsTest, VisualFromSDF_BadGeometryType)
   sdf::ElementPtr badElement(new sdf::Element());
   badElement->SetName("bad_type");
   sdf->GetElement("geometry")->InsertElement(badElement);
-  EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
+  EXPECT_THROW(gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(sdf),
       common::Exception);
 }
 
@@ -1543,7 +1578,8 @@ TEST_F(MsgsTest, VisualFromSDF_BadFogType)
            <grid>false</grid>\
          </scene>\
       </sdf>", sdf));
-  EXPECT_THROW(msgs::Scene msg = msgs::SceneFromSDF(sdf), common::Exception);
+  EXPECT_THROW(gazebo::msgs::Scene msg =
+      gazebo::msgs::SceneFromSDF(sdf), common::Exception);
 }
 
 TEST_F(MsgsTest, VisualSceneFromSDF_A)
@@ -1566,7 +1602,7 @@ TEST_F(MsgsTest, VisualSceneFromSDF_A)
            <grid>false</grid>\
          </scene>\
       </sdf>", sdf));
-  msgs::Scene msg = msgs::SceneFromSDF(sdf);
+  gazebo::msgs::Scene msg = gazebo::msgs::SceneFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, VisualSceneFromSDF_B)
@@ -1588,7 +1624,7 @@ TEST_F(MsgsTest, VisualSceneFromSDF_B)
            </fog>\
          </scene>\
       </sdf>", sdf));
-  msgs::Scene msg = msgs::SceneFromSDF(sdf);
+  gazebo::msgs::Scene msg = gazebo::msgs::SceneFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, VisualSceneFromSDF_C)
@@ -1611,7 +1647,7 @@ TEST_F(MsgsTest, VisualSceneFromSDF_C)
            <grid>true</grid>\
          </scene>\
       </sdf>", sdf));
-  msgs::Scene msg = msgs::SceneFromSDF(sdf);
+  gazebo::msgs::Scene msg = gazebo::msgs::SceneFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, VisualSceneFromSDF_CEmpty)
@@ -1623,7 +1659,7 @@ TEST_F(MsgsTest, VisualSceneFromSDF_CEmpty)
          <scene>\
          </scene>\
       </sdf>", sdf));
-  msgs::Scene msg = msgs::SceneFromSDF(sdf);
+  gazebo::msgs::Scene msg = gazebo::msgs::SceneFromSDF(sdf);
 }
 
 TEST_F(MsgsTest, VisualSceneFromSDF_CEmptyNoSky)
@@ -1636,7 +1672,7 @@ TEST_F(MsgsTest, VisualSceneFromSDF_CEmptyNoSky)
            <background>0 0 0 1</background>\
          </scene>\
       </sdf>", sdf));
-  msgs::Scene msg = msgs::SceneFromSDF(sdf);
+  gazebo::msgs::Scene msg = gazebo::msgs::SceneFromSDF(sdf);
 }
 
 /////////////////////////////////////////////////
@@ -1658,7 +1694,8 @@ TEST_F(MsgsTest, MeshFromSDF)
            </geometry>\
       </sdf>", sdf));
 
-  msgs::MeshGeom msg = msgs::MeshFromSDF(sdf->GetElement("mesh"));
+  gazebo::msgs::MeshGeom msg =
+    gazebo::msgs::MeshFromSDF(sdf->GetElement("mesh"));
   EXPECT_TRUE(msg.has_filename());
   EXPECT_STREQ("test/mesh.dae", msg.filename().c_str());
 
@@ -1711,13 +1748,13 @@ TEST_F(MsgsTest, CollisionFromSDF_Friction)
         </collision>\
       </sdf>", sdf));
 
-  msgs::Collision msg = msgs::CollisionFromSDF(sdf);
+  gazebo::msgs::Collision msg = gazebo::msgs::CollisionFromSDF(sdf);
 
   // Translational friction
   EXPECT_TRUE(msg.has_surface());
   EXPECT_TRUE(msg.surface().has_friction());
 
-  msgs::Friction friction = msg.surface().friction();
+  gazebo::msgs::Friction friction = msg.surface().friction();
 
   EXPECT_TRUE(friction.has_mu());
   EXPECT_DOUBLE_EQ(0.1, friction.mu());
@@ -1727,7 +1764,7 @@ TEST_F(MsgsTest, CollisionFromSDF_Friction)
 
   EXPECT_TRUE(friction.has_fdir1());
   EXPECT_EQ(ignition::math::Vector3d(0.3, 0.4, 0.5),
-      msgs::ConvertIgn(friction.fdir1()));
+      gazebo::msgs::ConvertIgn(friction.fdir1()));
 
   EXPECT_TRUE(friction.has_slip1());
   EXPECT_DOUBLE_EQ(0.6, friction.slip1());
@@ -1737,7 +1774,7 @@ TEST_F(MsgsTest, CollisionFromSDF_Friction)
 
   // Torsional friction
   EXPECT_TRUE(friction.has_torsional());
-  msgs::Friction::Torsional torsional = friction.torsional();
+  gazebo::msgs::Friction::Torsional torsional = friction.torsional();
 
   EXPECT_TRUE(torsional.has_coefficient());
   EXPECT_DOUBLE_EQ(0.8, torsional.coefficient());
@@ -1796,10 +1833,10 @@ TEST_F(MsgsTest, CollisionFromSDF_Contact)
         </collision>\
       </sdf>", sdf));
 
-  msgs::Collision msg = msgs::CollisionFromSDF(sdf);
+  gazebo::msgs::Collision msg = gazebo::msgs::CollisionFromSDF(sdf);
 
   EXPECT_TRUE(msg.has_surface());
-  msgs::Surface surface = msg.surface();
+  gazebo::msgs::Surface surface = msg.surface();
 
   EXPECT_TRUE(surface.has_restitution_coefficient());
   EXPECT_DOUBLE_EQ(0.9, surface.restitution_coefficient());
@@ -1867,7 +1904,7 @@ TEST_F(MsgsTest, SurfaceToFromSDF)
   double min_depth = 0.6;
 
   // Create message
-  msgs::Surface surfaceMsg1;
+  gazebo::msgs::Surface surfaceMsg1;
   surfaceMsg1.set_restitution_coefficient(restitution_coefficient);
   surfaceMsg1.set_bounce_threshold(threshold);
   surfaceMsg1.set_soft_cfm(soft_cfm);
@@ -1881,20 +1918,20 @@ TEST_F(MsgsTest, SurfaceToFromSDF)
       collide_without_contact_bitmask);
   surfaceMsg1.set_collide_bitmask(collide_bitmask);
 
-  msgs::Friction frictionMsg1;
+  gazebo::msgs::Friction frictionMsg1;
   frictionMsg1.set_mu(mu);
   frictionMsg1.set_mu2(mu2);
-  msgs::Set(frictionMsg1.mutable_fdir1(), fdir1);
+  gazebo::msgs::Set(frictionMsg1.mutable_fdir1(), fdir1);
   frictionMsg1.set_slip1(slip1);
   frictionMsg1.set_slip2(slip2);
 
-  msgs::Friction::Torsional torsionalMsg1;
+  gazebo::msgs::Friction::Torsional torsionalMsg1;
   torsionalMsg1.set_coefficient(mu3);
   torsionalMsg1.set_patch_radius(patch_radius);
   torsionalMsg1.set_surface_radius(surface_radius);
   torsionalMsg1.set_use_patch_radius(use_patch_radius);
 
-  msgs::Friction::Torsional::ODE torsionalOdeMsg1;
+  gazebo::msgs::Friction::Torsional::ODE torsionalOdeMsg1;
   torsionalOdeMsg1.set_slip(slip3);
 
   auto torsionalODE = torsionalMsg1.mutable_ode();
@@ -1907,10 +1944,10 @@ TEST_F(MsgsTest, SurfaceToFromSDF)
   friction->CopyFrom(frictionMsg1);
 
   // To SDF
-  sdf::ElementPtr sdf1 = msgs::SurfaceToSDF(surfaceMsg1);
+  sdf::ElementPtr sdf1 = gazebo::msgs::SurfaceToSDF(surfaceMsg1);
 
   // Back to Msg
-  msgs::Surface surfaceMsg2 = msgs::SurfaceFromSDF(sdf1);
+  gazebo::msgs::Surface surfaceMsg2 = gazebo::msgs::SurfaceFromSDF(sdf1);
   EXPECT_DOUBLE_EQ(surfaceMsg2.restitution_coefficient(),
       restitution_coefficient);
   EXPECT_DOUBLE_EQ(surfaceMsg2.bounce_threshold(), threshold);
@@ -1927,11 +1964,11 @@ TEST_F(MsgsTest, SurfaceToFromSDF)
       static_cast<unsigned int>(collide_bitmask));
 
   ASSERT_TRUE(surfaceMsg2.has_friction());
-  msgs::Friction frictionMsg2 = surfaceMsg2.friction();
+  gazebo::msgs::Friction frictionMsg2 = surfaceMsg2.friction();
 
   EXPECT_DOUBLE_EQ(frictionMsg2.mu(), mu);
   EXPECT_DOUBLE_EQ(frictionMsg2.mu2(), mu2);
-  EXPECT_EQ(msgs::ConvertIgn(frictionMsg2.fdir1()), fdir1);
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(frictionMsg2.fdir1()), fdir1);
   EXPECT_DOUBLE_EQ(frictionMsg2.slip1(), slip1);
   EXPECT_DOUBLE_EQ(frictionMsg2.slip2(), slip2);
   ASSERT_TRUE(frictionMsg2.has_torsional());
@@ -1946,7 +1983,7 @@ TEST_F(MsgsTest, SurfaceToFromSDF)
   sdf::ElementPtr sdf2;
   sdf2.reset(new sdf::Element);
   sdf::initFile("surface.sdf", sdf2);
-  msgs::SurfaceToSDF(surfaceMsg2, sdf2);
+  gazebo::msgs::SurfaceToSDF(surfaceMsg2, sdf2);
 
   ASSERT_TRUE(sdf2 != nullptr);
 
@@ -2018,10 +2055,11 @@ TEST_F(MsgsTest, AxisFromSDF)
            </axis>\
          </joint>\
       </sdf>", sdf));
-  msgs::Axis msg = msgs::AxisFromSDF(sdf->GetElement("axis"));
+  gazebo::msgs::Axis msg = gazebo::msgs::AxisFromSDF(sdf->GetElement("axis"));
 
   EXPECT_TRUE(msg.has_xyz());
-  EXPECT_EQ(msgs::ConvertIgn(msg.xyz()), ignition::math::Vector3d(0, 0, 1));
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(msg.xyz()),
+      ignition::math::Vector3d(0, 0, 1));
   EXPECT_TRUE(msg.has_limit_lower());
   EXPECT_NEAR(msg.limit_lower(), 0.01, 1e-6);
   EXPECT_TRUE(msg.has_limit_upper());
@@ -2082,14 +2120,14 @@ TEST_F(MsgsTest, JointFromSDF)
            </physics>\
          </joint>\
       </sdf>", sdf));
-  msgs::Joint msg = msgs::JointFromSDF(sdf);
+  gazebo::msgs::Joint msg = gazebo::msgs::JointFromSDF(sdf);
 
   EXPECT_TRUE(msg.has_name());
   EXPECT_EQ(msg.name(), "arm");
   EXPECT_TRUE(msg.has_type());
-  EXPECT_EQ(msgs::ConvertJointType(msg.type()), "revolute");
+  EXPECT_EQ(gazebo::msgs::ConvertJointType(msg.type()), "revolute");
   EXPECT_TRUE(msg.has_pose());
-  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(msg.pose()),
       ignition::math::Pose3d(1, 2, 3, 0, 1.57, 0));
   EXPECT_TRUE(msg.has_parent());
   EXPECT_EQ(msg.parent(), "arm_base");
@@ -2114,9 +2152,10 @@ TEST_F(MsgsTest, JointFromSDF)
 
   EXPECT_TRUE(msg.has_axis1());
   EXPECT_TRUE(!msg.has_axis2());
-  const msgs::Axis axisMsg = msg.axis1();
+  const gazebo::msgs::Axis axisMsg = msg.axis1();
   EXPECT_TRUE(axisMsg.has_xyz());
-  EXPECT_EQ(msgs::ConvertIgn(axisMsg.xyz()), ignition::math::Vector3d(1, 0, 0));
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(axisMsg.xyz()),
+      ignition::math::Vector3d(1, 0, 0));
   EXPECT_TRUE(axisMsg.has_limit_lower());
   EXPECT_NEAR(axisMsg.limit_lower(), 0.1, 1e-6);
   EXPECT_TRUE(axisMsg.has_limit_upper());
@@ -2189,14 +2228,14 @@ TEST_F(MsgsTest, JointFromSDF)
            </physics>\
          </joint>\
       </sdf>", gearboxSdf));
-  msgs::Joint gearboxMsg = msgs::JointFromSDF(gearboxSdf);
+  gazebo::msgs::Joint gearboxMsg = gazebo::msgs::JointFromSDF(gearboxSdf);
 
   EXPECT_TRUE(gearboxMsg.has_name());
   EXPECT_EQ(gearboxMsg.name(), "axle_wheel");
   EXPECT_TRUE(gearboxMsg.has_type());
-  EXPECT_EQ(msgs::ConvertJointType(gearboxMsg.type()), "gearbox");
+  EXPECT_EQ(gazebo::msgs::ConvertJointType(gearboxMsg.type()), "gearbox");
   EXPECT_TRUE(gearboxMsg.has_pose());
-  EXPECT_EQ(msgs::ConvertIgn(gearboxMsg.pose()),
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(gearboxMsg.pose()),
       ignition::math::Pose3d(5, 2, 1, 1.57, 0, 0));
   EXPECT_TRUE(gearboxMsg.has_parent());
   EXPECT_EQ(gearboxMsg.parent(), "axle");
@@ -2220,9 +2259,9 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_NEAR(gearboxMsg.suspension_erp(), 0.4, 1e-6);
 
   EXPECT_TRUE(gearboxMsg.has_axis1());
-  const msgs::Axis axisGearboxMsg = gearboxMsg.axis1();
+  const gazebo::msgs::Axis axisGearboxMsg = gearboxMsg.axis1();
   EXPECT_TRUE(axisGearboxMsg.has_xyz());
-  EXPECT_EQ(msgs::ConvertIgn(axisGearboxMsg.xyz()),
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(axisGearboxMsg.xyz()),
       ignition::math::Vector3d(0, 0, 1));
   EXPECT_TRUE(axisGearboxMsg.has_limit_lower());
   EXPECT_NEAR(axisGearboxMsg.limit_lower(), 0.01, 1e-6);
@@ -2240,9 +2279,9 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_NEAR(axisGearboxMsg.friction(), 0.1, 1e-6);
 
   EXPECT_TRUE(gearboxMsg.has_axis2());
-  const msgs::Axis axisGearboxMsg2 = gearboxMsg.axis2();
+  const gazebo::msgs::Axis axisGearboxMsg2 = gearboxMsg.axis2();
   EXPECT_TRUE(axisGearboxMsg2.has_xyz());
-  EXPECT_EQ(msgs::ConvertIgn(axisGearboxMsg2.xyz()),
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(axisGearboxMsg2.xyz()),
       ignition::math::Vector3d(0, 0, 1));
   EXPECT_TRUE(axisGearboxMsg2.has_limit_lower());
   EXPECT_NEAR(axisGearboxMsg2.limit_lower(), 0.02, 1e-6);
@@ -2305,14 +2344,14 @@ TEST_F(MsgsTest, JointFromSDF)
            </physics>\
          </joint>\
       </sdf>", screwSdf));
-  msgs::Joint screwMsg = msgs::JointFromSDF(screwSdf);
+  gazebo::msgs::Joint screwMsg = gazebo::msgs::JointFromSDF(screwSdf);
 
   EXPECT_TRUE(screwMsg.has_name());
   EXPECT_EQ(screwMsg.name(), "box_cylinder");
   EXPECT_TRUE(screwMsg.has_type());
-  EXPECT_EQ(msgs::ConvertJointType(screwMsg.type()), "screw");
+  EXPECT_EQ(gazebo::msgs::ConvertJointType(screwMsg.type()), "screw");
   EXPECT_TRUE(screwMsg.has_pose());
-  EXPECT_EQ(msgs::ConvertIgn(screwMsg.pose()),
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(screwMsg.pose()),
       ignition::math::Pose3d(1, 1, 0, 0, 0, 1.57));
   EXPECT_TRUE(screwMsg.has_parent());
   EXPECT_EQ(screwMsg.parent(), "box");
@@ -2337,9 +2376,9 @@ TEST_F(MsgsTest, JointFromSDF)
 
   EXPECT_TRUE(screwMsg.has_axis1());
   EXPECT_TRUE(!screwMsg.has_axis2());
-  const msgs::Axis axisScrewMsg = screwMsg.axis1();
+  const gazebo::msgs::Axis axisScrewMsg = screwMsg.axis1();
   EXPECT_TRUE(axisScrewMsg.has_xyz());
-  EXPECT_EQ(msgs::ConvertIgn(axisScrewMsg.xyz()),
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(axisScrewMsg.xyz()),
       ignition::math::Vector3d(0, 1, 0));
   EXPECT_TRUE(axisScrewMsg.has_limit_lower());
   EXPECT_NEAR(axisScrewMsg.limit_lower(), 0.0, 1e-6);
@@ -2368,13 +2407,13 @@ TEST_F(MsgsTest, LinkToSDF)
       ignition::math::Vector3d(3, 2, 1),
       ignition::math::Quaterniond(0.5, -0.5, -0.5, 0.5));
 
-  msgs::Link linkMsg;
+  gazebo::msgs::Link linkMsg;
   linkMsg.set_name(name);
   linkMsg.set_self_collide(false);
   linkMsg.set_gravity(true);
   linkMsg.set_kinematic(false);
   linkMsg.set_enable_wind(false);
-  msgs::Set(linkMsg.mutable_pose(), pose);
+  gazebo::msgs::Set(linkMsg.mutable_pose(), pose);
 
   const double laserRetro1 = 0.4;
   const double laserRetro2 = 0.5;
@@ -2399,7 +2438,7 @@ TEST_F(MsgsTest, LinkToSDF)
   auto inertialMsg = linkMsg.mutable_inertial();
   inertialMsg->set_mass(3.5);
 
-  sdf::ElementPtr linkSDF = msgs::LinkToSDF(linkMsg);
+  sdf::ElementPtr linkSDF = gazebo::msgs::LinkToSDF(linkMsg);
   EXPECT_EQ(linkSDF->Get<std::string>("name"), name);
   EXPECT_FALSE(linkSDF->Get<bool>("self_collide"));
   EXPECT_TRUE(linkSDF->Get<bool>("gravity"));
@@ -2430,28 +2469,28 @@ TEST_F(MsgsTest, CollisionToSDF)
 {
   const std::string name("collision");
 
-  msgs::Collision collisionMsg;
+  gazebo::msgs::Collision collisionMsg;
   collisionMsg.set_name(name);
   collisionMsg.set_laser_retro(0.2);
   collisionMsg.set_max_contacts(5);
   const ignition::math::Pose3d pose(
       ignition::math::Vector3d(1, 2, 3),
       ignition::math::Quaterniond(0, 0, 1, 0));
-  msgs::Set(collisionMsg.mutable_pose(), pose);
+  gazebo::msgs::Set(collisionMsg.mutable_pose(), pose);
 
   // geometry - see GeometryToSDF for a more detailed test
-  msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
-  geomMsg->set_type(msgs::Geometry::CYLINDER);
-  msgs::CylinderGeom *cylinderMsg = geomMsg->mutable_cylinder();
+  gazebo::msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
+  geomMsg->set_type(gazebo::msgs::Geometry::CYLINDER);
+  gazebo::msgs::CylinderGeom *cylinderMsg = geomMsg->mutable_cylinder();
   cylinderMsg->set_radius(3.3);
   cylinderMsg->set_length(1.0);
 
   // surface - see SurfaceToSDF for a more detailed test
-  msgs::Surface *surfaceMsg = collisionMsg.mutable_surface();
+  gazebo::msgs::Surface *surfaceMsg = collisionMsg.mutable_surface();
   surfaceMsg->set_restitution_coefficient(5.1);
   surfaceMsg->set_bounce_threshold(1300);
 
-  sdf::ElementPtr collisionSDF = msgs::CollisionToSDF(collisionMsg);
+  sdf::ElementPtr collisionSDF = gazebo::msgs::CollisionToSDF(collisionMsg);
 
   EXPECT_TRUE(collisionSDF->HasAttribute("name"));
   EXPECT_EQ(name, collisionSDF->Get<std::string>("name"));
@@ -2484,14 +2523,14 @@ TEST_F(MsgsTest, VisualToSDF)
   const std::string materialName("Gazebo/Grey");
   const std::string uri("pretend_this_is_a_URI");
 
-  msgs::Visual visualMsg;
+  gazebo::msgs::Visual visualMsg;
   visualMsg.set_name(name);
   visualMsg.set_laser_retro(laserRetro);
-  msgs::Set(visualMsg.mutable_pose(), pose);
+  gazebo::msgs::Set(visualMsg.mutable_pose(), pose);
 
   // geometry - see GeometryToSDF for a more detailed test
   auto geomMsg = visualMsg.mutable_geometry();
-  geomMsg->set_type(msgs::Geometry::SPHERE);
+  geomMsg->set_type(gazebo::msgs::Geometry::SPHERE);
   geomMsg->mutable_sphere()->set_radius(radius);
 
   // material - see MaterialToSDF for a more detailed test
@@ -2500,7 +2539,7 @@ TEST_F(MsgsTest, VisualToSDF)
   scriptMsg->add_uri();
   scriptMsg->set_uri(0, uri);
 
-  sdf::ElementPtr visualSDF = msgs::VisualToSDF(visualMsg);
+  sdf::ElementPtr visualSDF = gazebo::msgs::VisualToSDF(visualMsg);
 
   EXPECT_TRUE(visualSDF->HasAttribute("name"));
   EXPECT_EQ(name, visualSDF->Get<std::string>("name"));
@@ -2527,16 +2566,16 @@ TEST_F(MsgsTest, VisualToSDF)
 
   // Test the meta.layer property
   {
-    msgs::Visual msg;
+    gazebo::msgs::Visual msg;
     auto metaMsg = msg.mutable_meta();
     metaMsg->set_layer(1);
 
-    sdf::ElementPtr visSdf = msgs::VisualToSDF(msg);
+    sdf::ElementPtr visSdf = gazebo::msgs::VisualToSDF(msg);
     EXPECT_TRUE(visSdf->HasElement("meta"));
     EXPECT_TRUE(visSdf->GetElement("meta")->HasElement("layer"));
     EXPECT_EQ(visSdf->GetElement("meta")->Get<int32_t>("layer"), 1);
 
-    msgs::Visual msg2 = msgs::VisualFromSDF(visSdf);
+    gazebo::msgs::Visual msg2 = gazebo::msgs::VisualFromSDF(visSdf);
     EXPECT_TRUE(msg2.has_meta());
     EXPECT_TRUE(msg2.meta().has_layer());
     EXPECT_EQ(msg2.meta().layer(), 1);
@@ -2548,45 +2587,47 @@ TEST_F(MsgsTest, GeometryToSDF)
 {
   // box
   const ignition::math::Vector3d boxSize(0.5, 0.75, 1.0);
-  msgs::Geometry boxMsg;
-  boxMsg.set_type(msgs::Geometry::BOX);
-  msgs::BoxGeom *boxGeom = boxMsg.mutable_box();
-  msgs::Set(boxGeom->mutable_size(), boxSize);
+  gazebo::msgs::Geometry boxMsg;
+  boxMsg.set_type(gazebo::msgs::Geometry::BOX);
+  gazebo::msgs::BoxGeom *boxGeom = boxMsg.mutable_box();
+  gazebo::msgs::Set(boxGeom->mutable_size(), boxSize);
 
-  sdf::ElementPtr boxSDF = msgs::GeometryToSDF(boxMsg);
+  sdf::ElementPtr boxSDF = gazebo::msgs::GeometryToSDF(boxMsg);
   sdf::ElementPtr boxElem = boxSDF->GetElement("box");
   EXPECT_EQ(boxElem->Get<ignition::math::Vector3d>("size"), boxSize);
 
   // cylinder
-  msgs::Geometry cylinderMsg;
-  cylinderMsg.set_type(msgs::Geometry::CYLINDER);
-  msgs::CylinderGeom *cylinderGeom = cylinderMsg.mutable_cylinder();
+  gazebo::msgs::Geometry cylinderMsg;
+  cylinderMsg.set_type(gazebo::msgs::Geometry::CYLINDER);
+  gazebo::msgs::CylinderGeom *cylinderGeom = cylinderMsg.mutable_cylinder();
   cylinderGeom->set_radius(0.3);
   cylinderGeom->set_length(1.0);
 
-  sdf::ElementPtr cylinderSDF = msgs::GeometryToSDF(cylinderMsg);
+  sdf::ElementPtr cylinderSDF = gazebo::msgs::GeometryToSDF(cylinderMsg);
   sdf::ElementPtr cylinderElem = cylinderSDF->GetElement("cylinder");
   EXPECT_DOUBLE_EQ(cylinderElem->Get<double>("radius"), 0.3);
   EXPECT_DOUBLE_EQ(cylinderElem->Get<double>("length"), 1.0);
 
   // sphere
-  msgs::Geometry sphereMsg;
-  sphereMsg.set_type(msgs::Geometry::SPHERE);
-  msgs::SphereGeom *sphereGeom = sphereMsg.mutable_sphere();
+  gazebo::msgs::Geometry sphereMsg;
+  sphereMsg.set_type(gazebo::msgs::Geometry::SPHERE);
+  gazebo::msgs::SphereGeom *sphereGeom = sphereMsg.mutable_sphere();
   sphereGeom->set_radius(3.0);
 
-  sdf::ElementPtr sphereSDF = msgs::GeometryToSDF(sphereMsg);
+  sdf::ElementPtr sphereSDF = gazebo::msgs::GeometryToSDF(sphereMsg);
   sdf::ElementPtr sphereElem = sphereSDF->GetElement("sphere");
   EXPECT_DOUBLE_EQ(sphereElem->Get<double>("radius"), 3.0);
 
   // plane
-  msgs::Geometry planeMsg;
-  planeMsg.set_type(msgs::Geometry::PLANE);
-  msgs::PlaneGeom *planeGeom = planeMsg.mutable_plane();
-  msgs::Set(planeGeom->mutable_normal(), ignition::math::Vector3d(0, 0, 1.0));
-  msgs::Set(planeGeom->mutable_size(), ignition::math::Vector2d(0.5, 0.8));
+  gazebo::msgs::Geometry planeMsg;
+  planeMsg.set_type(gazebo::msgs::Geometry::PLANE);
+  gazebo::msgs::PlaneGeom *planeGeom = planeMsg.mutable_plane();
+  gazebo::msgs::Set(planeGeom->mutable_normal(),
+      ignition::math::Vector3d(0, 0, 1.0));
+  gazebo::msgs::Set(planeGeom->mutable_size(),
+      ignition::math::Vector2d(0.5, 0.8));
 
-  sdf::ElementPtr planeSDF = msgs::GeometryToSDF(planeMsg);
+  sdf::ElementPtr planeSDF = gazebo::msgs::GeometryToSDF(planeMsg);
   sdf::ElementPtr planeElem = planeSDF->GetElement("plane");
   EXPECT_TRUE(planeElem->Get<ignition::math::Vector3d>("normal") ==
       ignition::math::Vector3d(0, 0, 1.0));
@@ -2594,16 +2635,16 @@ TEST_F(MsgsTest, GeometryToSDF)
       ignition::math::Vector2d(0.5, 0.8));
 
   // image
-  msgs::Geometry imageMsg;
-  imageMsg.set_type(msgs::Geometry::IMAGE);
-  msgs::ImageGeom *imageGeom = imageMsg.mutable_image();
+  gazebo::msgs::Geometry imageMsg;
+  imageMsg.set_type(gazebo::msgs::Geometry::IMAGE);
+  gazebo::msgs::ImageGeom *imageGeom = imageMsg.mutable_image();
   imageGeom->set_uri("test_uri");
   imageGeom->set_scale(1.8);
   imageGeom->set_threshold(255);
   imageGeom->set_height(1.3);
   imageGeom->set_granularity(2);
 
-  sdf::ElementPtr imageSDF = msgs::GeometryToSDF(imageMsg);
+  sdf::ElementPtr imageSDF = gazebo::msgs::GeometryToSDF(imageMsg);
   sdf::ElementPtr imageElem = imageSDF->GetElement("image");
   EXPECT_STREQ(imageElem->Get<std::string>("uri").c_str(), "test_uri");
   EXPECT_DOUBLE_EQ(imageElem->Get<double>("scale"), 1.8);
@@ -2612,32 +2653,32 @@ TEST_F(MsgsTest, GeometryToSDF)
   EXPECT_DOUBLE_EQ(imageElem->Get<int>("granularity"), 2);
 
   // heightmap
-  msgs::Geometry heightmapMsg;
-  heightmapMsg.set_type(msgs::Geometry::HEIGHTMAP);
-  msgs::HeightmapGeom *heightmapGeom = heightmapMsg.mutable_heightmap();
+  gazebo::msgs::Geometry heightmapMsg;
+  heightmapMsg.set_type(gazebo::msgs::Geometry::HEIGHTMAP);
+  gazebo::msgs::HeightmapGeom *heightmapGeom = heightmapMsg.mutable_heightmap();
   heightmapGeom->set_filename("test_heightmap_filename");
-  msgs::Set(heightmapGeom->mutable_size(),
+  gazebo::msgs::Set(heightmapGeom->mutable_size(),
       ignition::math::Vector3d(100, 200, 30));
-  msgs::Set(heightmapGeom->mutable_origin(),
+  gazebo::msgs::Set(heightmapGeom->mutable_origin(),
       ignition::math::Vector3d(50, 100, 15));
   heightmapGeom->set_sampling(1);
   heightmapGeom->set_use_terrain_paging(true);
 
-  msgs::HeightmapGeom_Texture *texture1 = heightmapGeom->add_texture();
+  gazebo::msgs::HeightmapGeom_Texture *texture1 = heightmapGeom->add_texture();
   texture1->set_diffuse("test_diffuse1");
   texture1->set_normal("test_normal1");
   texture1->set_size(10);
 
-  msgs::HeightmapGeom_Texture *texture2 = heightmapGeom->add_texture();
+  gazebo::msgs::HeightmapGeom_Texture *texture2 = heightmapGeom->add_texture();
   texture2->set_diffuse("test_diffuse2");
   texture2->set_normal("test_normal2");
   texture2->set_size(20);
 
-  msgs::HeightmapGeom_Blend *blend = heightmapGeom->add_blend();
+  gazebo::msgs::HeightmapGeom_Blend *blend = heightmapGeom->add_blend();
   blend->set_min_height(25);
   blend->set_fade_dist(5);
 
-  sdf::ElementPtr heightmapSDF = msgs::GeometryToSDF(heightmapMsg);
+  sdf::ElementPtr heightmapSDF = gazebo::msgs::GeometryToSDF(heightmapMsg);
   sdf::ElementPtr heightmapElem = heightmapSDF->GetElement("heightmap");
   EXPECT_STREQ(heightmapElem->Get<std::string>("uri").c_str(),
       "test_heightmap_filename");
@@ -2670,15 +2711,16 @@ TEST_F(MsgsTest, GeometryToSDF)
   EXPECT_DOUBLE_EQ(blendElem->Get<double>("fade_dist"), 5);
 
   // mesh
-  msgs::Geometry meshMsg;
-  meshMsg.set_type(msgs::Geometry::MESH);
-  msgs::MeshGeom *meshGeom = meshMsg.mutable_mesh();
+  gazebo::msgs::Geometry meshMsg;
+  meshMsg.set_type(gazebo::msgs::Geometry::MESH);
+  gazebo::msgs::MeshGeom *meshGeom = meshMsg.mutable_mesh();
   meshGeom->set_filename("test_mesh_filename");
-  msgs::Set(meshGeom->mutable_scale(), ignition::math::Vector3d(2.3, 1.2, 2.9));
+  gazebo::msgs::Set(meshGeom->mutable_scale(),
+      ignition::math::Vector3d(2.3, 1.2, 2.9));
   meshGeom->set_submesh("test_mesh_submesh");
   meshGeom->set_center_submesh(false);
 
-  sdf::ElementPtr meshSDF = msgs::GeometryToSDF(meshMsg);
+  sdf::ElementPtr meshSDF = gazebo::msgs::GeometryToSDF(meshMsg);
   sdf::ElementPtr meshElem = meshSDF->GetElement("mesh");
   EXPECT_STREQ(meshElem->Get<std::string>("uri").c_str(),
       "test_mesh_filename");
@@ -2690,18 +2732,18 @@ TEST_F(MsgsTest, GeometryToSDF)
   EXPECT_TRUE(!submeshElem->Get<bool>("center"));
 
   // polyline
-  msgs::Geometry polylineMsg;
-  polylineMsg.set_type(msgs::Geometry::POLYLINE);
-  msgs::Polyline *polylineGeom = polylineMsg.add_polyline();
+  gazebo::msgs::Geometry polylineMsg;
+  polylineMsg.set_type(gazebo::msgs::Geometry::POLYLINE);
+  gazebo::msgs::Polyline *polylineGeom = polylineMsg.add_polyline();
   polylineGeom->set_height(2.33);
   const ignition::math::Vector2d point1(0.5, 0.7);
   const ignition::math::Vector2d point2(3.5, 4.7);
   const ignition::math::Vector2d point3(1000, 2000);
-  msgs::Set(polylineGeom->add_point(), point1);
-  msgs::Set(polylineGeom->add_point(), point2);
-  msgs::Set(polylineGeom->add_point(), point3);
+  gazebo::msgs::Set(polylineGeom->add_point(), point1);
+  gazebo::msgs::Set(polylineGeom->add_point(), point2);
+  gazebo::msgs::Set(polylineGeom->add_point(), point3);
 
-  sdf::ElementPtr polylineSDF = msgs::GeometryToSDF(polylineMsg);
+  sdf::ElementPtr polylineSDF = gazebo::msgs::GeometryToSDF(polylineMsg);
   sdf::ElementPtr polylineElem = polylineSDF->GetElement("polyline");
   EXPECT_DOUBLE_EQ(polylineElem->Get<double>("height"), 2.33);
 
@@ -2717,13 +2759,13 @@ TEST_F(MsgsTest, GeometryToSDF)
 TEST_F(MsgsTest, MeshToSDF)
 {
   const ignition::math::Vector3d meshScale(0.1, 0.2, 0.3);
-  msgs::MeshGeom msg;
+  gazebo::msgs::MeshGeom msg;
   msg.set_filename("test_filename");
-  msgs::Set(msg.mutable_scale(), meshScale);
+  gazebo::msgs::Set(msg.mutable_scale(), meshScale);
   msg.set_submesh("test_submesh");
   msg.set_center_submesh(true);
 
-  sdf::ElementPtr meshSDF = msgs::MeshToSDF(msg);
+  sdf::ElementPtr meshSDF = gazebo::msgs::MeshToSDF(msg);
 
   EXPECT_STREQ(meshSDF->Get<std::string>("uri").c_str(), "test_filename");
   EXPECT_TRUE(meshSDF->HasElement("scale"));
@@ -2739,11 +2781,11 @@ TEST_F(MsgsTest, MeshToSDF)
 
   // no submesh
   const ignition::math::Vector3d meshScale2(1, 2, 3);
-  msgs::MeshGeom msg2;
+  gazebo::msgs::MeshGeom msg2;
   msg2.set_filename("test_filename2");
-  msgs::Set(msg2.mutable_scale(), meshScale2);
+  gazebo::msgs::Set(msg2.mutable_scale(), meshScale2);
 
-  sdf::ElementPtr meshSDF2 = msgs::MeshToSDF(msg2);
+  sdf::ElementPtr meshSDF2 = gazebo::msgs::MeshToSDF(msg2);
 
   EXPECT_STREQ(meshSDF2->Get<std::string>("uri").c_str(), "test_filename2");
   EXPECT_TRUE(meshSDF2->HasElement("scale"));
@@ -2770,9 +2812,9 @@ TEST_F(MsgsTest, InertialToSDF)
   const double iyz = 0.0008;
   const double izz = 0.0038;
 
-  msgs::Inertial msg;
+  gazebo::msgs::Inertial msg;
   msg.set_mass(mass);
-  msgs::Set(msg.mutable_pose(), pose);
+  gazebo::msgs::Set(msg.mutable_pose(), pose);
   msg.set_ixx(ixx);
   msg.set_ixy(ixy);
   msg.set_ixz(ixz);
@@ -2780,7 +2822,7 @@ TEST_F(MsgsTest, InertialToSDF)
   msg.set_iyz(iyz);
   msg.set_izz(izz);
 
-  sdf::ElementPtr inertialSDF = msgs::InertialToSDF(msg);
+  sdf::ElementPtr inertialSDF = gazebo::msgs::InertialToSDF(msg);
 
   EXPECT_TRUE(inertialSDF->HasElement("mass"));
   EXPECT_DOUBLE_EQ(inertialSDF->Get<double>("mass"), mass);
@@ -2815,11 +2857,12 @@ TEST_F(MsgsTest, InertialToSDF)
 /////////////////////////////////////////////////
 TEST_F(MsgsTest, MaterialToSDF)
 {
-  msgs::Material msg;
+  gazebo::msgs::Material msg;
 
   const std::string name("Gazebo/Grey");
   const std::string uri("file://media/materials/scripts/gazebo.material");
-  const msgs::Material::ShaderType type = msgs::Material::VERTEX;
+  const gazebo::msgs::Material::ShaderType type =
+    gazebo::msgs::Material::VERTEX;
   const std::string normalMap("normalMap");
   const bool lighting = true;
   const ignition::math::Color ambient(.1, .2, .3, 1.0);
@@ -2833,12 +2876,12 @@ TEST_F(MsgsTest, MaterialToSDF)
   msg.set_shader_type(type);
   msg.set_normal_map(normalMap);
   msg.set_lighting(lighting);
-  msgs::Set(msg.mutable_ambient(), ambient);
-  msgs::Set(msg.mutable_diffuse(), diffuse);
-  msgs::Set(msg.mutable_emissive(), emissive);
-  msgs::Set(msg.mutable_specular(), specular);
+  gazebo::msgs::Set(msg.mutable_ambient(), ambient);
+  gazebo::msgs::Set(msg.mutable_diffuse(), diffuse);
+  gazebo::msgs::Set(msg.mutable_emissive(), emissive);
+  gazebo::msgs::Set(msg.mutable_specular(), specular);
 
-  sdf::ElementPtr materialSDF = msgs::MaterialToSDF(msg);
+  sdf::ElementPtr materialSDF = gazebo::msgs::MaterialToSDF(msg);
 
   {
     ASSERT_TRUE(materialSDF->HasElement("script"));
@@ -2853,7 +2896,7 @@ TEST_F(MsgsTest, MaterialToSDF)
     ASSERT_TRUE(materialSDF->HasElement("shader"));
     sdf::ElementPtr shaderElem = materialSDF->GetElement("shader");
     EXPECT_TRUE(shaderElem->HasAttribute("type"));
-    EXPECT_EQ(msgs::ConvertShaderType(type),
+    EXPECT_EQ(gazebo::msgs::ConvertShaderType(type),
               shaderElem->Get<std::string>("type"));
     EXPECT_TRUE(shaderElem->HasElement("normal_map"));
     EXPECT_EQ(normalMap, shaderElem->Get<std::string>("normal_map"));
@@ -2872,7 +2915,7 @@ TEST_F(MsgsTest, MaterialToSDF)
 /////////////////////////////////////////////////
 TEST_F(MsgsTest, SurfaceToSDF)
 {
-  msgs::Surface msg;
+  gazebo::msgs::Surface msg;
 
   // friction
   const double mu = 0.1;
@@ -2881,10 +2924,10 @@ TEST_F(MsgsTest, SurfaceToSDF)
   const double slip1 = 0.6;
   const double slip2 = 0.7;
 
-  msgs::Friction *friction = msg.mutable_friction();
+  gazebo::msgs::Friction *friction = msg.mutable_friction();
   friction->set_mu(mu);
   friction->set_mu2(mu2);
-  msgs::Set(friction->mutable_fdir1(), fdir1);
+  gazebo::msgs::Set(friction->mutable_fdir1(), fdir1);
   friction->set_slip1(slip1);
   friction->set_slip2(slip2);
 
@@ -2903,7 +2946,7 @@ TEST_F(MsgsTest, SurfaceToSDF)
   msg.set_collide_without_contact_bitmask(0x0004);
   msg.set_collide_bitmask(0x01);
 
-  sdf::ElementPtr surfaceSDF = msgs::SurfaceToSDF(msg);
+  sdf::ElementPtr surfaceSDF = gazebo::msgs::SurfaceToSDF(msg);
   sdf::ElementPtr frictionElem = surfaceSDF->GetElement("friction");
   sdf::ElementPtr frictionPhysicsElem = frictionElem->GetElement("ode");
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu"), mu);
@@ -2938,7 +2981,7 @@ TEST_F(MsgsTest, JointToSDF)
   // universal
   {
     const std::string name("test_joint");
-    const msgs::Joint::Type type = msgs::Joint::UNIVERSAL;
+    const gazebo::msgs::Joint::Type type = gazebo::msgs::Joint::UNIVERSAL;
     const ignition::math::Pose3d pose(
         ignition::math::Vector3d(9, 1, 1),
         ignition::math::Quaterniond(0, 1, 0, 0));
@@ -2971,12 +3014,12 @@ TEST_F(MsgsTest, JointToSDF)
     // don't set use_parent_model_frame for axis2
     // expect it to match sdformat default (false)
 
-    msgs::Joint jointMsg;
+    gazebo::msgs::Joint jointMsg;
     jointMsg.set_name(name);
     jointMsg.set_type(type);
     jointMsg.set_parent(parent);
     jointMsg.set_child(child);
-    msgs::Set(jointMsg.mutable_pose(), pose);
+    gazebo::msgs::Set(jointMsg.mutable_pose(), pose);
     jointMsg.set_cfm(cfm);
     jointMsg.set_bounce(bounce);
     jointMsg.set_velocity(velocity);
@@ -2987,7 +3030,7 @@ TEST_F(MsgsTest, JointToSDF)
     jointMsg.set_suspension_erp(suspension_erp);
     {
       auto axis1 = jointMsg.mutable_axis1();
-      msgs::Set(axis1->mutable_xyz(), xyz1);
+      gazebo::msgs::Set(axis1->mutable_xyz(), xyz1);
       axis1->set_limit_lower(limit_lower1);
       axis1->set_limit_upper(limit_upper1);
       axis1->set_limit_effort(limit_effort1);
@@ -2998,7 +3041,7 @@ TEST_F(MsgsTest, JointToSDF)
     }
     {
       auto axis2 = jointMsg.mutable_axis2();
-      msgs::Set(axis2->mutable_xyz(), xyz2);
+      gazebo::msgs::Set(axis2->mutable_xyz(), xyz2);
       axis2->set_limit_lower(limit_lower2);
       axis2->set_limit_upper(limit_upper2);
       axis2->set_limit_effort(limit_effort2);
@@ -3007,7 +3050,7 @@ TEST_F(MsgsTest, JointToSDF)
       axis2->set_friction(friction2);
     }
 
-    sdf::ElementPtr jointSDF = msgs::JointToSDF(jointMsg);
+    sdf::ElementPtr jointSDF = gazebo::msgs::JointToSDF(jointMsg);
     EXPECT_TRUE(jointSDF->HasAttribute("name"));
     EXPECT_EQ(jointSDF->Get<std::string>("name"), name);
     EXPECT_TRUE(jointSDF->HasAttribute("type"));
@@ -3108,7 +3151,7 @@ TEST_F(MsgsTest, JointToSDF)
   // gearbox
   {
     const std::string name("test_gearbox_joint");
-    const msgs::Joint::Type type = msgs::Joint::GEARBOX;
+    const gazebo::msgs::Joint::Type type = gazebo::msgs::Joint::GEARBOX;
     const ignition::math::Pose3d pose(
         ignition::math::Vector3d(2, 1, 3),
         ignition::math::Quaterniond(0, 0, 1, 0));
@@ -3143,12 +3186,12 @@ TEST_F(MsgsTest, JointToSDF)
     const std::string gearbox_reference_body = "child_gearbox_link";
     const double gearbox_ratio = 0.2;
 
-    msgs::Joint jointMsg;
+    gazebo::msgs::Joint jointMsg;
     jointMsg.set_name(name);
     jointMsg.set_type(type);
     jointMsg.set_parent(parent);
     jointMsg.set_child(child);
-    msgs::Set(jointMsg.mutable_pose(), pose);
+    gazebo::msgs::Set(jointMsg.mutable_pose(), pose);
     jointMsg.set_cfm(cfm);
     jointMsg.set_bounce(bounce);
     jointMsg.set_velocity(velocity);
@@ -3159,7 +3202,7 @@ TEST_F(MsgsTest, JointToSDF)
     jointMsg.set_suspension_erp(suspension_erp);
     {
       auto axis1 = jointMsg.mutable_axis1();
-      msgs::Set(axis1->mutable_xyz(), xyz1);
+      gazebo::msgs::Set(axis1->mutable_xyz(), xyz1);
       axis1->set_limit_lower(limit_lower1);
       axis1->set_limit_upper(limit_upper1);
       axis1->set_limit_effort(limit_effort1);
@@ -3170,7 +3213,7 @@ TEST_F(MsgsTest, JointToSDF)
     }
     {
       auto axis2 = jointMsg.mutable_axis2();
-      msgs::Set(axis2->mutable_xyz(), xyz2);
+      gazebo::msgs::Set(axis2->mutable_xyz(), xyz2);
       axis2->set_limit_lower(limit_lower2);
       axis2->set_limit_upper(limit_upper2);
       axis2->set_limit_effort(limit_effort2);
@@ -3178,11 +3221,11 @@ TEST_F(MsgsTest, JointToSDF)
       axis2->set_damping(damping2);
       axis2->set_friction(friction2);
     }
-    msgs::Joint::Gearbox *gearboxMsg = jointMsg.mutable_gearbox();
+    gazebo::msgs::Joint::Gearbox *gearboxMsg = jointMsg.mutable_gearbox();
     gearboxMsg->set_gearbox_reference_body(gearbox_reference_body);
     gearboxMsg->set_gearbox_ratio(gearbox_ratio);
 
-    sdf::ElementPtr jointSDF = msgs::JointToSDF(jointMsg);
+    sdf::ElementPtr jointSDF = gazebo::msgs::JointToSDF(jointMsg);
     EXPECT_TRUE(jointSDF->HasAttribute("name"));
     EXPECT_EQ(jointSDF->Get<std::string>("name"), name);
     EXPECT_TRUE(jointSDF->HasAttribute("type"));
@@ -3289,7 +3332,7 @@ TEST_F(MsgsTest, JointToSDF)
   // screw
   {
     const std::string name("test_screw_joint");
-    const msgs::Joint::Type type = msgs::Joint::SCREW;
+    const gazebo::msgs::Joint::Type type = gazebo::msgs::Joint::SCREW;
     const ignition::math::Pose3d pose(
         ignition::math::Vector3d(2, 1, 3),
         ignition::math::Quaterniond(0, 0, 0, 1));
@@ -3314,12 +3357,12 @@ TEST_F(MsgsTest, JointToSDF)
     const bool useParentModelFrame1 = false;
     const double thread_pitch = 0.9;
 
-    msgs::Joint jointMsg;
+    gazebo::msgs::Joint jointMsg;
     jointMsg.set_name(name);
     jointMsg.set_type(type);
     jointMsg.set_parent(parent);
     jointMsg.set_child(child);
-    msgs::Set(jointMsg.mutable_pose(), pose);
+    gazebo::msgs::Set(jointMsg.mutable_pose(), pose);
     jointMsg.set_cfm(cfm);
     jointMsg.set_bounce(bounce);
     jointMsg.set_velocity(velocity);
@@ -3330,7 +3373,7 @@ TEST_F(MsgsTest, JointToSDF)
     jointMsg.set_suspension_erp(suspension_erp);
     {
       auto axis1 = jointMsg.mutable_axis1();
-      msgs::Set(axis1->mutable_xyz(), xyz1);
+      gazebo::msgs::Set(axis1->mutable_xyz(), xyz1);
       axis1->set_limit_lower(limit_lower1);
       axis1->set_limit_upper(limit_upper1);
       axis1->set_limit_effort(limit_effort1);
@@ -3340,10 +3383,10 @@ TEST_F(MsgsTest, JointToSDF)
       axis1->set_use_parent_model_frame(useParentModelFrame1);
     }
 
-    msgs::Joint::Screw *screwMsg = jointMsg.mutable_screw();
+    gazebo::msgs::Joint::Screw *screwMsg = jointMsg.mutable_screw();
     screwMsg->set_thread_pitch(thread_pitch);
 
-    sdf::ElementPtr jointSDF = msgs::JointToSDF(jointMsg);
+    sdf::ElementPtr jointSDF = gazebo::msgs::JointToSDF(jointMsg);
     EXPECT_TRUE(jointSDF->HasAttribute("name"));
     EXPECT_EQ(jointSDF->Get<std::string>("name"), name);
     EXPECT_TRUE(jointSDF->HasAttribute("type"));
@@ -3418,12 +3461,12 @@ TEST_F(MsgsTest, JointToSDF)
 /////////////////////////////////////////////////
 TEST_F(MsgsTest, AddBoxLink)
 {
-  msgs::Model model;
+  gazebo::msgs::Model model;
   EXPECT_EQ(model.link_size(), 0);
 
   const double mass = 1.0;
   const ignition::math::Vector3d size(1, 1, 1);
-  msgs::AddBoxLink(model, mass, size);
+  gazebo::msgs::AddBoxLink(model, mass, size);
   EXPECT_EQ(model.link_size(), 1);
   {
     auto link = model.link(0);
@@ -3452,21 +3495,21 @@ TEST_F(MsgsTest, AddBoxLink)
     {
       auto collision = link.collision(0);
       auto geometry = collision.geometry();
-      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
-      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size);
+      EXPECT_EQ(geometry.type(), gazebo::msgs::Geometry_Type_BOX);
+      EXPECT_EQ(gazebo::msgs::ConvertIgn(geometry.box().size()), size);
     }
 
     EXPECT_EQ(link.visual_size(), 1);
     {
       auto visual = link.visual(0);
       auto geometry = visual.geometry();
-      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
-      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size);
+      EXPECT_EQ(geometry.type(), gazebo::msgs::Geometry_Type_BOX);
+      EXPECT_EQ(gazebo::msgs::ConvertIgn(geometry.box().size()), size);
     }
   }
 
   const double massRatio = 2.0;
-  msgs::AddBoxLink(model, mass*massRatio, size);
+  gazebo::msgs::AddBoxLink(model, mass*massRatio, size);
   EXPECT_EQ(model.link_size(), 2);
   {
     auto link1 = model.link(0);
@@ -3486,13 +3529,13 @@ TEST_F(MsgsTest, AddBoxLink)
 /////////////////////////////////////////////////
 TEST_F(MsgsTest, AddCylinderLink)
 {
-  msgs::Model model;
+  gazebo::msgs::Model model;
   EXPECT_EQ(model.link_size(), 0);
 
   const double mass = 1.0;
   const double radius = 0.5;
   const double length = 2.5;
-  msgs::AddCylinderLink(model, mass, radius, length);
+  gazebo::msgs::AddCylinderLink(model, mass, radius, length);
   EXPECT_EQ(model.link_size(), 1);
   {
     auto link = model.link(0);
@@ -3521,7 +3564,7 @@ TEST_F(MsgsTest, AddCylinderLink)
     {
       auto collision = link.collision(0);
       auto geometry = collision.geometry();
-      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_CYLINDER);
+      EXPECT_EQ(geometry.type(), gazebo::msgs::Geometry_Type_CYLINDER);
       EXPECT_DOUBLE_EQ(geometry.cylinder().radius(), radius);
       EXPECT_DOUBLE_EQ(geometry.cylinder().length(), length);
     }
@@ -3530,14 +3573,14 @@ TEST_F(MsgsTest, AddCylinderLink)
     {
       auto visual = link.visual(0);
       auto geometry = visual.geometry();
-      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_CYLINDER);
+      EXPECT_EQ(geometry.type(), gazebo::msgs::Geometry_Type_CYLINDER);
       EXPECT_DOUBLE_EQ(geometry.cylinder().radius(), radius);
       EXPECT_DOUBLE_EQ(geometry.cylinder().length(), length);
     }
   }
 
   const double massRatio = 2.0;
-  msgs::AddCylinderLink(model, mass*massRatio, radius, length);
+  gazebo::msgs::AddCylinderLink(model, mass*massRatio, radius, length);
   EXPECT_EQ(model.link_size(), 2);
   {
     auto link1 = model.link(0);
@@ -3557,12 +3600,12 @@ TEST_F(MsgsTest, AddCylinderLink)
 /////////////////////////////////////////////////
 TEST_F(MsgsTest, AddSphereLink)
 {
-  msgs::Model model;
+  gazebo::msgs::Model model;
   EXPECT_EQ(model.link_size(), 0);
 
   const double mass = 1.0;
   const double radius = 0.5;
-  msgs::AddSphereLink(model, mass, radius);
+  gazebo::msgs::AddSphereLink(model, mass, radius);
   EXPECT_EQ(model.link_size(), 1);
   {
     auto link = model.link(0);
@@ -3591,7 +3634,7 @@ TEST_F(MsgsTest, AddSphereLink)
     {
       auto collision = link.collision(0);
       auto geometry = collision.geometry();
-      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_SPHERE);
+      EXPECT_EQ(geometry.type(), gazebo::msgs::Geometry_Type_SPHERE);
       EXPECT_DOUBLE_EQ(geometry.sphere().radius(), radius);
     }
 
@@ -3599,13 +3642,13 @@ TEST_F(MsgsTest, AddSphereLink)
     {
       auto visual = link.visual(0);
       auto geometry = visual.geometry();
-      EXPECT_EQ(geometry.type(), msgs::Geometry_Type_SPHERE);
+      EXPECT_EQ(geometry.type(), gazebo::msgs::Geometry_Type_SPHERE);
       EXPECT_DOUBLE_EQ(geometry.sphere().radius(), radius);
     }
   }
 
   const double massRatio = 2.0;
-  msgs::AddSphereLink(model, mass*massRatio, radius);
+  gazebo::msgs::AddSphereLink(model, mass*massRatio, radius);
   EXPECT_EQ(model.link_size(), 2);
   {
     auto link1 = model.link(0);
@@ -3630,10 +3673,10 @@ TEST_F(MsgsTest, ModelToSDF)
       ignition::math::Vector3d(6, 1, 7),
       ignition::math::Quaterniond(0.5, 0.5, 0.5, 0.5));
 
-  msgs::Model model;
+  gazebo::msgs::Model model;
   model.set_name(name);
   model.set_is_static(false);
-  msgs::Set(model.mutable_pose(), pose);
+  gazebo::msgs::Set(model.mutable_pose(), pose);
   EXPECT_EQ(model.link_size(), 0);
   EXPECT_EQ(model.joint_size(), 0);
 
@@ -3658,7 +3701,7 @@ TEST_F(MsgsTest, ModelToSDF)
       -length/2, 0, -height/2, M_PI/2, 0, 0);
   {
     auto link = model.mutable_link(1);
-    msgs::Set(link->mutable_pose(), cylinderPose);
+    gazebo::msgs::Set(link->mutable_pose(), cylinderPose);
     link->set_name("rear_wheel");
   }
 
@@ -3669,7 +3712,7 @@ TEST_F(MsgsTest, ModelToSDF)
   const ignition::math::Pose3d spherePose(length/2, 0, -height/2, 0, 0, 0);
   {
     auto link = model.mutable_link(2);
-    msgs::Set(link->mutable_pose(), spherePose);
+    gazebo::msgs::Set(link->mutable_pose(), spherePose);
     link->set_name("front_wheel");
   }
 
@@ -3679,22 +3722,22 @@ TEST_F(MsgsTest, ModelToSDF)
   ASSERT_EQ(model.joint_size(), 1);
   auto frontJoint = model.mutable_joint(0);
   frontJoint->set_name("front_hinge");
-  frontJoint->set_type(msgs::ConvertJointType("revolute"));
+  frontJoint->set_type(gazebo::msgs::ConvertJointType("revolute"));
   frontJoint->set_parent("frame");
   frontJoint->set_child("front_wheel");
   const ignition::math::Vector3d frontAxis(0, 1, 0);
-  msgs::Set(frontJoint->mutable_axis1()->mutable_xyz(), frontAxis);
+  gazebo::msgs::Set(frontJoint->mutable_axis1()->mutable_xyz(), frontAxis);
 
   // Rear wheel joint
   model.add_joint();
   ASSERT_EQ(model.joint_size(), 2);
   auto rearJoint = model.mutable_joint(1);
   rearJoint->set_name("rear_hinge");
-  rearJoint->set_type(msgs::ConvertJointType("revolute"));
+  rearJoint->set_type(gazebo::msgs::ConvertJointType("revolute"));
   rearJoint->set_parent("frame");
   rearJoint->set_child("rear_wheel");
   const ignition::math::Vector3d rearAxis(0, 0, 1);
-  msgs::Set(rearJoint->mutable_axis1()->mutable_xyz(), rearAxis);
+  gazebo::msgs::Set(rearJoint->mutable_axis1()->mutable_xyz(), rearAxis);
 
   // Add plugin
   model.add_plugin();
@@ -3704,7 +3747,7 @@ TEST_F(MsgsTest, ModelToSDF)
   plugin->set_filename("plugin_filename");
   plugin->set_innerxml("<plugin_param>param</plugin_param>");
 
-  sdf::ElementPtr modelSDF = msgs::ModelToSDF(model);
+  sdf::ElementPtr modelSDF = gazebo::msgs::ModelToSDF(model);
   EXPECT_EQ(modelSDF->Get<std::string>("name"), name);
   EXPECT_FALSE(modelSDF->Get<bool>("static"));
   EXPECT_EQ(pose, modelSDF->Get<ignition::math::Pose3d>("pose"));
@@ -3748,12 +3791,12 @@ TEST_F(MsgsTest, PluginToSDF)
   std::string filename = "plugin_filename";
   std::string innerxml = "<plugin_param>param</plugin_param>";
 
-  msgs::Plugin msg;
+  gazebo::msgs::Plugin msg;
   msg.set_name(name);
   msg.set_filename(filename);
   msg.set_innerxml(innerxml);
 
-  sdf::ElementPtr pluginSDF = msgs::PluginToSDF(msg);
+  sdf::ElementPtr pluginSDF = gazebo::msgs::PluginToSDF(msg);
 
   EXPECT_TRUE(pluginSDF->HasAttribute("name"));
   EXPECT_EQ(pluginSDF->Get<std::string>("name"), name);
@@ -3773,16 +3816,16 @@ TEST_F(MsgsTest, PluginToFromSDF)
   std::string innerxml = "<plugin_param>param</plugin_param>\n";
 
   // Create message
-  msgs::Plugin msg1;
+  gazebo::msgs::Plugin msg1;
   msg1.set_name(name);
   msg1.set_filename(filename);
   msg1.set_innerxml(innerxml);
 
   // To SDF
-  sdf::ElementPtr sdf1 = msgs::PluginToSDF(msg1);
+  sdf::ElementPtr sdf1 = gazebo::msgs::PluginToSDF(msg1);
 
   // Back to Msg
-  msgs::Plugin msg2 = msgs::PluginFromSDF(sdf1);
+  gazebo::msgs::Plugin msg2 = gazebo::msgs::PluginFromSDF(sdf1);
   EXPECT_EQ(msg2.name(), name);
   EXPECT_EQ(msg2.filename(), filename);
   EXPECT_EQ(msg2.innerxml(), innerxml);
@@ -3791,7 +3834,7 @@ TEST_F(MsgsTest, PluginToFromSDF)
   sdf::ElementPtr sdf2;
   sdf2.reset(new sdf::Element);
   sdf::initFile("plugin.sdf", sdf2);
-  msgs::PluginToSDF(msg2, sdf2);
+  gazebo::msgs::PluginToSDF(msg2, sdf2);
   EXPECT_TRUE(sdf2 != nullptr);
   EXPECT_EQ(sdf2->Get<std::string>("name"), name);
   EXPECT_EQ(sdf2->Get<std::string>("filename"), filename);
@@ -3824,17 +3867,17 @@ TEST_F(MsgsTest, VisualPluginToFromSDF)
       </sdf>", sdf1));
 
   // To msg
-  auto msg1 = msgs::VisualFromSDF(sdf1);
+  auto msg1 = gazebo::msgs::VisualFromSDF(sdf1);
 
   // Back to SDF
-  auto sdf2 = msgs::VisualToSDF(msg1);
+  auto sdf2 = gazebo::msgs::VisualToSDF(msg1);
   ASSERT_TRUE(sdf2 != nullptr);
 
   // Back to Msg
-  auto msg2 = msgs::VisualFromSDF(sdf2);
+  auto msg2 = gazebo::msgs::VisualFromSDF(sdf2);
 
   // Back to SDF
-  auto sdf3 = msgs::VisualToSDF(msg2);
+  auto sdf3 = gazebo::msgs::VisualToSDF(msg2);
   ASSERT_TRUE(sdf3 != nullptr);
 
   ASSERT_TRUE(sdf3->HasAttribute("name"));
@@ -3864,8 +3907,8 @@ TEST_F(MsgsTest, ConvertIgnMsgColor)
   ignMsg.set_b(0.3);
   ignMsg.set_a(0.4);
 
-  auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
-  auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
+  auto gzMsg = gazebo::msgs::ConvertIgnMsg(ignMsg);
+  auto ignMsg2 = gazebo::msgs::ConvertIgnMsg(gzMsg);
 
   EXPECT_DOUBLE_EQ(ignMsg.r(), ignMsg2.r());
   EXPECT_DOUBLE_EQ(ignMsg.g(), ignMsg2.g());
@@ -3877,8 +3920,8 @@ TEST_F(MsgsTest, ConvertIgnMsgMaterialShaderType)
 {
   auto ignMsg = ignition::msgs::Material::PIXEL;
 
-  auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
-  auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
+  auto gzMsg = gazebo::msgs::ConvertIgnMsg(ignMsg);
+  auto ignMsg2 = gazebo::msgs::ConvertIgnMsg(gzMsg);
 
   EXPECT_DOUBLE_EQ(ignMsg, ignMsg2);
 }
@@ -3891,8 +3934,8 @@ TEST_F(MsgsTest, ConvertIgnMsgMaterialScript)
   for (size_t i = 0; i < 3; ++i)
     ignMsg.add_uri("uri_" + std::to_string(i));
 
-  auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
-  auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
+  auto gzMsg = gazebo::msgs::ConvertIgnMsg(ignMsg);
+  auto ignMsg2 = gazebo::msgs::ConvertIgnMsg(gzMsg);
 
   EXPECT_EQ(ignMsg.name(), ignMsg2.name());
   ASSERT_EQ(ignMsg2.uri().size(), 3);
@@ -3920,8 +3963,8 @@ TEST_F(MsgsTest, ConvertIgnMsgMaterial)
 
   ignMsg.set_lighting(false);
 
-  auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
-  auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
+  auto gzMsg = gazebo::msgs::ConvertIgnMsg(ignMsg);
+  auto ignMsg2 = gazebo::msgs::ConvertIgnMsg(gzMsg);
 
   EXPECT_EQ(ignMsg.script().name(), ignMsg2.script().name());
   EXPECT_EQ(ignMsg.script().uri(0), ignMsg2.script().uri(0));

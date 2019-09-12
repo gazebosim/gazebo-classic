@@ -49,7 +49,7 @@ TEST_F(Light_TEST, LightPoseTest)
 
   // create a light and attach it to parent visual
   rendering::LightPtr light(new gazebo::rendering::Light(scene));
-  msgs::Light msg;
+  gazebo::msgs::Light msg;
   msg.set_name("light_parent::light");
   light->LoadFromMsg(msg);
 
@@ -100,7 +100,7 @@ TEST_F(Light_TEST, CastShadows)
 
   // create a directional light and verify type and cast shadows.
   gazebo::rendering::LightPtr dirLight(new gazebo::rendering::Light(scene));
-  msgs::Light msg;
+  gazebo::msgs::Light msg;
   msg.set_type(gazebo::msgs::Light::DIRECTIONAL);
   msg.set_cast_shadows(true);
   dirLight->LoadFromMsg(msg);

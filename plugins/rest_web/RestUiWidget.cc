@@ -163,7 +163,7 @@ void RestUiWidget::Update()
     this->msgRespQ.pop_front();
 
     // look for login error, and reenable the login menu if necessary
-    if (msg->type() == msgs::RestResponse::ERR)
+    if (msg->type() == gazebo::msgs::RestResponse::ERR)
     {
       this->loginMenuAction.setEnabled(true);
       this->logoutMenuAction.setEnabled(false);
@@ -176,12 +176,12 @@ void RestUiWidget::Update()
       }
       this->loginLabel->setText(tr(""));
     }
-    else if (msg->type() == msgs::RestResponse::LOGIN)
+    else if (msg->type() == gazebo::msgs::RestResponse::LOGIN)
     {
       this->loginLabel->setText(
           QString::fromStdString(this->loginDialog.GetUsername()));
     }
-    else if (msg->type() == msgs::RestResponse::LOGOUT)
+    else if (msg->type() == gazebo::msgs::RestResponse::LOGOUT)
     {
       this->loginLabel->setText(tr(""));
     }

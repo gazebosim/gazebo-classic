@@ -76,10 +76,10 @@ namespace gazebo
       public: virtual double GetThreadPitch() = 0;
 
       // Documentation inherited
-      public: virtual void FillMsg(msgs::Joint &_msg)
+      public: virtual void FillMsg(gazebo::msgs::Joint &_msg)
               {
                 Joint::FillMsg(_msg);
-                msgs::Joint::Screw *screwMsg = _msg.mutable_screw();
+                gazebo::msgs::Joint::Screw *screwMsg = _msg.mutable_screw();
                 screwMsg->set_thread_pitch(this->threadPitch);
               }
 

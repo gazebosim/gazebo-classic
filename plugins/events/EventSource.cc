@@ -71,9 +71,12 @@ void EventSource::Emit(const std::string &_data) const
     worldStatsMsg = msg.mutable_world_statistics();
     worldStatsMsg->set_iterations(this->world->Iterations());
     worldStatsMsg->set_paused(this->world->IsPaused());
-    msgs::Set(worldStatsMsg->mutable_sim_time(), this->world->SimTime());
-    msgs::Set(worldStatsMsg->mutable_real_time(), this->world->RealTime());
-    msgs::Set(worldStatsMsg->mutable_pause_time(), this->world->PauseTime());
+    gazebo::msgs::Set(worldStatsMsg->mutable_sim_time(),
+        this->world->SimTime());
+    gazebo::msgs::Set(worldStatsMsg->mutable_real_time(),
+        this->world->RealTime());
+    gazebo::msgs::Set(worldStatsMsg->mutable_pause_time(),
+        this->world->PauseTime());
     // send it on the publisher we got in the ctor
     this->pub->Publish(msg);
   }

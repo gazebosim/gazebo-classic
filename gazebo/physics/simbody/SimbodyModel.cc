@@ -115,14 +115,14 @@ void SimbodyModel::Init()
     // The following message used to be filled and sent in Model::LoadJoint
     // It is moved here, after Joint::Init, so that the joint properties
     // can be included in the message.
-    msgs::Joint msg;
+    gazebo::msgs::Joint msg;
     (*iter)->FillMsg(msg);
     this->jointPub->Publish(msg);
   }
 }
 
 //////////////////////////////////////////////////
-// void SimbodyModel::FillMsg(msgs::Model &_msg)
+// void SimbodyModel::FillMsg(gazebo::msgs::Model &_msg)
 // {
 //   // rebuild simbody state
 //   // this needs to happen before this->joints are used

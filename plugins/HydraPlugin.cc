@@ -188,7 +188,7 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(_world->Name());
-  this->pub = this->node->Advertise<msgs::Hydra>("~/hydra");
+  this->pub = this->node->Advertise<gazebo::msgs::Hydra>("~/hydra");
 }
 
 /////////////////////////////////////////////////
@@ -215,9 +215,9 @@ void RazerHydra::Update()
   grabLeft.Pos() +=
       origLeft.Rot().RotateVector(ignition::math::Vector3d(-0.12, 0, 0));
 
-  msgs::Hydra msg;
-  msgs::Hydra::Paddle *rightPaddle = msg.mutable_right();
-  msgs::Hydra::Paddle *leftPaddle = msg.mutable_left();
+  gazebo::msgs::Hydra msg;
+  gazebo::msgs::Hydra::Paddle *rightPaddle = msg.mutable_right();
+  gazebo::msgs::Hydra::Paddle *leftPaddle = msg.mutable_left();
 
   // Analog 0: Left right(+) left(-)
   // Analog 1: Left forward(+) back(-)
@@ -250,8 +250,8 @@ void RazerHydra::Update()
   rightPaddle->set_button_center(this->buttons[12]);
   rightPaddle->set_button_joy(this->buttons[13]);
 
-  msgs::Set(rightPaddle->mutable_pose(), grabRight);
-  msgs::Set(leftPaddle->mutable_pose(), grabLeft);
+  gazebo::msgs::Set(rightPaddle->mutable_pose(), grabRight);
+  gazebo::msgs::Set(leftPaddle->mutable_pose(), grabLeft);
 
   this->pub->Publish(msg);
 }

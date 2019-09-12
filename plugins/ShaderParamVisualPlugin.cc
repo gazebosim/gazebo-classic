@@ -150,5 +150,5 @@ void ShaderParamVisualPlugin::OnInfo(ConstPosesStampedPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   // we are only interested in sim time
-  this->dataPtr->currentSimTime = msgs::Convert(_msg->time());
+  this->dataPtr->currentSimTime = gazebo::msgs::Convert(_msg->time());
 }

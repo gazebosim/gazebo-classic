@@ -61,11 +61,11 @@ namespace gazebo
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.
-      public: void FillMsg(msgs::Geometry &_msg);
+      public: void FillMsg(gazebo::msgs::Geometry &_msg);
 
       /// \brief Process a geometry message.
       /// \param[in] _msg The message to set values from.
-      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+      public: virtual void ProcessMsg(const gazebo::msgs::Geometry &_msg);
 
       /// \brief Set the scale of the polyline.
       /// \param[in] _scale Scale of the polyline.
@@ -84,7 +84,7 @@ namespace gazebo
 
       /// \brief Set the vertices of the polyline
       /// \param[in] _msg geometry msg containing the vertex information
-      private: virtual void SetVertices(const msgs::Geometry &_msg);
+      private: virtual void SetVertices(const gazebo::msgs::Geometry &_msg);
 
       /// \brief Set the parameters of polyline shape
       /// \param[in] _height Height of the polygon

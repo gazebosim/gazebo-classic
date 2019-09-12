@@ -60,8 +60,8 @@ namespace gazebo
       /// \param _simTime Simulation time associated with this State info.
       /// \param _iterations Simulation iterations since simulation started.
       public: State(const std::string &_name,
-                    const common::Time &_realTime,
-                    const common::Time &_simTime,
+                    const gazebo::common::Time &_realTime,
+                    const gazebo::common::Time &_simTime,
                     const uint64_t _iterations);
 
       /// \brief Destructor
@@ -95,15 +95,15 @@ namespace gazebo
 
       /// \brief Get the wall time when this state was generated
       /// \return The absolute clock time when the State data was recorded.
-      public: common::Time GetWallTime() const;
+      public: gazebo::common::Time GetWallTime() const;
 
       /// \brief Get the real time when this state was generated
       /// \return Clock time since simulation was stated.
-      public: common::Time GetRealTime() const;
+      public: gazebo::common::Time GetRealTime() const;
 
       /// \brief Get the sim time when this state was generated
       /// \return Simulation time when the data was recorded.
-      public: common::Time GetSimTime() const;
+      public: gazebo::common::Time GetSimTime() const;
 
       /// \brief Get the iterations when this state was generated
       /// \return Iterations when the data was recorded
@@ -112,15 +112,15 @@ namespace gazebo
       /// \brief Set the wall time when this state was generated
       /// \param[in] _time The absolute clock time when the State
       /// data was recorded.
-      public: virtual void SetWallTime(const common::Time &_time);
+      public: virtual void SetWallTime(const gazebo::common::Time &_time);
 
       /// \brief Set the real time when this state was generated
       /// \param[in] _time Clock time since simulation was stated.
-      public: virtual void SetRealTime(const common::Time &_time);
+      public: virtual void SetRealTime(const gazebo::common::Time &_time);
 
       /// \brief Set the sim time when this state was generated
       /// \param[in] _time Simulation time when the data was recorded.
-      public: virtual void SetSimTime(const common::Time &_time);
+      public: virtual void SetSimTime(const gazebo::common::Time &_time);
 
       /// \brief Set the iterations when this state was generated
       /// \param[in] _iterations Iterations when the data was recorded.
@@ -130,7 +130,7 @@ namespace gazebo
       protected: std::string name;
 
       /// \brief Times for the state data
-      protected: common::Time wallTime, realTime, simTime;
+      protected: gazebo::common::Time wallTime, realTime, simTime;
 
       /// \brief The number of simulation iterations when this state was
       /// generated.

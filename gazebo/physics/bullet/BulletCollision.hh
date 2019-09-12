@@ -71,7 +71,7 @@ namespace gazebo
       public: virtual unsigned int GetCollideBits() const;
 
       // Documentation inherited
-      public: virtual ignition::math::Box BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Set the collision shape
       /// \param[in] _shape Collision shape

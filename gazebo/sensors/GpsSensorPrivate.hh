@@ -44,7 +44,7 @@ namespace gazebo
       public: common::SphericalCoordinatesPtr sphericalCoordinates;
 
       /// \brief Stores most recent GPS sensor data.
-      public: msgs::GPS lastGpsMsg;
+      public: gazebo::msgs::GPS lastGpsMsg;
     };
   }
 }

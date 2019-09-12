@@ -47,7 +47,7 @@ namespace gazebo
       public: std::mutex mutex;
 
       /// \brief Laser message.
-      public: msgs::LaserScanStamped laserMsg;
+      public: gazebo::msgs::LaserScanStamped laserMsg;
     };
   }
 }

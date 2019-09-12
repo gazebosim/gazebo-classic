@@ -119,14 +119,14 @@ void PressurePlugin::Init()
     // Create publisher for tactile messages
     std::string topicName = "~/" + this->parentSensorName + "/tactile";
     boost::replace_all(topicName, "::", "/");
-    this->tactilePub = this->node->Advertise<msgs::Tactile>(topicName);
+    this->tactilePub = this->node->Advertise<gazebo::msgs::Tactile>(topicName);
   }
 }
 
 /////////////////////////////////////////////////
 void PressurePlugin::OnUpdate()
 {
-  msgs::Tactile tactileMsg;
+  gazebo::msgs::Tactile tactileMsg;
 
   // For each collision attached to this sensor
   std::map<std::string, double>::iterator iter;
@@ -160,13 +160,13 @@ void PressurePlugin::OnUpdate()
     }
   }
 
-  msgs::Contacts contacts = this->parentSensor->Contacts();
+  gazebo::msgs::Contacts contacts = this->parentSensor->Contacts();
   int nc = contacts.contact_size();
   if (nc > 0)
   {
     common::Time currentContactTime;
-    currentContactTime = msgs::Convert(contacts.contact(nc-1).time());
-    msgs::Set(tactileMsg.mutable_time(), currentContactTime);
+    currentContactTime = gazebo::msgs::Convert(contacts.contact(nc-1).time());
+    gazebo::msgs::Set(tactileMsg.mutable_time(), currentContactTime);
 
     if (this->tactilePub && tactileMsg.pressure_size() > 0)
       this->tactilePub->Publish(tactileMsg);

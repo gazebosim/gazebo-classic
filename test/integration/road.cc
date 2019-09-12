@@ -84,19 +84,20 @@ void RoadTest::RoadVisual()
   // publish road msg to create the road
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
-  transport::PublisherPtr roadPub = node->Advertise<msgs::Road>("~/roads");
+  transport::PublisherPtr roadPub = node->Advertise<gazebo::msgs::Road>(
+      "~/roads");
   roadPub->WaitForConnection();
 
   std::string roadName = "road_test";
-  msgs::Road msg;
+  gazebo::msgs::Road msg;
   msg.set_name(roadName);
   msg.set_width(8);
-  msgs::Vector3d *pt01Msg = msg.add_point();
-  msgs::Set(pt01Msg, ignition::math::Vector3d::Zero);
-  msgs::Vector3d *pt02Msg = msg.add_point();
-  msgs::Set(pt02Msg, ignition::math::Vector3d(0, 5, 0));
-  msgs::Vector3d *pt03Msg = msg.add_point();
-  msgs::Set(pt03Msg, ignition::math::Vector3d(2, 5, 0));
+  gazebo::msgs::Vector3d *pt01Msg = msg.add_point();
+  gazebo::msgs::Set(pt01Msg, ignition::math::Vector3d::Zero);
+  gazebo::msgs::Vector3d *pt02Msg = msg.add_point();
+  gazebo::msgs::Set(pt02Msg, ignition::math::Vector3d(0, 5, 0));
+  gazebo::msgs::Vector3d *pt03Msg = msg.add_point();
+  gazebo::msgs::Set(pt03Msg, ignition::math::Vector3d(2, 5, 0));
 
   roadPub->Publish(msg);
 

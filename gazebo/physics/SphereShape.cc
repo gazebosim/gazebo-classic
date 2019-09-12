@@ -67,14 +67,14 @@ void SphereShape::SetScale(const ignition::math::Vector3d &_scale)
 }
 
 //////////////////////////////////////////////////
-void SphereShape::FillMsg(msgs::Geometry &_msg)
+void SphereShape::FillMsg(gazebo::msgs::Geometry &_msg)
 {
-  _msg.set_type(msgs::Geometry::SPHERE);
+  _msg.set_type(gazebo::msgs::Geometry::SPHERE);
   _msg.mutable_sphere()->set_radius(this->GetRadius());
 }
 
 //////////////////////////////////////////////////
-void SphereShape::ProcessMsg(const msgs::Geometry &_msg)
+void SphereShape::ProcessMsg(const gazebo::msgs::Geometry &_msg)
 {
   this->SetRadius(_msg.sphere().radius());
 }

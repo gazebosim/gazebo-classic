@@ -36,10 +36,10 @@ TEST_F(FileHandling, Save)
   Load("worlds/empty.world");
 
   transport::PublisherPtr serverControlPub =
-    node->Advertise<msgs::ServerControl>("/gazebo/server/control");
+    node->Advertise<gazebo::msgs::ServerControl>("/gazebo/server/control");
 
   transport::PublisherPtr requestPub =
-    node->Advertise<msgs::Request>("~/request");
+    node->Advertise<gazebo::msgs::Request>("~/request");
 
   // Find a valid filename
   FILE *file = NULL;
@@ -52,7 +52,7 @@ TEST_F(FileHandling, Save)
     i++;
   } while ((file = fopen(filename.str().c_str(), "r")) != NULL);
 
-  msgs::ServerControl msg;
+  gazebo::msgs::ServerControl msg;
   msg.set_save_world_name("default");
   msg.set_save_filename(filename.str());
   serverControlPub->Publish(msg);

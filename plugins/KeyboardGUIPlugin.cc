@@ -65,7 +65,8 @@ KeyboardGUIPlugin::KeyboardGUIPlugin()
   this->dataPtr->gzNode = transport::NodePtr(new transport::Node());
   this->dataPtr->gzNode->Init();
   this->dataPtr->keyboardPub =
-      this->dataPtr->gzNode->Advertise<msgs::Any>("~/keyboard/keypress");
+      this->dataPtr->gzNode->Advertise<gazebo::msgs::Any>(
+          "~/keyboard/keypress");
 }
 
 /////////////////////////////////////////////////
@@ -78,8 +79,8 @@ KeyboardGUIPlugin::~KeyboardGUIPlugin()
 /////////////////////////////////////////////////
 void KeyboardGUIPlugin::OnKeyPress(const gazebo::common::KeyEvent &_event)
 {
-  msgs::Any msg;
-  msg.set_type(msgs::Any_ValueType_INT32);
+  gazebo::msgs::Any msg;
+  msg.set_type(gazebo::msgs::Any_ValueType_INT32);
   msg.set_int_value(_event.key);
   this->dataPtr->keyboardPub->Publish(msg);
 }

@@ -158,8 +158,8 @@ void WrenchVisual::Load(ConstJointPtr &_msg)
       event::Events::ConnectPreRender(
         boost::bind(&WrenchVisual::Update, this)));
 
-  this->SetPosition(msgs::ConvertIgn(_msg->pose().position()));
-  this->SetRotation(msgs::ConvertIgn(_msg->pose().orientation()));
+  this->SetPosition(gazebo::msgs::ConvertIgn(_msg->pose().position()));
+  this->SetRotation(gazebo::msgs::ConvertIgn(_msg->pose().orientation()));
 }
 
 /////////////////////////////////////////////////
@@ -191,7 +191,7 @@ void WrenchVisual::Update()
 
   magScale = 50000;
   ignition::math::Vector3d force =
-    msgs::ConvertIgn(dPtr->wrenchMsg->wrench().force());
+    gazebo::msgs::ConvertIgn(dPtr->wrenchMsg->wrench().force());
   double forceScale = (2.0 * vRange) / (1 +
       exp(force.SquaredLength() / magScale)) - offset;
 

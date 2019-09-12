@@ -168,9 +168,12 @@ void WorldState::Load(const sdf::ElementPtr _elem)
 {
   // Copy the name and time information
   this->name = _elem->Get<std::string>("world_name");
-  this->simTime = _elem->Get<common::Time>("sim_time");
-  this->wallTime = _elem->Get<common::Time>("wall_time");
-  this->realTime = _elem->Get<common::Time>("real_time");
+  auto time = _elem->Get<sdf::Time>("sim_time");
+  this->simTime.Set(time.sec, time.nsec);
+  time = _elem->Get<sdf::Time>("wall_time");
+  this->wallTime.Set(time.sec, time.nsec);
+  time = _elem->Get<sdf::Time>("real_time");
+  this->realTime.Set(time.sec, time.nsec);
   this->iterations = _elem->Get<uint64_t>("iterations");
 
   // Add the model states

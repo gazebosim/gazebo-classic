@@ -113,7 +113,7 @@ namespace gazebo
     private: ignition::math::Angle angleStep;
 
     /// \brief State received from the Cessna plugin.
-    private: msgs::Cessna state;
+    private: gazebo::msgs::Cessna state;
 
     /// \brief Protection.
     private: std::mutex mutex;

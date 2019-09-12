@@ -333,7 +333,7 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     auto link = linkSurface.first.lock();
     GZ_ASSERT(link, "link should still exist inside Load");
     auto &params = linkSurface.second;
-    params.slipPub = this->dataPtr->gzNode->Advertise<msgs::Vector3d>(
+    params.slipPub = this->dataPtr->gzNode->Advertise<gazebo::msgs::Vector3d>(
         "~/" + _model->GetName() + "/wheel_slip/" + link->GetName());
   }
 
@@ -508,9 +508,9 @@ void WheelSlipPlugin::Update()
     // Try to publish slip data for this wheel
     if (link)
     {
-      msgs::Vector3d msg;
+      gazebo::msgs::Vector3d msg;
       auto name = link->GetName();
-      msg = msgs::Convert(slips[name]);
+      msg = gazebo::msgs::Convert(slips[name]);
       if (params.slipPub)
         params.slipPub->Publish(msg);
     }

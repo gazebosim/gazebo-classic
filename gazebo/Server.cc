@@ -85,7 +85,7 @@ namespace gazebo
     std::mutex receiveMutex;
 
     /// \brief List of received control messages.
-    std::list<msgs::ServerControl> controlMsgs;
+    std::list<gazebo::msgs::ServerControl> controlMsgs;
 
     /// \brief Command line params that are passed to various Gazebo objects.
     gazebo::common::StrStr_M params;
@@ -479,7 +479,8 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
                                    &Server::OnControl, this);
 
   this->dataPtr->worldModPub =
-    this->dataPtr->node->Advertise<msgs::WorldModify>("/gazebo/world/modify");
+    this->dataPtr->node->Advertise<gazebo::msgs::WorldModify>(
+        "/gazebo/world/modify");
 
   common::Time waitTime(1, 0);
   int waitCount = 0;
@@ -644,7 +645,7 @@ void Server::OnControl(ConstServerControlPtr &_msg)
 /////////////////////////////////////////////////
 void Server::ProcessControlMsgs()
 {
-  std::list<msgs::ServerControl>::iterator iter;
+  std::list<gazebo::msgs::ServerControl>::iterator iter;
   for (iter = this->dataPtr->controlMsgs.begin();
        iter != this->dataPtr->controlMsgs.end(); ++iter)
   {
@@ -718,7 +719,7 @@ void Server::ProcessControlMsgs()
       }
 
       // Notify the result.
-      msgs::WorldModify worldMsg;
+      gazebo::msgs::WorldModify worldMsg;
       worldMsg.set_world_name(worldName);
       worldMsg.set_cloned(success);
       if (success)
@@ -779,7 +780,7 @@ bool Server::OpenWorld(const std::string & /*_filename*/)
     return false;
   }
 
-  msgs::WorldModify worldMsg;
+  gazebo::msgs::WorldModify worldMsg;
   worldMsg.set_world_name("default");
   worldMsg.set_remove(true);
   this->worldModPub->Publish(worldMsg);

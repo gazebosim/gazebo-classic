@@ -67,7 +67,8 @@ class WorldPlaybackTest : public ServerFixture,
     this->node = transport::NodePtr(new transport::Node());
     this->node->Init();
     this->logPlaybackPub =
-      this->node->Advertise<msgs::LogPlaybackControl>("~/playback_control");
+      this->node->Advertise<gazebo::msgs::LogPlaybackControl>(
+          "~/playback_control");
 
     // Read expected values.
     this->features = logs[this->logName];
@@ -99,7 +100,7 @@ TEST_P(WorldPlaybackTest, Pause)
   EXPECT_TRUE(this->world->IsPaused());
 
   // Send a message to unpause the world.
-  msgs::LogPlaybackControl msg;
+  gazebo::msgs::LogPlaybackControl msg;
   msg.set_pause(false);
   this->logPlaybackPub->Publish(msg);
 
@@ -132,7 +133,7 @@ TEST_P(WorldPlaybackTest, Pause)
 TEST_P(WorldPlaybackTest, Step)
 {
   ASSERT_TRUE(this->world != NULL);
-  msgs::LogPlaybackControl msg;
+  gazebo::msgs::LogPlaybackControl msg;
   common::Time expectedSimTime;
 
   // Rewind the world.
@@ -202,7 +203,7 @@ TEST_P(WorldPlaybackTest, Rewind)
     world->Step(steps);
 
     // Rewind the world.
-    msgs::LogPlaybackControl msg;
+    gazebo::msgs::LogPlaybackControl msg;
     common::Time expectedSimTime;
 
     expectedSimTime.Set(std::get<0>(this->features));
@@ -225,7 +226,7 @@ TEST_P(WorldPlaybackTest, Forward)
     world->Step(steps);
 
     // Fast forward the world.
-    msgs::LogPlaybackControl msg;
+    gazebo::msgs::LogPlaybackControl msg;
     common::Time expectedSimTime;
 
     expectedSimTime.Set(std::get<3>(this->features));
@@ -245,8 +246,8 @@ TEST_P(WorldPlaybackTest, Seek)
 
   // Move the simulation to the time at frame #2.
   expectedSimTime.Set(std::get<1>(this->features));
-  auto msgExpectedTime = msgs::Convert(expectedSimTime);
-  msgs::LogPlaybackControl msg;
+  auto msgExpectedTime = gazebo::msgs::Convert(expectedSimTime);
+  gazebo::msgs::LogPlaybackControl msg;
   msg.mutable_seek()->set_sec(msgExpectedTime.sec());
   msg.mutable_seek()->set_nsec(msgExpectedTime.nsec());
   this->logPlaybackPub->Publish(msg);
@@ -255,7 +256,7 @@ TEST_P(WorldPlaybackTest, Seek)
 
   // Move the simulation to the time at last frame.
   expectedSimTime.Set(std::get<3>(this->features));
-  msgExpectedTime = msgs::Convert(expectedSimTime);
+  msgExpectedTime = gazebo::msgs::Convert(expectedSimTime);
   msg.Clear();
   msg.mutable_seek()->set_sec(msgExpectedTime.sec());
   msg.mutable_seek()->set_nsec(msgExpectedTime.nsec());
@@ -265,7 +266,7 @@ TEST_P(WorldPlaybackTest, Seek)
 
   // Specify a time slightly before #4.
   expectedSimTime.Set(std::get<2>(this->features));
-  msgExpectedTime = msgs::Convert(expectedSimTime - 0.000001);
+  msgExpectedTime = gazebo::msgs::Convert(expectedSimTime - 0.000001);
   msg.mutable_seek()->set_sec(msgExpectedTime.sec());
   msg.mutable_seek()->set_nsec(msgExpectedTime.nsec());
   this->logPlaybackPub->Publish(msg);
@@ -274,7 +275,7 @@ TEST_P(WorldPlaybackTest, Seek)
 
   // Specify a time before the initial time.
   expectedSimTime.Set(std::get<0>(this->features));
-  msgExpectedTime = msgs::Convert(expectedSimTime - 1.0);
+  msgExpectedTime = gazebo::msgs::Convert(expectedSimTime - 1.0);
   msg.mutable_seek()->set_sec(msgExpectedTime.sec());
   msg.mutable_seek()->set_nsec(msgExpectedTime.nsec());
   this->logPlaybackPub->Publish(msg);
@@ -283,7 +284,7 @@ TEST_P(WorldPlaybackTest, Seek)
 
   // Specify a time after the last frame.
   expectedSimTime.Set(std::get<3>(this->features));
-  msgExpectedTime = msgs::Convert(expectedSimTime + 1.0);
+  msgExpectedTime = gazebo::msgs::Convert(expectedSimTime + 1.0);
   msg.mutable_seek()->set_sec(msgExpectedTime.sec());
   msg.mutable_seek()->set_nsec(msgExpectedTime.nsec());
   this->logPlaybackPub->Publish(msg);

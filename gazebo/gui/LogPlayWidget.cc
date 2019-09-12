@@ -238,7 +238,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   this->dataPtr->node->TryInit(common::Time::Maximum());
 
   this->dataPtr->logPlaybackControlPub = this->dataPtr->node->
-      Advertise<msgs::LogPlaybackControl>("~/playback_control");
+      Advertise<gazebo::msgs::LogPlaybackControl>("~/playback_control");
 }
 
 /////////////////////////////////////////////////
@@ -318,7 +318,7 @@ void LogPlayWidget::SetPaused(const bool _paused)
 /////////////////////////////////////////////////
 void LogPlayWidget::OnPlay()
 {
-  msgs::LogPlaybackControl msg;
+  gazebo::msgs::LogPlaybackControl msg;
   msg.set_pause(false);
   this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
@@ -326,7 +326,7 @@ void LogPlayWidget::OnPlay()
 /////////////////////////////////////////////////
 void LogPlayWidget::OnPause()
 {
-  msgs::LogPlaybackControl msg;
+  gazebo::msgs::LogPlaybackControl msg;
   msg.set_pause(true);
   this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
@@ -364,7 +364,7 @@ void LogPlayWidget::OnStepBack()
 /////////////////////////////////////////////////
 void LogPlayWidget::OnRewind()
 {
-  msgs::LogPlaybackControl msg;
+  gazebo::msgs::LogPlaybackControl msg;
   msg.set_rewind(true);
   this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
@@ -372,7 +372,7 @@ void LogPlayWidget::OnRewind()
 /////////////////////////////////////////////////
 void LogPlayWidget::OnForward()
 {
-  msgs::LogPlaybackControl msg;
+  gazebo::msgs::LogPlaybackControl msg;
   msg.set_forward(true);
   this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
@@ -380,8 +380,8 @@ void LogPlayWidget::OnForward()
 /////////////////////////////////////////////////
 void LogPlayWidget::OnSeek(const common::Time &_time)
 {
-  msgs::LogPlaybackControl msg;
-  msgs::Set(msg.mutable_seek(), _time);
+  gazebo::msgs::LogPlaybackControl msg;
+  gazebo::msgs::Set(msg.mutable_seek(), _time);
   this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
 
@@ -530,7 +530,7 @@ void LogPlayWidget::EmitSetEndTime(const common::Time &_time)
 /////////////////////////////////////////////////
 void LogPlayWidget::PublishMultistep(const int _step)
 {
-  msgs::LogPlaybackControl msg;
+  gazebo::msgs::LogPlaybackControl msg;
   msg.set_multi_step(_step);
   this->dataPtr->logPlaybackControlPub->Publish(msg);
 }

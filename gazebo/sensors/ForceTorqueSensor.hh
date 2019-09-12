@@ -80,7 +80,7 @@ namespace gazebo
       /// \param[in] _subscriber Callback function.
       /// \return The connection, which must be kept in scope.
       public: event::ConnectionPtr ConnectUpdate(
-                  std::function<void (msgs::WrenchStamped)> _subscriber);
+                  std::function<void(gazebo::msgs::WrenchStamped)> _subscriber);
 
       // Documentation inherited.
       protected: virtual bool UpdateImpl(const bool _force);

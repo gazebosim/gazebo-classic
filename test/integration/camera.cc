@@ -59,13 +59,13 @@ TEST_F(CameraTest, Follow)
 
   // Tell the camera to follow the box. The camera should move toward the
   // box.
-  msgs::CameraCmd msg;
+  gazebo::msgs::CameraCmd msg;
   msg.set_follow_model("box");
 
   transport::NodePtr node(new transport::Node());
   node->Init("default");
 
-  transport::PublisherPtr pub = node->Advertise<msgs::CameraCmd>(
+  transport::PublisherPtr pub = node->Advertise<gazebo::msgs::CameraCmd>(
       "~/test_camera_model/body/test_camera/cmd");
 
   pub->WaitForConnection();

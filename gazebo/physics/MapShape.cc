@@ -109,9 +109,9 @@ void MapShape::Init()
 }
 
 //////////////////////////////////////////////////
-void MapShape::FillMsg(msgs::Geometry &_msg)
+void MapShape::FillMsg(gazebo::msgs::Geometry &_msg)
 {
-  _msg.set_type(msgs::Geometry::IMAGE);
+  _msg.set_type(gazebo::msgs::Geometry::IMAGE);
   _msg.mutable_image()->set_uri(this->GetURI());
   _msg.mutable_image()->set_scale(this->Scale().X());
   _msg.mutable_image()->set_threshold(this->GetThreshold());
@@ -435,7 +435,7 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
 }
 
 //////////////////////////////////////////////////
-void MapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
+void MapShape::ProcessMsg(const gazebo::msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
 }

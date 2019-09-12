@@ -247,10 +247,10 @@ bool WorldCommand::RunImpl()
   node->Init(worldName);
 
   transport::PublisherPtr pub =
-    node->Advertise<msgs::WorldControl>("~/world_control");
+    node->Advertise<gazebo::msgs::WorldControl>("~/world_control");
   pub->WaitForConnection();
 
-  msgs::WorldControl msg;
+  gazebo::msgs::WorldControl msg;
   bool good = false;
 
   if (this->vm.count("pause"))
@@ -335,10 +335,10 @@ bool PhysicsCommand::RunImpl()
   node->Init(worldName);
 
   transport::PublisherPtr pub =
-    node->Advertise<msgs::Physics>("~/physics");
+    node->Advertise<gazebo::msgs::Physics>("~/physics");
   pub->WaitForConnection();
 
-  msgs::Physics msg;
+  gazebo::msgs::Physics msg;
 
   bool good = false;
 
@@ -458,8 +458,10 @@ bool ModelCommand::RunImpl()
 
   if (this->vm.count("delete"))
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete", modelName);
-    transport::PublisherPtr pub = node->Advertise<msgs::Request>("~/request");
+    gazebo::msgs::Request *msg =
+      gazebo::msgs::CreateRequest("entity_delete", modelName);
+    transport::PublisherPtr pub =
+      node->Advertise<gazebo::msgs::Request>("~/request");
     pub->WaitForConnection();
     pub->Publish(*msg, true);
     delete msg;
@@ -518,7 +520,8 @@ bool ModelCommand::RunImpl()
   }
   else if (this->vm.count("info") || this->vm.count("pose"))
   {
-    boost::shared_ptr<msgs::Response> response = gazebo::transport::request(
+    boost::shared_ptr<gazebo::msgs::Response> response =
+      gazebo::transport::request(
         worldName, "entity_info", modelName);
     gazebo::msgs::Model modelMsg;
 
@@ -541,12 +544,12 @@ bool ModelCommand::RunImpl()
   else
   {
     transport::PublisherPtr pub =
-      node->Advertise<msgs::Model>("~/model/modify");
+      node->Advertise<gazebo::msgs::Model>("~/model/modify");
     pub->WaitForConnection();
 
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
     msg.set_name(modelName);
-    msgs::Set(msg.mutable_pose(), pose);
+    gazebo::msgs::Set(msg.mutable_pose(), pose);
     pub->Publish(msg, true);
   }
 
@@ -570,12 +573,13 @@ bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
   if (!_name.empty())
     modelElem->GetAttribute("name")->SetFromString(_name);
 
-  transport::PublisherPtr pub = _node->Advertise<msgs::Factory>("~/factory");
+  transport::PublisherPtr pub =
+    _node->Advertise<gazebo::msgs::Factory>("~/factory");
   pub->WaitForConnection();
 
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf(_sdf->ToString());
-  msgs::Set(msg.mutable_pose(), _pose);
+  gazebo::msgs::Set(msg.mutable_pose(), _pose);
   pub->Publish(msg, true);
 
   return true;
@@ -748,14 +752,14 @@ bool CameraCommand::RunImpl()
 
     if (connection)
     {
-      msgs::Packet packet;
-      msgs::Request *request;
-      msgs::GzString_V topics;
+      gazebo::msgs::Packet packet;
+      gazebo::msgs::Request *request;
+      gazebo::msgs::GzString_V topics;
       std::string data;
 
-      request = msgs::CreateRequest("get_topics");
+      request = gazebo::msgs::CreateRequest("get_topics");
       request->set_id(0);
-      connection->EnqueueMsg(msgs::Package("request", *request), true);
+      connection->EnqueueMsg(gazebo::msgs::Package("request", *request), true);
       connection->Read(data);
 
       packet.ParseFromString(data);
@@ -763,8 +767,9 @@ bool CameraCommand::RunImpl()
 
       for (int i = 0; i < topics.data_size(); ++i)
       {
-        request = msgs::CreateRequest("topic_info", topics.data(i));
-        connection->EnqueueMsg(msgs::Package("request", *request), true);
+        request = gazebo::msgs::CreateRequest("topic_info", topics.data(i));
+        connection->EnqueueMsg(
+            gazebo::msgs::Package("request", *request), true);
 
         int j = 0;
         do
@@ -773,7 +778,7 @@ bool CameraCommand::RunImpl()
           packet.ParseFromString(data);
         } while (packet.type() != "topic_info_response" && ++j < 10);
 
-        msgs::TopicInfo topicInfo;
+        gazebo::msgs::TopicInfo topicInfo;
 
         if (j <10)
           topicInfo.ParseFromString(packet.serialized_data());
@@ -809,7 +814,7 @@ bool CameraCommand::RunImpl()
     return false;
   }
 
-  msgs::CameraCmd msg;
+  gazebo::msgs::CameraCmd msg;
   if (this->vm.count("follow"))
     msg.set_follow_model(this->vm["follow"].as<std::string>());
 
@@ -819,7 +824,7 @@ bool CameraCommand::RunImpl()
   boost::replace_all(cameraName, "::", "/");
 
   transport::PublisherPtr pub =
-    node->Advertise<msgs::CameraCmd>(
+    node->Advertise<gazebo::msgs::CameraCmd>(
         std::string("~/") + cameraName + "/cmd");
 
   pub->WaitForConnection();
@@ -882,14 +887,14 @@ void StatsCommand::CB(ConstWorldStatisticsPtr &_msg)
 
   double percent = 0;
   char paused;
-  common::Time simTime  = msgs::Convert(_msg->sim_time());
-  common::Time realTime = msgs::Convert(_msg->real_time());
+  common::Time simTime  = gazebo::msgs::Convert(_msg->sim_time());
+  common::Time realTime = gazebo::msgs::Convert(_msg->real_time());
 
-  this->simTimes.push_back(msgs::Convert(_msg->sim_time()));
+  this->simTimes.push_back(gazebo::msgs::Convert(_msg->sim_time()));
   if (this->simTimes.size() > 20)
     this->simTimes.pop_front();
 
-  this->realTimes.push_back(msgs::Convert(_msg->real_time()));
+  this->realTimes.push_back(gazebo::msgs::Convert(_msg->real_time()));
   if (this->realTimes.size() > 20)
     this->realTimes.pop_front();
 

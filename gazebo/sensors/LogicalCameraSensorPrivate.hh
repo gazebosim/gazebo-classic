@@ -38,7 +38,7 @@ namespace gazebo
       public: void AddVisibleModels(ignition::math::Pose3d &_myPose,
         const physics::Model_V &_models);
 
-      /// \brief Publisher of msgs::LogicalCameraImage messages.
+      /// \brief Publisher of gazebo::msgs::LogicalCameraImage messages.
       public: transport::PublisherPtr pub;
 
       /// \brief Camera frustum.
@@ -48,7 +48,7 @@ namespace gazebo
       public: physics::LinkPtr parentLink;
 
       /// \brief Used to store and report the detected models.
-      public: msgs::LogicalCameraImage msg;
+      public: gazebo::msgs::LogicalCameraImage msg;
 
       /// \brief Mutex to protect the msg.
       public: std::mutex mutex;

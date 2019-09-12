@@ -71,7 +71,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
 
   ignition::math::Pose3d pose;
   if (_msg->has_pose())
-    pose = msgs::ConvertIgn(_msg->pose());
+    pose = gazebo::msgs::ConvertIgn(_msg->pose());
 
   this->SetPosition(pose.Pos());
   this->SetRotation(pose.Rot());
@@ -93,8 +93,9 @@ void JointVisual::Load(ConstJointPtr &_msg)
     jointVis->Load(_msg, pose + this->GetParent()->WorldPose());
 
     // attach axis2 to this visual
-    msgs::Axis axis2Msg = _msg->axis2();
-    dPtr->arrowVisual = this->CreateAxis(msgs::ConvertIgn(axis2Msg.xyz()),
+    gazebo::msgs::Axis axis2Msg = _msg->axis2();
+    dPtr->arrowVisual = this->CreateAxis(
+        gazebo::msgs::ConvertIgn(axis2Msg.xyz()),
         axis2Msg.use_parent_model_frame(), _msg->type());
 
     dPtr->parentAxisVis = jointVis;
@@ -103,8 +104,9 @@ void JointVisual::Load(ConstJointPtr &_msg)
   {
     // for all other joint types:
     // axis1 is attached to child link
-    msgs::Axis axis1Msg = _msg->axis1();
-    dPtr->arrowVisual = this->CreateAxis(msgs::ConvertIgn(axis1Msg.xyz()),
+    gazebo::msgs::Axis axis1Msg = _msg->axis1();
+    dPtr->arrowVisual = this->CreateAxis(
+        gazebo::msgs::ConvertIgn(axis1Msg.xyz()),
         axis1Msg.use_parent_model_frame(), _msg->type());
   }
 
@@ -129,8 +131,9 @@ void JointVisual::Load(ConstJointPtr &_msg,
 
   Visual::Load();
 
-  msgs::Axis axis1Msg = _msg->axis1();
-  dPtr->arrowVisual = this->CreateAxis(msgs::ConvertIgn(axis1Msg.xyz()),
+  gazebo::msgs::Axis axis1Msg = _msg->axis1();
+  dPtr->arrowVisual = this->CreateAxis(
+      gazebo::msgs::ConvertIgn(axis1Msg.xyz()),
       axis1Msg.use_parent_model_frame(), _msg->type());
 
   // joint pose is always relative to the child link so update axis pose
@@ -142,7 +145,7 @@ void JointVisual::Load(ConstJointPtr &_msg,
 
 /////////////////////////////////////////////////
 ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
-    const bool _useParentFrame, const msgs::Joint::Type &_type)
+    const bool _useParentFrame, const gazebo::msgs::Joint::Type &_type)
 {
   ArrowVisualPtr axis;
 
@@ -162,7 +165,7 @@ ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
 void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     const ignition::math::Vector3d &_axis,
     const bool _useParentFrame,
-    const msgs::Joint::Type &_type)
+    const gazebo::msgs::Joint::Type &_type)
 {
   JointVisualPrivate *dPtr =
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
@@ -194,10 +197,10 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     _arrowVisual->SetRotation(quatFromModel.Inverse() *
         _arrowVisual->Rotation());
   }
-  _arrowVisual->ShowRotation(_type == msgs::Joint::REVOLUTE ||
-                             _type == msgs::Joint::REVOLUTE2 ||
-                             _type == msgs::Joint::UNIVERSAL ||
-                             _type == msgs::Joint::GEARBOX);
+  _arrowVisual->ShowRotation(_type == gazebo::msgs::Joint::REVOLUTE ||
+                             _type == gazebo::msgs::Joint::REVOLUTE2 ||
+                             _type == gazebo::msgs::Joint::UNIVERSAL ||
+                             _type == gazebo::msgs::Joint::GEARBOX);
 
   if (dPtr->axisVisual)
   {
@@ -244,9 +247,9 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
   if (_msg->has_pose())
   {
     // Avoid position changing when parent is scaled
-    this->SetPosition(msgs::ConvertIgn(_msg->pose().position()) /
+    this->SetPosition(gazebo::msgs::ConvertIgn(_msg->pose().position()) /
         this->GetParent()->Scale());
-    this->SetRotation(msgs::ConvertIgn(_msg->pose().orientation()));
+    this->SetRotation(gazebo::msgs::ConvertIgn(_msg->pose().orientation()));
   }
 
   ArrowVisualPtr axis2Visual = NULL;
@@ -263,8 +266,8 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
     dPtr->axisVisual->ShowAxisHead(2, true);
   }
 
-  msgs::Axis axis1Msg;
-  msgs::Axis axis2Msg;
+  gazebo::msgs::Axis axis1Msg;
+  gazebo::msgs::Axis axis2Msg;
   // Now has 2 axes
   if (_msg->has_axis2())
   {
@@ -273,12 +276,13 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
     // Previously already had 2 axes
     if (axis2Visual)
     {
-      this->UpdateAxis(dPtr->arrowVisual, msgs::ConvertIgn(axis1Msg.xyz()),
+      this->UpdateAxis(dPtr->arrowVisual,
+          gazebo::msgs::ConvertIgn(axis1Msg.xyz()),
           axis1Msg.use_parent_model_frame(), _msg->type());
-      this->UpdateAxis(axis2Visual, msgs::ConvertIgn(axis2Msg.xyz()),
+      this->UpdateAxis(axis2Visual, gazebo::msgs::ConvertIgn(axis2Msg.xyz()),
           axis2Msg.use_parent_model_frame(), _msg->type());
       // joint pose is always relative to the child link
-      dPtr->parentAxisVis->SetWorldPose(msgs::ConvertIgn(_msg->pose()) +
+      dPtr->parentAxisVis->SetWorldPose(gazebo::msgs::ConvertIgn(_msg->pose()) +
           this->GetParent()->WorldPose());
     }
     else
@@ -292,7 +296,8 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
       JointVisualPtr jointVis;
       jointVis.reset(new JointVisual(this->Name() + "_parent_", parentVis));
       jointVis->Load(_msg,
-          msgs::ConvertIgn(_msg->pose()) + this->GetParent()->WorldPose());
+          gazebo::msgs::ConvertIgn(_msg->pose()) +
+          this->GetParent()->WorldPose());
 
       dPtr->parentAxisVis = jointVis;
       dPtr->parentAxisVis->SetScale(dPtr->scaleToLink);
@@ -300,13 +305,15 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
       // Previously had 1 axis, which becomes axis 2 now
       if (dPtr->arrowVisual)
       {
-        this->UpdateAxis(dPtr->arrowVisual, msgs::ConvertIgn(axis2Msg.xyz()),
+        this->UpdateAxis(dPtr->arrowVisual,
+            gazebo::msgs::ConvertIgn(axis2Msg.xyz()),
             axis2Msg.use_parent_model_frame(), _msg->type());
       }
       // Previously had no axis
       else
       {
-        dPtr->arrowVisual = this->CreateAxis(msgs::ConvertIgn(axis2Msg.xyz()),
+        dPtr->arrowVisual = this->CreateAxis(
+            gazebo::msgs::ConvertIgn(axis2Msg.xyz()),
             axis2Msg.use_parent_model_frame(), _msg->type());
       }
     }
@@ -322,13 +329,15 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
     // Previously had at least 1 axis
     if (dPtr->arrowVisual)
     {
-      this->UpdateAxis(dPtr->arrowVisual, msgs::ConvertIgn(axis1Msg.xyz()),
+      this->UpdateAxis(dPtr->arrowVisual,
+          gazebo::msgs::ConvertIgn(axis1Msg.xyz()),
           axis1Msg.use_parent_model_frame(), _msg->type());
     }
     // Previously had no axis
     else
     {
-      dPtr->arrowVisual = this->CreateAxis(msgs::ConvertIgn(axis1Msg.xyz()),
+      dPtr->arrowVisual = this->CreateAxis(
+          gazebo::msgs::ConvertIgn(axis1Msg.xyz()),
           axis1Msg.use_parent_model_frame(), _msg->type());
     }
   }

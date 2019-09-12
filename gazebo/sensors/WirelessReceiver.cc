@@ -60,7 +60,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
 {
   WirelessTransceiver::Load(_worldName);
 
-  this->pub = this->node->Advertise<msgs::WirelessNodes>(
+  this->pub = this->node->Advertise<gazebo::msgs::WirelessNodes>(
       this->Topic(), 30);
   GZ_ASSERT(this->pub != nullptr,
       "wirelessReceiverSensor did not get a valid publisher pointer");
@@ -109,7 +109,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
 bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
 {
   std::string txEssid;
-  msgs::WirelessNodes msg;
+  gazebo::msgs::WirelessNodes msg;
   double rxPower;
   double txFreq;
 
@@ -138,7 +138,7 @@ bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
 
       txEssid = transmitter->ESSID();
 
-      msgs::WirelessNode *wirelessNode = msg.add_node();
+      gazebo::msgs::WirelessNode *wirelessNode = msg.add_node();
       wirelessNode->set_essid(txEssid);
       wirelessNode->set_frequency(txFreq);
       wirelessNode->set_signal_level(rxPower);

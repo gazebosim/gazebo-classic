@@ -66,16 +66,16 @@ class Factory : public WorldPlugin
 
       // Create a publisher on the ~/factory topic
       transport::PublisherPtr factoryPub =
-      node->Advertise<msgs::Factory>("~/factory");
+      node->Advertise<gazebo::msgs::Factory>("~/factory");
 
       // Create the message
-      msgs::Factory msg;
+      gazebo::msgs::Factory msg;
 
       // Model file to load
       msg.set_sdf_filename("model://cylinder");
 
       // Pose to initialize the model to
-      msgs::Set(msg.mutable_pose(),
+      gazebo::msgs::Set(msg.mutable_pose(),
           ignition::math::Pose3d(
             ignition::math::Vector3d(1, -2, 0),
             ignition::math::Quaterniond(0, 0, 0)));

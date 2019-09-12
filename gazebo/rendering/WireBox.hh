@@ -41,14 +41,14 @@ namespace gazebo
       /// \param[in] _box Dimension of the box to draw.
       /// \param[in] _parent Parent visual of the box.
       public: explicit WireBox(VisualPtr _parent,
-          const ignition::math::Box &_box);
+          const ignition::math::AxisAlignedBox &_box);
 
       /// \brief Destructor.
       public: ~WireBox();
 
       /// \brief Builds the wireframe line list.
       /// \param[in] _box Box to build a wireframe from.
-      public: void Init(const ignition::math::Box &_box);
+      public: void Init(const ignition::math::AxisAlignedBox &_box);
 
       /// \brief Set the visibility of the box.
       /// \param[in] _visible True to make the box visible, False to hide.
@@ -60,7 +60,7 @@ namespace gazebo
 
       /// \brief Get the wireframe box.
       /// \return The wireframe box.
-      public: ignition::math::Box Box() const;
+      public: ignition::math::AxisAlignedBox Box() const;
 
       /// \internal
       /// \brief Pointer to private data.

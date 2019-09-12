@@ -36,17 +36,17 @@ class MisalignmentPluginTest : public ServerFixture
 
   public: void MisalignmentCallback(ConstPoseStampedPtr &_msg)
   {
-    lastPoseMsg.reset(new msgs::PoseStamped(*_msg));
+    lastPoseMsg.reset(new gazebo::msgs::PoseStamped(*_msg));
   }
 
   /// \brief last pose message received
-  public: msgs::PoseStampedPtr lastPoseMsg;
+  public: gazebo::msgs::PoseStampedPtr lastPoseMsg;
 };
 
 //////////////////////////////////////////////////
 TEST_F(MisalignmentPluginTest, Disable)
 {
-  msgs::Int enableMsg;
+  gazebo::msgs::Int enableMsg;
 
   this->Load("worlds/misalignment_plugin_demo.world", true);
   auto world = physics::get_world();
@@ -67,7 +67,8 @@ TEST_F(MisalignmentPluginTest, Disable)
   ASSERT_NE(nullptr, this->lastPoseMsg.get());
 
   // Disable plugin
-  auto enablePub = this->node->Advertise<msgs::Int>(firstPrefix + "/enable");
+  auto enablePub = this->node->Advertise<gazebo::msgs::Int>(
+      firstPrefix + "/enable");
   enableMsg.set_data(0);
   enablePub->Publish(enableMsg);
 
@@ -89,7 +90,7 @@ TEST_F(MisalignmentPluginTest, Disable)
 //////////////////////////////////////////////////
 TEST_F(MisalignmentPluginTest, CompareAlignments)
 {
-  msgs::Int enableMsg;
+  gazebo::msgs::Int enableMsg;
 
   this->Load("worlds/misalignment_plugin_demo.world", true);
   auto world = physics::get_world();
@@ -113,7 +114,7 @@ TEST_F(MisalignmentPluginTest, CompareAlignments)
     // make sure a message is received
     world->Step(10);
     ASSERT_NE(nullptr, this->lastPoseMsg.get());
-    firstPose = msgs::ConvertIgn(this->lastPoseMsg->pose());
+    firstPose = gazebo::msgs::ConvertIgn(this->lastPoseMsg->pose());
   }
 
   // clear any data from first subscriber
@@ -130,7 +131,7 @@ TEST_F(MisalignmentPluginTest, CompareAlignments)
     // make sure a message is received
     world->Step(10);
     ASSERT_NE(nullptr, this->lastPoseMsg.get());
-    secondPose = msgs::ConvertIgn(this->lastPoseMsg->pose());
+    secondPose = gazebo::msgs::ConvertIgn(this->lastPoseMsg->pose());
   }
 
   EXPECT_EQ(firstPose, secondPose);

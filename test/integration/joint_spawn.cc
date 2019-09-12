@@ -97,7 +97,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     ASSERT_TRUE(parent != nullptr);
     EXPECT_EQ(parent->GetChildJoints().size(), 1u);
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
-    EXPECT_EQ(_jointType, msgs::ConvertJointType(joint->GetMsgType()));
+    EXPECT_EQ(_jointType, gazebo::msgs::ConvertJointType(joint->GetMsgType()));
     for (unsigned int i = 0; i < joint->DOF(); ++i)
     {
       CheckJointProperties(i, joint);
@@ -130,7 +130,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     ASSERT_TRUE(parent != nullptr);
     EXPECT_EQ(parent->GetChildJoints().size(), 1u);
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
-    EXPECT_EQ(_jointType, msgs::ConvertJointType(joint->GetMsgType()));
+    EXPECT_EQ(_jointType, gazebo::msgs::ConvertJointType(joint->GetMsgType()));
     for (unsigned int i = 0; i < joint->DOF(); ++i)
     {
       CheckJointProperties(i, joint);
@@ -386,7 +386,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     gzerr << "Skipping friction test for "
           << physics->GetType()
           << " "
-          << msgs::ConvertJointType(_joint->GetMsgType())
+          << gazebo::msgs::ConvertJointType(_joint->GetMsgType())
           << " joint"
           << std::endl;
   }

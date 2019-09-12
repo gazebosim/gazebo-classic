@@ -780,7 +780,7 @@ void JointMaker::RemoveJointByUser(const std::string &_name)
       auto joint = jointIt->second;
       auto cmd = this->dataPtr->userCmdManager->NewCmd(
           "Deleted [" + joint->name + "]", MEUserCmd::DELETING_JOINT);
-      cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
+      cmd->SetSDF(gazebo::msgs::JointToSDF(*joint->jointMsg));
       cmd->SetScopedName(joint->visual->Name());
       cmd->SetJointId(joint->hotspot->Name());
     }
@@ -964,7 +964,7 @@ void JointMaker::GenerateSDF()
     JointData *joint = jointsIt.second;
     sdf::ElementPtr jointElem = this->dataPtr->modelSDF->AddElement("joint");
 
-    msgs::JointPtr jointMsg = joint->jointMsg;
+    gazebo::msgs::JointPtr jointMsg = joint->jointMsg;
     unsigned int axisCount = this->JointAxisCount(joint->type);
     for (unsigned int i = axisCount; i < 2u; ++i)
     {
@@ -973,7 +973,7 @@ void JointMaker::GenerateSDF()
       else if (i == 1u)
         jointMsg->clear_axis2();
     }
-    jointElem = msgs::JointToSDF(*jointMsg.get(), jointElem);
+    jointElem = gazebo::msgs::JointToSDF(*jointMsg.get(), jointElem);
 
     sdf::ElementPtr parentElem = jointElem->GetElement("parent");
     std::string parentName = joint->parent->Name();
@@ -1064,7 +1064,7 @@ unsigned int JointMaker::JointCount()
 void JointData::OnApply()
 {
   // Get data from inspector
-  msgs::Joint *inspectorMsg = this->inspector->Data();
+  gazebo::msgs::Joint *inspectorMsg = this->inspector->Data();
   if (!inspectorMsg)
     return;
 
@@ -1078,7 +1078,7 @@ void JointData::OnApply()
 
   // Type
   this->type = JointMaker::ConvertJointType(
-      msgs::ConvertJointType(this->jointMsg->type()));
+      gazebo::msgs::ConvertJointType(this->jointMsg->type()));
 
   // Get scoped names
   std::string parentOldName = this->parent->Name();
@@ -1254,14 +1254,14 @@ void JointData::Update()
 void JointData::UpdateMsg()
 {
   // Some values are only stored in the msg, so we keep those
-  msgs::JointPtr oldMsg(new msgs::Joint);
+  gazebo::msgs::JointPtr oldMsg(new gazebo::msgs::Joint);
   if (this->jointMsg)
   {
     oldMsg->CopyFrom(*this->jointMsg);
   }
 
   // Reset
-  this->jointMsg.reset(new msgs::Joint);
+  this->jointMsg.reset(new gazebo::msgs::Joint);
 
   // Name
   this->jointMsg->set_name(this->name);
@@ -1299,19 +1299,20 @@ void JointData::UpdateMsg()
   }
   else
   {
-    msgs::Set(this->jointMsg->mutable_pose(), ignition::math::Pose3d::Zero);
+    gazebo::msgs::Set(this->jointMsg->mutable_pose(),
+        ignition::math::Pose3d::Zero);
   }
 
   // Type
   this->jointMsg->set_type(
-      msgs::ConvertJointType(JointMaker::TypeAsString(this->type)));
+      gazebo::msgs::ConvertJointType(JointMaker::TypeAsString(this->type)));
 
   // Axes
   unsigned int axisCount = JointMaker::JointAxisCount(this->type);
   for (unsigned int i = 0; i < axisCount; ++i)
   {
-    msgs::Axis *axisMsg;
-    msgs::Axis *oldAxisMsg = nullptr;
+    gazebo::msgs::Axis *axisMsg;
+    gazebo::msgs::Axis *oldAxisMsg = nullptr;
     if (i == 0u)
     {
       axisMsg = this->jointMsg->mutable_axis1();
@@ -1341,7 +1342,8 @@ void JointData::UpdateMsg()
     {
       if (this->type == JointMaker::JOINT_GEARBOX)
       {
-        msgs::Set(axisMsg->mutable_xyz(), ignition::math::Vector3d::UnitZ);
+        gazebo::msgs::Set(axisMsg->mutable_xyz(),
+            ignition::math::Vector3d::UnitZ);
       }
       else
       {
@@ -1350,7 +1352,7 @@ void JointData::UpdateMsg()
           this->axes.push_back(
               JointMaker::unitVectors[i%JointMaker::unitVectors.size()]);
         }
-        msgs::Set(axisMsg->mutable_xyz(), this->axes[i]);
+        gazebo::msgs::Set(axisMsg->mutable_xyz(), this->axes[i]);
       }
       axisMsg->set_use_parent_model_frame(false);
       axisMsg->set_limit_lower(-ignition::math::MAX_D);
@@ -1468,7 +1470,7 @@ void JointMaker::DeselectAll()
 void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
     const std::string &_modelName)
 {
-  msgs::Joint jointMsg = msgs::JointFromSDF(_jointElem);
+  gazebo::msgs::Joint jointMsg = gazebo::msgs::JointFromSDF(_jointElem);
 
   // Parent
   std::string parentName = _modelName + "::" + jointMsg.parent();
@@ -1491,10 +1493,11 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   joint->name = jointMsg.name();
   joint->parent = parentVis;
   joint->child = childVis;
-  joint->type = this->ConvertJointType(msgs::ConvertJointType(jointMsg.type()));
+  joint->type = this->ConvertJointType(
+      gazebo::msgs::ConvertJointType(jointMsg.type()));
   std::string jointVisName = _modelName + "::" + joint->name;
 
-  joint->jointMsg.reset(new msgs::Joint);
+  joint->jointMsg.reset(new gazebo::msgs::Joint);
   joint->jointMsg->CopyFrom(jointMsg);
   joint->jointMsg->set_parent_id(joint->parent->GetId());
   joint->jointMsg->set_child_id(joint->child->GetId());
@@ -1690,7 +1693,7 @@ void JointMaker::SetAxis(const std::string &_axis,
   {
     if (_axis == "axis1" && this->dataPtr->newJoint->jointMsg->has_axis1())
     {
-      msgs::Set(
+      gazebo::msgs::Set(
           this->dataPtr->newJoint->jointMsg->mutable_axis1()->mutable_xyz(),
           _value);
       this->dataPtr->newJoint->axes[0] = _value;
@@ -1698,7 +1701,7 @@ void JointMaker::SetAxis(const std::string &_axis,
     else if (_axis == "axis2" &&
         this->dataPtr->newJoint->jointMsg->has_axis2())
     {
-      msgs::Set(
+      gazebo::msgs::Set(
           this->dataPtr->newJoint->jointMsg->mutable_axis2()->mutable_xyz(),
           _value);
       this->dataPtr->newJoint->axes[1] = _value;
@@ -1712,7 +1715,7 @@ void JointMaker::SetJointPose(const ignition::math::Pose3d &_pose)
 {
   if (this->dataPtr->newJoint && this->dataPtr->newJoint->jointMsg)
   {
-    msgs::Set(this->dataPtr->newJoint->jointMsg->mutable_pose(), _pose);
+    gazebo::msgs::Set(this->dataPtr->newJoint->jointMsg->mutable_pose(), _pose);
     this->dataPtr->newJoint->dirty = true;
   }
 }
@@ -1886,7 +1889,7 @@ void JointMaker::FinalizeCreation()
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
         "Inserted [" + this->dataPtr->newJoint->name + "]",
         MEUserCmd::INSERTING_JOINT);
-    cmd->SetSDF(msgs::JointToSDF(*this->dataPtr->newJoint->jointMsg));
+    cmd->SetSDF(gazebo::msgs::JointToSDF(*this->dataPtr->newJoint->jointMsg));
     cmd->SetScopedName(this->dataPtr->newJoint->visual->Name());
     cmd->SetJointId(this->dataPtr->newJoint->hotspot->Name());
   }

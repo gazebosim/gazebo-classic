@@ -346,7 +346,8 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
   // Initialize transport.
   this->dataPtr->gzNode = transport::NodePtr(new transport::Node());
   this->dataPtr->gzNode->Init();
-  this->dataPtr->keyboardSub = this->dataPtr->gzNode->Subscribe<msgs::Any>(
+  this->dataPtr->keyboardSub = this->dataPtr->gzNode->Subscribe<
+    gazebo::msgs::Any>(
     "~/keyboard/keypress", &PlaneDemoPluginPrivate::OnKeyHit,
     this->dataPtr.get());
   gzdbg << "Load done.\n";

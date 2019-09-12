@@ -178,11 +178,11 @@ namespace gazebo
 
       /// \brief Fill in a surface message.
       /// \param[in] _msg Message to fill with this object's values.
-      public: virtual void FillMsg(msgs::Surface &_msg);
+      public: virtual void FillMsg(gazebo::msgs::Surface &_msg);
 
       /// \brief Process a surface message.
       /// \param[in] _msg Message to read values from.
-      public: virtual void ProcessMsg(const msgs::Surface &_msg);
+      public: virtual void ProcessMsg(const gazebo::msgs::Surface &_msg);
 
       /// \brief Get access to FrictionPyramid data, if available.
       /// \return Pointer to FrictionPyramid data or NULL if class does

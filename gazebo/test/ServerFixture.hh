@@ -220,10 +220,10 @@ namespace gazebo
                    unsigned char **_imgData, unsigned int &_width,
                    unsigned int &_height);
 
-    /// \brief Spawn a model from a msgs::Model and return ModelPtr.
+    /// \brief Spawn a model from a gazebo::msgs::Model and return ModelPtr.
     /// \param[in] _msg Model message.
     /// \return Pointer to model.
-    protected: physics::ModelPtr SpawnModel(const msgs::Model &_msg);
+    protected: physics::ModelPtr SpawnModel(const gazebo::msgs::Model &_msg);
 
     /// \brief Check that a pointer is not NULL. A function is created
     /// for this purpose, since ASSERT's cannot be called from non-void

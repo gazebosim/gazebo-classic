@@ -69,7 +69,7 @@ namespace gazebo
       /// \param[in] _type Type of axis.
       /// \returns Newly created arrow visual.
       public: ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis,
-          const bool _useParentFrame, const msgs::Joint::Type &_type);
+          const bool _useParentFrame, const gazebo::msgs::Joint::Type &_type);
 
       // Documentation Inherited.
       public: virtual void SetVisible(bool _visible, bool _cascade = true);
@@ -86,7 +86,7 @@ namespace gazebo
       /// \param[in] _type Type of axis.
       public: void UpdateAxis(ArrowVisualPtr _arrowVisual,
           const ignition::math::Vector3d &_axis, const bool _useParentFrame,
-          const msgs::Joint::Type &_type);
+          const gazebo::msgs::Joint::Type &_type);
 
       /// \brief Get the JointVisual which is attached to the parent link.
       /// returns Parent axis visual.

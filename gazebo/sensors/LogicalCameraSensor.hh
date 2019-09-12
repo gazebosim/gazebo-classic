@@ -82,9 +82,10 @@ namespace gazebo
       public: double AspectRatio() const;
 
       /// \brief Get the latest image. An image is an instance of
-      /// msgs::LogicalCameraImage, which contains a list of detected models.
+      /// gazebo::msgs::LogicalCameraImage, which contains a list of detected
+      /// models.
       /// \return List of detected models.
-      public: msgs::LogicalCameraImage Image() const;
+      public: gazebo::msgs::LogicalCameraImage Image() const;
 
       // Documentation inherited
       public: virtual bool IsActive() const;

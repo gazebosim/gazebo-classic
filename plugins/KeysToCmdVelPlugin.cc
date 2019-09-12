@@ -64,7 +64,7 @@ class CmdVelKeyboardControls
 
 class KeysToCmdVelPluginPrivate {
   public: KeysToCmdVelPluginPrivate() : keys(new CmdVelKeyboardControls),
-    keyboardControlMessage(new msgs::Pose)
+    keyboardControlMessage(new gazebo::msgs::Pose)
   {
   }
 
@@ -72,7 +72,7 @@ class KeysToCmdVelPluginPrivate {
   public: std::unique_ptr<CmdVelKeyboardControls> keys;
 
   /// \brief The message to be sent that is updated by keypresses.
-  public: msgs::PosePtr keyboardControlMessage;
+  public: gazebo::msgs::PosePtr keyboardControlMessage;
 
   /// \brief The topic to which cmd_vel messages should be published.
   public: std::string cmdVelTopic;
@@ -188,17 +188,18 @@ void KeysToCmdVelPlugin::Init()
   this->dataPtr->keyboardSub = this->dataPtr->node->Subscribe(
       "~/keyboard/keypress", &KeysToCmdVelPlugin::OnKeyPress, this, true);
 
-  this->dataPtr->cmdVelPub = this->dataPtr->node->Advertise<msgs::Pose>(
+  this->dataPtr->cmdVelPub = this->dataPtr->node->Advertise<gazebo::msgs::Pose>(
       this->dataPtr->cmdVelTopic);
 }
 
 /////////////////////////////////////////////////
 void KeysToCmdVelPlugin::Reset()
 {
-  msgs::Set(this->dataPtr->keyboardControlMessage->mutable_position(),
+  gazebo::msgs::Set(this->dataPtr->keyboardControlMessage->mutable_position(),
             ignition::math::Vector3d::Zero);
-  msgs::Set(this->dataPtr->keyboardControlMessage->mutable_orientation(),
-            ignition::math::Quaterniond::Identity);
+  gazebo::msgs::Set(
+      this->dataPtr->keyboardControlMessage->mutable_orientation(),
+      ignition::math::Quaterniond::Identity);
 }
 
 /////////////////////////////////////////////////
@@ -269,7 +270,7 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
     if (angularVelSet)
     {
       const auto oldAngularVel =
-        msgs::ConvertIgn(message->orientation()).Euler().Z();
+        gazebo::msgs::ConvertIgn(message->orientation()).Euler().Z();
 
       if (!ignition::math::equal(angularVel, oldAngularVel))
       {
@@ -290,7 +291,7 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
   {
     auto yaw = ignition::math::Quaterniond::EulerToQuaternion(
       0, 0, angularVel);
-    msgs::Set(message->mutable_orientation(), yaw);
+    gazebo::msgs::Set(message->mutable_orientation(), yaw);
   }
 
   if (linearVelSet || angularVelSet)

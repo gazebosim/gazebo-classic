@@ -37,7 +37,7 @@
 #include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
-using namespace common;
+using namespace gazebo::common;
 
 FuelModelDatabase *FuelModelDatabase::myself = FuelModelDatabase::Instance();
 
@@ -56,7 +56,6 @@ FuelModelDatabase::FuelModelDatabase()
   ignition::common::Console::SetVerbosity(verbosity);
 
   ignition::fuel_tools::ClientConfig conf;
-  conf.LoadConfig();
   std::string userAgent = "Gazebo " GAZEBO_VERSION_FULL;
 
 #if defined(_WIN32)
@@ -223,7 +222,7 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
     }
   }
 
-  if (!this->dataPtr->fuelClient->DownloadModel(fuelUri.Str(), path))
+  if (!this->dataPtr->fuelClient->DownloadModel(fuelUri, path))
   {
     gzerr << "Unable to download model[" << _uri << "]" << std::endl;
     return std::string();

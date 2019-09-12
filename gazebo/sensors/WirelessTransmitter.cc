@@ -75,7 +75,7 @@ void WirelessTransmitter::Load(const std::string &_worldName)
   }
 
   this->pub =
-    this->node->Advertise<msgs::PropagationGrid>(this->Topic(), 30);
+    this->node->Advertise<gazebo::msgs::PropagationGrid>(this->Topic(), 30);
   GZ_ASSERT(this->pub != nullptr,
       "wirelessTransmitterSensor did not get a valid publisher pointer");
 }
@@ -98,11 +98,11 @@ bool WirelessTransmitter::UpdateImpl(const bool /*_force*/)
 
   if (this->dataPtr->visualize)
   {
-    msgs::PropagationGrid msg;
+    gazebo::msgs::PropagationGrid msg;
     ignition::math::Pose3d pos;
     ignition::math::Pose3d worldPose;
     double strength;
-    msgs::PropagationParticle *p;
+    gazebo::msgs::PropagationParticle *p;
 
     // Iterate using a rectangular grid, but only choose the points within
     // a circunference of radius MaxRadius

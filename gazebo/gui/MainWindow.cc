@@ -338,14 +338,15 @@ void MainWindow::Init()
   }
 
   this->dataPtr->worldControlPub =
-    this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
+    this->dataPtr->node->Advertise<gazebo::msgs::WorldControl>(
+        "~/world_control");
   this->dataPtr->serverControlPub =
-    this->dataPtr->node->Advertise<msgs::ServerControl>(
+    this->dataPtr->node->Advertise<gazebo::msgs::ServerControl>(
       "/gazebo/server/control");
   this->dataPtr->scenePub =
-    this->dataPtr->node->Advertise<msgs::Scene>("~/scene");
-  this->dataPtr->userCmdPub = this->dataPtr->node->Advertise<msgs::UserCmd>(
-    "~/user_cmd");
+    this->dataPtr->node->Advertise<gazebo::msgs::Scene>("~/scene");
+  this->dataPtr->userCmdPub =
+    this->dataPtr->node->Advertise<gazebo::msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->newEntitySub = this->dataPtr->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this, true);
@@ -360,7 +361,7 @@ void MainWindow::Init()
     &MainWindow::OnLight, this);
 
   this->dataPtr->requestPub =
-    this->dataPtr->node->Advertise<msgs::Request>("~/request");
+    this->dataPtr->node->Advertise<gazebo::msgs::Request>("~/request");
   this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
       &MainWindow::OnResponse, this);
 
@@ -368,7 +369,7 @@ void MainWindow::Init()
                                             "/gazebo/world/modify",
                                             &MainWindow::OnWorldModify, this);
 
-  this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
+  this->dataPtr->requestMsg = gazebo::msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
   gui::Events::mainWindowReady();
@@ -420,7 +421,7 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 /////////////////////////////////////////////////
 void MainWindow::New()
 {
-  msgs::ServerControl msg;
+  gazebo::msgs::ServerControl msg;
   msg.set_new_world(true);
   this->dataPtr->serverControlPub->Publish(msg);
 }
@@ -461,7 +462,7 @@ void MainWindow::Open()
 
   if (!filename.empty())
   {
-    msgs::ServerControl msg;
+    gazebo::msgs::ServerControl msg;
     msg.set_open_filename(filename);
     this->dataPtr->serverControlPub->Publish(msg);
   }
@@ -521,10 +522,10 @@ void MainWindow::Save()
   if (this->dataPtr->isSavedOnce)
   {
     // Get the latest world in SDF.
-    boost::shared_ptr<msgs::Response> response =
+    boost::shared_ptr<gazebo::msgs::Response> response =
       transport::request(get_world(), "world_sdf_save");
 
-    msgs::GzString msg;
+    gazebo::msgs::GzString msg;
     std::string msgData;
 
     // Make sure the response is correct
@@ -601,7 +602,7 @@ void MainWindow::Clone()
   if (cloneWindow->exec() == QDialog::Accepted && cloneWindow->IsValidPort())
   {
     // Create a gzserver clone in the server side.
-    msgs::ServerControl msg;
+    gazebo::msgs::ServerControl msg;
     msg.set_save_world_name("");
     msg.set_clone(true);
     msg.set_new_port(cloneWindow->Port());
@@ -668,7 +669,7 @@ void MainWindow::HotkeyChart()
 /////////////////////////////////////////////////
 void MainWindow::Play()
 {
-  msgs::WorldControl msg;
+  gazebo::msgs::WorldControl msg;
   msg.set_pause(false);
 
   this->dataPtr->worldControlPub->Publish(msg);
@@ -677,7 +678,7 @@ void MainWindow::Play()
 /////////////////////////////////////////////////
 void MainWindow::Pause()
 {
-  msgs::WorldControl msg;
+  gazebo::msgs::WorldControl msg;
   msg.set_pause(true);
 
   this->dataPtr->worldControlPub->Publish(msg);
@@ -686,7 +687,7 @@ void MainWindow::Pause()
 /////////////////////////////////////////////////
 void MainWindow::Step()
 {
-  msgs::WorldControl msg;
+  gazebo::msgs::WorldControl msg;
   msg.set_multi_step(this->dataPtr->inputStepSize);
 
   this->dataPtr->worldControlPub->Publish(msg);
@@ -717,15 +718,15 @@ void MainWindow::OnFollow(const std::string &_modelName)
 /////////////////////////////////////////////////
 void MainWindow::OnResetModelOnly()
 {
-  msgs::WorldControl msg;
+  gazebo::msgs::WorldControl msg;
   msg.mutable_reset()->set_all(false);
   msg.mutable_reset()->set_time_only(false);
   msg.mutable_reset()->set_model_only(true);
 
   // Register user command on server
-  msgs::UserCmd userCmdMsg;
+  gazebo::msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description("Reset models");
-  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.set_type(gazebo::msgs::UserCmd::WORLD_CONTROL);
   userCmdMsg.mutable_world_control()->CopyFrom(msg);
   this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
@@ -733,13 +734,13 @@ void MainWindow::OnResetModelOnly()
 /////////////////////////////////////////////////
 void MainWindow::OnResetWorld()
 {
-  msgs::WorldControl msg;
+  gazebo::msgs::WorldControl msg;
   msg.mutable_reset()->set_all(true);
 
   // Register user command on server
-  msgs::UserCmd userCmdMsg;
+  gazebo::msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description("Reset world");
-  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.set_type(gazebo::msgs::UserCmd::WORLD_CONTROL);
   userCmdMsg.mutable_world_control()->CopyFrom(msg);
   this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
@@ -902,7 +903,7 @@ void MainWindow::ShowCollisions()
 /////////////////////////////////////////////////
 void MainWindow::ShowGrid()
 {
-  msgs::Scene msg;
+  gazebo::msgs::Scene msg;
   msg.set_name(gui::get_world());
   msg.set_grid(g_showGridAct->isChecked());
   this->dataPtr->scenePub->Publish(msg);
@@ -911,7 +912,7 @@ void MainWindow::ShowGrid()
 /////////////////////////////////////////////////
 void MainWindow::ShowOrigin()
 {
-  msgs::Scene msg;
+  gazebo::msgs::Scene msg;
   msg.set_name(gui::get_world());
   msg.set_origin_visual(g_showOriginAct->isChecked());
   this->dataPtr->scenePub->Publish(msg);
@@ -1995,7 +1996,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
     if (_msg->camera().has_pose())
     {
-      const msgs::Pose &msg_pose = _msg->camera().pose();
+      const gazebo::msgs::Pose &msg_pose = _msg->camera().pose();
 
       auto cam_pose_pos = ignition::math::Vector3d(
         msg_pose.position().x(),
@@ -2036,7 +2037,10 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
         cam->SetTrackUseModelFrame(_msg->camera().track().use_model_frame());
 
       if (_msg->camera().track().has_xyz())
-        cam->SetTrackPosition(msgs::ConvertIgn(_msg->camera().track().xyz()));
+      {
+        cam->SetTrackPosition(
+            gazebo::msgs::ConvertIgn(_msg->camera().track().xyz()));
+      }
 
       if (_msg->camera().track().has_inherit_yaw())
         cam->SetTrackInheritYaw(_msg->camera().track().inherit_yaw());
@@ -2069,7 +2073,8 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     std::lock_guard<std::mutex> lock(this->dataPtr->pluginLoadMutex);
     for (int i = 0; i < _msg->plugin_size(); ++i)
     {
-      std::shared_ptr<msgs::Plugin> pm(new msgs::Plugin(_msg->plugin(i)));
+      std::shared_ptr<gazebo::msgs::Plugin> pm(
+          new gazebo::msgs::Plugin(_msg->plugin(i)));
       this->dataPtr->pluginMsgs.push_back(pm);
     }
   }
@@ -2105,7 +2110,7 @@ void MainWindow::OnAddPlugins()
 
         // Attach the plugin to the render widget.
         this->dataPtr->renderWidget->AddPlugin(plugin,
-          msgs::PluginToSDF(**iter));
+          gazebo::msgs::PluginToSDF(**iter));
       }
     }
   }
@@ -2152,7 +2157,7 @@ void MainWindow::OnResponse(ConstResponsePtr &_msg)
     this->dataPtr->requestMsg->id())
     return;
 
-  msgs::Scene sceneMsg;
+  gazebo::msgs::Scene sceneMsg;
 
   if (_msg->has_type() && _msg->type() == sceneMsg.GetTypeName())
   {
@@ -2227,7 +2232,7 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   if (_msg->has_create() && _msg->create())
   {
     this->dataPtr->renderWidget->CreateScene(_msg->world_name());
-    this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
+    this->dataPtr->requestMsg = gazebo::msgs::CreateRequest("scene_info");
     this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
   }
   else if (_msg->has_remove() && _msg->remove())

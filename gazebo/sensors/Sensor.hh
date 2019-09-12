@@ -143,9 +143,9 @@ namespace gazebo
       /// \return Topic name.
       public: virtual std::string Topic() const;
 
-      /// \brief fills a msgs::Sensor message.
+      /// \brief fills a gazebo::msgs::Sensor message.
       /// \param[out] _msg Message to fill.
-      public: void FillMsg(msgs::Sensor &_msg);
+      public: void FillMsg(gazebo::msgs::Sensor &_msg);
 
       /// \brief Returns the name of the world the sensor is in.
       /// \return Name of the world.

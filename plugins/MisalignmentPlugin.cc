@@ -231,20 +231,20 @@ void MisalignmentPluginPrivate::OnUpdate(const common::UpdateInfo &_info)
     gzdbg << "Misalignment xyz(" << x << ", " << y << ", " << z << ")"
       << " rpy(" << roll << ", " << pitch << ", " << yaw << ")\n";
 
-    msgs::PoseStamped refPoseInWorld;
-    msgs::PoseStamped tgtPoseInWorld;
-    msgs::Set(refPoseInWorld.mutable_time(), _info.simTime);
-    msgs::Set(tgtPoseInWorld.mutable_time(), _info.simTime);
-    msgs::Set(refPoseInWorld.mutable_pose(), refPose);
-    msgs::Set(tgtPoseInWorld.mutable_pose(), tgtPose);
+    gazebo::msgs::PoseStamped refPoseInWorld;
+    gazebo::msgs::PoseStamped tgtPoseInWorld;
+    gazebo::msgs::Set(refPoseInWorld.mutable_time(), _info.simTime);
+    gazebo::msgs::Set(tgtPoseInWorld.mutable_time(), _info.simTime);
+    gazebo::msgs::Set(refPoseInWorld.mutable_pose(), refPose);
+    gazebo::msgs::Set(tgtPoseInWorld.mutable_pose(), tgtPose);
     this->pubDbgRefPose->Publish(refPoseInWorld);
     this->pubDbgTgtPose->Publish(tgtPoseInWorld);
   }
 
   // Publish misalignment
-  msgs::PoseStamped msg;
-  msgs::Set(msg.mutable_time(), _info.simTime);
-  msgs::Set(msg.mutable_pose(), misalignment);
+  gazebo::msgs::PoseStamped msg;
+  gazebo::msgs::Set(msg.mutable_time(), _info.simTime);
+  gazebo::msgs::Set(msg.mutable_pose(), misalignment);
   this->pubMisalignment->Publish(msg);
 }
 
@@ -322,16 +322,16 @@ void MisalignmentPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       &*(this->dataPtr));
 
   this->dataPtr->pubMisalignment =
-    this->dataPtr->gzNode->Advertise<msgs::PoseStamped>(
+    this->dataPtr->gzNode->Advertise<gazebo::msgs::PoseStamped>(
       "/" + this->dataPtr->ns + "/misalignment");
 
   if (this->dataPtr->debug)
   {
     this->dataPtr->pubDbgRefPose =
-      this->dataPtr->gzNode->Advertise<msgs::PoseStamped>(
+      this->dataPtr->gzNode->Advertise<gazebo::msgs::PoseStamped>(
         "/" + this->dataPtr->ns + "/debug/first_pose");
     this->dataPtr->pubDbgTgtPose =
-      this->dataPtr->gzNode->Advertise<msgs::PoseStamped>(
+      this->dataPtr->gzNode->Advertise<gazebo::msgs::PoseStamped>(
         "/" + this->dataPtr->ns + "/debug/second_pose");
   }
 
@@ -341,7 +341,7 @@ void MisalignmentPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   // Enable the plugin
   if (this->dataPtr->enabledByDefault)
   {
-    msgs::IntPtr msg(new msgs::Int());
+    gazebo::msgs::IntPtr msg(new gazebo::msgs::Int());
     msg->set_data(1);
     this->dataPtr->Enable(msg);
   }

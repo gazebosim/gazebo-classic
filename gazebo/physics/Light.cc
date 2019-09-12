@@ -30,7 +30,7 @@
 class gazebo::physics::LightPrivate
 {
   /// \brief Light message container.
-  public: msgs::Light msg;
+  public: gazebo::msgs::Light msg;
 
   /// \brief Flag to indicate if light world pose is dirty or not.
   public: bool worldPoseDirty = false;
@@ -63,7 +63,7 @@ void Light::Init()
 }
 
 //////////////////////////////////////////////////
-void Light::ProcessMsg(const msgs::Light &_msg)
+void Light::ProcessMsg(const gazebo::msgs::Light &_msg)
 {
   // Get leaf name
   std::string lightName = _msg.name();
@@ -74,14 +74,14 @@ void Light::ProcessMsg(const msgs::Light &_msg)
   this->SetName(lightName);
   if (_msg.has_pose())
   {
-    this->worldPose = msgs::ConvertIgn(_msg.pose());
+    this->worldPose = gazebo::msgs::ConvertIgn(_msg.pose());
   }
 
   this->dataPtr->msg.MergeFrom(_msg);
 }
 
 //////////////////////////////////////////////////
-void Light::FillMsg(msgs::Light &_msg)
+void Light::FillMsg(gazebo::msgs::Light &_msg)
 {
   _msg.MergeFrom(this->dataPtr->msg);
 
@@ -89,7 +89,7 @@ void Light::FillMsg(msgs::Light &_msg)
   _msg.set_name(this->GetScopedName());
 
   ignition::math::Pose3d pose = this->RelativePose();
-  msgs::Set(_msg.mutable_pose(), pose);
+  gazebo::msgs::Set(_msg.mutable_pose(), pose);
 }
 
 //////////////////////////////////////////////////

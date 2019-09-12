@@ -109,7 +109,7 @@ namespace gazebo
     public: transport::PublisherPtr pubLight;
 
     /// \brief A message holding a flashlight command.
-    public: msgs::Light msg;
+    public: gazebo::msgs::Light msg;
 
     /// \brief True if <light> element exists.
     public: bool lightExists;
@@ -511,9 +511,9 @@ void FlashLightSetting::Flash()
   if (this->dataPtr->blocks[this->dataPtr->currentBlockIndex]->color
     != ignition::math::Color::Black)
   {
-    msgs::Set(this->dataPtr->msg.mutable_diffuse(),
+    gazebo::msgs::Set(this->dataPtr->msg.mutable_diffuse(),
       this->dataPtr->blocks[this->dataPtr->currentBlockIndex]->color);
-    msgs::Set(this->dataPtr->msg.mutable_specular(),
+    gazebo::msgs::Set(this->dataPtr->msg.mutable_specular(),
       this->dataPtr->blocks[this->dataPtr->currentBlockIndex]->color);
   }
   // Send the message.

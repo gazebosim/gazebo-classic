@@ -126,7 +126,7 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
   private: void Callback(const ConstContactsPtr &_msg);
 
   /// \brief Message to be filled with the latest contacts message.
-  private: msgs::Contacts contactsMsg;
+  private: gazebo::msgs::Contacts contactsMsg;
 
   /// \brief Mutex to protect reads and writes to contactsMsg.
   public: mutable boost::mutex mutex;
@@ -195,7 +195,7 @@ void PhysicsTorsionalFrictionTest::DepthTest(
   ASSERT_EQ(this->contactsMsg.contact().size(), 20);
 
   // Copy message to local variable
-  msgs::Contacts contacts;
+  gazebo::msgs::Contacts contacts;
   {
     boost::mutex::scoped_lock lock(this->mutex);
     contacts = this->contactsMsg;
@@ -250,7 +250,8 @@ void PhysicsTorsionalFrictionTest::DepthTest(
     auto sphere = spheres[number-1];
 
     // Check that contact normal is in the positive Z direction
-    ignition::math::Vector3d normal = msgs::ConvertIgn(contact.normal(0));
+    ignition::math::Vector3d normal =
+      gazebo::msgs::ConvertIgn(contact.normal(0));
     EXPECT_EQ(normal, ignition::math::Vector3d::UnitZ);
 
     // Check that contact depth is:

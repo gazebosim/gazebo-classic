@@ -66,9 +66,11 @@ TEST_F(COMVisual_TEST, COMVisualTest)
 
   gazebo::msgs::Link linkMsg;
   linkMsg.set_name("link");
-  msgs::Set(linkMsg.mutable_inertial()->mutable_pose()->mutable_position(),
+  gazebo::msgs::Set(
+      linkMsg.mutable_inertial()->mutable_pose()->mutable_position(),
       pos);
-  msgs::Set(linkMsg.mutable_inertial()->mutable_pose()->mutable_orientation(),
+  gazebo::msgs::Set(
+      linkMsg.mutable_inertial()->mutable_pose()->mutable_orientation(),
       quat);
 
   // create a link visual
@@ -79,7 +81,7 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   // create CoMVisual for the link using SDF Load
   gazebo::rendering::COMVisualPtr comVis(
       new gazebo::rendering::COMVisual("_COM_VISUAL_", linkVis));
-  comVis->Load(msgs::LinkToSDF(linkMsg));
+  comVis->Load(gazebo::msgs::LinkToSDF(linkMsg));
 
   EXPECT_EQ(comVis->InertiaPose().Pos(), pos);
   EXPECT_EQ(comVis->InertiaPose().Rot(), quat);

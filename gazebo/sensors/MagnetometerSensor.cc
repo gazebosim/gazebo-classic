@@ -77,7 +77,7 @@ void MagnetometerSensor::Load(const std::string &_worldName)
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
-  this->dataPtr->magPub = this->node->Advertise<msgs::Magnetometer>(
+  this->dataPtr->magPub = this->node->Advertise<gazebo::msgs::Magnetometer>(
       this->GetTopic(), 50);
 
   // Parse sdf noise parameters
@@ -172,11 +172,12 @@ bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
     }
 
     // Set the body-frame magnetic field strength
-    msgs::Set(this->dataPtr->magMsg.mutable_field_tesla(), field);
+    gazebo::msgs::Set(this->dataPtr->magMsg.mutable_field_tesla(), field);
   }
 
   // Save the time of the measurement
-  msgs::Set(this->dataPtr->magMsg.mutable_time(), this->world->SimTime());
+  gazebo::msgs::Set(this->dataPtr->magMsg.mutable_time(),
+      this->world->SimTime());
 
   // Publish the message if needed
   if (this->dataPtr->magPub)
@@ -189,5 +190,5 @@ bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
 ignition::math::Vector3d MagnetometerSensor::MagneticField() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  return msgs::ConvertIgn(this->dataPtr->magMsg.field_tesla());
+  return gazebo::msgs::ConvertIgn(this->dataPtr->magMsg.field_tesla());
 }

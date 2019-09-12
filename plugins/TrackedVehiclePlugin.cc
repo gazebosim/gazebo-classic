@@ -136,7 +136,8 @@ void TrackedVehiclePlugin::Init()
     &TrackedVehiclePlugin::OnVelMsg, this);
 
   this->dataPtr->tracksVelocityPub =
-    this->dataPtr->robotNode->Advertise<msgs::Vector2d>("~/tracks_speed", 1000);
+    this->dataPtr->robotNode->Advertise<gazebo::msgs::Vector2d>(
+        "~/tracks_speed", 1000);
 }
 
 void TrackedVehiclePlugin::Reset()
@@ -161,7 +162,7 @@ void TrackedVehiclePlugin::SetTrackVelocity(double _left, double _right)
   this->SetTrackVelocityImpl(left, right);
 
   // Publish the resulting track velocities to anyone who is interested.
-  auto speedMsg = msgs::Vector2d();
+  auto speedMsg = gazebo::msgs::Vector2d();
   speedMsg.set_x(left);
   speedMsg.set_y(right);
   this->dataPtr->tracksVelocityPub->Publish(speedMsg);
@@ -177,7 +178,7 @@ void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
     -this->dataPtr->maxLinearSpeed,
     this->dataPtr->maxLinearSpeed);
 
-  const auto yaw = msgs::ConvertIgn(_msg->orientation()).Euler().Z();
+  const auto yaw = gazebo::msgs::ConvertIgn(_msg->orientation()).Euler().Z();
   const auto angularSpeed = ignition::math::clamp(
     yaw,
     -this->dataPtr->maxAngularSpeed,

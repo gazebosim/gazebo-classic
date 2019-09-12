@@ -77,7 +77,7 @@ TimePanel::TimePanel(QWidget *_parent)
       "~/world_stats", &TimePanel::OnStats, this);
 
   this->dataPtr->userCmdPub =
-      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
+      this->dataPtr->node->Advertise<gazebo::msgs::UserCmd>("~/user_cmd");
 
   // Timer
   QTimer *timer = new QTimer(this);
@@ -227,11 +227,11 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   if (!this->isVisible())
     return;
 
-  this->dataPtr->simTimes.push_back(msgs::Convert(_msg->sim_time()));
+  this->dataPtr->simTimes.push_back(gazebo::msgs::Convert(_msg->sim_time()));
   if (this->dataPtr->simTimes.size() > 20)
     this->dataPtr->simTimes.pop_front();
 
-  this->dataPtr->realTimes.push_back(msgs::Convert(_msg->real_time()));
+  this->dataPtr->realTimes.push_back(gazebo::msgs::Convert(_msg->real_time()));
   if (this->dataPtr->realTimes.size() > 20)
     this->dataPtr->realTimes.pop_front();
 
@@ -254,11 +254,11 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   {
     // Set simulation time
     this->dataPtr->timeWidget->EmitSetSimTime(QString::fromStdString(
-        msgs::Convert(_msg->sim_time()).FormattedString()));
+        gazebo::msgs::Convert(_msg->sim_time()).FormattedString()));
 
     // Set real time
     this->dataPtr->timeWidget->EmitSetRealTime(QString::fromStdString(
-        msgs::Convert(_msg->real_time()).FormattedString()));
+        gazebo::msgs::Convert(_msg->real_time()).FormattedString()));
 
     // Set the iterations
     this->dataPtr->timeWidget->EmitSetIterations(QString::fromStdString(
@@ -268,15 +268,15 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   {
     // Set current time
     this->dataPtr->logPlayWidget->EmitSetCurrentTime(
-        msgs::Convert(_msg->sim_time()));
+        gazebo::msgs::Convert(_msg->sim_time()));
 
     // Set start time in text and in ms
     this->dataPtr->logPlayWidget->EmitSetStartTime(
-        msgs::Convert(_msg->log_playback_stats().start_time()));
+        gazebo::msgs::Convert(_msg->log_playback_stats().start_time()));
 
     // Set end time in text and in ms
     this->dataPtr->logPlayWidget->EmitSetEndTime(
-        msgs::Convert(_msg->log_playback_stats().end_time()));
+        gazebo::msgs::Convert(_msg->log_playback_stats().end_time()));
   }
 }
 
@@ -338,14 +338,14 @@ void TimePanel::Update()
 /////////////////////////////////////////////////
 void TimePanel::OnTimeReset()
 {
-  msgs::WorldControl msg;
+  gazebo::msgs::WorldControl msg;
   msg.mutable_reset()->set_all(false);
   msg.mutable_reset()->set_time_only(true);
 
   // Register user command on server
-  msgs::UserCmd userCmdMsg;
+  gazebo::msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description("Reset time");
-  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.set_type(gazebo::msgs::UserCmd::WORLD_CONTROL);
   userCmdMsg.mutable_world_control()->CopyFrom(msg);
   this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }

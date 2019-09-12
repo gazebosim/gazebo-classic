@@ -99,7 +99,7 @@ namespace gazebo
       public: std::map<std::string, unsigned int> entities;
 
       /// \brief Message used to field requests.
-      public: msgs::Request *requestMsg = nullptr;
+      public: gazebo::msgs::Request *requestMsg = nullptr;
 
       /// \brief The left-hand tab widget
       public: QTabWidget *tabWidget = nullptr;

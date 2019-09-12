@@ -87,8 +87,8 @@ using namespace rendering;
 uint32_t ScenePrivate::idCounter = 0;
 
 struct VisualMessageLess {
-    bool operator() (boost::shared_ptr<msgs::Visual const> _i,
-                     boost::shared_ptr<msgs::Visual const> _j)
+    bool operator() (boost::shared_ptr<gazebo::msgs::Visual const> _i,
+                     boost::shared_ptr<gazebo::msgs::Visual const> _j)
     {
       return _i->name().size() < _j->name().size();
     }
@@ -181,7 +181,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       this->dataPtr->node->Subscribe("~/roads", &Scene::OnRoadMsg, this, true);
 
   this->dataPtr->requestPub =
-      this->dataPtr->node->Advertise<msgs::Request>("~/request");
+      this->dataPtr->node->Advertise<gazebo::msgs::Request>("~/request");
 
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
       &Scene::OnRequest, this);
@@ -404,7 +404,7 @@ void Scene::Init()
   this->dataPtr->originVisual->Load();
 
   this->dataPtr->requestPub->WaitForConnection();
-  this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
+  this->dataPtr->requestMsg = gazebo::msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
   if (!this->dataPtr->isServer)
@@ -855,7 +855,7 @@ VisualPtr Scene::VisualAt(CameraPtr _camera,
         _mod = Ogre::any_cast<std::string>(
             closestEntity->getUserObjectBindings().getUserAny());
       }
-      catch(boost::bad_any_cast &e)
+      catch(Ogre::Exception &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
       }
@@ -866,7 +866,7 @@ VisualPtr Scene::VisualAt(CameraPtr _camera,
       visual = this->GetVisual(Ogre::any_cast<std::string>(
             closestEntity->getUserObjectBindings().getUserAny()));
     }
-    catch(boost::bad_any_cast &e)
+    catch(Ogre::Exception &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
     }
@@ -1020,7 +1020,7 @@ void Scene::VisualsBelowPoint(const ignition::math::Vector3d &_pt,
           if (v)
             _visuals.push_back(v);
         }
-        catch(boost::bad_any_cast &e)
+        catch(Ogre::Exception &e)
         {
           gzerr << "boost any_cast error:" << e.what() << "\n";
         }
@@ -1044,7 +1044,7 @@ VisualPtr Scene::VisualAt(CameraPtr _camera,
       visual = this->GetVisual(Ogre::any_cast<std::string>(
             closestEntity->getUserObjectBindings().getUserAny()));
     }
-    catch(boost::bad_any_cast &e)
+    catch(Ogre::Exception &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
     }
@@ -1547,21 +1547,23 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 
   for (int i = 0; i < _msg->light_size(); ++i)
   {
-    boost::shared_ptr<msgs::Light> lm(new msgs::Light(_msg->light(i)));
+    boost::shared_ptr<gazebo::msgs::Light> lm(
+        new gazebo::msgs::Light(_msg->light(i)));
     this->dataPtr->lightFactoryMsgs.push_back(lm);
   }
 
   for (int i = 0; i < _msg->joint_size(); ++i)
   {
-    boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(_msg->joint(i)));
+    boost::shared_ptr<gazebo::msgs::Joint> jm(
+        new gazebo::msgs::Joint(_msg->joint(i)));
     this->dataPtr->jointMsgs.push_back(jm);
   }
 
   if (_msg->has_ambient())
-    this->SetAmbientColor(msgs::Convert(_msg->ambient()));
+    this->SetAmbientColor(gazebo::msgs::Convert(_msg->ambient()));
 
   if (_msg->has_background())
-    this->SetBackgroundColor(msgs::Convert(_msg->background()));
+    this->SetBackgroundColor(gazebo::msgs::Convert(_msg->background()));
 
   if (_msg->has_shadows())
     this->SetShadowsEnabled(_msg->shadows());
@@ -1575,7 +1577,8 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   // Process the sky message.
   if (_msg->has_sky())
   {
-    boost::shared_ptr<msgs::Sky> sm(new msgs::Sky(_msg->sky()));
+    boost::shared_ptr<gazebo::msgs::Sky> sm(
+        new gazebo::msgs::Sky(_msg->sky()));
     this->OnSkyMsg(sm);
   }
 
@@ -1585,7 +1588,7 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 
     if (_msg->fog().has_color())
       elem->GetElement("color")->Set(
-          msgs::Convert(_msg->fog().color()));
+          gazebo::msgs::Convert(_msg->fog().color()));
 
     if (_msg->fog().has_density())
       elem->GetElement("density")->Set(_msg->fog().density());
@@ -1599,11 +1602,11 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
     if (_msg->fog().has_type())
     {
       std::string type;
-      if (_msg->fog().type() == msgs::Fog::LINEAR)
+      if (_msg->fog().type() == gazebo::msgs::Fog::LINEAR)
         type = "linear";
-      else if (_msg->fog().type() == msgs::Fog::EXPONENTIAL)
+      else if (_msg->fog().type() == gazebo::msgs::Fog::EXPONENTIAL)
         type = "exp";
-      else if (_msg->fog().type() == msgs::Fog::EXPONENTIAL2)
+      else if (_msg->fog().type() == gazebo::msgs::Fog::EXPONENTIAL2)
         type = "exp2";
       else
         type = "none";
@@ -1621,14 +1624,14 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 }
 
 //////////////////////////////////////////////////
-bool Scene::ProcessModelMsg(const msgs::Model &_msg)
+bool Scene::ProcessModelMsg(const gazebo::msgs::Model &_msg)
 {
   std::string modelName, linkName;
 
   modelName = _msg.name() + "::";
   for (int j = 0; j < _msg.visual_size(); ++j)
   {
-    boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
+    boost::shared_ptr<gazebo::msgs::Visual> vm(new gazebo::msgs::Visual(
           _msg.visual(j)));
     this->dataPtr->modelVisualMsgs.push_back(vm);
   }
@@ -1637,7 +1640,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   if (_msg.has_scale())
   {
     // update scale using a visual msg
-    boost::shared_ptr<msgs::Visual> vm(new msgs::Visual);
+    boost::shared_ptr<gazebo::msgs::Visual> vm(new gazebo::msgs::Visual);
     if (_msg.has_id())
       vm->set_id(_msg.id());
     if (_msg.has_name())
@@ -1650,13 +1653,13 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
 
   for (int j = 0; j < _msg.joint_size(); ++j)
   {
-    boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(
+    boost::shared_ptr<gazebo::msgs::Joint> jm(new gazebo::msgs::Joint(
           _msg.joint(j)));
     this->dataPtr->jointMsgs.push_back(jm);
 
     for (int k = 0; k < _msg.joint(j).sensor_size(); ++k)
     {
-      boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
+      boost::shared_ptr<gazebo::msgs::Sensor> sm(new gazebo::msgs::Sensor(
             _msg.joint(j).sensor(k)));
       this->dataPtr->sensorMsgs.push_back(sm);
     }
@@ -1685,21 +1688,22 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
 
     if (_msg.link(j).has_inertial())
     {
-      boost::shared_ptr<msgs::Link> lm(new msgs::Link(_msg.link(j)));
+      boost::shared_ptr<gazebo::msgs::Link> lm(
+          new gazebo::msgs::Link(_msg.link(j)));
       this->dataPtr->linkMsgs.push_back(lm);
     }
 
     if (_msg.link(j).visual_size() > 0)
     {
       // note: the first visual in the link is the link visual
-      msgs::VisualPtr vm(new msgs::Visual(
+      gazebo::msgs::VisualPtr vm(new gazebo::msgs::Visual(
             _msg.link(j).visual(0)));
       this->dataPtr->linkVisualMsgs.push_back(vm);
     }
 
     for (int k = 1; k < _msg.link(j).visual_size(); ++k)
     {
-      boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
+      boost::shared_ptr<gazebo::msgs::Visual> vm(new gazebo::msgs::Visual(
             _msg.link(j).visual(k)));
       this->dataPtr->visualMsgs.push_back(vm);
     }
@@ -1709,7 +1713,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
       for (int l = 0;
           l < _msg.link(j).collision(k).visual_size(); l++)
       {
-        boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
+        boost::shared_ptr<gazebo::msgs::Visual> vm(new gazebo::msgs::Visual(
               _msg.link(j).collision(k).visual(l)));
         this->dataPtr->collisionVisualMsgs.push_back(vm);
       }
@@ -1717,13 +1721,13 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
 
     for (int k = 0; k < _msg.link(j).sensor_size(); ++k)
     {
-      boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
+      boost::shared_ptr<gazebo::msgs::Sensor> sm(new gazebo::msgs::Sensor(
             _msg.link(j).sensor(k)));
       this->dataPtr->sensorMsgs.push_back(sm);
     }
     for (int k = 0; k < _msg.link(j).light_size(); ++k)
     {
-      boost::shared_ptr<msgs::Light> lm(new msgs::Light(
+      boost::shared_ptr<gazebo::msgs::Light> lm(new gazebo::msgs::Light(
             _msg.link(j).light(k)));
       this->dataPtr->lightFactoryMsgs.push_back(lm);
     }
@@ -1731,7 +1735,8 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
 
   for (int i = 0; i < _msg.model_size(); ++i)
   {
-    boost::shared_ptr<msgs::Model> mm(new msgs::Model(_msg.model(i)));
+    boost::shared_ptr<gazebo::msgs::Model> mm(
+        new gazebo::msgs::Model(_msg.model(i)));
     this->dataPtr->modelMsgs.push_back(mm);
   }
 
@@ -2064,7 +2069,7 @@ void Scene::PreRender()
             (iter->first != this->dataPtr->selectedVis->GetId() &&
             !this->dataPtr->selectedVis->IsAncestorOf(iter->second)))
         {
-          ignition::math::Pose3d pose = msgs::ConvertIgn(pIter->second);
+          ignition::math::Pose3d pose = gazebo::msgs::ConvertIgn(pIter->second);
           GZ_ASSERT(iter->second, "Visual pointer is NULL");
           iter->second->SetPose(pose);
           PoseMsgs_M::iterator prev = pIter++;
@@ -2079,7 +2084,7 @@ void Scene::PreRender()
         auto lIter = this->dataPtr->lights.find(pIter->first);
         if (lIter != this->dataPtr->lights.end())
         {
-          ignition::math::Pose3d pose = msgs::ConvertIgn(pIter->second);
+          ignition::math::Pose3d pose = gazebo::msgs::ConvertIgn(pIter->second);
           lIter->second->SetPosition(pose.Pos());
           lIter->second->SetRotation(pose.Rot());
           auto prev = pIter++;
@@ -2098,7 +2103,7 @@ void Scene::PreRender()
           this->dataPtr->visuals.find((*spIter)->model_id());
       for (int i = 0; i < (*spIter)->pose_size(); ++i)
       {
-        const msgs::Pose& pose_msg = (*spIter)->pose(i);
+        const gazebo::msgs::Pose& pose_msg = (*spIter)->pose(i);
         if (pose_msg.has_id())
         {
           Visual_M::iterator iter2 = this->dataPtr->visuals.find(pose_msg.id());
@@ -2110,7 +2115,7 @@ void Scene::PreRender()
                 (iter->first != this->dataPtr->selectedVis->GetId()&&
                 !this->dataPtr->selectedVis->IsAncestorOf(iter->second)))
             {
-              ignition::math::Pose3d pose = msgs::ConvertIgn(pose_msg);
+              ignition::math::Pose3d pose = gazebo::msgs::ConvertIgn(pose_msg);
               iter2->second->SetPose(pose);
             }
           }
@@ -2238,7 +2243,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
         // parentVis' children list so that it can be properly deleted.
         parentVis->AttachVisual(cameraVis);
 
-        cameraVis->SetPose(msgs::ConvertIgn(_msg->pose()));
+        cameraVis->SetPose(gazebo::msgs::ConvertIgn(_msg->pose()));
         cameraVis->SetId(_msg->id());
         cameraVis->Load(_msg->camera());
         this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
@@ -2261,14 +2266,14 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       // parentVis' children list so that it can be properly deleted.
       parentVis->AttachVisual(cameraVis);
 
-      cameraVis->SetPose(msgs::ConvertIgn(_msg->pose()));
+      cameraVis->SetPose(gazebo::msgs::ConvertIgn(_msg->pose()));
       cameraVis->SetId(_msg->id());
       cameraVis->Load(_msg->logical_camera());
       this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
     }
     else if (_msg->has_pose())
     {
-      iter->second->SetPose(msgs::ConvertIgn(_msg->pose()));
+      iter->second->SetPose(gazebo::msgs::ConvertIgn(_msg->pose()));
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&
@@ -2404,9 +2409,9 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
       _msg->id() != this->dataPtr->requestMsg->id())
     return;
 
-  msgs::Scene sceneMsg;
+  gazebo::msgs::Scene sceneMsg;
   sceneMsg.ParseFromString(_msg->serialized_data());
-  boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
+  boost::shared_ptr<gazebo::msgs::Scene> sm(new gazebo::msgs::Scene(sceneMsg));
 
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
   this->dataPtr->sceneMsgs.push_back(sm);
@@ -2425,14 +2430,14 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_info")
   {
-    msgs::Response response;
+    gazebo::msgs::Response response;
     response.set_id(_msg->id());
     response.set_request(_msg->request());
 
     LightPtr light = this->LightByName(_msg->data());
     if (light)
     {
-      msgs::Light lightMsg;
+      gazebo::msgs::Light lightMsg;
       light->FillMsg(lightMsg);
 
       std::string *serializedData = response.mutable_serialized_data();
@@ -2721,7 +2726,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   // Creating heightmap
   // FIXME: A bit of a hack.
   if (_msg->has_geometry() &&
-      _msg->geometry().type() == msgs::Geometry::HEIGHTMAP &&
+      _msg->geometry().type() == gazebo::msgs::Geometry::HEIGHTMAP &&
       _type != Visual::VT_COLLISION)
   {
     if (this->dataPtr->terrain)
@@ -2738,7 +2743,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
         VisualPtr visual(new Visual(_msg->name(), this->dataPtr->worldVisual));
         auto m = *_msg.get();
         m.clear_material();
-        visual->Load(msgs::VisualToSDF(m));
+        visual->Load(gazebo::msgs::VisualToSDF(m));
 
         this->dataPtr->terrain = new Heightmap(shared_from_this());
         // check the material fields and set material if it is specified

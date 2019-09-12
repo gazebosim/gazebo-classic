@@ -76,7 +76,7 @@ void ImageView::SetTopic(const std::string &_topicName)
 void ImageView::OnImage(ConstImageStampedPtr &_msg)
 {
   // Update the Hz and Bandwidth info
-  this->OnMsg(msgs::Convert(_msg->time()), _msg->image().data().size());
+  this->OnMsg(gazebo::msgs::Convert(_msg->time()), _msg->image().data().size());
 
   this->dataPtr->imageFrame->OnImage(_msg->image());
 }

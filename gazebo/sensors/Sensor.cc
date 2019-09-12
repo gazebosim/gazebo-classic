@@ -106,7 +106,7 @@ void Sensor::Load(const std::string &_worldName)
 
   this->node->Init(this->world->Name());
   this->dataPtr->sensorPub =
-    this->node->Advertise<msgs::Sensor>("~/sensor");
+    this->node->Advertise<gazebo::msgs::Sensor>("~/sensor");
 }
 
 //////////////////////////////////////////////////
@@ -125,7 +125,7 @@ void Sensor::Init()
     }
   }
 
-  msgs::Sensor msg;
+  gazebo::msgs::Sensor msg;
   this->FillMsg(msg);
   this->dataPtr->sensorPub->Publish(msg);
 }
@@ -320,14 +320,14 @@ void Sensor::SetPose(const ignition::math::Pose3d &_pose)
   // Update the visualization with the pose information.
   if (this->dataPtr->sensorPub && this->Visualize())
   {
-    msgs::Sensor msg;
+    gazebo::msgs::Sensor msg;
     msg.set_name(this->Name());
     msg.set_id(this->Id());
     msg.set_parent(this->ParentName());
     msg.set_parent_id(this->ParentId());
     msg.set_type(this->Type());
     msg.set_visualize(true);
-    msgs::Set(msg.mutable_pose(), this->pose);
+    gazebo::msgs::Set(msg.mutable_pose(), this->pose);
     this->dataPtr->sensorPub->Publish(msg);
   }
 }
@@ -385,14 +385,14 @@ std::string Sensor::Topic() const
 }
 
 //////////////////////////////////////////////////
-void Sensor::FillMsg(msgs::Sensor &_msg)
+void Sensor::FillMsg(gazebo::msgs::Sensor &_msg)
 {
   _msg.set_name(this->Name());
   _msg.set_id(this->Id());
   _msg.set_type(this->Type());
   _msg.set_parent(this->ParentName());
   _msg.set_parent_id(this->ParentId());
-  msgs::Set(_msg.mutable_pose(), this->Pose());
+  gazebo::msgs::Set(_msg.mutable_pose(), this->Pose());
 
   _msg.set_always_on(this->IsActive());
   _msg.set_topic(this->Topic());
@@ -402,7 +402,7 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
   if (this->Type() == "logical_camera")
   {
     LogicalCameraSensor *camSensor = static_cast<LogicalCameraSensor*>(this);
-    msgs::LogicalCameraSensor *camMsg = _msg.mutable_logical_camera();
+    gazebo::msgs::LogicalCameraSensor *camMsg = _msg.mutable_logical_camera();
     camMsg->set_near_clip(camSensor->Near());
     camMsg->set_far_clip(camSensor->Far());
     camMsg->set_horizontal_fov(camSensor->HorizontalFOV().Radian());
@@ -411,7 +411,7 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
   else if (this->Type() == "camera" || this->Type() == "wideanglecamera")
   {
     CameraSensor *camSensor = static_cast<CameraSensor*>(this);
-    msgs::CameraSensor *camMsg = _msg.mutable_camera();
+    gazebo::msgs::CameraSensor *camMsg = _msg.mutable_camera();
     auto cam = camSensor->Camera();
     camMsg->set_horizontal_fov(cam->HFOV().Radian());
     camMsg->mutable_image_size()->set_x(camSensor->ImageWidth());
@@ -422,7 +422,7 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     auto distortion = cam->LensDistortion();
     if (distortion)
     {
-      msgs::Distortion *distortionMsg = camMsg->mutable_distortion();
+      gazebo::msgs::Distortion *distortionMsg = camMsg->mutable_distortion();
       distortionMsg->set_k1(distortion->K1());
       distortionMsg->set_k2(distortion->K2());
       distortionMsg->set_k3(distortion->K3());

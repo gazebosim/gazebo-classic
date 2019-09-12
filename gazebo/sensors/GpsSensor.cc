@@ -76,7 +76,7 @@ void GpsSensor::Load(const std::string &_worldName)
   boost::replace_all(this->dataPtr->topicName, "::", "/");
 
   this->dataPtr->gpsPub =
-    this->node->Advertise<msgs::GPS>(this->dataPtr->topicName, 50);
+    this->node->Advertise<gazebo::msgs::GPS>(this->dataPtr->topicName, 50);
 
   // Parse sdf noise parameters
   sdf::ElementPtr gpsElem = this->sdf->GetElement("gps");
@@ -183,7 +183,7 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
     }
   }
   this->lastMeasurementTime = this->world->SimTime();
-  msgs::Set(this->dataPtr->lastGpsMsg.mutable_time(),
+  gazebo::msgs::Set(this->dataPtr->lastGpsMsg.mutable_time(),
       this->lastMeasurementTime);
 
   if (this->dataPtr->gpsPub)

@@ -60,14 +60,14 @@ void SavingLoadingTest::SaveScaledModel(const std::string &_physicsEngine)
   // Create transport
   auto node = transport::NodePtr(new transport::Node());
   node->Init();
-  auto modelPub = node->Advertise<msgs::Model>("~/model/modify");
+  auto modelPub = node->Advertise<gazebo::msgs::Model>("~/model/modify");
 
   // scale box
   ignition::math::Vector3d newScale(0.1, 2, 3);
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
   msg.set_name("box");
 
-  msgs::Set(msg.mutable_scale(), newScale);
+  gazebo::msgs::Set(msg.mutable_scale(), newScale);
   modelPub->Publish(msg);
 
   // Check box has been scaled

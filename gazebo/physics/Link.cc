@@ -79,7 +79,7 @@ class gazebo::physics::LinkPrivate
   public: transport::PublisherPtr dataPub;
 
   /// \brief Link data message
-  public: msgs::LinkData linkDataMsg;
+  public: gazebo::msgs::LinkData linkDataMsg;
 
   /// \brief True to publish data, false otherwise
   public: bool publishData = false;
@@ -94,7 +94,7 @@ class gazebo::physics::LinkPrivate
   public: transport::SubscriberPtr wrenchSub;
 
   /// \brief Vector of wrench messages to be processed.
-  public: std::vector<msgs::Wrench> wrenchMsgs;
+  public: std::vector<gazebo::msgs::Wrench> wrenchMsgs;
 
   /// \brief Mutex to protect the wrenchMsgs variable.
   public: std::mutex wrenchMsgMutex;
@@ -359,12 +359,12 @@ void Link::Fini()
   {
     for (auto iter : this->visuals)
     {
-      auto deleteMsg = msgs::CreateRequest("entity_delete",
+      auto deleteMsg = gazebo::msgs::CreateRequest("entity_delete",
           std::to_string(iter.second.id()));
       this->requestPub->Publish(*deleteMsg, true);
       delete deleteMsg;
 
-      msgs::Visual msg;
+      gazebo::msgs::Visual msg;
       msg.set_name(iter.second.name());
       msg.set_id(iter.second.id());
       if (this->parent)
@@ -464,12 +464,12 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     while (visualElem)
     {
       // TODO: Update visuals properly
-      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+      gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(visualElem);
 
       msg.set_name(this->GetScopedName() + "::" + msg.name());
       msg.set_parent_name(this->GetScopedName());
       msg.set_is_static(this->IsStatic());
-      msg.set_type(msgs::Visual::VISUAL);
+      msg.set_type(gazebo::msgs::Visual::VISUAL);
 
       this->visPub->Publish(msg);
 
@@ -604,7 +604,7 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
 
   if (!this->IsStatic() && !this->dataPtr->wrenchMsgs.empty())
   {
-    std::vector<msgs::Wrench> messages;
+    std::vector<gazebo::msgs::Wrench> messages;
     {
       std::lock_guard<std::mutex> lock(this->dataPtr->wrenchMsgMutex);
       messages = this->dataPtr->wrenchMsgs;
@@ -811,9 +811,9 @@ ModelPtr Link::GetModel() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Link::BoundingBox() const
+ignition::math::AxisAlignedBox Link::BoundingBox() const
 {
-  ignition::math::Box box;
+  ignition::math::AxisAlignedBox box;
 
   box.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
       ignition::math::MAX_D);
@@ -952,7 +952,7 @@ void Link::RemoveChildJoint(const std::string &_jointName)
 }
 
 //////////////////////////////////////////////////
-void Link::FillMsg(msgs::Link &_msg)
+void Link::FillMsg(gazebo::msgs::Link &_msg)
 {
   ignition::math::Pose3d relPose = this->RelativePose();
 
@@ -963,14 +963,14 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.set_enable_wind(this->WindMode());
   _msg.set_kinematic(this->GetKinematic());
   _msg.set_enabled(this->GetEnabled());
-  msgs::Set(_msg.mutable_pose(), relPose);
+  gazebo::msgs::Set(_msg.mutable_pose(), relPose);
 
   // The visual msgs name might not have been set if the link was created
   // dynamically without using SDF.
   if (!this->visualMsg->has_name())
     this->visualMsg->set_name(this->GetScopedName());
 
-  msgs::Set(this->visualMsg->mutable_pose(), relPose);
+  gazebo::msgs::Set(this->visualMsg->mutable_pose(), relPose);
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   _msg.mutable_inertial()->set_mass(this->inertial->Mass());
@@ -980,7 +980,8 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.mutable_inertial()->set_iyy(this->inertial->IYY());
   _msg.mutable_inertial()->set_iyz(this->inertial->IYZ());
   _msg.mutable_inertial()->set_izz(this->inertial->IZZ());
-  msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->Pose());
+  gazebo::msgs::Set(_msg.mutable_inertial()->mutable_pose(),
+      this->inertial->Pose());
 
   for (auto &child : this->children)
   {
@@ -997,8 +998,8 @@ void Link::FillMsg(msgs::Link &_msg)
     sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
     while (sensorElem)
     {
-      msgs::Sensor *msg = _msg.add_sensor();
-      msg->CopyFrom(msgs::SensorFromSDF(sensorElem));
+      gazebo::msgs::Sensor *msg = _msg.add_sensor();
+      msg->CopyFrom(gazebo::msgs::SensorFromSDF(sensorElem));
       msg->set_parent(this->GetScopedName());
       msg->set_parent_id(this->GetId());
       sensorElem = sensorElem->GetNextElement("sensor");
@@ -1013,7 +1014,7 @@ void Link::FillMsg(msgs::Link &_msg)
   for (Visuals_M::iterator iter = this->visuals.begin();
       iter != this->visuals.end(); ++iter)
   {
-    msgs::Visual *vis = _msg.add_visual();
+    gazebo::msgs::Visual *vis = _msg.add_visual();
     vis->CopyFrom(iter->second);
   }
 
@@ -1021,14 +1022,15 @@ void Link::FillMsg(msgs::Link &_msg)
   {
     sdf::ElementPtr elem = this->sdf->GetElement("projector");
 
-    msgs::Projector *proj = _msg.add_projector();
+    gazebo::msgs::Projector *proj = _msg.add_projector();
     proj->set_name(
         this->GetScopedName() + "::" + elem->Get<std::string>("name"));
     proj->set_texture(elem->Get<std::string>("texture"));
     proj->set_fov(elem->Get<double>("fov"));
     proj->set_near_clip(elem->Get<double>("near_clip"));
     proj->set_far_clip(elem->Get<double>("far_clip"));
-    msgs::Set(proj->mutable_pose(), elem->Get<ignition::math::Pose3d>("pose"));
+    gazebo::msgs::Set(proj->mutable_pose(),
+        elem->Get<ignition::math::Pose3d>("pose"));
   }
 
   if (this->IsCanonicalLink())
@@ -1037,20 +1039,20 @@ void Link::FillMsg(msgs::Link &_msg)
   // Fill message with battery information
   for (auto &battery : this->dataPtr->batteries)
   {
-    msgs::Battery *bat = _msg.add_battery();
+    gazebo::msgs::Battery *bat = _msg.add_battery();
     bat->set_name(battery->Name());
     bat->set_voltage(battery->Voltage());
   }
 
   for (auto &light : this->dataPtr->lights)
   {
-    msgs::Light *lightMsg = _msg.add_light();
+    gazebo::msgs::Light *lightMsg = _msg.add_light();
     light->FillMsg(*lightMsg);
   }
 }
 
 //////////////////////////////////////////////////
-void Link::ProcessMsg(const msgs::Link &_msg)
+void Link::ProcessMsg(const gazebo::msgs::Link &_msg)
 {
   if (_msg.id() != this->GetId())
   {
@@ -1085,7 +1087,7 @@ void Link::ProcessMsg(const msgs::Link &_msg)
   if (_msg.has_pose())
   {
     this->SetEnabled(true);
-    this->SetRelativePose(msgs::ConvertIgn(_msg.pose()));
+    this->SetRelativePose(gazebo::msgs::ConvertIgn(_msg.pose()));
   }
 
   for (int i = 0; i < _msg.collision_size(); i++)
@@ -1227,7 +1229,8 @@ void Link::SetPublishData(bool _enable)
   if (_enable)
   {
     std::string topic = "~/" + this->GetScopedName();
-    this->dataPtr->dataPub = this->node->Advertise<msgs::LinkData>(topic);
+    this->dataPtr->dataPub =
+      this->node->Advertise<gazebo::msgs::LinkData>(topic);
     this->connections.push_back(
       event::Events::ConnectWorldUpdateEnd(
         std::bind(&Link::PublishData, this)));
@@ -1245,12 +1248,12 @@ void Link::PublishData()
 {
   if (this->dataPtr->publishData && this->dataPtr->dataPub->HasConnections())
   {
-    msgs::Set(this->dataPtr->linkDataMsg.mutable_time(),
+    gazebo::msgs::Set(this->dataPtr->linkDataMsg.mutable_time(),
         this->world->SimTime());
     this->dataPtr->linkDataMsg.set_name(this->GetScopedName());
-    msgs::Set(this->dataPtr->linkDataMsg.mutable_linear_velocity(),
+    gazebo::msgs::Set(this->dataPtr->linkDataMsg.mutable_linear_velocity(),
         this->WorldLinearVel());
-    msgs::Set(this->dataPtr->linkDataMsg.mutable_angular_velocity(),
+    gazebo::msgs::Set(this->dataPtr->linkDataMsg.mutable_angular_velocity(),
         this->WorldAngularVel());
     this->dataPtr->dataPub->Publish(this->dataPtr->linkDataMsg);
   }
@@ -1315,10 +1318,10 @@ bool Link::VisualPose(const uint32_t _id, ignition::math::Pose3d &_pose) const
           << "] for link [" << this->GetScopedName() << "]\n";
     return false;
   }
-  const msgs::Visual &msg = iter->second;
+  const gazebo::msgs::Visual &msg = iter->second;
   if (msg.has_pose())
   {
-    _pose = msgs::ConvertIgn(msg.pose());
+    _pose = gazebo::msgs::ConvertIgn(msg.pose());
   }
   else
   {
@@ -1339,8 +1342,8 @@ bool Link::SetVisualPose(const uint32_t _id,
           << "] for link [" << this->GetScopedName() << "]\n";
     return false;
   }
-  msgs::Visual &msg = iter->second;
-  msgs::Set(msg.mutable_pose(), _pose);
+  gazebo::msgs::Visual &msg = iter->second;
+  gazebo::msgs::Set(msg.mutable_pose(), _pose);
   std::string linkName = this->GetScopedName();
   if (this->sdf->HasElement("visual"))
   {
@@ -1360,12 +1363,12 @@ bool Link::SetVisualPose(const uint32_t _id,
       visualElem = visualElem->GetNextElement("visual");
     }
   }
-  msgs::Visual visual;
+  gazebo::msgs::Visual visual;
   visual.set_name(msg.name());
   visual.set_id(_id);
   visual.set_parent_name(linkName);
   visual.set_parent_id(this->GetId());
-  msgs::Set(visual.mutable_pose(), _pose);
+  gazebo::msgs::Set(visual.mutable_pose(), _pose);
   this->visPub->Publish(visual);
   return true;
 }
@@ -1515,7 +1518,7 @@ void Link::UpdateVisualMsg()
     sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
     while (visualElem)
     {
-      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+      gazebo::msgs::Visual msg = gazebo::msgs::VisualFromSDF(visualElem);
 
       bool newVis = true;
       std::string linkName = this->GetScopedName();
@@ -1542,8 +1545,8 @@ void Link::UpdateVisualMsg()
         msg.set_parent_name(this->GetScopedName());
         msg.set_parent_id(this->GetId());
         msg.set_is_static(this->IsStatic());
-        msg.set_type(msgs::Visual::VISUAL);
-        msgs::Set(msg.mutable_scale(), this->scale);
+        msg.set_type(gazebo::msgs::Visual::VISUAL);
+        gazebo::msgs::Set(msg.mutable_scale(), this->scale);
 
         auto iter = this->visuals.find(msg.id());
         if (iter != this->visuals.end())
@@ -1738,9 +1741,9 @@ bool Link::ContainsLink(const Link_V &_vector, const LinkPtr &_value)
 }
 
 /////////////////////////////////////////////////
-msgs::Visual Link::GetVisualMessage(const std::string &_name) const
+gazebo::msgs::Visual Link::GetVisualMessage(const std::string &_name) const
 {
-  msgs::Visual result;
+  gazebo::msgs::Visual result;
 
   Visuals_M::const_iterator iter;
   for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
@@ -1787,7 +1790,7 @@ void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
+void Link::ProcessWrenchMsg(const gazebo::msgs::Wrench &_msg)
 {
   // Sanity check
   if (this->IsStatic())
@@ -1800,13 +1803,14 @@ void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
   ignition::math::Vector3d pos;
   if (_msg.has_force_offset())
   {
-    pos = msgs::ConvertIgn(_msg.force_offset());
+    pos = gazebo::msgs::ConvertIgn(_msg.force_offset());
   }
 
-  const ignition::math::Vector3d force = msgs::ConvertIgn(_msg.force());
+  const ignition::math::Vector3d force = gazebo::msgs::ConvertIgn(_msg.force());
   this->AddLinkForce(force, pos);
 
-  const ignition::math::Vector3d torque = msgs::ConvertIgn(_msg.torque());
+  const ignition::math::Vector3d torque =
+    gazebo::msgs::ConvertIgn(_msg.torque());
   this->AddRelativeTorque(torque);
 }
 
@@ -1907,7 +1911,7 @@ void Link::LoadLight(sdf::ElementPtr _sdf)
   // Create new light object
   LightPtr light(new physics::Light(shared_from_this()));
   light->SetStatic(true);
-  light->ProcessMsg(msgs::LightFromSDF(_sdf));
+  light->ProcessMsg(gazebo::msgs::LightFromSDF(_sdf));
   light->SetWorld(this->world);
   light->Load(_sdf);
   this->dataPtr->lights.push_back(light);

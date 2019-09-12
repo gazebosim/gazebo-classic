@@ -43,6 +43,7 @@ set (sources
   Event.cc
   Events.cc
   Exception.cc
+  FuelModelDatabase.cc
   HeightmapData.cc
   Image.cc
   ImageHeightmap.cc
@@ -99,6 +100,7 @@ set (headers
   Event.hh
   Events.hh
   Exception.hh
+  FuelModelDatabase.hh
   MovingWindowFilter.hh
   HeightmapData.hh
   Image.hh
@@ -144,6 +146,7 @@ set (gtest_sources
   EnumIface_TEST.cc
   Exception_TEST.cc
   Event_TEST.cc
+  FuelModelDatabase_TEST.cc
   HeightmapData_TEST.cc
   Image_TEST.cc
   ImageHeightmap_TEST.cc
@@ -198,21 +201,6 @@ if (HAVE_FFMPEG)
 endif()
 
 set (headers_install ${headers})
-
-# Do not install fuel_tools headers.
-if (HAVE_IGNITION_FUEL_TOOLS)
-  set (headers ${headers}
-    FuelModelDatabase.hh
-  )
-
-  set (sources ${sources}
-    FuelModelDatabase.cc
-  )
-
-  set (gtest_sources ${gtest_sources}
-    FuelModelDatabase_TEST.cc
-  )
-endif()
 
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common ${tinyxml_LIBRARIES})
 

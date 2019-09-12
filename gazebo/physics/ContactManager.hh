@@ -159,7 +159,7 @@ namespace gazebo
       /// \brief Clear all stored contacts.
       public: void Clear();
 
-      /// \brief Publish all contacts in a msgs::Contacts message.
+      /// \brief Publish all contacts in a gazebo::msgs::Contacts message.
       public: void PublishContacts();
 
       /// \brief Set the contact count to zero.

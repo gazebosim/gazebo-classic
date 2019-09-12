@@ -85,7 +85,7 @@ class TestSimpleTrackedVehiclePlugin : public SimpleTrackedVehiclePlugin
     TrackedVehiclePlugin::SetTrackVelocity(_left, _right);
   }
 
-  public: msgs::Vector2d lastTracksVelMsg;
+  public: gazebo::msgs::Vector2d lastTracksVelMsg;
   public: void OnTracksVelReceived(ConstVector2dPtr &_msg)
   {
     this->lastTracksVelMsg = *_msg;
@@ -112,10 +112,11 @@ class TestSimpleTrackedVehiclePlugin : public SimpleTrackedVehiclePlugin
   }
 };
 
-void AddTrack(msgs::Model &_model, const std::string &_name,
-              const msgs::Link *_body, const double _x, const double _y)
+void AddTrack(gazebo::msgs::Model &_model, const std::string &_name,
+              const gazebo::msgs::Link *_body, const double _x, const double _y)
 {
-  msgs::AddBoxLink(_model, 1.0, ignition::math::Vector3d(0.1, 0.2, 0.5));
+  gazebo::msgs::AddBoxLink(_model, 1.0,
+      ignition::math::Vector3d(0.1, 0.2, 0.5));
   auto link = _model.mutable_link(_model.link_size()-1);
   link->set_name(_name);
   link->mutable_collision(0)->set_name(_name + "_collision");
@@ -125,7 +126,7 @@ void AddTrack(msgs::Model &_model, const std::string &_name,
 
   auto joint = _model.add_joint();
   joint->set_name(_name + "_j");
-  joint->set_type(msgs::Joint_Type::Joint_Type_FIXED);
+  joint->set_type(gazebo::msgs::Joint_Type::Joint_Type_FIXED);
   joint->set_parent(_body->name());
   joint->set_child(link->name());
 }
@@ -153,11 +154,12 @@ uint64_t GetCategoryBits(const std::string& _physicsEngine,
 TEST_F(SimpleTrackedVehiclePluginTest, LoadCorrectModel)
 {
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(0.5, 0.25, 0.14));
+  gazebo::msgs::AddBoxLink(modelMsg, 10.,
+      ignition::math::Vector3d(0.5, 0.25, 0.14));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
@@ -202,11 +204,12 @@ TEST_F(SimpleTrackedVehiclePluginTest, LoadCorrectModel)
 TEST_F(SimpleTrackedVehiclePluginTest, LoadTrackNotFound)
 {
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(0.5, 0.25, 0.14));
+  gazebo::msgs::AddBoxLink(modelMsg, 10.,
+      ignition::math::Vector3d(0.5, 0.25, 0.14));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
@@ -246,11 +249,12 @@ TEST_F(SimpleTrackedVehiclePluginTest, LoadTrackNotFound)
 TEST_F(SimpleTrackedVehiclePluginTest, LoadBodyNotFound)
 {
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(0.5, 0.25, 0.14));
+  gazebo::msgs::AddBoxLink(modelMsg, 10.,
+      ignition::math::Vector3d(0.5, 0.25, 0.14));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
@@ -290,11 +294,12 @@ TEST_F(SimpleTrackedVehiclePluginTest, LoadBodyNotFound)
 TEST_F(SimpleTrackedVehiclePluginTest, LoadTrackNotSpecified)
 {
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(0.5, 0.25, 0.14));
+  gazebo::msgs::AddBoxLink(modelMsg, 10.,
+      ignition::math::Vector3d(0.5, 0.25, 0.14));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
@@ -334,11 +339,12 @@ TEST_F(SimpleTrackedVehiclePluginTest, LoadTrackNotSpecified)
 TEST_F(SimpleTrackedVehiclePluginTest, LoadBodyNotSpecified)
 {
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(0.5, 0.25, 0.14));
+  gazebo::msgs::AddBoxLink(modelMsg, 10.,
+      ignition::math::Vector3d(0.5, 0.25, 0.14));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
@@ -387,11 +393,12 @@ TEST_P(SimpleTrackedVehiclePluginTestParametrized, Init)
   }
 
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(0.5, 0.25, 0.14));
+  gazebo::msgs::AddBoxLink(modelMsg, 10.,
+      ignition::math::Vector3d(0.5, 0.25, 0.14));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
@@ -482,11 +489,12 @@ TEST_P(SimpleTrackedVehiclePluginTestParametrized,
   }
 
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(0.5, 0.25, 0.14));
+  gazebo::msgs::AddBoxLink(modelMsg, 10.,
+      ignition::math::Vector3d(0.5, 0.25, 0.14));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
@@ -586,11 +594,12 @@ TEST_P(SimpleTrackedVehiclePluginTestParametrized,
 TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
 {
   // Create the model
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
 
-  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(0.5, 0.25, 0.14));
+  gazebo::msgs::AddBoxLink(modelMsg, 10.,
+      ignition::math::Vector3d(0.5, 0.25, 0.14));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 

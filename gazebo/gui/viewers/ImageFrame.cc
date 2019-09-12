@@ -62,7 +62,7 @@ void ImageFrame::paintEvent(QPaintEvent * /*_event*/)
 }
 
 /////////////////////////////////////////////////
-void ImageFrame::OnImage(const msgs::Image &_msg)
+void ImageFrame::OnImage(const gazebo::msgs::Image &_msg)
 {
   if (_msg.width() == 0 || _msg.height() == 0)
     return;

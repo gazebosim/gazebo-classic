@@ -78,10 +78,10 @@ class JointGetForceTorqueTest : public ServerFixture,
   /// \param[in] _opt Options for box attached to the world.
   public: physics::ModelPtr SpawnBox(const SpawnGetFTBoxOptions &_opt)
           {
-            msgs::Model msg;
+            gazebo::msgs::Model msg;
             std::string modelName = this->GetUniqueString("box_model");
             msg.set_name(modelName);
-            msgs::Set(msg.mutable_pose(), _opt.modelPose);
+            gazebo::msgs::Set(msg.mutable_pose(), _opt.modelPose);
 
             double dx = _opt.size.X();
             double dy = _opt.size.Y();
@@ -103,8 +103,8 @@ class JointGetForceTorqueTest : public ServerFixture,
             int linkCount = msg.link_size();
             auto link = msg.mutable_link(linkCount-1);
             link->set_name("link");
-            msgs::Set(link->mutable_pose(), _opt.linkPose);
-            msgs::Inertial inertial;
+            gazebo::msgs::Set(link->mutable_pose(), _opt.linkPose);
+            gazebo::msgs::Inertial inertial;
             inertial.set_mass(_opt.mass);
             inertial.set_ixx(ixx);
             inertial.set_iyy(iyy);
@@ -112,7 +112,7 @@ class JointGetForceTorqueTest : public ServerFixture,
             inertial.set_ixy(0.0);
             inertial.set_ixz(0.0);
             inertial.set_iyz(0.0);
-            msgs::Set(inertial.mutable_pose(), _opt.inertialPose);
+            gazebo::msgs::Set(inertial.mutable_pose(), _opt.inertialPose);
 
             *(link->mutable_inertial()) = inertial;
 
@@ -130,14 +130,14 @@ class JointGetForceTorqueTest : public ServerFixture,
               joint->set_name("dummy_joint");
               joint->set_parent("world");
               joint->set_child("dummy_link");
-              joint->set_type(msgs::ConvertJointType("fixed"));
+              joint->set_type(gazebo::msgs::ConvertJointType("fixed"));
             }
 
             msg.add_joint();
             int jointCount = msg.joint_size();
             auto joint = msg.mutable_joint(jointCount-1);
             joint->set_name("joint");
-            joint->set_type(msgs::ConvertJointType(_opt.jointType));
+            joint->set_type(gazebo::msgs::ConvertJointType(_opt.jointType));
             if ( _opt.parentIsWorld )
             {
               joint->set_parent("world");
@@ -151,7 +151,7 @@ class JointGetForceTorqueTest : public ServerFixture,
             if ( _opt.jointType != "fixed" )
             {
               auto axis = joint->mutable_axis1();
-              msgs::Set(axis->mutable_xyz(), _opt.jointAxis);
+              gazebo::msgs::Set(axis->mutable_xyz(), _opt.jointAxis);
               axis->set_limit_lower(0.0);
               axis->set_limit_upper(0.0);
             }

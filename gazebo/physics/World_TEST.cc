@@ -42,16 +42,16 @@ TEST_F(WorldTest, UniqueModelName)
   EXPECT_EQ(world->UniqueModelName(modelName), modelName);
 
   // Spawn model
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
   msg.set_name(modelName);
   msg.add_link();
 
   std::string modelSDFStr(
     "<sdf version='" + std::string(SDF_VERSION) + "'>"
-    + msgs::ModelToSDF(msg)->ToString("")
+    + gazebo::msgs::ModelToSDF(msg)->ToString("")
     + "</sdf>");
 
-  msgs::Factory facMsg;
+  gazebo::msgs::Factory facMsg;
   facMsg.set_sdf(modelSDFStr);
   this->factoryPub->Publish(facMsg);
 
@@ -111,16 +111,16 @@ TEST_F(WorldTest, EditName)
 
   // Spawn a box
   {
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
     msg.set_name("box");
-    msgs::AddBoxLink(msg, 1.0, ignition::math::Vector3d::One);
+    gazebo::msgs::AddBoxLink(msg, 1.0, ignition::math::Vector3d::One);
 
     std::string modelSDFStr(
       "<sdf version='" + std::string(SDF_VERSION) + "'>"
-      + msgs::ModelToSDF(msg)->ToString("")
+      + gazebo::msgs::ModelToSDF(msg)->ToString("")
       + "</sdf>");
 
-    msgs::Factory facMsg;
+    gazebo::msgs::Factory facMsg;
     facMsg.set_sdf(modelSDFStr);
     this->factoryPub->Publish(facMsg);
   }
@@ -152,16 +152,16 @@ TEST_F(WorldTest, EditName)
 
   // Edit model mass
   {
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
     msg.set_name("box");
-    msgs::AddBoxLink(msg, 2.0, ignition::math::Vector3d::One);
+    gazebo::msgs::AddBoxLink(msg, 2.0, ignition::math::Vector3d::One);
 
     std::string modelSDFStr(
       "<sdf version='" + std::string(SDF_VERSION) + "'>"
-      + msgs::ModelToSDF(msg)->ToString("")
+      + gazebo::msgs::ModelToSDF(msg)->ToString("")
       + "</sdf>");
 
-    msgs::Factory facMsg;
+    gazebo::msgs::Factory facMsg;
     facMsg.set_sdf(modelSDFStr);
     facMsg.set_edit_name("box");
     this->factoryPub->Publish(facMsg);

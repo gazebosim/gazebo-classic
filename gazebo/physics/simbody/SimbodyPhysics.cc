@@ -176,7 +176,7 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 {
-  msgs::Response response;
+  gazebo::msgs::Response response;
   response.set_id(_msg->id());
   response.set_request(_msg->request());
   response.set_response("success");
@@ -184,16 +184,16 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 
   if (_msg->request() == "physics_info")
   {
-    msgs::Physics physicsMsg;
-    physicsMsg.set_type(msgs::Physics::SIMBODY);
+    gazebo::msgs::Physics physicsMsg;
+    physicsMsg.set_type(gazebo::msgs::Physics::SIMBODY);
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(this->GetMaxStepSize());
     physicsMsg.set_enable_physics(this->world->PhysicsEnabled());
 
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->world->Gravity()));
+      gazebo::msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-      msgs::Convert(this->world->MagneticField()));
+      gazebo::msgs::Convert(this->world->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -216,7 +216,7 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->world->SetPhysicsEnabled(_msg->enable_physics());
 
   if (_msg->has_gravity())
-    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
+    this->SetGravity(gazebo::msgs::ConvertIgn(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());

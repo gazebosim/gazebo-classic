@@ -197,11 +197,11 @@ void MudPlugin::OnUpdate()
       // checking each contact with a timestamp matching the last contact
       // Add each link name to contactLinkNames
       common::Time latestContactTime =
-        msgs::Convert(this->newestContactsMsg.contact(nc-1).time());
+        gazebo::msgs::Convert(this->newestContactsMsg.contact(nc-1).time());
       std::string targetCollName, tmpLinkName;
 
       for (int i = nc-1; i >= 0 &&
-           msgs::Convert(this->newestContactsMsg.contact(i).time())
+           gazebo::msgs::Convert(this->newestContactsMsg.contact(i).time())
             == latestContactTime; --i)
       {
         // Try to find name of the other collision
@@ -245,7 +245,7 @@ void MudPlugin::OnUpdate()
             for (unsigned int j = 0; j < pc; ++j)
             {
               contactPositionAverage +=
-                msgs::ConvertIgn(
+                gazebo::msgs::ConvertIgn(
                     this->newestContactsMsg.contact(i).position(j));
             }
             // Then divide by numer of contact points

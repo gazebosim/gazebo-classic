@@ -85,7 +85,7 @@ namespace gazebo
       /// \param[in] _worldPose Pose used to tranform the bounding box.
       /// \param[out] _vertices Vertices of the tranformed bounding box in
       /// world coordinates.
-      private: void Transform(const ignition::math::Box &_bbox,
+      private: void Transform(const ignition::math::AxisAlignedBox &_bbox,
           const ignition::math::Pose3d &_worldPose,
           std::vector<ignition::math::Vector3d> &_vertices);
 

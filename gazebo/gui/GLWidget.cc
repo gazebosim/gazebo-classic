@@ -127,7 +127,7 @@ GLWidget::GLWidget(QWidget *_parent)
 
   // Publishes information about user selections.
   this->dataPtr->selectionPub =
-    this->dataPtr->node->Advertise<msgs::Selection>("~/selection");
+    this->dataPtr->node->Advertise<gazebo::msgs::Selection>("~/selection");
 
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
       &GLWidget::OnRequest, this);
@@ -352,7 +352,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
       this->dataPtr->selectedVisuals.pop_back();
 
       // Publish message about visual deselection
-      msgs::Selection msg;
+      gazebo::msgs::Selection msg;
       msg.set_id(id);
       msg.set_name(name);
       msg.set_selected(false);
@@ -855,13 +855,13 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   if (connection)
   {
     std::string topicData;
-    msgs::Packet packet;
-    msgs::Request request;
-    msgs::GzString_V topics;
+    gazebo::msgs::Packet packet;
+    gazebo::msgs::Request request;
+    gazebo::msgs::GzString_V topics;
 
     request.set_id(0);
     request.set_request("get_topics");
-    connection->EnqueueMsg(msgs::Package("request", request), true);
+    connection->EnqueueMsg(gazebo::msgs::Package("request", request), true);
     try
     {
       connection->Read(topicData);
@@ -1068,7 +1068,7 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 
   std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
 
-  msgs::Selection msg;
+  gazebo::msgs::Selection msg;
 
   if (_vis && !_vis->IsPlane())
   {
@@ -1117,7 +1117,7 @@ void GLWidget::DeselectAllVisuals()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
 
-  msgs::Selection msg;
+  gazebo::msgs::Selection msg;
   for (unsigned int i = 0; i < this->dataPtr->selectedVisuals.size(); ++i)
   {
     this->dataPtr->selectedVisuals[i]->SetHighlighted(false);

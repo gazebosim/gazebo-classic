@@ -44,13 +44,14 @@ namespace gazebo
 
     /// \def Map of publish messages to connections.
     public: typedef
-        std::list< std::pair<msgs::Publish, transport::ConnectionPtr> >
+        std::list< std::pair<gazebo::msgs::Publish, transport::ConnectionPtr> >
         PubList;
 
     /// \def Map of subscribe messages to connections.
     public: typedef
-        std::list< std::pair<msgs::Subscribe, transport::ConnectionPtr> >
-        SubList;
+        std::list<
+          std::pair<gazebo::msgs::Subscribe, transport::ConnectionPtr> >
+          SubList;
 
     /// \brief Constructor
     public: Master();
@@ -104,7 +105,7 @@ namespace gazebo
     /// \brief Get a publisher for the given topic
     /// \param[in] _topic Name of the topic
     /// \return A publish message
-    private: msgs::Publish GetPublisher(const std::string &_topic);
+    private: gazebo::msgs::Publish GetPublisher(const std::string &_topic);
 
     /// \brief Find a connection given a host and port
     /// \param[in] _host Host name
@@ -121,12 +122,12 @@ namespace gazebo
     /// \brief Remove a publisher.
     /// \param[in] _pub Publish message that contains the info necessary to
     /// remove a publisher.
-    private: void RemovePublisher(const msgs::Publish _pub);
+    private: void RemovePublisher(const gazebo::msgs::Publish _pub);
 
     /// \brief Remove a subscriber.
     /// \param[in] _pub Subscribe message that contains the info necessary to
     /// remove a subscriber.
-    private: void RemoveSubscriber(const msgs::Subscribe _sub);
+    private: void RemoveSubscriber(const gazebo::msgs::Subscribe _sub);
 
     /// \internal
     /// \brief Pointer to private data.

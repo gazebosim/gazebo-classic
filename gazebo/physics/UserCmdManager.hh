@@ -43,7 +43,7 @@ namespace gazebo
       public: UserCmd(const unsigned int _id,
                       physics::WorldPtr _world,
                       const std::string &_description,
-                      const msgs::UserCmd::Type &_type);
+                      const gazebo::msgs::UserCmd::Type &_type);
 
       /// \brief Destructor
       public: virtual ~UserCmd();
@@ -64,7 +64,7 @@ namespace gazebo
 
       /// \brief Return this command's type.
       /// \return Command type
-      public: msgs::UserCmd::Type Type() const;
+      public: gazebo::msgs::UserCmd::Type Type() const;
 
       /// \internal
       /// \brief Pointer to private data.

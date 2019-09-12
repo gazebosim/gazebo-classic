@@ -31,7 +31,7 @@ class WirelessTransmitter_TEST : public ServerFixture
 
     private: std::mutex mutex;
     private: bool receivedMsg;
-    private: boost::shared_ptr<msgs::PropagationGrid const> gridMsg;
+    private: boost::shared_ptr<gazebo::msgs::PropagationGrid const> gridMsg;
     private: sensors::WirelessTransmitterPtr tx;
     private: sensors::WirelessTransmitterPtr txNoVisual;
 };

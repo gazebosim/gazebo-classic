@@ -143,7 +143,8 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   std::string prefix = "~/" + this->model->GetName() + "/";
-  this->statePub = this->node->Advertise<msgs::Cessna>(prefix + "state");
+  this->statePub = this->node->Advertise<gazebo::msgs::Cessna>(
+      prefix + "state");
   this->controlSub = this->node->Subscribe(prefix + "control",
     &CessnaPlugin::OnControl, this);
 
@@ -226,7 +227,7 @@ void CessnaPlugin::PublishState()
   float elevators = this->joints[kElevators]->Position(0);
   float rudder = this->joints[kRudder]->Position(0);
 
-  msgs::Cessna msg;
+  gazebo::msgs::Cessna msg;
   // Set the observed state.
   msg.set_propeller_speed(propellerSpeed);
   msg.set_left_aileron(leftAileron);

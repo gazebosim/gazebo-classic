@@ -339,9 +339,10 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
     const double dz = 0.9;
     const double mass = 10.0;
 
-    msgs::Model msgModel;
+    gazebo::msgs::Model msgModel;
     msgModel.set_name(this->GetUniqueString("model"));
-    msgs::AddBoxLink(msgModel, mass, ignition::math::Vector3d(dx, dy, dz));
+    gazebo::msgs::AddBoxLink(msgModel, mass,
+        ignition::math::Vector3d(dx, dy, dz));
     model = this->SpawnModel(msgModel);
   }
   ASSERT_TRUE(model != NULL);
@@ -456,12 +457,13 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
   const unsigned int testCases = 5;
   for (unsigned int i = 0; i < testCases; ++i)
   {
-    // Use msgs::AddBoxLink
-    msgs::Model msgModel;
+    // Use gazebo::msgs::AddBoxLink
+    gazebo::msgs::Model msgModel;
     ignition::math::Pose3d modelPose, linkPose, inertialPose;
 
     msgModel.set_name(this->GetUniqueString("model"));
-    msgs::AddBoxLink(msgModel, mass, ignition::math::Vector3d(dx, dy, dz));
+    gazebo::msgs::AddBoxLink(msgModel, mass,
+        ignition::math::Vector3d(dx, dy, dz));
     modelPose.Pos().X() = i * dz;
     modelPose.Pos().Z() = dz;
 
@@ -490,7 +492,7 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
       ignition::math::MassMatrix3d m;
       EXPECT_TRUE(m.SetFromBox(mass, ignition::math::Vector3d(dx, dy, dz),
           ignition::math::Quaterniond(0, 0, angle)));
-      msgs::Set(msgModel.mutable_link(0)->mutable_inertial(), m);
+      gazebo::msgs::Set(msgModel.mutable_link(0)->mutable_inertial(), m);
     }
     // i=4: offset inertial pose
     //  expect inertial pose to differ from link pose
@@ -503,9 +505,9 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
       auto msgLink = msgModel.mutable_link(0);
       auto msgInertial = msgLink->mutable_inertial();
 
-      msgs::Set(msgModel.mutable_pose(), modelPose);
-      msgs::Set(msgLink->mutable_pose(), linkPose);
-      msgs::Set(msgInertial->mutable_pose(), inertialPose);
+      gazebo::msgs::Set(msgModel.mutable_pose(), modelPose);
+      gazebo::msgs::Set(msgLink->mutable_pose(), linkPose);
+      gazebo::msgs::Set(msgInertial->mutable_pose(), inertialPose);
     }
 
     auto model = this->SpawnModel(msgModel);
@@ -637,9 +639,9 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
   std::string topicName = "~/" + link->GetScopedName() + "/wrench";
   boost::replace_all(topicName, "::", "/");
   transport::PublisherPtr wrenchPub =
-    this->node->Advertise<msgs::Wrench>(topicName);
+    this->node->Advertise<gazebo::msgs::Wrench>(topicName);
 
-  msgs::Wrench msg;
+  gazebo::msgs::Wrench msg;
 
   std::vector<ignition::math::Vector3d> forces;
   std::vector<ignition::math::Vector3d> torques;
@@ -690,11 +692,11 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
                                << forceOffsets[i].Z() << std::endl;
 
     // Publish message
-    msgs::Set(msg.mutable_force(), forces[i]);
-    msgs::Set(msg.mutable_torque(), torques[i]);
+    gazebo::msgs::Set(msg.mutable_force(), forces[i]);
+    gazebo::msgs::Set(msg.mutable_torque(), torques[i]);
     // Leave optional field unset if it's zero
     if (forceOffsets[i] != ignition::math::Vector3d::Zero)
-      msgs::Set(msg.mutable_force_offset(), forceOffsets[i]);
+      gazebo::msgs::Set(msg.mutable_force_offset(), forceOffsets[i]);
 
     wrenchPub->Publish(msg);
 

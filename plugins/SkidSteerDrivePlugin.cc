@@ -116,11 +116,13 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 {
   // gzmsg << "cmd_vel: " << msg->position().x() << ", "
-  //       << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
+  //       << gazebo::msgs::Convert(msg->orientation()).GetAsEuler().z
+  //       << std::endl;
 
   double vel_lin = _msg->position().x() / this->wheelRadius;
-  double vel_rot = -1 * msgs::ConvertIgn(_msg->orientation()).Euler().Z()
-                   * (this->wheelSeparation / this->wheelRadius);
+  double vel_rot = -1 * gazebo::msgs::ConvertIgn(
+      _msg->orientation()).Euler().Z()
+    * (this->wheelSeparation / this->wheelRadius);
 
   this->joints[RIGHT_FRONT]->SetVelocity(0, vel_lin - vel_rot);
   this->joints[RIGHT_REAR ]->SetVelocity(0, vel_lin - vel_rot);

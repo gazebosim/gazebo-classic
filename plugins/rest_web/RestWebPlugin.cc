@@ -130,10 +130,10 @@ void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
     std::string name = _msg->name();
     std::string data = _msg->data();
 
-    msgs::WorldStatistics ws = _msg->world_statistics();
-    msgs::Time simT = ws.sim_time();
-    msgs::Time realT = ws.real_time();
-    msgs::Time pauseT = ws.pause_time();
+    gazebo::msgs::WorldStatistics ws = _msg->world_statistics();
+    gazebo::msgs::Time simT = ws.sim_time();
+    gazebo::msgs::Time realT = ws.real_time();
+    gazebo::msgs::Time pauseT = ws.pause_time();
     bool paused = ws.paused();
 
     std::string worldName = physics::get_world()->Name();
@@ -165,30 +165,30 @@ void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
 
     event += "\"real_time\": ";
     event += "\"";
-    event += msgs::Convert(realT).FormattedString();
+    event += gazebo::msgs::Convert(realT).FormattedString();
     event += "\", ";
 
     event += "\"sim_time\": ";
     event += "\"";
-    event += msgs::Convert(simT).FormattedString();
+    event += gazebo::msgs::Convert(simT).FormattedString();
     event += "\", ";
 
     event += "\"pause_time\": ";
     event += "\"";
-    event += msgs::Convert(pauseT).FormattedString();
+    event += gazebo::msgs::Convert(pauseT).FormattedString();
     event += "\"";
 
     event += "}\n";  // world element
     event += "}";    // root element
     // post it with curl
     this->restApi.PostJsonData(route.c_str(), event.c_str());
-    msg.set_type(msgs::RestResponse::SUCCESS);
+    msg.set_type(gazebo::msgs::RestResponse::SUCCESS);
   }
   catch(RestException &x)
   {
     response = "There was a problem trying to send data to the server: ";
     response += x.what();
-    msg.set_type(msgs::RestResponse::ERR);
+    msg.set_type(gazebo::msgs::RestResponse::ERR);
     // alert the user via the gui plugin
     gzerr << "ERROR in REST service POST request: " << response << std::endl;
   }
@@ -265,13 +265,13 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
     event += "}";
 
     this->restApi.PostJsonData(_msg->route().c_str(), event.c_str());
-    msg.set_type(msgs::RestResponse::SUCCESS);
+    msg.set_type(gazebo::msgs::RestResponse::SUCCESS);
   }
   catch(RestException &x)
   {
     response = "There was a problem trying to send data to the server: ";
     response += x.what();
-    msg.set_type(msgs::RestResponse::ERR);
+    msg.set_type(gazebo::msgs::RestResponse::ERR);
     // alert the user via the gui plugin
     gzerr << "ERROR in REST request: " << response << std::endl;
   }
@@ -298,7 +298,7 @@ void RestWebPlugin::OnRestLogoutRequest(ConstRestLogoutPtr &_msg)
   gazebo::msgs::RestResponse msg;
   if (_msg->has_id())
     msg.set_id(_msg->id());
-  msg.set_type(msgs::RestResponse::LOGOUT);
+  msg.set_type(gazebo::msgs::RestResponse::LOGOUT);
   msg.set_msg("Success");
   this->pub->Publish(msg);
 }
@@ -318,13 +318,13 @@ void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
         _msg->password().c_str());
 
     response = "Success";
-    msg.set_type(msgs::RestResponse::LOGIN);
+    msg.set_type(gazebo::msgs::RestResponse::LOGIN);
   }
   catch(RestException &x)
   {
     response = "There was a problem trying to login to the server: ";
     response += x.what();
-    msg.set_type(msgs::RestResponse::ERR);
+    msg.set_type(gazebo::msgs::RestResponse::ERR);
 
     // alert the user via the gui plugin
     gzerr << "ERROR in REST login request. : " << response << std::endl;

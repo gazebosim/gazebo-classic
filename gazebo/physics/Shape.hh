@@ -64,11 +64,11 @@ namespace gazebo
 
       /// \brief Fill in the values for a geometry message.
       /// \param[out] _msg The geometry message to fill.
-      public: virtual void FillMsg(msgs::Geometry &_msg) = 0;
+      public: virtual void FillMsg(gazebo::msgs::Geometry &_msg) = 0;
 
       /// \brief Process a geometry message.
       /// \param[in] _msg The message to set values from.
-      public: virtual void ProcessMsg(const msgs::Geometry &_msg) = 0;
+      public: virtual void ProcessMsg(const gazebo::msgs::Geometry &_msg) = 0;
 
       /// \brief Get the volume of this shape. Implemented accurately for
       /// simple shapes; an approximation is used for meshes, polylines, etc.

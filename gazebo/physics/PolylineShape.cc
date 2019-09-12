@@ -128,9 +128,9 @@ void PolylineShape::SetVertices(
 }
 
 ////////////////////////////////////////////////////
-void PolylineShape::SetVertices(const msgs::Geometry &_msg)
+void PolylineShape::SetVertices(const gazebo::msgs::Geometry &_msg)
 {
-  sdf::ElementPtr geomSDF = msgs::GeometryToSDF(_msg);
+  sdf::ElementPtr geomSDF = gazebo::msgs::GeometryToSDF(_msg);
   this->sdf = geomSDF->GetElement("polyline");
 }
 
@@ -143,13 +143,13 @@ void PolylineShape::SetPolylineShape(const double &_height,
 }
 
 //////////////////////////////////////////////////
-void PolylineShape::FillMsg(msgs::Geometry &_msg)
+void PolylineShape::FillMsg(gazebo::msgs::Geometry &_msg)
 {
-  _msg = msgs::GeometryFromSDF(this->sdf->GetParent());
+  _msg = gazebo::msgs::GeometryFromSDF(this->sdf->GetParent());
 }
 
 //////////////////////////////////////////////////
-void PolylineShape::ProcessMsg(const msgs::Geometry &_msg)
+void PolylineShape::ProcessMsg(const gazebo::msgs::Geometry &_msg)
 {
   if (_msg.polyline_size() > 0)
   {

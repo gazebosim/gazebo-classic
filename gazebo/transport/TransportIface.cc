@@ -40,8 +40,8 @@ std::mutex requestMutex;
 bool g_stopped = true;
 bool g_minimalComms = false;
 
-std::list<msgs::Request *> g_requests;
-std::list<boost::shared_ptr<msgs::Response> > g_responses;
+std::list<gazebo::msgs::Request *> g_requests;
+std::list<boost::shared_ptr<gazebo::msgs::Response> > g_responses;
 
 /////////////////////////////////////////////////
 void dummy_callback_fn(uint32_t)
@@ -166,7 +166,7 @@ void on_response(ConstResponsePtr &_msg)
   if (g_requests.empty() || g_stopped)
     return;
 
-  std::list<msgs::Request *>::iterator iter;
+  std::list<gazebo::msgs::Request *>::iterator iter;
   for (iter = g_requests.begin(); iter != g_requests.end(); ++iter)
   {
     if (_msg->id() == (*iter)->id())
@@ -178,7 +178,8 @@ void on_response(ConstResponsePtr &_msg)
     return;
 
   std::unique_lock<std::mutex> lock(requestMutex);
-  boost::shared_ptr<msgs::Response> response(new msgs::Response);
+  boost::shared_ptr<gazebo::msgs::Response> response(
+      new gazebo::msgs::Response);
   response->CopyFrom(*_msg);
   g_responses.push_back(response);
 
@@ -192,18 +193,18 @@ void transport::get_topic_namespaces(std::list<std::string> &_namespaces)
 }
 
 /////////////////////////////////////////////////
-boost::shared_ptr<msgs::Response> transport::request(
+boost::shared_ptr<gazebo::msgs::Response> transport::request(
     const std::string &_worldName, const std::string &_request,
     const std::string &_data, const common::Time &_timeout)
 {
-  boost::shared_ptr<msgs::Response> response;
+  boost::shared_ptr<gazebo::msgs::Response> response;
   auto deadline = std::chrono::system_clock::now() +
     std::chrono::duration<double>(_timeout.Double());
 
   NodePtr node = NodePtr(new Node());
   node->Init(_worldName);
 
-  PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
+  PublisherPtr requestPub = node->Advertise<gazebo::msgs::Request>("~/request");
   if (!requestPub->WaitForConnection(_timeout))
   {
     std::cerr << "Unable to create a connection to topic ~/request.\n";
@@ -212,7 +213,7 @@ boost::shared_ptr<msgs::Response> transport::request(
     return response;
   }
 
-  msgs::Request *request = msgs::CreateRequest(_request, _data);
+  gazebo::msgs::Request *request = gazebo::msgs::CreateRequest(_request, _data);
   g_requests.push_back(request);
 
   SubscriberPtr responseSub = node->Subscribe("~/response", &on_response, true);
@@ -279,10 +280,11 @@ void transport::requestNoReply(NodePtr _node, const std::string &_request,
                                const std::string &_data)
 {
   // Create a publisher on the request topic.
-  PublisherPtr requestPub = _node->Advertise<msgs::Request>("~/request");
+  PublisherPtr requestPub =
+    _node->Advertise<gazebo::msgs::Request>("~/request");
 
   // Create a new request message
-  msgs::Request *request = msgs::CreateRequest(_request, _data);
+  gazebo::msgs::Request *request = gazebo::msgs::CreateRequest(_request, _data);
 
   // Publish the request message
   requestPub->Publish(*request);
@@ -298,11 +300,11 @@ void transport::requestNoReply(NodePtr _node, const std::string &_request,
 std::map<std::string, std::list<std::string> > transport::getAdvertisedTopics()
 {
   std::map<std::string, std::list<std::string> > result;
-  std::list<msgs::Publish> publishers;
+  std::list<gazebo::msgs::Publish> publishers;
 
   ConnectionManager::Instance()->GetAllPublishers(publishers);
 
-  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
+  for (std::list<gazebo::msgs::Publish>::iterator iter = publishers.begin();
       iter != publishers.end(); ++iter)
   {
     result[(*iter).msg_type()].push_back((*iter).topic());
@@ -316,11 +318,11 @@ std::list<std::string> transport::getAdvertisedTopics(
     const std::string &_msgType)
 {
   std::list<std::string> result;
-  std::list<msgs::Publish> publishers;
+  std::list<gazebo::msgs::Publish> publishers;
 
   ConnectionManager::Instance()->GetAllPublishers(publishers);
 
-  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
+  for (std::list<gazebo::msgs::Publish>::iterator iter = publishers.begin();
       iter != publishers.end(); ++iter)
   {
     if (std::find(result.begin(), result.end(), (*iter).topic()) !=
@@ -338,11 +340,11 @@ std::list<std::string> transport::getAdvertisedTopics(
 std::string transport::getTopicMsgType(const std::string &_topicName)
 {
   std::string result;
-  std::list<msgs::Publish> publishers;
+  std::list<gazebo::msgs::Publish> publishers;
 
   ConnectionManager::Instance()->GetAllPublishers(publishers);
 
-  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
+  for (std::list<gazebo::msgs::Publish>::iterator iter = publishers.begin();
       iter != publishers.end() && result.empty(); ++iter)
   {
     if (_topicName == (*iter).topic())
@@ -368,7 +370,7 @@ bool transport::getMinimalComms()
 transport::ConnectionPtr transport::connectToMaster()
 {
   std::string data, namespacesData, publishersData;
-  msgs::Packet packet;
+  gazebo::msgs::Packet packet;
 
   std::string host;
   unsigned int port;
@@ -395,7 +397,7 @@ transport::ConnectionPtr transport::connectToMaster()
     packet.ParseFromString(data);
     if (packet.type() == "version_init")
     {
-      msgs::GzString msg;
+      gazebo::msgs::GzString msg;
       msg.ParseFromString(packet.serialized_data());
       if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION)
         std::cerr << "Conflicting gazebo versions\n";

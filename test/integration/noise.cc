@@ -42,7 +42,7 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
   std::string pluginFileName = "libRaySensorNoisePlugin.so";
   double maxRange = 5.0;
 
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     << "<model name ='" << modelName << "'>"

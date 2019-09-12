@@ -223,10 +223,10 @@ void ServerFixture::LoadArgs(const std::string &_args)
       &ServerFixture::OnStats, this);
 
   this->factoryPub =
-    this->node->Advertise<msgs::Factory>("~/factory");
+    this->node->Advertise<gazebo::msgs::Factory>("~/factory");
 
   this->requestPub =
-    this->node->Advertise<msgs::Request>("~/request");
+    this->node->Advertise<gazebo::msgs::Request>("~/request");
 
   // Wait for the world to reach the correct pause state.
   // This might not work properly with multiple worlds.
@@ -316,9 +316,9 @@ rendering::ScenePtr ServerFixture::GetScene(
 /////////////////////////////////////////////////
 void ServerFixture::OnStats(ConstWorldStatisticsPtr &_msg)
 {
-  this->simTime = msgs::Convert(_msg->sim_time());
-  this->realTime = msgs::Convert(_msg->real_time());
-  this->pauseTime = msgs::Convert(_msg->pause_time());
+  this->simTime = gazebo::msgs::Convert(_msg->sim_time());
+  this->realTime = gazebo::msgs::Convert(_msg->real_time());
+  this->pauseTime = gazebo::msgs::Convert(_msg->pause_time());
   this->paused = _msg->paused();
 
   if (this->realTime == 0)
@@ -351,7 +351,8 @@ void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
   std::lock_guard<std::mutex> lock(this->receiveMutex);
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
-    this->poses[_msg->pose(i).name()] = msgs::ConvertIgn(_msg->pose(i));
+    this->poses[_msg->pose(i).name()] =
+      gazebo::msgs::ConvertIgn(_msg->pose(i));
   }
 }
 
@@ -541,13 +542,13 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
 }
 
 /////////////////////////////////////////////////
-physics::ModelPtr ServerFixture::SpawnModel(const msgs::Model &_msg)
+physics::ModelPtr ServerFixture::SpawnModel(const gazebo::msgs::Model &_msg)
 {
   physics::WorldPtr world = physics::get_world();
   ServerFixture::CheckPointer(world);
   world->InsertModelString(
     "<sdf version='" + std::string(SDF_VERSION) + "'>"
-    + msgs::ModelToSDF(_msg)->ToString("")
+    + gazebo::msgs::ModelToSDF(_msg)->ToString("")
     + "</sdf>");
 
   common::Time wait(10, 0);
@@ -578,7 +579,7 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     double _distortionK3, double _distortionP1, double _distortionP2,
     double _cx, double _cy)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -647,7 +648,7 @@ void ServerFixture::SpawnWideAngleCamera(const std::string &_modelName,
     const double _envTextureSize, const double _c1, const double _c2,
     const double _f, const std::string &_fun)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -711,7 +712,7 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     const std::string &_noiseType, double _noiseMean,
     double _noiseStdDev)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -781,7 +782,7 @@ sensors::SonarSensorPtr ServerFixture::SpawnSonar(const std::string &_modelName,
     const double _maxRange,
     const double _radius)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -840,7 +841,7 @@ void ServerFixture::SpawnGpuRaySensorVertical(const std::string &_modelName,
     const std::string &_noiseType, double _noiseMean,
     double _noiseStdDev)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -909,7 +910,7 @@ void ServerFixture::SpawnDepthCameraSensor(const std::string &_modelName,
     unsigned int _width, unsigned int _height, double _rate, double _near,
     double _far)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -953,7 +954,7 @@ void ServerFixture::SpawnImuSensor(const std::string &_modelName,
     double _accelNoiseMean, double _accelNoiseStdDev,
     double _accelBiasMean, double _accelBiasStdDev)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -1048,7 +1049,7 @@ void ServerFixture::SpawnUnitContactSensor(const std::string &_name,
     const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
   std::ostringstream shapeStr;
 
@@ -1109,7 +1110,7 @@ void ServerFixture::SpawnUnitImuSensor(const std::string &_name,
     const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
   std::ostringstream shapeStr;
   if (_collisionType == "box")
@@ -1167,7 +1168,7 @@ void ServerFixture::SpawnUnitAltimeterSensor(const std::string &_name,
     const ignition::math::Vector3d &_rpy,
     bool _static)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
   std::ostringstream shapeStr;
 
@@ -1221,7 +1222,7 @@ void ServerFixture::SpawnUnitMagnetometerSensor(const std::string &_name,
     const ignition::math::Vector3d &_pos,
     const ignition::math::Vector3d &_rpy, bool _static)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
   std::ostringstream shapeStr;
   if (_collisionType == "box")
@@ -1284,7 +1285,7 @@ void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
     double _gain,
     bool _visualize)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -1327,7 +1328,7 @@ void ServerFixture::SpawnWirelessReceiverSensor(const std::string &_name,
     double _sensitivity,
     bool _visualize)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -1441,7 +1442,7 @@ void ServerFixture::SpawnLight(const std::string &_name,
     const double _spotFallOff,
     const bool _castShadows)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newLightStr;
 
   newLightStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -1474,7 +1475,7 @@ void ServerFixture::SpawnLight(const std::string &_name,
   this->factoryPub->Publish(msg);
 
   physics::WorldPtr world = physics::get_world();
-  msgs::Scene sceneMsg;
+  gazebo::msgs::Scene sceneMsg;
   int timeOutCount = 0;
   int maxTimeOut = 10;
   while (timeOutCount < maxTimeOut)
@@ -1495,20 +1496,20 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
     const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
-  msgs::Model model;
+  gazebo::msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
+  gazebo::msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
       ignition::math::Quaterniond(_rpy)));
-  msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
+  gazebo::msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << msgs::ModelToSDF(model)->ToString("")
+    << gazebo::msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
@@ -1524,7 +1525,7 @@ void ServerFixture::SpawnSphere(const std::string &_name,
     const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _wait, bool _static)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -1560,23 +1561,23 @@ void ServerFixture::SpawnSphere(const std::string &_name,
     const ignition::math::Vector3d &_cog, double _radius,
     bool _wait, bool _static)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
-  msgs::Model model;
+  gazebo::msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
+  gazebo::msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
       ignition::math::Quaterniond(_rpy)));
-  msgs::AddSphereLink(model, 1.0, _radius);
+  gazebo::msgs::AddSphereLink(model, 1.0, _radius);
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
-  msgs::Set(link->mutable_inertial()->mutable_pose(),
+  gazebo::msgs::Set(link->mutable_inertial()->mutable_pose(),
             ignition::math::Pose3d(_cog,
               ignition::math::Quaterniond()));
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << msgs::ModelToSDF(model)->ToString("")
+    << gazebo::msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
@@ -1592,20 +1593,20 @@ void ServerFixture::SpawnBox(const std::string &_name,
     const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_pos,
     const ignition::math::Vector3d &_rpy, bool _static)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
-  msgs::Model model;
+  gazebo::msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
+  gazebo::msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
       ignition::math::Quaterniond(_rpy)));
-  msgs::AddBoxLink(model, 1.0, _size);
+  gazebo::msgs::AddBoxLink(model, 1.0, _size);
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << msgs::ModelToSDF(model)->ToString("")
+    << gazebo::msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
@@ -1622,7 +1623,7 @@ void ServerFixture::SpawnTrimesh(const std::string &_name,
     const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -1660,18 +1661,18 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
     const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   std::ostringstream newModelStr;
-  msgs::Model model;
+  gazebo::msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
+  gazebo::msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
       ignition::math::Quaterniond(_rpy)));
   model.add_link();
   model.mutable_link(0)->set_name("body");
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << msgs::ModelToSDF(model)->ToString("")
+    << gazebo::msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   msg.set_sdf(newModelStr.str());
@@ -1685,7 +1686,7 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnModel(const std::string &_filename)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf_filename(_filename);
   this->factoryPub->Publish(msg);
 }
@@ -1693,7 +1694,7 @@ void ServerFixture::SpawnModel(const std::string &_filename)
 /////////////////////////////////////////////////
 void ServerFixture::SpawnSDF(const std::string &_sdf)
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf(_sdf);
   this->factoryPub->Publish(msg);
 
@@ -1738,7 +1739,8 @@ physics::ModelPtr ServerFixture::GetModel(const std::string &_name)
 /////////////////////////////////////////////////
 void ServerFixture::RemoveModel(const std::string &_name)
 {
-  msgs::Request *msg = msgs::CreateRequest("entity_delete", _name);
+  gazebo::msgs::Request *msg = gazebo::msgs::CreateRequest(
+      "entity_delete", _name);
   this->requestPub->Publish(*msg);
   delete msg;
 }

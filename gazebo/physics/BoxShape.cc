@@ -69,16 +69,16 @@ void BoxShape::SetScale(const ignition::math::Vector3d &_scale)
 }
 
 //////////////////////////////////////////////////
-void BoxShape::FillMsg(msgs::Geometry &_msg)
+void BoxShape::FillMsg(gazebo::msgs::Geometry &_msg)
 {
-  _msg.set_type(msgs::Geometry::BOX);
-  msgs::Set(_msg.mutable_box()->mutable_size(), this->Size());
+  _msg.set_type(gazebo::msgs::Geometry::BOX);
+  gazebo::msgs::Set(_msg.mutable_box()->mutable_size(), this->Size());
 }
 
 //////////////////////////////////////////////////
-void BoxShape::ProcessMsg(const msgs::Geometry &_msg)
+void BoxShape::ProcessMsg(const gazebo::msgs::Geometry &_msg)
 {
-  this->SetSize(msgs::ConvertIgn(_msg.box().size()));
+  this->SetSize(gazebo::msgs::ConvertIgn(_msg.box().size()));
 }
 
 //////////////////////////////////////////////////

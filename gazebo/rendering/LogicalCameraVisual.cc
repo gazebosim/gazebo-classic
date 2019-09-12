@@ -44,7 +44,7 @@ LogicalCameraVisual::~LogicalCameraVisual()
 }
 
 /////////////////////////////////////////////////
-void LogicalCameraVisual::Load(const msgs::LogicalCameraSensor &_msg)
+void LogicalCameraVisual::Load(const gazebo::msgs::LogicalCameraSensor &_msg)
 {
   double nearWidth = (tan(_msg.horizontal_fov()*0.5) * _msg.near_clip());
   double nearHeight = nearWidth / _msg.aspect_ratio();

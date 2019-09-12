@@ -360,7 +360,7 @@ TEST_F(CameraSensor, FillMsg)
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
-  msgs::Sensor msg;
+  gazebo::msgs::Sensor msg;
   sensor->FillMsg(msg);
 
   // Required fields
@@ -373,7 +373,7 @@ TEST_F(CameraSensor, FillMsg)
   EXPECT_EQ(msg.always_on(), sensor->IsActive());
 
   ASSERT_TRUE(msg.has_pose());
-  EXPECT_EQ(msgs::ConvertIgn(msg.pose()), sensor->Pose());
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(msg.pose()), sensor->Pose());
 
   ASSERT_TRUE(msg.has_topic());
   EXPECT_EQ(msg.topic(), sensor->Topic());
@@ -1848,14 +1848,14 @@ TEST_F(CameraSensor, Light)
   rendering::ScenePtr scene = camera->GetScene();
   ASSERT_NE(nullptr, scene);
 
-  transport::PublisherPtr lightModifyPub = this->node->Advertise<msgs::Light>(
-        "~/light/modify");
+  transport::PublisherPtr lightModifyPub =
+    this->node->Advertise<gazebo::msgs::Light>("~/light/modify");
 
   // Set the light to be green
   ignition::math::Color newColor(0, 1, 0);
-  msgs::Light lightMsg;
+  gazebo::msgs::Light lightMsg;
   lightMsg.set_name("sun");
-  msgs::Set(lightMsg.mutable_diffuse(), newColor);
+  gazebo::msgs::Set(lightMsg.mutable_diffuse(), newColor);
   lightModifyPub->Publish(lightMsg);
 
   rendering::LightPtr sun = scene->LightByName("sun");

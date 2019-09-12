@@ -39,7 +39,7 @@ namespace gazebo
 
       /// \brief Message containing the next update. A message is a collection
       /// of items and values.
-      msgs::Param_V msg;
+      gazebo::msgs::Param_V msg;
     };
 
     /// \brief Todo.

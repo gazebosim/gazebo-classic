@@ -166,7 +166,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName)
   }
 
   this->dataPtr->wrenchPub =
-    this->node->Advertise<msgs::WrenchStamped>(this->Topic());
+    this->node->Advertise<gazebo::msgs::WrenchStamped>(this->Topic());
 }
 
 //////////////////////////////////////////////////
@@ -194,13 +194,13 @@ physics::JointPtr ForceTorqueSensor::Joint() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d ForceTorqueSensor::Force() const
 {
-  return msgs::ConvertIgn(this->dataPtr->wrenchMsg.wrench().force());
+  return gazebo::msgs::ConvertIgn(this->dataPtr->wrenchMsg.wrench().force());
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d ForceTorqueSensor::Torque() const
 {
-  return msgs::ConvertIgn(this->dataPtr->wrenchMsg.wrench().torque());
+  return gazebo::msgs::ConvertIgn(this->dataPtr->wrenchMsg.wrench().torque());
 }
 
 //////////////////////////////////////////////////
@@ -209,7 +209,7 @@ bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   this->lastMeasurementTime = this->world->SimTime();
-  msgs::Set(this->dataPtr->wrenchMsg.mutable_time(),
+  gazebo::msgs::Set(this->dataPtr->wrenchMsg.mutable_time(),
       this->lastMeasurementTime);
 
   physics::JointWrench wrench = this->dataPtr->parentJoint->GetForceTorque(0u);
@@ -265,9 +265,9 @@ bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
     }
   }
 
-  msgs::Set(this->dataPtr->wrenchMsg.mutable_wrench()->mutable_force(),
+  gazebo::msgs::Set(this->dataPtr->wrenchMsg.mutable_wrench()->mutable_force(),
       measuredForce);
-  msgs::Set(this->dataPtr->wrenchMsg.mutable_wrench()->mutable_torque(),
+  gazebo::msgs::Set(this->dataPtr->wrenchMsg.mutable_wrench()->mutable_torque(),
       measuredTorque);
 
   this->dataPtr->update(this->dataPtr->wrenchMsg);
@@ -286,7 +286,7 @@ bool ForceTorqueSensor::IsActive() const
 
 //////////////////////////////////////////////////
 event::ConnectionPtr ForceTorqueSensor::ConnectUpdate(
-    std::function<void (msgs::WrenchStamped)> _subscriber)
+    std::function<void (gazebo::msgs::WrenchStamped)> _subscriber)
 {
   return this->dataPtr->update.Connect(_subscriber);
 }

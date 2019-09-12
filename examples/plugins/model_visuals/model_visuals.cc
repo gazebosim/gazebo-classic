@@ -25,11 +25,11 @@ namespace gazebo
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
     {
       transport::PublisherPtr visPub;
-      msgs::Visual visualMsg;
+      gazebo::msgs::Visual visualMsg;
 
       this->node = transport::NodePtr(new transport::Node());
       this->node->Init(_parent->GetWorld()->Name());
-      visPub = this->node->Advertise<msgs::Visual>("~/visual", 10);
+      visPub = this->node->Advertise<gazebo::msgs::Visual>("~/visual", 10);
 
       // Set the visual's name. This should be unique.
       visualMsg.set_name("__RED_CYLINDER_VISUAL__");
@@ -38,8 +38,8 @@ namespace gazebo
       visualMsg.set_parent_name(_parent->GetScopedName());
 
       // Create a cylinder
-      msgs::Geometry *geomMsg = visualMsg.mutable_geometry();
-      geomMsg->set_type(msgs::Geometry::CYLINDER);
+      gazebo::msgs::Geometry *geomMsg = visualMsg.mutable_geometry();
+      geomMsg->set_type(gazebo::msgs::Geometry::CYLINDER);
       geomMsg->mutable_cylinder()->set_radius(1);
       geomMsg->mutable_cylinder()->set_length(.1);
 
@@ -48,7 +48,7 @@ namespace gazebo
         "Gazebo/RedGlow");
 
       // Set the pose of the visual relative to its parent
-      msgs::Set(visualMsg.mutable_pose(),
+      gazebo::msgs::Set(visualMsg.mutable_pose(),
         ignition::math::Pose3d(0, 0, 0.6, 0, 0, 0));
 
       // Don't cast shadows

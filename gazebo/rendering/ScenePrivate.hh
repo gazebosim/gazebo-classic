@@ -69,11 +69,11 @@ namespace gazebo
 
     /// \typedef PoseMsgs_M.
     /// \brief List of messages.
-    typedef std::map<uint32_t, msgs::Pose> PoseMsgs_M;
+    typedef std::map<uint32_t, gazebo::msgs::Pose> PoseMsgs_M;
 
     /// \typedef LightPoseMsgs_M.
     /// \brief List of messages.
-    typedef std::map<std::string, msgs::Pose> LightPoseMsgs_M;
+    typedef std::map<std::string, gazebo::msgs::Pose> LightPoseMsgs_M;
 
     /// \def SceneMsgs_L
     /// \brief List of scene messages.
@@ -290,7 +290,7 @@ namespace gazebo
       public: std::string selectionMode;
 
       /// \brief Keep around our request message.
-      public: msgs::Request *requestMsg = nullptr;
+      public: gazebo::msgs::Request *requestMsg = nullptr;
 
       /// \brief True if visualizations should be rendered.
       public: bool enableVisualizations;

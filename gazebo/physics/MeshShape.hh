@@ -69,14 +69,14 @@ namespace gazebo
       /// \param[in] _scale Scaling factor.
       public: void SetScale(const ignition::math::Vector3d &_scale);
 
-      /// \brief Populate a msgs::Geometry message with data from this
+      /// \brief Populate a gazebo::msgs::Geometry message with data from this
       /// shape.
       /// \param[out] _msg Message to fill.
-      public: void FillMsg(msgs::Geometry &_msg);
+      public: void FillMsg(gazebo::msgs::Geometry &_msg);
 
       /// \brief Update this shape from a message.
       /// \param[in] _msg Message that contains triangle mesh info.
-      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+      public: virtual void ProcessMsg(const gazebo::msgs::Geometry &_msg);
 
       /// \brief Pointer to the mesh data.
       protected: const common::Mesh *mesh;

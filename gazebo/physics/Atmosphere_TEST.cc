@@ -36,10 +36,10 @@ class AtmosphereTest : public ServerFixture,
   public: void AtmosphereParamBool(const std::string &_atmosphere);
 
   /// \brief Incoming atmosphere message.
-  public: static msgs::Atmosphere atmospherePubMsg;
+  public: static gazebo::msgs::Atmosphere atmospherePubMsg;
 
   /// \brief Received atmosphere message.
-  public: static msgs::Atmosphere atmosphereResponseMsg;
+  public: static gazebo::msgs::Atmosphere atmosphereResponseMsg;
 };
 
 msgs::Atmosphere AtmosphereTest::atmospherePubMsg;
@@ -67,21 +67,22 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
   atmosphereNode->Init();
 
   transport::PublisherPtr atmospherePub
-       = atmosphereNode->Advertise<msgs::Atmosphere>("~/atmosphere");
+       = atmosphereNode->Advertise<gazebo::msgs::Atmosphere>("~/atmosphere");
   transport::PublisherPtr requestPub
-      = atmosphereNode->Advertise<msgs::Request>("~/request");
+      = atmosphereNode->Advertise<gazebo::msgs::Request>("~/request");
   transport::SubscriberPtr responsePub = atmosphereNode->Subscribe("~/response",
       &AtmosphereTest::OnAtmosphereMsgResponse, this);
 
   ASSERT_EQ(_atmosphere, "adiabatic");
-  atmospherePubMsg.set_type(msgs::Atmosphere::ADIABATIC);
+  atmospherePubMsg.set_type(gazebo::msgs::Atmosphere::ADIABATIC);
   atmospherePubMsg.set_temperature(0.01);
   atmospherePubMsg.set_pressure(500);
   atmospherePubMsg.set_mass_density(174.18084087484144);
 
   atmospherePub->Publish(atmospherePubMsg);
 
-  msgs::Request *requestMsg = msgs::CreateRequest("atmosphere_info", "");
+  gazebo::msgs::Request *requestMsg =
+    gazebo::msgs::CreateRequest("atmosphere_info", "");
   requestPub->Publish(*requestMsg);
 
   int waitCount = 0, maxWaitCount = 3000;

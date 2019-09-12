@@ -41,7 +41,7 @@ namespace gazebo
       public: physics::LinkPtr parentLink;
 
       /// \brief Stores most recent magnetometer sensor data.
-      public: msgs::Magnetometer magMsg;
+      public: gazebo::msgs::Magnetometer magMsg;
     };
   }
 }

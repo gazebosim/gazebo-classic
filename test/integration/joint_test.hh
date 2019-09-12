@@ -155,10 +155,10 @@ class JointTest : public ServerFixture,
   /// \param[in] _opt Options for spawned model and joint.
   public: physics::JointPtr SpawnJoint(const SpawnJointOptions &_opt)
           {
-            msgs::Model msg;
+            gazebo::msgs::Model msg;
             std::string modelName = this->GetUniqueString("joint_model");
             msg.set_name(modelName);
-            msgs::Set(msg.mutable_pose(), _opt.modelPose);
+            gazebo::msgs::Set(msg.mutable_pose(), _opt.modelPose);
 
             if (!_opt.worldParent)
             {
@@ -169,7 +169,7 @@ class JointTest : public ServerFixture,
               link->set_name("parent");
               if (!_opt.noLinkPose)
               {
-                msgs::Set(link->mutable_pose(), _opt.parentLinkPose);
+                gazebo::msgs::Set(link->mutable_pose(), _opt.parentLinkPose);
               }
             }
             if (!_opt.worldChild)
@@ -181,18 +181,19 @@ class JointTest : public ServerFixture,
               link->set_name("child");
               if (!_opt.noLinkPose)
               {
-                msgs::Set(link->mutable_pose(), _opt.childLinkPose);
+                gazebo::msgs::Set(link->mutable_pose(), _opt.childLinkPose);
               }
               if (_opt.useChildLinkInertia)
               {
-                msgs::Set(link->mutable_inertial(), _opt.childLinkInertia);
+                gazebo::msgs::Set(link->mutable_inertial(),
+                    _opt.childLinkInertia);
               }
             }
             msg.add_joint();
             auto jointMsg = msg.mutable_joint(0);
             jointMsg->set_name("joint");
-            jointMsg->set_type(msgs::ConvertJointType(_opt.type));
-            msgs::Set(jointMsg->mutable_pose(), _opt.jointPose);
+            jointMsg->set_type(gazebo::msgs::ConvertJointType(_opt.type));
+            gazebo::msgs::Set(jointMsg->mutable_pose(), _opt.jointPose);
             if (_opt.worldParent)
             {
               jointMsg->set_parent("world");
@@ -212,14 +213,14 @@ class JointTest : public ServerFixture,
 
             {
               auto axis = jointMsg->mutable_axis1();
-              msgs::Set(axis->mutable_xyz(), _opt.axis);
+              gazebo::msgs::Set(axis->mutable_xyz(), _opt.axis);
               axis->set_use_parent_model_frame(_opt.useParentModelFrame);
             }
             // Hack: hardcode a second axis for universal joints
             if (_opt.type == "universal" || _opt.type == "revolute2")
             {
               auto axis2 = jointMsg->mutable_axis2();
-              msgs::Set(axis2->mutable_xyz(),
+              gazebo::msgs::Set(axis2->mutable_xyz(),
                   ignition::math::Vector3d(0, 1, 0));
               axis2->set_use_parent_model_frame(_opt.useParentModelFrame);
             }

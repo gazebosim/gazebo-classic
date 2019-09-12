@@ -52,7 +52,7 @@ namespace gazebo
 
       /// \brief Get the msg containing all link data.
       /// \return Link msg.
-      public: msgs::Link *GetData() const;
+      public: gazebo::msgs::Link *GetData() const;
 
       /// \brief Set the pose of the link.
       /// \param[in] _pose Pose to set the link to.
@@ -130,7 +130,7 @@ namespace gazebo
 
       /// \brief Message containing the data which was in the widget when first
       /// open.
-      private: msgs::Link originalDataMsg;
+      private: gazebo::msgs::Link originalDataMsg;
     };
     /// \}
   }

@@ -94,17 +94,17 @@ void PlaneShape::SetScale(const ignition::math::Vector3d &_scale)
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::FillMsg(msgs::Geometry &_msg)
+void PlaneShape::FillMsg(gazebo::msgs::Geometry &_msg)
 {
-  _msg.set_type(msgs::Geometry::PLANE);
-  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->Normal());
-  msgs::Set(_msg.mutable_plane()->mutable_size(), this->Size());
+  _msg.set_type(gazebo::msgs::Geometry::PLANE);
+  gazebo::msgs::Set(_msg.mutable_plane()->mutable_normal(), this->Normal());
+  gazebo::msgs::Set(_msg.mutable_plane()->mutable_size(), this->Size());
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::ProcessMsg(const msgs::Geometry &_msg)
+void PlaneShape::ProcessMsg(const gazebo::msgs::Geometry &_msg)
 {
-  this->SetNormal(msgs::ConvertIgn(_msg.plane().normal()));
+  this->SetNormal(gazebo::msgs::ConvertIgn(_msg.plane().normal()));
 }
 
 //////////////////////////////////////////////////

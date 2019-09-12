@@ -78,7 +78,7 @@ void Model::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
+  this->jointPub = this->node->Advertise<gazebo::msgs::Joint>("~/joint");
 
   this->SetStatic(this->sdf->Get<bool>("static"));
   if (this->sdf->HasElement("static"))
@@ -285,7 +285,7 @@ void Model::Init()
     // The following message used to be filled and sent in Model::LoadJoint
     // It is moved here, after Joint::Init, so that the joint properties
     // can be included in the message.
-    msgs::Joint msg;
+    gazebo::msgs::Joint msg;
     (*iter)->FillMsg(msg);
     this->jointPub->Publish(msg);
   }
@@ -779,9 +779,9 @@ ignition::math::Vector3d Model::WorldAngularAccel() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Model::BoundingBox() const
+ignition::math::AxisAlignedBox Model::BoundingBox() const
 {
-  ignition::math::Box box;
+  ignition::math::AxisAlignedBox box;
 
   box.Min().Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.Max().Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
@@ -790,7 +790,7 @@ ignition::math::Box Model::BoundingBox() const
   {
     if (iter)
     {
-      ignition::math::Box linkBox;
+      ignition::math::AxisAlignedBox linkBox;
       linkBox = iter->BoundingBox();
       box += linkBox;
     }
@@ -1154,7 +1154,7 @@ void Model::SetLaserRetro(const float _retro)
 }
 
 //////////////////////////////////////////////////
-void Model::FillMsg(msgs::Model &_msg)
+void Model::FillMsg(gazebo::msgs::Model &_msg)
 {
   ignition::math::Pose3d relPose = this->RelativePose();
 
@@ -1162,11 +1162,11 @@ void Model::FillMsg(msgs::Model &_msg)
   _msg.set_is_static(this->IsStatic());
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_enable_wind(this->WindMode());
-  msgs::Set(_msg.mutable_pose(), relPose);
+  gazebo::msgs::Set(_msg.mutable_pose(), relPose);
   _msg.set_id(this->GetId());
-  msgs::Set(_msg.mutable_scale(), this->scale);
+  gazebo::msgs::Set(_msg.mutable_scale(), this->scale);
 
-  msgs::Set(this->visualMsg->mutable_pose(), relPose);
+  gazebo::msgs::Set(this->visualMsg->mutable_pose(), relPose);
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   for (const auto &link : this->links)
@@ -1189,7 +1189,7 @@ void Model::FillMsg(msgs::Model &_msg)
     while (pluginElem)
     {
       auto pluginMsg = _msg.add_plugin();
-      pluginMsg->CopyFrom(msgs::PluginFromSDF(pluginElem));
+      pluginMsg->CopyFrom(gazebo::msgs::PluginFromSDF(pluginElem));
 
       pluginElem = pluginElem->GetNextElement("plugin");
     }
@@ -1197,7 +1197,7 @@ void Model::FillMsg(msgs::Model &_msg)
 }
 
 //////////////////////////////////////////////////
-void Model::ProcessMsg(const msgs::Model &_msg)
+void Model::ProcessMsg(const gazebo::msgs::Model &_msg)
 {
   if (_msg.has_id() && _msg.id() != this->GetId())
   {
@@ -1214,7 +1214,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
   this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
-    this->SetWorldPose(msgs::ConvertIgn(_msg.pose()));
+    this->SetWorldPose(gazebo::msgs::ConvertIgn(_msg.pose()));
   for (int i = 0; i < _msg.link_size(); i++)
   {
     LinkPtr link = this->GetLinkById(_msg.link(i).id());
@@ -1226,7 +1226,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     this->SetStatic(_msg.is_static());
 
   if (_msg.has_scale())
-    this->SetScale(msgs::ConvertIgn(_msg.scale()));
+    this->SetScale(gazebo::msgs::ConvertIgn(_msg.scale()));
 
   if (_msg.has_enable_wind())
     this->SetWindMode(_msg.enable_wind());

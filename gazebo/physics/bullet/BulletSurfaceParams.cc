@@ -66,7 +66,7 @@ void BulletSurfaceParams::Load(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void BulletSurfaceParams::FillMsg(msgs::Surface &_msg)
+void BulletSurfaceParams::FillMsg(gazebo::msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
@@ -75,7 +75,7 @@ void BulletSurfaceParams::FillMsg(msgs::Surface &_msg)
 }
 
 /////////////////////////////////////////////////
-void BulletSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
+void BulletSurfaceParams::ProcessMsg(const gazebo::msgs::Surface &_msg)
 {
   SurfaceParams::ProcessMsg(_msg);
 

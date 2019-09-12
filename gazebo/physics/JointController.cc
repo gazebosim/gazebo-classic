@@ -245,7 +245,7 @@ void JointController::OnJointCommand(const ignition::msgs::JointCmd &_msg)
   iter = this->dataPtr->joints.find(_msg.name());
   if (iter != this->dataPtr->joints.end())
   {
-    if (_msg.has_reset() && _msg.reset())
+    if (_msg.reset())
     {
       if (this->dataPtr->forces.find(_msg.name()) !=
           this->dataPtr->forces.end())
@@ -268,103 +268,41 @@ void JointController::OnJointCommand(const ignition::msgs::JointCmd &_msg)
       }
     }
 
-    if (_msg.has_force())
-      this->dataPtr->forces[_msg.name()] = _msg.force();
+    this->dataPtr->forces[_msg.name()] = _msg.force();
 
     if (_msg.has_position())
     {
-      if (_msg.position().has_target())
+      if (!this->SetPositionTarget(_msg.name(), _msg.position().target()))
       {
-        if (!this->SetPositionTarget(_msg.name(), _msg.position().target()))
-        {
-          gzerr << "Unable to set position target for joint["
-            << _msg.name() << "]. Joint is not found.\n";
-        }
+        gzerr << "Unable to set position target for joint["
+          << _msg.name() << "]. Joint is not found.\n";
       }
 
-      if (_msg.position().has_p_gain())
-      {
-        this->dataPtr->posPids[_msg.name()].SetPGain(
-            _msg.position().p_gain());
-      }
+      this->dataPtr->posPids[_msg.name()].SetPGain(_msg.position().p_gain());
+      this->dataPtr->posPids[_msg.name()].SetIGain(_msg.position().i_gain());
+      this->dataPtr->posPids[_msg.name()].SetDGain(_msg.position().d_gain());
+      this->dataPtr->posPids[_msg.name()].SetIMax(_msg.position().i_max());
 
-      if (_msg.position().has_i_gain())
-      {
-        this->dataPtr->posPids[_msg.name()].SetIGain(
-            _msg.position().i_gain());
-      }
+      this->dataPtr->posPids[_msg.name()].SetIMin(_msg.position().i_min());
 
-      if (_msg.position().has_d_gain())
-      {
-        this->dataPtr->posPids[_msg.name()].SetDGain(
-            _msg.position().d_gain());
-      }
-
-      if (_msg.position().has_i_max())
-      {
-        this->dataPtr->posPids[_msg.name()].SetIMax(_msg.position().i_max());
-      }
-
-      if (_msg.position().has_i_min())
-      {
-        this->dataPtr->posPids[_msg.name()].SetIMin(_msg.position().i_min());
-      }
-
-      if (_msg.position().has_limit())
-      {
-        this->dataPtr->posPids[_msg.name()].SetCmdMax(
-            _msg.position().limit());
-        this->dataPtr->posPids[_msg.name()].SetCmdMin(
-            -_msg.position().limit());
-      }
+      this->dataPtr->posPids[_msg.name()].SetCmdMax(_msg.position().limit());
+      this->dataPtr->posPids[_msg.name()].SetCmdMin(-_msg.position().limit());
     }
 
     if (_msg.has_velocity())
     {
-      if (_msg.velocity().has_target())
+      if (!this->SetVelocityTarget(_msg.name(), _msg.velocity().target()))
       {
-        if (!this->SetVelocityTarget(_msg.name(), _msg.velocity().target()))
-        {
-          gzerr << "Unable to set velocity target for joint["
-            << _msg.name() << "]. Joint is not found.\n";
-        }
+        gzerr << "Unable to set velocity target for joint["
+          << _msg.name() << "]. Joint is not found.\n";
       }
-
-      if (_msg.velocity().has_p_gain())
-      {
-        this->dataPtr->velPids[_msg.name()].SetPGain(
-            _msg.velocity().p_gain());
-      }
-
-      if (_msg.velocity().has_i_gain())
-      {
-        this->dataPtr->velPids[_msg.name()].SetIGain(
-            _msg.velocity().i_gain());
-      }
-
-      if (_msg.velocity().has_d_gain())
-      {
-        this->dataPtr->velPids[_msg.name()].SetDGain(
-            _msg.velocity().d_gain());
-      }
-
-      if (_msg.velocity().has_i_max())
-      {
-        this->dataPtr->velPids[_msg.name()].SetIMax(_msg.velocity().i_max());
-      }
-
-      if (_msg.velocity().has_i_min())
-      {
-        this->dataPtr->velPids[_msg.name()].SetIMin(_msg.velocity().i_min());
-      }
-
-      if (_msg.velocity().has_limit())
-      {
-        this->dataPtr->velPids[_msg.name()].SetCmdMax(
-            _msg.velocity().limit());
-        this->dataPtr->velPids[_msg.name()].SetCmdMin(
-            -_msg.velocity().limit());
-      }
+      this->dataPtr->velPids[_msg.name()].SetPGain(_msg.velocity().p_gain());
+      this->dataPtr->velPids[_msg.name()].SetIGain(_msg.velocity().i_gain());
+      this->dataPtr->velPids[_msg.name()].SetDGain(_msg.velocity().d_gain());
+      this->dataPtr->velPids[_msg.name()].SetIMax(_msg.velocity().i_max());
+      this->dataPtr->velPids[_msg.name()].SetIMin(_msg.velocity().i_min());
+      this->dataPtr->velPids[_msg.name()].SetCmdMax(_msg.velocity().limit());
+      this->dataPtr->velPids[_msg.name()].SetCmdMin(-_msg.velocity().limit());
     }
   }
   else

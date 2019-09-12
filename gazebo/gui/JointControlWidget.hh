@@ -151,15 +151,15 @@ namespace gazebo
 
       /// \brief Layout the force tab.
       /// \param[in] _modelMsg Message used to create the joint controls
-      private: void LayoutForceTab(msgs::Model &_modelMsg);
+      private: void LayoutForceTab(gazebo::msgs::Model &_modelMsg);
 
       /// \brief Layout the position PID tab.
       /// \param[in] _modelMsg Message used to create the joint controls
-      private: void LayoutPositionTab(msgs::Model &_modelMsg);
+      private: void LayoutPositionTab(gazebo::msgs::Model &_modelMsg);
 
       /// \brief Layout the velocity PID tab.
       /// \param[in] _modelMsg Message used to create the joint controls
-      private: void LayoutVelocityTab(msgs::Model &_modelMsg);
+      private: void LayoutVelocityTab(gazebo::msgs::Model &_modelMsg);
 
       /// \internal
       /// \brief Pointer to private data.

@@ -101,7 +101,8 @@ namespace gazebo
     /// value to wait forever.
     /// \return The response to the request.  Can be empty.
     GZ_TRANSPORT_VISIBLE
-    boost::shared_ptr<msgs::Response> request(const std::string &_worldName,
+    boost::shared_ptr<gazebo::msgs::Response> request(
+        const std::string &_worldName,
             const std::string &_request,
             const std::string &_data = "",
             const common::Time &_timeout = -1);

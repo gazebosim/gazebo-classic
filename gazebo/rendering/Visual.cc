@@ -327,9 +327,10 @@ void Visual::Init()
 }
 
 //////////////////////////////////////////////////
-void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
+void Visual::LoadFromMsg(
+    const boost::shared_ptr< gazebo::msgs::Visual const> &_msg)
 {
-  this->dataPtr->sdf = msgs::VisualToSDF(*_msg.get());
+  this->dataPtr->sdf = gazebo::msgs::VisualToSDF(*_msg.get());
   this->Load();
   this->UpdateFromMsg(_msg);
 }
@@ -2131,9 +2132,9 @@ std::string Visual::GetMaterialName() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Visual::BoundingBox() const
+ignition::math::AxisAlignedBox Visual::BoundingBox() const
 {
-  ignition::math::Box box(
+  ignition::math::AxisAlignedBox box(
       ignition::math::Vector3d::Zero,
       ignition::math::Vector3d::Zero);
   this->BoundsHelper(this->GetSceneNode(), box);
@@ -2142,7 +2143,7 @@ ignition::math::Box Visual::BoundingBox() const
 
 //////////////////////////////////////////////////
 void Visual::BoundsHelper(Ogre::SceneNode *_node,
-                          ignition::math::Box &_box) const
+                          ignition::math::AxisAlignedBox &_box) const
 {
   _node->_updateBounds();
   _node->_update(false, true);
@@ -2195,7 +2196,7 @@ void Visual::BoundsHelper(Ogre::SceneNode *_node,
         max = Conversions::ConvertIgn(bb.getMaximum());
       }
 
-      _box.Merge(ignition::math::Box(min, max));
+      _box.Merge(ignition::math::AxisAlignedBox(min, max));
     }
   }
 
@@ -2521,7 +2522,8 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
 }
 
 //////////////////////////////////////////////////
-void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
+void Visual::UpdateFromMsg(
+    const boost::shared_ptr< gazebo::msgs::Visual const> &_msg)
 {
   // TODO: Put back in, and check for performance improvements.
   /*if (msg->has_is_static() && msg->is_static())
@@ -2543,18 +2545,18 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   }
 
   if (_msg->has_pose())
-    this->SetPose(msgs::ConvertIgn(_msg->pose()));
+    this->SetPose(gazebo::msgs::ConvertIgn(_msg->pose()));
 
   if (_msg->has_visible())
     this->SetVisible(_msg->visible());
 
   if (_msg->has_scale())
-    this->SetScale(msgs::ConvertIgn(_msg->scale()));
+    this->SetScale(gazebo::msgs::ConvertIgn(_msg->scale()));
 
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {
     std::string newGeometryType =
-        msgs::ConvertGeometryType(_msg->geometry().type());
+        gazebo::msgs::ConvertGeometryType(_msg->geometry().type());
 
     std::string geometryType = this->GetGeometryType();
     std::string geometryName = this->GetMeshName();
@@ -2629,22 +2631,22 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     ignition::math::Vector3d geomScale(1, 1, 1);
 
-    if (_msg->geometry().type() == msgs::Geometry::BOX)
+    if (_msg->geometry().type() == gazebo::msgs::Geometry::BOX)
     {
-      geomScale = msgs::ConvertIgn(_msg->geometry().box().size());
+      geomScale = gazebo::msgs::ConvertIgn(_msg->geometry().box().size());
     }
-    else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
+    else if (_msg->geometry().type() == gazebo::msgs::Geometry::CYLINDER)
     {
       geomScale.X(_msg->geometry().cylinder().radius() * 2.0);
       geomScale.Y(_msg->geometry().cylinder().radius() * 2.0);
       geomScale.Z(_msg->geometry().cylinder().length());
     }
-    else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
+    else if (_msg->geometry().type() == gazebo::msgs::Geometry::SPHERE)
     {
       geomScale.X() = geomScale.Y() = geomScale.Z()
           = _msg->geometry().sphere().radius() * 2.0;
     }
-    else if (_msg->geometry().type() == msgs::Geometry::PLANE)
+    else if (_msg->geometry().type() == gazebo::msgs::Geometry::PLANE)
     {
       if (_msg->geometry().plane().has_size())
       {
@@ -2652,24 +2654,24 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
         geomScale.Y(_msg->geometry().plane().size().y());
       }
     }
-    else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
+    else if (_msg->geometry().type() == gazebo::msgs::Geometry::IMAGE)
     {
       geomScale.X() = geomScale.Y() = geomScale.Z()
           = _msg->geometry().image().scale();
     }
-    else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
+    else if (_msg->geometry().type() == gazebo::msgs::Geometry::HEIGHTMAP)
     {
-      geomScale = msgs::ConvertIgn(_msg->geometry().heightmap().size());
+      geomScale = gazebo::msgs::ConvertIgn(_msg->geometry().heightmap().size());
     }
-    else if (_msg->geometry().type() == msgs::Geometry::MESH)
+    else if (_msg->geometry().type() == gazebo::msgs::Geometry::MESH)
     {
       if (_msg->geometry().mesh().has_scale())
       {
-        geomScale = msgs::ConvertIgn(_msg->geometry().mesh().scale());
+        geomScale = gazebo::msgs::ConvertIgn(_msg->geometry().mesh().scale());
       }
     }
-    else if (_msg->geometry().type() == msgs::Geometry::EMPTY ||
-        _msg->geometry().type() == msgs::Geometry::POLYLINE)
+    else if (_msg->geometry().type() == gazebo::msgs::Geometry::EMPTY ||
+        _msg->geometry().type() == gazebo::msgs::Geometry::POLYLINE)
     {
       // do nothing for now - keep unit scale.
     }
@@ -2681,7 +2683,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
-    this->ProcessMaterialMsg(msgs::ConvertIgnMsg(_msg->material()));
+    this->ProcessMaterialMsg(gazebo::msgs::ConvertIgnMsg(_msg->material()));
   }
 
   if (_msg->has_transparency())
@@ -2699,7 +2701,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     for (int i = 0; i < _msg->plugin_size(); ++i)
     {
       sdf::ElementPtr pluginElem;
-      pluginElem = msgs::PluginToSDF(_msg->plugin(i), pluginElem);
+      pluginElem = gazebo::msgs::PluginToSDF(_msg->plugin(i), pluginElem);
       this->dataPtr->sdf->InsertElement(pluginElem);
     }
     this->LoadPlugins();
@@ -3098,7 +3100,7 @@ void Visual::ShowCollision(bool _show)
         continue;
       }
 
-      auto msg = dynamic_cast<msgs::Visual *>(it->second);
+      auto msg = dynamic_cast<gazebo::msgs::Visual *>(it->second);
       if (!msg)
       {
         gzerr << "Wrong message to generate collision visual." << std::endl;
@@ -3210,7 +3212,7 @@ void Visual::ShowJoints(bool _show)
         continue;
       }
 
-      auto msg = dynamic_cast<const msgs::Joint *>(it->second);
+      auto msg = dynamic_cast<const gazebo::msgs::Joint *>(it->second);
       if (!msg)
       {
         ++it;
@@ -3255,7 +3257,7 @@ void Visual::ShowCOM(bool _show)
   else if (_show && this->dataPtr->type == VT_LINK &&
       !this->dataPtr->scene->GetVisual(this->Name() + "_COM_VISUAL__"))
   {
-    auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
+    auto msg = dynamic_cast<gazebo::msgs::Link *>(this->dataPtr->typeMsg);
     if (!msg)
     {
       gzerr << "Couldn't get link message for visual [" << this->Name() <<
@@ -3292,7 +3294,7 @@ void Visual::ShowInertia(bool _show)
   else if (_show && this->dataPtr->type == VT_LINK && this->dataPtr->typeMsg &&
       !this->dataPtr->scene->GetVisual(this->Name() + suffix))
   {
-    auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
+    auto msg = dynamic_cast<gazebo::msgs::Link *>(this->dataPtr->typeMsg);
     if (!msg)
     {
       gzerr << "Couldn't get link message for visual [" << this->Name() <<
@@ -3341,7 +3343,7 @@ void Visual::ShowLinkFrame(bool _show)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
+void Visual::SetSkeletonPose(const gazebo::msgs::PoseAnimation &_pose)
 {
   if (!this->dataPtr->skeleton)
   {
@@ -3351,7 +3353,7 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
 
   for (int i = 0; i < _pose.pose_size(); i++)
   {
-    const msgs::Pose& bonePose = _pose.pose(i);
+    const gazebo::msgs::Pose& bonePose = _pose.pose(i);
     if (!this->dataPtr->skeleton->hasBone(bonePose.name()))
       continue;
     Ogre::Bone *bone = this->dataPtr->skeleton->getBone(bonePose.name());
@@ -3498,34 +3500,35 @@ void Visual::SetLayer(const int32_t _layer)
 }
 
 //////////////////////////////////////////////////
-Visual::VisualType Visual::ConvertVisualType(const msgs::Visual::Type &_type)
+Visual::VisualType Visual::ConvertVisualType(
+    const gazebo::msgs::Visual::Type &_type)
 {
   Visual::VisualType visualType = Visual::VT_ENTITY;
 
   switch (_type)
   {
-    case msgs::Visual::ENTITY:
+    case gazebo::msgs::Visual::ENTITY:
       visualType = Visual::VT_ENTITY;
       break;
-    case msgs::Visual::MODEL:
+    case gazebo::msgs::Visual::MODEL:
       visualType = Visual::VT_MODEL;
       break;
-    case msgs::Visual::LINK:
+    case gazebo::msgs::Visual::LINK:
       visualType = Visual::VT_LINK;
       break;
-    case msgs::Visual::VISUAL:
+    case gazebo::msgs::Visual::VISUAL:
       visualType = Visual::VT_VISUAL;
       break;
-    case msgs::Visual::COLLISION:
+    case gazebo::msgs::Visual::COLLISION:
       visualType = Visual::VT_COLLISION;
       break;
-    case msgs::Visual::SENSOR:
+    case gazebo::msgs::Visual::SENSOR:
       visualType = Visual::VT_SENSOR;
       break;
-    case msgs::Visual::GUI:
+    case gazebo::msgs::Visual::GUI:
       visualType = Visual::VT_GUI;
       break;
-    case msgs::Visual::PHYSICS:
+    case gazebo::msgs::Visual::PHYSICS:
       visualType = Visual::VT_PHYSICS;
       break;
     default:
@@ -3537,35 +3540,36 @@ Visual::VisualType Visual::ConvertVisualType(const msgs::Visual::Type &_type)
 }
 
 //////////////////////////////////////////////////
-msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
+gazebo::msgs::Visual::Type Visual::ConvertVisualType(
+    const Visual::VisualType &_type)
 {
-  msgs::Visual::Type visualType = msgs::Visual::ENTITY;
+  gazebo::msgs::Visual::Type visualType = gazebo::msgs::Visual::ENTITY;
 
   switch (_type)
   {
     case Visual::VT_ENTITY:
-      visualType = msgs::Visual::ENTITY;
+      visualType = gazebo::msgs::Visual::ENTITY;
       break;
     case Visual::VT_MODEL:
-      visualType = msgs::Visual::MODEL;
+      visualType = gazebo::msgs::Visual::MODEL;
       break;
     case Visual::VT_LINK:
-      visualType = msgs::Visual::LINK;
+      visualType = gazebo::msgs::Visual::LINK;
       break;
     case Visual::VT_VISUAL:
-      visualType = msgs::Visual::VISUAL;
+      visualType = gazebo::msgs::Visual::VISUAL;
       break;
     case Visual::VT_COLLISION:
-      visualType = msgs::Visual::COLLISION;
+      visualType = gazebo::msgs::Visual::COLLISION;
       break;
     case Visual::VT_SENSOR:
-      visualType = msgs::Visual::SENSOR;
+      visualType = gazebo::msgs::Visual::SENSOR;
       break;
     case Visual::VT_GUI:
-      visualType = msgs::Visual::GUI;
+      visualType = gazebo::msgs::Visual::GUI;
       break;
     case Visual::VT_PHYSICS:
-      visualType = msgs::Visual::PHYSICS;
+      visualType = gazebo::msgs::Visual::PHYSICS;
       break;
     default:
       gzerr << "Cannot convert visual type. Defaults to 'msgs::Visual::ENTITY'"
@@ -3607,10 +3611,7 @@ void Visual::AddPendingChild(std::pair<VisualType,
 /////////////////////////////////////////////////
 void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
 {
-  if (_msg.has_lighting())
-  {
-    this->SetLighting(_msg.lighting());
-  }
+  this->SetLighting(_msg.lighting());
 
   if (_msg.has_script())
   {
@@ -3619,8 +3620,7 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
       RenderEngine::Instance()->AddResourcePath(
           _msg.script().uri(i));
     }
-    if (_msg.script().has_name() &&
-        !_msg.script().name().empty())
+    if (!_msg.script().name().empty())
     {
       this->SetMaterial(_msg.script().name());
     }
@@ -3654,34 +3654,31 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
           _msg.emissive().a()));
   }
 
-  if (_msg.has_shader_type())
+  if (_msg.shader_type() == ignition::msgs::Material::VERTEX)
   {
-    if (_msg.shader_type() == ignition::msgs::Material::VERTEX)
-    {
-      this->SetShaderType("vertex");
-    }
-    else if (_msg.shader_type() == ignition::msgs::Material::PIXEL)
-    {
-      this->SetShaderType("pixel");
-    }
-    else if (_msg.shader_type() ==
-        ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
-    {
-      this->SetShaderType("normal_map_object_space");
-    }
-    else if (_msg.shader_type() ==
-        ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
-    {
-      this->SetShaderType("normal_map_tangent_space");
-    }
-    else
-    {
-      gzerr << "Unrecognized shader type" << std::endl;
-    }
-
-    if (_msg.has_normal_map())
-      this->SetNormalMap(_msg.normal_map());
+    this->SetShaderType("vertex");
   }
+  else if (_msg.shader_type() == ignition::msgs::Material::PIXEL)
+  {
+    this->SetShaderType("pixel");
+  }
+  else if (_msg.shader_type() ==
+      ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+  {
+    this->SetShaderType("normal_map_object_space");
+  }
+  else if (_msg.shader_type() ==
+      ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+  {
+    this->SetShaderType("normal_map_tangent_space");
+  }
+  else
+  {
+    gzerr << "Unrecognized shader type" << std::endl;
+  }
+
+  if (!_msg.normal_map().empty())
+    this->SetNormalMap(_msg.normal_map());
 }
 
 /////////////////////////////////////////////////

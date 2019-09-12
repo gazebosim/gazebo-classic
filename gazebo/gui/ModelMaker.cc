@@ -52,7 +52,7 @@ ModelMaker::ModelMaker() : dataPtr(new ModelMakerPrivate)
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->makerPub =
-      this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
+      this->dataPtr->node->Advertise<gazebo::msgs::Factory>("~/factory");
 }
 
 /////////////////////////////////////////////////
@@ -145,20 +145,21 @@ bool ModelMaker::InitSimpleShape(SimpleShapes _shape)
     modelName = "unit_cylinder";
 
   // Model message
-  msgs::Model model;
+  gazebo::msgs::Model model;
   model.set_name(modelName);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
+  gazebo::msgs::Set(model.mutable_pose(),
+      ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
   if (_shape == BOX)
-    msgs::AddBoxLink(model, 1.0, ignition::math::Vector3d::One);
+    gazebo::msgs::AddBoxLink(model, 1.0, ignition::math::Vector3d::One);
   else if (_shape == SPHERE)
-    msgs::AddSphereLink(model, 1.0, 0.5);
+    gazebo::msgs::AddSphereLink(model, 1.0, 0.5);
   else if (_shape == CYLINDER)
-    msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
+    gazebo::msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
   model.mutable_link(0)->set_name("link");
 
   // Model SDF
   std::string modelString = "<sdf version='" + std::string(SDF_VERSION) + "'>"
-       + msgs::ModelToSDF(model)->ToString("") + "</sdf>";
+       + gazebo::msgs::ModelToSDF(model)->ToString("") + "</sdf>";
 
   this->dataPtr->modelSDF.reset(new sdf::SDF);
   sdf::initFile("root.sdf", this->dataPtr->modelSDF);
@@ -349,7 +350,7 @@ void ModelMaker::Stop()
 /////////////////////////////////////////////////
 void ModelMaker::CreateTheEntity()
 {
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   if (!this->dataPtr->clone)
   {
     sdf::ElementPtr modelElem;
@@ -381,7 +382,7 @@ void ModelMaker::CreateTheEntity()
   }
   else
   {
-    msgs::Set(msg.mutable_pose(),
+    gazebo::msgs::Set(msg.mutable_pose(),
         this->dataPtr->modelVisual->WorldPose());
     msg.set_clone_model_name(this->dataPtr->modelVisual->Name().substr(0,
           this->dataPtr->modelVisual->Name().find("_clone_tmp")));

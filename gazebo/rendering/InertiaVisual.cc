@@ -54,7 +54,7 @@ void InertiaVisual::Load(ConstLinkPtr &_msg)
 {
   Visual::Load();
 
-  auto inertial = msgs::Convert(_msg->inertial());
+  auto inertial = gazebo::msgs::Convert(_msg->inertial());
   auto xyz = inertial.Pose().Pos();
   auto q = inertial.Pose().Rot();
 

@@ -52,7 +52,7 @@ namespace gazebo
     public: std::mutex mutex;
 
     /// \brief Local copy of input image.
-    public: msgs::Image imageMsg;
+    public: gazebo::msgs::Image imageMsg;
 
     /// \brief Revolute joint for moving the left wheel of the vehicle.
     public: physics::JointPtr leftJoint;
@@ -187,7 +187,7 @@ void FollowerPlugin::FindJoints()
   physics::Joint_V revJoints;
   for (const auto &j : joints)
   {
-    if (j->GetMsgType() == msgs::Joint::REVOLUTE)
+    if (j->GetMsgType() == gazebo::msgs::Joint::REVOLUTE)
       revJoints.push_back(j);
   }
 

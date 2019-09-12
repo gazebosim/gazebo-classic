@@ -79,7 +79,7 @@ namespace gazebo
     private: mutable std::mutex mutex;
 
     /// \brief Store newest contacts message.
-    private: msgs::Contacts newestContactsMsg;
+    private: gazebo::msgs::Contacts newestContactsMsg;
 
     /// \brief Flag to indicate new contact message.
     private: bool newMsg;

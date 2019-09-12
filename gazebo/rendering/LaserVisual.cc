@@ -115,7 +115,8 @@ void LaserVisual::Update()
 
   double verticalAngle = dPtr->laserMsg->scan().vertical_angle_min();
   ignition::math::Pose3d offset =
-    msgs::ConvertIgn(dPtr->laserMsg->scan().world_pose()) - this->WorldPose();
+    gazebo::msgs::ConvertIgn(
+        dPtr->laserMsg->scan().world_pose()) - this->WorldPose();
 
   unsigned int vertCount = dPtr->laserMsg->scan().has_vertical_count() ?
       dPtr->laserMsg->scan().vertical_count() : 1u;

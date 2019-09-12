@@ -131,12 +131,12 @@ TEST_F(Heightmap_TEST, LoadDEM)
   EXPECT_TRUE(heightmap != nullptr);
 
   // create a heightmapgeom msg for the heightmap
-  msgs::Visual msg;
+  gazebo::msgs::Visual msg;
   msg.set_name("heightmap_visual");
   msg.set_parent_name("heightmap_visual_parent");
   auto geomMsg = msg.mutable_geometry();
   // set size to zero to let heightmap read actual size from dem file
-  msgs::Set(geomMsg->mutable_heightmap()->mutable_size(),
+  gazebo::msgs::Set(geomMsg->mutable_heightmap()->mutable_size(),
       ignition::math::Vector3d::Zero);
 
   boost::filesystem::path path = TEST_PATH;

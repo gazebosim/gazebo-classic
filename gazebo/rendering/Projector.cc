@@ -126,7 +126,7 @@ void Projector::Load(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void Projector::Load(const msgs::Projector &_msg)
+void Projector::Load(const gazebo::msgs::Projector &_msg)
 {
   ignition::math::Pose3d pose;
   std::string textureName;
@@ -135,7 +135,7 @@ void Projector::Load(const msgs::Projector &_msg)
   double fov = M_PI * 0.25;
 
   if (_msg.has_pose())
-    pose = msgs::ConvertIgn(_msg.pose());
+    pose = gazebo::msgs::ConvertIgn(_msg.pose());
 
   if (_msg.has_texture())
     textureName = _msg.texture();

@@ -64,7 +64,7 @@ namespace gazebo
       {
         auto func = [=]()
         {
-          return msgs::ConvertAny(_cb());
+          return gazebo::msgs::ConvertAny(_cb());
         };
 
         return this->Register(_item, func);

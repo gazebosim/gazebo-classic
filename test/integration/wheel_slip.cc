@@ -157,9 +157,9 @@ TEST_F(WheelSlipTest, TireDrum)
       "/drum/joint_cmd");
 
   // slip compliance publishers
-  this->slipLateralPub = node->Advertise<msgs::GzString>(
+  this->slipLateralPub = node->Advertise<gazebo::msgs::GzString>(
       "~/tire/wheel_slip/lateral_compliance");
-  this->slipLongitudinalPub = node->Advertise<msgs::GzString>(
+  this->slipLongitudinalPub = node->Advertise<gazebo::msgs::GzString>(
       "~/tire/wheel_slip/longitudinal_compliance");
 
   sensors::ForceTorqueSensorPtr sensor =
@@ -407,14 +407,14 @@ void WheelSlipTest::SetCommands(const WheelSlipState &_state)
   }
 
   {
-    msgs::GzString msg;
+    gazebo::msgs::GzString msg;
     msg.set_data(std::to_string(_state.wheelSlipComplianceLateral));
 
     this->slipLateralPub->Publish(msg);
   }
 
   {
-    msgs::GzString msg;
+    gazebo::msgs::GzString msg;
     msg.set_data(std::to_string(_state.wheelSlipComplianceLongitudinal));
 
     this->slipLongitudinalPub->Publish(msg);

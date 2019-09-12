@@ -319,7 +319,7 @@ double LinkInspector::ComputeVolume() const
 
   for (auto it : this->dataPtr->collisionConfig->ConfigData())
   {
-    msgs::Collision *coll =
+    gazebo::msgs::Collision *coll =
         this->dataPtr->collisionConfig->GetData(it.second->name);
     if (coll)
       volume += LinkData::ComputeVolume(*coll);
@@ -335,7 +335,7 @@ ignition::math::Vector3d LinkInspector::ComputeInertia(const double _mass) const
   // Use first collision entry
   for (auto it : this->dataPtr->collisionConfig->ConfigData())
   {
-    msgs::Collision *coll =
+    gazebo::msgs::Collision *coll =
         this->dataPtr->collisionConfig->GetData(it.second->name);
     if (coll)
     {

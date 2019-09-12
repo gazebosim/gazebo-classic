@@ -117,7 +117,7 @@ namespace gazebo
 
       /// \brief Publish response to a request.
       /// \param[in] _msg Message to be published.
-      protected: void Publish(const msgs::Response &_msg) const;
+      protected: void Publish(const gazebo::msgs::Response &_msg) const;
 
       /// \brief Molar mass of the air in kg/mol
       public: static const double MOLAR_MASS;

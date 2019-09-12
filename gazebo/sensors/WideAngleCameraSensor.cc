@@ -141,7 +141,7 @@ void WideAngleCameraSensor::Init()
 void WideAngleCameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(
+  this->imagePub = this->node->Advertise<gazebo::msgs::ImageStamped>(
       this->Topic(), 50);
 
   std::string lensTopicName = "~/";
@@ -157,7 +157,7 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
     this->sdf->GetElement("camera")->GetElement("lens");
 
   // create a topic that publishes lens states
-  this->dataPtr->lensPub = this->node->Advertise<msgs::CameraLens>(
+  this->dataPtr->lensPub = this->node->Advertise<gazebo::msgs::CameraLens>(
     lensTopicName+"info", 1);
 
   this->dataPtr->lensSub =
@@ -191,7 +191,7 @@ bool WideAngleCameraSensor::UpdateImpl(const bool _force)
             this->dataPtr->hfovCmdQueue.front()));
     }
 
-    msgs::CameraLens msg;
+    gazebo::msgs::CameraLens msg;
 
     rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(

@@ -65,11 +65,12 @@ TEST_F(LightTest, LightMsg)
   EXPECT_TRUE(lightPtr != NULL);
 
   // Create the light message
-  msgs::Light lightMsg;
+  gazebo::msgs::Light lightMsg;
   lightMsg.set_name("test_light");
-  msgs::Set(lightMsg.mutable_pose(), pose);
-  msgs::Set(lightMsg.mutable_diffuse(), ignition::math::Color(0.4, 0.5, 0.6));
-  lightMsg.set_type(msgs::Light::SPOT);
+  gazebo::msgs::Set(lightMsg.mutable_pose(), pose);
+  gazebo::msgs::Set(lightMsg.mutable_diffuse(),
+      ignition::math::Color(0.4, 0.5, 0.6));
+  lightMsg.set_type(gazebo::msgs::Light::SPOT);
 
   // Process message
   lightPtr->ProcessMsg(lightMsg);
@@ -78,7 +79,7 @@ TEST_F(LightTest, LightMsg)
   EXPECT_EQ(lightPtr->WorldPose(), pose);
 
   // Get message
-  msgs::Light newLightMsg;
+  gazebo::msgs::Light newLightMsg;
   lightPtr->FillMsg(newLightMsg);
 
   // Check message against original message

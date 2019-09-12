@@ -45,11 +45,11 @@ LightMaker::LightMaker() : dataPtr(new LightMakerPrivate)
   this->dataPtr->node->TryInit(common::Time::Maximum());
 
   this->dataPtr->lightPub =
-      this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
+      this->dataPtr->node->Advertise<gazebo::msgs::Light>("~/factory/light");
 
-  msgs::Set(this->msg.mutable_diffuse(),
+  gazebo::msgs::Set(this->msg.mutable_diffuse(),
       ignition::math::Color(0.5, 0.5, 0.5, 1));
-  msgs::Set(this->msg.mutable_specular(),
+  gazebo::msgs::Set(this->msg.mutable_specular(),
       ignition::math::Color(0.1, 0.1, 0.1, 1));
 
   this->msg.set_attenuation_constant(0.5);
@@ -165,9 +165,9 @@ void LightMaker::Stop()
 /////////////////////////////////////////////////
 void LightMaker::CreateTheEntity()
 {
-  msgs::Set(this->msg.mutable_pose()->mutable_position(),
+  gazebo::msgs::Set(this->msg.mutable_pose()->mutable_position(),
             this->dataPtr->light->Position());
-  msgs::Set(this->msg.mutable_pose()->mutable_orientation(),
+  gazebo::msgs::Set(this->msg.mutable_pose()->mutable_orientation(),
             ignition::math::Quaterniond());
   this->dataPtr->lightPub->Publish(this->msg);
 }
@@ -187,7 +187,7 @@ void LightMaker::SetEntityPosition(const ignition::math::Vector3d &_pos)
 /////////////////////////////////////////////////
 PointLightMaker::PointLightMaker() : LightMaker()
 {
-  this->msg.set_type(msgs::Light::POINT);
+  this->msg.set_type(gazebo::msgs::Light::POINT);
   this->msg.set_cast_shadows(false);
   this->lightTypename = "point";
 }
@@ -195,8 +195,8 @@ PointLightMaker::PointLightMaker() : LightMaker()
 /////////////////////////////////////////////////
 SpotLightMaker::SpotLightMaker() : LightMaker()
 {
-  this->msg.set_type(msgs::Light::SPOT);
-  msgs::Set(this->msg.mutable_direction(),
+  this->msg.set_type(gazebo::msgs::Light::SPOT);
+  gazebo::msgs::Set(this->msg.mutable_direction(),
             ignition::math::Vector3d(0, 0, -1));
   this->msg.set_cast_shadows(false);
 
@@ -209,8 +209,8 @@ SpotLightMaker::SpotLightMaker() : LightMaker()
 /////////////////////////////////////////////////
 DirectionalLightMaker::DirectionalLightMaker() : LightMaker()
 {
-  this->msg.set_type(msgs::Light::DIRECTIONAL);
-  msgs::Set(this->msg.mutable_direction(),
+  this->msg.set_type(gazebo::msgs::Light::DIRECTIONAL);
+  gazebo::msgs::Set(this->msg.mutable_direction(),
             ignition::math::Vector3d(.1, .1, -0.9));
   this->msg.set_cast_shadows(true);
 

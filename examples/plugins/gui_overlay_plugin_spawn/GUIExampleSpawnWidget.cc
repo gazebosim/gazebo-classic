@@ -68,7 +68,7 @@ GUIExampleSpawnWidget::GUIExampleSpawnWidget()
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
+  this->factoryPub = this->node->Advertise<gazebo::msgs::Factory>("~/factory");
 }
 
 /////////////////////////////////////////////////
@@ -79,20 +79,21 @@ GUIExampleSpawnWidget::~GUIExampleSpawnWidget()
 /////////////////////////////////////////////////
 void GUIExampleSpawnWidget::OnButton()
 {
-  msgs::Model model;
+  gazebo::msgs::Model model;
   model.set_name("plugin_unit_sphere_" + std::to_string(this->counter++));
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 1.5, 0, 0, 0));
+  gazebo::msgs::Set(model.mutable_pose(),
+      ignition::math::Pose3d(0, 0, 1.5, 0, 0, 0));
   const double mass = 1.0;
   const double radius = 0.5;
-  msgs::AddSphereLink(model, mass, radius);
+  gazebo::msgs::AddSphereLink(model, mass, radius);
 
   std::ostringstream newModelStr;
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-    << msgs::ModelToSDF(model)->ToString("")
+    << gazebo::msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   // Send the model to the gazebo server
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf(newModelStr.str());
   this->factoryPub->Publish(msg);
 }

@@ -191,7 +191,7 @@ namespace gazebo
 
       /// \brief Connect a local Subscriber to a remote Publisher
       /// \param[in] _pub The publish object to use
-      public: void ConnectSubToPub(const msgs::Publish &_pub);
+      public: void ConnectSubToPub(const gazebo::msgs::Publish &_pub);
 
       /// \brief Disconnect a local publisher from a remote subscriber
       /// \param[in] _topic The topic to be disconnected

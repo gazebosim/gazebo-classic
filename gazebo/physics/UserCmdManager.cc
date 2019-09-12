@@ -39,7 +39,7 @@ using namespace physics;
 UserCmd::UserCmd(const unsigned int _id,
                  physics::WorldPtr _world,
                  const std::string &_description,
-                 const msgs::UserCmd::Type &_type)
+                 const gazebo::msgs::UserCmd::Type &_type)
   : dataPtr(new UserCmdPrivate())
 {
   this->dataPtr->id = _id;
@@ -98,7 +98,7 @@ std::string UserCmd::Description() const
 }
 
 /////////////////////////////////////////////////
-msgs::UserCmd::Type UserCmd::Type() const
+gazebo::msgs::UserCmd::Type UserCmd::Type() const
 {
   return this->dataPtr->type;
 }
@@ -119,16 +119,18 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
       &UserCmdManager::OnUndoRedoMsg, this);
 
   this->dataPtr->userCmdStatsPub =
-    this->dataPtr->node->Advertise<msgs::UserCmdStats>("~/user_cmd_stats");
+    this->dataPtr->node->Advertise<gazebo::msgs::UserCmdStats>(
+        "~/user_cmd_stats");
 
   this->dataPtr->worldControlPub =
-      this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
+      this->dataPtr->node->Advertise<gazebo::msgs::WorldControl>(
+          "~/world_control");
 
   this->dataPtr->modelModifyPub =
-      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
+      this->dataPtr->node->Advertise<gazebo::msgs::Model>("~/model/modify");
 
   this->dataPtr->lightModifyPub =
-      this->dataPtr->node->Advertise<msgs::Light>("~/light/modify");
+      this->dataPtr->node->Advertise<gazebo::msgs::Light>("~/light/modify");
 
   this->dataPtr->idCounter = 0;
 }
@@ -173,7 +175,7 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   // Forward message after we've saved the current state
   switch (_msg->type())
   {
-    case msgs::UserCmd::MOVING:
+    case gazebo::msgs::UserCmd::MOVING:
     {
       for (int i = 0; i < _msg->model_size(); ++i)
         this->dataPtr->modelModifyPub->Publish(_msg->model(i));
@@ -183,14 +185,14 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 
       break;
     }
-    case msgs::UserCmd::SCALING:
+    case gazebo::msgs::UserCmd::SCALING:
     {
       for (int i = 0; i < _msg->model_size(); ++i)
         this->dataPtr->modelModifyPub->Publish(_msg->model(i));
 
       break;
     }
-    case msgs::UserCmd::WORLD_CONTROL:
+    case gazebo::msgs::UserCmd::WORLD_CONTROL:
     {
       if (_msg->has_world_control())
       {
@@ -205,14 +207,15 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 
       break;
     }
-    case msgs::UserCmd::WRENCH:
+    case gazebo::msgs::UserCmd::WRENCH:
     {
       // Set publisher
       std::string topicName = "~/";
       topicName += _msg->entity_name() + "/wrench";
       boost::replace_all(topicName, "::", "/");
 
-      auto wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
+      auto wrenchPub = this->dataPtr->node->Advertise<gazebo::msgs::Wrench>(
+          topicName);
       wrenchPub->Publish(_msg->wrench());
       wrenchPub->Fini();
 
@@ -340,14 +343,14 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
 /////////////////////////////////////////////////
 void UserCmdManager::PublishCurrentStats()
 {
-  msgs::UserCmdStats statsMsg;
+  gazebo::msgs::UserCmdStats statsMsg;
 
   statsMsg.set_undo_cmd_count(this->dataPtr->undoCmds.size());
   statsMsg.set_redo_cmd_count(this->dataPtr->redoCmds.size());
 
   for (auto cmd : this->dataPtr->undoCmds)
   {
-    msgs::UserCmd *msg = statsMsg.add_undo_cmd();
+    gazebo::msgs::UserCmd *msg = statsMsg.add_undo_cmd();
     msg->set_id(cmd->Id());
     msg->set_description(cmd->Description());
     msg->set_type(cmd->Type());
@@ -355,7 +358,7 @@ void UserCmdManager::PublishCurrentStats()
 
   for (auto cmd : this->dataPtr->redoCmds)
   {
-    msgs::UserCmd *msg = statsMsg.add_redo_cmd();
+    gazebo::msgs::UserCmd *msg = statsMsg.add_redo_cmd();
     msg->set_id(cmd->Id());
     msg->set_description(cmd->Description());
     msg->set_type(cmd->Type());

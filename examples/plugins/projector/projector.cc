@@ -38,7 +38,7 @@ namespace gazebo
                           _sdf->Get<std::string>("projector");
 
       // Create a publisher on the ~/physics topic
-      this->projectorPub = node->Advertise<msgs::Projector>(name);
+      this->projectorPub = node->Advertise<gazebo::msgs::Projector>(name);
 
       this->prevTime = common::Time::GetWallTime();
 
@@ -54,7 +54,7 @@ namespace gazebo
       if (common::Time::GetWallTime() - this->prevTime > common::Time(2, 0))
       {
         this->state = !this->state;
-        msgs::Projector msg;
+        gazebo::msgs::Projector msg;
         msg.set_name("texture_projector");
         msg.set_enabled(this->state);
         this->projectorPub->Publish(msg);

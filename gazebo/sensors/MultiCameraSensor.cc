@@ -88,7 +88,7 @@ void MultiCameraSensor::Load(const std::string &_worldName)
 
   // Create the publisher of image data.
   this->dataPtr->imagePub =
-    this->node->Advertise<msgs::ImagesStamped>(this->Topic(), 50);
+    this->node->Advertise<gazebo::msgs::ImagesStamped>(this->Topic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -177,7 +177,7 @@ void MultiCameraSensor::Init()
       this->dataPtr->cameras.push_back(camera);
     }
 
-    msgs::Image *image = this->dataPtr->msg.add_image();
+    gazebo::msgs::Image *image = this->dataPtr->msg.add_image();
     image->set_width(camera->ImageWidth());
     image->set_height(camera->ImageHeight());
     image->set_pixel_format(common::Image::ConvertPixelFormat(
@@ -264,7 +264,7 @@ bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
 
   bool publish = this->dataPtr->imagePub->HasConnections();
 
-  msgs::Set(this->dataPtr->msg.mutable_time(),
+  gazebo::msgs::Set(this->dataPtr->msg.mutable_time(),
             this->lastMeasurementTime);
 
   int index = 0;
@@ -275,7 +275,7 @@ bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
 
     if (publish)
     {
-      msgs::Image *image = this->dataPtr->msg.mutable_image(index);
+      gazebo::msgs::Image *image = this->dataPtr->msg.mutable_image(index);
       image->set_data((*iter)->ImageData(0),
           image->width() * (*iter)->ImageDepth() * image->height());
     }

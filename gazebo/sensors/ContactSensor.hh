@@ -122,7 +122,7 @@ namespace gazebo
       ///                           CG of perspective links for each collision
       ///                           body, specified in the inertial frame.
       ///    \li Time time          time at which this contact happened.
-      public: msgs::Contacts Contacts() const;
+      public: gazebo::msgs::Contacts Contacts() const;
 
       /// \brief Gets contacts of a collision
       /// \param[in] _collisionName Name of collision

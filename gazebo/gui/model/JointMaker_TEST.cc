@@ -284,8 +284,9 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(rev2joint->inspector != NULL);
 
   // verify default values
-  QVERIFY(msgs::ConvertJointType(rev2joint->jointMsg->type()) == "revolute2");
-  QCOMPARE(msgs::ConvertIgn(rev2joint->jointMsg->pose()),
+  QVERIFY(gazebo::msgs::ConvertJointType(
+        rev2joint->jointMsg->type()) == "revolute2");
+  QCOMPARE(gazebo::msgs::ConvertIgn(rev2joint->jointMsg->pose()),
       ignition::math::Pose3d::Zero);
   QVERIFY(ignition::math::equal(rev2joint->jointMsg->cfm(), 0.0));
   QVERIFY(ignition::math::equal(rev2joint->jointMsg->bounce(), 0.0));
@@ -295,8 +296,8 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(ignition::math::equal(rev2joint->jointMsg->suspension_cfm(), 0.0));
   QVERIFY(ignition::math::equal(rev2joint->jointMsg->suspension_erp(), 0.2));
 
-  msgs::Axis rev2Axis1Msg = rev2joint->jointMsg->axis1();
-  QCOMPARE(msgs::ConvertIgn(rev2Axis1Msg.xyz()),
+  gazebo::msgs::Axis rev2Axis1Msg = rev2joint->jointMsg->axis1();
+  QCOMPARE(gazebo::msgs::ConvertIgn(rev2Axis1Msg.xyz()),
       ignition::math::Vector3d(1, 0, 0));
   QVERIFY(ignition::math::equal(rev2Axis1Msg.limit_lower(),
       -ignition::math::MAX_D));
@@ -308,8 +309,8 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(ignition::math::equal(rev2Axis1Msg.friction(), 0.0));
   QCOMPARE(rev2Axis1Msg.use_parent_model_frame(), false);
 
-  msgs::Axis rev2Axis2Msg = rev2joint->jointMsg->axis2();
-  QCOMPARE(msgs::ConvertIgn(rev2Axis2Msg.xyz()),
+  gazebo::msgs::Axis rev2Axis2Msg = rev2joint->jointMsg->axis2();
+  QCOMPARE(gazebo::msgs::ConvertIgn(rev2Axis2Msg.xyz()),
       ignition::math::Vector3d(0, 1, 0));
   QVERIFY(ignition::math::equal(rev2Axis2Msg.limit_lower(),
       -ignition::math::MAX_D));
@@ -342,8 +343,9 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(prisJoint->inspector != NULL);
 
   // verify default values
-  QVERIFY(msgs::ConvertJointType(prisJoint->jointMsg->type()) == "prismatic");
-  QCOMPARE(msgs::ConvertIgn(prisJoint->jointMsg->pose()),
+  QVERIFY(gazebo::msgs::ConvertJointType(
+        prisJoint->jointMsg->type()) == "prismatic");
+  QCOMPARE(gazebo::msgs::ConvertIgn(prisJoint->jointMsg->pose()),
       ignition::math::Pose3d::Zero);
   QVERIFY(ignition::math::equal(prisJoint->jointMsg->cfm(), 0.0));
   QVERIFY(ignition::math::equal(prisJoint->jointMsg->bounce(), 0.0));
@@ -353,8 +355,8 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(ignition::math::equal(prisJoint->jointMsg->suspension_cfm(), 0.0));
   QVERIFY(ignition::math::equal(prisJoint->jointMsg->suspension_erp(), 0.2));
 
-  msgs::Axis prisAxis1Msg = prisJoint->jointMsg->axis1();
-  QCOMPARE(msgs::ConvertIgn(prisAxis1Msg.xyz()),
+  gazebo::msgs::Axis prisAxis1Msg = prisJoint->jointMsg->axis1();
+  QCOMPARE(gazebo::msgs::ConvertIgn(prisAxis1Msg.xyz()),
       ignition::math::Vector3d(1, 0, 0));
   QVERIFY(ignition::math::equal(prisAxis1Msg.limit_lower(),
       -ignition::math::MAX_D));
@@ -387,8 +389,9 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(gearboxJoint->inspector != NULL);
 
   // verify default values
-  QVERIFY(msgs::ConvertJointType(gearboxJoint->jointMsg->type()) == "gearbox");
-  QCOMPARE(msgs::ConvertIgn(gearboxJoint->jointMsg->pose()),
+  QVERIFY(gazebo::msgs::ConvertJointType(
+        gearboxJoint->jointMsg->type()) == "gearbox");
+  QCOMPARE(gazebo::msgs::ConvertIgn(gearboxJoint->jointMsg->pose()),
       ignition::math::Pose3d::Zero);
   QVERIFY(ignition::math::equal(gearboxJoint->jointMsg->cfm(), 0.0));
   QVERIFY(ignition::math::equal(gearboxJoint->jointMsg->bounce(), 0.0));
@@ -398,8 +401,8 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(ignition::math::equal(gearboxJoint->jointMsg->suspension_cfm(), 0.0));
   QVERIFY(ignition::math::equal(gearboxJoint->jointMsg->suspension_erp(), 0.2));
 
-  msgs::Axis gearboxAxis1Msg = gearboxJoint->jointMsg->axis1();
-  QCOMPARE(msgs::ConvertIgn(gearboxAxis1Msg.xyz()),
+  gazebo::msgs::Axis gearboxAxis1Msg = gearboxJoint->jointMsg->axis1();
+  QCOMPARE(gazebo::msgs::ConvertIgn(gearboxAxis1Msg.xyz()),
       ignition::math::Vector3d(0, 0, 1));
   QVERIFY(ignition::math::equal(gearboxAxis1Msg.limit_lower(),
       -ignition::math::MAX_D));
@@ -411,8 +414,8 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(ignition::math::equal(gearboxAxis1Msg.friction(), 0.0));
   QCOMPARE(gearboxAxis1Msg.use_parent_model_frame(), false);
 
-  msgs::Axis gearboxAxis2Msg = gearboxJoint->jointMsg->axis2();
-  QCOMPARE(msgs::ConvertIgn(gearboxAxis2Msg.xyz()),
+  gazebo::msgs::Axis gearboxAxis2Msg = gearboxJoint->jointMsg->axis2();
+  QCOMPARE(gazebo::msgs::ConvertIgn(gearboxAxis2Msg.xyz()),
       ignition::math::Vector3d(0, 0, 1));
   QVERIFY(ignition::math::equal(gearboxAxis2Msg.limit_lower(),
       -ignition::math::MAX_D));
@@ -445,8 +448,9 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(fixedJoint->inspector != NULL);
 
   // verify default values
-  QVERIFY(msgs::ConvertJointType(fixedJoint->jointMsg->type()) == "fixed");
-  QCOMPARE(msgs::ConvertIgn(fixedJoint->jointMsg->pose()),
+  QVERIFY(gazebo::msgs::ConvertJointType(
+        fixedJoint->jointMsg->type()) == "fixed");
+  QCOMPARE(gazebo::msgs::ConvertIgn(fixedJoint->jointMsg->pose()),
       ignition::math::Pose3d::Zero);
   QVERIFY(ignition::math::equal(fixedJoint->jointMsg->cfm(), 0.0));
   QVERIFY(ignition::math::equal(fixedJoint->jointMsg->bounce(), 0.0));
@@ -755,10 +759,11 @@ void JointMaker_TEST::UpdateMsg()
   QVERIFY(msg1 != NULL);
   QVERIFY(msg1->name() == name1);
   QVERIFY(gui::JointMaker::ConvertJointType(
-      msgs::ConvertJointType(msg1->type())) == type1);
+      gazebo::msgs::ConvertJointType(msg1->type())) == type1);
   QVERIFY(msg1->has_axis1());
   QVERIFY(!msg1->has_axis2());
-  QCOMPARE(msgs::ConvertIgn(msg1->pose()), ignition::math::Pose3d::Zero);
+  QCOMPARE(gazebo::msgs::ConvertIgn(msg1->pose()),
+      ignition::math::Pose3d::Zero);
 
   auto parentVis = jointData->parent;
   QVERIFY(parentVis != NULL);
@@ -801,7 +806,7 @@ void JointMaker_TEST::UpdateMsg()
 
   jointData->name = name2;
   jointData->type = type2;
-  msgs::Set(jointData->jointMsg->mutable_pose(), pose2);
+  gazebo::msgs::Set(jointData->jointMsg->mutable_pose(), pose2);
 
   jointData->Update();
 
@@ -814,10 +819,10 @@ void JointMaker_TEST::UpdateMsg()
 
   QVERIFY(msg1->type() != msg2->type());
   QVERIFY(gui::JointMaker::ConvertJointType(
-      msgs::ConvertJointType(msg2->type())) == type2);
+      gazebo::msgs::ConvertJointType(msg2->type())) == type2);
   QVERIFY(msg2->has_axis1());
   QVERIFY(msg2->has_axis2());
-  QCOMPARE(msgs::ConvertIgn(msg2->pose()), pose2);
+  QCOMPARE(gazebo::msgs::ConvertIgn(msg2->pose()), pose2);
 
   // Change data and update - 2 axes -> 0 axes
   std::string name3 = "new_name2";
@@ -826,7 +831,7 @@ void JointMaker_TEST::UpdateMsg()
 
   jointData->name = name3;
   jointData->type = type3;
-  msgs::Set(jointData->jointMsg->mutable_pose(), pose3);
+  gazebo::msgs::Set(jointData->jointMsg->mutable_pose(), pose3);
 
   jointData->Update();
 
@@ -839,10 +844,10 @@ void JointMaker_TEST::UpdateMsg()
 
   QVERIFY(msg2->type() != msg3->type());
   QVERIFY(gui::JointMaker::ConvertJointType(
-      msgs::ConvertJointType(msg3->type())) == type3);
+      gazebo::msgs::ConvertJointType(msg3->type())) == type3);
   QVERIFY(!msg3->has_axis1());
   QVERIFY(!msg3->has_axis2());
-  QCOMPARE(msgs::ConvertIgn(msg3->pose()), pose3);
+  QCOMPARE(gazebo::msgs::ConvertIgn(msg3->pose()), pose3);
 
   // Change data and update - 0 axes -> 1 axis
   std::string name4 = "new_name3";
@@ -851,7 +856,7 @@ void JointMaker_TEST::UpdateMsg()
 
   jointData->name = name4;
   jointData->type = type4;
-  msgs::Set(jointData->jointMsg->mutable_pose(), pose4);
+  gazebo::msgs::Set(jointData->jointMsg->mutable_pose(), pose4);
 
   jointData->Update();
 
@@ -864,10 +869,10 @@ void JointMaker_TEST::UpdateMsg()
 
   QVERIFY(msg3->type() != msg4->type());
   QVERIFY(gui::JointMaker::ConvertJointType(
-      msgs::ConvertJointType(msg4->type())) == type4);
+      gazebo::msgs::ConvertJointType(msg4->type())) == type4);
   QVERIFY(msg4->has_axis1());
   QVERIFY(!msg4->has_axis2());
-  QCOMPARE(msgs::ConvertIgn(msg4->pose()), pose4);
+  QCOMPARE(gazebo::msgs::ConvertIgn(msg4->pose()), pose4);
 
   delete jointMaker;
   mainWindow->close();

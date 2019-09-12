@@ -69,7 +69,7 @@ namespace gazebo
 
       /// \brief Message containing the data which was in the widget when first
       /// open.
-      public: msgs::Collision originalDataMsg;
+      public: gazebo::msgs::Collision originalDataMsg;
     };
 
     /// \class CollisionConfig CollisionConfig.hh
@@ -95,7 +95,7 @@ namespace gazebo
       /// \param[in] _collisionMsg Msg containing information of the collision
       /// to be added.
       public: void AddCollision(const std::string &_name,
-          const msgs::Collision *_collisionMsg = NULL);
+          const gazebo::msgs::Collision *_collisionMsg = NULL);
 
       /// \brief Update a collision widget from a collision msg.
       /// \param[in] _name Name of collision to be updated.
@@ -114,7 +114,7 @@ namespace gazebo
       /// \brief Get the msg containing all collision data.
       /// \param[in] _name Name of collision.
       /// \return Collision msg.
-      public: msgs::Collision *GetData(const std::string &_name) const;
+      public: gazebo::msgs::Collision *GetData(const std::string &_name) const;
 
       /// \brief Set the geometry data of a collision
       /// \param[in] _name Name of collision.

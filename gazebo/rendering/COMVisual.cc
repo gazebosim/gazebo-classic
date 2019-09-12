@@ -97,7 +97,7 @@ void COMVisual::Load(ConstLinkPtr &_msg)
   COMVisualPrivate *dPtr =
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
 
-  dPtr->inertiaPose = msgs::ConvertIgn(_msg->inertial().pose());
+  dPtr->inertiaPose = gazebo::msgs::ConvertIgn(_msg->inertial().pose());
 
   dPtr->mass = _msg->inertial().mass();
   dPtr->linkName = _msg->name();
@@ -134,7 +134,7 @@ void COMVisual::Load()
 
   // Get the link's bounding box
   VisualPtr vis = this->GetScene()->GetVisual(dPtr->linkName);
-  ignition::math::Box box;
+  ignition::math::AxisAlignedBox box;
 
   if (vis)
     box = vis->BoundingBox();

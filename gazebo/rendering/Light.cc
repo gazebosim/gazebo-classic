@@ -145,9 +145,9 @@ void Light::Update()
 }
 
 //////////////////////////////////////////////////
-void Light::UpdateSDFFromMsg(const msgs::Light &_msg)
+void Light::UpdateSDFFromMsg(const gazebo::msgs::Light &_msg)
 {
-  msgs::LightToSDF(_msg, this->dataPtr->sdf);
+  gazebo::msgs::LightToSDF(_msg, this->dataPtr->sdf);
 }
 
 //////////////////////////////////////////////////
@@ -159,13 +159,13 @@ void Light::UpdateFromMsg(ConstLightPtr &_msg)
 
   if (_msg->has_pose())
   {
-    this->SetPosition(msgs::ConvertIgn(_msg->pose().position()));
-    this->SetRotation(msgs::ConvertIgn(_msg->pose().orientation()));
+    this->SetPosition(gazebo::msgs::ConvertIgn(_msg->pose().position()));
+    this->SetRotation(gazebo::msgs::ConvertIgn(_msg->pose().orientation()));
   }
 }
 
 //////////////////////////////////////////////////
-void Light::LoadFromMsg(const msgs::Light &_msg)
+void Light::LoadFromMsg(const gazebo::msgs::Light &_msg)
 {
   if (_msg.has_id())
     this->dataPtr->id = _msg.id();
@@ -176,8 +176,8 @@ void Light::LoadFromMsg(const msgs::Light &_msg)
 
   if (_msg.has_pose())
   {
-    this->SetPosition(msgs::ConvertIgn(_msg.pose().position()));
-    this->SetRotation(msgs::ConvertIgn(_msg.pose().orientation()));
+    this->SetPosition(gazebo::msgs::ConvertIgn(_msg.pose().position()));
+    this->SetRotation(gazebo::msgs::ConvertIgn(_msg.pose().orientation()));
   }
 }
 
@@ -635,25 +635,25 @@ void Light::SetSpotFalloff(const double _angle)
 }
 
 //////////////////////////////////////////////////
-void Light::FillMsg(msgs::Light &_msg) const
+void Light::FillMsg(gazebo::msgs::Light &_msg) const
 {
   std::string lightType = this->dataPtr->sdf->Get<std::string>("type");
 
   _msg.set_name(this->Name());
 
   if (lightType == "point")
-    _msg.set_type(msgs::Light::POINT);
+    _msg.set_type(gazebo::msgs::Light::POINT);
   else if (lightType == "spot")
-    _msg.set_type(msgs::Light::SPOT);
+    _msg.set_type(gazebo::msgs::Light::SPOT);
   else if (lightType == "directional")
-    _msg.set_type(msgs::Light::DIRECTIONAL);
+    _msg.set_type(gazebo::msgs::Light::DIRECTIONAL);
 
-  msgs::Set(_msg.mutable_pose()->mutable_position(), this->Position());
-  msgs::Set(_msg.mutable_pose()->mutable_orientation(),
+  gazebo::msgs::Set(_msg.mutable_pose()->mutable_position(), this->Position());
+  gazebo::msgs::Set(_msg.mutable_pose()->mutable_orientation(),
       this->Rotation());
-  msgs::Set(_msg.mutable_diffuse(), this->DiffuseColor());
-  msgs::Set(_msg.mutable_specular(), this->SpecularColor());
-  msgs::Set(_msg.mutable_direction(), this->Direction());
+  gazebo::msgs::Set(_msg.mutable_diffuse(), this->DiffuseColor());
+  gazebo::msgs::Set(_msg.mutable_specular(), this->SpecularColor());
+  gazebo::msgs::Set(_msg.mutable_direction(), this->Direction());
 
   _msg.set_cast_shadows(this->dataPtr->light->getCastShadows());
 

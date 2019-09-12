@@ -438,7 +438,7 @@ void Camera::Update()
   }
   this->dataPtr->commandMsgs.clear();
 
-  std::list<msgs::Request>::iterator iter = this->requests.begin();
+  std::list<gazebo::msgs::Request>::iterator iter = this->requests.begin();
   while (iter != this->requests.end())
   {
     bool erase = false;
@@ -449,7 +449,7 @@ void Camera::Update()
     }
     else if ((*iter).request() == "attach_visual")
     {
-      msgs::TrackVisual msg;
+      gazebo::msgs::TrackVisual msg;
       msg.ParseFromString((*iter).data());
       bool result = false;
 
@@ -1626,8 +1626,8 @@ void Camera::AttachToVisual(const uint32_t _visualId,
                             const bool _inheritOrientation,
                             const double _minDist, const double _maxDist)
 {
-  msgs::Request request;
-  msgs::TrackVisual track;
+  gazebo::msgs::Request request;
+  gazebo::msgs::TrackVisual track;
 
   track.set_name(this->Name() + "_attach_to_visual_track");
   track.set_id(_visualId);
@@ -1648,8 +1648,8 @@ void Camera::AttachToVisual(const std::string &_visualName,
                             const bool _inheritOrientation,
                             const double _minDist, const double _maxDist)
 {
-  msgs::Request request;
-  msgs::TrackVisual track;
+  gazebo::msgs::Request request;
+  gazebo::msgs::TrackVisual track;
 
   VisualPtr visual = this->scene->GetVisual(_visualName);
 
@@ -1677,7 +1677,7 @@ void Camera::AttachToVisual(const std::string &_visualName,
 //////////////////////////////////////////////////
 void Camera::TrackVisual(const std::string &_name)
 {
-  msgs::Request request;
+  gazebo::msgs::Request request;
   request.set_request("track_visual");
   request.set_data(_name);
   request.set_id(0);
@@ -1788,7 +1788,7 @@ bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)
   {
-    ignition::math::Box bbox = _visual->BoundingBox();
+    ignition::math::AxisAlignedBox bbox = _visual->BoundingBox();
     Ogre::AxisAlignedBox box;
     box.setMinimum(bbox.Min().X(), bbox.Min().Y(), bbox.Min().Z());
     box.setMaximum(bbox.Max().X(), bbox.Max().Y(), bbox.Max().Z());

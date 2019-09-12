@@ -139,7 +139,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
   LinkPtr actorLinkPtr = Model::GetLink(actorLinkName);
   if (actorLinkPtr)
   {
-    msgs::Visual actorVisualMsg = actorLinkPtr->GetVisualMessage(
+    gazebo::msgs::Visual actorVisualMsg = actorLinkPtr->GetVisualMessage(
         this->visualName);
     if (actorVisualMsg.has_id())
       this->visualId = actorVisualMsg.id();
@@ -151,7 +151,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
   }
 
   // Advertise skeleton pose info
-  this->bonePosePub = this->node->Advertise<msgs::PoseAnimation>(
+  this->bonePosePub = this->node->Advertise<gazebo::msgs::PoseAnimation>(
                                        "~/skeleton_pose/info", 10);
 }
 
@@ -703,7 +703,7 @@ void Actor::Update()
 void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
     std::map<std::string, std::string> _skelMap, const double _time)
 {
-  msgs::PoseAnimation msg;
+  gazebo::msgs::PoseAnimation msg;
   msg.set_model_name(this->visualName);
   msg.set_model_id(this->visualId);
 
@@ -733,55 +733,60 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
       bonePose.Correct();
     }
 
-    msgs::Pose *bone_pose = msg.add_pose();
+    gazebo::msgs::Pose *bone_pose = msg.add_pose();
     bone_pose->set_name(bone->GetName());
 
     if (!parentBone)
     {
       bone_pose->mutable_position()->CopyFrom(
-          msgs::Convert(ignition::math::Vector3d()));
-      bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(
+          gazebo::msgs::Convert(ignition::math::Vector3d()));
+      bone_pose->mutable_orientation()->CopyFrom(gazebo::msgs::Convert(
             ignition::math::Quaterniond()));
       if (!this->customTrajectoryInfo)
         mainLinkPose = bonePose;
     }
     else
     {
-      bone_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.Pos()));
-      bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.Rot()));
+      bone_pose->mutable_position()->CopyFrom(
+          gazebo::msgs::Convert(bonePose.Pos()));
+      bone_pose->mutable_orientation()->CopyFrom(
+          gazebo::msgs::Convert(bonePose.Rot()));
       LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
       auto parentPose = parentLink->WorldPose();
       ignition::math::Matrix4d parentTrans(parentPose);
       transform = parentTrans * transform;
     }
 
-    msgs::Pose *link_pose = msg.add_pose();
+    gazebo::msgs::Pose *link_pose = msg.add_pose();
     link_pose->set_name(currentLink->GetScopedName());
     link_pose->set_id(currentLink->GetId());
     ignition::math::Pose3d linkPose = transform.Pose() - mainLinkPose;
-    link_pose->mutable_position()->CopyFrom(msgs::Convert(linkPose.Pos()));
-    link_pose->mutable_orientation()->CopyFrom(msgs::Convert(linkPose.Rot()));
+    link_pose->mutable_position()->CopyFrom(
+        gazebo::msgs::Convert(linkPose.Pos()));
+    link_pose->mutable_orientation()->CopyFrom(
+        gazebo::msgs::Convert(linkPose.Rot()));
     currentLink->SetWorldPose(transform.Pose(), true, false);
   }
 
-  msgs::Time *stamp = msg.add_time();
-  stamp->CopyFrom(msgs::Convert(_time));
+  gazebo::msgs::Time *stamp = msg.add_time();
+  stamp->CopyFrom(gazebo::msgs::Convert(_time));
 
-  msgs::Pose *model_pose = msg.add_pose();
+  gazebo::msgs::Pose *model_pose = msg.add_pose();
   model_pose->set_name(this->GetScopedName());
   model_pose->set_id(this->GetId());
   if (!this->customTrajectoryInfo)
   {
-    model_pose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.Pos()));
+    model_pose->mutable_position()->CopyFrom(
+        gazebo::msgs::Convert(mainLinkPose.Pos()));
     model_pose->mutable_orientation()->CopyFrom(
-        msgs::Convert(mainLinkPose.Rot()));
+        gazebo::msgs::Convert(mainLinkPose.Rot()));
   }
   else
   {
     model_pose->mutable_position()->CopyFrom(
-        msgs::Convert(this->worldPose.Pos()));
+        gazebo::msgs::Convert(this->worldPose.Pos()));
     model_pose->mutable_orientation()->CopyFrom(
-        msgs::Convert(this->worldPose.Rot()));
+        gazebo::msgs::Convert(this->worldPose.Rot()));
   }
 
   if (this->bonePosePub && this->bonePosePub->HasConnections())

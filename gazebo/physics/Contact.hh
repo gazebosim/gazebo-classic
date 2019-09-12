@@ -63,13 +63,13 @@ namespace gazebo
       public: Contact &operator =(const Contact &_contact);
 
       /// \brief Operator =.
-      /// \param[in] _contact msgs::Contact to copy.
+      /// \param[in] _contact gazebo::msgs::Contact to copy.
       /// \return Reference to this contact
-      public: Contact &operator =(const msgs::Contact &_contact);
+      public: Contact &operator =(const gazebo::msgs::Contact &_contact);
 
-      /// \brief Populate a msgs::Contact with data from this.
+      /// \brief Populate a gazebo::msgs::Contact with data from this.
       /// \param[out] _msg Contact message the will hold the data.
-      public: void FillMsg(msgs::Contact &_msg) const;
+      public: void FillMsg(gazebo::msgs::Contact &_msg) const;
 
       /// \brief Produce a debug string.
       /// \return A string that contains the values of the contact.

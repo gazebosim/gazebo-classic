@@ -57,9 +57,9 @@ void ModelData_TEST::Clone()
   ignition::math::Vector3d size = ignition::math::Vector3d::One;
 
   // create a link
-  msgs::Model model;
-  msgs::AddBoxLink(model, mass, size);
-  link->Load(msgs::LinkToSDF(model.link(0)));
+  gazebo::msgs::Model model;
+  gazebo::msgs::AddBoxLink(model, mass, size);
+  link->Load(gazebo::msgs::LinkToSDF(model.link(0)));
   rendering::VisualPtr linkVis(new rendering::Visual("model::box_link",
       scene->WorldVisual()));
   link->SetLinkVisual(linkVis);
@@ -67,7 +67,7 @@ void ModelData_TEST::Clone()
   // add a visual
   rendering::VisualPtr vis(
       new rendering::Visual("model::box_link::visual", linkVis));
-  vis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+  vis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
   link->AddVisual(vis);
   QVERIFY(link->visuals.size() == 1);
   QVERIFY(link->collisions.empty());
@@ -76,7 +76,7 @@ void ModelData_TEST::Clone()
   // add a collision visual
   rendering::VisualPtr collisionVis(
       new rendering::Visual("model::box_link::collision", linkVis));
-  collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+  collisionVis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
   link->AddCollision(collisionVis);
   QVERIFY(link->visuals.size() == 1);
   QVERIFY(link->collisions.size() == 1);
@@ -131,7 +131,7 @@ void ModelData_TEST::Clone()
   sdf::ElementPtr massElem = inertialElem->GetElement("mass");
   QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
 
-  msgs::Inertial inertialMsg = model.link(0).inertial();
+  gazebo::msgs::Inertial inertialMsg = model.link(0).inertial();
   double ixx = inertialMsg.ixx();
   double iyy = inertialMsg.iyy();
   double izz = inertialMsg.izz();
@@ -202,16 +202,16 @@ void ModelData_TEST::LinkScale()
     ignition::math::Vector3d size = ignition::math::Vector3d::One;
 
     // create a link
-    msgs::Model model;
-    msgs::AddBoxLink(model, mass, size);
-    link->Load(msgs::LinkToSDF(model.link(0)));
+    gazebo::msgs::Model model;
+    gazebo::msgs::AddBoxLink(model, mass, size);
+    link->Load(gazebo::msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("box_link", scene));
     link->SetLinkVisual(linkVis);
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
         new rendering::Visual("box_link::collision", linkVis));
-    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    collisionVis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddCollision(collisionVis);
 
     // verify scale
@@ -230,7 +230,7 @@ void ModelData_TEST::LinkScale()
     QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
 
     // verify inertia values
-    msgs::Inertial inertialMsg = model.link(0).inertial();
+    gazebo::msgs::Inertial inertialMsg = model.link(0).inertial();
     double ixx = inertialMsg.ixx();
     double iyy = inertialMsg.iyy();
     double izz = inertialMsg.izz();
@@ -271,9 +271,10 @@ void ModelData_TEST::LinkScale()
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       // verify new inertia values
-      // use msgs::AddBoxLink to help us compute the expected inertia values.
-      msgs::AddBoxLink(model, newMass, newScale);
-      msgs::Inertial newInertialMsg = model.link(1).inertial();
+      // use gazebo::msgs::AddBoxLink to help us compute the expected
+      // inertia values.
+      gazebo::msgs::AddBoxLink(model, newMass, newScale);
+      gazebo::msgs::Inertial newInertialMsg = model.link(1).inertial();
       double newIxx = newInertialMsg.ixx();
       double newIyy = newInertialMsg.iyy();
       double newIzz = newInertialMsg.izz();
@@ -326,9 +327,10 @@ void ModelData_TEST::LinkScale()
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       // verify new inertia values
-      // use msgs::AddBoxLink to help us compute the expected inertia values.
-      msgs::AddBoxLink(model, newMass, newScale);
-      msgs::Inertial newInertialMsg = model.link(2).inertial();
+      // use gazebo::msgs::AddBoxLink to help us compute the
+      // expected inertia values.
+      gazebo::msgs::AddBoxLink(model, newMass, newScale);
+      gazebo::msgs::Inertial newInertialMsg = model.link(2).inertial();
       double newIxx = newInertialMsg.ixx();
       double newIyy = newInertialMsg.iyy();
       double newIzz = newInertialMsg.izz();
@@ -360,17 +362,17 @@ void ModelData_TEST::LinkScale()
     double radius = 0.5;
     double length = 1.0;
 
-    msgs::Model model;
+    gazebo::msgs::Model model;
     // set reasonable inertial values based on geometry
-    msgs::AddCylinderLink(model, mass, radius, length);
-    link->Load(msgs::LinkToSDF(model.link(0)));
+    gazebo::msgs::AddCylinderLink(model, mass, radius, length);
+    link->Load(gazebo::msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("cylinder_link", scene));
     link->SetLinkVisual(linkVis);
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
         new rendering::Visual("cylinder_link::collision", linkVis));
-    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    collisionVis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddCollision(collisionVis);
 
     // verify scale
@@ -389,7 +391,7 @@ void ModelData_TEST::LinkScale()
     QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
 
     // verify inertia values
-    msgs::Inertial inertialMsg = model.link(0).inertial();
+    gazebo::msgs::Inertial inertialMsg = model.link(0).inertial();
     double ixx = inertialMsg.ixx();
     double iyy = inertialMsg.iyy();
     double izz = inertialMsg.izz();
@@ -432,10 +434,10 @@ void ModelData_TEST::LinkScale()
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       // verify new inertia values
-      // use msgs::AddCylinderLink to help us compute the
+      // use gazebo::msgs::AddCylinderLink to help us compute the
       // expected inertia values.
-      msgs::AddCylinderLink(model, newMass, newRadius, newLength);
-      msgs::Inertial newInertialMsg = model.link(1).inertial();
+      gazebo::msgs::AddCylinderLink(model, newMass, newRadius, newLength);
+      gazebo::msgs::Inertial newInertialMsg = model.link(1).inertial();
       double newIxx = newInertialMsg.ixx();
       double newIyy = newInertialMsg.iyy();
       double newIzz = newInertialMsg.izz();
@@ -490,10 +492,10 @@ void ModelData_TEST::LinkScale()
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       // verify new inertia values
-      // use msgs::AddCylinderLink to help us compute
+      // use gazebo::msgs::AddCylinderLink to help us compute
       // the expected inertia values.
-      msgs::AddCylinderLink(model, newMass, newRadius, newLength);
-      msgs::Inertial newInertialMsg = model.link(2).inertial();
+      gazebo::msgs::AddCylinderLink(model, newMass, newRadius, newLength);
+      gazebo::msgs::Inertial newInertialMsg = model.link(2).inertial();
       double newIxx = newInertialMsg.ixx();
       double newIyy = newInertialMsg.iyy();
       double newIzz = newInertialMsg.izz();
@@ -524,17 +526,17 @@ void ModelData_TEST::LinkScale()
     double mass = 1.0;
     double radius = 0.5;
 
-    msgs::Model model;
+    gazebo::msgs::Model model;
     // set reasonable inertial values based on geometry
-    msgs::AddSphereLink(model, mass, radius);
-    link->Load(msgs::LinkToSDF(model.link(0)));
+    gazebo::msgs::AddSphereLink(model, mass, radius);
+    link->Load(gazebo::msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("sphere_link", scene));
     link->SetLinkVisual(linkVis);
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
         new rendering::Visual("sphere_link::collision", linkVis));
-    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    collisionVis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddCollision(collisionVis);
 
     // verify scale
@@ -553,7 +555,7 @@ void ModelData_TEST::LinkScale()
     QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
 
     // verify inertia values
-    msgs::Inertial inertialMsg = model.link(0).inertial();
+    gazebo::msgs::Inertial inertialMsg = model.link(0).inertial();
     double ixx = inertialMsg.ixx();
     double iyy = inertialMsg.iyy();
     double izz = inertialMsg.izz();
@@ -594,9 +596,10 @@ void ModelData_TEST::LinkScale()
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       // verify new inertia values
-      // use msgs::AddSphereLink to help us compute the expected inertia values.
-      msgs::AddSphereLink(model, newMass, newRadius);
-      msgs::Inertial newInertialMsg = model.link(1).inertial();
+      // use gazebo::msgs::AddSphereLink to help us compute the expected
+      // inertia values.
+      gazebo::msgs::AddSphereLink(model, newMass, newRadius);
+      gazebo::msgs::Inertial newInertialMsg = model.link(1).inertial();
       double newIxx = newInertialMsg.ixx();
       double newIyy = newInertialMsg.iyy();
       double newIzz = newInertialMsg.izz();
@@ -649,9 +652,10 @@ void ModelData_TEST::LinkScale()
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       // verify new inertia values
-      // use msgs::AddSphereLink to help us compute the expected inertia values.
-      msgs::AddSphereLink(model, newMass, newRadius);
-      msgs::Inertial newInertialMsg = model.link(2).inertial();
+      // use gazebo::msgs::AddSphereLink to help us compute the expected
+      // inertia values.
+      gazebo::msgs::AddSphereLink(model, newMass, newRadius);
+      gazebo::msgs::Inertial newInertialMsg = model.link(2).inertial();
       double newIxx = newInertialMsg.ixx();
       double newIyy = newInertialMsg.iyy();
       double newIzz = newInertialMsg.izz();
@@ -682,17 +686,17 @@ void ModelData_TEST::LinkScale()
     double mass = 2.8;
     double radius = 1.2;
 
-    msgs::Model model;
+    gazebo::msgs::Model model;
     // set reasonable inertial values based on geometry
-    msgs::AddSphereLink(model, mass, radius);
-    link->Load(msgs::LinkToSDF(model.link(0)));
+    gazebo::msgs::AddSphereLink(model, mass, radius);
+    link->Load(gazebo::msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("sphere_link2", scene));
     link->SetLinkVisual(linkVis);
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
         new rendering::Visual("sphere_link2::collision", linkVis));
-    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    collisionVis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddCollision(collisionVis);
 
     // verify scale
@@ -711,7 +715,7 @@ void ModelData_TEST::LinkScale()
     QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
 
     // verify inertia values
-    msgs::Inertial inertialMsg = model.link(0).inertial();
+    gazebo::msgs::Inertial inertialMsg = model.link(0).inertial();
     double ixx = inertialMsg.ixx();
     double iyy = inertialMsg.iyy();
     double izz = inertialMsg.izz();
@@ -753,9 +757,10 @@ void ModelData_TEST::LinkScale()
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       // verify new inertia values
-      // use msgs::AddSphereLink to help us compute the expected inertia values.
-      msgs::AddSphereLink(model, newMass, newRadius);
-      msgs::Inertial newInertialMsg = model.link(1).inertial();
+      // use gazebo::msgs::AddSphereLink to help us compute the expected
+      // inertia values.
+      gazebo::msgs::AddSphereLink(model, newMass, newRadius);
+      gazebo::msgs::Inertial newInertialMsg = model.link(1).inertial();
       double newIxx = newInertialMsg.ixx();
       double newIyy = newInertialMsg.iyy();
       double newIzz = newInertialMsg.izz();
@@ -786,17 +791,17 @@ void ModelData_TEST::LinkScale()
     double mass = 1.0;
     double radius = 0.5;
 
-    msgs::Model model;
+    gazebo::msgs::Model model;
     // set reasonable inertial values based on geometry
-    msgs::AddSphereLink(model, mass, radius);
-    link->Load(msgs::LinkToSDF(model.link(0)));
+    gazebo::msgs::AddSphereLink(model, mass, radius);
+    link->Load(gazebo::msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("sphere_link3", scene));
     link->SetLinkVisual(linkVis);
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
         new rendering::Visual("sphere_link3::collision", linkVis));
-    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    collisionVis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddCollision(collisionVis);
 
     // verify scale
@@ -815,7 +820,7 @@ void ModelData_TEST::LinkScale()
     QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
 
     // verify inertia values
-    msgs::Inertial inertialMsg = model.link(0).inertial();
+    gazebo::msgs::Inertial inertialMsg = model.link(0).inertial();
     double ixx = inertialMsg.ixx();
     double iyy = inertialMsg.iyy();
     double izz = inertialMsg.izz();
@@ -919,10 +924,10 @@ void ModelData_TEST::LinkVolume()
     double mass = 1.0;
     double expectedVolume = 60.0;
 
-    msgs::Model model;
-    msgs::AddBoxLink(model, mass, size);
+    gazebo::msgs::Model model;
+    gazebo::msgs::AddBoxLink(model, mass, size);
 
-    link->Load(msgs::LinkToSDF(model.link(0)));
+    link->Load(gazebo::msgs::LinkToSDF(model.link(0)));
 
     rendering::VisualPtr linkVis(new rendering::Visual("box_link", scene));
     link->SetLinkVisual(linkVis);
@@ -930,7 +935,7 @@ void ModelData_TEST::LinkVolume()
     rendering::VisualPtr collisionVis(
         new rendering::Visual("box_link::collision", linkVis));
 
-    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    collisionVis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddCollision(collisionVis);
 
     double volume = link->ComputeVolume();
@@ -947,10 +952,10 @@ void ModelData_TEST::LinkVolume()
     double radius = 1.5;
     double expectedVolume = 14.137;
 
-    msgs::Model model;
-    msgs::AddSphereLink(model, mass, radius);
+    gazebo::msgs::Model model;
+    gazebo::msgs::AddSphereLink(model, mass, radius);
 
-    link->Load(msgs::LinkToSDF(model.link(0)));
+    link->Load(gazebo::msgs::LinkToSDF(model.link(0)));
 
     rendering::VisualPtr linkVis(new rendering::Visual("sphere_link", scene));
     link->SetLinkVisual(linkVis);
@@ -958,7 +963,7 @@ void ModelData_TEST::LinkVolume()
     rendering::VisualPtr collisionVis(
         new rendering::Visual("sphere_link::collision", linkVis));
 
-    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    collisionVis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddCollision(collisionVis);
 
     double volume = link->ComputeVolume();
@@ -976,10 +981,10 @@ void ModelData_TEST::LinkVolume()
     double length = 5.0;
     double expectedVolume = 35.343;
 
-    msgs::Model model;
-    msgs::AddCylinderLink(model, mass, radius, length);
+    gazebo::msgs::Model model;
+    gazebo::msgs::AddCylinderLink(model, mass, radius, length);
 
-    link->Load(msgs::LinkToSDF(model.link(0)));
+    link->Load(gazebo::msgs::LinkToSDF(model.link(0)));
 
     rendering::VisualPtr linkVis(new rendering::Visual("cylinder_link", scene));
     link->SetLinkVisual(linkVis);
@@ -987,7 +992,7 @@ void ModelData_TEST::LinkVolume()
     rendering::VisualPtr collisionVis(
         new rendering::Visual("cylinder_link::collision", linkVis));
 
-    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    collisionVis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddCollision(collisionVis);
 
     double volume = link->ComputeVolume();
@@ -1003,19 +1008,19 @@ void ModelData_TEST::BoxVolume()
   const double l = 3, w = 4, h = 5;
   const double expectedVolume = 60;
 
-  msgs::Vector3d *size = new msgs::Vector3d();
+  gazebo::msgs::Vector3d *size = new gazebo::msgs::Vector3d();
   size->set_x(l);
   size->set_y(w);
   size->set_z(h);
 
-  msgs::BoxGeom *box = new msgs::BoxGeom();
+  gazebo::msgs::BoxGeom *box = new gazebo::msgs::BoxGeom();
   box->set_allocated_size(size);
 
-  msgs::Geometry *geo = new msgs::Geometry();
-  geo->set_type(msgs::Geometry_Type_BOX);
+  gazebo::msgs::Geometry *geo = new gazebo::msgs::Geometry();
+  geo->set_type(gazebo::msgs::Geometry_Type_BOX);
   geo->set_allocated_box(box);
 
-  msgs::Collision *col = new msgs::Collision();
+  gazebo::msgs::Collision *col = new gazebo::msgs::Collision();
   col->set_allocated_geometry(geo);
 
   double volume = gui::LinkData::ComputeVolume(*col);
@@ -1030,15 +1035,15 @@ void ModelData_TEST::CylinderVolume()
   const double r = 1.5, l = 5.0;
   const double expectedVolume = 35.343;
 
-  msgs::CylinderGeom *cyl = new msgs::CylinderGeom();
+  gazebo::msgs::CylinderGeom *cyl = new gazebo::msgs::CylinderGeom();
   cyl->set_radius(r);
   cyl->set_length(l);
 
-  msgs::Geometry *geo = new msgs::Geometry();
-  geo->set_type(msgs::Geometry_Type_CYLINDER);
+  gazebo::msgs::Geometry *geo = new gazebo::msgs::Geometry();
+  geo->set_type(gazebo::msgs::Geometry_Type_CYLINDER);
   geo->set_allocated_cylinder(cyl);
 
-  msgs::Collision *col = new msgs::Collision();
+  gazebo::msgs::Collision *col = new gazebo::msgs::Collision();
   col->set_allocated_geometry(geo);
 
   double volume = gui::LinkData::ComputeVolume(*col);
@@ -1053,14 +1058,14 @@ void ModelData_TEST::SphereVolume()
   const double r = 1.5;
   const double expectedVolume = 14.137;
 
-  msgs::SphereGeom *sphere = new msgs::SphereGeom();
+  gazebo::msgs::SphereGeom *sphere = new gazebo::msgs::SphereGeom();
   sphere->set_radius(r);
 
-  msgs::Geometry *geo = new msgs::Geometry();
-  geo->set_type(msgs::Geometry_Type_SPHERE);
+  gazebo::msgs::Geometry *geo = new gazebo::msgs::Geometry();
+  geo->set_type(gazebo::msgs::Geometry_Type_SPHERE);
   geo->set_allocated_sphere(sphere);
 
-  msgs::Collision *col = new msgs::Collision();
+  gazebo::msgs::Collision *col = new gazebo::msgs::Collision();
   col->set_allocated_geometry(geo);
 
   double volume = gui::LinkData::ComputeVolume(*col);
@@ -1075,19 +1080,19 @@ void ModelData_TEST::MeshVolume()
   const double l = 3, w = 4, h = 5;
   const double expectedVolume = 60;
 
-  msgs::Vector3d *size = new msgs::Vector3d();
+  gazebo::msgs::Vector3d *size = new gazebo::msgs::Vector3d();
   size->set_x(l);
   size->set_y(w);
   size->set_z(h);
 
-  msgs::BoxGeom *box = new msgs::BoxGeom();
+  gazebo::msgs::BoxGeom *box = new gazebo::msgs::BoxGeom();
   box->set_allocated_size(size);
 
-  msgs::Geometry *geo = new msgs::Geometry();
-  geo->set_type(msgs::Geometry_Type_MESH);
+  gazebo::msgs::Geometry *geo = new gazebo::msgs::Geometry();
+  geo->set_type(gazebo::msgs::Geometry_Type_MESH);
   geo->set_allocated_box(box);
 
-  msgs::Collision *col = new msgs::Collision();
+  gazebo::msgs::Collision *col = new gazebo::msgs::Collision();
   col->set_allocated_geometry(geo);
 
   double volume = gui::LinkData::ComputeVolume(*col);
@@ -1102,19 +1107,19 @@ void ModelData_TEST::PolylineVolume()
   const double l = 3, w = 4, h = 5;
   const double expectedVolume = 60;
 
-  msgs::Vector3d *size = new msgs::Vector3d();
+  gazebo::msgs::Vector3d *size = new gazebo::msgs::Vector3d();
   size->set_x(l);
   size->set_y(w);
   size->set_z(h);
 
-  msgs::BoxGeom *box = new msgs::BoxGeom();
+  gazebo::msgs::BoxGeom *box = new gazebo::msgs::BoxGeom();
   box->set_allocated_size(size);
 
-  msgs::Geometry *geo = new msgs::Geometry();
-  geo->set_type(msgs::Geometry_Type_POLYLINE);
+  gazebo::msgs::Geometry *geo = new gazebo::msgs::Geometry();
+  geo->set_type(gazebo::msgs::Geometry_Type_POLYLINE);
   geo->set_allocated_box(box);
 
-  msgs::Collision *col = new msgs::Collision();
+  gazebo::msgs::Collision *col = new gazebo::msgs::Collision();
   col->set_allocated_geometry(geo);
 
   double volume = gui::LinkData::ComputeVolume(*col);
@@ -1129,14 +1134,14 @@ void ModelData_TEST::SphereMomentOfInertia()
   const double m = 1.0;
   const double expectedI = 0.9;
 
-  msgs::SphereGeom *sphere = new msgs::SphereGeom();
+  gazebo::msgs::SphereGeom *sphere = new gazebo::msgs::SphereGeom();
   sphere->set_radius(r);
 
-  msgs::Geometry *geo = new msgs::Geometry();
-  geo->set_type(msgs::Geometry_Type_SPHERE);
+  gazebo::msgs::Geometry *geo = new gazebo::msgs::Geometry();
+  geo->set_type(gazebo::msgs::Geometry_Type_SPHERE);
   geo->set_allocated_sphere(sphere);
 
-  msgs::Collision *col = new msgs::Collision();
+  gazebo::msgs::Collision *col = new gazebo::msgs::Collision();
   col->set_allocated_geometry(geo);
 
   ignition::math::Vector3d I = gui::LinkData::ComputeMomentOfInertia(*col, m);
@@ -1155,15 +1160,15 @@ void ModelData_TEST::CylinderMomentOfInertia()
   const double expectedIy = 2.64583;
   const double expectedIz = 1.125;
 
-  msgs::CylinderGeom *cyl = new msgs::CylinderGeom();
+  gazebo::msgs::CylinderGeom *cyl = new gazebo::msgs::CylinderGeom();
   cyl->set_radius(r);
   cyl->set_length(l);
 
-  msgs::Geometry *geo = new msgs::Geometry();
-  geo->set_type(msgs::Geometry_Type_CYLINDER);
+  gazebo::msgs::Geometry *geo = new gazebo::msgs::Geometry();
+  geo->set_type(gazebo::msgs::Geometry_Type_CYLINDER);
   geo->set_allocated_cylinder(cyl);
 
-  msgs::Collision *col = new msgs::Collision();
+  gazebo::msgs::Collision *col = new gazebo::msgs::Collision();
   col->set_allocated_geometry(geo);
 
   ignition::math::Vector3d I = gui::LinkData::ComputeMomentOfInertia(*col, m);
@@ -1183,19 +1188,19 @@ void ModelData_TEST::BoxMomentOfInertia()
   const double expectedIy = 2.83333;
   const double expectedIz = 2.08333;
 
-  msgs::Vector3d *size = new msgs::Vector3d();
+  gazebo::msgs::Vector3d *size = new gazebo::msgs::Vector3d();
   size->set_x(l);
   size->set_y(w);
   size->set_z(h);
 
-  msgs::BoxGeom *box = new msgs::BoxGeom();
+  gazebo::msgs::BoxGeom *box = new gazebo::msgs::BoxGeom();
   box->set_allocated_size(size);
 
-  msgs::Geometry *geo = new msgs::Geometry();
-  geo->set_type(msgs::Geometry_Type_BOX);
+  gazebo::msgs::Geometry *geo = new gazebo::msgs::Geometry();
+  geo->set_type(gazebo::msgs::Geometry_Type_BOX);
   geo->set_allocated_box(box);
 
-  msgs::Collision *col = new msgs::Collision();
+  gazebo::msgs::Collision *col = new gazebo::msgs::Collision();
   col->set_allocated_geometry(geo);
 
   ignition::math::Vector3d I = gui::LinkData::ComputeMomentOfInertia(*col, m);
@@ -1215,19 +1220,19 @@ void ModelData_TEST::MeshMomentOfInertia()
   const double expectedIy = 2.83333;
   const double expectedIz = 2.08333;
 
-  msgs::Vector3d *size = new msgs::Vector3d();
+  gazebo::msgs::Vector3d *size = new gazebo::msgs::Vector3d();
   size->set_x(l);
   size->set_y(w);
   size->set_z(h);
 
-  msgs::BoxGeom *box = new msgs::BoxGeom();
+  gazebo::msgs::BoxGeom *box = new gazebo::msgs::BoxGeom();
   box->set_allocated_size(size);
 
-  msgs::Geometry *geo = new msgs::Geometry();
-  geo->set_type(msgs::Geometry_Type_MESH);
+  gazebo::msgs::Geometry *geo = new gazebo::msgs::Geometry();
+  geo->set_type(gazebo::msgs::Geometry_Type_MESH);
   geo->set_allocated_box(box);
 
-  msgs::Collision *col = new msgs::Collision();
+  gazebo::msgs::Collision *col = new gazebo::msgs::Collision();
   col->set_allocated_geometry(geo);
 
   ignition::math::Vector3d I = gui::LinkData::ComputeMomentOfInertia(*col, m);
@@ -1247,19 +1252,19 @@ void ModelData_TEST::PolylineMomentOfInertia()
   const double expectedIy = 2.83333;
   const double expectedIz = 2.08333;
 
-  msgs::Vector3d *size = new msgs::Vector3d();
+  gazebo::msgs::Vector3d *size = new gazebo::msgs::Vector3d();
   size->set_x(l);
   size->set_y(w);
   size->set_z(h);
 
-  msgs::BoxGeom *box = new msgs::BoxGeom();
+  gazebo::msgs::BoxGeom *box = new gazebo::msgs::BoxGeom();
   box->set_allocated_size(size);
 
-  msgs::Geometry *geo = new msgs::Geometry();
-  geo->set_type(msgs::Geometry_Type_POLYLINE);
+  gazebo::msgs::Geometry *geo = new gazebo::msgs::Geometry();
+  geo->set_type(gazebo::msgs::Geometry_Type_POLYLINE);
   geo->set_allocated_box(box);
 
-  msgs::Collision *col = new msgs::Collision();
+  gazebo::msgs::Collision *col = new gazebo::msgs::Collision();
   col->set_allocated_geometry(geo);
 
   ignition::math::Vector3d I = gui::LinkData::ComputeMomentOfInertia(*col, m);
@@ -1299,18 +1304,18 @@ void ModelData_TEST::BoundingCollision()
   {
     // Create a link with a box visual
     ignition::math::Vector3d size(0.1, 0.2, 0.3);
-    msgs::Model model;
-    msgs::AddBoxLink(model, 1.0, size);
+    gazebo::msgs::Model model;
+    gazebo::msgs::AddBoxLink(model, 1.0, size);
 
     auto link = new gui::LinkData();
-    link->Load(msgs::LinkToSDF(model.link(0)));
+    link->Load(gazebo::msgs::LinkToSDF(model.link(0)));
 
     rendering::VisualPtr linkVis(new rendering::Visual("box_link", scene));
     link->SetLinkVisual(linkVis);
 
     rendering::VisualPtr vis(
         new rendering::Visual("model::box_link::visual", linkVis));
-    vis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    vis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddVisual(vis);
 
     // Check there are no collisions
@@ -1363,18 +1368,18 @@ void ModelData_TEST::BoundingCollision()
   {
     // Create a link with a sphere visual
     double visRadius = 2.5;
-    msgs::Model model;
-    msgs::AddSphereLink(model, 1.0, visRadius);
+    gazebo::msgs::Model model;
+    gazebo::msgs::AddSphereLink(model, 1.0, visRadius);
 
     auto link = new gui::LinkData();
-    link->Load(msgs::LinkToSDF(model.link(0)));
+    link->Load(gazebo::msgs::LinkToSDF(model.link(0)));
 
     rendering::VisualPtr linkVis(new rendering::Visual("sphere_link", scene));
     link->SetLinkVisual(linkVis);
 
     rendering::VisualPtr vis(
         new rendering::Visual("model::sphere_link::visual", linkVis));
-    vis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    vis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddVisual(vis);
 
     // Check there are no collisions
@@ -1420,18 +1425,18 @@ void ModelData_TEST::BoundingCollision()
     // Create a link with a cylinder visual
     double visRadius = 0.5;
     double visLength = 1.5;
-    msgs::Model model;
-    msgs::AddCylinderLink(model, 1.0, visRadius, visLength);
+    gazebo::msgs::Model model;
+    gazebo::msgs::AddCylinderLink(model, 1.0, visRadius, visLength);
 
     auto link = new gui::LinkData();
-    link->Load(msgs::LinkToSDF(model.link(0)));
+    link->Load(gazebo::msgs::LinkToSDF(model.link(0)));
 
     rendering::VisualPtr linkVis(new rendering::Visual("cylinder_link", scene));
     link->SetLinkVisual(linkVis);
 
     rendering::VisualPtr vis(
         new rendering::Visual("model::cylinder_link::visual", linkVis));
-    vis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    vis->Load(gazebo::msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddVisual(vis);
 
     // Check there are no collisions

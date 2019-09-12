@@ -411,7 +411,7 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
       this->dataPtr->node->Subscribe("~/log/control",
           &LogRecord::OnLogControl, this);
     this->dataPtr->logStatusPub =
-      this->dataPtr->node->Advertise<msgs::LogStatus>("~/log/status");
+      this->dataPtr->node->Advertise<gazebo::msgs::LogStatus>("~/log/status");
   }
 }
 
@@ -989,11 +989,11 @@ void LogRecord::PublishLogStatus()
 
   /// \todo right now this function will only report on the first log.
 
-  msgs::LogStatus msg;
+  gazebo::msgs::LogStatus msg;
   unsigned int size = 0;
 
   // Set the time of the status message
-  msgs::Set(msg.mutable_sim_time(), this->RunTime());
+  gazebo::msgs::Set(msg.mutable_sim_time(), this->RunTime());
 
   // Set the log recording base path name
   msg.mutable_log_file()->set_base_path(this->BasePath());
@@ -1011,21 +1011,25 @@ void LogRecord::PublishLogStatus()
   size = this->FileSize();
 
   if (size < 1000)
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::BYTES);
+    msg.mutable_log_file()->set_size_units(
+        gazebo::msgs::LogStatus::LogFile::BYTES);
   else if (size < 1e6)
   {
     msg.mutable_log_file()->set_size(size / 1.0e3);
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::K_BYTES);
+    msg.mutable_log_file()->set_size_units(
+        gazebo::msgs::LogStatus::LogFile::K_BYTES);
   }
   else if (size < 1e9)
   {
     msg.mutable_log_file()->set_size(size / 1.0e6);
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::M_BYTES);
+    msg.mutable_log_file()->set_size_units(
+        gazebo::msgs::LogStatus::LogFile::M_BYTES);
   }
   else
   {
     msg.mutable_log_file()->set_size(size / 1.0e9);
-    msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::G_BYTES);
+    msg.mutable_log_file()->set_size_units(
+        gazebo::msgs::LogStatus::LogFile::G_BYTES);
   }
 
   this->dataPtr->logStatusPub->Publish(msg);

@@ -363,7 +363,7 @@ namespace gazebo
       /// \brief Get the bounding box for the link and all the child
       /// elements.
       /// \return The link's bounding box.
-      public: virtual ignition::math::Box BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Set the linear damping factor.
       /// \param[in] _damping Linear damping factor.
@@ -420,11 +420,11 @@ namespace gazebo
 
       /// \brief Fill a link message
       /// \param[out] _msg Message to fill
-      public: void FillMsg(msgs::Link &_msg);
+      public: void FillMsg(gazebo::msgs::Link &_msg);
 
       /// \brief Update parameters from a message
       /// \param[in] _msg Message to read.
-      public: void ProcessMsg(const msgs::Link &_msg);
+      public: void ProcessMsg(const gazebo::msgs::Link &_msg);
 
       /// \brief Joints that have this Link as a parent Link.
       /// \param[in] _joint Joint that is a child of this link.
@@ -518,7 +518,8 @@ namespace gazebo
       /// \brief Returns the visual message specified by its name
       /// \param[in] name of the visual message
       /// \return visual message
-      public: msgs::Visual GetVisualMessage(const std::string &_name) const;
+      public: gazebo::msgs::Visual GetVisualMessage(
+                  const std::string &_name) const;
 
       /// \brief Freeze link to ground (inertial frame).
       /// \param[in] _static if true, freeze link to ground.  Otherwise
@@ -616,7 +617,7 @@ namespace gazebo
 
       /// \def Visuals_M
       /// \brief Map of unique ID to visual message.
-      typedef std::map<uint32_t, msgs::Visual> Visuals_M;
+      typedef std::map<uint32_t, gazebo::msgs::Visual> Visuals_M;
 
       /// \brief Return the link visual elements.
       /// \return a map of unique ID to visual message
@@ -664,7 +665,7 @@ namespace gazebo
 
       /// \brief Process the message and add force and torque.
       /// \param[in] _msg The message to set the wrench from.
-      private: void ProcessWrenchMsg(const msgs::Wrench &_msg);
+      private: void ProcessWrenchMsg(const gazebo::msgs::Wrench &_msg);
 
       /// \brief Load a battery.
       /// \param[in] _sdf SDF parameter.

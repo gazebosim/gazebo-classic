@@ -97,15 +97,15 @@ double CylinderShape::GetLength() const
 }
 
 /////////////////////////////////////////////////
-void CylinderShape::FillMsg(msgs::Geometry &_msg)
+void CylinderShape::FillMsg(gazebo::msgs::Geometry &_msg)
 {
-  _msg.set_type(msgs::Geometry::CYLINDER);
+  _msg.set_type(gazebo::msgs::Geometry::CYLINDER);
   _msg.mutable_cylinder()->set_radius(this->GetRadius());
   _msg.mutable_cylinder()->set_length(this->GetLength());
 }
 
 /////////////////////////////////////////////////
-void CylinderShape::ProcessMsg(const msgs::Geometry &_msg)
+void CylinderShape::ProcessMsg(const gazebo::msgs::Geometry &_msg)
 {
   this->SetSize(_msg.cylinder().radius(), _msg.cylinder().length());
 }

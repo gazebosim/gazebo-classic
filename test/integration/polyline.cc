@@ -111,9 +111,9 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
 
   // Check the FillMsg function
   {
-    msgs::Geometry msg;
+    gazebo::msgs::Geometry msg;
     polyShape->FillMsg(msg);
-    EXPECT_EQ(msg.type(), msgs::Geometry::POLYLINE);
+    EXPECT_EQ(msg.type(), gazebo::msgs::Geometry::POLYLINE);
     EXPECT_DOUBLE_EQ(msg.polyline(0).height(), 1);
     EXPECT_DOUBLE_EQ(msg.polyline(0).point(0).x(), -0.5);
     EXPECT_DOUBLE_EQ(msg.polyline(0).point(0).y(), -0.5);

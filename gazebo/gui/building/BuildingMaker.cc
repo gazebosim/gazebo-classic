@@ -113,7 +113,7 @@ BuildingMaker::BuildingMaker() : dataPtr(new BuildingMakerPrivate())
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->makerPub =
-      this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
+      this->dataPtr->node->Advertise<gazebo::msgs::Factory>("~/factory");
 
   this->Reset();
 }
@@ -1202,7 +1202,7 @@ void BuildingMaker::CreateTheEntity()
     return;
   }
 
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   // Create a new name if the model exists
   sdf::ElementPtr modelElem =
       this->dataPtr->modelSDF->Root()->GetElement("model");

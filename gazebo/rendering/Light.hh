@@ -74,7 +74,7 @@ namespace gazebo
 
       /// \brief Load from a light message.
       /// \param[in] _msg Message containing the light information.
-      public: void LoadFromMsg(const msgs::Light &_msg);
+      public: void LoadFromMsg(const gazebo::msgs::Light &_msg);
 
       /// \brief Set the name of the visual.
       /// \param[in] _name Name of the light source.
@@ -195,7 +195,7 @@ namespace gazebo
 
       /// \brief Fill the contents of a light message.
       /// \param[out] _msg Message to fill.
-      public: void FillMsg(msgs::Light &_msg) const;
+      public: void FillMsg(gazebo::msgs::Light &_msg) const;
 
       /// \brief Update a light source from a message.
       /// \param[in] _msg Light message to update from
@@ -222,7 +222,7 @@ namespace gazebo
 
       /// \brief Update SDF value based on a message.
       /// \param[in] _msg The light message to update from.
-      private: void UpdateSDFFromMsg(const msgs::Light &_msg);
+      private: void UpdateSDFFromMsg(const gazebo::msgs::Light &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

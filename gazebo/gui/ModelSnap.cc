@@ -138,7 +138,7 @@ void ModelSnap::Init()
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->userCmdPub =
-      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
+      this->dataPtr->node->Advertise<gazebo::msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->rayQuery.reset(
       new rendering::RayQuery(this->dataPtr->userCamera));
@@ -368,18 +368,18 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
   if (_vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
   {
     // Register user command on server
-    msgs::UserCmd userCmdMsg;
+    gazebo::msgs::UserCmd userCmdMsg;
     userCmdMsg.set_description("Snap [" + _vis->Name() + "]");
-    userCmdMsg.set_type(msgs::UserCmd::MOVING);
+    userCmdMsg.set_type(gazebo::msgs::UserCmd::MOVING);
 
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
 
     auto id = gui::get_entity_id(_vis->Name());
     if (id)
       msg.set_id(id);
 
     msg.set_name(_vis->Name());
-    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
+    gazebo::msgs::Set(msg.mutable_pose(), _vis->WorldPose());
 
     auto modelMsg = userCmdMsg.add_model();
     modelMsg->CopyFrom(msg);

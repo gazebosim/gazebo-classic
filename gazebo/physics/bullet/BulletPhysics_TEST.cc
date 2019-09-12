@@ -32,8 +32,8 @@ class BulletPhysics_TEST : public ServerFixture
 {
   public: void PhysicsMsgParam();
   public: void OnPhysicsMsgResponse(ConstResponsePtr &_msg);
-  public: static msgs::Physics physicsPubMsg;
-  public: static msgs::Physics physicsResponseMsg;
+  public: static gazebo::msgs::Physics physicsPubMsg;
+  public: static gazebo::msgs::Physics physicsResponseMsg;
 };
 
 msgs::Physics BulletPhysics_TEST::physicsPubMsg;
@@ -206,9 +206,9 @@ void BulletPhysics_TEST::PhysicsMsgParam()
   phyNode->Init();
 
   transport::PublisherPtr physicsPub
-       = phyNode->Advertise<msgs::Physics>("~/physics");
+       = phyNode->Advertise<gazebo::msgs::Physics>("~/physics");
   transport::PublisherPtr requestPub
-      = phyNode->Advertise<msgs::Request>("~/request");
+      = phyNode->Advertise<gazebo::msgs::Request>("~/request");
   transport::SubscriberPtr responsePub = phyNode->Subscribe("~/response",
       &BulletPhysics_TEST::OnPhysicsMsgResponse, this);
 
@@ -221,11 +221,12 @@ void BulletPhysics_TEST::PhysicsMsgParam()
   physicsPubMsg.set_cfm(0.12);
   physicsPubMsg.set_erp(0.23);
   physicsPubMsg.set_contact_surface_layer(0.01);
-  physicsPubMsg.set_type(msgs::Physics::BULLET);
+  physicsPubMsg.set_type(gazebo::msgs::Physics::BULLET);
   physicsPubMsg.set_solver_type("sequential_impulse");
   physicsPub->Publish(physicsPubMsg);
 
-  msgs::Request *requestMsg = msgs::CreateRequest("physics_info", "");
+  gazebo::msgs::Request *requestMsg =
+    gazebo::msgs::CreateRequest("physics_info", "");
   requestPub->Publish(*requestMsg);
 
   int waitCount = 0, maxWaitCount = 3000;

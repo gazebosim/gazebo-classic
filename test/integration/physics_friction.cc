@@ -117,26 +117,26 @@ class PhysicsFrictionTest : public ServerFixture,
           {
             std::string modelName = this->GetUniqueString("box_model");
 
-            msgs::Model model;
+            gazebo::msgs::Model model;
             model.set_name(modelName);
-            msgs::Set(model.mutable_pose(), _opt.modelPose);
+            gazebo::msgs::Set(model.mutable_pose(), _opt.modelPose);
 
-            msgs::AddBoxLink(model, _opt.mass, _opt.size);
+            gazebo::msgs::AddBoxLink(model, _opt.mass, _opt.size);
             auto link = model.mutable_link(0);
-            msgs::Set(link->mutable_pose(), _opt.linkPose);
+            gazebo::msgs::Set(link->mutable_pose(), _opt.linkPose);
 
             {
               auto inertial = link->mutable_inertial();
-              msgs::Set(inertial->mutable_pose(), _opt.inertialPose);
+              gazebo::msgs::Set(inertial->mutable_pose(), _opt.inertialPose);
             }
 
             auto collision = link->mutable_collision(0);
-            msgs::Set(collision->mutable_pose(), _opt.collisionPose);
+            gazebo::msgs::Set(collision->mutable_pose(), _opt.collisionPose);
 
             auto friction = collision->mutable_surface()->mutable_friction();
             friction->set_mu(_opt.friction1);
             friction->set_mu2(_opt.friction2);
-            msgs::Set(friction->mutable_fdir1(), _opt.direction1);
+            gazebo::msgs::Set(friction->mutable_fdir1(), _opt.direction1);
 
             return ServerFixture::SpawnModel(model);
           }

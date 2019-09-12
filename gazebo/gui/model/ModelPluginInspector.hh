@@ -55,7 +55,7 @@ namespace gazebo
 
       /// \brief Get the message containing plugin data.
       /// \return Plugin message
-      msgs::Plugin *Data() const;
+      gazebo::msgs::Plugin *Data() const;
 
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.

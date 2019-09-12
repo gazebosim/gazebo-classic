@@ -66,7 +66,7 @@ namespace gazebo
       protected: virtual void CreateTheEntity();
 
       /// \brief Message that holds all the light information.
-      protected: msgs::Light msg;
+      protected: gazebo::msgs::Light msg;
 
       /// \brief Type of the light being spawned.
       protected: std::string lightTypename;

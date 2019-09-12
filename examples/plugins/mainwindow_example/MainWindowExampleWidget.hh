@@ -50,7 +50,7 @@ namespace gazebo
     /// \brief Helper function to format time string.
     /// \param[in] _msg Time message.
     /// \return Time formatted as a string.
-    private: std::string FormatTime(const msgs::Time &_msg) const;
+    private: std::string FormatTime(const gazebo::msgs::Time &_msg) const;
 
     /// \brief Node used to establish communication with gzserver.
     private: transport::NodePtr node;

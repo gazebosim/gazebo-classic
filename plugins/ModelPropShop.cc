@@ -121,10 +121,10 @@ void ModelPropShop::Init()
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->pub = this->node->Advertise<msgs::ServerControl>(
+  this->pub = this->node->Advertise<gazebo::msgs::ServerControl>(
       "/gazebo/server/control");
 
-  this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
+  this->factoryPub = this->node->Advertise<gazebo::msgs::Factory>("~/factory");
 }
 
 /////////////////////////////////////////////
@@ -134,7 +134,7 @@ void ModelPropShop::OnWorldCreated()
 
   if (this->sdf)
   {
-    msgs::Factory msg;
+    gazebo::msgs::Factory msg;
     msg.set_sdf(this->sdf->ToString());
     this->factoryPub->Publish(msg, true);
   }
@@ -272,7 +272,7 @@ void ModelPropShop::Update()
       this->scene->RemoveCamera("propshopcamera");
 
       // Tell the server to stop.
-      msgs::ServerControl msg;
+      gazebo::msgs::ServerControl msg;
       msg.set_stop(true);
       this->pub->Publish(msg);
     }

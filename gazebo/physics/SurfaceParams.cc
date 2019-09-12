@@ -220,7 +220,7 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void SurfaceParams::FillMsg(msgs::Surface &_msg)
+void SurfaceParams::FillMsg(gazebo::msgs::Surface &_msg)
 {
   _msg.set_collide_without_contact(this->collideWithoutContact);
   _msg.set_collide_without_contact_bitmask(this->collideWithoutContactBitmask);
@@ -228,7 +228,7 @@ void SurfaceParams::FillMsg(msgs::Surface &_msg)
 }
 
 /////////////////////////////////////////////////
-void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
+void SurfaceParams::ProcessMsg(const gazebo::msgs::Surface &_msg)
 {
   if (_msg.has_collide_without_contact())
     this->collideWithoutContact = _msg.collide_without_contact();

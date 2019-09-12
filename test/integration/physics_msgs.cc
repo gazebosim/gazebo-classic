@@ -61,10 +61,10 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
 
   // Set Gravity by publishing to "~/physics"
   transport::PublisherPtr physicsPub =
-    this->node->Advertise<msgs::Physics>("~/physics");
-  msgs::Physics msg;
+    this->node->Advertise<gazebo::msgs::Physics>("~/physics");
+  gazebo::msgs::Physics msg;
   // it doesn't actually seem to matter what type you set
-  msg.set_type(msgs::Physics::Type_MIN);
+  msg.set_type(gazebo::msgs::Physics::Type_MIN);
 
   std::vector<ignition::math::Vector3d> gravityValues;
   gravityValues.push_back(ignition::math::Vector3d(0, 0, 9.81));
@@ -80,7 +80,7 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
 
   for (auto const &gravity : gravityValues)
   {
-    msgs::Set(msg.mutable_gravity(), gravity);
+    gazebo::msgs::Set(msg.mutable_gravity(), gravity);
     physicsPub->Publish(msg);
 
     while (gravity != world->Gravity())
@@ -116,7 +116,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
 
   // advertise on "~/model/modify"
   transport::PublisherPtr modelPub =
-    this->node->Advertise<msgs::Model>("~/model/modify");
+    this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
 
   // list of poses to move to
   std::vector<ignition::math::Pose3d> poses;
@@ -142,14 +142,14 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   }
 
   {
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
     msg.set_name(name);
     msg.set_id(model->GetId());
 
     for (std::vector<ignition::math::Pose3d>::iterator iter = poses.begin();
          iter != poses.end(); ++iter)
     {
-      msgs::Set(msg.mutable_pose(), (*iter));
+      gazebo::msgs::Set(msg.mutable_pose(), (*iter));
       modelPub->Publish(msg);
 
       while (*iter != model->WorldPose())
@@ -172,13 +172,13 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   // https://bitbucket.org/osrf/gazebo/issues/2309
   {
     transport::PublisherPtr userCmdPub =
-        this->node->Advertise<msgs::UserCmd>("~/user_cmd");
+        this->node->Advertise<gazebo::msgs::UserCmd>("~/user_cmd");
 
-    msgs::UserCmd userCmdMsg;
+    gazebo::msgs::UserCmd userCmdMsg;
     userCmdMsg.set_description("Translate [" + name + "]");
-    userCmdMsg.set_type(msgs::UserCmd::MOVING);
+    userCmdMsg.set_type(gazebo::msgs::UserCmd::MOVING);
 
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
     msg.set_name(name);
     msg.set_id(model->GetId());
 
@@ -187,7 +187,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
 
     for (const auto &pose : poses)
     {
-      msgs::Set(modelMsg->mutable_pose(), pose);
+      gazebo::msgs::Set(modelMsg->mutable_pose(), pose);
       userCmdPub->Publish(userCmdMsg);
 
       while (pose != model->WorldPose())
@@ -232,7 +232,7 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
 
   // advertise on "~/model/modify"
   transport::PublisherPtr modelPub =
-    this->node->Advertise<msgs::Model>("~/model/modify");
+    this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
 
   physics::ModelPtr model = world->ModelByName(name);
   ASSERT_TRUE(model != NULL);
@@ -264,11 +264,11 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
 
   {
     // change gravity mode and verify the msg gets through
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
     msg.set_name(name);
     msg.set_id(model->GetId());
 
-    msgs::Link *linkMsg = msg.add_link();
+    gazebo::msgs::Link *linkMsg = msg.add_link();
     linkMsg->set_id(link->GetId());
     linkMsg->set_name(link->GetScopedName());
 
@@ -292,11 +292,11 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
   if (_physicsEngine != "bullet" && _physicsEngine != "dart")
   {
     // change kinematic mode and verify the msg gets through
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
     msg.set_name(name);
     msg.set_id(model->GetId());
 
-    msgs::Link *linkMsg = msg.add_link();
+    gazebo::msgs::Link *linkMsg = msg.add_link();
     linkMsg->set_id(link->GetId());
     linkMsg->set_name(link->GetScopedName());
 
@@ -323,11 +323,11 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
 
   {
     // change self collide mode and verify the msg gets through
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
     msg.set_name(name);
     msg.set_id(model->GetId());
 
-    msgs::Link *linkMsg = msg.add_link();
+    gazebo::msgs::Link *linkMsg = msg.add_link();
     linkMsg->set_id(link->GetId());
     linkMsg->set_name(link->GetName());
 
@@ -363,7 +363,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
 
   // advertise on "~/model/modify"
   transport::PublisherPtr modelPub =
-    this->node->Advertise<msgs::Model>("~/model/modify");
+    this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
 
   double z0 = 5;
   // list of poses to move to
@@ -397,15 +397,15 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
       for (std::vector<ignition::math::Pose3d>::iterator iter = poses.begin();
            iter != poses.end(); ++iter)
       {
-        msgs::Model msg;
+        gazebo::msgs::Model msg;
         msg.set_name(name);
         msg.set_id(model->GetId());
 
-        msgs::Link *linkMsg = msg.add_link();
+        gazebo::msgs::Link *linkMsg = msg.add_link();
         linkMsg->set_id(link->GetId());
         linkMsg->set_name(link->GetScopedName());
 
-        msgs::Set(linkMsg->mutable_pose(), (*iter));
+        gazebo::msgs::Set(linkMsg->mutable_pose(), (*iter));
         modelPub->Publish(msg);
 
         int sleep = 0;
@@ -502,7 +502,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   // advertise on "~/model/modify" to generate resize messages
   transport::PublisherPtr modelPub =
-    this->node->Advertise<msgs::Model>("~/model/modify");
+    this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
 
   int steps = 2;
   physics::ModelPtr model;
@@ -539,10 +539,10 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     if (*(name.rbegin()) == '2')
     {
       // Use a message to resize this one
-      msgs::Model msg;
+      gazebo::msgs::Model msg;
       msg.set_name(name);
       msg.set_id(model->GetId());
-      msgs::Set(msg.mutable_scale(),
+      gazebo::msgs::Set(msg.mutable_scale(),
           scaleFactor * ignition::math::Vector3d::One);
       modelPub->Publish(msg);
     }
@@ -613,23 +613,23 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   {
     std::string name = iter.first;
     model = world->ModelByName(name);
-    msgs::Model modelMsg;
+    gazebo::msgs::Model modelMsg;
     model->FillMsg(modelMsg);
 
-    EXPECT_EQ(msgs::ConvertIgn(modelMsg.scale()),
+    EXPECT_EQ(gazebo::msgs::ConvertIgn(modelMsg.scale()),
         scaleFactor * ignition::math::Vector3d::One);
     for (int i = 0; i < modelMsg.link_size(); ++i)
     {
-      msgs::Link linkMsg = modelMsg.link(i);
+      gazebo::msgs::Link linkMsg = modelMsg.link(i);
 
       // verify visual geom msgs
       for (int j = 0; j < linkMsg.visual_size(); ++j)
       {
-        msgs::Visual visualMsg = linkMsg.visual(j);
-        msgs::Geometry geomMsg = visualMsg.geometry();
+        gazebo::msgs::Visual visualMsg = linkMsg.visual(j);
+        gazebo::msgs::Geometry geomMsg = visualMsg.geometry();
         if (geomMsg.has_box())
         {
-          EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()),
+          EXPECT_EQ(gazebo::msgs::ConvertIgn(geomMsg.box().size()),
               modelSize[name] * scaleFactor);
         }
         else if (geomMsg.has_sphere())
@@ -649,11 +649,11 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       // verify collision geom msgs
       for (int j = 0; j < linkMsg.collision_size(); ++j)
       {
-        msgs::Collision collisionMsg = linkMsg.collision(j);
-        msgs::Geometry geomMsg = collisionMsg.geometry();
+        gazebo::msgs::Collision collisionMsg = linkMsg.collision(j);
+        gazebo::msgs::Geometry geomMsg = collisionMsg.geometry();
         if (geomMsg.has_box())
         {
-          EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()),
+          EXPECT_EQ(gazebo::msgs::ConvertIgn(geomMsg.box().size()),
               modelSize[name] * scaleFactor);
         }
         else if (geomMsg.has_sphere())
@@ -793,36 +793,36 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
   physics::ModelPtr model;
   model = world->ModelByName("box_test");
   EXPECT_TRUE(model != NULL);
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
   model->FillMsg(msg);
 
   EXPECT_EQ(msg.link_size(), 1);
-  msgs::Link linkMsg = msg.link(0);
+  gazebo::msgs::Link linkMsg = msg.link(0);
 
   // 3 visuals to be created: 1 link body + 2 visuals
   EXPECT_EQ(linkMsg.visual_size(), 3);
 
   // verify link body visual
-  msgs::Visual visualMsg = linkMsg.visual(0);
+  gazebo::msgs::Visual visualMsg = linkMsg.visual(0);
   EXPECT_EQ(visualMsg.name(), "box_test::body");
   EXPECT_TRUE(visualMsg.has_type());
-  EXPECT_EQ(visualMsg.type(), msgs::Visual::LINK);
+  EXPECT_EQ(visualMsg.type(), gazebo::msgs::Visual::LINK);
   EXPECT_FALSE(visualMsg.has_geometry());
 
   // verify remaining visual msgs
   for (int i = 1; i < linkMsg.visual_size(); ++i)
   {
-    msgs::Visual visualMsg = linkMsg.visual(i);
+    gazebo::msgs::Visual visualMsg = linkMsg.visual(i);
     std::stringstream visName;
     visName << "box_test::body::visual";
     if (i > 1)
       visName << i;
     EXPECT_EQ(visualMsg.name(), visName.str());
     EXPECT_TRUE(visualMsg.has_type());
-    EXPECT_EQ(visualMsg.type(), msgs::Visual::VISUAL);
-    msgs::Geometry geomMsg = visualMsg.geometry();
+    EXPECT_EQ(visualMsg.type(), gazebo::msgs::Visual::VISUAL);
+    gazebo::msgs::Geometry geomMsg = visualMsg.geometry();
     EXPECT_TRUE(geomMsg.has_box());
-    EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()), boxSize);
+    EXPECT_EQ(gazebo::msgs::ConvertIgn(geomMsg.box().size()), boxSize);
   }
 }
 
@@ -946,7 +946,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
   physics::ModelPtr model;
   model = world->ModelByName("joint_msg_test");
   EXPECT_TRUE(model != NULL);
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
   model->FillMsg(msg);
 
   // only ode supports gearbox joint
@@ -957,16 +957,16 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
   EXPECT_EQ(msg.joint_size(), jointSize);
 
   {
-    msgs::Joint jointMsg = msg.joint(0);
+    gazebo::msgs::Joint jointMsg = msg.joint(0);
     EXPECT_EQ(jointMsg.name(), "joint_msg_test::revolute_joint");
     EXPECT_EQ(jointMsg.parent(), "joint_msg_test::link1");
     EXPECT_EQ(jointMsg.child(), "joint_msg_test::link2");
-    EXPECT_EQ(msgs::ConvertIgn(jointMsg.pose()),
+    EXPECT_EQ(gazebo::msgs::ConvertIgn(jointMsg.pose()),
         ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
     EXPECT_TRUE(jointMsg.has_axis1());
     EXPECT_TRUE(!jointMsg.has_axis2());
-    msgs::Axis axis1Msg = jointMsg.axis1();
-    EXPECT_EQ(msgs::ConvertIgn(axis1Msg.xyz()),
+    gazebo::msgs::Axis axis1Msg = jointMsg.axis1();
+    EXPECT_EQ(gazebo::msgs::ConvertIgn(axis1Msg.xyz()),
         ignition::math::Vector3d(1, 0, 0));
     EXPECT_EQ(axis1Msg.use_parent_model_frame(), false);
     EXPECT_DOUBLE_EQ(axis1Msg.limit_lower(), -1);
@@ -980,16 +980,16 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
   }
 
   {
-    msgs::Joint jointMsg = msg.joint(1);
+    gazebo::msgs::Joint jointMsg = msg.joint(1);
     EXPECT_EQ(jointMsg.name(), "joint_msg_test::screw_joint");
     EXPECT_EQ(jointMsg.parent(), "joint_msg_test::link2");
     EXPECT_EQ(jointMsg.child(), "joint_msg_test::link3");
-    EXPECT_EQ(msgs::ConvertIgn(jointMsg.pose()),
+    EXPECT_EQ(gazebo::msgs::ConvertIgn(jointMsg.pose()),
         ignition::math::Pose3d(0, 0.2, 0, 0, 0, 0));
     EXPECT_TRUE(jointMsg.has_axis1());
     EXPECT_TRUE(jointMsg.has_axis2());
-    msgs::Axis axis1Msg = jointMsg.axis1();
-    EXPECT_EQ(msgs::ConvertIgn(axis1Msg.xyz()),
+    gazebo::msgs::Axis axis1Msg = jointMsg.axis1();
+    EXPECT_EQ(gazebo::msgs::ConvertIgn(axis1Msg.xyz()),
         ignition::math::Vector3d(0, 1, 0));
     EXPECT_EQ(axis1Msg.use_parent_model_frame(), false);
     EXPECT_DOUBLE_EQ(axis1Msg.limit_lower(), -2);
@@ -1000,7 +1000,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     // only ode returns correct screw friction param value
     if (_physicsEngine == "ode")
       EXPECT_DOUBLE_EQ(axis1Msg.friction(), 0.2);
-    msgs::Joint::Screw screwMsg = jointMsg.screw();
+    gazebo::msgs::Joint::Screw screwMsg = jointMsg.screw();
     EXPECT_DOUBLE_EQ(screwMsg.thread_pitch(), 2);
   }
 
@@ -1010,16 +1010,16 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     return;
 
   {
-    msgs::Joint jointMsg = msg.joint(2);
+    gazebo::msgs::Joint jointMsg = msg.joint(2);
     EXPECT_EQ(jointMsg.name(), "joint_msg_test::gearbox_joint");
     EXPECT_EQ(jointMsg.parent(), "joint_msg_test::link3");
     EXPECT_EQ(jointMsg.child(), "joint_msg_test::link1");
-    EXPECT_EQ(msgs::ConvertIgn(jointMsg.pose()),
+    EXPECT_EQ(gazebo::msgs::ConvertIgn(jointMsg.pose()),
         ignition::math::Pose3d(0, 0, 0.1, 0, 0, 0));
     EXPECT_TRUE(jointMsg.has_axis1());
     EXPECT_TRUE(jointMsg.has_axis2());
-    msgs::Axis axis1Msg = jointMsg.axis1();
-    EXPECT_EQ(msgs::ConvertIgn(axis1Msg.xyz()),
+    gazebo::msgs::Axis axis1Msg = jointMsg.axis1();
+    EXPECT_EQ(gazebo::msgs::ConvertIgn(axis1Msg.xyz()),
         ignition::math::Vector3d(1, 0, 0));
     EXPECT_EQ(axis1Msg.use_parent_model_frame(), false);
     EXPECT_DOUBLE_EQ(axis1Msg.limit_lower(), -1e6);
@@ -1029,8 +1029,8 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(axis1Msg.damping(), 0.4);
     // gearbox friction param does not return correct value
     // EXPECT_DOUBLE_EQ(axis1Msg.friction(), 0.11);
-    msgs::Axis axis2Msg = jointMsg.axis2();
-    EXPECT_EQ(msgs::ConvertIgn(axis2Msg.xyz()),
+    gazebo::msgs::Axis axis2Msg = jointMsg.axis2();
+    EXPECT_EQ(gazebo::msgs::ConvertIgn(axis2Msg.xyz()),
         ignition::math::Vector3d(0, 0, 1));
     EXPECT_EQ(axis2Msg.use_parent_model_frame(), true);
     EXPECT_DOUBLE_EQ(axis2Msg.limit_lower(), -1e3);
@@ -1040,7 +1040,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(axis2Msg.damping(), 0.23);
     // gearbox friction param does not return correct value
     // EXPECT_DOUBLE_EQ(axis2Msg.friction(), 0.32);
-    msgs::Joint::Gearbox gearboxMsg = jointMsg.gearbox();
+    gazebo::msgs::Joint::Gearbox gearboxMsg = jointMsg.gearbox();
     EXPECT_EQ(gearboxMsg.gearbox_reference_body(),
          "link_2");
     EXPECT_DOUBLE_EQ(gearboxMsg.gearbox_ratio(), 6.6);

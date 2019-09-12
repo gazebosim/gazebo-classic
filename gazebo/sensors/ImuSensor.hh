@@ -62,7 +62,7 @@ namespace gazebo
 
       /// \brief Returns the imu message
       /// \return Imu message.
-      public: msgs::IMU ImuMessage() const;
+      public: gazebo::msgs::IMU ImuMessage() const;
 
       /// \brief Returns the angular velocity in the IMU sensor local frame.
       /// \param[in] _noiseFree True if the returned measurement should

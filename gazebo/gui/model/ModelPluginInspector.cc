@@ -38,7 +38,7 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent)
   this->setMinimumHeight(300);
 
   // Config widget
-  msgs::Plugin pluginMsg;
+  gazebo::msgs::Plugin pluginMsg;
   this->dataPtr->configWidget = new ConfigWidget;
   this->dataPtr->configWidget->Load(&pluginMsg);
 
@@ -170,9 +170,9 @@ void ModelPluginInspector::Clear()
 }
 
 /////////////////////////////////////////////////
-msgs::Plugin *ModelPluginInspector::Data() const
+gazebo::msgs::Plugin *ModelPluginInspector::Data() const
 {
-  msgs::Plugin *msg = dynamic_cast<msgs::Plugin *>(
+  gazebo::msgs::Plugin *msg = dynamic_cast<gazebo::msgs::Plugin *>(
       this->dataPtr->configWidget->Msg());
   if (!msg)
   {

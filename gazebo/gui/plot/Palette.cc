@@ -759,7 +759,7 @@ void Palette::FillTopics()
       return;
     }
 
-    auto msg = msgs::MsgFactory::NewMsg(msgType);
+    auto msg = gazebo::msgs::MsgFactory::NewMsg(msgType);
     this->FillFromMsg(msg.get(), topicItem, topic + "?p=");
   }
 }

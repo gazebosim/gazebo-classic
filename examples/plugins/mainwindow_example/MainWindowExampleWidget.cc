@@ -103,7 +103,8 @@ void MainWindowExampleWidget::OnStats(ConstWorldStatisticsPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-std::string MainWindowExampleWidget::FormatTime(const msgs::Time &_msg) const
+std::string MainWindowExampleWidget::FormatTime(
+    const gazebo::msgs::Time &_msg) const
 {
   std::ostringstream stream;
   unsigned int day, hour, min, sec, msec;

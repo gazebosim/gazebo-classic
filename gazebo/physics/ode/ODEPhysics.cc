@@ -244,7 +244,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 {
-  msgs::Response response;
+  gazebo::msgs::Response response;
   response.set_id(_msg->id());
   response.set_request(_msg->request());
   response.set_response("success");
@@ -252,8 +252,8 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 
   if (_msg->request() == "physics_info")
   {
-    msgs::Physics physicsMsg;
-    physicsMsg.set_type(msgs::Physics::ODE);
+    gazebo::msgs::Physics physicsMsg;
+    physicsMsg.set_type(gazebo::msgs::Physics::ODE);
     physicsMsg.set_solver_type(this->dataPtr->stepType);
     // min_step_size is defined but not yet used
     boost::any min_step_size;
@@ -277,9 +277,9 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_contact_surface_layer(
       this->GetContactSurfaceLayer());
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->world->Gravity()));
+      gazebo::msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-      msgs::Convert(this->world->MagneticField()));
+      gazebo::msgs::Convert(this->world->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -329,7 +329,7 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetContactSurfaceLayer(_msg->contact_surface_layer());
 
   if (_msg->has_gravity())
-    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
+    this->SetGravity(gazebo::msgs::ConvertIgn(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());

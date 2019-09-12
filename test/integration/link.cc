@@ -54,17 +54,17 @@ TEST_F(LinkTest, StaticWrench)
   topicName += link0->GetScopedName() + "/wrench";
   boost::replace_all(topicName, "::", "/");
 
-  auto wrenchModel0Pub = this->node->Advertise<msgs::Wrench>(topicName);
+  auto wrenchModel0Pub = this->node->Advertise<gazebo::msgs::Wrench>(topicName);
 
   topicName = "~/";
   topicName += link1->GetScopedName() + "/wrench";
   boost::replace_all(topicName, "::", "/");
 
-  auto wrenchModel1Pub = this->node->Advertise<msgs::Wrench>(topicName);
+  auto wrenchModel1Pub = this->node->Advertise<gazebo::msgs::Wrench>(topicName);
 
-  msgs::Wrench msg;
-  msgs::Set(msg.mutable_force(), ignition::math::Vector3d(0, 10000, 0));
-  msgs::Set(msg.mutable_torque(), ignition::math::Vector3d::Zero);
+  gazebo::msgs::Wrench msg;
+  gazebo::msgs::Set(msg.mutable_force(), ignition::math::Vector3d(0, 10000, 0));
+  gazebo::msgs::Set(msg.mutable_torque(), ignition::math::Vector3d::Zero);
 
   // Send wrench msg to non static model and check it moves
   wrenchModel1Pub->Publish(msg);

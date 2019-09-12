@@ -46,7 +46,7 @@ void Issue624Test::CollisionWorldPose(const std::string &_physicsEngine)
 
   // Spawn some custom model
   {
-    msgs::Factory msg;
+    gazebo::msgs::Factory msg;
     std::ostringstream newModelStr;
 
     std::string name = "box_1";

@@ -64,6 +64,6 @@ RFIDVisual::~RFIDVisual()
 /////////////////////////////////////////////////
 void RFIDVisual::OnScan(ConstPosePtr &/*_msg*/)
 {
-  // auto pt = msgs::Convert(_msg->position());
+  // auto pt = gazebo::msgs::Convert(_msg->position());
   // this->sceneNode->setPosition(Conversions::Convert(pt));
 }

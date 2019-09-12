@@ -249,11 +249,11 @@ DataLogger::DataLogger(QWidget *_parent)
   // Advertise on the log control topic. The server listens to log control
   // messages.
   this->dataPtr->pub =
-      this->dataPtr->node->Advertise<msgs::LogControl>("~/log/control");
+      this->dataPtr->node->Advertise<gazebo::msgs::LogControl>("~/log/control");
 
   // Subscribe to the log status topic. The server publishes log status
   // messages.
-  this->dataPtr->sub = this->dataPtr->node->Subscribe<msgs::LogStatus>(
+  this->dataPtr->sub = this->dataPtr->node->Subscribe<gazebo::msgs::LogStatus>(
       "~/log/status",  &DataLogger::OnStatus, this);
 
   // Fill the path with the home folder - duplicated from util/LogRecord
@@ -304,7 +304,7 @@ void DataLogger::OnRecord(bool _toggle)
     this->dataPtr->statusTimer->start(100);
 
     // Tell the server to start data logging
-    msgs::LogControl msg;
+    gazebo::msgs::LogControl msg;
     msg.set_start(true);
     this->dataPtr->pub->Publish(msg);
   }
@@ -352,7 +352,7 @@ void DataLogger::OnRecord(bool _toggle)
     this->SetDestinationPath(this->dataPtr->basePath);
 
     // Tell the server to stop data logging
-    msgs::LogControl msg;
+    gazebo::msgs::LogControl msg;
     msg.set_stop(true);
     this->dataPtr->pub->Publish(msg);
 
@@ -364,7 +364,7 @@ void DataLogger::OnRecord(bool _toggle)
 void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 {
   // A new log status message has arrived, let's display the contents.
-  common::Time time = msgs::Convert(_msg->sim_time());
+  common::Time time = gazebo::msgs::Convert(_msg->sim_time());
   std::ostringstream stream;
 
   // Compute the hours, minutes, seconds, and milliseconds that logging has
@@ -419,13 +419,13 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
       // Get the size units.
       switch (_msg->log_file().size_units())
       {
-        case msgs::LogStatus::LogFile::BYTES:
+        case gazebo::msgs::LogStatus::LogFile::BYTES:
           stream << "B)";
           break;
-        case msgs::LogStatus::LogFile::K_BYTES:
+        case gazebo::msgs::LogStatus::LogFile::K_BYTES:
           stream << "KB)";
           break;
-        case msgs::LogStatus::LogFile::M_BYTES:
+        case gazebo::msgs::LogStatus::LogFile::M_BYTES:
           stream << "MB)";
           break;
         default:
@@ -468,7 +468,7 @@ void DataLogger::OnToggleSettings(bool _checked)
 /////////////////////////////////////////////////
 void DataLogger::OnRecordResources(bool _checked)
 {
-  msgs::LogControl msg;
+  gazebo::msgs::LogControl msg;
   msg.set_record_resources(_checked);
   this->dataPtr->pub->Publish(msg);
 }
@@ -535,7 +535,7 @@ void DataLogger::OnBrowse()
   }
 
   // Set the new base path
-  msgs::LogControl msg;
+  gazebo::msgs::LogControl msg;
   msg.set_base_path(path.string());
   this->dataPtr->pub->Publish(msg);
 

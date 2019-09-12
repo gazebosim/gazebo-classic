@@ -44,7 +44,7 @@ class TransceiverTest : public ServerFixture,
   private: std::mutex mutex;
   private: std::vector<int> num_msgs;
   private: std::vector<common::Time> elapsed_time;
-  private: boost::shared_ptr<msgs::WirelessNodes const> nodesMsg;
+  private: boost::shared_ptr<gazebo::msgs::WirelessNodes const> nodesMsg;
   private: bool receivedMsg;
 };
 

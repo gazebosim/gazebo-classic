@@ -1233,10 +1233,10 @@ TEST_F(Visual_TEST, UpdateMeshFromMsg)
   EXPECT_EQ(meshUpdateVis->GetMeshName(), "unit_box");
   EXPECT_EQ(meshUpdateVis->GetSubMeshName(), "");
 
-  msgs::VisualPtr visualMsg(new msgs::Visual);
-  msgs::Geometry *geomMsg = visualMsg->mutable_geometry();
-  geomMsg->set_type(msgs::Geometry::MESH);
-  msgs::MeshGeom *meshMsg = geomMsg->mutable_mesh();
+  gazebo::msgs::VisualPtr visualMsg(new gazebo::msgs::Visual);
+  gazebo::msgs::Geometry *geomMsg = visualMsg->mutable_geometry();
+  geomMsg->set_type(gazebo::msgs::Geometry::MESH);
+  gazebo::msgs::MeshGeom *meshMsg = geomMsg->mutable_mesh();
   std::string meshFile = "polaris_ranger_ev/meshes/polaris.dae";
   meshMsg->set_filename("model://" + meshFile);
   meshMsg->set_submesh("Steering_Wheel");
@@ -1506,41 +1506,41 @@ TEST_F(Visual_TEST, EntityDepths)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, ConvertVisualType)
 {
-  // convert from msgs::Visual::Type to Visual::VisualType
-  EXPECT_EQ(msgs::Visual::ENTITY,
+  // convert from gazebo::msgs::Visual::Type to Visual::VisualType
+  EXPECT_EQ(gazebo::msgs::Visual::ENTITY,
       rendering::Visual::ConvertVisualType(rendering::Visual::VT_ENTITY));
-  EXPECT_EQ(msgs::Visual::MODEL,
+  EXPECT_EQ(gazebo::msgs::Visual::MODEL,
       rendering::Visual::ConvertVisualType(rendering::Visual::VT_MODEL));
-  EXPECT_EQ(msgs::Visual::LINK,
+  EXPECT_EQ(gazebo::msgs::Visual::LINK,
       rendering::Visual::ConvertVisualType(rendering::Visual::VT_LINK));
-  EXPECT_EQ(msgs::Visual::VISUAL,
+  EXPECT_EQ(gazebo::msgs::Visual::VISUAL,
       rendering::Visual::ConvertVisualType(rendering::Visual::VT_VISUAL));
-  EXPECT_EQ(msgs::Visual::COLLISION,
+  EXPECT_EQ(gazebo::msgs::Visual::COLLISION,
       rendering::Visual::ConvertVisualType(rendering::Visual::VT_COLLISION));
-  EXPECT_EQ(msgs::Visual::SENSOR,
+  EXPECT_EQ(gazebo::msgs::Visual::SENSOR,
       rendering::Visual::ConvertVisualType(rendering::Visual::VT_SENSOR));
-  EXPECT_EQ(msgs::Visual::GUI,
+  EXPECT_EQ(gazebo::msgs::Visual::GUI,
       rendering::Visual::ConvertVisualType(rendering::Visual::VT_GUI));
-  EXPECT_EQ(msgs::Visual::PHYSICS,
+  EXPECT_EQ(gazebo::msgs::Visual::PHYSICS,
       rendering::Visual::ConvertVisualType(rendering::Visual::VT_PHYSICS));
 
-  // convert from Visual::VisualType to msgs::Visual::Type
+  // convert from Visual::VisualType to gazebo::msgs::Visual::Type
   EXPECT_EQ(rendering::Visual::VT_ENTITY,
-      rendering::Visual::ConvertVisualType(msgs::Visual::ENTITY));
+      rendering::Visual::ConvertVisualType(gazebo::msgs::Visual::ENTITY));
   EXPECT_EQ(rendering::Visual::VT_MODEL,
-      rendering::Visual::ConvertVisualType(msgs::Visual::MODEL));
+      rendering::Visual::ConvertVisualType(gazebo::msgs::Visual::MODEL));
   EXPECT_EQ(rendering::Visual::VT_LINK,
-      rendering::Visual::ConvertVisualType(msgs::Visual::LINK));
+      rendering::Visual::ConvertVisualType(gazebo::msgs::Visual::LINK));
   EXPECT_EQ(rendering::Visual::VT_VISUAL,
-      rendering::Visual::ConvertVisualType(msgs::Visual::VISUAL));
+      rendering::Visual::ConvertVisualType(gazebo::msgs::Visual::VISUAL));
   EXPECT_EQ(rendering::Visual::VT_COLLISION,
-      rendering::Visual::ConvertVisualType(msgs::Visual::COLLISION));
+      rendering::Visual::ConvertVisualType(gazebo::msgs::Visual::COLLISION));
   EXPECT_EQ(rendering::Visual::VT_SENSOR,
-      rendering::Visual::ConvertVisualType(msgs::Visual::SENSOR));
+      rendering::Visual::ConvertVisualType(gazebo::msgs::Visual::SENSOR));
   EXPECT_EQ(rendering::Visual::VT_GUI,
-      rendering::Visual::ConvertVisualType(msgs::Visual::GUI));
+      rendering::Visual::ConvertVisualType(gazebo::msgs::Visual::GUI));
   EXPECT_EQ(rendering::Visual::VT_PHYSICS,
-      rendering::Visual::ConvertVisualType(msgs::Visual::PHYSICS));
+      rendering::Visual::ConvertVisualType(gazebo::msgs::Visual::PHYSICS));
 }
 
 /////////////////////////////////////////////////

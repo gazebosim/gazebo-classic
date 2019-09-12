@@ -129,12 +129,13 @@ TEST_F(TransportTest, PubSub)
 
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
-  transport::PublisherPtr scenePub = node->Advertise<msgs::Scene>("~/scene");
+  transport::PublisherPtr scenePub =
+    node->Advertise<gazebo::msgs::Scene>("~/scene");
   transport::SubscriberPtr sceneSub = node->Subscribe("~/scene",
       &ReceiveSceneMsg);
 
-  msgs::Scene msg;
-  msgs::Init(msg, "test");
+  gazebo::msgs::Scene msg;
+  gazebo::msgs::Init(msg, "test");
   msg.set_name("default");
 
   scenePub->Publish(msg);
@@ -144,7 +145,7 @@ TEST_F(TransportTest, PubSub)
 
   for (unsigned int i = 0; i < 10; ++i)
   {
-    pubs.push_back(node->Advertise<msgs::Scene>("~/scene"));
+    pubs.push_back(node->Advertise<gazebo::msgs::Scene>("~/scene"));
     subs.push_back(node->Subscribe("~/scene", &ReceiveSceneMsg));
     scenePub->Publish(msg);
   }
@@ -160,8 +161,8 @@ TEST_F(TransportTest, DirectPublish)
 
   g_sceneMsg = false;
 
-  msgs::Scene msg;
-  msgs::Init(msg, "test");
+  gazebo::msgs::Scene msg;
+  gazebo::msgs::Init(msg, "test");
   msg.set_name("default");
 
   transport::NodePtr node = transport::NodePtr(new transport::Node());
@@ -169,7 +170,7 @@ TEST_F(TransportTest, DirectPublish)
 
   transport::SubscriberPtr sceneSub = node->Subscribe("~/scene",
       &ReceiveSceneMsg);
-  transport::publish<msgs::Scene>("~/scene", msg);
+  transport::publish<gazebo::msgs::Scene>("~/scene", msg);
 
   // Not nice to time check here but 10 seconds should be 'safe' to check
   // against
@@ -192,9 +193,10 @@ void SinglePub()
   transport::NodePtr node(new transport::Node());
   node->Init();
 
-  transport::PublisherPtr pub = node->Advertise<msgs::GzString>("~/test");
+  transport::PublisherPtr pub =
+    node->Advertise<gazebo::msgs::GzString>("~/test");
 
-  msgs::GzString msg;
+  gazebo::msgs::GzString msg;
   msg.set_data("Child process sending message.");
   pub->Publish(msg);
 }
@@ -263,10 +265,12 @@ void MultiPub()
   transport::NodePtr node(new transport::Node());
   node->Init();
 
-  transport::PublisherPtr pub = node->Advertise<msgs::GzString>("~/test");
-  transport::PublisherPtr pub2 = node->Advertise<msgs::GzString>("~/test");
+  transport::PublisherPtr pub =
+    node->Advertise<gazebo::msgs::GzString>("~/test");
+  transport::PublisherPtr pub2 =
+    node->Advertise<gazebo::msgs::GzString>("~/test");
 
-  msgs::GzString msg;
+  gazebo::msgs::GzString msg;
   msg.set_data("Child process sending message.");
   pub->Publish(msg);
   pub2->Publish(msg);
@@ -308,8 +312,10 @@ void MultiPubSub()
   transport::NodePtr node(new transport::Node());
   node->Init("default");
 
-  transport::PublisherPtr pub = node->Advertise<msgs::GzString>("~/test");
-  transport::PublisherPtr pub2 = node->Advertise<msgs::GzString>("~/test");
+  transport::PublisherPtr pub =
+    node->Advertise<gazebo::msgs::GzString>("~/test");
+  transport::PublisherPtr pub2 =
+    node->Advertise<gazebo::msgs::GzString>("~/test");
 
   transport::SubscriberPtr sub =
     node->Subscribe("~/testO", &ReceiveStringMsg3, true);
@@ -320,7 +326,7 @@ void MultiPubSub()
   EXPECT_STREQ("gazebo.msgs.GzString",
       node->GetMsgType("/gazebo/default/testO").c_str());
 
-  msgs::GzString msg;
+  gazebo::msgs::GzString msg;
   msg.set_data("Child process sending message.");
   pub->Publish(msg);
   pub2->Publish(msg);
@@ -351,13 +357,15 @@ TEST_F(TransportTest, ThreadedMultiPubSubBidirectional)
   transport::SubscriberPtr sub2 =
     node->Subscribe("~/test", &ReceiveStringMsg2, true);
 
-  transport::PublisherPtr pub = node->Advertise<msgs::GzString>("~/testO");
-  transport::PublisherPtr pub2 = node->Advertise<msgs::GzString>("~/testO");
+  transport::PublisherPtr pub =
+    node->Advertise<gazebo::msgs::GzString>("~/testO");
+  transport::PublisherPtr pub2 =
+    node->Advertise<gazebo::msgs::GzString>("~/testO");
 
   EXPECT_STREQ("gazebo.msgs.GzString",
       node->GetMsgType("/gazebo/default/test").c_str());
 
-  msgs::GzString msg;
+  gazebo::msgs::GzString msg;
   msg.set_data("Parent send message");
   pub->Publish(msg);
   pub2->Publish(msg);
@@ -470,11 +478,11 @@ TEST_F(TransportTest, ClearBuffers)
   ASSERT_TRUE(node != NULL);
 
   // Advertise publisher
-  auto pub = node->Advertise<msgs::Vector3d>(fullTopic);
+  auto pub = node->Advertise<gazebo::msgs::Vector3d>(fullTopic);
   ASSERT_TRUE(pub != NULL);
 
   // Publish a message
-  msgs::Vector3d msg;
+  gazebo::msgs::Vector3d msg;
   msg.set_x(1);
   msg.set_y(2);
   msg.set_z(3);
@@ -559,7 +567,7 @@ TEST_F(TransportTest, Latching)
   ASSERT_TRUE(subCreatedBeforePub != NULL);
 
   // Advertise publisher
-  auto pub1 = node1->Advertise<msgs::Vector3d>(fullTopic);
+  auto pub1 = node1->Advertise<gazebo::msgs::Vector3d>(fullTopic);
   ASSERT_TRUE(pub1 != NULL);
 
   // Check that topic has been advertised
@@ -580,7 +588,7 @@ TEST_F(TransportTest, Latching)
   EXPECT_EQ(g_createdBeforePub, 0);
 
   // Publish a message
-  msgs::Vector3d msg;
+  gazebo::msgs::Vector3d msg;
   msg.set_x(1);
   msg.set_y(2);
   msg.set_z(3);
@@ -634,7 +642,7 @@ TEST_F(TransportTest, Latching)
   EXPECT_EQ(g_latchCreatedAfterPub2, 1);
 
   // Publish another message
-  msgs::Vector3d msg2;
+  gazebo::msgs::Vector3d msg2;
   msg2.set_x(4);
   msg2.set_y(5);
   msg2.set_z(6);
@@ -658,7 +666,7 @@ TEST_F(TransportTest, Latching)
   ASSERT_TRUE(node2 != NULL);
 
   // Advertise another publisher
-  auto pub2 = node2->Advertise<msgs::Vector3d>(fullTopic);
+  auto pub2 = node2->Advertise<gazebo::msgs::Vector3d>(fullTopic);
   ASSERT_TRUE(pub2 != NULL);
 
   // Check that the subscribers didn't get latched messages again
@@ -674,7 +682,7 @@ TEST_F(TransportTest, Latching)
   EXPECT_EQ(g_latchCreatedAfterPub2, 2);
 
   // Publish with new publisher
-  msgs::Vector3d msg3;
+  gazebo::msgs::Vector3d msg3;
   msg3.set_x(4);
   msg3.set_y(5);
   msg3.set_z(6);
@@ -712,12 +720,12 @@ TEST_F(TransportTest, Errors)
   // EXPECT_THROW(testNode->Advertise<ignition::math::Vector3d>("~/scene"),
   //             common::Exception);
 
-  scenePub = testNode->Advertise<msgs::Scene>("~/scene");
-  EXPECT_THROW(testNode->Advertise<msgs::Factory>("~/scene"),
+  scenePub = testNode->Advertise<gazebo::msgs::Scene>("~/scene");
+  EXPECT_THROW(testNode->Advertise<gazebo::msgs::Factory>("~/scene"),
                common::Exception);
 
   transport::PublisherPtr factoryPub =
-    testNode->Advertise<msgs::Factory>("~/factory");
+    testNode->Advertise<gazebo::msgs::Factory>("~/factory");
   factoryPub->WaitForConnection();
   EXPECT_EQ(static_cast<unsigned int>(0), factoryPub->GetOutgoingCount());
   EXPECT_STREQ("/gazebo/default/factory", factoryPub->GetTopic().c_str());

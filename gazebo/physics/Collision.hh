@@ -98,7 +98,7 @@ namespace gazebo
 
       /// \brief Get the bounding box for this collision.
       /// \return The bounding box.
-      public: virtual ignition::math::Box BoundingBox() const = 0;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const = 0;
 
       /// \brief Get the shape type.
       /// \return The shape type.
@@ -162,11 +162,11 @@ namespace gazebo
 
       /// \brief Fill a collision message.
       /// \param[out] _msg The message to fill with this collision's data.
-      public: void FillMsg(msgs::Collision &_msg);
+      public: void FillMsg(gazebo::msgs::Collision &_msg);
 
       /// \brief Update parameters from a message.
       /// \param[in] _msg Message to update from.
-      public: void ProcessMsg(const msgs::Collision &_msg);
+      public: void ProcessMsg(const gazebo::msgs::Collision &_msg);
 
       /// \brief Get the surface parameters.
       /// \return The surface parameters.
@@ -193,7 +193,7 @@ namespace gazebo
 
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.
-      private: msgs::Visual CreateCollisionVisual();
+      private: gazebo::msgs::Visual CreateCollisionVisual();
 
       /// \brief The link this collision belongs to
       protected: LinkPtr link;

@@ -122,7 +122,7 @@ TEST_F(FiducialCameraTest, Fiducial)
     sleep++;
 
     std::lock_guard<std::mutex> lock(g_mutex);
-    common::Time timestamp = msgs::Convert(g_fiducialPoseMsg.time());
+    common::Time timestamp = gazebo::msgs::Convert(g_fiducialPoseMsg.time());
     received = g_received && timestamp > poseUpdateTime;
     g_received = false;
   }
@@ -153,7 +153,7 @@ TEST_F(FiducialCameraTest, Fiducial)
     sleep++;
 
     std::lock_guard<std::mutex> lock(g_mutex);
-    common::Time timestamp = msgs::Convert(g_fiducialPoseMsg.time());
+    common::Time timestamp = gazebo::msgs::Convert(g_fiducialPoseMsg.time());
     received = g_received && timestamp > spawnBoxTime;
     g_received = false;
   }

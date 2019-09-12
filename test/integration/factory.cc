@@ -92,7 +92,7 @@ class LightFactoryTest : public ServerFixture
   protected: bool responseCbCalled;
 
   /// \brief Response message holding the entity information.
-  protected: msgs::Response resMsg;
+  protected: gazebo::msgs::Response resMsg;
 
   /// \brief Mutex for the variables accessed by the callback.
   protected: std::mutex resMutex;
@@ -101,7 +101,7 @@ class LightFactoryTest : public ServerFixture
   protected: transport::SubscriberPtr modelInfoSub;
 
   /// \brief Model message from ~/model/info
-  protected: msgs::Model modMsg;
+  protected: gazebo::msgs::Model modMsg;
 
   /// \brief True if the callback for model info was called
   protected: bool modelInfoCbCalled;
@@ -144,7 +144,7 @@ void FactoryTest::BoxSdf(const std::string &_physicsEngine)
 
     physics::ModelPtr model = this->GetModel(name.str());
     ASSERT_TRUE(model != NULL);
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
     model->FillMsg(msg);
     EXPECT_TRUE(msg.has_pose());
     // gzerr << msg.DebugString() << '\n';
@@ -251,7 +251,7 @@ void FactoryTest::ActorSkinOnly(const std::string &_physicsEngine)
     << "</actor>"
     << "</sdf>";
 
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf(actorStr.str());
   this->factoryPub->Publish(msg);
 
@@ -341,7 +341,7 @@ void FactoryTest::ActorSkinAnim(const std::string &_physicsEngine)
     << "</actor>"
     << "</sdf>";
 
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf(actorStr.str());
   this->factoryPub->Publish(msg);
 
@@ -433,7 +433,7 @@ void FactoryTest::ActorSkinTrajectory(const std::string &_physicsEngine)
     << "</actor>"
     << "</sdf>";
 
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf(actorStr.str());
   this->factoryPub->Publish(msg);
 
@@ -537,7 +537,7 @@ void FactoryTest::ActorLinkTrajectory(const std::string &_physicsEngine)
     << "</actor>"
     << "</sdf>";
 
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf(actorStr.str());
   this->factoryPub->Publish(msg);
 
@@ -631,7 +631,7 @@ TEST_F(FactoryTest, ActorPlugin)
     << "</actor>"
     << "</sdf>";
 
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf(actorStr.str());
   this->factoryPub->Publish(msg);
 
@@ -697,7 +697,7 @@ void FactoryTest::ActorAll(const std::string &_physicsEngine)
     << "</actor>"
     << "</sdf>";
 
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf(actorStr.str());
   this->factoryPub->Publish(msg);
 
@@ -780,11 +780,11 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
 
   // clone the pr2
   std::string name = "pr2";
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   ignition::math::Pose3d clonePose;
   clonePose.Set(ignition::math::Vector3d(2, 3, 0.5),
       ignition::math::Quaterniond::Identity);
-  msgs::Set(msg.mutable_pose(), clonePose);
+  gazebo::msgs::Set(msg.mutable_pose(), clonePose);
   msg.set_clone_model_name(name);
   this->factoryPub->Publish(msg);
 
@@ -930,19 +930,20 @@ TEST_F(LightFactoryTest, SpawnLight)
   ASSERT_TRUE(world != nullptr);
 
   // create lights using ~/factory/light topic
-  this->lightFactoryPub = this->node->Advertise<msgs::Light>("~/factory/light");
+  this->lightFactoryPub = this->node->Advertise<gazebo::msgs::Light>(
+      "~/factory/light");
   std::string light1Name = "new1_light";
   std::string light2Name = "new2_light";
 
-  msgs::Light msg;
+  gazebo::msgs::Light msg;
   msg.set_name(light1Name);
   ignition::math::Pose3d light1Pose = ignition::math::Pose3d(0, 2, 1, 0, 0, 0);
-  msgs::Set(msg.mutable_pose(), light1Pose);
+  gazebo::msgs::Set(msg.mutable_pose(), light1Pose);
   this->lightFactoryPub->Publish(msg);
 
   msg.set_name(light2Name);
   ignition::math::Pose3d light2Pose = ignition::math::Pose3d(1, 0, 5, 0, 2, 0);
-  msgs::Set(msg.mutable_pose(), light2Pose);
+  gazebo::msgs::Set(msg.mutable_pose(), light2Pose);
   this->lightFactoryPub->Publish(msg);
 
   // wait for light to spawn
@@ -999,25 +1000,25 @@ TEST_F(LightFactoryTest, SpawnModelWithLight)
 
   // Create a publisher to request for entity information.
   this->requestPub
-    = this->node->Advertise<msgs::Request>("~/request");
-  msgs::Request reqMsg;
+    = this->node->Advertise<gazebo::msgs::Request>("~/request");
+  gazebo::msgs::Request reqMsg;
   reqMsg.set_request("entity_info");
   reqMsg.set_data("test_model");
 
   // Create a subscriber to get a response for entity information.
   this->responseSub
-    = this->node->Subscribe<msgs::Response>("~/response",
+    = this->node->Subscribe<gazebo::msgs::Response>("~/response",
     &LightFactoryTest::ResponseCb, dynamic_cast<LightFactoryTest*>(this));
 
   // Create a subscriber to get a model info.
   this->modelInfoSub
-    = this->node->Subscribe<msgs::Model>("~/model/info",
+    = this->node->Subscribe<gazebo::msgs::Model>("~/model/info",
     &LightFactoryTest::ModelInfoCb, dynamic_cast<LightFactoryTest*>(this));
 
   // Create a publisher to spawn a model.
   this->factoryPub
-    = this->node->Advertise<msgs::Factory>("~/factory");
-  msgs::Factory facMsg;
+    = this->node->Advertise<gazebo::msgs::Factory>("~/factory");
+  gazebo::msgs::Factory facMsg;
 
   // Request for entity informaiton.
   reqMsg.set_id(0);
@@ -1087,14 +1088,14 @@ TEST_F(LightFactoryTest, SpawnModelWithLight)
     EXPECT_EQ(1, this->resMsg.id()) << "Wrong message ID";
     EXPECT_NE("nonexistent", this->resMsg.response())
       << "The model does not exist.";
-    msgs::Model modelMsg;
+    gazebo::msgs::Model modelMsg;
     modelMsg.ParseFromString(this->resMsg.serialized_data());
     EXPECT_EQ(1, modelMsg.link_size())
       << "The number of links must be 1.";
-    msgs::Link linkMsg = modelMsg.link(0);
+    gazebo::msgs::Link linkMsg = modelMsg.link(0);
     EXPECT_EQ(1, linkMsg.light_size())
       << "The number of lights must be 1.";
-    msgs::Light lightMsg = linkMsg.light(0);
+    gazebo::msgs::Light lightMsg = linkMsg.light(0);
     EXPECT_EQ("test_model::link::spawned_light", lightMsg.name())
       << "The name of the light is wrong.";
   }
@@ -1105,10 +1106,10 @@ TEST_F(LightFactoryTest, SpawnModelWithLight)
     EXPECT_TRUE(this->modelInfoCbCalled) << "No model info callback";
     EXPECT_EQ(1, this->modMsg.link_size())
       << "The number of links must be 1.";
-    msgs::Link linkMsg = this->modMsg.link(0);
+    gazebo::msgs::Link linkMsg = this->modMsg.link(0);
     EXPECT_EQ(1, linkMsg.light_size())
       << "The number of lights must be 1.";
-    msgs::Light lightMsg = linkMsg.light(0);
+    gazebo::msgs::Light lightMsg = linkMsg.light(0);
     EXPECT_EQ("test_model::link::spawned_light", lightMsg.name())
       << "The name of the light is wrong.";
   }
@@ -1128,10 +1129,10 @@ TEST_F(FactoryTest, FilenameModelDatabase)
   ASSERT_NE(nullptr, world);
 
   // Publish factory msg
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf_filename("model://cococan");
 
-  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  auto pub = this->node->Advertise<gazebo::msgs::Factory>("~/factory");
   pub->Publish(msg);
 
   // Wait for it to be spawned
@@ -1147,7 +1148,6 @@ TEST_F(FactoryTest, FilenameModelDatabase)
 }
 
 //////////////////////////////////////////////////
-#ifdef HAVE_IGNITION_FUEL_TOOLS
 TEST_F(FactoryTest, FilenameFuelURL)
 {
   this->Load("worlds/empty.world", true);
@@ -1156,11 +1156,11 @@ TEST_F(FactoryTest, FilenameFuelURL)
   auto world = physics::get_world("default");
   ASSERT_NE(nullptr, world);
 
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf_filename(
       "https://api.ignitionfuel.org/1.0/chapulina/models/Test box");
 
-  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  auto pub = this->node->Advertise<gazebo::msgs::Factory>("~/factory");
   pub->Publish(msg);
 
   // Wait for it to be spawned
@@ -1174,7 +1174,6 @@ TEST_F(FactoryTest, FilenameFuelURL)
   // Check model was spawned
   ASSERT_NE(nullptr, world->ModelByName("test_box"));
 }
-#endif
 
 //////////////////////////////////////////////////
 TEST_P(FactoryTest, InvalidMeshInsertion)

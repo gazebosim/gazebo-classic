@@ -46,10 +46,10 @@ TEST_F(Issue1782Test, Unadvertise)
       "/test_topic";
 
   // Advertise two publishers to the same topic
-  auto pubA = node->Advertise<msgs::Vector3d>(fullTopic);
+  auto pubA = node->Advertise<gazebo::msgs::Vector3d>(fullTopic);
   ASSERT_TRUE(pubA != NULL);
 
-  auto pubB = node->Advertise<msgs::Vector3d>(fullTopic);
+  auto pubB = node->Advertise<gazebo::msgs::Vector3d>(fullTopic);
   ASSERT_TRUE(pubA != NULL);
 
   // Check that topic has been advertised

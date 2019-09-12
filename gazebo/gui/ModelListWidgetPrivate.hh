@@ -89,7 +89,7 @@ namespace gazebo
       public: bool fillingPropertyTree;
       public: QtProperty *selectedProperty;
 
-      public: msgs::Request *requestMsg;
+      public: gazebo::msgs::Request *requestMsg;
 
       public: std::vector<event::ConnectionPtr> connections;
 
@@ -102,33 +102,33 @@ namespace gazebo
       typedef std::list<std::string> RemoveEntity_L;
       public: RemoveEntity_L removeEntityList;
 
-      public: msgs::Model modelMsg;
-      public: msgs::Link linkMsg;
-      public: msgs::Scene sceneMsg;
-      public: msgs::Joint jointMsg;
+      public: gazebo::msgs::Model modelMsg;
+      public: gazebo::msgs::Link linkMsg;
+      public: gazebo::msgs::Scene sceneMsg;
+      public: gazebo::msgs::Joint jointMsg;
 
       /// \brief Keep latest plugin message.
       public: ignition::msgs::Plugin pluginMsg;
 
-      public: msgs::Physics physicsMsg;
-      public: msgs::Wind windMsg;
+      public: gazebo::msgs::Physics physicsMsg;
+      public: gazebo::msgs::Wind windMsg;
 
       /// \brief Keep latest atmosphere message.
-      public: msgs::Atmosphere atmosphereMsg;
+      public: gazebo::msgs::Atmosphere atmosphereMsg;
 
-      public: msgs::Light lightMsg;
-      public: msgs::SphericalCoordinates sphericalCoordMsg;
+      public: gazebo::msgs::Light lightMsg;
+      public: gazebo::msgs::SphericalCoordinates sphericalCoordMsg;
 
       public: bool fillPropertyTree;
       public: std::deque<std::string> fillTypes;
 
-      public: msgs::Light::LightType lightType;
+      public: gazebo::msgs::Light::LightType lightType;
 
       /// \brief Type of physics engine.
-      public: msgs::Physics_Type physicsType;
+      public: gazebo::msgs::Physics_Type physicsType;
 
       /// \brief Type of atmosphere model.
-      public: msgs::Atmosphere_Type atmosphereType;
+      public: gazebo::msgs::Atmosphere_Type atmosphereType;
 
       /// \brief Node for ignition transport communication.
       public: ignition::transport::Node ignNode;

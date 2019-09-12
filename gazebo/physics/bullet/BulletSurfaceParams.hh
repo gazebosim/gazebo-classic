@@ -45,10 +45,10 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: virtual void FillMsg(msgs::Surface &_msg);
+      public: virtual void FillMsg(gazebo::msgs::Surface &_msg);
 
       // Documentation inherited.
-      public: virtual void ProcessMsg(const msgs::Surface &_msg);
+      public: virtual void ProcessMsg(const gazebo::msgs::Surface &_msg);
 
       // Documentation inherited.
       public: virtual FrictionPyramidPtr FrictionPyramid() const;

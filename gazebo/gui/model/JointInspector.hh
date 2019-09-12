@@ -57,7 +57,7 @@ namespace gazebo
 
       /// \brief Get the msg containing all joint data.
       /// \return Joint msg.
-      public: msgs::Joint *Data() const;
+      public: gazebo::msgs::Joint *Data() const;
 
       /// \brief Set the pose of the joint.
       /// \param[in] _pose Pose to set the joint to.

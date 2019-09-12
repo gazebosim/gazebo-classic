@@ -41,7 +41,7 @@ namespace gazebo
 
     /// \brief Update callback. Overload this function in a child class.
     /// \param[in] _msg The sonar ping message.
-    protected: virtual void OnUpdate(msgs::SonarStamped _msg);
+    protected: virtual void OnUpdate(gazebo::msgs::SonarStamped _msg);
 
     /// \brief The parent sensor
     protected: sensors::SonarSensorPtr parentSensor;

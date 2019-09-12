@@ -42,7 +42,7 @@ namespace gazebo
       public: physics::LinkPtr parentLink;
 
       /// \brief Stores most recent altimeter sensor data.
-      public: msgs::Altimeter altMsg;
+      public: gazebo::msgs::Altimeter altMsg;
     };
   }
 }

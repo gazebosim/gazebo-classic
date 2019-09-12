@@ -71,7 +71,7 @@ namespace gazebo
       public: virtual unsigned int GetCollideBits() const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Box BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Get DART body node.
       /// \return Pointer to the dart BodyNode.

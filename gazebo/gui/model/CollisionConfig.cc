@@ -187,7 +187,7 @@ void CollisionConfig::UpdateCollision(const std::string &_name,
 
 /////////////////////////////////////////////////
 void CollisionConfig::AddCollision(const std::string &_name,
-    const msgs::Collision *_collisionMsg)
+    const gazebo::msgs::Collision *_collisionMsg)
 {
   // Header button
   QRadioButton *headerButton = new QRadioButton();
@@ -245,7 +245,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
   headerWidget->setLayout(headerLayout);
 
   // ConfigWidget
-  msgs::Collision msgToLoad;
+  gazebo::msgs::Collision msgToLoad;
   if (_collisionMsg)
     msgToLoad = *_collisionMsg;
 
@@ -254,7 +254,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
   if (!msgToLoad.has_max_contacts())
     msgToLoad.set_max_contacts(10);
 
-  msgs::Surface *surfaceMsg = msgToLoad.mutable_surface();
+  gazebo::msgs::Surface *surfaceMsg = msgToLoad.mutable_surface();
   if (!surfaceMsg->has_bounce_threshold())
     surfaceMsg->set_bounce_threshold(10e5);
   if (!surfaceMsg->has_soft_erp())
@@ -270,13 +270,13 @@ void CollisionConfig::AddCollision(const std::string &_name,
   if (!surfaceMsg->has_collide_bitmask())
     surfaceMsg->set_collide_bitmask(1);
 
-  msgs::Friction *frictionMsg = surfaceMsg->mutable_friction();
+  gazebo::msgs::Friction *frictionMsg = surfaceMsg->mutable_friction();
   if (!frictionMsg->has_mu())
     frictionMsg->set_mu(1.0);
   if (!frictionMsg->has_mu2())
     frictionMsg->set_mu2(1.0);
 
-  msgs::Friction::Torsional *torsionalMsg =
+  gazebo::msgs::Friction::Torsional *torsionalMsg =
       frictionMsg->mutable_torsional();
   if (!torsionalMsg->has_coefficient())
     torsionalMsg->set_coefficient(1.0);
@@ -444,14 +444,16 @@ void CollisionConfig::OnShowCollision(const int _id)
 }
 
 /////////////////////////////////////////////////
-msgs::Collision *CollisionConfig::GetData(const std::string &_name) const
+gazebo::msgs::Collision *CollisionConfig::GetData(
+    const std::string &_name) const
 {
   for (auto const &it : this->configs)
   {
     std::string name = it.second->name;
     if (name == _name)
     {
-      return dynamic_cast<msgs::Collision *>(it.second->configWidget->Msg());
+      return dynamic_cast<gazebo::msgs::Collision *>(
+          it.second->configWidget->Msg());
     }
   }
   return NULL;
@@ -572,8 +574,8 @@ void CollisionConfigData::OnGeometryChanged()
 /////////////////////////////////////////////////
 void CollisionConfigData::RestoreOriginalData()
 {
-  msgs::CollisionPtr collisionPtr;
-  collisionPtr.reset(new msgs::Collision);
+  gazebo::msgs::CollisionPtr collisionPtr;
+  collisionPtr.reset(new gazebo::msgs::Collision);
   collisionPtr->CopyFrom(this->originalDataMsg);
 
   // Update default widgets

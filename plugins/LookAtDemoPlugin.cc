@@ -152,7 +152,7 @@ void LookAtDemoPlugin::Load(sdf::ElementPtr /*_elem*/)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->modelModifyPub =
-      this->node->Advertise<msgs::Model>("~/model/modify");
+      this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
 }
 
 /////////////////////////////////////////////////
@@ -170,21 +170,21 @@ void LookAtDemoPlugin::OnChange(const double /*_newValue*/)
   auto lookat = ignition::math::Matrix4d::LookAt(eye, target, up).Pose();
 
   // Publish model modify messages
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
   msg.set_name("frame");
-  msgs::Set(msg.mutable_pose(), lookat);
+  gazebo::msgs::Set(msg.mutable_pose(), lookat);
 
   this->modelModifyPub->Publish(msg);
 
   msg.set_name("target");
-  msgs::Set(msg.mutable_pose(), ignition::math::Pose3d(target,
+  gazebo::msgs::Set(msg.mutable_pose(), ignition::math::Pose3d(target,
       ignition::math::Quaterniond::Identity));
 
   this->modelModifyPub->Publish(msg);
 
   auto desZ = ignition::math::Matrix4d::LookAt(eye, up).Pose();
   msg.set_name("desired_z");
-  msgs::Set(msg.mutable_pose(), desZ);
+  gazebo::msgs::Set(msg.mutable_pose(), desZ);
 
   this->modelModifyPub->Publish(msg);
 }

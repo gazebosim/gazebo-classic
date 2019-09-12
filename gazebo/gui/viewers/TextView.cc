@@ -94,7 +94,7 @@ void TextView::SetTopic(const std::string &_topicName)
   TopicView::SetTopic(_topicName);
 
   boost::mutex::scoped_lock lock(this->mutex);
-  this->msg = msgs::MsgFactory::NewMsg(this->msgTypeName);
+  this->msg = gazebo::msgs::MsgFactory::NewMsg(this->msgTypeName);
 
   this->msgList->clear();
 

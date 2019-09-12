@@ -188,7 +188,7 @@ void SonarSensor::Load(const std::string &_worldName)
       &SonarSensor::OnContacts, this);
 
   // Advertise the sensor's topic on which we will output range data.
-  this->dataPtr->sonarPub = this->node->Advertise<msgs::SonarStamped>(
+  this->dataPtr->sonarPub = this->node->Advertise<gazebo::msgs::SonarStamped>(
       this->Topic());
 
   // Initialize the message that will be published on this->dataPtr->sonarPub.
@@ -199,7 +199,8 @@ void SonarSensor::Load(const std::string &_worldName)
   this->dataPtr->sonarMsg.mutable_sonar()->set_radius(
       this->dataPtr->radius);
 
-  msgs::Set(this->dataPtr->sonarMsg.mutable_sonar()->mutable_world_pose(),
+  gazebo::msgs::Set(
+      this->dataPtr->sonarMsg.mutable_sonar()->mutable_world_pose(),
       this->dataPtr->sonarMidPose);
   this->dataPtr->sonarMsg.mutable_sonar()->set_range(0);
 }
@@ -209,7 +210,8 @@ void SonarSensor::Init()
 {
   Sensor::Init();
   this->dataPtr->sonarMsg.mutable_sonar()->set_frame(this->ParentName());
-  msgs::Set(this->dataPtr->sonarMsg.mutable_time(), this->world->SimTime());
+  gazebo::msgs::Set(
+      this->dataPtr->sonarMsg.mutable_time(), this->world->SimTime());
   this->dataPtr->sonarMsg.mutable_sonar()->set_range(this->dataPtr->rangeMax);
 
   if (this->dataPtr->sonarPub)
@@ -261,7 +263,7 @@ bool SonarSensor::UpdateImpl(const bool /*_force*/)
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   this->lastMeasurementTime = this->world->SimTime();
-  msgs::Set(this->dataPtr->sonarMsg.mutable_time(),
+  gazebo::msgs::Set(this->dataPtr->sonarMsg.mutable_time(),
             this->lastMeasurementTime);
 
   ignition::math::Pose3d referencePose =
@@ -297,7 +299,7 @@ bool SonarSensor::UpdateImpl(const bool /*_force*/)
       for (int j = 0; j < (*iter)->contact(i).position_size(); ++j)
       {
         // Get the contact position relative to the reference position.
-        pos = msgs::ConvertIgn((*iter)->contact(i).position(j)) -
+        pos = gazebo::msgs::ConvertIgn((*iter)->contact(i).position(j)) -
           referencePose.Pos();
 
         // Compute the sensed range.
@@ -353,7 +355,7 @@ void SonarSensor::OnContacts(ConstContactsPtr &_msg)
 
 //////////////////////////////////////////////////
 event::ConnectionPtr SonarSensor::ConnectUpdate(
-    std::function<void (msgs::SonarStamped)> _subscriber)
+    std::function<void (gazebo::msgs::SonarStamped)> _subscriber)
 {
   return this->dataPtr->update.Connect(_subscriber);
 }

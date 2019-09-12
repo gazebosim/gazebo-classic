@@ -47,7 +47,7 @@ TEST_F(Issue1082Test, PIDLimitsVelocity)
 
   auto startPose = model->GetLink("arm_elbow_pan")->WorldPose();
 
-  msgs::JointCmd msg;
+  gazebo::msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
   msg.mutable_velocity()->set_target(10);
   msg.mutable_velocity()->set_p_gain(1);
@@ -89,7 +89,7 @@ TEST_F(Issue1082Test, PIDLimitsPosition)
 
   auto startPose = model->GetLink("arm_elbow_pan")->WorldPose();
 
-  msgs::JointCmd msg;
+  gazebo::msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
   msg.mutable_position()->set_target(10);
   msg.mutable_position()->set_p_gain(1);

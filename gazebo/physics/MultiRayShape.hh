@@ -130,12 +130,12 @@ namespace gazebo
       /// \TODO This function is not implemented.
       /// \brief Fill a message with this shape's values.
       /// \param[out] _msg Message that contains the shape's values.
-      public: void FillMsg(msgs::Geometry &_msg);
+      public: void FillMsg(gazebo::msgs::Geometry &_msg);
 
       /// \TODO This function is not implemented.
       /// \brief Update the ray based on a message.
       /// \param[in] _msg Message to update from.
-      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+      public: virtual void ProcessMsg(const gazebo::msgs::Geometry &_msg);
 
       /// Documentation inherited
       public: virtual double ComputeVolume() const;

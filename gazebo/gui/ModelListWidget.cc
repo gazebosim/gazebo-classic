@@ -193,7 +193,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     this->dataPtr->propTreeBrowser->clear();
     if (name == "Scene")
     {
-      this->dataPtr->requestMsg = msgs::CreateRequest("scene_info",
+      this->dataPtr->requestMsg = gazebo::msgs::CreateRequest("scene_info",
                          this->dataPtr->selectedEntityName);
       this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
     }
@@ -209,25 +209,25 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     }
     else if (name == "Physics")
     {
-      this->dataPtr->requestMsg = msgs::CreateRequest("physics_info",
+      this->dataPtr->requestMsg = gazebo::msgs::CreateRequest("physics_info",
                                              this->dataPtr->selectedEntityName);
       this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
     }
     else if (name == "Atmosphere")
     {
-      this->dataPtr->requestMsg = msgs::CreateRequest("atmosphere_info",
+      this->dataPtr->requestMsg = gazebo::msgs::CreateRequest("atmosphere_info",
                                              this->dataPtr->selectedEntityName);
       this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
     }
     else if (name == "Wind")
     {
-      this->dataPtr->requestMsg = msgs::CreateRequest("wind_info",
+      this->dataPtr->requestMsg = gazebo::msgs::CreateRequest("wind_info",
                                              this->dataPtr->selectedEntityName);
       this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
     }
     else if (name == "Spherical Coordinates")
     {
-      this->dataPtr->requestMsg = msgs::CreateRequest(
+      this->dataPtr->requestMsg = gazebo::msgs::CreateRequest(
           "spherical_coordinates_info",
           this->dataPtr->selectedEntityName);
       this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
@@ -275,7 +275,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       }
       else if (this->dataPtr->requestPub)
       {
-        this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
+        this->dataPtr->requestMsg = gazebo::msgs::CreateRequest("entity_info",
             this->dataPtr->selectedEntityName);
         this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
       }
@@ -357,19 +357,19 @@ void ModelListWidget::Update()
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
+void ModelListWidget::OnModelUpdate(const gazebo::msgs::Model &_msg)
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
   msg.CopyFrom(_msg);
   this->dataPtr->modelMsgs.push_back(msg);
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnLightUpdate(const msgs::Light &_msg)
+void ModelListWidget::OnLightUpdate(const gazebo::msgs::Light &_msg)
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  msgs::Light msg;
+  gazebo::msgs::Light msg;
   msg.CopyFrom(_msg);
   this->dataPtr->lightMsgs.push_back(msg);
 }
@@ -745,7 +745,7 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
 /////////////////////////////////////////////////
 void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
 {
-  msgs::Light msg;
+  gazebo::msgs::Light msg;
 
   QList<QtProperty*> properties = this->dataPtr->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
@@ -769,7 +769,7 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
                  this->ChildItem((*iter), "pitch")).toDouble(),
                this->dataPtr->variantManager->value(
                  this->ChildItem((*iter), "yaw")).toDouble());
-      msgs::Set(msg.mutable_pose(), pose);
+      gazebo::msgs::Set(msg.mutable_pose(), pose);
     }
     else if ((*iter)->propertyName().toStdString() == "range")
       msg.set_range(this->dataPtr->variantManager->value((*iter)).toDouble());
@@ -839,11 +839,11 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
       || changedProperty == "pitch"
       || changedProperty == "yaw")
     {
-      msgs::Pose poseMsg;
+      gazebo::msgs::Pose poseMsg;
       this->FillPoseMsg(cameraPoseProperty, &poseMsg, poseMsg.GetDescriptor());
       rendering::UserCameraPtr cam = gui::get_active_camera();
       if (cam)
-        cam->SetWorldPose(msgs::ConvertIgn(poseMsg));
+        cam->SetWorldPose(gazebo::msgs::ConvertIgn(poseMsg));
     }
   }
 
@@ -907,9 +907,9 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
         || changedProperty == "y"
         || changedProperty == "z")
     {
-      msgs::Vector3d msg;
+      gazebo::msgs::Vector3d msg;
       this->FillVector3Msg(cameraFollowProperty, &msg);
-      cam->SetTrackPosition(msgs::ConvertIgn(msg));
+      cam->SetTrackPosition(gazebo::msgs::ConvertIgn(msg));
     }
     else if (changedProperty == "min_distance")
     {
@@ -975,7 +975,7 @@ void ModelListWidget::GUIGridPropertyChanged(QtProperty *_item)
 /////////////////////////////////////////////////
 void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 {
-  msgs::Physics msg;
+  gazebo::msgs::Physics msg;
 
   QList<QtProperty*> properties = this->dataPtr->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
@@ -1025,7 +1025,7 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 /////////////////////////////////////////////////
 void ModelListWidget::AtmospherePropertyChanged(QtProperty *_item)
 {
-  msgs::Atmosphere msg;
+  gazebo::msgs::Atmosphere msg;
 
   QList<QtProperty*> properties = this->dataPtr->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
@@ -1055,7 +1055,7 @@ void ModelListWidget::AtmospherePropertyChanged(QtProperty *_item)
   if (changedProperty == "temperature" || changedProperty == "pressure")
   {
     // Send request to retrieve new value for mass_density
-    this->dataPtr->requestMsg = msgs::CreateRequest("atmosphere_info",
+    this->dataPtr->requestMsg = gazebo::msgs::CreateRequest("atmosphere_info",
                                            this->dataPtr->selectedEntityName);
     this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
   }
@@ -1064,7 +1064,7 @@ void ModelListWidget::AtmospherePropertyChanged(QtProperty *_item)
 /////////////////////////////////////////////////
 void ModelListWidget::WindPropertyChanged(QtProperty * /*_item*/)
 {
-  msgs::Wind msg;
+  gazebo::msgs::Wind msg;
 
   QList<QtProperty*> properties = this->dataPtr->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
@@ -1087,7 +1087,7 @@ void ModelListWidget::WindPropertyChanged(QtProperty * /*_item*/)
 /////////////////////////////////////////////////
 void ModelListWidget::ScenePropertyChanged(QtProperty */*_item*/)
 {
-  msgs::Scene msg;
+  gazebo::msgs::Scene msg;
 
   QList<QtProperty*> properties = this->dataPtr->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
@@ -1108,7 +1108,7 @@ void ModelListWidget::ScenePropertyChanged(QtProperty */*_item*/)
 /////////////////////////////////////////////////
 void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
 {
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
 
   google::protobuf::Message *fillMsg = &msg;
 
@@ -1123,7 +1123,7 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
     msg.set_id(currentItem->data(2, Qt::UserRole).toInt());
 
     // set link id and strip link name.
-    msgs::Link *linkMsg = msg.add_link();
+    gazebo::msgs::Link *linkMsg = msg.add_link();
     linkMsg->set_id(this->dataPtr->linkMsg.id());
     std::string linkName = this->dataPtr->linkMsg.name();
     size_t index = linkName.find_last_of("::");
@@ -1211,7 +1211,7 @@ void ModelListWidget::FillMsgField(QtProperty *_item,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillColorMsg(QtProperty *_item, msgs::Color *_msg)
+void ModelListWidget::FillColorMsg(QtProperty *_item, gazebo::msgs::Color *_msg)
 {
   _msg->set_r(this->dataPtr->variantManager->value(
       this->ChildItem(_item, "Red")).toDouble() / 255.0);
@@ -1224,7 +1224,8 @@ void ModelListWidget::FillColorMsg(QtProperty *_item, msgs::Color *_msg)
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillVector3Msg(QtProperty *_item, msgs::Vector3d *_msg)
+void ModelListWidget::FillVector3Msg(QtProperty *_item,
+    gazebo::msgs::Vector3d *_msg)
 {
   _msg->set_x(this->dataPtr->variantManager->value(
       this->ChildItem(_item, "x")).toDouble());
@@ -1258,7 +1259,7 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
   if (type == "box")
   {
     QtProperty *sizeProperty = this->ChildItem(_item, "size");
-    msgs::BoxGeom *boxMsg = (msgs::BoxGeom*)(message);
+    gazebo::msgs::BoxGeom *boxMsg = (gazebo::msgs::BoxGeom*)(message);
     double xValue = this->dataPtr->variantManager->value(
         this->ChildItem(sizeProperty, "x")).toDouble();
     double yValue = this->dataPtr->variantManager->value(
@@ -1273,7 +1274,7 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
   else if (type == "sphere")
   {
     QtProperty *radiusProperty = this->ChildItem(_item, "radius");
-    msgs::SphereGeom *sphereMsg = (msgs::SphereGeom*)(message);
+    gazebo::msgs::SphereGeom *sphereMsg =(gazebo::msgs::SphereGeom*)(message);
 
     sphereMsg->set_radius(
         this->dataPtr->variantManager->value(radiusProperty).toDouble());
@@ -1283,7 +1284,8 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     QtProperty *radiusProperty = this->ChildItem(_item, "radius");
     QtProperty *lengthProperty = this->ChildItem(_item, "length");
 
-    msgs::CylinderGeom *cylinderMsg = (msgs::CylinderGeom*)(message);
+    gazebo::msgs::CylinderGeom *cylinderMsg =
+      (gazebo::msgs::CylinderGeom*)(message);
     cylinderMsg->set_radius(
         this->dataPtr->variantManager->value(radiusProperty).toDouble());
     cylinderMsg->set_length(
@@ -1292,7 +1294,8 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
   else if (type == "plane")
   {
     QtProperty *normalProperty = this->ChildItem(_item, "normal");
-    msgs::PlaneGeom *planeMessage = (msgs::PlaneGeom*)(message);
+    gazebo::msgs::PlaneGeom *planeMessage =
+      (gazebo::msgs::PlaneGeom*)(message);
 
     double xValue = this->dataPtr->variantManager->value(
         this->ChildItem(normalProperty, "x")).toDouble();
@@ -1313,7 +1316,7 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     QtProperty *thresholdProp = this->ChildItem(_item, "threshold");
     QtProperty *granularityProp = this->ChildItem(_item, "granularity");
 
-    msgs::ImageGeom *imageMessage = (msgs::ImageGeom*)(message);
+    gazebo::msgs::ImageGeom *imageMessage = (gazebo::msgs::ImageGeom*)(message);
     imageMessage->set_uri(
        this->dataPtr->variantManager->value(fileProp).toString().toStdString());
     imageMessage->set_scale(
@@ -1332,9 +1335,10 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     QtProperty *fileProp = this->ChildItem(_item, "filename");
 
     double px, py, pz;
-    msgs::HeightmapGeom *heightmapMessage = (msgs::HeightmapGeom*)(message);
+    gazebo::msgs::HeightmapGeom *heightmapMessage =
+      (gazebo::msgs::HeightmapGeom*)(message);
 
-    msgs::Set(heightmapMessage->mutable_image(),
+    gazebo::msgs::Set(heightmapMessage->mutable_image(),
         common::Image(this->dataPtr->variantManager->value(
             fileProp).toString().toStdString()));
 
@@ -1366,7 +1370,7 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     QtProperty *fileProp = this->ChildItem(_item, "filename");
 
     double px, py, pz;
-    msgs::MeshGeom *meshMessage = (msgs::MeshGeom*)(message);
+    gazebo::msgs::MeshGeom *meshMessage = (gazebo::msgs::MeshGeom*)(message);
     meshMessage->set_filename(this->dataPtr->variantManager->value(
           fileProp).toString().toStdString());
 
@@ -1459,16 +1463,18 @@ void ModelListWidget::FillMsg(QtProperty *_item,
     QtProperty *nameItem = this->ChildItem(_item, "name");
     QtVariantProperty *idItem =
         dynamic_cast<QtVariantProperty *>(this->ChildItem(_item, "id"));
-    ((msgs::Link*)(_message))->set_name(nameItem->valueText().toStdString());
-    ((msgs::Link*)(_message))->set_id(idItem->value().toInt());
+    ((gazebo::msgs::Link*)(_message))->set_name(
+    nameItem->valueText().toStdString());
+    ((gazebo::msgs::Link*)(_message))->set_id(idItem->value().toInt());
   }
   else if (_item->propertyName().toStdString() == "collision")
   {
     QtProperty *nameItem = this->ChildItem(_item, "name");
     QtVariantProperty *idItem =
         dynamic_cast<QtVariantProperty *>(this->ChildItem(_item, "id"));
-    ((msgs::Collision*)_message)->set_name(nameItem->valueText().toStdString());
-    ((msgs::Collision*)(_message))->set_id(idItem->value().toInt());
+    ((gazebo::msgs::Collision*)_message)->set_name(
+      nameItem->valueText().toStdString());
+    ((gazebo::msgs::Collision*)(_message))->set_id(idItem->value().toInt());
   }
 
   if (_item->propertyName().toStdString() == "geometry" &&
@@ -1724,8 +1730,9 @@ QtProperty *ModelListWidget::ChildItem(QtProperty *_item,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::SphericalCoordinates &_msg,
-                                       QtProperty * /*_parent*/)
+void ModelListWidget::FillPropertyTree(
+    const gazebo::msgs::SphericalCoordinates &_msg,
+    QtProperty * /*_parent*/)
 {
   QtVariantProperty *item = nullptr;
 
@@ -1739,7 +1746,7 @@ void ModelListWidget::FillPropertyTree(const msgs::SphericalCoordinates &_msg,
   if (!surfaceModelEnum)
   {
     gzerr << "Unable to get SurfaceModel enum descriptor from "
-      << "SphericalCoordinates message. msgs::SphericalCoordinates "
+      << "SphericalCoordinates message. gazebo::msgs::SphericalCoordinates "
       << "has probably changed\n";
     types << "invalid";
   }
@@ -1780,7 +1787,7 @@ void ModelListWidget::FillPropertyTree(const msgs::SphericalCoordinates &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
+void ModelListWidget::FillPropertyTree(const gazebo::msgs::Joint &_msg,
                                        QtProperty * /*_parent*/)
 {
   QtProperty *topItem = nullptr;
@@ -1798,7 +1805,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
   {
     item = this->dataPtr->variantManager->addProperty(QVariant::String,
                                              tr("type"));
-    std::string jointType = msgs::ConvertJointType(_msg.type());
+    std::string jointType = gazebo::msgs::ConvertJointType(_msg.type());
     item->setValue(jointType.c_str());
     this->dataPtr->propTreeBrowser->addProperty(item);
     item->setEnabled(false);
@@ -1846,7 +1853,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
   // Add joint axes if present
   for (int i = 0; i < 2; ++i)
   {
-    const msgs::Axis *axis = nullptr;
+    const gazebo::msgs::Axis *axis = nullptr;
     std::string axisName;
 
     if (i == 0 && _msg.has_axis1())
@@ -1922,7 +1929,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
   // gearbox
   if (_msg.has_gearbox())
   {
-    msgs::Joint::Gearbox gearboxMsg = _msg.gearbox();
+    gazebo::msgs::Joint::Gearbox gearboxMsg = _msg.gearbox();
     if (gearboxMsg.has_gearbox_reference_body())
     {
       item = this->dataPtr->variantManager->addProperty(QVariant::String,
@@ -1944,7 +1951,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
   // screw
   if (_msg.has_screw())
   {
-    msgs::Joint::Screw screwMsg = _msg.screw();
+    gazebo::msgs::Joint::Screw screwMsg = _msg.screw();
     if (screwMsg.has_thread_pitch())
     {
       item = this->dataPtr->variantManager->addProperty(QVariant::Double,
@@ -1957,7 +1964,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
+void ModelListWidget::FillPropertyTree(const gazebo::msgs::Link &_msg,
                                        QtProperty *_parent)
 {
   QtProperty *topItem = nullptr;
@@ -2123,7 +2130,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     this->FillVector3dProperty(_msg.wind(), windItem);
   else
   {
-    msgs::Vector3d xyz;
+    gazebo::msgs::Vector3d xyz;
     xyz.set_x(0);
     xyz.set_y(0);
     xyz.set_z(0);
@@ -2195,7 +2202,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Collision &_msg,
+void ModelListWidget::FillPropertyTree(const gazebo::msgs::Collision &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -2254,7 +2261,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Collision &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
+void ModelListWidget::FillPropertyTree(const gazebo::msgs::Surface &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -2398,7 +2405,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
+void ModelListWidget::FillPropertyTree(const gazebo::msgs::Geometry &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -2418,7 +2425,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
   item->setAttribute("enumNames", types);
   _parent->addSubProperty(item);
 
-  if (_msg.type() == msgs::Geometry::BOX)
+  if (_msg.type() == gazebo::msgs::Geometry::BOX)
   {
     item->setValue(0);
     QtProperty *sizeItem = this->dataPtr->variantManager->addProperty(
@@ -2427,7 +2434,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     _parent->addSubProperty(sizeItem);
     this->FillVector3dProperty(_msg.box().size(), sizeItem);
   }
-  else if (_msg.type() == msgs::Geometry::SPHERE)
+  else if (_msg.type() == gazebo::msgs::Geometry::SPHERE)
   {
     item->setValue(1);
 
@@ -2436,7 +2443,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     item->setValue(_msg.sphere().radius());
     _parent->addSubProperty(item);
   }
-  else if (_msg.type() == msgs::Geometry::CYLINDER)
+  else if (_msg.type() == gazebo::msgs::Geometry::CYLINDER)
   {
     item->setValue(2);
     item = this->dataPtr->variantManager->addProperty(QVariant::Double,
@@ -2449,7 +2456,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     item->setValue(_msg.cylinder().length());
     _parent->addSubProperty(item);
   }
-  else if (_msg.type() == msgs::Geometry::PLANE)
+  else if (_msg.type() == gazebo::msgs::Geometry::PLANE)
   {
     item->setValue(3);
     QtProperty *normalItem = this->dataPtr->variantManager->addProperty(
@@ -2458,7 +2465,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     _parent->addSubProperty(normalItem);
     this->FillVector3dProperty(_msg.plane().normal(), normalItem);
   }
-  else if (_msg.type() == msgs::Geometry::MESH)
+  else if (_msg.type() == gazebo::msgs::Geometry::MESH)
   {
     item->setValue(4);
 
@@ -2473,7 +2480,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     _parent->addSubProperty(sizeItem);
     this->FillVector3dProperty(_msg.mesh().scale(), sizeItem);
   }
-  else if (_msg.type() == msgs::Geometry::IMAGE)
+  else if (_msg.type() == gazebo::msgs::Geometry::IMAGE)
   {
     item->setValue(5);
 
@@ -2502,7 +2509,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     item->setValue(_msg.image().granularity());
     _parent->addSubProperty(item);
   }
-  else if (_msg.type() == msgs::Geometry::HEIGHTMAP)
+  else if (_msg.type() == gazebo::msgs::Geometry::HEIGHTMAP)
   {
     item->setValue(6);
 
@@ -2526,7 +2533,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
+void ModelListWidget::FillPropertyTree(const gazebo::msgs::Visual &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -2589,7 +2596,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
+void ModelListWidget::FillPropertyTree(const gazebo::msgs::Model &_msg,
                                        QtProperty * /*_parent*/)
 {
   QtProperty *topItem = nullptr;
@@ -2678,7 +2685,7 @@ void ModelListWidget::FillPropertyTree(const ignition::msgs::Plugin &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
+void ModelListWidget::FillVector3dProperty(const gazebo::msgs::Vector3d &_msg,
                                            QtProperty *_parent)
 {
   if (!_parent)
@@ -2690,7 +2697,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
 
   QtVariantProperty *item;
   ignition::math::Vector3d value;
-  value = msgs::ConvertIgn(_msg);
+  value = gazebo::msgs::ConvertIgn(_msg);
   value.Round(6);
 
   // Add X value
@@ -2731,7 +2738,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
+void ModelListWidget::FillPoseProperty(const gazebo::msgs::Pose &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -2743,7 +2750,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
 
   QtVariantProperty *item;
   ignition::math::Pose3d value;
-  value = msgs::ConvertIgn(_msg);
+  value = gazebo::msgs::ConvertIgn(_msg);
   value.Round(6);
 
   ignition::math::Vector3d rpy = value.Rot().Euler();
@@ -2846,7 +2853,7 @@ void ModelListWidget::OnCreateScene(const std::string &_name)
   this->dataPtr->propTreeBrowser->clear();
   this->InitTransport(_name);
 
-  // this->requestMsg = msgs::CreateRequest("scene_info");
+  // this->requestMsg = gazebo::msgs::CreateRequest("scene_info");
   // this->requestPub->Publish(*this->requestMsg);
 }
 
@@ -2874,24 +2881,24 @@ void ModelListWidget::InitTransport(const std::string &_name)
   else
     this->dataPtr->node->Init(_name);
 
-  this->dataPtr->modelPub = this->dataPtr->node->Advertise<msgs::Model>(
-      "~/model/modify");
-  this->dataPtr->scenePub = this->dataPtr->node->Advertise<msgs::Scene>(
-      "~/scene");
-  this->dataPtr->physicsPub = this->dataPtr->node->Advertise<msgs::Physics>(
-      "~/physics");
+  this->dataPtr->modelPub =
+    this->dataPtr->node->Advertise<gazebo::msgs::Model>("~/model/modify");
+  this->dataPtr->scenePub =
+    this->dataPtr->node->Advertise<gazebo::msgs::Scene>("~/scene");
+  this->dataPtr->physicsPub =
+    this->dataPtr->node->Advertise<gazebo::msgs::Physics>("~/physics");
 
   this->dataPtr->atmospherePub =
-    this->dataPtr->node->Advertise<msgs::Atmosphere>("~/atmosphere");
+    this->dataPtr->node->Advertise<gazebo::msgs::Atmosphere>("~/atmosphere");
 
-  this->dataPtr->windPub = this->dataPtr->node->Advertise<msgs::Wind>(
+  this->dataPtr->windPub = this->dataPtr->node->Advertise<gazebo::msgs::Wind>(
       "~/wind");
 
-  this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
+  this->dataPtr->lightPub = this->dataPtr->node->Advertise<gazebo::msgs::Light>(
       "~/light/modify");
 
-  this->dataPtr->requestPub = this->dataPtr->node->Advertise<msgs::Request>(
-      "~/request");
+  this->dataPtr->requestPub =
+    this->dataPtr->node->Advertise<gazebo::msgs::Request>("~/request");
   this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
                                             &ModelListWidget::OnResponse, this);
 
@@ -2979,7 +2986,7 @@ void ModelListWidget::ResetScene()
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
+void ModelListWidget::FillPropertyTree(const gazebo::msgs::Scene &_msg,
                                        QtProperty * /*_parent*/)
 {
   // QtProperty *topItem = nullptr;
@@ -3043,7 +3050,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
+void ModelListWidget::FillPropertyTree(const gazebo::msgs::Physics &_msg,
                                        QtProperty * /*_parent*/)
 {
   QtVariantProperty *item = nullptr;
@@ -3062,7 +3069,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     if (!engineTypeEnum)
     {
       gzerr << "Unable to get Type enum descriptor from "
-        << "Physics message. msgs::Physics "
+        << "Physics message. gazebo::msgs::Physics "
         << "has probably changed\n";
       types << "invalid";
     }
@@ -3108,7 +3115,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     this->FillVector3dProperty(_msg.gravity(), gravityItem);
   else
   {
-    msgs::Vector3d xyz;
+    gazebo::msgs::Vector3d xyz;
     xyz.set_x(0);
     xyz.set_y(0);
     xyz.set_z(-9.8);
@@ -3122,7 +3129,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     this->FillVector3dProperty(_msg.magnetic_field(), magneticFieldItem);
   else
   {
-    msgs::Vector3d xyz;
+    gazebo::msgs::Vector3d xyz;
     xyz.set_x(0.0);
     xyz.set_y(0.0);
     xyz.set_z(0.0);
@@ -3191,7 +3198,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Atmosphere &_msg,
+void ModelListWidget::FillPropertyTree(const gazebo::msgs::Atmosphere &_msg,
                                        QtProperty */*_parent*/)
 {
   QtVariantProperty *item = nullptr;
@@ -3235,7 +3242,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Atmosphere &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Wind &_msg,
+void ModelListWidget::FillPropertyTree(const gazebo::msgs::Wind &_msg,
                                        QtProperty * /*_parent*/)
 {
   QtVariantProperty *item = nullptr;
@@ -3253,7 +3260,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Wind &_msg,
     this->FillVector3dProperty(_msg.linear_velocity(), linearVelocityItem);
   else
   {
-    msgs::Vector3d xyz;
+    gazebo::msgs::Vector3d xyz;
     xyz.set_x(0.0);
     xyz.set_y(0.0);
     xyz.set_z(0.0);
@@ -3262,7 +3269,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Wind &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
+void ModelListWidget::FillPropertyTree(const gazebo::msgs::Light &_msg,
                                        QtProperty * /*_parent*/)
 {
   QtVariantProperty *item = nullptr;
@@ -3282,7 +3289,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
   if (_msg.has_pose())
     this->FillPoseProperty(_msg.pose(), topItem);
   else
-    this->FillPoseProperty(msgs::Convert(ignition::math::Pose3d()), topItem);
+  {
+    this->FillPoseProperty(
+        gazebo::msgs::Convert(ignition::math::Pose3d()), topItem);
+  }
 
   // Create and set the diffuse color property
   item = this->dataPtr->variantManager->addProperty(QVariant::Color,
@@ -3315,7 +3325,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
     this->FillVector3dProperty(_msg.direction(), directionItem);
   else
   {
-    msgs::Vector3d xyz;
+    gazebo::msgs::Vector3d xyz;
     xyz.set_x(0.0);
     xyz.set_y(0.0);
     xyz.set_z(0.0);
@@ -3470,7 +3480,7 @@ void ModelListWidget::FillUserCamera()
     topItem->addSubProperty(item);
     ignition::math::Pose3d cameraPose = cam->WorldPose();
 
-    this->FillPoseProperty(msgs::Convert(cameraPose), item);
+    this->FillPoseProperty(gazebo::msgs::Convert(cameraPose), item);
     // set expanded to true by default for easier viewing
     this->dataPtr->propTreeBrowser->setExpanded(cameraBrowser, true);
     for (auto browser : cameraBrowser->children())
@@ -3514,7 +3524,7 @@ void ModelListWidget::FillUserCamera()
     item->addSubProperty(item2);
 
     ignition::math::Vector3d trackPos = cam->TrackPosition();
-    this->FillVector3dProperty(msgs::Convert(trackPos), item);
+    this->FillVector3dProperty(gazebo::msgs::Convert(trackPos), item);
 
     double minDist = cam->TrackMinDistance();
     item2 = this->dataPtr->variantManager->addProperty(

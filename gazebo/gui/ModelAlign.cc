@@ -93,13 +93,13 @@ void ModelAlign::Init()
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->userCmdPub =
-      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
+      this->dataPtr->node->Advertise<gazebo::msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->initialized = true;
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::Transform(const ignition::math::Box &_bbox,
+void ModelAlign::Transform(const ignition::math::AxisAlignedBox &_bbox,
     const ignition::math::Pose3d &_worldPose,
     std::vector<ignition::math::Vector3d> &_vertices)
 {
@@ -312,24 +312,24 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   // Register user command on server
   if (_publish)
   {
-    msgs::UserCmd userCmdMsg;
+    gazebo::msgs::UserCmd userCmdMsg;
     userCmdMsg.set_description(
         "Align to [" + this->dataPtr->targetVis->Name() + "]");
-    userCmdMsg.set_type(msgs::UserCmd::MOVING);
+    userCmdMsg.set_type(gazebo::msgs::UserCmd::MOVING);
 
     for (const auto &vis : visualsToPublish)
     {
       // Only publish for models
       if (vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
       {
-        msgs::Model msg;
+        gazebo::msgs::Model msg;
 
         auto id = gui::get_entity_id(vis->Name());
         if (id)
           msg.set_id(id);
 
         msg.set_name(vis->Name());
-        msgs::Set(msg.mutable_pose(), vis->WorldPose());
+        gazebo::msgs::Set(msg.mutable_pose(), vis->WorldPose());
 
         auto modelMsg = userCmdMsg.add_model();
         modelMsg->CopyFrom(msg);

@@ -70,11 +70,12 @@ void BreakableJointPlugin::Load(sensors::SensorPtr _parent,
 }
 
 /////////////////////////////////////////////////
-void BreakableJointPlugin::OnUpdate(msgs::WrenchStamped _msg)
+void BreakableJointPlugin::OnUpdate(gazebo::msgs::WrenchStamped _msg)
 {
   if (this->parentJoint)
   {
-    ignition::math::Vector3d force = msgs::ConvertIgn(_msg.wrench().force());
+    ignition::math::Vector3d force =
+      gazebo::msgs::ConvertIgn(_msg.wrench().force());
     if (force.Length() > this->breakingForce)
     {
       this->worldConnection = event::Events::ConnectWorldUpdateBegin(

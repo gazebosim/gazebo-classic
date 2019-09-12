@@ -95,7 +95,7 @@ void DiagnosticManager::Init(const std::string &_worldName)
   this->dataPtr->node->Init(_worldName);
 
   this->dataPtr->pub =
-    this->dataPtr->node->Advertise<msgs::Diagnostics>("~/diagnostics");
+    this->dataPtr->node->Advertise<gazebo::msgs::Diagnostics>("~/diagnostics");
 
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
       std::bind(&DiagnosticManager::Update, this, std::placeholders::_1));
@@ -120,8 +120,8 @@ void DiagnosticManager::Update(const common::UpdateInfo &_info)
     this->dataPtr->msg.set_real_time_factor(0.0);
   }
 
-  msgs::Set(this->dataPtr->msg.mutable_real_time(), _info.realTime);
-  msgs::Set(this->dataPtr->msg.mutable_sim_time(), _info.simTime);
+  gazebo::msgs::Set(this->dataPtr->msg.mutable_real_time(), _info.realTime);
+  gazebo::msgs::Set(this->dataPtr->msg.mutable_sim_time(), _info.simTime);
 
   if (this->dataPtr->pub && this->dataPtr->pub->HasConnections())
     this->dataPtr->pub->Publish(this->dataPtr->msg);
@@ -133,10 +133,10 @@ void DiagnosticManager::Update(const common::UpdateInfo &_info)
 void DiagnosticManager::AddTime(const std::string &_name,
     const common::Time &_wallTime, const common::Time &_elapsedTime)
 {
-  msgs::Diagnostics::DiagTime *time = this->dataPtr->msg.add_time();
+  gazebo::msgs::Diagnostics::DiagTime *time = this->dataPtr->msg.add_time();
   time->set_name(_name);
-  msgs::Set(time->mutable_elapsed(), _elapsedTime);
-  msgs::Set(time->mutable_wall(), _wallTime);
+  gazebo::msgs::Set(time->mutable_elapsed(), _elapsedTime);
+  gazebo::msgs::Set(time->mutable_wall(), _wallTime);
 }
 
 //////////////////////////////////////////////////

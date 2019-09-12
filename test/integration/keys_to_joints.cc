@@ -52,7 +52,8 @@ void KeysToJoints::Position(const std::string &_physicsEngine)
   ASSERT_NE(model, nullptr);
 
   // Setup keyboard publisher
-  auto keyboardPub = this->node->Advertise<msgs::Any>("~/keyboard/keypress");
+  auto keyboardPub = this->node->Advertise<gazebo::msgs::Any>(
+      "~/keyboard/keypress");
 
   // Position teleop
   auto joint = model->GetJoint("joint");
@@ -61,8 +62,8 @@ void KeysToJoints::Position(const std::string &_physicsEngine)
   // Trigger key to increase position
   double target = joint->Position(0) + 0.05;
 
-  msgs::Any msg;
-  msg.set_type(msgs::Any_ValueType_INT32);
+  gazebo::msgs::Any msg;
+  msg.set_type(gazebo::msgs::Any_ValueType_INT32);
   msg.set_int_value(106);
   keyboardPub->Publish(msg);
 
@@ -106,7 +107,8 @@ void KeysToJoints::Velocity(const std::string &_physicsEngine)
   ASSERT_NE(model, nullptr);
 
   // Setup keyboard publisher
-  auto keyboardPub = this->node->Advertise<msgs::Any>("~/keyboard/keypress");
+  auto keyboardPub = this->node->Advertise<gazebo::msgs::Any>(
+      "~/keyboard/keypress");
 
   // Velocity teleop
   auto joint = model->GetJoint("joint");
@@ -115,8 +117,8 @@ void KeysToJoints::Velocity(const std::string &_physicsEngine)
   // Trigger key to have a positive velocity
   double target = 0.29;
 
-  msgs::Any msg;
-  msg.set_type(msgs::Any_ValueType_INT32);
+  gazebo::msgs::Any msg;
+  msg.set_type(gazebo::msgs::Any_ValueType_INT32);
   msg.set_int_value(107);
   keyboardPub->Publish(msg);
 
@@ -173,7 +175,8 @@ void KeysToJoints::Force(const std::string &_physicsEngine)
   ASSERT_NE(model, nullptr);
 
   // Setup keyboard publisher
-  auto keyboardPub = this->node->Advertise<msgs::Any>("~/keyboard/keypress");
+  auto keyboardPub = this->node->Advertise<gazebo::msgs::Any>(
+      "~/keyboard/keypress");
 
   // Force teleop
   auto joint = model->GetJoint("joint");
@@ -182,8 +185,8 @@ void KeysToJoints::Force(const std::string &_physicsEngine)
   // Trigger key to push in positive direction
   double target = joint->Position(0) + 0.1;
 
-  msgs::Any msg;
-  msg.set_type(msgs::Any_ValueType_INT32);
+  gazebo::msgs::Any msg;
+  msg.set_type(gazebo::msgs::Any_ValueType_INT32);
   msg.set_int_value(108);
   keyboardPub->Publish(msg);
 
@@ -257,7 +260,8 @@ void KeysToJoints::MultipleJoints(const std::string &_physicsEngine)
   ASSERT_NE(model, nullptr);
 
   // Setup keyboard publisher
-  auto keyboardPub = this->node->Advertise<msgs::Any>("~/keyboard/keypress");
+  auto keyboardPub = this->node->Advertise<gazebo::msgs::Any>(
+      "~/keyboard/keypress");
 
   // MultipleJoints teleop
   auto joint2 = model->GetJoint("joint_2");
@@ -270,8 +274,8 @@ void KeysToJoints::MultipleJoints(const std::string &_physicsEngine)
   double target2 = joint2->Position(0) + 0.05;
   double target3 = joint3->Position(0) - 0.05;
 
-  msgs::Any msg;
-  msg.set_type(msgs::Any_ValueType_INT32);
+  gazebo::msgs::Any msg;
+  msg.set_type(gazebo::msgs::Any_ValueType_INT32);
   msg.set_int_value(59);
   keyboardPub->Publish(msg);
 

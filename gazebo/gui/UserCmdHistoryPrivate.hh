@@ -40,7 +40,7 @@ namespace gazebo
       public: transport::SubscriberPtr userCmdStatsSub;
 
       /// \brief Copy of last received user command stats message.
-      public: msgs::UserCmdStats msg;
+      public: gazebo::msgs::UserCmdStats msg;
 
       /// \brief Group of actions in undo history menu.
       public: QActionGroup *undoActions;

@@ -95,7 +95,8 @@ std::string CameraSensor::TopicIgn() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->Topic(), 50);
+  this->imagePub = this->node->Advertise<gazebo::msgs::ImageStamped>(
+      this->Topic(), 50);
 
   ignition::transport::AdvertiseMessageOptions opts;
   opts.SetMsgsPerSec(50);
@@ -222,8 +223,8 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
     auto simTime = this->scene->SimTime();
     if (this->imagePub && this->imagePub->HasConnections())
     {
-      msgs::ImageStamped msg;
-      msgs::Set(msg.mutable_time(), simTime);
+      gazebo::msgs::ImageStamped msg;
+      gazebo::msgs::Set(msg.mutable_time(), simTime);
       msg.mutable_image()->set_width(this->camera->ImageWidth());
       msg.mutable_image()->set_height(this->camera->ImageHeight());
       msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(

@@ -395,9 +395,9 @@ void LinkData::UpdateInspectorScale()
 
   if (m.IsValid())
   {
-    newIxx = m.IXX();
-    newIyy = m.IYY();
-    newIzz = m.IZZ();
+    newIxx = m.Ixx();
+    newIyy = m.Iyy();
+    newIzz = m.Izz();
   }
 
   // update inspector inertia
@@ -474,13 +474,13 @@ void LinkData::Load(sdf::ElementPtr _sdf)
     elem = elem->GetNextElement("collision");
   }
 
-  // TODO: Use msgs::LinkFromSDF once that's available (issue #1903)
-  msgs::LinkPtr linkMsgPtr(new msgs::Link);
+  // TODO: Use gazebo::msgs::LinkFromSDF once that's available (issue #1903)
+  gazebo::msgs::LinkPtr linkMsgPtr(new gazebo::msgs::Link);
   if (this->linkSDF->HasElement("inertial"))
   {
     sdf::ElementPtr inertialElem = this->linkSDF->GetElement("inertial");
 
-    msgs::Inertial *inertialMsg = linkMsgPtr->mutable_inertial();
+    gazebo::msgs::Inertial *inertialMsg = linkMsgPtr->mutable_inertial();
     if (inertialElem->HasElement("mass"))
     {
       this->mass = inertialElem->Get<double>("mass");
@@ -491,7 +491,7 @@ void LinkData::Load(sdf::ElementPtr _sdf)
     {
       ignition::math::Pose3d inertialPose =
         inertialElem->Get<ignition::math::Pose3d>("pose");
-      msgs::Set(inertialMsg->mutable_pose(), inertialPose);
+      gazebo::msgs::Set(inertialMsg->mutable_pose(), inertialPose);
     }
 
     if (inertialElem->HasElement("inertia"))
@@ -653,19 +653,19 @@ void LinkData::UpdateConfig()
     visualConfig->SetGeometry(leafName, it.first->GetGeometrySize(),
         it.first->GetMeshName());
 
-    msgs::Visual *updateMsg = visualConfig->GetData(leafName);
-    msgs::Visual visualMsg = it.second;
+    gazebo::msgs::Visual *updateMsg = visualConfig->GetData(leafName);
+    gazebo::msgs::Visual visualMsg = it.second;
     updateMsg->clear_scale();
-    msgs::Material *matMsg = updateMsg->mutable_material();
+    gazebo::msgs::Material *matMsg = updateMsg->mutable_material();
     // clear empty colors so they are not used by visual updates
     ignition::math::Color emptyColor(0, 0, 0, 0);
-    if (msgs::Convert(matMsg->ambient()) == emptyColor)
+    if (gazebo::msgs::Convert(matMsg->ambient()) == emptyColor)
       matMsg->clear_ambient();
-    if (msgs::Convert(matMsg->diffuse()) == emptyColor)
+    if (gazebo::msgs::Convert(matMsg->diffuse()) == emptyColor)
       matMsg->clear_diffuse();
-    if (msgs::Convert(matMsg->specular()) == emptyColor)
+    if (gazebo::msgs::Convert(matMsg->specular()) == emptyColor)
       matMsg->clear_specular();
-    if (msgs::Convert(matMsg->emissive()) == emptyColor)
+    if (gazebo::msgs::Convert(matMsg->emissive()) == emptyColor)
       matMsg->clear_emissive();
 
     if (matMsg->has_diffuse())
@@ -685,8 +685,8 @@ void LinkData::UpdateConfig()
     collisionConfig->SetGeometry(leafName, colIt.first->GetGeometrySize(),
         colIt.first->GetMeshName());
 
-    msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
-    msgs::Collision collisionMsg = colIt.second;
+    gazebo::msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
+    gazebo::msgs::Collision collisionMsg = colIt.second;
     collisionMsg.CopyFrom(*updateMsg);
     colIt.second = collisionMsg;
   }
@@ -696,7 +696,8 @@ void LinkData::UpdateConfig()
 void LinkData::AddVisual(rendering::VisualPtr _visual)
 {
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
-  msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
+  gazebo::msgs::Visual visualMsg = gazebo::msgs::VisualFromSDF(
+      _visual->GetSDF());
 
   _visual->SetVisible(this->showVisuals);
 
@@ -715,7 +716,7 @@ void LinkData::AddVisual(rendering::VisualPtr _visual)
 
 /////////////////////////////////////////////////
 void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
-    const msgs::Collision *_msg)
+    const gazebo::msgs::Collision *_msg)
 {
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
 
@@ -728,7 +729,7 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
   if (idx != std::string::npos)
     leafName = visName.substr(idx+2);
 
-  msgs::Collision collisionMsg;
+  gazebo::msgs::Collision collisionMsg;
   // Use input message
   if (_msg)
   {
@@ -737,11 +738,12 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
   // Get data from input visual
   else
   {
-    msgs::Visual visualMsg = msgs::VisualFromSDF(_collisionVis->GetSDF());
+    gazebo::msgs::Visual visualMsg = gazebo::msgs::VisualFromSDF(
+        _collisionVis->GetSDF());
     collisionMsg.set_name(leafName);
-    msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
+    gazebo::msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
     geomMsg->CopyFrom(visualMsg.geometry());
-    msgs::Pose *poseMsg = collisionMsg.mutable_pose();
+    gazebo::msgs::Pose *poseMsg = collisionMsg.mutable_pose();
     poseMsg->CopyFrom(visualMsg.pose());
   }
 
@@ -825,35 +827,35 @@ LinkData *LinkData::Clone(const std::string &_newName)
 }
 
 /////////////////////////////////////////////////
-double LinkData::ComputeVolume(const msgs::Collision &_collision)
+double LinkData::ComputeVolume(const gazebo::msgs::Collision &_collision)
 {
   double volume = -1;
 
   if (_collision.has_geometry())
   {
-    const msgs::Geometry &geometry = _collision.geometry();
+    const gazebo::msgs::Geometry &geometry = _collision.geometry();
     if (geometry.has_type())
     {
       switch (geometry.type())
       {
-        case msgs::Geometry_Type_BOX:
-        case msgs::Geometry_Type_MESH:
-        case msgs::Geometry_Type_POLYLINE:
+        case gazebo::msgs::Geometry_Type_BOX:
+        case gazebo::msgs::Geometry_Type_MESH:
+        case gazebo::msgs::Geometry_Type_POLYLINE:
           if (geometry.has_box())
           {
-            const msgs::BoxGeom &box = geometry.box();
+            const gazebo::msgs::BoxGeom &box = geometry.box();
             if (box.has_size())
             {
-              const msgs::Vector3d &size = box.size();
+              const gazebo::msgs::Vector3d &size = box.size();
               volume = IGN_BOX_VOLUME(size.x(), size.y(), size.z());
             }
           }
           break;
 
-        case msgs::Geometry_Type_CYLINDER:
+        case gazebo::msgs::Geometry_Type_CYLINDER:
           if (geometry.has_cylinder())
           {
-            const msgs::CylinderGeom &cylinder = geometry.cylinder();
+            const gazebo::msgs::CylinderGeom &cylinder = geometry.cylinder();
             if (cylinder.has_radius() && cylinder.has_length())
             {
               // Cylinder volume: PI * r^2 * height
@@ -863,10 +865,10 @@ double LinkData::ComputeVolume(const msgs::Collision &_collision)
           }
           break;
 
-        case msgs::Geometry_Type_SPHERE:
+        case gazebo::msgs::Geometry_Type_SPHERE:
           if (geometry.has_sphere())
           {
-            const msgs::SphereGeom &sphere = geometry.sphere();
+            const gazebo::msgs::SphereGeom &sphere = geometry.sphere();
             if (sphere.has_radius())
             {
               // Sphere volume: 4/3 * PI * r^3
@@ -885,24 +887,24 @@ double LinkData::ComputeVolume(const msgs::Collision &_collision)
 
 /////////////////////////////////////////////////
 ignition::math::Vector3d LinkData::ComputeMomentOfInertia(
-    const msgs::Collision &_collision, const double _mass)
+    const gazebo::msgs::Collision &_collision, const double _mass)
 {
   ignition::math::Vector3d result;
   result.Set(0, 0, 0);
 
   if (_collision.has_geometry())
   {
-    const msgs::Geometry &geometry = _collision.geometry();
+    const gazebo::msgs::Geometry &geometry = _collision.geometry();
     if (geometry.has_type())
     {
       switch (geometry.type())
       {
-        case msgs::Geometry_Type_BOX:
-        case msgs::Geometry_Type_MESH:
-        case msgs::Geometry_Type_POLYLINE:
+        case gazebo::msgs::Geometry_Type_BOX:
+        case gazebo::msgs::Geometry_Type_MESH:
+        case gazebo::msgs::Geometry_Type_POLYLINE:
           if (geometry.has_box())
           {
-            const msgs::BoxGeom &box = geometry.box();
+            const gazebo::msgs::BoxGeom &box = geometry.box();
             if (box.has_size())
             {
               // Box:
@@ -925,10 +927,10 @@ ignition::math::Vector3d LinkData::ComputeMomentOfInertia(
           }
           break;
 
-        case msgs::Geometry_Type_CYLINDER:
+        case gazebo::msgs::Geometry_Type_CYLINDER:
           if (geometry.has_cylinder())
           {
-            const msgs::CylinderGeom &cylinder = geometry.cylinder();
+            const gazebo::msgs::CylinderGeom &cylinder = geometry.cylinder();
             if (cylinder.has_radius() && cylinder.has_length())
             {
               // Cylinder:
@@ -946,10 +948,10 @@ ignition::math::Vector3d LinkData::ComputeMomentOfInertia(
           }
           break;
 
-        case msgs::Geometry_Type_SPHERE:
+        case gazebo::msgs::Geometry_Type_SPHERE:
           if (geometry.has_sphere())
           {
-            const msgs::SphereGeom &sphere = geometry.sphere();
+            const gazebo::msgs::SphereGeom &sphere = geometry.sphere();
             if (sphere.has_radius())
             {
               // Sphere: I = 2/5 * M * R^2
@@ -1073,13 +1075,13 @@ bool LinkData::Apply()
 
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
-  msgs::Link *linkMsg = linkConfig->GetData();
+  gazebo::msgs::Link *linkMsg = linkConfig->GetData();
 
   // update link sdf
-  this->linkSDF = msgs::LinkToSDF(*linkMsg, this->linkSDF);
+  this->linkSDF = gazebo::msgs::LinkToSDF(*linkMsg, this->linkSDF);
 
   // update internal variables
-  msgs::Inertial *inertialMsg = linkMsg->mutable_inertial();
+  gazebo::msgs::Inertial *inertialMsg = linkMsg->mutable_inertial();
   this->mass = inertialMsg->mass();
   this->inertiaIxx = inertialMsg->ixx();
   this->inertiaIyy = inertialMsg->iyy();
@@ -1088,8 +1090,8 @@ bool LinkData::Apply()
   // update link visual pose
   this->linkVisual->SetPose(this->Pose());
 
-  std::vector<msgs::Visual *> visualUpdateMsgsTemp;
-  std::vector<msgs::Collision *> collisionUpdateMsgsTemp;
+  std::vector<gazebo::msgs::Visual *> visualUpdateMsgsTemp;
+  std::vector<gazebo::msgs::Collision *> collisionUpdateMsgsTemp;
 
   // update visuals
   if (!this->visuals.empty())
@@ -1102,13 +1104,13 @@ bool LinkData::Apply()
       size_t idx = name.rfind("::");
       if (idx != std::string::npos)
         leafName = name.substr(idx+2);
-      msgs::Visual *updateMsg = visualConfig->GetData(leafName);
+      gazebo::msgs::Visual *updateMsg = visualConfig->GetData(leafName);
       if (updateMsg)
       {
-        msgs::Visual visualMsg = it.second;
+        gazebo::msgs::Visual visualMsg = it.second;
 
         // check if the geometry is valid
-        msgs::Geometry *geomMsg = updateMsg->mutable_geometry();
+        gazebo::msgs::Geometry *geomMsg = updateMsg->mutable_geometry();
 
         // warnings when changing from/to polyline
         for (auto &vis : this->visuals)
@@ -1120,7 +1122,7 @@ bool LinkData::Apply()
           {
             // Changing from polyline, give option to cancel
             if (vis.second.mutable_geometry()->type() ==
-                msgs::Geometry::POLYLINE)
+                gazebo::msgs::Geometry::POLYLINE)
             {
               std::string msg =
                   "Once you change the geometry, you can't go "
@@ -1141,7 +1143,7 @@ bool LinkData::Apply()
                 return false;
             }
             // Changing to polyline: not allowed
-            else if (geomMsg->type() == msgs::Geometry::POLYLINE)
+            else if (geomMsg->type() == gazebo::msgs::Geometry::POLYLINE)
             {
               std::string msg =
                   "It's not possible to change into polyline.\n"
@@ -1156,9 +1158,9 @@ bool LinkData::Apply()
           }
         }
 
-        if (geomMsg->type() == msgs::Geometry::MESH)
+        if (geomMsg->type() == gazebo::msgs::Geometry::MESH)
         {
-          msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
+          gazebo::msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
           QFileInfo info(QString::fromStdString(meshGeom->filename()));
 
           std::string suffix;
@@ -1180,8 +1182,8 @@ bool LinkData::Apply()
 
         // update the visualMsg that will be used to generate the sdf.
         updateMsg->clear_scale();
-        msgs::Material *matMsg = updateMsg->mutable_material();
-        msgs::Material::Script *scriptMsg = matMsg->mutable_script();
+        gazebo::msgs::Material *matMsg = updateMsg->mutable_material();
+        gazebo::msgs::Material::Script *scriptMsg = matMsg->mutable_script();
 
         ignition::math::Color matAmbient;
         ignition::math::Color matDiffuse;
@@ -1191,10 +1193,10 @@ bool LinkData::Apply()
             matDiffuse, matSpecular, matEmissive);
 
         ignition::math::Color emptyColor(0, 0, 0, 0);
-        auto ambient = msgs::Convert(matMsg->ambient());
-        auto diffuse = msgs::Convert(matMsg->diffuse());
-        auto specular = msgs::Convert(matMsg->specular());
-        auto emissive = msgs::Convert(matMsg->emissive());
+        auto ambient = gazebo::msgs::Convert(matMsg->ambient());
+        auto diffuse = gazebo::msgs::Convert(matMsg->diffuse());
+        auto specular = gazebo::msgs::Convert(matMsg->specular());
+        auto emissive = gazebo::msgs::Convert(matMsg->emissive());
 
         if (ambient == emptyColor)
         {
@@ -1240,13 +1242,13 @@ bool LinkData::Apply()
       size_t idx = name.rfind("::");
       if (idx != std::string::npos)
         leafName = name.substr(idx+2);
-      msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
+      gazebo::msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
       if (updateMsg)
       {
-        msgs::Collision collisionMsg = it.second;
+        gazebo::msgs::Collision collisionMsg = it.second;
 
         // check if the geometry is valid
-        msgs::Geometry *geomMsg = updateMsg->mutable_geometry();
+        gazebo::msgs::Geometry *geomMsg = updateMsg->mutable_geometry();
 
         // warnings when changing from/to polyline
         for (auto &col : this->collisions)
@@ -1258,7 +1260,7 @@ bool LinkData::Apply()
           {
             // Changing from polyline, give option to cancel
             if (col.second.mutable_geometry()->type() ==
-                msgs::Geometry::POLYLINE)
+                gazebo::msgs::Geometry::POLYLINE)
             {
               std::string msg =
                   "Once you change the geometry, you can't go "
@@ -1279,7 +1281,7 @@ bool LinkData::Apply()
                 return false;
             }
             // Changing to polyline: not allowed
-            else if (geomMsg->type() == msgs::Geometry::POLYLINE)
+            else if (geomMsg->type() == gazebo::msgs::Geometry::POLYLINE)
             {
               std::string msg =
                   "It's not possible to change into polyline.\n"
@@ -1294,9 +1296,9 @@ bool LinkData::Apply()
           }
         }
 
-        if (geomMsg->type() == msgs::Geometry::MESH)
+        if (geomMsg->type() == gazebo::msgs::Geometry::MESH)
         {
-          msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
+          gazebo::msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
           QFileInfo info(QString::fromStdString(meshGeom->filename()));
 
           std::string suffix;
@@ -1344,7 +1346,7 @@ void LinkData::OnAddVisual(const std::string &_name)
   visualName << this->linkVisual->Name() << "::" << _name;
 
   rendering::VisualPtr visVisual;
-  msgs::Visual visualMsg;
+  gazebo::msgs::Visual visualMsg;
 
   // See if this is in the deleted list
   for (auto it = this->deletedVisuals.begin();
@@ -1367,7 +1369,7 @@ void LinkData::OnAddVisual(const std::string &_name)
     auto refVisual = this->visuals.rbegin()->first;
     visVisual = refVisual->Clone(visualName.str(), this->linkVisual);
 
-    visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
+    visualMsg = gazebo::msgs::VisualFromSDF(visVisual->GetSDF());
     visualMsg.set_transparency(this->visuals[refVisual].transparency());
   }
   else if (!visVisual)
@@ -1380,10 +1382,10 @@ void LinkData::OnAddVisual(const std::string &_name)
     sdf::ElementPtr visualElem =  modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     visVisual->Load(visualElem);
-    visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
+    visualMsg = gazebo::msgs::VisualFromSDF(visVisual->GetSDF());
   }
 
-  msgs::VisualPtr visualMsgPtr(new msgs::Visual);
+  gazebo::msgs::VisualPtr visualMsgPtr(new gazebo::msgs::Visual);
   visualMsgPtr->CopyFrom(visualMsg);
   visualConfig->UpdateVisual(_name, visualMsgPtr);
 
@@ -1410,7 +1412,7 @@ void LinkData::OnAddCollision(const std::string &_name,
   collisionName << this->linkVisual->Name() << "::" << _name;
 
   rendering::VisualPtr collisionVis;
-  msgs::Collision collisionMsg;
+  gazebo::msgs::Collision collisionMsg;
 
   // See if this is in the deleted list
   for (auto it = this->deletedCollisions.begin();
@@ -1599,7 +1601,7 @@ void LinkData::OnAddCollision(const std::string &_name,
 
           if (_collisionShape == "box")
           {
-            ignition::math::Box boundingBox(max, min);
+            ignition::math::AxisAlignedBox boundingBox(max, min);
             ignition::math::Vector3d size = boundingBox.Size();
 
             geomElem->GetElement("box")->GetElement("size")->Set(size);
@@ -1614,7 +1616,7 @@ void LinkData::OnAddCollision(const std::string &_name,
           }
           else if (_collisionShape == "cylinder")
           {
-            ignition::math::Box boundingBox(max, min);
+            ignition::math::AxisAlignedBox boundingBox(max, min);
             ignition::math::Vector3d size = boundingBox.Size();
 
             double radius, length;
@@ -1669,13 +1671,14 @@ void LinkData::OnAddCollision(const std::string &_name,
 
     collisionVis->Load(collisionElem);
     collisionVis->SetMaterial("Gazebo/Orange");
-    msgs::Visual visualMsg = msgs::VisualFromSDF(collisionVis->GetSDF());
+    gazebo::msgs::Visual visualMsg =
+      gazebo::msgs::VisualFromSDF(collisionVis->GetSDF());
     collisionMsg.set_name(_name);
-    msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
+    gazebo::msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
     geomMsg->CopyFrom(visualMsg.geometry());
   }
 
-  msgs::CollisionPtr collisionMsgPtr(new msgs::Collision);
+  gazebo::msgs::CollisionPtr collisionMsgPtr(new gazebo::msgs::Collision);
   collisionMsgPtr->CopyFrom(collisionMsg);
   collisionConfig->UpdateCollision(_name, collisionMsgPtr);
 
@@ -1750,7 +1753,7 @@ void LinkData::Update()
   while (!this->visualUpdateMsgs.empty())
   {
     boost::shared_ptr<gazebo::msgs::Visual> updateMsgPtr;
-    updateMsgPtr.reset(new msgs::Visual);
+    updateMsgPtr.reset(new gazebo::msgs::Visual);
     updateMsgPtr->CopyFrom(*this->visualUpdateMsgs.front());
 
     this->visualUpdateMsgs.erase(this->visualUpdateMsgs.begin());
@@ -1774,20 +1777,20 @@ void LinkData::Update()
 
   while (!this->collisionUpdateMsgs.empty())
   {
-    msgs::Collision collisionMsg = *this->collisionUpdateMsgs.front();
+    gazebo::msgs::Collision collisionMsg = *this->collisionUpdateMsgs.front();
     this->collisionUpdateMsgs.erase(this->collisionUpdateMsgs.begin());
     for (auto &it : this->collisions)
     {
       if (it.second.name() == collisionMsg.name())
       {
-        msgs::Visual collisionVisMsg;
-        msgs::Geometry *geomMsg = collisionVisMsg.mutable_geometry();
+        gazebo::msgs::Visual collisionVisMsg;
+        gazebo::msgs::Geometry *geomMsg = collisionVisMsg.mutable_geometry();
         geomMsg->CopyFrom(collisionMsg.geometry());
-        msgs::Pose *poseMsg = collisionVisMsg.mutable_pose();
+        gazebo::msgs::Pose *poseMsg = collisionVisMsg.mutable_pose();
         poseMsg->CopyFrom(collisionMsg.pose());
 
         boost::shared_ptr<gazebo::msgs::Visual> updateMsgPtr;
-        updateMsgPtr.reset(new msgs::Visual);
+        updateMsgPtr.reset(new gazebo::msgs::Visual);
         updateMsgPtr->CopyFrom(collisionVisMsg);
         std::string origGeomType = it.first->GetGeometryType();
         it.first->UpdateFromMsg(updateMsgPtr);
@@ -1831,8 +1834,8 @@ void ModelPluginData::Load(sdf::ElementPtr _pluginElem)
   this->modelPluginSDF = _pluginElem;
 
   // Convert SDF to msg
-  msgs::Plugin pluginMsg = msgs::PluginFromSDF(_pluginElem);
-  msgs::PluginPtr pluginPtr(new msgs::Plugin);
+  gazebo::msgs::Plugin pluginMsg = gazebo::msgs::PluginFromSDF(_pluginElem);
+  gazebo::msgs::PluginPtr pluginPtr(new gazebo::msgs::Plugin);
   pluginPtr->CopyFrom(pluginMsg);
 
   // Update inspector

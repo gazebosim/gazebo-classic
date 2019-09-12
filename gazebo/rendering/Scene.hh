@@ -679,7 +679,7 @@ namespace gazebo
 
       /// \brief Process a model message.
       /// \param[in] _msg The message data.
-      private: bool ProcessModelMsg(const msgs::Model &_msg);
+      private: bool ProcessModelMsg(const gazebo::msgs::Model &_msg);
 
       /// \brief Scene message callback.
       /// \param[in] _msg The message data.

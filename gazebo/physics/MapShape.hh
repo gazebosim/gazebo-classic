@@ -61,14 +61,14 @@ namespace gazebo
       /// \brief Init the map.
       public: virtual void Init();
 
-      /// \brief Fills out a msgs::Geometry message containing
+      /// \brief Fills out a gazebo::msgs::Geometry message containing
       /// information about this map geometry object.
       /// \param[in] _msg Message to fill with this object's data.
-      public: void FillMsg(msgs::Geometry &_msg);
+      public: void FillMsg(gazebo::msgs::Geometry &_msg);
 
       /// \brief \TODO: Implement this function.
       /// \param[in] _msg Message to process, which will alter the map.
-      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+      public: virtual void ProcessMsg(const gazebo::msgs::Geometry &_msg);
 
       /// \brief Returns the image URI for this geometry.
       /// \return The image URI that was used to load the map.

@@ -799,7 +799,7 @@ dart::simulation::WorldPtr DARTPhysics::DARTWorld() const
 //////////////////////////////////////////////////
 void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
 {
-  msgs::Response response;
+  gazebo::msgs::Response response;
   response.set_id(_msg->id());
   response.set_request(_msg->request());
   response.set_response("success");
@@ -807,12 +807,12 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
 
   if (_msg->request() == "physics_info")
   {
-    msgs::Physics physicsMsg;
-    physicsMsg.set_type(msgs::Physics::DART);
+    gazebo::msgs::Physics physicsMsg;
+    physicsMsg.set_type(gazebo::msgs::Physics::DART);
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->world->Gravity()));
+      gazebo::msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-      msgs::Convert(this->world->MagneticField()));
+      gazebo::msgs::Convert(this->world->MagneticField()));
     physicsMsg.set_enable_physics(this->world->PhysicsEnabled());
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
@@ -839,7 +839,7 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
     this->world->SetPhysicsEnabled(_msg->enable_physics());
 
   if (_msg->has_gravity())
-    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
+    this->SetGravity(gazebo::msgs::ConvertIgn(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());

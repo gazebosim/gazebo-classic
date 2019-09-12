@@ -47,7 +47,7 @@ namespace gazebo
 
       /// \brief Load the Visual
       /// \param[in] _msg Message describing the camera sensor.
-      public: void Load(const msgs::LogicalCameraSensor &_msg);
+      public: void Load(const gazebo::msgs::LogicalCameraSensor &_msg);
       using Visual::Load;
 
       // Documentation inherited

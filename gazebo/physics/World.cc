@@ -42,10 +42,8 @@
 #include <ignition/msgs/plugin_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
 
-#ifdef HAVE_IGNITION_FUEL_TOOLS
-  #include <ignition/common/URI.hh>
-  #include "gazebo/common/FuelModelDatabase.hh"
-#endif
+#include <ignition/common/URI.hh>
+#include "gazebo/common/FuelModelDatabase.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -165,9 +163,7 @@ World::World(const std::string &_name)
 
   // Make sure dbs are initialized
   common::ModelDatabase::Instance();
-#ifdef HAVE_IGNITION_FUEL_TOOLS
   common::FuelModelDatabase::Instance();
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -193,7 +189,7 @@ void World::Load(sdf::ElementPtr _sdf)
 #endif
 
   this->dataPtr->sceneMsg.CopyFrom(
-      msgs::SceneFromSDF(this->dataPtr->sdf->GetElement("scene")));
+      gazebo::msgs::SceneFromSDF(this->dataPtr->sdf->GetElement("scene")));
   this->dataPtr->sceneMsg.set_name(this->Name());
 
   // The period at which messages are processed
@@ -206,18 +202,21 @@ void World::Load(sdf::ElementPtr _sdf)
   // Scene, which in turn will be used by rendering sensors.
   // TODO: replace local communication with shared memory for efficiency.
   this->dataPtr->poseLocalPub =
-    this->dataPtr->node->Advertise<msgs::PosesStamped>("~/pose/local/info", 10);
+    this->dataPtr->node->Advertise<gazebo::msgs::PosesStamped>(
+        "~/pose/local/info", 10);
 
   // pose pub for client with a cap on publishing rate to reduce traffic
   // overhead
-  this->dataPtr->posePub = this->dataPtr->node->Advertise<msgs::PosesStamped>(
-    "~/pose/info", 10, 60);
+  this->dataPtr->posePub =
+    this->dataPtr->node->Advertise<gazebo::msgs::PosesStamped>(
+        "~/pose/info", 10, 60);
 
-  this->dataPtr->guiPub = this->dataPtr->node->Advertise<msgs::GUI>("~/gui", 5);
+  this->dataPtr->guiPub = this->dataPtr->node->Advertise<gazebo::msgs::GUI>(
+      "~/gui", 5);
   if (this->dataPtr->sdf->HasElement("gui"))
   {
     this->dataPtr->guiPub->Publish(
-        msgs::GUIFromSDF(this->dataPtr->sdf->GetElement("gui")));
+        gazebo::msgs::GUIFromSDF(this->dataPtr->sdf->GetElement("gui")));
   }
 
   this->dataPtr->factorySub = this->dataPtr->node->Subscribe("~/factory",
@@ -239,20 +238,20 @@ void World::Load(sdf::ElementPtr _sdf)
       this->dataPtr->node->Subscribe("~/light/modify",
       &World::OnLightModifyMsg, this);
 
-  this->dataPtr->modelSub = this->dataPtr->node->Subscribe<msgs::Model>(
+  this->dataPtr->modelSub = this->dataPtr->node->Subscribe<gazebo::msgs::Model>(
       "~/model/modify", &World::OnModelMsg, this);
 
-  this->dataPtr->responsePub = this->dataPtr->node->Advertise<msgs::Response>(
-      "~/response");
+  this->dataPtr->responsePub = this->dataPtr->node->Advertise<
+    gazebo::msgs::Response>("~/response");
   this->dataPtr->statPub =
-    this->dataPtr->node->Advertise<msgs::WorldStatistics>(
+    this->dataPtr->node->Advertise<gazebo::msgs::WorldStatistics>(
         "~/world_stats", 100, 5);
-  this->dataPtr->modelPub = this->dataPtr->node->Advertise<msgs::Model>(
+  this->dataPtr->modelPub = this->dataPtr->node->Advertise<gazebo::msgs::Model>(
       "~/model/info");
-  this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
+  this->dataPtr->lightPub = this->dataPtr->node->Advertise<gazebo::msgs::Light>(
       "~/light/modify");
-  this->dataPtr->lightFactoryPub = this->dataPtr->node->Advertise<msgs::Light>(
-      "~/factory/light");
+  this->dataPtr->lightFactoryPub =
+    this->dataPtr->node->Advertise<gazebo::msgs::Light>("~/factory/light");
 
   // Ignition transport
   std::string pluginInfoService("/physics/info/plugin");
@@ -310,8 +309,9 @@ void World::Load(sdf::ElementPtr _sdf)
     longitude.Degree(spherical->Get<double>("longitude_deg"));
     heading.Degree(spherical->Get<double>("heading_deg"));
 
-    this->dataPtr->sphericalCoordinates.reset(new common::SphericalCoordinates(
-      surfaceType, latitude, longitude, elevation, heading));
+    this->dataPtr->sphericalCoordinates.reset(
+        new gazebo::common::SphericalCoordinates(
+          surfaceType, latitude, longitude, elevation, heading));
   }
 
   if (this->dataPtr->sphericalCoordinates == nullptr)
@@ -985,7 +985,7 @@ PresetManagerPtr World::PresetMgr() const
 }
 
 //////////////////////////////////////////////////
-common::SphericalCoordinatesPtr World::SphericalCoords() const
+gazebo::common::SphericalCoordinatesPtr World::SphericalCoords() const
 {
   return this->dataPtr->sphericalCoordinates;
 }
@@ -1084,7 +1084,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 
     event::Events::addEntity(model->GetScopedName());
 
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
     model->FillMsg(msg);
     this->dataPtr->modelPub->Publish(msg);
 
@@ -1112,8 +1112,8 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
   }
 
   // Add to scene message
-  msgs::Light *msg = this->dataPtr->sceneMsg.add_light();
-  msg->CopyFrom(msgs::LightFromSDF(_sdf));
+  gazebo::msgs::Light *msg = this->dataPtr->sceneMsg.add_light();
+  msg->CopyFrom(gazebo::msgs::LightFromSDF(_sdf));
 
   // Create new light object
   LightPtr light(new physics::Light(_parent));
@@ -1145,7 +1145,7 @@ ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
 
   event::Events::addEntity(actor->GetScopedName());
 
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
   actor->FillMsg(msg);
   this->dataPtr->modelPub->Publish(msg);
 
@@ -1342,7 +1342,7 @@ gazebo::common::Time World::StartTime() const
 }
 
 //////////////////////////////////////////////////
-common::Time World::RealTime() const
+gazebo::common::Time World::RealTime() const
 {
   if (!util::LogPlay::Instance()->IsOpen())
   {
@@ -1473,7 +1473,7 @@ void World::ProcessPlaybackControlMsgs()
 
     if (msg.has_seek())
     {
-      common::Time targetSimTime = msgs::Convert(msg.seek());
+      common::Time targetSimTime = gazebo::msgs::Convert(msg.seek());
       util::LogPlay::Instance()->Seek(targetSimTime);
       this->dataPtr->stepInc = 1;
     }
@@ -1521,7 +1521,7 @@ void World::JointLog(ConstJointPtr &_msg)
 
   if (i >= this->dataPtr->sceneMsg.joint_size())
   {
-    msgs::Joint *newJoint = this->dataPtr->sceneMsg.add_joint();
+    gazebo::msgs::Joint *newJoint = this->dataPtr->sceneMsg.add_joint();
     newJoint->CopyFrom(*_msg);
   }
 }
@@ -1534,19 +1534,19 @@ void World::OnModelMsg(ConstModelPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
+void World::BuildSceneMsg(gazebo::msgs::Scene &_scene, BasePtr _entity)
 {
   if (_entity)
   {
     if (_entity->HasType(Entity::MODEL))
     {
-      msgs::Model *modelMsg = _scene.add_model();
+      gazebo::msgs::Model *modelMsg = _scene.add_model();
       boost::static_pointer_cast<Model>(_entity)->FillMsg(*modelMsg);
     }
     else if (_entity->HasType(Entity::LIGHT) &&
         _entity->GetParent() == this->dataPtr->rootElement)
     {
-      msgs::Light *lightMsg = _scene.add_light();
+      gazebo::msgs::Light *lightMsg = _scene.add_light();
       boost::static_pointer_cast<physics::Light>(_entity)->FillMsg(*lightMsg);
     }
 
@@ -1669,7 +1669,7 @@ void World::ProcessEntityMsgs()
 void World::ProcessRequestMsgs()
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
-  msgs::Response response;
+  gazebo::msgs::Response response;
 
   for (auto const &requestMsg : this->dataPtr->requestMsgs)
   {
@@ -1680,7 +1680,7 @@ void World::ProcessRequestMsgs()
 
     if (requestMsg.request() == "entity_list")
     {
-      msgs::Model_V modelVMsg;
+      gazebo::msgs::Model_V modelVMsg;
 
       for (unsigned int i = 0;
           i < this->dataPtr->rootElement->GetChildCount(); ++i)
@@ -1688,7 +1688,7 @@ void World::ProcessRequestMsgs()
         BasePtr entity = this->dataPtr->rootElement->GetChild(i);
         if (entity->HasType(Base::MODEL))
         {
-          msgs::Model *modelMsg = modelVMsg.add_models();
+          gazebo::msgs::Model *modelMsg = modelVMsg.add_models();
           ModelPtr model = boost::dynamic_pointer_cast<Model>(entity);
           model->FillMsg(*modelMsg);
         }
@@ -1711,7 +1711,7 @@ void World::ProcessRequestMsgs()
       {
         if (entity->HasType(Base::MODEL))
         {
-          msgs::Model modelMsg;
+          gazebo::msgs::Model modelMsg;
           ModelPtr model = boost::dynamic_pointer_cast<Model>(entity);
           model->FillMsg(modelMsg);
 
@@ -1721,7 +1721,7 @@ void World::ProcessRequestMsgs()
         }
         else if (entity->HasType(Base::LINK))
         {
-          msgs::Link linkMsg;
+          gazebo::msgs::Link linkMsg;
           LinkPtr link = boost::dynamic_pointer_cast<Link>(entity);
           link->FillMsg(linkMsg);
 
@@ -1731,7 +1731,7 @@ void World::ProcessRequestMsgs()
         }
         else if (entity->HasType(Base::COLLISION))
         {
-          msgs::Collision collisionMsg;
+          gazebo::msgs::Collision collisionMsg;
           CollisionPtr collision =
             boost::dynamic_pointer_cast<Collision>(entity);
           collision->FillMsg(collisionMsg);
@@ -1742,7 +1742,7 @@ void World::ProcessRequestMsgs()
         }
         else if (entity->HasType(Base::JOINT))
         {
-          msgs::Joint jointMsg;
+          gazebo::msgs::Joint jointMsg;
           JointPtr joint = boost::dynamic_pointer_cast<Joint>(entity);
           joint->FillMsg(jointMsg);
 
@@ -1787,7 +1787,7 @@ void World::ProcessRequestMsgs()
         }
       }
 
-      msgs::GzString msg;
+      gazebo::msgs::GzString msg;
       std::ostringstream stream;
       stream << "<?xml version='1.0'?>\n"
              << "<sdf version='" << SDF_VERSION << "'>\n"
@@ -1812,8 +1812,9 @@ void World::ProcessRequestMsgs()
     }
     else if (requestMsg.request() == "spherical_coordinates_info")
     {
-      msgs::SphericalCoordinates sphereCoordMsg;
-      msgs::Set(&sphereCoordMsg, *(this->dataPtr->sphericalCoordinates));
+      gazebo::msgs::SphericalCoordinates sphereCoordMsg;
+      gazebo::msgs::Set(&sphereCoordMsg,
+          *(this->dataPtr->sphericalCoordinates));
 
       std::string *serializedData = response.mutable_serialized_data();
       sphereCoordMsg.SerializeToString(serializedData);
@@ -1857,7 +1858,7 @@ void World::ProcessModelMsgs()
       // are leaving it temporarily in case we find a need for it.
       //
       // Let all other subscribers know about the change
-      // msgs::Model msg;
+      // gazebo::msgs::Model msg;
       // model->FillMsg(msg);
       // // FillMsg fills the visual components from initial sdf
       // // but problem is that Visuals may have changed e.g. through ~/visual,
@@ -1924,7 +1925,7 @@ void World::ProcessLightFactoryMsgs()
 {
   // LoadLight also publishes to ~/light/factory so copy light factory msgs to
   // avoid deadlock in OnLightFactory callback when trying to lock receiveMutex
-  std::list<msgs::Light> lightFactoryMsgsCopy;
+  std::list<gazebo::msgs::Light> lightFactoryMsgsCopy;
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
 
@@ -1944,7 +1945,7 @@ void World::ProcessLightFactoryMsgs()
     else
     {
       // Add to world SDF
-      sdf::ElementPtr lightSDF = msgs::LightToSDF(lightFactoryMsg);
+      sdf::ElementPtr lightSDF = gazebo::msgs::LightToSDF(lightFactoryMsg);
       lightSDF->SetParent(this->dataPtr->sdf);
       lightSDF->GetParent()->InsertElement(lightSDF);
 
@@ -1978,7 +1979,6 @@ void World::ProcessFactoryMsgs()
               !factoryMsg.sdf_filename().empty())
       {
         std::string filename;
-#ifdef HAVE_IGNITION_FUEL_TOOLS
         // If http(s), look at Fuel
         auto uri = ignition::common::URI(factoryMsg.sdf_filename());
         if (uri.Valid() && (uri.Scheme() == "https" || uri.Scheme() == "http"))
@@ -1988,7 +1988,6 @@ void World::ProcessFactoryMsgs()
         }
         // Otherwise, look at database
         else
-#endif
         {
           filename = common::ModelDatabase::Instance()->GetModelFile(
               factoryMsg.sdf_filename());
@@ -2085,7 +2084,8 @@ void World::ProcessFactoryMsgs()
         elem->GetParent()->InsertElement(elem);
         if (factoryMsg.has_pose())
         {
-          elem->GetElement("pose")->Set(msgs::ConvertIgn(factoryMsg.pose()));
+          elem->GetElement("pose")->Set(
+              gazebo::msgs::ConvertIgn(factoryMsg.pose()));
         }
 
         if (isActor)
@@ -2333,7 +2333,7 @@ void World::SetState(const WorldState &_state)
 void World::InsertModelFile(const std::string &_sdfFilename)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf_filename(_sdfFilename);
   this->dataPtr->factoryMsgs.push_back(msg);
 }
@@ -2342,7 +2342,7 @@ void World::InsertModelFile(const std::string &_sdfFilename)
 void World::InsertModelSDF(const sdf::SDF &_sdf)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf(_sdf.ToString());
   this->dataPtr->factoryMsgs.push_back(msg);
 }
@@ -2351,7 +2351,7 @@ void World::InsertModelSDF(const sdf::SDF &_sdf)
 void World::InsertModelString(const std::string &_sdfString)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf(_sdfString);
   this->dataPtr->factoryMsgs.push_back(msg);
 }
@@ -2571,10 +2571,10 @@ void World::ProcessMessages()
         (this->dataPtr->poseLocalPub &&
          this->dataPtr->poseLocalPub->HasConnections()))
     {
-      msgs::PosesStamped msg;
+      gazebo::msgs::PosesStamped msg;
 
       // Time stamp this PosesStamped message
-      msgs::Set(msg.mutable_time(), this->SimTime());
+      gazebo::msgs::Set(msg.mutable_time(), this->SimTime());
 
       if (!this->dataPtr->publishModelPoses.empty() ||
           !this->dataPtr->publishLightPoses.empty())
@@ -2587,12 +2587,12 @@ void World::ProcessMessages()
           {
             ModelPtr m = modelList.front();
             modelList.pop_front();
-            msgs::Pose *poseMsg = msg.add_pose();
+            gazebo::msgs::Pose *poseMsg = msg.add_pose();
 
             // Publish the model's relative pose
             poseMsg->set_name(m->GetScopedName());
             poseMsg->set_id(m->GetId());
-            msgs::Set(poseMsg, m->RelativePose());
+            gazebo::msgs::Set(poseMsg, m->RelativePose());
 
             // Publish each of the model's child links relative poses
             Link_V links = m->GetLinks();
@@ -2601,7 +2601,7 @@ void World::ProcessMessages()
               poseMsg = msg.add_pose();
               poseMsg->set_name(link->GetScopedName());
               poseMsg->set_id(link->GetId());
-              msgs::Set(poseMsg, link->RelativePose());
+              gazebo::msgs::Set(poseMsg, link->RelativePose());
             }
 
             // add all nested models to the queue
@@ -2613,12 +2613,12 @@ void World::ProcessMessages()
 
         for (auto const &light : this->dataPtr->publishLightPoses)
         {
-          msgs::Pose *poseMsg = msg.add_pose();
+          gazebo::msgs::Pose *poseMsg = msg.add_pose();
 
           // Publish the light's pose
           poseMsg->set_name(light->GetScopedName());
           poseMsg->set_id(light->GetId());
-          msgs::Set(poseMsg, light->RelativePose());
+          gazebo::msgs::Set(poseMsg, light->RelativePose());
         }
 
         if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())
@@ -2654,10 +2654,10 @@ void World::ProcessMessages()
             modelList.pop_front();
 
             // Publish the model's scale
-            msgs::Model msg;
+            gazebo::msgs::Model msg;
             msg.set_name(m->GetScopedName());
             msg.set_id(m->GetId());
-            msgs::Set(msg.mutable_scale(), m->Scale());
+            gazebo::msgs::Set(msg.mutable_scale(), m->Scale());
 
             // Not publishing for links for now
 
@@ -2693,11 +2693,11 @@ void World::PublishWorldStats()
 {
   this->dataPtr->worldStatsMsg.Clear();
 
-  msgs::Set(this->dataPtr->worldStatsMsg.mutable_sim_time(),
+  gazebo::msgs::Set(this->dataPtr->worldStatsMsg.mutable_sim_time(),
       this->SimTime());
-  msgs::Set(this->dataPtr->worldStatsMsg.mutable_real_time(),
+  gazebo::msgs::Set(this->dataPtr->worldStatsMsg.mutable_real_time(),
       this->RealTime());
-  msgs::Set(this->dataPtr->worldStatsMsg.mutable_pause_time(),
+  gazebo::msgs::Set(this->dataPtr->worldStatsMsg.mutable_pause_time(),
       this->PauseTime());
 
   this->dataPtr->worldStatsMsg.set_iterations(this->dataPtr->iterations);
@@ -2705,10 +2705,10 @@ void World::PublishWorldStats()
 
   if (util::LogPlay::Instance()->IsOpen())
   {
-    msgs::LogPlaybackStatistics logStats;
-    msgs::Set(logStats.mutable_start_time(),
+    gazebo::msgs::LogPlaybackStatistics logStats;
+    gazebo::msgs::Set(logStats.mutable_start_time(),
         util::LogPlay::Instance()->LogStartTime());
-    msgs::Set(logStats.mutable_end_time(),
+    gazebo::msgs::Set(logStats.mutable_end_time(),
         util::LogPlay::Instance()->LogEndTime());
 
     this->dataPtr->worldStatsMsg.mutable_log_playback_stats()->CopyFrom(
@@ -2990,7 +2990,7 @@ void World::OnLightFactoryMsg(ConstLightPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-msgs::Scene World::SceneMsg() const
+gazebo::msgs::Scene World::SceneMsg() const
 {
   return this->dataPtr->sceneMsg;
 }
@@ -3065,7 +3065,7 @@ void World::ResetPhysicsStates()
 }
 
 /////////////////////////////////////////////////
-common::URI World::URI() const
+gazebo::common::URI World::URI() const
 {
   return this->dataPtr->uri;
 }

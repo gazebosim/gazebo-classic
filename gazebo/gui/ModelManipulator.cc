@@ -95,7 +95,7 @@ void ModelManipulator::Init()
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->userCmdPub =
-      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
+      this->dataPtr->node->Advertise<gazebo::msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->selectionObj.reset(new rendering::SelectionObj("__GL_MANIP__",
       this->dataPtr->scene->WorldVisual()));
@@ -554,21 +554,21 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     return;
   }
 
-  msgs::UserCmd userCmdMsg;
+  gazebo::msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description(description + _vis->Name() + "]");
-  userCmdMsg.set_type(msgs::UserCmd::MOVING);
+  userCmdMsg.set_type(gazebo::msgs::UserCmd::MOVING);
 
   // Only publish for models
   if (_vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
   {
-    msgs::Model msg;
+    gazebo::msgs::Model msg;
 
     auto id = gui::get_entity_id(_vis->Name());
     if (id)
       msg.set_id(id);
 
     msg.set_name(_vis->Name());
-    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
+    gazebo::msgs::Set(msg.mutable_pose(), _vis->WorldPose());
 
     auto modelMsg = userCmdMsg.add_model();
     modelMsg->CopyFrom(msg);
@@ -576,9 +576,9 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   // Otherwise, check to see if the visual is a light
   else if (this->dataPtr->scene->LightByName(_vis->Name()))
   {
-    msgs::Light msg;
+    gazebo::msgs::Light msg;
     msg.set_name(_vis->Name());
-    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
+    gazebo::msgs::Set(msg.mutable_pose(), _vis->WorldPose());
 
     auto lightMsg = userCmdMsg.add_light();
     lightMsg->CopyFrom(msg);
@@ -601,18 +601,18 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
   }
 
   // Register user command on server
-  msgs::UserCmd userCmdMsg;
+  gazebo::msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description("Scale [" + _vis->Name() + "]");
-  userCmdMsg.set_type(msgs::UserCmd::SCALING);
+  userCmdMsg.set_type(gazebo::msgs::UserCmd::SCALING);
 
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
 
   auto id = gui::get_entity_id(_vis->Name());
   if (id)
     msg.set_id(id);
 
   msg.set_name(_vis->Name());
-  msgs::Set(msg.mutable_scale(), _vis->Scale());
+  gazebo::msgs::Set(msg.mutable_scale(), _vis->Scale());
 
   auto modelMsg = userCmdMsg.add_model();
   modelMsg->CopyFrom(msg);

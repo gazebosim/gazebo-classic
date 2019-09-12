@@ -93,15 +93,15 @@ namespace gazebo
       /// data are not packed in this message to minimize packet size.
       /// \param[in] _msg Message to fill.
       /// \sa FillHeights
-      public: void FillMsg(msgs::Geometry &_msg);
+      public: void FillMsg(gazebo::msgs::Geometry &_msg);
 
       /// \brief Fill a geometry message with this shape's height data.
       /// \param[in] _msg Message to fill.
-      public: void FillHeights(msgs::Geometry &_msg) const;
+      public: void FillHeights(gazebo::msgs::Geometry &_msg) const;
 
       /// \brief Update the heightmap from a message.
       /// \param[in] _msg Message to update from.
-      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+      public: virtual void ProcessMsg(const gazebo::msgs::Geometry &_msg);
 
       /// Documentation inherited
       public: virtual double ComputeVolume() const;

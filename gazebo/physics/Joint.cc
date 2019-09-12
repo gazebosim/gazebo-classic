@@ -565,61 +565,61 @@ LinkPtr Joint::GetParent() const
 }
 
 //////////////////////////////////////////////////
-msgs::Joint::Type Joint::GetMsgType() const
+gazebo::msgs::Joint::Type Joint::GetMsgType() const
 {
   if (this->HasType(Base::HINGE_JOINT))
   {
-    return msgs::Joint::REVOLUTE;
+    return gazebo::msgs::Joint::REVOLUTE;
   }
   else if (this->HasType(Base::HINGE2_JOINT))
   {
-    return msgs::Joint::REVOLUTE2;
+    return gazebo::msgs::Joint::REVOLUTE2;
   }
   else if (this->HasType(Base::BALL_JOINT))
   {
-    return msgs::Joint::BALL;
+    return gazebo::msgs::Joint::BALL;
   }
   else if (this->HasType(Base::SLIDER_JOINT))
   {
-    return msgs::Joint::PRISMATIC;
+    return gazebo::msgs::Joint::PRISMATIC;
   }
   else if (this->HasType(Base::SCREW_JOINT))
   {
-    return msgs::Joint::SCREW;
+    return gazebo::msgs::Joint::SCREW;
   }
   else if (this->HasType(Base::GEARBOX_JOINT))
   {
-    return msgs::Joint::GEARBOX;
+    return gazebo::msgs::Joint::GEARBOX;
   }
   else if (this->HasType(Base::UNIVERSAL_JOINT))
   {
-    return msgs::Joint::UNIVERSAL;
+    return gazebo::msgs::Joint::UNIVERSAL;
   }
   else if (this->HasType(Base::FIXED_JOINT))
   {
-    return msgs::Joint::FIXED;
+    return gazebo::msgs::Joint::FIXED;
   }
 
   gzerr << "No joint recognized in type ["
         << this->GetType()
         << "], returning REVOLUTE"
         << std::endl;
-  return msgs::Joint::REVOLUTE;
+  return gazebo::msgs::Joint::REVOLUTE;
 }
 
 //////////////////////////////////////////////////
-void Joint::FillMsg(msgs::Joint &_msg)
+void Joint::FillMsg(gazebo::msgs::Joint &_msg)
 {
   _msg.set_name(this->GetScopedName());
   _msg.set_id(this->GetId());
 
-  msgs::Set(_msg.mutable_pose(), this->anchorPose);
+  gazebo::msgs::Set(_msg.mutable_pose(), this->anchorPose);
   _msg.set_type(this->GetMsgType());
 
   for (unsigned int i = 0; i < this->DOF(); ++i)
   {
     _msg.add_angle(this->Position(i));
-    msgs::Axis *axis;
+    gazebo::msgs::Axis *axis;
     if (i == 0)
       axis = _msg.mutable_axis1();
     else if (i == 1)
@@ -627,7 +627,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
     else
       break;
 
-    msgs::Set(axis->mutable_xyz(), this->LocalAxis(i));
+    gazebo::msgs::Set(axis->mutable_xyz(), this->LocalAxis(i));
     axis->set_limit_lower(this->LowerLimit(i));
     axis->set_limit_upper(this->UpperLimit(i));
     axis->set_limit_effort(this->GetEffortLimit(i));
@@ -665,8 +665,8 @@ void Joint::FillMsg(msgs::Joint &_msg)
     sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
     while (sensorElem)
     {
-      msgs::Sensor *msg = _msg.add_sensor();
-      msg->CopyFrom(msgs::SensorFromSDF(sensorElem));
+      gazebo::msgs::Sensor *msg = _msg.add_sensor();
+      msg->CopyFrom(gazebo::msgs::SensorFromSDF(sensorElem));
       msg->set_parent(this->GetScopedName());
       msg->set_parent_id(this->GetId());
       sensorElem = sensorElem->GetNextElement("sensor");

@@ -53,18 +53,18 @@ namespace gazebo
                                         const std::string &_mode);
       private: void OnResponse(ConstResponsePtr &_msg);
 
-      private: void OnModelUpdate(const msgs::Model &_msg);
+      private: void OnModelUpdate(const gazebo::msgs::Model &_msg);
 
       /// \brief An event callback to handle light update msgs.
       /// \param[in] _msg Light message.
-      private: void OnLightUpdate(const msgs::Light &_msg);
+      private: void OnLightUpdate(const gazebo::msgs::Light &_msg);
 
       private: void OnRequest(ConstRequestPtr &_msg);
 
       private: void OnRemoveScene(const std::string &_name);
       private: void OnCreateScene(const std::string &_name);
 
-      private: void AddModelToList(const msgs::Model &_msg);
+      private: void AddModelToList(const gazebo::msgs::Model &_msg);
 
       private: void FillMsgField(QtProperty *_item,
                    google::protobuf::Message *_message,
@@ -85,9 +85,10 @@ namespace gazebo
                    google::protobuf::Message *_message,
                    const google::protobuf::Descriptor *_descriptor);
 
-      private: void FillColorMsg(QtProperty *_item, msgs::Color *_msg);
+      private: void FillColorMsg(QtProperty *_item, gazebo::msgs::Color *_msg);
 
-      private: void FillVector3Msg(QtProperty *_item, msgs::Vector3d *_msg);
+      private: void FillVector3Msg(QtProperty *_item,
+                   gazebo::msgs::Vector3d *_msg);
 
       private: QtProperty *PopChildItem(QList<QtProperty*> &_list,
                                         const std::string &_name);
@@ -115,7 +116,7 @@ namespace gazebo
       private: QTreeWidgetItem *ListItem(const std::string &_name,
                                          QTreeWidgetItem *_parent);
 
-      private: void FillPropertyTree(const msgs::Model &_msg,
+      private: void FillPropertyTree(const gazebo::msgs::Model &_msg,
                                      QtProperty *_parent);
 
       /// \brief Fill the property tree with plugin info.
@@ -125,55 +126,56 @@ namespace gazebo
       private: void FillPropertyTree(const ignition::msgs::Plugin &_msg,
                                      QtProperty *_parent);
 
-      private: void FillPropertyTree(const msgs::Link &_msg,
+      private: void FillPropertyTree(const gazebo::msgs::Link &_msg,
                                      QtProperty *_parent);
 
-      private: void FillPropertyTree(const msgs::Collision &_msg,
+      private: void FillPropertyTree(const gazebo::msgs::Collision &_msg,
                                      QtProperty *_parent);
 
-      private: void FillPropertyTree(const msgs::Joint &_msg,
+      private: void FillPropertyTree(const gazebo::msgs::Joint &_msg,
                                      QtProperty *_parent);
 
-      private: void FillPropertyTree(const msgs::Surface &_msg,
+      private: void FillPropertyTree(const gazebo::msgs::Surface &_msg,
                                      QtProperty *_parent);
 
-      private: void FillPropertyTree(const msgs::Visual &_msg,
+      private: void FillPropertyTree(const gazebo::msgs::Visual &_msg,
                                      QtProperty *_parent);
 
-      private: void FillPropertyTree(const msgs::Geometry &_msg,
+      private: void FillPropertyTree(const gazebo::msgs::Geometry &_msg,
                                      QtProperty *_parent);
 
-      private: void FillPropertyTree(const msgs::Scene &_msg,
+      private: void FillPropertyTree(const gazebo::msgs::Scene &_msg,
                                      QtProperty *_parent);
 
-      private: void FillPropertyTree(const msgs::Physics &_msg,
+      private: void FillPropertyTree(const gazebo::msgs::Physics &_msg,
                                      QtProperty *_parent);
 
-      private: void FillPropertyTree(const msgs::Wind &_msg,
+      private: void FillPropertyTree(const gazebo::msgs::Wind &_msg,
                                      QtProperty *_parent);
 
       /// \brief Fill the property tree with atmosphere info.
       /// \param[in] _msg The atmosphere message.
       /// \param[in] _parent Pointer to the qtproperty which will receive
       /// the message data.
-      private: void FillPropertyTree(const msgs::Atmosphere &_msg,
+      private: void FillPropertyTree(const gazebo::msgs::Atmosphere &_msg,
                                      QtProperty *_parent);
 
-      private: void FillPropertyTree(const msgs::Light &_msg,
+      private: void FillPropertyTree(const gazebo::msgs::Light &_msg,
                                      QtProperty *_parent);
 
-      private: void FillVector3dProperty(const msgs::Vector3d &_msg,
+      private: void FillVector3dProperty(const gazebo::msgs::Vector3d &_msg,
                                          QtProperty *_parent);
 
-      private: void FillPoseProperty(const msgs::Pose &_msg,
+      private: void FillPoseProperty(const gazebo::msgs::Pose &_msg,
                                      QtProperty *_parent);
 
       /// \brief Fill the property tree with spherical coordinates info.
       /// \param[in] _msg The spherical coordinates message.
       /// \param[in] _parent Pointer to the qtproperty which will receive
       /// the message data.
-      private: void FillPropertyTree(const msgs::SphericalCoordinates &_msg,
-                                     QtProperty *_parent);
+      private: void FillPropertyTree(
+                   const gazebo::msgs::SphericalCoordinates &_msg,
+                   QtProperty *_parent);
 
       /// \brief Fill the property tree with user camera info taken from
       /// rendering.

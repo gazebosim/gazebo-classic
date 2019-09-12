@@ -47,7 +47,7 @@ namespace gazebo
     public: transport::PublisherPtr pubVisual;
 
     /// \brief A message holding a Visual message.
-    public: msgs::Visual msg;
+    public: gazebo::msgs::Visual msg;
 
     /// \brief True if <visual> element exists.
     public: bool visualExists;
@@ -76,7 +76,7 @@ LedSetting::LedSetting(
 {
   // check if the visual element exists.
   this->dataPtr->visualExists = false;
-  msgs::Link msg;
+  gazebo::msgs::Link msg;
   this->Link()->FillMsg(msg);
   for (auto visualMsg : msg.visual())
   {
@@ -92,7 +92,7 @@ LedSetting::LedSetting(
         && visualMsg.material().has_emissive())
       {
         this->dataPtr->defaultEmissiveColor
-          = msgs::Convert(visualMsg.material().emissive());
+          = gazebo::msgs::Convert(visualMsg.material().emissive());
       }
 
       this->dataPtr->visualExists = true;
@@ -137,15 +137,19 @@ void LedSetting::Flash()
   {
     // If the base class is using a specific color rather than the default,
     // apply it to the visual object.
-    msgs::Set(this->dataPtr->msg.mutable_material()->mutable_diffuse(), color);
-    msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(), color);
-    msgs::Set(this->dataPtr->msg.mutable_material()->mutable_specular(), color);
-    msgs::Set(this->dataPtr->msg.mutable_material()->mutable_ambient(), color);
+    gazebo::msgs::Set(
+        this->dataPtr->msg.mutable_material()->mutable_diffuse(), color);
+    gazebo::msgs::Set(
+        this->dataPtr->msg.mutable_material()->mutable_emissive(), color);
+    gazebo::msgs::Set(
+        this->dataPtr->msg.mutable_material()->mutable_specular(), color);
+    gazebo::msgs::Set(
+        this->dataPtr->msg.mutable_material()->mutable_ambient(), color);
   }
   else
   {
     // Otherwise, just apply the default color.
-    msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
+    gazebo::msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
       this->dataPtr->defaultEmissiveColor);
   }
 
@@ -172,7 +176,7 @@ void LedSetting::Dim()
 
   // Make the appearance darker.
   this->dataPtr->msg.set_transparency(this->dataPtr->transparency);
-  msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
+  gazebo::msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
     ignition::math::Color(0, 0, 0));
   // Send the message.
   if (this->dataPtr->visualExists)

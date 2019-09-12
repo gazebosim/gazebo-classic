@@ -163,7 +163,7 @@ void FiducialCameraPlugin::Init()
     topicName = topicName.substr(0, pos) + "/" + topicName.substr(pos+2);
 
   this->dataPtr->fiducialPub =
-      this->dataPtr->node->Advertise<msgs::PosesStamped>(topicName);
+      this->dataPtr->node->Advertise<gazebo::msgs::PosesStamped>(topicName);
 }
 
 /////////////////////////////////////////////////
@@ -253,18 +253,18 @@ void FiducialCameraPluginPrivate::Publish(
   // publish the results
   common::Time timestamp = this->parentSensor->LastMeasurementTime();
 
-  msgs::PosesStamped msg;
-  msgs::Set(msg.mutable_time(), timestamp);
+  gazebo::msgs::PosesStamped msg;
+  gazebo::msgs::Set(msg.mutable_time(), timestamp);
 
   for (const auto &fd : _results)
   {
     // use pose msg to store the result
     // position x and y are image coordinates and z always 0
     // orientation is always an identity quaternion for now
-    msgs::Pose *poseMsg = msg.add_pose();
+    gazebo::msgs::Pose *poseMsg = msg.add_pose();
     poseMsg->set_name(fd.id);
     ignition::math::Vector3d pos(fd.pt.X(), fd.pt.Y(), 0);
-    msgs::Set(poseMsg, ignition::math::Pose3d(pos,
+    gazebo::msgs::Set(poseMsg, ignition::math::Pose3d(pos,
         ignition::math::Quaterniond::Identity));
   }
 

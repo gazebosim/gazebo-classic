@@ -87,7 +87,8 @@ void GUIExampleTimeWidget::OnStats(ConstWorldStatisticsPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-std::string GUIExampleTimeWidget::FormatTime(const msgs::Time &_msg) const
+std::string GUIExampleTimeWidget::FormatTime(
+    const gazebo::msgs::Time &_msg) const
 {
   std::ostringstream stream;
   unsigned int day, hour, min, sec, msec;

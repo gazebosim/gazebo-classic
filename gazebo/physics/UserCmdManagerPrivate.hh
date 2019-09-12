@@ -52,7 +52,7 @@ namespace gazebo
       public: std::string description;
 
       /// \brief Type of command, such as MOVING or DELETING.
-      public: msgs::UserCmd::Type type;
+      public: gazebo::msgs::UserCmd::Type type;
     };
 
     class UserCmd;

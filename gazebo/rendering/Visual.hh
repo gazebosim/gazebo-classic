@@ -417,7 +417,7 @@ namespace gazebo
 
       /// \brief Get the bounding box for the visual.
       /// \return The bounding box in world coordinates.
-      public: ignition::math::Box BoundingBox() const;
+      public: ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Add a line to the visual.
       /// \param[in] _type The type of line to make.
@@ -571,7 +571,7 @@ namespace gazebo
 
       /// \brief Set animation skeleton pose.
       /// \param[in] _pose Skelton message
-      public: void SetSkeletonPose(const msgs::PoseAnimation &_pose);
+      public: void SetSkeletonPose(const gazebo::msgs::PoseAnimation &_pose);
 
       /// \brief Load a plugin
       /// \param _filename The filename of the plugin
@@ -644,16 +644,16 @@ namespace gazebo
       public: void AddPendingChild(std::pair<VisualType,
           const google::protobuf::Message *> _pair);
 
-      /// \brief Convert from msgs::Visual::Type to VisualType.
-      /// \param[in] _type A msgs::Visual::Type enum.
+      /// \brief Convert from gazebo::msgs::Visual::Type to VisualType.
+      /// \param[in] _type A gazebo::msgs::Visual::Type enum.
       /// \return VisualType enum.
       public: static Visual::VisualType ConvertVisualType(
-          const msgs::Visual::Type &_type);
+          const gazebo::msgs::Visual::Type &_type);
 
-      /// \brief Convert from msgs::Visual::Type to VisualType.
+      /// \brief Convert from gazebo::msgs::Visual::Type to VisualType.
       /// \param[in] _type VisualType enum.
-      /// \return A msgs::Visual::Type enum.
-      public: static msgs::Visual::Type ConvertVisualType(
+      /// \return A gazebo::msgs::Visual::Type enum.
+      public: static gazebo::msgs::Visual::Type ConvertVisualType(
           const Visual::VisualType &_type);
 
       /// \brief Fill an ignition::msgs::Material message based on this
@@ -715,7 +715,7 @@ namespace gazebo
       /// \param[in] _node Pointer to the Ogre Node to process.
       /// \param[in] _box Current bounding box information.
       private: void BoundsHelper(Ogre::SceneNode *_node,
-                                 ignition::math::Box &_box) const;
+                                 ignition::math::AxisAlignedBox &_box) const;
 
       /// \brief Return true if the submesh should be centered.
       /// \return True if the submesh should be centered when it's inserted

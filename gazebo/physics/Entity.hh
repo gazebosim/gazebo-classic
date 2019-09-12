@@ -19,7 +19,7 @@
 
 #include <string>
 #include <vector>
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/transport/Node.hh>
@@ -95,7 +95,7 @@ namespace gazebo
 
       /// \brief Return the bounding box for the entity.
       /// \return The bounding box.
-      public: virtual ignition::math::Box BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Get the absolute pose of the entity.
       /// \return The absolute pose of the entity.
@@ -209,7 +209,7 @@ namespace gazebo
 
       /// \brief Returns collision bounding box.
       /// \return Collsion bounding box.
-      public: ignition::math::Box CollisionBoundingBox() const;
+      public: ignition::math::AxisAlignedBox CollisionBoundingBox() const;
 
       /// \brief Set angular and linear rates of an physics::Entity.
       /// \param[in] _linear Linear twist.
@@ -237,7 +237,7 @@ namespace gazebo
       /// \brief Helper function to get the collision bounding box.
       /// \param[in] _base Object to calculated the bounding box for.
       /// \return The bounding box for the passed in object.
-      private: ignition::math::Box CollisionBoundingBoxHelper(
+      private: ignition::math::AxisAlignedBox CollisionBoundingBoxHelper(
                    BasePtr _base) const;
 
       /// \brief Set the world pose for a model.
@@ -294,7 +294,7 @@ namespace gazebo
       protected: transport::PublisherPtr requestPub;
 
       /// \brief Visual message container.
-      protected: msgs::Visual *visualMsg;
+      protected: gazebo::msgs::Visual *visualMsg;
 
       /// \brief Current pose animation
       protected: common::PoseAnimationPtr animation;

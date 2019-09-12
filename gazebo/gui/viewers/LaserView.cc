@@ -148,7 +148,7 @@ void LaserView::resizeEvent(QResizeEvent *_event)
 void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
 {
   // Update the Hz and Bandwidth info
-  this->OnMsg(msgs::Convert(_msg->time()), _msg->ByteSize());
+  this->OnMsg(gazebo::msgs::Convert(_msg->time()), _msg->ByteSize());
 
   this->laserItem->Clear();
 

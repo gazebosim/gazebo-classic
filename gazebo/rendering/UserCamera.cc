@@ -100,7 +100,8 @@ void UserCamera::Load()
     &UserCamera::OnJoyPose, this);
 
   this->dataPtr->posePub =
-    this->dataPtr->node->Advertise<msgs::Pose>("~/user_camera/pose", 1, 30.0);
+    this->dataPtr->node->Advertise<gazebo::msgs::Pose>(
+        "~/user_camera/pose", 1, 30.0);
 }
 
 //////////////////////////////////////////////////
@@ -236,7 +237,7 @@ void UserCamera::Update()
     this->dataPtr->viewController->Update();
 
   // publish camera pose
-  this->dataPtr->posePub->Publish(msgs::Convert(this->WorldPose()));
+  this->dataPtr->posePub->Publish(gazebo::msgs::Convert(this->WorldPose()));
 }
 
 //////////////////////////////////////////////////
@@ -549,7 +550,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   start.Correct();
 
   // Center of visual
-  ignition::math::Box box = _visual->BoundingBox();
+  ignition::math::AxisAlignedBox box = _visual->BoundingBox();
   ignition::math::Vector3d visCenter = box.Center() +
     _visual->WorldPose().Pos();
   visCenter.Correct();
@@ -833,7 +834,7 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
     {
       const double transRotRatio = 0.05;
       ignition::math::Vector3d trans =
-        msgs::ConvertIgn(_msg->translation()) * transRotRatio;
+        gazebo::msgs::ConvertIgn(_msg->translation()) * transRotRatio;
       pose.Pos() = pose.Rot().RotateVector(trans) + pose.Pos();
     }
 
@@ -841,7 +842,7 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
     if (_msg->has_rotation())
     {
       ignition::math::Vector3d rot =
-        msgs::ConvertIgn(_msg->rotation()) * rpyFactor;
+        gazebo::msgs::ConvertIgn(_msg->rotation()) * rpyFactor;
       pose.Rot().Euler(pose.Rot().Euler() + rot);
     }
 
@@ -858,8 +859,8 @@ void UserCamera::OnJoyPose(ConstPosePtr &_msg)
   if (_msg->has_position() && _msg->has_orientation())
   {
     // Get the XYZ
-    ignition::math::Pose3d pose(msgs::ConvertIgn(_msg->position()),
-                                msgs::ConvertIgn(_msg->orientation()));
+    ignition::math::Pose3d pose(gazebo::msgs::ConvertIgn(_msg->position()),
+                                gazebo::msgs::ConvertIgn(_msg->orientation()));
     this->SetWorldPose(pose);
   }
 }

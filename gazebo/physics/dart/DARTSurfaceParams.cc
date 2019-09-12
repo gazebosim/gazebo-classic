@@ -70,7 +70,7 @@ void DARTSurfaceParams::Load(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void DARTSurfaceParams::FillMsg(msgs::Surface &_msg)
+void DARTSurfaceParams::FillMsg(gazebo::msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
@@ -81,7 +81,7 @@ void DARTSurfaceParams::FillMsg(msgs::Surface &_msg)
 }
 
 /////////////////////////////////////////////////
-void DARTSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
+void DARTSurfaceParams::ProcessMsg(const gazebo::msgs::Surface &_msg)
 {
   SurfaceParams::ProcessMsg(_msg);
 

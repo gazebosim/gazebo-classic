@@ -37,11 +37,11 @@ namespace gazebo
       /// \brief Mutex to protect the cameras list.
       public: mutable std::mutex cameraMutex;
 
-      /// \brief Publishes messages of type msgs::ImagesStamped.
+      /// \brief Publishes messages of type gazebo::msgs::ImagesStamped.
       public: transport::PublisherPtr imagePub;
 
       /// \brief The images msg.
-      public: msgs::ImagesStamped msg;
+      public: gazebo::msgs::ImagesStamped msg;
 
       /// \brief True if the sensor was rendered.
       public: bool rendered;

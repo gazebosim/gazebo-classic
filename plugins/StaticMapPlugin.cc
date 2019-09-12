@@ -355,7 +355,7 @@ void StaticMapPlugin::Init()
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
   this->dataPtr->factoryPub =
-      this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
+      this->dataPtr->node->Advertise<gazebo::msgs::Factory>("~/factory");
 
   boost::filesystem::path modelPath = basePath / this->dataPtr->modelName;
   if (this->dataPtr->useCache && common::exists(modelPath.string()))
@@ -684,8 +684,8 @@ void StaticMapPluginPrivate::SpawnModel(const std::string &_uri,
     const ignition::math::Pose3d &_pose)
 {
   // publish to factory topic to spawn the model
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   msg.set_sdf_filename(_uri);
-  msgs::Set(msg.mutable_pose(), _pose);
+  gazebo::msgs::Set(msg.mutable_pose(), _pose);
   this->factoryPub->Publish(msg);
 }

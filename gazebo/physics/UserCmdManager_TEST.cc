@@ -45,7 +45,7 @@ TEST_F(UserCmdManagerTest, CreateCmd)
   // Create the command
   unsigned int id = 21;
   std::string description = "Command description";
-  msgs::UserCmd::Type type = msgs::UserCmd::MOVING;
+  gazebo::msgs::UserCmd::Type type = gazebo::msgs::UserCmd::MOVING;
   physics::UserCmd *cmd = new physics::UserCmd(id, world, description, type);
   EXPECT_TRUE(cmd != NULL);
 

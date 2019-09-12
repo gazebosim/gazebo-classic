@@ -30,8 +30,8 @@ class ODEPhysics_TEST : public ServerFixture
 {
   public: void PhysicsMsgParam();
   public: void OnPhysicsMsgResponse(ConstResponsePtr &_msg);
-  public: static msgs::Physics physicsPubMsg;
-  public: static msgs::Physics physicsResponseMsg;
+  public: static gazebo::msgs::Physics physicsPubMsg;
+  public: static gazebo::msgs::Physics physicsResponseMsg;
 };
 
 msgs::Physics ODEPhysics_TEST::physicsPubMsg;
@@ -400,9 +400,9 @@ void ODEPhysics_TEST::PhysicsMsgParam()
   phyNode->Init();
 
   transport::PublisherPtr physicsPub
-       = phyNode->Advertise<msgs::Physics>("~/physics");
+       = phyNode->Advertise<gazebo::msgs::Physics>("~/physics");
   transport::PublisherPtr requestPub
-      = phyNode->Advertise<msgs::Request>("~/request");
+      = phyNode->Advertise<gazebo::msgs::Request>("~/request");
   transport::SubscriberPtr responseSub = phyNode->Subscribe("~/response",
       &ODEPhysics_TEST::OnPhysicsMsgResponse, this);
 
@@ -425,12 +425,13 @@ void ODEPhysics_TEST::PhysicsMsgParam()
   // physicsPubMsg.set_warm_start_factor(0.6);
   // physicsPubMsg.set_extra_friction_iterations(89);
 
-  physicsPubMsg.set_type(msgs::Physics::ODE);
+  physicsPubMsg.set_type(gazebo::msgs::Physics::ODE);
   physicsPubMsg.set_solver_type("quick");
 
   physicsPub->Publish(physicsPubMsg);
 
-  msgs::Request *requestMsg = msgs::CreateRequest("physics_info", "");
+  gazebo::msgs::Request *requestMsg =
+    gazebo::msgs::CreateRequest("physics_info", "");
   requestPub->Publish(*requestMsg);
 
   int waitCount = 0, maxWaitCount = 3000;

@@ -98,7 +98,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
 
   {
     // Step forward until we get a contacts message from the contact sensor
-    msgs::Contacts contacts;
+    gazebo::msgs::Contacts contacts;
     while (contacts.contact_size() == 0 && --steps > 0)
     {
       world->Step(1);
@@ -107,7 +107,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
 
     // Verify that both objects are recognized by contact sensor
     int i;
-    msgs::Contact contact;
+    gazebo::msgs::Contact contact;
     bool collideBoxHit = false;
     bool contactBoxHit = false;
     for (i = 0; i < contacts.contact_size(); ++i)
@@ -140,7 +140,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
 
   {
     // Step forward until we get a contacts message from the contact sensor
-    msgs::Contacts contacts;
+    gazebo::msgs::Contacts contacts;
     while (contacts.contact_size() == 0 && --steps > 0)
     {
       world->Step(1);
@@ -149,7 +149,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
 
     // Verify that only contactBox is recognized by contact sensor
     int i;
-    msgs::Contact contact;
+    gazebo::msgs::Contact contact;
     bool collideBoxHit = false;
     bool contactBoxHit = false;
     for (i = 0; i < contacts.contact_size(); ++i)

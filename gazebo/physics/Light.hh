@@ -46,11 +46,11 @@ namespace gazebo
 
       /// \brief Update this light's parameters from a message.
       /// \param[in] _msg Message to process.
-      public: void ProcessMsg(const msgs::Light &_msg);
+      public: void ProcessMsg(const gazebo::msgs::Light &_msg);
 
       /// \brief Fill a light message with this light's parameters.
       /// \param[out] _msg Message to fill using this light's data.
-      public: void FillMsg(msgs::Light &_msg);
+      public: void FillMsg(gazebo::msgs::Light &_msg);
 
       /// \brief Set the current light state.
       /// \param[in] _state State to set the light to.

@@ -42,7 +42,7 @@ namespace gazebo
 
       /// \brief Receives incoming image messages.
       /// \param[in] _msg New image message.
-      public: void OnImage(const msgs::Image &_msg);
+      public: void OnImage(const gazebo::msgs::Image &_msg);
 
       /// \brief Event used to paint the image.
       /// \param[in] _event Pointer to the event information.

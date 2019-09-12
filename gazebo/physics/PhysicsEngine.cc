@@ -60,7 +60,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
       &PhysicsEngine::OnPhysicsMsg, this);
 
   this->responsePub =
-    this->node->Advertise<msgs::Response>("~/response");
+    this->node->Advertise<gazebo::msgs::Response>("~/response");
 
   this->requestSub = this->node->Subscribe("~/request",
                                            &PhysicsEngine::OnRequest, this);

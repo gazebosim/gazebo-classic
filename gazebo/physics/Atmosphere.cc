@@ -99,7 +99,7 @@ Atmosphere::Atmosphere(physics::World &_world)
       &Atmosphere::OnAtmosphereMsg, this);
 
   this->dataPtr->responsePub =
-    this->dataPtr->node->Advertise<msgs::Response>("~/response");
+    this->dataPtr->node->Advertise<gazebo::msgs::Response>("~/response");
 
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
       &Atmosphere::OnRequest, this);
@@ -221,7 +221,7 @@ World &Atmosphere::World() const
 }
 
 //////////////////////////////////////////////////
-void Atmosphere::Publish(const msgs::Response &_msg) const
+void Atmosphere::Publish(const gazebo::msgs::Response &_msg) const
 {
   this->dataPtr->responsePub->Publish(_msg);
 }

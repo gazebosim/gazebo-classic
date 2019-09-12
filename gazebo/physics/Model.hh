@@ -159,7 +159,7 @@ namespace gazebo
 
       /// \brief Get the size of the bounding box.
       /// \return The bounding box.
-      public: virtual ignition::math::Box BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Get the number of joints.
       /// \return Get the number of joints.
@@ -230,11 +230,11 @@ namespace gazebo
 
       /// \brief Fill a model message.
       /// \param[in] _msg Message to fill using this model's data.
-      public: virtual void FillMsg(msgs::Model &_msg);
+      public: virtual void FillMsg(gazebo::msgs::Model &_msg);
 
       /// \brief Update parameters from a model message.
       /// \param[in] _msg Message to process.
-      public: void ProcessMsg(const msgs::Model &_msg);
+      public: void ProcessMsg(const gazebo::msgs::Model &_msg);
 
       /// \brief Set the positions of a Joint by name.
       /// \sa JointController::SetJointPosition

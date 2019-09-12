@@ -245,7 +245,7 @@ void GravityCompensationPlugin::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   if (_msg->has_gravity())
   {
-    ignition::math::Vector3d g = msgs::ConvertIgn(_msg->gravity());
+    ignition::math::Vector3d g = gazebo::msgs::ConvertIgn(_msg->gravity());
     this->dataPtr->skel->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
   }
 }

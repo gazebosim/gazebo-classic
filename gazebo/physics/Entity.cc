@@ -57,7 +57,7 @@ Entity::Entity(BasePtr _parent)
   this->node = transport::NodePtr(new transport::Node());
   this->AddType(ENTITY);
 
-  this->visualMsg = new msgs::Visual;
+  this->visualMsg = new gazebo::msgs::Visual;
   this->visualMsg->set_id(this->id);
 
   if (this->world)
@@ -94,8 +94,8 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   this->poseSub = this->node->Subscribe("~/pose/modify",
       &Entity::OnPoseMsg, this);
-  this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 200);
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  this->visPub = this->node->Advertise<gazebo::msgs::Visual>("~/visual", 200);
+  this->requestPub = this->node->Advertise<gazebo::msgs::Request>("~/request");
 
   this->visualMsg->set_name(this->GetScopedName());
 
@@ -123,14 +123,14 @@ void Entity::Load(sdf::ElementPtr _sdf)
     this->visualMsg->set_parent_name(this->world->Name());
     this->visualMsg->set_parent_id(0);
   }
-  msgs::Set(this->visualMsg->mutable_pose(), this->RelativePose());
+  gazebo::msgs::Set(this->visualMsg->mutable_pose(), this->RelativePose());
 
   if (this->HasType(Base::MODEL))
-    this->visualMsg->set_type(msgs::Visual::MODEL);
+    this->visualMsg->set_type(gazebo::msgs::Visual::MODEL);
   if (this->HasType(Base::LINK))
-    this->visualMsg->set_type(msgs::Visual::LINK);
+    this->visualMsg->set_type(gazebo::msgs::Visual::LINK);
   if (this->HasType(Base::COLLISION))
-    this->visualMsg->set_type(msgs::Visual::COLLISION);
+    this->visualMsg->set_type(gazebo::msgs::Visual::COLLISION);
 
   this->visPub->Publish(*this->visualMsg);
 
@@ -185,9 +185,9 @@ ignition::math::Pose3d Entity::InitialRelativePose() const
 
 
 //////////////////////////////////////////////////
-ignition::math::Box Entity::BoundingBox() const
+ignition::math::AxisAlignedBox Entity::BoundingBox() const
 {
-  return ignition::math::Box(
+  return ignition::math::AxisAlignedBox(
       ignition::math::Vector3d::Zero, ignition::math::Vector3d::One);
 }
 
@@ -583,7 +583,7 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 {
   if (_msg->name() == this->GetScopedName())
   {
-    ignition::math::Pose3d p = msgs::ConvertIgn(*_msg);
+    ignition::math::Pose3d p = gazebo::msgs::ConvertIgn(*_msg);
     this->SetWorldPose(p);
   }
 }
@@ -596,7 +596,8 @@ void Entity::Fini()
 
   if (this->requestPub)
   {
-    auto msg = msgs::CreateRequest("entity_delete", this->GetScopedName());
+    auto msg = gazebo::msgs::CreateRequest("entity_delete",
+        this->GetScopedName());
     this->requestPub->Publish(*msg, true);
     delete msg;
   }
@@ -680,19 +681,20 @@ const ignition::math::Pose3d &Entity::DirtyPose() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Entity::CollisionBoundingBox() const
+ignition::math::AxisAlignedBox Entity::CollisionBoundingBox() const
 {
   BasePtr base = boost::const_pointer_cast<Base>(shared_from_this());
   return this->CollisionBoundingBoxHelper(base);
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Entity::CollisionBoundingBoxHelper(BasePtr _base) const
+ignition::math::AxisAlignedBox Entity::CollisionBoundingBoxHelper(
+    BasePtr _base) const
 {
   if (_base->HasType(COLLISION))
     return boost::dynamic_pointer_cast<Collision>(_base)->BoundingBox();
 
-  ignition::math::Box box;
+  ignition::math::AxisAlignedBox box;
 
   for (unsigned int i = 0; i < _base->GetChildCount(); i++)
   {
@@ -706,8 +708,8 @@ ignition::math::Box Entity::CollisionBoundingBoxHelper(BasePtr _base) const
 void Entity::PlaceOnEntity(const std::string &_entityName)
 {
   EntityPtr onEntity = this->GetWorld()->EntityByName(_entityName);
-  ignition::math::Box box = this->CollisionBoundingBox();
-  ignition::math::Box onBox = onEntity->CollisionBoundingBox();
+  ignition::math::AxisAlignedBox box = this->CollisionBoundingBox();
+  ignition::math::AxisAlignedBox onBox = onEntity->CollisionBoundingBox();
 
   ignition::math::Pose3d p = onEntity->WorldPose();
   p.Pos().Z() = onBox.Max().Z() + box.ZLength()*0.5;
@@ -722,7 +724,7 @@ void Entity::GetNearestEntityBelow(double &_distBelow,
   RayShapePtr rayShape = boost::dynamic_pointer_cast<RayShape>(
     this->GetWorld()->Physics()->CreateShape("ray", CollisionPtr()));
 
-  ignition::math::Box box = this->CollisionBoundingBox();
+  ignition::math::AxisAlignedBox box = this->CollisionBoundingBox();
   ignition::math::Vector3d start = this->WorldPose().Pos();
   ignition::math::Vector3d end = start;
   start.Z() = box.Min().Z() - 0.00001;

@@ -222,7 +222,7 @@ namespace gazebo
 
       /// \brief Update parameters from a message
       /// \param[in] _msg Message to read
-      public: void ProcessMsg(const msgs::Inertial &_msg);
+      public: void ProcessMsg(const gazebo::msgs::Inertial &_msg);
 
       /// \brief Get the equivalent inertia from a point in local Link frame
       /// If you specify MOI(this->GetPose()), you should get

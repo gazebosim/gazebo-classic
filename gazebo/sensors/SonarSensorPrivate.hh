@@ -37,7 +37,7 @@ namespace gazebo
       typedef std::list<boost::shared_ptr<msgs::Contacts const> > ContactMsgs_L;
 
       /// \brief Update event.
-      public: event::EventT<void(msgs::SonarStamped)> update;
+      public: event::EventT<void(gazebo::msgs::SonarStamped)> update;
 
       /// \brief Collison object that holds the sonarShape.
       public: physics::CollisionPtr sonarCollision;
@@ -55,7 +55,7 @@ namespace gazebo
       public: transport::PublisherPtr sonarPub;
 
       /// \brief Store current sonar info
-      public: msgs::SonarStamped sonarMsg;
+      public: gazebo::msgs::SonarStamped sonarMsg;
 
       /// \brief Mutex used to protect reading/writing the sonar message.
       public: std::mutex mutex;

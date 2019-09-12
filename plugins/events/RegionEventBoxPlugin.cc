@@ -94,7 +94,7 @@ void RegionEventBoxPlugin::OnModelMsg(ConstModelPtr &_msg)
   std::lock_guard<std::mutex> lock(this->receiveMutex);
   if (_msg->has_name() && _msg->name() == this->modelName && _msg->has_scale())
   {
-    this->boxScale = msgs::ConvertIgn(_msg->scale());
+    this->boxScale = gazebo::msgs::ConvertIgn(_msg->scale());
     this->hasStaleSizeAndPose = true;
   }
 }
@@ -156,12 +156,13 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
 
 //////////////////////////////////////////////////
 bool RegionEventBoxPlugin::PointInRegion(const ignition::math::Vector3d &_point,
-    const ignition::math::Box &_box, const ignition::math::Pose3d &_pose) const
+    const ignition::math::AxisAlignedBox &_box,
+    const ignition::math::Pose3d &_pose) const
 {
   // transform box extents into local space
   // box extents are already axis-aligned (see UpdateRegion) so no need to
   // apply inverse rotation.
-  ignition::math::Box localBox(_box.Min() - _pose.Pos(),
+  ignition::math::AxisAlignedBox localBox(_box.Min() - _pose.Pos(),
       _box.Max() - _pose.Pos());
 
   // transform point into box space
@@ -178,7 +179,7 @@ void RegionEventBoxPlugin::UpdateRegion(const ignition::math::Vector3d &_size,
   ignition::math::Vector3d vmin = _pose.Pos() - _size * 0.5;
   ignition::math::Vector3d vmax = _pose.Pos() + _size * 0.5;
 
-  this->box = ignition::math::Box(vmin, vmax);
+  this->box = ignition::math::AxisAlignedBox(vmin, vmax);
 }
 
 //////////////////////////////////////////////////

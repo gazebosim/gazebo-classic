@@ -63,7 +63,7 @@ namespace gazebo
       public: std::unique_ptr<Atmosphere> atmosphere;
 
       /// \brief Pointer the spherical coordinates data.
-      public: common::SphericalCoordinatesPtr sphericalCoordinates;
+      public: gazebo::common::SphericalCoordinatesPtr sphericalCoordinates;
 
       /// \brief The root of all entities in the world.
       public: BasePtr rootElement;
@@ -150,10 +150,10 @@ namespace gazebo
       public: transport::SubscriberPtr requestSub;
 
       /// \brief Outgoing world statistics message.
-      public: msgs::WorldStatistics worldStatsMsg;
+      public: gazebo::msgs::WorldStatistics worldStatsMsg;
 
       /// \brief Outgoing scene message.
-      public: msgs::Scene sceneMsg;
+      public: gazebo::msgs::Scene sceneMsg;
 
       /// \brief Function pointer to the model update function.
       public: void (World::*modelUpdateFunc)();

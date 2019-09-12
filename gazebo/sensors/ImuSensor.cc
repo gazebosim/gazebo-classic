@@ -63,7 +63,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   Sensor::Load(_worldName, _sdf);
 
   // Initialize orientation to identity.
-  msgs::Set(this->dataPtr->imuMsg.mutable_orientation(),
+  gazebo::msgs::Set(this->dataPtr->imuMsg.mutable_orientation(),
       ignition::math::Quaterniond::Identity);
 
   // initialize worldToReference transform as local frame
@@ -76,7 +76,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
       this->sdf->GetElement("imu")->Get<std::string>("topic")
       != "__default_topic__")
   {
-    this->dataPtr->pub = this->node->Advertise<msgs::IMU>(
+    this->dataPtr->pub = this->node->Advertise<gazebo::msgs::IMU>(
         this->sdf->GetElement("imu")->Get<std::string>("topic"), 500);
   }
   // CASE 2 : Topic is specified in parent sensor definition
@@ -87,7 +87,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     boost::replace_all(topicName, "::", "/");
 
     this->dataPtr->pub =
-      this->node->Advertise<msgs::IMU>(topicName, 500);
+      this->node->Advertise<gazebo::msgs::IMU>(topicName, 500);
   }
 
   // Get the imu element pointer
@@ -247,7 +247,7 @@ void ImuSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-msgs::IMU ImuSensor::ImuMessage() const
+gazebo::msgs::IMU ImuSensor::ImuMessage() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   return this->dataPtr->imuMsg;
@@ -268,7 +268,7 @@ ignition::math::Vector3d ImuSensor::AngularVelocity(const bool _noiseFree) const
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   if (_noiseFree)
     return this->dataPtr->angularVel;
-  return msgs::ConvertIgn(this->dataPtr->imuMsg.angular_velocity());
+  return gazebo::msgs::ConvertIgn(this->dataPtr->imuMsg.angular_velocity());
 }
 
 //////////////////////////////////////////////////
@@ -278,14 +278,14 @@ ignition::math::Vector3d ImuSensor::LinearAcceleration(
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   if (_noiseFree)
     return this->dataPtr->linearAcc;
-  return msgs::ConvertIgn(this->dataPtr->imuMsg.linear_acceleration());
+  return gazebo::msgs::ConvertIgn(this->dataPtr->imuMsg.linear_acceleration());
 }
 
 //////////////////////////////////////////////////
 ignition::math::Quaterniond ImuSensor::Orientation() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  return msgs::ConvertIgn(this->dataPtr->imuMsg.orientation());
+  return gazebo::msgs::ConvertIgn(this->dataPtr->imuMsg.orientation());
 }
 
 //////////////////////////////////////////////////
@@ -306,7 +306,7 @@ void ImuSensor::SetWorldToReferenceOrientation(
 //////////////////////////////////////////////////
 bool ImuSensor::UpdateImpl(const bool /*_force*/)
 {
-  msgs::LinkData msg;
+  gazebo::msgs::LinkData msg;
   int readIndex = 0;
 
   {
@@ -324,7 +324,7 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
   // toggle the index
   msg.CopyFrom(*this->dataPtr->incomingLinkData[readIndex].get());
 
-  common::Time timestamp = msgs::Convert(msg.time());
+  common::Time timestamp = gazebo::msgs::Convert(msg.time());
 
   double dt = (timestamp - this->lastMeasurementTime).Double();
 
@@ -338,14 +338,14 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
 
     this->dataPtr->gravity = this->world->Gravity();
 
-    msgs::Set(this->dataPtr->imuMsg.mutable_stamp(), timestamp);
+    gazebo::msgs::Set(this->dataPtr->imuMsg.mutable_stamp(), timestamp);
 
     ignition::math::Pose3d parentEntityPose =
       this->dataPtr->parentEntity->WorldPose();
     ignition::math::Pose3d imuWorldPose = this->pose + parentEntityPose;
 
     // Get the angular velocity
-    ignition::math::Vector3d linkWorldAngularVel = msgs::ConvertIgn(
+    ignition::math::Vector3d linkWorldAngularVel = gazebo::msgs::ConvertIgn(
         msg.angular_velocity());
 
     /////////////////////////////////////////////////////////////////////
@@ -353,7 +353,7 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
     /////////////////////////////////////////////////////////////////////
     this->dataPtr->angularVel = imuWorldPose.Rot().Inverse().RotateVector(
         linkWorldAngularVel);
-    msgs::Set(this->dataPtr->imuMsg.mutable_angular_velocity(),
+    gazebo::msgs::Set(this->dataPtr->imuMsg.mutable_angular_velocity(),
         this->dataPtr->angularVel);
 
     /////////////////////////////////////////////////////////////////////
@@ -361,7 +361,7 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
     /////////////////////////////////////////////////////////////////////
     // first get imu link's linear velocity in world frame
     ignition::math::Vector3d linkWorldLinearVel
-        = msgs::ConvertIgn(msg.linear_velocity());
+        = gazebo::msgs::ConvertIgn(msg.linear_velocity());
     // next, account for vel in world frame of the imu
     // given the imu frame is offset from link frame, and link is rotating
     // compute the velocity of the imu axis origin in world frame
@@ -379,14 +379,14 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
         this->dataPtr->gravity);
 
     // publish linear acceleration
-    msgs::Set(this->dataPtr->imuMsg.mutable_linear_acceleration(),
+    gazebo::msgs::Set(this->dataPtr->imuMsg.mutable_linear_acceleration(),
         this->dataPtr->linearAcc);
 
     // Set the IMU orientation
     // imu orientation with respect to reference frame
     ignition::math::Quaterniond imuReferenceOrientation =
       (this->dataPtr->worldToReference.Inverse() * imuWorldPose.Rot());
-    msgs::Set(this->dataPtr->imuMsg.mutable_orientation(),
+    gazebo::msgs::Set(this->dataPtr->imuMsg.mutable_orientation(),
       imuReferenceOrientation);
 
     this->dataPtr->lastImuWorldLinearVel = imuWorldLinearVel;

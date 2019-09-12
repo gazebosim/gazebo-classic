@@ -294,7 +294,7 @@ void IntrospectionCurveHandler::OnIntrospection(
     {
       if (paramValue.has_time_value())
       {
-        common::Time t = msgs::Convert(paramValue.time_value());
+        common::Time t = gazebo::msgs::Convert(paramValue.time_value());
         simTime = t.Double();
         hasSimTime = true;
       }
@@ -343,7 +343,7 @@ void IntrospectionCurveHandler::OnIntrospection(
         {
           if (paramValue.has_time_value())
           {
-            common::Time t = msgs::Convert(paramValue.time_value());
+            common::Time t = gazebo::msgs::Convert(paramValue.time_value());
             data = t.Double();
           }
           break;
@@ -353,7 +353,7 @@ void IntrospectionCurveHandler::OnIntrospection(
           if (paramValue.has_pose3d_value())
           {
             ignition::math::Pose3d p =
-                msgs::ConvertIgn(paramValue.pose3d_value());
+                gazebo::msgs::ConvertIgn(paramValue.pose3d_value());
 
             double d = 0;
             // use uri to parse and get specific attribute
@@ -387,7 +387,7 @@ void IntrospectionCurveHandler::OnIntrospection(
           if (paramValue.has_vector3d_value())
           {
             ignition::math::Vector3d vec =
-                msgs::ConvertIgn(paramValue.vector3d_value());
+                gazebo::msgs::ConvertIgn(paramValue.vector3d_value());
 
             double d = 0;
             // use uri to parse and get specific attribute
@@ -407,7 +407,7 @@ void IntrospectionCurveHandler::OnIntrospection(
           if (paramValue.has_quaternion_value())
           {
             ignition::math::Quaterniond quat =
-                msgs::ConvertIgn(paramValue.quaternion_value());
+                gazebo::msgs::ConvertIgn(paramValue.quaternion_value());
 
             double d = 0;
             // use uri to parse and get specific attribute

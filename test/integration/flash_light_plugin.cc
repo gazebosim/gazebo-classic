@@ -115,7 +115,7 @@ void FlashLightPluginTest::lightCb(ConstLightPtr &_msg)
   // Update for the color
   if (_msg->has_diffuse())
   {
-    ignition::math::Color color = msgs::Convert(_msg->diffuse());
+    ignition::math::Color color = gazebo::msgs::Convert(_msg->diffuse());
     auto it = std::find(
       this->flashLight[indx].colors.begin(),
       this->flashLight[indx].colors.end(),

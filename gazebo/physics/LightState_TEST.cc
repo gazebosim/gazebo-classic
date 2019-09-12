@@ -75,9 +75,9 @@ TEST_F(LightStateTest, LightConstructor)
   basePtr->SetWorld(world);
 
   // Create the light message
-  msgs::Light lightMsg;
+  gazebo::msgs::Light lightMsg;
   lightMsg.set_name("test_light");
-  msgs::Set(lightMsg.mutable_pose(), pose);
+  gazebo::msgs::Set(lightMsg.mutable_pose(), pose);
 
   // Create the light
   physics::LightPtr lightPtr(new physics::Light(basePtr));

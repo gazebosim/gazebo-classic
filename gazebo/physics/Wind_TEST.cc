@@ -45,10 +45,10 @@ class WindTest : public ServerFixture
   public: void WindSetLinearVelFunc();
 
   /// \brief Incoming wind message.
-  public: static msgs::Wind windPubMsg;
+  public: static gazebo::msgs::Wind windPubMsg;
 
   /// \brief Received wind message.
-  public: static msgs::Wind windResponseMsg;
+  public: static gazebo::msgs::Wind windResponseMsg;
 
   /// \brief Factor by which we multiply wind velocity.
   public: double windFactor;
@@ -87,21 +87,22 @@ void WindTest::WindParam()
   windNode->Init();
 
   transport::PublisherPtr windPub
-       = windNode->Advertise<msgs::Wind>("~/wind");
+       = windNode->Advertise<gazebo::msgs::Wind>("~/wind");
   transport::PublisherPtr requestPub
-      = windNode->Advertise<msgs::Request>("~/request");
+      = windNode->Advertise<gazebo::msgs::Request>("~/request");
   transport::SubscriberPtr responsePub = windNode->Subscribe("~/response",
       &WindTest::OnWindMsgResponse, this);
 
   windPubMsg.mutable_linear_velocity()->CopyFrom(
-    msgs::Convert(ignition::math::Vector3d(0.7, 0.7, 0)));
+    gazebo::msgs::Convert(ignition::math::Vector3d(0.7, 0.7, 0)));
 
   windPub->Publish(windPubMsg);
 
   // Wait 10 ms for the message to be processed
   common::Time::MSleep(10);
 
-  msgs::Request *requestMsg = msgs::CreateRequest("wind_info", "");
+  gazebo::msgs::Request *requestMsg =
+    gazebo::msgs::CreateRequest("wind_info", "");
   requestPub->Publish(*requestMsg);
 
   int waitCount = 0, maxWaitCount = 3000;
@@ -110,15 +111,15 @@ void WindTest::WindParam()
 
   ASSERT_LT(waitCount, maxWaitCount);
 
-  EXPECT_EQ(msgs::ConvertIgn(windResponseMsg.linear_velocity()),
-            msgs::ConvertIgn(windPubMsg.linear_velocity()));
+  EXPECT_EQ(gazebo::msgs::ConvertIgn(windResponseMsg.linear_velocity()),
+            gazebo::msgs::ConvertIgn(windPubMsg.linear_velocity()));
 
   // Test Wind::[GS]etParam()
   {
     physics::Wind &wind = world->Wind();
     ignition::math::Vector3d vel = boost::any_cast<ignition::math::Vector3d>(
       wind.Param("linear_velocity"));
-    EXPECT_EQ(vel, msgs::ConvertIgn(windPubMsg.linear_velocity()));
+    EXPECT_EQ(vel, gazebo::msgs::ConvertIgn(windPubMsg.linear_velocity()));
 
     EXPECT_NO_THROW(wind.Param("fake_param_name"));
     EXPECT_NO_THROW(wind.SetParam("fake_param_name", 0));

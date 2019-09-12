@@ -96,13 +96,13 @@ void ContactVisual::Update()
   {
     for (int j = 0; j < dPtr->contactsMsg->contact(i).position_size(); j++)
     {
-      auto pos = msgs::ConvertIgn(
+      auto pos = gazebo::msgs::ConvertIgn(
           dPtr->contactsMsg->contact(i).position(j));
-      auto normal = msgs::ConvertIgn(
+      auto normal = gazebo::msgs::ConvertIgn(
           dPtr->contactsMsg->contact(i).normal(j));
       double depth = dPtr->contactsMsg->contact(i).depth(j);
 
-      auto force = msgs::ConvertIgn(
+      auto force = gazebo::msgs::ConvertIgn(
           dPtr->contactsMsg->contact(i).wrench(j).body_1_wrench().force());
 
       // Scaling factor for the normal line.

@@ -66,7 +66,7 @@ void RFIDTag::Load(const std::string &_worldName)
 
   if (this->sdf->GetElement("topic"))
   {
-    this->dataPtr->scanPub = this->node->Advertise<msgs::Pose>(
+    this->dataPtr->scanPub = this->node->Advertise<gazebo::msgs::Pose>(
         this->sdf->GetElement("topic")->Get<std::string>());
   }
 
@@ -101,15 +101,15 @@ bool RFIDTag::UpdateImpl(const bool /*_force*/)
 {
   if (this->dataPtr->scanPub)
   {
-    msgs::Pose msg;
-    msgs::Set(&msg, this->dataPtr->entity->WorldPose());
+    gazebo::msgs::Pose msg;
+    gazebo::msgs::Set(&msg, this->dataPtr->entity->WorldPose());
 
     // msg.set_position(link->WorldPose().Pos());
     // msg.set_orientation(link->WorldPose().Rot());
-    // msgs::LaserScan msg;
+    // gazebo::msgs::LaserScan msg;
 
     // msg.set_frame(this->link->GetScopedName());
-    // msgs::Set(msg.mutable_offset(), this->GetPose());
+    // gazebo::msgs::Set(msg.mutable_offset(), this->GetPose());
     // msg.set_angle_min( this->GetAngleMin().Radian() );
     // msg.set_angle_max( this->GetAngleMax().Radian() );
     // msg.set_angle_step( this->GetAngleResolution() );

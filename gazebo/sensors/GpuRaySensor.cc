@@ -88,7 +88,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   this->dataPtr->scanPub =
-    this->node->Advertise<msgs::LaserScanStamped>(this->Topic(), 50);
+    this->node->Advertise<gazebo::msgs::LaserScanStamped>(this->Topic(), 50);
 
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   this->dataPtr->scanElem = rayElem->GetElement("scan");
@@ -587,13 +587,13 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  msgs::Set(this->dataPtr->laserMsg.mutable_time(),
+  gazebo::msgs::Set(this->dataPtr->laserMsg.mutable_time(),
       this->lastMeasurementTime);
 
-  msgs::LaserScan *scan = this->dataPtr->laserMsg.mutable_scan();
+  gazebo::msgs::LaserScan *scan = this->dataPtr->laserMsg.mutable_scan();
 
   // Store the latest laser scans into laserMsg
-  msgs::Set(scan->mutable_world_pose(),
+  gazebo::msgs::Set(scan->mutable_world_pose(),
       this->pose + this->dataPtr->parentEntity->WorldPose());
   scan->set_angle_min(this->AngleMin().Radian());
   scan->set_angle_max(this->AngleMax().Radian());

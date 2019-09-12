@@ -132,13 +132,13 @@ void SonarVisual::Update()
   }
 
   ignition::math::Pose3d pose =
-    msgs::ConvertIgn(dPtr->sonarMsg->sonar().world_pose());
+    gazebo::msgs::ConvertIgn(dPtr->sonarMsg->sonar().world_pose());
   this->SetPose(pose);
 
   if (dPtr->sonarMsg->sonar().has_contact())
   {
     ignition::math::Vector3d pos =
-      msgs::ConvertIgn(dPtr->sonarMsg->sonar().contact());
+      gazebo::msgs::ConvertIgn(dPtr->sonarMsg->sonar().contact());
     dPtr->sonarRay->SetPoint(1, pos);
   }
   else

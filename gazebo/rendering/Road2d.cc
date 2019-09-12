@@ -39,7 +39,7 @@ namespace gazebo
     {
       /// \brief Load the road segment from message data.
       /// \param[in] _msg The robot data.
-      public: void Load(msgs::Road _msg);
+      public: void Load(gazebo::msgs::Road _msg);
 
       /// \brief Name of the road segment.
       public: std::string name;
@@ -92,7 +92,7 @@ Road2d::~Road2d()
 }
 
 //////////////////////////////////////////////////
-void Road2d::Load(msgs::Road _msg)
+void Road2d::Load(gazebo::msgs::Road _msg)
 {
   this->Load();
 
@@ -114,13 +114,13 @@ void Road2d::Load(msgs::Road _msg)
 }
 
 /////////////////////////////////////////////////
-void RoadSegment::Load(msgs::Road _msg)
+void RoadSegment::Load(gazebo::msgs::Road _msg)
 {
   this->width = _msg.width();
 
   for (int i = 0; i < _msg.point_size(); ++i)
   {
-    this->points.push_back(msgs::ConvertIgn(_msg.point(i)));
+    this->points.push_back(gazebo::msgs::ConvertIgn(_msg.point(i)));
   }
 
   this->name = _msg.name();
@@ -178,7 +178,7 @@ void RoadSegment::Load(msgs::Road _msg)
 
   ignition::math::Vector3d pA, pB, tangent;
 
-  ignition::math::Box bounds;
+  ignition::math::AxisAlignedBox bounds;
   bounds.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
                    ignition::math::MAX_D);
   bounds.Max().Set(ignition::math::MIN_D, ignition::math::MIN_D,

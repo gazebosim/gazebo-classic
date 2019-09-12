@@ -76,7 +76,7 @@ namespace gazebo
       public: std::mutex mutex;
 
       /// \brief Laser message to publish data.
-      public: msgs::LaserScanStamped laserMsg;
+      public: gazebo::msgs::LaserScanStamped laserMsg;
 
       /// \brief Parent entity of gpu ray sensor
       public: physics::EntityPtr parentEntity;

@@ -78,7 +78,7 @@ namespace gazebo
     private: std::map<std::string, RegionPtr> regions;
 
     /// \brief String message that is transmitted when an event occurs.
-    public: msgs::GzString msg;
+    public: gazebo::msgs::GzString msg;
 
     /// \brief Publisher that transmits the message when an event occurs.
     public: transport::PublisherPtr msgPub;

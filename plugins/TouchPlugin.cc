@@ -102,7 +102,7 @@ void TouchPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   auto enabled = _sdf->HasElement("enabled") && _sdf->Get<bool>("enabled");
   if (enabled)
   {
-    boost::shared_ptr<msgs::Int> msg(new msgs::Int());
+    boost::shared_ptr<gazebo::msgs::Int> msg(new gazebo::msgs::Int());
     msg->set_data(1);
     this->Enable(msg);
   }
@@ -118,7 +118,7 @@ void TouchPlugin::Enable(ConstIntPtr &_msg)
     this->updateConnection = event::Events::ConnectWorldUpdateBegin(
         std::bind(&TouchPlugin::OnUpdate, this, std::placeholders::_1));
 
-    this->touchedPub = this->gzNode->Advertise<msgs::Int>(
+    this->touchedPub = this->gzNode->Advertise<gazebo::msgs::Int>(
         "/" + this->ns + "/touched");
 
     for (auto s : this->contactSensors)
@@ -147,7 +147,7 @@ void TouchPlugin::Enable(ConstIntPtr &_msg)
 void TouchPlugin::OnUpdate(const common::UpdateInfo &_info)
 {
   // Get all contacts across all sensors
-  msgs::Contacts contacts;
+  gazebo::msgs::Contacts contacts;
 
   for (const auto &s : this->contactSensors)
     contacts.MergeFrom(s->Contacts());
@@ -227,7 +227,7 @@ void TouchPlugin::OnUpdate(const common::UpdateInfo &_info)
     this->touchedPub->Publish(msg);
 
     // Disable
-    boost::shared_ptr<msgs::Int> m(new msgs::Int());
+    boost::shared_ptr<gazebo::msgs::Int> m(new gazebo::msgs::Int());
     m->set_data(0);
     this->Enable(m);
   }

@@ -64,7 +64,7 @@ void RFIDSensor::Load(const std::string &_worldName)
 
   if (this->sdf->GetElement("topic"))
   {
-    this->dataPtr->scanPub = this->node->Advertise<msgs::Pose>(
+    this->dataPtr->scanPub = this->node->Advertise<gazebo::msgs::Pose>(
         this->sdf->GetElement("topic")->Get<std::string>());
   }
 
@@ -126,8 +126,8 @@ bool RFIDSensor::UpdateImpl(const bool /*_force*/)
 
   if (this->dataPtr->scanPub)
   {
-    msgs::Pose msg;
-    msgs::Set(&msg, this->dataPtr->entity->WorldPose());
+    gazebo::msgs::Pose msg;
+    gazebo::msgs::Set(&msg, this->dataPtr->entity->WorldPose());
     this->dataPtr->scanPub->Publish(msg);
   }
 

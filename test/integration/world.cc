@@ -231,19 +231,20 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
 
     // Check scene message
-    msgs::Scene sceneMsg = world->SceneMsg();
+    gazebo::msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
   }
 
-  transport::PublisherPtr lightModifyPub = this->node->Advertise<msgs::Light>(
-        "~/light/modify");
+  transport::PublisherPtr lightModifyPub =
+    this->node->Advertise<gazebo::msgs::Light>("~/light/modify");
 
   // Set the light to be green
   {
-    msgs::Light lightMsg;
+    gazebo::msgs::Light lightMsg;
     lightMsg.set_name("sun");
-    msgs::Set(lightMsg.mutable_diffuse(), ignition::math::Color(0, 1, 0));
+    gazebo::msgs::Set(
+        lightMsg.mutable_diffuse(), ignition::math::Color(0, 1, 0));
     lightModifyPub->Publish(lightMsg);
   }
 
@@ -258,14 +259,14 @@ TEST_F(WorldTest, ModifyLight)
     physics::Light_V lights = world->Lights();
     EXPECT_EQ(lights.size(), 1u);
     EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
-    msgs::Light lightMsg;
+    gazebo::msgs::Light lightMsg;
     lights[0]->FillMsg(lightMsg);
     EXPECT_EQ(lightMsg.diffuse().r(), 0);
     EXPECT_EQ(lightMsg.diffuse().g(), 1);
     EXPECT_EQ(lightMsg.diffuse().b(), 0);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->SceneMsg();
+    gazebo::msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
     EXPECT_EQ(sceneMsg.light(0).diffuse().r(), 0);
@@ -273,15 +274,16 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(sceneMsg.light(0).diffuse().b(), 0);
   }
 
-  transport::PublisherPtr lightFactoryPub = this->node->Advertise<msgs::Light>(
-        "~/factory/light");
+  transport::PublisherPtr lightFactoryPub =
+    this->node->Advertise<gazebo::msgs::Light>("~/factory/light");
 
   // Add a new light
   {
-    msgs::Light lightMsg;
+    gazebo::msgs::Light lightMsg;
     lightMsg.set_name("test_light");
-    msgs::Set(lightMsg.mutable_diffuse(), ignition::math::Color(1, 0, 1));
-    lightMsg.set_type(msgs::Light::POINT);
+    gazebo::msgs::Set(lightMsg.mutable_diffuse(),
+        ignition::math::Color(1, 0, 1));
+    lightMsg.set_type(gazebo::msgs::Light::POINT);
     lightFactoryPub->Publish(lightMsg);
   }
 
@@ -293,21 +295,21 @@ TEST_F(WorldTest, ModifyLight)
     physics::Light_V lights = world->Lights();
     EXPECT_EQ(lights.size(), 2u);
     EXPECT_STREQ(lights[1]->GetName().c_str(), "test_light");
-    msgs::Light lightMsg;
+    gazebo::msgs::Light lightMsg;
     lights[1]->FillMsg(lightMsg);
     EXPECT_EQ(lightMsg.diffuse().r(), 1);
     EXPECT_EQ(lightMsg.diffuse().g(), 0);
     EXPECT_EQ(lightMsg.diffuse().b(), 1);
-    EXPECT_EQ(lightMsg.type(), msgs::Light::POINT);
+    EXPECT_EQ(lightMsg.type(), gazebo::msgs::Light::POINT);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->SceneMsg();
+    gazebo::msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_light");
     EXPECT_EQ(sceneMsg.light(1).diffuse().r(), 1);
     EXPECT_EQ(sceneMsg.light(1).diffuse().g(), 0);
     EXPECT_EQ(sceneMsg.light(1).diffuse().b(), 1);
-    EXPECT_EQ(sceneMsg.light(1).type(), msgs::Light::POINT);
+    EXPECT_EQ(sceneMsg.light(1).type(), gazebo::msgs::Light::POINT);
   }
 
   // Delete the test_light
@@ -324,17 +326,18 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
 
     // Check scene message
-    msgs::Scene sceneMsg = world->SceneMsg();
+    gazebo::msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
   }
 
   // Add a new spot light
   {
-    msgs::Light lightMsg;
+    gazebo::msgs::Light lightMsg;
     lightMsg.set_name("test_spot_light");
-    msgs::Set(lightMsg.mutable_diffuse(), ignition::math::Color(1, 1, 0));
-    lightMsg.set_type(msgs::Light::SPOT);
+    gazebo::msgs::Set(lightMsg.mutable_diffuse(),
+        ignition::math::Color(1, 1, 0));
+    lightMsg.set_type(gazebo::msgs::Light::SPOT);
     lightFactoryPub->Publish(lightMsg);
   }
 
@@ -346,28 +349,28 @@ TEST_F(WorldTest, ModifyLight)
     physics::Light_V lights = world->Lights();
     EXPECT_EQ(lights.size(), 2u);
     EXPECT_STREQ(lights[1]->GetName().c_str(), "test_spot_light");
-    msgs::Light lightMsg;
+    gazebo::msgs::Light lightMsg;
     lights[1]->FillMsg(lightMsg);
     EXPECT_EQ(lightMsg.diffuse().r(), 1);
     EXPECT_EQ(lightMsg.diffuse().g(), 1);
     EXPECT_EQ(lightMsg.diffuse().b(), 0);
-    EXPECT_EQ(lightMsg.type(), msgs::Light::SPOT);
+    EXPECT_EQ(lightMsg.type(), gazebo::msgs::Light::SPOT);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->SceneMsg();
+    gazebo::msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_spot_light");
     EXPECT_EQ(sceneMsg.light(1).diffuse().r(), 1);
     EXPECT_EQ(sceneMsg.light(1).diffuse().g(), 1);
     EXPECT_EQ(sceneMsg.light(1).diffuse().b(), 0);
-    EXPECT_EQ(sceneMsg.light(1).type(), msgs::Light::SPOT);
+    EXPECT_EQ(sceneMsg.light(1).type(), gazebo::msgs::Light::SPOT);
   }
 
   // Modify spot light pose
   {
-    msgs::Light lightMsg;
+    gazebo::msgs::Light lightMsg;
     lightMsg.set_name("test_spot_light");
-    msgs::Set(lightMsg.mutable_pose(),
+    gazebo::msgs::Set(lightMsg.mutable_pose(),
         ignition::math::Pose3d(
           ignition::math::Vector3d(3, 2, 1),
           ignition::math::Quaterniond(0, 1, 0, 0)));
@@ -383,7 +386,7 @@ TEST_F(WorldTest, ModifyLight)
     physics::Light_V lights = world->Lights();
     EXPECT_EQ(lights.size(), 2u);
     EXPECT_STREQ(lights[1]->GetName().c_str(), "test_spot_light");
-    msgs::Light lightMsg;
+    gazebo::msgs::Light lightMsg;
     lights[1]->FillMsg(lightMsg);
     EXPECT_EQ(lightMsg.diffuse().r(), 1);
     EXPECT_EQ(lightMsg.diffuse().g(), 1);
@@ -397,10 +400,10 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(lightMsg.pose().orientation().y(), 0);
     EXPECT_EQ(lightMsg.pose().orientation().z(), 0);
 
-    EXPECT_EQ(lightMsg.type(), msgs::Light::SPOT);
+    EXPECT_EQ(lightMsg.type(), gazebo::msgs::Light::SPOT);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->SceneMsg();
+    gazebo::msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_spot_light");
     EXPECT_EQ(sceneMsg.light(1).diffuse().r(), 1);
@@ -415,15 +418,16 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(sceneMsg.light(1).pose().orientation().y(), 0);
     EXPECT_EQ(sceneMsg.light(1).pose().orientation().z(), 0);
 
-    EXPECT_EQ(sceneMsg.light(1).type(), msgs::Light::SPOT);
+    EXPECT_EQ(sceneMsg.light(1).type(), gazebo::msgs::Light::SPOT);
   }
 
   // Add a new light with the name of a light that has been deleted
   {
-    msgs::Light lightMsg;
+    gazebo::msgs::Light lightMsg;
     lightMsg.set_name("test_light");
-    msgs::Set(lightMsg.mutable_diffuse(), ignition::math::Color(0, 0, 1));
-    lightMsg.set_type(msgs::Light::DIRECTIONAL);
+    gazebo::msgs::Set(lightMsg.mutable_diffuse(),
+        ignition::math::Color(0, 0, 1));
+    lightMsg.set_type(gazebo::msgs::Light::DIRECTIONAL);
     lightFactoryPub->Publish(lightMsg);
   }
 
@@ -435,21 +439,21 @@ TEST_F(WorldTest, ModifyLight)
     physics::Light_V lights = world->Lights();
     EXPECT_EQ(lights.size(), 3u);
     EXPECT_STREQ(lights[2]->GetName().c_str(), "test_light");
-    msgs::Light lightMsg;
+    gazebo::msgs::Light lightMsg;
     lights[2]->FillMsg(lightMsg);
     EXPECT_DOUBLE_EQ(lightMsg.diffuse().r(), 0);
     EXPECT_EQ(lightMsg.diffuse().g(), 0);
     EXPECT_EQ(lightMsg.diffuse().b(), 1);
-    EXPECT_EQ(lightMsg.type(), msgs::Light::DIRECTIONAL);
+    EXPECT_EQ(lightMsg.type(), gazebo::msgs::Light::DIRECTIONAL);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->SceneMsg();
+    gazebo::msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 3);
     EXPECT_STREQ(sceneMsg.light(2).name().c_str(), "test_light");
     EXPECT_EQ(sceneMsg.light(2).diffuse().r(), 0);
     EXPECT_EQ(sceneMsg.light(2).diffuse().g(), 0);
     EXPECT_EQ(sceneMsg.light(2).diffuse().b(), 1);
-    EXPECT_EQ(sceneMsg.light(2).type(), msgs::Light::DIRECTIONAL);
+    EXPECT_EQ(sceneMsg.light(2).type(), gazebo::msgs::Light::DIRECTIONAL);
   }
 }
 

@@ -39,16 +39,16 @@ namespace gazebo
 
       // Create a publisher on the ~/physics topic
       transport::PublisherPtr physicsPub =
-        node->Advertise<msgs::Physics>("~/physics");
+        node->Advertise<gazebo::msgs::Physics>("~/physics");
 
-      msgs::Physics physicsMsg;
-      physicsMsg.set_type(msgs::Physics::ODE);
+      gazebo::msgs::Physics physicsMsg;
+      physicsMsg.set_type(gazebo::msgs::Physics::ODE);
 
       // Set the step time
       physicsMsg.set_max_step_size(0.01);
 
       // Change gravity
-      msgs::Set(physicsMsg.mutable_gravity(),
+      gazebo::msgs::Set(physicsMsg.mutable_gravity(),
           ignition::math::Vector3d(0.01, 0, 0.1));
       physicsPub->Publish(physicsMsg);
     }

@@ -79,7 +79,7 @@ std::string AdiabaticAtmosphere::Type() const
 /////////////////////////////////////////////////
 void AdiabaticAtmosphere::OnRequest(ConstRequestPtr &_msg)
 {
-  msgs::Response response;
+  gazebo::msgs::Response response;
   response.set_id(_msg->id());
   response.set_request(_msg->request());
   response.set_response("success");
@@ -87,8 +87,8 @@ void AdiabaticAtmosphere::OnRequest(ConstRequestPtr &_msg)
 
   if (_msg->request() == "atmosphere_info")
   {
-    msgs::Atmosphere atmosphereMsg;
-    atmosphereMsg.set_type(msgs::Atmosphere::ADIABATIC);
+    gazebo::msgs::Atmosphere atmosphereMsg;
+    atmosphereMsg.set_type(gazebo::msgs::Atmosphere::ADIABATIC);
     atmosphereMsg.set_enable_atmosphere(this->World().AtmosphereEnabled());
     atmosphereMsg.set_temperature(Atmosphere::Temperature());
     atmosphereMsg.set_pressure(Atmosphere::Pressure());

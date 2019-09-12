@@ -113,10 +113,10 @@ void TouchPluginTest::OneLink(const std::string &_physicsEngine)
   EXPECT_FALSE(this->whiteTouched);
 
   // Enable plugin again
-  auto enablePub = this->node->Advertise<msgs::Int>(
+  auto enablePub = this->node->Advertise<gazebo::msgs::Int>(
         "/white_touches_only_green/enable");
 
-  msgs::Int msg;
+  gazebo::msgs::Int msg;
   msg.set_data(1);
   enablePub->Publish(msg);
 
@@ -216,10 +216,10 @@ void TouchPluginTest::StartDisabled(const std::string &_physicsEngine)
   EXPECT_FALSE(this->blueTouched);
 
   // Enable plugin
-  auto enablePub = this->node->Advertise<msgs::Int>(
+  auto enablePub = this->node->Advertise<gazebo::msgs::Int>(
         "/blue_touches_only_green/enable");
 
-  msgs::Int msg;
+  gazebo::msgs::Int msg;
   msg.set_data(1);
   enablePub->Publish(msg);
 

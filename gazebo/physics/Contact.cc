@@ -72,7 +72,7 @@ Contact &Contact::operator =(const Contact &_contact)
 }
 
 //////////////////////////////////////////////////
-Contact &Contact::operator =(const msgs::Contact &_contact)
+Contact &Contact::operator =(const gazebo::msgs::Contact &_contact)
 {
   this->count = 0;
 
@@ -93,28 +93,28 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
 
   for (int j = 0; j < _contact.position_size(); ++j)
   {
-    this->positions[j] = msgs::ConvertIgn(_contact.position(j));
+    this->positions[j] = gazebo::msgs::ConvertIgn(_contact.position(j));
 
-    this->normals[j] = msgs::ConvertIgn(_contact.normal(j));
+    this->normals[j] = gazebo::msgs::ConvertIgn(_contact.normal(j));
 
     this->depths[j] = _contact.depth(j);
 
     this->wrench[j].body1Force =
-      msgs::ConvertIgn(_contact.wrench(j).body_1_wrench().force());
+      gazebo::msgs::ConvertIgn(_contact.wrench(j).body_1_wrench().force());
 
     this->wrench[j].body2Force =
-      msgs::ConvertIgn(_contact.wrench(j).body_2_wrench().force());
+      gazebo::msgs::ConvertIgn(_contact.wrench(j).body_2_wrench().force());
 
     this->wrench[j].body1Torque =
-      msgs::ConvertIgn(_contact.wrench(j).body_1_wrench().torque());
+      gazebo::msgs::ConvertIgn(_contact.wrench(j).body_1_wrench().torque());
 
     this->wrench[j].body2Torque =
-      msgs::ConvertIgn(_contact.wrench(j).body_2_wrench().torque());
+      gazebo::msgs::ConvertIgn(_contact.wrench(j).body_2_wrench().torque());
 
     this->count++;
   }
 
-  this->time = msgs::Convert(_contact.time());
+  this->time = gazebo::msgs::Convert(_contact.time());
 
   return *this;
 }
@@ -152,32 +152,32 @@ std::string Contact::DebugString() const
 }
 
 //////////////////////////////////////////////////
-void Contact::FillMsg(msgs::Contact &_msg) const
+void Contact::FillMsg(gazebo::msgs::Contact &_msg) const
 {
   _msg.set_world(this->world->Name());
   _msg.set_collision1(this->collision1->GetScopedName());
   _msg.set_collision2(this->collision2->GetScopedName());
-  msgs::Set(_msg.mutable_time(), this->time);
+  gazebo::msgs::Set(_msg.mutable_time(), this->time);
 
   for (int j = 0; j < this->count; ++j)
   {
     _msg.add_depth(this->depths[j]);
 
-    msgs::Set(_msg.add_position(), this->positions[j]);
-    msgs::Set(_msg.add_normal(), this->normals[j]);
+    gazebo::msgs::Set(_msg.add_position(), this->positions[j]);
+    gazebo::msgs::Set(_msg.add_normal(), this->normals[j]);
 
-    msgs::JointWrench *jntWrench = _msg.add_wrench();
+    gazebo::msgs::JointWrench *jntWrench = _msg.add_wrench();
     jntWrench->set_body_1_name(this->collision1->GetScopedName());
     jntWrench->set_body_1_id(this->collision1->GetId());
     jntWrench->set_body_2_name(this->collision2->GetScopedName());
     jntWrench->set_body_2_id(this->collision2->GetId());
 
-    msgs::Wrench *wrenchMsg =  jntWrench->mutable_body_1_wrench();
-    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body1Force);
-    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body1Torque);
+    gazebo::msgs::Wrench *wrenchMsg =  jntWrench->mutable_body_1_wrench();
+    gazebo::msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body1Force);
+    gazebo::msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body1Torque);
 
     wrenchMsg =  jntWrench->mutable_body_2_wrench();
-    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body2Force);
-    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body2Torque);
+    gazebo::msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body2Force);
+    gazebo::msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body2Torque);
   }
 }

@@ -75,7 +75,7 @@ void AltimeterSensor::Load(const std::string &_worldName)
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
   this->dataPtr->altPub =
-    this->node->Advertise<msgs::Altimeter>(this->Topic(), 50);
+    this->node->Advertise<gazebo::msgs::Altimeter>(this->Topic(), 50);
 
   // Parse sdf noise parameters
   sdf::ElementPtr altElem = this->sdf->GetElement("altimeter");
@@ -169,7 +169,8 @@ bool AltimeterSensor::UpdateImpl(const bool /*_force*/)
   }
 
   // Save the time of the measurement
-  msgs::Set(this->dataPtr->altMsg.mutable_time(), this->world->SimTime());
+  gazebo::msgs::Set(
+      this->dataPtr->altMsg.mutable_time(), this->world->SimTime());
 
   // Publish the message if needed
   if (this->dataPtr->altPub)

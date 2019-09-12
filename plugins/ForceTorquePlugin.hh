@@ -41,7 +41,7 @@ namespace gazebo
 
     /// \brief Update callback. Overload this function in a child class.
     /// \param[in] _msg The force torque message.
-    protected: virtual void OnUpdate(msgs::WrenchStamped _msg);
+    protected: virtual void OnUpdate(gazebo::msgs::WrenchStamped _msg);
 
     /// \brief The parent sensor
     protected: sensors::ForceTorqueSensorPtr parentSensor;

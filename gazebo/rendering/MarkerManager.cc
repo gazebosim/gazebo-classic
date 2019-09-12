@@ -203,7 +203,7 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 {
   // Get the namespace, if it exists. Otherwise, use the global namespace
   std::string ns;
-  if (_msg.has_ns())
+  if (!_msg.ns().empty())
     ns = _msg.ns();
 
   // Get the namespace that the marker belongs to
@@ -211,7 +211,7 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 
   // If an id is given
   size_t id;
-  if (_msg.has_id())
+  if (_msg.id() != 0)
   {
     id = _msg.id();
   }
@@ -360,5 +360,5 @@ bool MarkerManagerPrivate::OnList(ignition::msgs::Marker_V &_rep)
 void MarkerManagerPrivate::OnStatsMsg(ConstWorldStatisticsPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
-  this->simTime = msgs::Convert(_msg->sim_time());
+  this->simTime = gazebo::msgs::Convert(_msg->sim_time());
 }

@@ -47,7 +47,7 @@ PublicationTransport::~PublicationTransport()
 {
   if (this->connection)
   {
-    msgs::Subscribe sub;
+    gazebo::msgs::Subscribe sub;
     sub.set_topic(this->topic);
     sub.set_msg_type(this->msgType);
     sub.set_host(this->connection->GetLocalAddress());
@@ -65,14 +65,14 @@ PublicationTransport::~PublicationTransport()
 void PublicationTransport::Init(const ConnectionPtr &_conn, bool _latched)
 {
   this->connection = _conn;
-  msgs::Subscribe sub;
+  gazebo::msgs::Subscribe sub;
   sub.set_topic(this->topic);
   sub.set_msg_type(this->msgType);
   sub.set_host(this->connection->GetLocalAddress());
   sub.set_port(this->connection->GetLocalPort());
   sub.set_latching(_latched);
 
-  this->connection->EnqueueMsg(msgs::Package("sub", sub));
+  this->connection->EnqueueMsg(gazebo::msgs::Package("sub", sub));
 
   // Put this in PublicationTransportPtr
   // Start reading messages from the remote publisher

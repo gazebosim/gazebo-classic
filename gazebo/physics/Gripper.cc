@@ -87,7 +87,7 @@ class gazebo::physics::GripperPrivate
   public: std::map<std::string, physics::CollisionPtr> collisions;
 
   /// \brief The current contacts.
-  public: std::vector<msgs::Contact> contacts;
+  public: std::vector<gazebo::msgs::Contact> contacts;
 
   /// \brief Mutex used to protect reading/writing the contact message.
   public: std::mutex mutexContacts;

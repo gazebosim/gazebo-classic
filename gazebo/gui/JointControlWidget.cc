@@ -383,7 +383,7 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
     return;
   }
 
-  msgs::Model modelMsg;
+  gazebo::msgs::Model modelMsg;
 
   this->dataPtr->modelLabel->setText(
       QString::fromStdString(std::string("Model: ")));
@@ -400,7 +400,7 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
       gzerr << "Error advertising topic [" << topic << "]\n";
     }
 
-    boost::shared_ptr<msgs::Response> response = transport::request(
+    boost::shared_ptr<gazebo::msgs::Response> response = transport::request(
         gui::get_world(), "entity_info", _modelName);
 
     if (response->response() != "error" &&
@@ -520,53 +520,26 @@ void JointControlWidget::OnResponse(const std::string &_modelName,
 {
   if (_modelName == this->dataPtr->modelName)
   {
-    if (_rep.has_force())
-    {
-      auto slider = this->dataPtr->sliders[_rep.name()];
-      GZ_ASSERT(slider, "Joint force controller is null");
-      slider->SetForce(_rep.force());
-    }
+    auto slider = this->dataPtr->sliders[_rep.name()];
+    GZ_ASSERT(slider, "Joint force controller is null");
+    slider->SetForce(_rep.force());
     if (_rep.has_position())
     {
       auto slider = this->dataPtr->pidPosSliders[_rep.name()];
       GZ_ASSERT(slider, "Joint PID position controller is null");
-      if (_rep.position().has_target())
-      {
-        slider->SetPositionTarget(_rep.position().target());
-      }
-      if (_rep.position().has_p_gain())
-      {
-        slider->SetPGain(_rep.position().p_gain());
-      }
-      if (_rep.position().has_i_gain())
-      {
-        slider->SetIGain(_rep.position().i_gain());
-      }
-      if (_rep.position().has_d_gain())
-      {
-        slider->SetDGain(_rep.position().d_gain());
-      }
+      slider->SetPositionTarget(_rep.position().target());
+      slider->SetPGain(_rep.position().p_gain());
+      slider->SetIGain(_rep.position().i_gain());
+      slider->SetDGain(_rep.position().d_gain());
     }
     if (_rep.has_velocity())
     {
       auto slider = this->dataPtr->pidVelSliders[_rep.name()];
       GZ_ASSERT(slider, "Joint PID velocity controller is null");
-      if (_rep.velocity().has_target())
-      {
-        slider->SetVelocityTarget(_rep.velocity().target());
-      }
-      if (_rep.velocity().has_p_gain())
-      {
-        slider->SetPGain(_rep.velocity().p_gain());
-      }
-      if (_rep.velocity().has_i_gain())
-      {
-        slider->SetIGain(_rep.velocity().i_gain());
-      }
-      if (_rep.velocity().has_d_gain())
-      {
-        slider->SetDGain(_rep.velocity().d_gain());
-      }
+      slider->SetVelocityTarget(_rep.velocity().target());
+      slider->SetPGain(_rep.velocity().p_gain());
+      slider->SetIGain(_rep.velocity().i_gain());
+      slider->SetDGain(_rep.velocity().d_gain());
     }
   }
 }
@@ -776,7 +749,7 @@ void JointControlWidget::AddScrollTab(QTabWidget *_tabPane,
 }
 
 /////////////////////////////////////////////////
-void JointControlWidget::LayoutForceTab(msgs::Model &_modelMsg)
+void JointControlWidget::LayoutForceTab(gazebo::msgs::Model &_modelMsg)
 {
   // Remove the old widgets;
   QLayoutItem *wItem;
@@ -827,7 +800,7 @@ void JointControlWidget::LayoutForceTab(msgs::Model &_modelMsg)
 }
 
 /////////////////////////////////////////////////
-void JointControlWidget::LayoutPositionTab(msgs::Model &_modelMsg)
+void JointControlWidget::LayoutPositionTab(gazebo::msgs::Model &_modelMsg)
 {
   // Remove the old widgets;
   QLayoutItem *wItem;
@@ -898,7 +871,7 @@ void JointControlWidget::LayoutPositionTab(msgs::Model &_modelMsg)
 }
 
 /////////////////////////////////////////////////
-void JointControlWidget::LayoutVelocityTab(msgs::Model &_modelMsg)
+void JointControlWidget::LayoutVelocityTab(gazebo::msgs::Model &_modelMsg)
 {
   // Remove the old widgets;
   QLayoutItem *wItem;

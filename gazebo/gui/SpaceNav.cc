@@ -122,8 +122,8 @@ bool SpaceNav::Load()
   {
     this->dataPtr->node = transport::NodePtr(new transport::Node());
     this->dataPtr->node->TryInit(common::Time::Maximum());
-    this->dataPtr->joyPub = this->dataPtr->node->Advertise<msgs::Joystick>(
-        topic);
+    this->dataPtr->joyPub =
+      this->dataPtr->node->Advertise<gazebo::msgs::Joystick>(topic);
 
     this->dataPtr->pollThread = new boost::thread(
         boost::bind(&SpaceNav::Run, this));
@@ -152,7 +152,7 @@ void SpaceNav::Run()
   this->dataPtr->stop = false;
   while (!this->dataPtr->stop)
   {
-    msgs::Joystick joystickMsg;
+    gazebo::msgs::Joystick joystickMsg;
 
     // add button state
     for (unsigned int i = 0; i < 2; ++i)

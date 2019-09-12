@@ -61,7 +61,7 @@ TEST_F(TransportStressTest, LocalPublish)
   transport::NodePtr testNode = transport::NodePtr(new transport::Node());
   testNode->Init("default");
 
-  transport::PublisherPtr pub = testNode->Advertise<msgs::Image>(
+  transport::PublisherPtr pub = testNode->Advertise<gazebo::msgs::Image>(
       "~/test/local_publish__", g_localPublishMessageCount);
 
   transport::SubscriberPtr sub = testNode->Subscribe("~/test/local_publish__",
@@ -72,7 +72,7 @@ TEST_F(TransportStressTest, LocalPublish)
   unsigned char *fakeData = new unsigned char[width * height];
 
   // Create a large image message with fake data
-  msgs::Image fakeMsg;
+  gazebo::msgs::Image fakeMsg;
   fakeMsg.set_width(width);
   fakeMsg.set_height(height);
   fakeMsg.set_pixel_format(0);
@@ -162,7 +162,7 @@ TEST_F(TransportStressTest, ManyNodes)
     nodes.push_back(transport::NodePtr(new transport::Node()));
     nodes.back()->Init();
 
-    pubs.push_back(nodes.back()->Advertise<msgs::Image>(
+    pubs.push_back(nodes.back()->Advertise<gazebo::msgs::Image>(
           "~/test/local_publish2__", nodeCount * g_localPublishMessageCount));
 
     subs.push_back(nodes.back()->Subscribe("~/test/local_publish2__",
@@ -175,7 +175,7 @@ TEST_F(TransportStressTest, ManyNodes)
   unsigned char *fakeData = new unsigned char[width * height];
 
   // Create a large image message with fake data
-  msgs::Image fakeMsg;
+  gazebo::msgs::Image fakeMsg;
   fakeMsg.set_width(width);
   fakeMsg.set_height(height);
   fakeMsg.set_pixel_format(0);

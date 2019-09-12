@@ -63,7 +63,7 @@ namespace gazebo
 
       /// \brief Message containing the data which was in the widget when first
       /// open.
-      public: msgs::Visual originalDataMsg;
+      public: gazebo::msgs::Visual originalDataMsg;
     };
 
     /// \class VisualConfig VisualConfig.hh
@@ -89,7 +89,7 @@ namespace gazebo
       /// \param[in] _visualMsg Msg containing information of the visual
       /// to be added.
       public: void AddVisual(const std::string &_name,
-          const msgs::Visual *_visualMsg = NULL);
+          const gazebo::msgs::Visual *_visualMsg = NULL);
 
       /// \brief Update a visual widget from a visual msg.
       /// \param[in] _name Name of visual to be updated.
@@ -112,7 +112,7 @@ namespace gazebo
       /// \brief Get the msg containing all visual data.
       /// \param[in] _name Name of visual.
       /// \return Visual msg.
-      public: msgs::Visual *GetData(const std::string &_name) const;
+      public: gazebo::msgs::Visual *GetData(const std::string &_name) const;
 
       /// \brief Set the geometry data of a visual
       /// \param[in] _name Name of visual.

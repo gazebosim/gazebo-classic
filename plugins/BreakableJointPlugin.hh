@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \brief Overloaded Update callback.
     /// \param[in] _msg The force torque message.
-    protected: virtual void OnUpdate(msgs::WrenchStamped _msg);
+    protected: virtual void OnUpdate(gazebo::msgs::WrenchStamped _msg);
 
     /// \brief WorldUpdate callback, used to safely detach parent joint.
     protected: void OnWorldUpdate();

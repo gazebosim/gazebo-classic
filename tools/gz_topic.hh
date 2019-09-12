@@ -50,7 +50,7 @@ namespace gazebo
     /// \brief Get a TopicInfo message from a topic.
     /// \param[in] _topic Topic to get info about.
     /// \return The TopicInfo message about the _topic.
-    private: msgs::TopicInfo GetInfo(const std::string &_topic);
+    private: gazebo::msgs::TopicInfo GetInfo(const std::string &_topic);
 
     /// \brief Callback used by Echo() to receive topic messages.
     /// \param[in] _data Data message from a topic.

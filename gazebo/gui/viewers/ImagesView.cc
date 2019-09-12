@@ -170,5 +170,5 @@ void ImagesView::OnImages(ConstImagesStampedPtr &_msg)
   }
 
   // Update the Hz and Bandwidth info
-  this->OnMsg(msgs::Convert(_msg->time()), dataSize);
+  this->OnMsg(gazebo::msgs::Convert(_msg->time()), dataSize);
 }

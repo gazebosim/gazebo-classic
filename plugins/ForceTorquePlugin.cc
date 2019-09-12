@@ -60,7 +60,7 @@ void ForceTorquePlugin::Load(sensors::SensorPtr _parent,
 }
 
 /////////////////////////////////////////////////
-void ForceTorquePlugin::OnUpdate(msgs::WrenchStamped /*_msg*/)
+void ForceTorquePlugin::OnUpdate(gazebo::msgs::WrenchStamped /*_msg*/)
 {
   // overload with useful callback here
 }

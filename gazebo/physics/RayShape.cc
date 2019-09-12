@@ -173,12 +173,12 @@ void RayShape::Init()
 }
 
 //////////////////////////////////////////////////
-void RayShape::FillMsg(msgs::Geometry &/*_msg*/)
+void RayShape::FillMsg(gazebo::msgs::Geometry &/*_msg*/)
 {
 }
 
 //////////////////////////////////////////////////
-void RayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
+void RayShape::ProcessMsg(const gazebo::msgs::Geometry &/*_msg*/)
 {
 }
 

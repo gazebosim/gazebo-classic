@@ -57,28 +57,28 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // spawn a model
-  msgs::Model model;
+  gazebo::msgs::Model model;
   model.set_name("a_fancy_box");
   const ignition::math::Vector3d pos(5.0, 0.0, 0.5);
-  msgs::Set(model.mutable_pose(),
+  gazebo::msgs::Set(model.mutable_pose(),
             ignition::math::Pose3<double>(pos,
             ignition::math::Quaternion<double>::Identity));
   const double mass = 1.5;
   const ignition::math::Vector3d size(1.1, 1.2, 1.3);
-  msgs::AddBoxLink(model, mass, size);
+  gazebo::msgs::AddBoxLink(model, mass, size);
   auto link = model.mutable_link(0);
-  msgs::Set(link->mutable_pose(), ignition::math::Pose3d());
+  gazebo::msgs::Set(link->mutable_pose(), ignition::math::Pose3d());
 
   {
     auto inertial = link->mutable_inertial();
-    msgs::Set(inertial->mutable_pose(), ignition::math::Pose3d());
+    gazebo::msgs::Set(inertial->mutable_pose(), ignition::math::Pose3d());
   }
 
   auto collision = link->mutable_collision(0);
-  msgs::Set(collision->mutable_pose(), ignition::math::Pose3d());
+  gazebo::msgs::Set(collision->mutable_pose(), ignition::math::Pose3d());
 
   auto linkVisual = link->mutable_visual(0);
-  msgs::Set(linkVisual->mutable_pose(), ignition::math::Pose3d());
+  gazebo::msgs::Set(linkVisual->mutable_pose(), ignition::math::Pose3d());
 
   physics::ModelPtr box = ServerFixture::SpawnModel(model);
   EXPECT_TRUE(box != NULL);

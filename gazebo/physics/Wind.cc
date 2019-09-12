@@ -94,7 +94,7 @@ Wind::Wind(World &_world, sdf::ElementPtr _sdf)
       &Wind::OnWindMsg, this);
 
   this->dataPtr->responsePub =
-    this->dataPtr->node->Advertise<msgs::Response>("~/response");
+    this->dataPtr->node->Advertise<gazebo::msgs::Response>("~/response");
 
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
                                            &Wind::OnRequest, this);
@@ -211,7 +211,7 @@ void Wind::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void Wind::OnRequest(ConstRequestPtr &_msg)
 {
-  msgs::Response response;
+  gazebo::msgs::Response response;
   response.set_id(_msg->id());
   response.set_request(_msg->request());
   response.set_response("success");
@@ -219,9 +219,9 @@ void Wind::OnRequest(ConstRequestPtr &_msg)
 
   if (_msg->request() == "wind_info")
   {
-    msgs::Wind windMsg;
+    gazebo::msgs::Wind windMsg;
     windMsg.mutable_linear_velocity()->CopyFrom(
-      msgs::Convert(this->dataPtr->linearVel));
+      gazebo::msgs::Convert(this->dataPtr->linearVel));
     windMsg.set_enable_wind(this->dataPtr->world.WindEnabled());
 
     response.set_type(windMsg.GetTypeName());
@@ -234,7 +234,7 @@ void Wind::OnRequest(ConstRequestPtr &_msg)
 void Wind::OnWindMsg(ConstWindPtr &_msg)
 {
   if (_msg->has_linear_velocity())
-    this->SetLinearVel(msgs::ConvertIgn(_msg->linear_velocity()));
+    this->SetLinearVel(gazebo::msgs::ConvertIgn(_msg->linear_velocity()));
 
   if (_msg->has_enable_wind())
     this->dataPtr->world.SetWindEnabled(_msg->enable_wind());

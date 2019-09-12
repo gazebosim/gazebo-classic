@@ -533,7 +533,7 @@ void HarnessPlugin::OnAttach(ConstPosePtr &_msg)
   // Block physics updates during harness attachment
   boost::recursive_mutex::scoped_lock lock(
       *this->dataPtr->model->GetWorld()->Physics()->GetPhysicsUpdateMutex());
-  this->Attach(msgs::ConvertIgn(*_msg));
+  this->Attach(gazebo::msgs::ConvertIgn(*_msg));
 }
 
 /////////////////////////////////////////////////

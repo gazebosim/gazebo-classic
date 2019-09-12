@@ -144,7 +144,7 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
+void ODESurfaceParams::FillMsg(gazebo::msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
@@ -152,7 +152,7 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
   _msg.mutable_friction()->set_mu2(this->frictionPyramid->MuSecondary());
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
-  msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
+  gazebo::msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
             this->frictionPyramid->direction1);
 
   _msg.mutable_friction()->mutable_torsional()->set_coefficient(
@@ -180,7 +180,7 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
 }
 
 /////////////////////////////////////////////////
-void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
+void ODESurfaceParams::ProcessMsg(const gazebo::msgs::Surface &_msg)
 {
   SurfaceParams::ProcessMsg(_msg);
 
@@ -197,7 +197,7 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
     if (_msg.friction().has_fdir1())
     {
       this->frictionPyramid->direction1 =
-        msgs::ConvertIgn(_msg.friction().fdir1());
+        gazebo::msgs::ConvertIgn(_msg.friction().fdir1());
     }
 
     if (_msg.friction().has_torsional())

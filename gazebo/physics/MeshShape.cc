@@ -136,16 +136,16 @@ void MeshShape::SetMesh(const std::string &_uri,
 }
 
 //////////////////////////////////////////////////
-void MeshShape::FillMsg(msgs::Geometry &_msg)
+void MeshShape::FillMsg(gazebo::msgs::Geometry &_msg)
 {
-  _msg.set_type(msgs::Geometry::MESH);
-  _msg.mutable_mesh()->CopyFrom(msgs::MeshFromSDF(this->sdf));
+  _msg.set_type(gazebo::msgs::Geometry::MESH);
+  _msg.mutable_mesh()->CopyFrom(gazebo::msgs::MeshFromSDF(this->sdf));
 }
 
 //////////////////////////////////////////////////
-void MeshShape::ProcessMsg(const msgs::Geometry &_msg)
+void MeshShape::ProcessMsg(const gazebo::msgs::Geometry &_msg)
 {
-  this->SetScale(msgs::ConvertIgn(_msg.mesh().scale()));
+  this->SetScale(gazebo::msgs::ConvertIgn(_msg.mesh().scale()));
   this->SetMesh(_msg.mesh().filename(),
       _msg.mesh().has_submesh() ? _msg.mesh().submesh() : std::string(),
       _msg.mesh().has_center_submesh() ? _msg.mesh().center_submesh() :  false);

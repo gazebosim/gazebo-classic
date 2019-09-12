@@ -493,7 +493,7 @@ TEST_F(VisualProperty, VisualMessage)
   auto pubVisual
     = node->Advertise<gazebo::msgs::Visual>("~/visual");
   pubVisual->WaitForConnection();
-  msgs::Visual msg;
+  gazebo::msgs::Visual msg;
   msg.set_name("box::link::visual");
   msg.set_parent_name("box::link");
   uint32_t id;

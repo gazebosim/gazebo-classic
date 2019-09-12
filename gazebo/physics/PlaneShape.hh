@@ -75,12 +75,12 @@ namespace gazebo
 
       /// \brief Fill a geometry message with data from this object.
       /// \param[out] _msg Message to fill.
-      public: void FillMsg(msgs::Geometry &_msg);
+      public: void FillMsg(gazebo::msgs::Geometry &_msg);
 
       /// \brief Process a geometry message and use the data to update
       /// this object.
       /// \param[in] _msg Message to update from.
-      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+      public: virtual void ProcessMsg(const gazebo::msgs::Geometry &_msg);
 
       /// Documentation inherited
       public: virtual double ComputeVolume() const;

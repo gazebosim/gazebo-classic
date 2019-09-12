@@ -326,7 +326,7 @@ void TopicManager::ConnectSubscribers(const std::string &_topic)
 }
 
 //////////////////////////////////////////////////
-void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
+void TopicManager::ConnectSubToPub(const gazebo::msgs::Publish &_pub)
 {
   this->UpdatePublications(_pub.topic(), _pub.msg_type());
 

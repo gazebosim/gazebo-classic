@@ -197,7 +197,7 @@ void ContactSensor::MoveTool(const std::string &_physicsEngine)
   // advertise on "~/model/modify"
   // so that we can move the sphere
   transport::PublisherPtr modelPub =
-    this->node->Advertise<msgs::Model>("~/model/modify");
+    this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
 
   // Step forward to allow the sphere to fall
   world->Step(200);
@@ -210,10 +210,10 @@ void ContactSensor::MoveTool(const std::string &_physicsEngine)
   pose.Pos().X() += 0.2;
   pose.Pos().Y() += 0.2;
 
-  msgs::Model msg;
+  gazebo::msgs::Model msg;
   msg.set_name(modelName);
   msg.set_id(model->GetId());
-  msgs::Set(msg.mutable_pose(), pose);
+  gazebo::msgs::Set(msg.mutable_pose(), pose);
   modelPub->Publish(msg);
 
   while (pose != model->WorldPose())
@@ -389,8 +389,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   double gravityZ = -9.8;
   physics->SetGravity(ignition::math::Vector3d(0, 0, gravityZ));
 
-  msgs::Contacts contacts01;
-  msgs::Contacts contacts02;
+  gazebo::msgs::Contacts contacts01;
+  gazebo::msgs::Contacts contacts02;
 
   // let objects stablize
   world->Step(1000);
@@ -409,7 +409,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   }
   EXPECT_GT(steps, 0);
 
-  std::vector<msgs::Contacts> contacts;
+  std::vector<gazebo::msgs::Contacts> contacts;
   contacts.push_back(contacts01);
   contacts.push_back(contacts02);
 
@@ -596,7 +596,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   double gravityZ = -9.8;
   physics->SetGravity(ignition::math::Vector3d(0, 0, gravityZ));
 
-  msgs::Contacts contacts;
+  gazebo::msgs::Contacts contacts;
 
   if (_physicsEngine == "_ode" || _physicsEngine == "bullet")
   {

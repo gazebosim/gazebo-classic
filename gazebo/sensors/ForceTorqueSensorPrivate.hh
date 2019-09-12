@@ -32,7 +32,7 @@ namespace gazebo
     class ForceTorqueSensorPrivate
     {
       /// \brief Update event.
-      public: event::EventT<void(msgs::WrenchStamped)> update;
+      public: event::EventT<void(gazebo::msgs::WrenchStamped)> update;
 
       /// \brief Parent joint, from which we get force torque info.
       public: physics::JointPtr parentJoint;
@@ -41,7 +41,7 @@ namespace gazebo
       public: transport::PublisherPtr wrenchPub;
 
       /// \brief Message the store the current force torque info.
-      public: msgs::WrenchStamped wrenchMsg;
+      public: gazebo::msgs::WrenchStamped wrenchMsg;
 
       /// \brief Mutex to protect the wrench message
       public: std::mutex mutex;

@@ -49,7 +49,7 @@ namespace gazebo
       public: transport::PublisherPtr pub;
 
       /// \brief The message to output
-      public: msgs::Diagnostics msg;
+      public: gazebo::msgs::Diagnostics msg;
 
       /// \brief Pointer to the update event connection
       public: event::ConnectionPtr updateConnection;

@@ -67,9 +67,9 @@ void Road::Init()
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
-  this->roadPub = this->node->Advertise<msgs::Road>("~/roads", 10);
+  this->roadPub = this->node->Advertise<gazebo::msgs::Road>("~/roads", 10);
 
-  msgs::Road msg;
+  gazebo::msgs::Road msg;
 
   msg.set_name(this->GetName());
 
@@ -109,8 +109,8 @@ void Road::Init()
     ignition::math::Vector3d point = pointElem->Get<ignition::math::Vector3d>();
     pointElem = pointElem->GetNextElement("point");
 
-    msgs::Vector3d *ptMsg = msg.add_point();
-    msgs::Set(ptMsg, point);
+    gazebo::msgs::Vector3d *ptMsg = msg.add_point();
+    gazebo::msgs::Set(ptMsg, point);
   }
 
   this->roadPub->Publish(msg);
