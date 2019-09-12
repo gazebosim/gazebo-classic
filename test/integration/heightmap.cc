@@ -1004,6 +1004,7 @@ TEST_F(HeightmapTest, DartCollisionDetectorSelectionOde)
   physics::PhysicsEnginePtr engine = world->Physics();
   ASSERT_NE(engine, nullptr);
 
+#ifdef HAVE_DART
   physics::DARTPhysicsPtr dartEngine
     = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
   ASSERT_NE(dartEngine, nullptr);
@@ -1013,6 +1014,7 @@ TEST_F(HeightmapTest, DartCollisionDetectorSelectionOde)
   // ODE collision detector should be disabled, as it causes conflicts.
   // Instad, the default collision detector should have been selected.
   EXPECT_NE(cd, "ode");
+#endif
 }
 
 

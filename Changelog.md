@@ -2,6 +2,21 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. ColladaLoader: use default value of 1 for stride parameter when unset.
+    * [Pull request 3112](https://bitbucket.org/osrf/gazebo/pull-request/3112)
+
+1. TopicManager: lock subscriberMutex anywhere subscribedNodes is used
+    * [Pull request 3096](https://bitbucket.org/osrf/gazebo/pull-request/3096)
+
+1. Export `OGRE-*` cmake variables in addition to `OGRE_*` variables
+    * [Pull request 3109](https://bitbucket.org/osrf/gazebo/pull-request/3109)
+
+1. Fix race conditions in `Master::ProcessMessage` and `Publisher::OnPublishComplete`
+    * [Pull request 3103](https://bitbucket.org/osrf/gazebo/pull-request/3103)
+
+1. Fix compilation of tests without DART installed.
+    * [Pull request 3075](https://bitbucket.org/osrf/gazebo/pull-request/3075)
+
 1. Fix build with DART 6.9, using 32-bit float for dart heightmap scale.
     * [Pull request 3106](https://bitbucket.org/osrf/gazebo/pull-request/3106)
     * [Pull request 3107](https://bitbucket.org/osrf/gazebo/pull-request/3107)
@@ -9,8 +24,24 @@
 1. Fix kinematic loops for DART 6.8, reverting to dart 6.7 behavior
     * [Pull request 3101](https://bitbucket.org/osrf/gazebo/pull-request/3101)
 
+1. Enable extra kinematic loop test for DART 6.8+
+    * [Pull request 3104](https://bitbucket.org/osrf/gazebo/pull-request/3104)
+
 1. Lens flare: use light world pose at each time step instead of only at initialization
     * [Pull request 3093](https://bitbucket.org/osrf/gazebo/pull-request/3093)
+
+1. LinkPlot3dPlugin: read optional `<model>` tag to find links in nested models
+    * [Pull request 3095](https://bitbucket.org/osrf/gazebo/pull-request/3095)
+
+1. Make the GPU laser warp artifact transparent
+    * [Pull request 3100](https://bitbucket.org/osrf/gazebo/pull-request/3100)
+
+1. Added support for tracked vehicles
+    * [Pull request 2652](https://bitbucket.org/osrf/gazebo/pull-request/2652)
+    * [Issue #863](https://bitbucket.org/osrf/gazebo/issues/863)
+
+1. Fix loading sdf with orthographic projection camera
+    * [Pull request 3098](https://bitbucket.org/osrf/gazebo/pull-request/3098)
 
 
 ## Gazebo 10.1.0 (2019-03-28)
@@ -117,16 +148,51 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+## Gazebo 9.10.0 (2019-07-12)
+
+1. ColladaLoader: use default value of 1 for stride parameter when unset.
+    * [Pull request 3112](https://bitbucket.org/osrf/gazebo/pull-request/3112)
+
+1. TopicManager: lock subscriberMutex anywhere subscribedNodes is used
+    * [Pull request 3096](https://bitbucket.org/osrf/gazebo/pull-request/3096)
+
+1. Export `OGRE-*` cmake variables in addition to `OGRE_*` variables
+    * [Pull request 3109](https://bitbucket.org/osrf/gazebo/pull-request/3109)
+
+1. Fix race conditions in `Master::ProcessMessage` and `Publisher::OnPublishComplete`
+    * [Pull request 3103](https://bitbucket.org/osrf/gazebo/pull-request/3103)
+
+## Gazebo 9.9.0 (2019-05-23)
+
+1. Backport camera intrinsics feature
+    * [Pull request 3099](https://bitbucket.org/osrf/gazebo/pull-request/3099)
+
 1. Fix kinematic loops for DART 6.8, reverting to dart 6.7 behavior
     * [Pull request 3101](https://bitbucket.org/osrf/gazebo/pull-request/3101)
+
+1. Enable extra kinematic loop test for DART 6.8+
+    * [Pull request 3104](https://bitbucket.org/osrf/gazebo/pull-request/3104)
 
 1. Lens flare: use light world pose at each time step instead of only at initialization
     * [Pull request 3093](https://bitbucket.org/osrf/gazebo/pull-request/3093)
 
+1. LinkPlot3dPlugin: read optional `<model>` tag to find links in nested models
+    * [Pull request 3095](https://bitbucket.org/osrf/gazebo/pull-request/3095)
+
 1. Refactor ODE gearbox joint implementation to match hinge joint
     * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
 
-## Gazebo 9.8.0 (2019-XX-XX)
+1. Make the GPU laser warp artifact transparent
+    * [Pull request 3100](https://bitbucket.org/osrf/gazebo/pull-request/3100)
+
+1. Added support for tracked vehicles
+    * [Pull request 2652](https://bitbucket.org/osrf/gazebo/pull-request/2652)
+    * [Issue #863](https://bitbucket.org/osrf/gazebo/issues/863)
+
+1. Fix loading sdf with orthographic projection camera
+    * [Pull request 3098](https://bitbucket.org/osrf/gazebo/pull-request/3098)
+
+## Gazebo 9.8.0 (2019-04-10)
 
 1. Fix kinematic loops for DART 6.7 and later
     * [Pull request 3086](https://bitbucket.org/osrf/gazebo/pull-request/3086)

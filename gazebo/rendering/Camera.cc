@@ -229,7 +229,7 @@ void Camera::UpdateCameraIntrinsics(
     clipFar = clipElem->Get<double>("far");
   }
 
-  this->cameraProjectiveMatrix = this->BuildProjectiveMatrix(
+  this->cameraProjectiveMatrix = this->BuildProjectionMatrix(
     this->imageWidth, this->imageHeight,
     _cameraIntrinsicsFx, _cameraIntrinsicsFy,
     _cameraIntrinsicsCx, _cameraIntrinsicsCy,
@@ -238,7 +238,7 @@ void Camera::UpdateCameraIntrinsics(
   if (this->camera != nullptr)
   {
     this->camera->setCustomProjectionMatrix(true,
-        Conversions::Convert(cameraProjectiveMatrix));
+        Conversions::Convert(this->cameraProjectiveMatrix));
   }
 
   this->cameraUsingIntrinsics = true;
@@ -307,10 +307,24 @@ ignition::math::Matrix4d Camera::BuildProjectiveMatrix(
     const double _intrinsicsS,
     const double _clipNear, const double _clipFar)
 {
+  return BuildProjectionMatrix(_imageWidth, _imageHeight,
+    _intrinsicsFx, _intrinsicsFy, _intrinsicsCx, _intrinsicsCy, _intrinsicsS,
+    _clipNear, _clipFar);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::BuildProjectionMatrix(
+    const double _imageWidth, const double _imageHeight,
+    const double _intrinsicsFx, const double _intrinsicsFy,
+    const double _intrinsicsCx, double _intrinsicsCy,
+    const double _intrinsicsS,
+    const double _clipNear, const double _clipFar)
+{
   return Camera::BuildNDCMatrix(
            0, _imageWidth, 0, _imageHeight, _clipNear, _clipFar) *
          Camera::BuildPerspectiveMatrix(
-           _intrinsicsFx, _intrinsicsFy, _intrinsicsCx, _intrinsicsCy,
+           _intrinsicsFx, _intrinsicsFy,
+           _intrinsicsCx, _imageHeight - _intrinsicsCy,
            _intrinsicsS, _clipNear, _clipFar);
 }
 
@@ -1506,7 +1520,7 @@ void Camera::CreateCamera()
   if (cameraUsingIntrinsics)
   {
     this->camera->setCustomProjectionMatrix(true,
-      Conversions::Convert(cameraProjectiveMatrix));
+      Conversions::Convert(this->cameraProjectiveMatrix));
   }
 }
 
@@ -1992,7 +2006,7 @@ void Camera::UpdateFOV()
     if (this->cameraUsingIntrinsics)
     {
         this->camera->setCustomProjectionMatrix(true,
-          Conversions::Convert(cameraProjectiveMatrix));
+          Conversions::Convert(this->cameraProjectiveMatrix));
     }
     else
     {
