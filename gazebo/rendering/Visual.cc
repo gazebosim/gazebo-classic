@@ -2517,9 +2517,10 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
         else
         {
           // When there is a skeleton associated with the mesh,
-          // OGRE requires at least 1 bone assignment to compile the blend weights.
-          // The submeshs loaded from COLLADA may not have weights so we need to add
-          // a dummy bone assignment for OGRE.
+          // OGRE requires at least 1 bone assignment to compile the blend
+          // weights.
+          // The submeshs loaded from COLLADA may not have weights so we need
+          // to add a dummy bone assignment for OGRE.
           Ogre::VertexBoneAssignment vba;
           vba.vertexIndex = 0;
           vba.boneIndex = 0;
