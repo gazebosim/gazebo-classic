@@ -298,6 +298,43 @@ TEST_F(MeshTest, SubMeshCenter)
 }
 
 /////////////////////////////////////////////////
+// Test STL import
+TEST_F(MeshTest, STLRead)
+{
+  std::vector<std::string> fileFormats = {"stlb", "stl" };
+  for (const std::string &format: fileFormats)
+  {
+    const common::Mesh *mesh = common::MeshManager::Instance()->Load(
+        std::string(PROJECT_SOURCE_PATH) + "/test/data/twoFaces." + format);
+    ASSERT_FALSE(nullptr == mesh);
+    float *vertArray = nullptr;
+    int *indArray = nullptr;
+    mesh->FillArrays(&vertArray, &indArray);
+
+    int i = 0;
+    EXPECT_FLOAT_EQ(0, vertArray[i++]);
+    EXPECT_FLOAT_EQ(0, vertArray[i++]);
+    EXPECT_FLOAT_EQ(0, vertArray[i++]);
+    EXPECT_FLOAT_EQ(1, vertArray[i++]);
+    EXPECT_FLOAT_EQ(0, vertArray[i++]);
+    EXPECT_FLOAT_EQ(0, vertArray[i++]);
+    EXPECT_FLOAT_EQ(1, vertArray[i++]);
+    EXPECT_FLOAT_EQ(1, vertArray[i++]);
+    EXPECT_FLOAT_EQ(0, vertArray[i++]);
+
+    EXPECT_FLOAT_EQ(1, vertArray[i++]);
+    EXPECT_FLOAT_EQ(0, vertArray[i++]);
+    EXPECT_FLOAT_EQ(0, vertArray[i++]);
+    EXPECT_FLOAT_EQ(2, vertArray[i++]);
+    EXPECT_FLOAT_EQ(0, vertArray[i++]);
+    EXPECT_FLOAT_EQ(0, vertArray[i++]);
+    EXPECT_FLOAT_EQ(2, vertArray[i++]);
+    EXPECT_FLOAT_EQ(1, vertArray[i++]);
+    EXPECT_FLOAT_EQ(0, vertArray[i++]);
+  }
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
