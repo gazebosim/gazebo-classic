@@ -3,8 +3,8 @@
 
 ## Gazebo 9.XX.X (20XX-XX-XX)
 
-1. Fix moving model files between partition in StaticMapPlugin
-    * [Pull request 3119](https://bitbucket.org/osrf/gazebo/pull-request/3119)
+1. Fix moving model files in StaticMapPlugin
+    * [Pull request 3123](https://bitbucket.org/osrf/gazebo/pull-request/3123)
 
 ## Gazebo 9.11.0 (2019-08-29)
 
