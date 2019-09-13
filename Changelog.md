@@ -1,5 +1,11 @@
 ## Gazebo 9
 
+
+## Gazebo 9.XX.X (20XX-XX-XX)
+
+1. Fix moving model files between partition in StaticMapPlugin
+    * [Pull request 3119](https://bitbucket.org/osrf/gazebo/pull-request/3119)
+
 ## Gazebo 9.11.0 (2019-08-29)
 
 1. Add Camera PreRender and PostRender events
