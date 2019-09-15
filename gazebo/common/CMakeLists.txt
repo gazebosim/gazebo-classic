@@ -262,6 +262,7 @@ target_link_libraries(gazebo_common
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
   ${IGNITION-FUEL_TOOLS_LIBRARIES}
+  ${IGNITION-COMMON_LIBRARIES}
 )
 
 if (UNIX)
