@@ -278,6 +278,24 @@ TEST_F(ColladaLoader, LoadBoxWithDefaultStride)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadBoxWithMultipleGeoms)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/box_with_multiple_geoms.dae");
+
+  EXPECT_EQ(72u, mesh->GetIndexCount());
+  EXPECT_EQ(48u, mesh->GetVertexCount());
+  EXPECT_EQ(0u, mesh->GetMaterialCount());
+  EXPECT_EQ(48u, mesh->GetTexCoordCount());
+  ASSERT_EQ(1u, mesh->GetSkeleton()->GetNumAnimations());
+  ASSERT_EQ(2u, mesh->GetSubMeshCount());
+  EXPECT_EQ(24u, mesh->GetSubMesh(0)->GetNodeAssignmentsCount());
+  EXPECT_EQ(0u, mesh->GetSubMesh(1)->GetNodeAssignmentsCount());
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
