@@ -361,6 +361,7 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
 }
 
 /////////////////////////////////////////////////
+// TODO: rootNodeXmls no longer used, can be removed in next major version.
 void ColladaLoader::LoadController(TiXmlElement *_contrXml,
       const std::vector<TiXmlElement*> &rootNodeXmls,
       const ignition::math::Matrix4d &_transform, Mesh *_mesh)
@@ -2225,6 +2226,42 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
 
     _mat->SetBlendFactors(srcFactor, dstFactor);
   }
+}
+
+/////////////////////////////////////////////////
+// TODO: No longer used, can be removed in next major version.
+void ColladaLoader::MergeSkeleton(Skeleton *_skeleton, SkeletonNode *_mergeNode)
+{
+  if (_skeleton->GetNodeById(_mergeNode->GetId()))
+    return;
+
+  SkeletonNode *currentRoot = _skeleton->GetRootNode();
+  if (currentRoot->GetId() == _mergeNode->GetId())
+    return;
+
+  if (_mergeNode->GetChildById(currentRoot->GetId()))
+  {
+    _skeleton->SetRootNode(_mergeNode);
+    return;
+  }
+
+  SkeletonNode *dummyRoot = nullptr;
+  if (currentRoot->GetId() == "gazebo-dummy-root")
+    dummyRoot = currentRoot;
+  else
+  {
+    dummyRoot =
+        new SkeletonNode(nullptr, "gazebo-dummy-root", "gazebo-dummy-root");
+  }
+  if (dummyRoot != currentRoot)
+  {
+    dummyRoot->AddChild(currentRoot);
+    currentRoot->SetParent(dummyRoot);
+  }
+  dummyRoot->AddChild(_mergeNode);
+  _mergeNode->SetParent(dummyRoot);
+  dummyRoot->SetTransform(ignition::math::Matrix4d::Identity);
+  _skeleton->SetRootNode(dummyRoot);
 }
 
 /////////////////////////////////////////////////
