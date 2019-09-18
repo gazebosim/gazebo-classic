@@ -23,6 +23,7 @@
 #include <sstream>
 #include <limits>
 #include <algorithm>
+#include <queue>
 
 #include "gazebo/common/BVHLoader.hh"
 #include "gazebo/common/Console.hh"
@@ -631,6 +632,29 @@ void Actor::Update()
 
   auto skelMap = this->skelNodesMap[tinfo->type];
 
+  // FIXME: use the 1st animation available when requesting for
+  // "gazebo_dummy_root" due to a regression caused by adding support to load
+  // more complex collada models. This is caused by the problem that collada
+  // describes a scene and we load the scene as a mesh for an actor. The scene
+  // can have multiple root nodes but a mesh can have only one skeleton and a
+  // skeleton only can have one root node. The workaround is to add a dummy
+  // root node to the skeleton but it can cause it to crash here as the dummy
+  // root does not have animations associated with it.
+  std::string virtualRootName = this->skeleton->GetRootNode()->GetName();
+  if (virtualRootName == "gazebo_dummy_root")
+  {
+    std::queue<SkeletonNode*> queue{};
+    SkeletonNode *curNode = this->skeleton->GetRootNode();
+    while (!skelAnim->HasNode(curNode->GetName()))
+    {
+      for (unsigned int i = 0; i < curNode->GetChildCount(); i++)
+        queue.push(curNode->GetChild(i));
+      curNode = queue.front();
+      queue.pop();
+    }
+    virtualRootName = curNode->GetName();
+  }
+
   std::map<std::string, ignition::math::Matrix4d> frame;
   if (!this->customTrajectoryInfo)
   {
@@ -638,7 +662,7 @@ void Actor::Update()
           this->trajectories.find(tinfo->id) != this->trajectories.end())
     {
       frame = skelAnim->PoseAtX(this->pathLength,
-                skelMap[this->skeleton->GetRootNode()->GetName()]);
+                skelMap[virtualRootName]);
     }
     else
     {
@@ -653,10 +677,10 @@ void Actor::Update()
   this->lastTraj = tinfo->id;
 
   ignition::math::Matrix4d rootTrans = ignition::math::Matrix4d::Identity;
-  auto iter = frame.find(skelMap[this->skeleton->GetRootNode()->GetName()]);
+  auto iter = frame.find(skelMap[virtualRootName]);
   if (iter != frame.end())
   {
-    rootTrans = frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
+    rootTrans = frame[skelMap[virtualRootName]];
   }
 
   ignition::math::Vector3d rootPos = rootTrans.Translation();
@@ -688,7 +712,7 @@ void Actor::Update()
     // workaround for rotation bug
     rootM.SetTranslation(rootM.Translation() * this->skinScale);
   }
-  frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
+  frame[skelMap[virtualRootName]] = rootM;
 
   this->SetPose(frame, skelMap, currentTime.Double());
 }
