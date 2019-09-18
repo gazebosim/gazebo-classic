@@ -1,5 +1,11 @@
 ## Gazebo 9
 
+## Gazebo 9.XX.X (2019-XX-XX)
+
+1. MeshManager: add .stlb file extension support
+    * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
+    * [Pull request 3128](https://bitbucket.org/osrf/gazebo/pull-request/3128)
+
 ## Gazebo 9.11.0 (2019-08-29)
 
 1. Add Camera PreRender and PostRender events
