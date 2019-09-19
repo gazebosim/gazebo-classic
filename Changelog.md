@@ -2,6 +2,9 @@
 
 ## Gazebo 9.XX.X (2019-XX-XX)
 
+1. Fix moving model files in StaticMapPlugin
+    * [Pull request 3123](https://bitbucket.org/osrf/gazebo/pull-request/3123)
+
 1. MeshManager: add .stlb file extension support
     * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
     * [Pull request 3128](https://bitbucket.org/osrf/gazebo/pull-request/3128)
