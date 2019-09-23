@@ -39,19 +39,12 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
+#include <OGRE/OgrePrerequisites.h>
+
+
 namespace SkyX
 {
   class SkyX;
-}
-
-namespace Ogre
-{
-  class SceneManager;
-  class Node;
-  class Entity;
-  class Mesh;
-  class Vector3;
-  class Quaternion;
 }
 
 namespace gazebo

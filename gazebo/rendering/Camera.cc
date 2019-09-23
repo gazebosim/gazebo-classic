@@ -1793,7 +1793,11 @@ bool Camera::IsVisible(VisualPtr _visual)
     box.setMinimum(bbox.Min().X(), bbox.Min().Y(), bbox.Min().Z());
     box.setMaximum(bbox.Max().X(), bbox.Max().Y(), bbox.Max().Z());
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    box.transform(_visual->GetSceneNode()->_getFullTransform());
+#else
     box.transformAffine(_visual->GetSceneNode()->_getFullTransform());
+#endif
 
     // update cam node to ensure transform is update-to-date
     this->cameraNode->_update(false, true);
@@ -2019,16 +2023,24 @@ void Camera::UpdateFOV()
 //////////////////////////////////////////////////
 float Camera::AvgFPS() const
 {
-  if (this->renderTarget)
+  if (this->renderTarget) {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    return this->renderTarget->getStatistics().avgFPS;
+#else
     return this->renderTarget->getAverageFPS();
-  else
+#endif
+  } else
     return 0.0f;
 }
 
 //////////////////////////////////////////////////
 unsigned int Camera::TriangleCount() const
 {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+  return this->renderTarget->getStatistics().triangleCount;
+#else
   return this->renderTarget->getTriangleCount();
+#endif
 }
 
 //////////////////////////////////////////////////
