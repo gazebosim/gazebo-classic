@@ -82,15 +82,17 @@
 #include <OGRE/OgreFontManager.h>
 #endif
 
-#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR < 11
-// OgreWindowEventUtilities was moved to the Bites component in Ogre 1.11
-// (see  https://github.com/OGRECave/ogre/pull/647) however it is not actualy
-// used at all in Gazebo, so we just include it for Ogre <= 1.10 to avoid breaking
-// transitive includes. In the next major release of Gazebo, this can be removed.
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 11
+// The  <OGRE/OgreWindowEventUtilities.h> header has always been included in
+// public headers for Gazebo <= 10, but was moved to the Bites component in
+// Ogre 1.11 (see  https://github.com/OGRECave/ogre/pull/647). As it is not
+// used at all in Gazebo, we can just include it for Ogre <= 1.10 to avoid
+// breaking transitive includes in downstream projects.
+// In Gazebo 11, this can be removed.
 #include <OGRE/OgreWindowEventUtilities.h>
 #endif
 
-#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 11
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
 #define GZ_OGRE_SET_MATERIAL_BY_NAME(ptr, name) \
   (ptr)->setMaterial(Ogre::MaterialManager::getSingleton().getByName(name))
 #define GZ_OGRE_SET_MATERIAL_BY_NAME_UPPER(ptr, name) \

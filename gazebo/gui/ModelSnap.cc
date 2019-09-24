@@ -416,7 +416,8 @@ void ModelSnap::Update()
         this->dataPtr->snapHighlight =
             this->dataPtr->highlightVisual->CreateDynamicLine(
             rendering::RENDERING_TRIANGLE_FAN);
-        GZ_OGRE_SET_MATERIAL_BY_NAME(this->dataPtr->snapHighlight, "Gazebo/RedTransparent");
+        GZ_OGRE_SET_MATERIAL_BY_NAME(this->dataPtr->snapHighlight,
+            "Gazebo/RedTransparent");
         this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0]);
         this->dataPtr->snapHighlight->AddPoint(hoverTriangle[1]);
         this->dataPtr->snapHighlight->AddPoint(hoverTriangle[2]);

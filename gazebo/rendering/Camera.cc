@@ -2023,14 +2023,18 @@ void Camera::UpdateFOV()
 //////////////////////////////////////////////////
 float Camera::AvgFPS() const
 {
-  if (this->renderTarget) {
+  if (this->renderTarget)
+  {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
     return this->renderTarget->getStatistics().avgFPS;
 #else
     return this->renderTarget->getAverageFPS();
 #endif
-  } else
+  }
+  else
+  {
     return 0.0f;
+  }
 }
 
 //////////////////////////////////////////////////

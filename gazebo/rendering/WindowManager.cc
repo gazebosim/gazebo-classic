@@ -204,14 +204,17 @@ float WindowManager::AvgFPS(const uint32_t _windowId) const
 //////////////////////////////////////////////////
 uint32_t WindowManager::TriangleCount(const uint32_t _windowId) const
 {
-  if (_windowId < this->dataPtr->windows.size())  {
+  if (_windowId < this->dataPtr->windows.size())
+  {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
     auto stats = this->dataPtr->windows[_windowId]->getStatistics();
     return stats.triangleCount;
 #else
     return this->dataPtr->windows[_windowId]->getTriangleCount();
 #endif
-  } else {
+  }
+  else
+  {
     return 0;
   }
 }
