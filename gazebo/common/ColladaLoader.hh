@@ -238,7 +238,6 @@ namespace gazebo
       ///         dummy root and adds both of them as childrens.
       /// \param[in] _skeleton skeleton to merge
       /// \param[in] _mergeNode new root node to merge
-      // TODO: No longer used, can be removed in next major version.
       private: void MergeSkeleton(Skeleton *_skeleton,
           SkeletonNode *_mergeNode);
 
