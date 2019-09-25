@@ -1,5 +1,23 @@
 ## Gazebo 9
 
+## Gazebo 9.XX.X (2019-XX-XX)
+
+1. Fix moving model files in StaticMapPlugin
+    * [Pull request 3123](https://bitbucket.org/osrf/gazebo/pull-request/3123)
+
+1. MeshManager: add .stlb file extension support
+    * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
+    * [Pull request 3128](https://bitbucket.org/osrf/gazebo/pull-request/3128)
+
+## Gazebo 9.11.0 (2019-08-29)
+
+1. Add Camera PreRender and PostRender events
+    * [Pull request 3118](https://bitbucket.org/osrf/gazebo/pull-request/3118)
+
+1. Fix ColladaLoader wrong node weights caused by buffer overflow bug
+    * [Pull request 3115](https://bitbucket.org/osrf/gazebo/pull-request/3115)
+
+
 ## Gazebo 9.10.0 (2019-07-12)
 
 1. ColladaLoader: use default value of 1 for stride parameter when unset.
