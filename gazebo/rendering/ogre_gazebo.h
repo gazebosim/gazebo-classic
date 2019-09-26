@@ -95,13 +95,6 @@
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
 #define GZ_OGRE_SET_MATERIAL_BY_NAME(ptr, name) \
   (ptr)->setMaterial(Ogre::MaterialManager::getSingleton().getByName(name))
-#define GZ_OGRE_SET_MATERIAL_BY_NAME_UPPER(ptr, name) \
-  (ptr)->SetMaterial(Ogre::MaterialManager::getSingleton().getByName(name))
-#else
 #define GZ_OGRE_SET_MATERIAL_BY_NAME(ptr, name) \
   (ptr)->setMaterial(name)
-#define GZ_OGRE_SET_MATERIAL_BY_NAME_UPPER(ptr, name) \
-  (ptr)->SetMaterial(name)
-#endif
-
 #endif
