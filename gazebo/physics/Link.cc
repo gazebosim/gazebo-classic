@@ -119,6 +119,9 @@ class gazebo::physics::LinkPrivate
       /// playback.
       public: transport::SubscriberPtr audioContactsSub;
 #endif
+
+  /// \brief SDF Link DOM object
+  public: const sdf::Link *linkSDFDom;
 };
 
 using namespace gazebo;
@@ -144,6 +147,9 @@ Link::~Link()
 //////////////////////////////////////////////////
 void Link::Load(sdf::ElementPtr _sdf)
 {
+  this->dataPtr->linkSDFDom =
+      this->GetModel()->GetSDFDom()->LinkByName(_sdf->Get<std::string>("name"));
+
   Entity::Load(_sdf);
 
   // before loading child collision, we have to figure out if selfCollide is
@@ -301,8 +307,8 @@ void Link::Init()
   this->dataPtr->enabled = true;
 
   // Set Link pose before setting pose of child collisions
-  this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
-  this->SetInitialRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
+  this->SetRelativePose(this->SDFPoseRelativeToParent());
+  this->SetInitialRelativePose(this->SDFPoseRelativeToParent());
 
   // Call Init for child collisions, which whill set their pose
   Base_V::iterator iter;
@@ -1516,6 +1522,15 @@ void Link::UpdateVisualMsg()
     while (visualElem)
     {
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+      // The function `VisualFromSDF` does not support frame semantics so we
+      // need to update the pose of the msg object.
+      auto *visualDom = this->dataPtr->linkSDFDom->VisualByName(
+          visualElem->Get<std::string>("name"));
+
+      ignition::math::Pose3d resolvedPose;
+      visualDom->ResolvePose(resolvedPose);
+
+      msgs::Set(msg.mutable_pose(), resolvedPose);
 
       bool newVis = true;
       std::string linkName = this->GetScopedName();
@@ -1921,4 +1936,16 @@ void Link::LoadLight(sdf::ElementPtr _sdf)
 const Link::Visuals_M &Link::Visuals() const
 {
   return this->visuals;
+}
+
+const sdf::Link *Link::GetSDFDom() const
+{
+  return this->dataPtr->linkSDFDom;
+}
+
+ignition::math::Pose3d Link::SDFPoseRelativeToParent() const
+{
+  ignition::math::Pose3d sdfPose;
+  this->dataPtr->linkSDFDom->ResolvePose(sdfPose);
+  return sdfPose;
 }

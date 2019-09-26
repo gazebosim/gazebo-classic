@@ -76,8 +76,19 @@ Model::~Model()
 //////////////////////////////////////////////////
 void Model::Load(sdf::ElementPtr _sdf)
 {
-  Entity::Load(_sdf);
+  // Create a DOM object to compute the resolved initial pose (with frame
+  // semantics)
+  sdf::Errors errors = this->modelSDFDom.Load(_sdf);
+  if (!errors.empty())
+  {
+    for (const auto &error : errors)
+    {
+      gzerr << error << "\n";
+    }
+    return;
+  }
 
+  Entity::Load(_sdf);
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic(this->sdf->Get<bool>("static"));
@@ -247,10 +258,8 @@ void Model::LoadJoints()
 void Model::Init()
 {
   // Record the model's initial pose (for reseting)
-  ignition::math::Pose3d initPose =
-    this->sdf->Get<ignition::math::Pose3d>("pose");
-  this->SetInitialRelativePose(initPose);
-  this->SetRelativePose(initPose);
+  this->SetInitialRelativePose(this->SDFPoseRelativeToParent());
+  this->SetRelativePose(this->SDFPoseRelativeToParent());
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
@@ -528,6 +537,11 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
 const sdf::ElementPtr Model::GetSDF()
 {
   return Entity::GetSDF();
+}
+
+const sdf::Model *Model::GetSDFDom() const
+{
+  return &this->modelSDFDom;
 }
 
 //////////////////////////////////////////////////

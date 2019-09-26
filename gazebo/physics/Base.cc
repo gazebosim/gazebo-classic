@@ -458,3 +458,10 @@ const sdf::ElementPtr Base::GetSDF()
   this->sdf->Update();
   return this->sdf;
 }
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Base::SDFPoseRelativeToParent() const
+{
+  return this->sdf->Get<ignition::math::Pose3d>("pose");
+}
+

@@ -581,6 +581,9 @@ namespace gazebo
       /// \return this joint's spring potential energy,
       public: double GetWorldEnergyPotentialSpring(unsigned int _index) const;
 
+      /// \brief Documentation inherited
+      public: virtual ignition::math::Pose3d SDFPoseRelativeToParent()
+                  const override;
       /// \brief Helper function to get the position of an axis.
       ///
       /// Subclasses must override this.
@@ -707,6 +710,9 @@ namespace gazebo
 
       /// \brief Joint stop dissipation
       private: double stopDissipation[MAX_JOINT_AXIS];
+
+      /// \brief SDF Joint DOM object
+      private: const sdf::Joint *jointSDFDom;
     };
     /// \}
   }

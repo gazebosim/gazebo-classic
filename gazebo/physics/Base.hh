@@ -322,6 +322,12 @@ namespace gazebo
       /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Get the SDF pose of the object relative to its parent. Objects
+      /// that support frame semantics need to override this function and
+      /// provide the pose of the object relative to its XML parent.
+      /// \return The pose of the object relative to its parent.
+      public: virtual ignition::math::Pose3d SDFPoseRelativeToParent() const;
+
       /// \brief Register items in the introspection service.
       protected: virtual void RegisterIntrospectionItems();
 

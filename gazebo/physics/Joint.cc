@@ -113,6 +113,12 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child,
 //////////////////////////////////////////////////
 void Joint::Load(sdf::ElementPtr _sdf)
 {
+  if (nullptr != this->model)
+  {
+    this->jointSDFDom = this->model->GetSDFDom()->JointByName(
+        _sdf->Get<std::string>("name"));
+  }
+
   Base::Load(_sdf);
 
   // Joint force and torque feedback
@@ -295,7 +301,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
       gzthrow("Couldn't Find Child Link[" + childName  + "]");
   }
 
-  this->LoadImpl(_sdf->Get<ignition::math::Pose3d>("pose"));
+  this->LoadImpl(this->SDFPoseRelativeToParent());
 }
 
 /////////////////////////////////////////////////
@@ -1328,6 +1334,14 @@ double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
   double x = this->Position(_index) -
     this->springReferencePosition[_index];
   return 0.5 * k * x * x;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Joint::SDFPoseRelativeToParent() const
+{
+  ignition::math::Pose3d sdfPose;
+  this->jointSDFDom->ResolvePose(this->GetChild()->GetName(), sdfPose);
+  return sdfPose;
 }
 
 //////////////////////////////////////////////////

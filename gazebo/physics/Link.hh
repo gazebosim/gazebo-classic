@@ -614,6 +614,13 @@ namespace gazebo
       public: bool SetVisualPose(const uint32_t _id,
                                  const ignition::math::Pose3d &_pose);
 
+      /// \brief Get the SDF DOM object of this link
+      /// \return Pointer to SDF DOM Object
+      public: const sdf::Link *GetSDFDom() const;
+
+      // Documentation inherited.
+      public: virtual ignition::math::Pose3d SDFPoseRelativeToParent()
+                  const override;
       /// \def Visuals_M
       /// \brief Map of unique ID to visual message.
       typedef std::map<uint32_t, msgs::Visual> Visuals_M;

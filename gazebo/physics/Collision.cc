@@ -103,6 +103,9 @@ void Collision::Fini()
 //////////////////////////////////////////////////
 void Collision::Load(sdf::ElementPtr _sdf)
 {
+  this->collisionSDFDom = this->GetLink()->GetSDFDom()->CollisionByName(
+      _sdf->Get<std::string>("name"));
+
   Entity::Load(_sdf);
 
   this->maxContacts = _sdf->Get<unsigned int>("max_contacts");
@@ -110,8 +113,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
 
   if (this->sdf->HasElement("laser_retro"))
     this->SetLaserRetro(this->sdf->Get<double>("laser_retro"));
-
-  this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
 
   this->surface->Load(this->sdf->GetElement("surface"));
 
@@ -125,8 +126,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
 void Collision::Init()
 {
   this->shape->Init();
-
-  this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
 }
 
 //////////////////////////////////////////////////
@@ -410,4 +409,11 @@ void Collision::SetWorldPoseDirty()
   // Tell the collision object that the next call to ::GetWorldPose should
   // compute a new worldPose value.
   this->worldPoseDirty = true;
+}
+
+ignition::math::Pose3d Collision::SDFPoseRelativeToParent() const
+{
+  ignition::math::Pose3d sdfPose;
+  this->collisionSDFDom->ResolvePose(sdfPose);
+  return sdfPose;
 }

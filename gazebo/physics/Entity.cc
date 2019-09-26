@@ -102,15 +102,15 @@ void Entity::Load(sdf::ElementPtr _sdf)
   {
     if (this->parent && this->parentEntity)
     {
-      this->worldPose = this->sdf->Get<ignition::math::Pose3d>("pose") +
-                        this->parentEntity->worldPose;
+      this->worldPose =
+          this->SDFPoseRelativeToParent() + this->parentEntity->worldPose;
     }
     else
     {
-      this->worldPose = this->sdf->Get<ignition::math::Pose3d>("pose");
+      this->worldPose = this->SDFPoseRelativeToParent();
     }
 
-    this->initialRelativePose = this->sdf->Get<ignition::math::Pose3d>("pose");
+    this->initialRelativePose = this->SDFPoseRelativeToParent();
   }
 
   if (this->parent)

@@ -89,6 +89,10 @@ namespace gazebo
       /// \return The SDF value for this model.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Get the SDF DOM for the model.
+      /// \return The SDF DOM for this model.
+      public: const sdf::Model *GetSDFDom() const;
+
       /// \internal
       /// \brief Get the SDF element for the model, without all effects of
       /// scaling. This is useful in cases when the scale will be applied
@@ -535,6 +539,9 @@ namespace gazebo
 
       /// \brief Mutex to protect incoming message buffers.
       private: std::mutex receiveMutex;
+
+      /// \brief SDF Model DOM object
+      private: sdf::Model modelSDFDom;
     };
     /// \}
   }
