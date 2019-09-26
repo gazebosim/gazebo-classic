@@ -583,13 +583,12 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 6)
-find_package(SDFormat ${SDFormat_MIN_VERSION})
-if (SDFormat_FOUND)
-  message (STATUS "Looking for SDFormat ${SDFormat_MIN_VERSION} - found")
+find_package(sdformat7 QUIET)
+if (NOT sdformat7_FOUND)
+  message (STATUS "Looking for libsdformat7 - not found")
+  BUILD_ERROR ("Missing: SDFormat library required for reading and writing SDF files (libsdformat7-dev).")
 else ()
-  message (STATUS "Looking for SDFormat ${SDFormat_MIN_VERSION} - not found")
-  BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION}. Required for reading and writing SDF files.")
+  message (STATUS "Looking for libsdformat7 - found")
 endif()
 
 ########################################
