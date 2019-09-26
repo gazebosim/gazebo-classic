@@ -96,6 +96,7 @@ set(tests
   saving_and_loading.cc
   sdf.cc
   sensor.cc
+  sdf_frame_semantics.cc
   server_fixture.cc
   sim_events.cc
   speed.cc
