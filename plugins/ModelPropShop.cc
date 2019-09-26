@@ -194,7 +194,7 @@ void ModelPropShop::Update()
     rendering::VisualPtr vis = this->scene->GetVisual(this->modelName);
     if (vis)
     {
-      ignition::math::Box bbox = vis->BoundingBox();
+      ignition::math::AxisAlignedBox bbox = vis->BoundingBox();
 
       // Compute model scaling.
       double scaling = 1.0 / bbox.Size().Max();

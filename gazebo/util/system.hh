@@ -328,3 +328,11 @@
 #define GAZEBO_DEPRECATED(version) ()
 #define GAZEBO_FORCEINLINE
 #endif
+
+#if defined(__GNUC__)
+#define FALLTHROUGH [[gnu::fallthrough]] // NOLINT
+#elif defined(__clang__)
+#define FALLTHROUGH [[clang::fallthrough]] // NOLINT
+#else
+#define FALLTHROUGH
+#endif

@@ -202,12 +202,12 @@ namespace gazebo
     void Set(msgs::Inertial *_i, const ignition::math::MassMatrix3d &_m)
     {
       _i->set_mass(_m.Mass());
-      _i->set_ixx(_m.IXX());
-      _i->set_iyy(_m.IYY());
-      _i->set_izz(_m.IZZ());
-      _i->set_ixy(_m.IXY());
-      _i->set_ixz(_m.IXZ());
-      _i->set_iyz(_m.IYZ());
+      _i->set_ixx(_m.Ixx());
+      _i->set_iyy(_m.Iyy());
+      _i->set_izz(_m.Izz());
+      _i->set_ixy(_m.Ixy());
+      _i->set_ixz(_m.Ixz());
+      _i->set_iyz(_m.Iyz());
     }
 
     /////////////////////////////////////////////////

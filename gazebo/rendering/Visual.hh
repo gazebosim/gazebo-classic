@@ -24,7 +24,7 @@
 #include <vector>
 
 #include <sdf/sdf.hh>
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
@@ -417,7 +417,7 @@ namespace gazebo
 
       /// \brief Get the bounding box for the visual.
       /// \return The bounding box in world coordinates.
-      public: ignition::math::Box BoundingBox() const;
+      public: ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Add a line to the visual.
       /// \param[in] _type The type of line to make.
@@ -715,7 +715,7 @@ namespace gazebo
       /// \param[in] _node Pointer to the Ogre Node to process.
       /// \param[in] _box Current bounding box information.
       private: void BoundsHelper(Ogre::SceneNode *_node,
-                                 ignition::math::Box &_box) const;
+                                 ignition::math::AxisAlignedBox &_box) const;
 
       /// \brief Return true if the submesh should be centered.
       /// \return True if the submesh should be centered when it's inserted

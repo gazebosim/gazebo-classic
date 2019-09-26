@@ -55,11 +55,6 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data
       private: DARTHeightmapShapePrivate<HeightmapShape::HeightType> *dataPtr;
-
-      /// \internal
-      /// \brief Vector3 type that is dependent on HeightType
-      private: using Vector3 =
-                   Eigen::Matrix<HeightmapShape::HeightType, 3, 1>;
     };
     /// \}
   }

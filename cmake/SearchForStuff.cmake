@@ -706,33 +706,33 @@ endif ()
 
 ########################################
 # Find ignition msgs
-find_package(ignition-msgs1 1.0 QUIET)
-if (NOT ignition-msgs1_FOUND)
-  message(STATUS "Looking for ignition-msgs1-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition msgs1 library (libignition-msgs-dev).")
+find_package(ignition-msgs2 2.0 QUIET)
+if (NOT ignition-msgs2_FOUND)
+  message(STATUS "Looking for ignition-msgs2-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition msgs2 library (libignition-msgs2-dev).")
 else()
-  message(STATUS "Looking for ignition-msgs1-config.cmake - found")
+  message(STATUS "Looking for ignition-msgs2-config.cmake - found")
   include_directories(${IGNITION-MSGS_INCLUDE_DIRS})
   link_directories(${IGNITION-MSGS_LIBRARY_DIRS})
 endif()
 
 ########################################
 # Find ignition math library
-find_package(ignition-math4 QUIET)
-if (NOT ignition-math4_FOUND)
-    message(STATUS "Looking for ignition-math4-config.cmake - not found")
-    BUILD_ERROR ("Missing: Ignition math (libignition-math4-dev)")
+find_package(ignition-math5 QUIET)
+if (NOT ignition-math5_FOUND)
+    message(STATUS "Looking for ignition-math5-config.cmake - not found")
+    BUILD_ERROR ("Missing: Ignition math (libignition-math5-dev)")
 else()
-  message(STATUS "Looking for ignition-math4-config.cmake - found")
+  message(STATUS "Looking for ignition-math5-config.cmake - found")
 endif()
 
 ########################################
 # Find the Ignition_Transport library
-find_package(ignition-transport4 QUIET)
-if (NOT ignition-transport4_FOUND)
-  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport4-dev)")
+find_package(ignition-transport5 QUIET)
+if (NOT ignition-transport5_FOUND)
+  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport5-dev)")
 else()
-  message(STATUS "Looking for ignition-transport4-config.cmake - found")
+  message(STATUS "Looking for ignition-transport5-config.cmake - found")
 
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
   include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})

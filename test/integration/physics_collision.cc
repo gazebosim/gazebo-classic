@@ -68,7 +68,7 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
 
     physics::ModelPtr model = world->ModelByName("ground_plane");
     ASSERT_TRUE(model != nullptr);
-    ignition::math::Box box = model->BoundingBox();
+    ignition::math::AxisAlignedBox box = model->BoundingBox();
     EXPECT_LT(box.Min().X(), -big);
     EXPECT_LT(box.Min().Y(), -big);
     EXPECT_LT(box.Min().Z(), -big);
@@ -113,7 +113,7 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
   {
     physics::ModelPtr model = world->ModelByName("model_tshape");
     ASSERT_TRUE(model != nullptr);
-    ignition::math::Box box = model->BoundingBox();
+    ignition::math::AxisAlignedBox box = model->BoundingBox();
     gzdbg << "Bounding box for " << _physicsEngine << ": " << box << std::endl;
     static double tol = 1e-03;
     EXPECT_NEAR(box.Min().X(), -0.5, tol);

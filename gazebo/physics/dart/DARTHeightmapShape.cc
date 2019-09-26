@@ -64,14 +64,13 @@ void DARTHeightmapShape::Init()
   GZ_ASSERT(this->dataPtr->Shape(), "Shape is NULL");
   this->dataPtr->Shape()->setHeightField(this->vertSize, this->vertSize,
                                          this->heights);
-  this->dataPtr->Shape()->setScale(Vector3(this->scale.X(),
-                                           this->scale.Y(), 1));
+  this->dataPtr->Shape()->setScale({this->scale.X(), this->scale.Y(), 1});
 }
 
 //////////////////////////////////////////////////
 void DARTHeightmapShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   GZ_ASSERT(this->dataPtr->Shape(), "Shape is NULL");
-  this->dataPtr->Shape()->setScale(Vector3(_scale.X(), _scale.Y(), 1));
+  this->dataPtr->Shape()->setScale({_scale.X(), _scale.Y(), 1});
   HeightmapShape::SetScale(_scale);
 }

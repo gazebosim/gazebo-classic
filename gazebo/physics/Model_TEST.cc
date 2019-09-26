@@ -237,8 +237,9 @@ TEST_F(ModelTest, BoundingBox)
   auto model = world->ModelByName("box");
   ASSERT_TRUE(model != nullptr);
 
-  EXPECT_EQ(ignition::math::Box(-10.5, -20.5, -30.5, -9.5, -19.5, -29.5),
-            model->BoundingBox());
+  EXPECT_EQ(
+      ignition::math::AxisAlignedBox(-10.5, -20.5, -30.5, -9.5, -19.5, -29.5),
+      model->BoundingBox());
 }
 
 //////////////////////////////////////////////////
