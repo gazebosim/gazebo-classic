@@ -37,7 +37,7 @@ void VisualConfig_TEST::Initialization()
 void VisualConfig_TEST::VisualUpdates()
 {
   VisualConfig vc;
-  msgs::Visual v1, v2, v3;
+  gazebo::msgs::Visual v1, v2, v3;
 
   vc.AddVisual("v1", &v1);
   vc.AddVisual("v2", &v2);
@@ -50,7 +50,7 @@ void VisualConfig_TEST::VisualUpdates()
   QVERIFY(vc.GetData("v3") != NULL);
   QVERIFY(vc.GetData("NotFound") == NULL);
 
-  msgs::VisualPtr visualMsgPtr(new msgs::Visual);
+  gazebo::msgs::VisualPtr visualMsgPtr(new gazebo::msgs::Visual);
   visualMsgPtr->set_transparency(0.50);
 
   vc.UpdateVisual("v1", visualMsgPtr);
@@ -82,7 +82,7 @@ void VisualConfig_TEST::VisualUpdates()
 void VisualConfig_TEST::GeometryUpdates()
 {
   VisualConfig vc;
-  msgs::Visual v1;
+  gazebo::msgs::Visual v1;
 
   vc.AddVisual("v1", &v1);
 
@@ -178,7 +178,7 @@ void VisualConfig_TEST::OnApply()
 void VisualConfig_TEST::Restore()
 {
   VisualConfig vc;
-  msgs::Visual v1, v2, v3;
+  gazebo::msgs::Visual v1, v2, v3;
 
   vc.AddVisual("v1", &v1);
   vc.AddVisual("v2", &v2);

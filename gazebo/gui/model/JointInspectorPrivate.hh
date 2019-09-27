@@ -76,7 +76,7 @@ namespace gazebo
 
       /// \brief Message containing the data which was in the widget when first
       /// open.
-      public: msgs::Joint originalDataMsg;
+      public: gazebo::msgs::Joint originalDataMsg;
     };
   }
 }

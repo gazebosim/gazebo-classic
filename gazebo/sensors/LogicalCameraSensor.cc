@@ -84,7 +84,7 @@ void LogicalCameraSensor::Load(const std::string &_worldName)
 
   // Create publisher of the logical camera images
   this->dataPtr->pub =
-    this->node->Advertise<msgs::LogicalCameraImage>(this->Topic(), 50);
+    this->node->Advertise<gazebo::msgs::LogicalCameraImage>(this->Topic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -126,11 +126,11 @@ void LogicalCameraSensorPrivate::AddVisibleModels(
     if (this->modelName != scopedName && this->frustum.Contains(aabb))
     {
       // Add new model msg
-      msgs::LogicalCameraImage::Model *modelMsg = this->msg.add_model();
+      gazebo::msgs::LogicalCameraImage::Model *modelMsg = this->msg.add_model();
 
       // Set the name and pose reported by the sensor.
       modelMsg->set_name(scopedName);
-      msgs::Set(modelMsg->mutable_pose(),
+      gazebo::msgs::Set(modelMsg->mutable_pose(),
           model->WorldPose() - _myPose);
     }
     // Check nested models
@@ -158,7 +158,7 @@ bool LogicalCameraSensor::UpdateImpl(const bool _force)
     this->dataPtr->frustum.SetPose(myPose);
 
     // Set the camera's pose in the message.
-    msgs::Set(this->dataPtr->msg.mutable_pose(), myPose);
+    gazebo::msgs::Set(this->dataPtr->msg.mutable_pose(), myPose);
 
     // Recursively check if models and nested models are in the frustum.
     this->dataPtr->AddVisibleModels(myPose, this->world->Models());
@@ -202,7 +202,7 @@ double LogicalCameraSensor::AspectRatio() const
 }
 
 //////////////////////////////////////////////////
-msgs::LogicalCameraImage LogicalCameraSensor::Image() const
+gazebo::msgs::LogicalCameraImage LogicalCameraSensor::Image() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   return this->dataPtr->msg;

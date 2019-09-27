@@ -133,7 +133,7 @@ class Rotor
   public: double cmd = 0;
 
   /// \brief Velocity PID for motor control
-  public: common::PID pid;
+  public: gazebo::common::PID pid;
 
   /// \brief Control propeller joint.
   public: std::string jointName;

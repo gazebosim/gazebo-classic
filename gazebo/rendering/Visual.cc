@@ -2131,9 +2131,9 @@ std::string Visual::GetMaterialName() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Visual::BoundingBox() const
+ignition::math::AxisAlignedBox Visual::BoundingBox() const
 {
-  ignition::math::Box box(
+  ignition::math::AxisAlignedBox box(
       ignition::math::Vector3d::Zero,
       ignition::math::Vector3d::Zero);
   this->BoundsHelper(this->GetSceneNode(), box);
@@ -2142,7 +2142,7 @@ ignition::math::Box Visual::BoundingBox() const
 
 //////////////////////////////////////////////////
 void Visual::BoundsHelper(Ogre::SceneNode *_node,
-                          ignition::math::Box &_box) const
+                          ignition::math::AxisAlignedBox &_box) const
 {
   _node->_updateBounds();
   _node->_update(false, true);
@@ -2195,7 +2195,7 @@ void Visual::BoundsHelper(Ogre::SceneNode *_node,
         max = Conversions::ConvertIgn(bb.getMaximum());
       }
 
-      _box.Merge(ignition::math::Box(min, max));
+      _box.Merge(ignition::math::AxisAlignedBox(min, max));
     }
   }
 
@@ -3537,35 +3537,36 @@ Visual::VisualType Visual::ConvertVisualType(const msgs::Visual::Type &_type)
 }
 
 //////////////////////////////////////////////////
-msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
+gazebo::msgs::Visual::Type Visual::ConvertVisualType(
+    const Visual::VisualType &_type)
 {
-  msgs::Visual::Type visualType = msgs::Visual::ENTITY;
+  gazebo::msgs::Visual::Type visualType = gazebo::msgs::Visual::ENTITY;
 
   switch (_type)
   {
     case Visual::VT_ENTITY:
-      visualType = msgs::Visual::ENTITY;
+      visualType = gazebo::msgs::Visual::ENTITY;
       break;
     case Visual::VT_MODEL:
-      visualType = msgs::Visual::MODEL;
+      visualType = gazebo::msgs::Visual::MODEL;
       break;
     case Visual::VT_LINK:
-      visualType = msgs::Visual::LINK;
+      visualType = gazebo::msgs::Visual::LINK;
       break;
     case Visual::VT_VISUAL:
-      visualType = msgs::Visual::VISUAL;
+      visualType = gazebo::msgs::Visual::VISUAL;
       break;
     case Visual::VT_COLLISION:
-      visualType = msgs::Visual::COLLISION;
+      visualType = gazebo::msgs::Visual::COLLISION;
       break;
     case Visual::VT_SENSOR:
-      visualType = msgs::Visual::SENSOR;
+      visualType = gazebo::msgs::Visual::SENSOR;
       break;
     case Visual::VT_GUI:
-      visualType = msgs::Visual::GUI;
+      visualType = gazebo::msgs::Visual::GUI;
       break;
     case Visual::VT_PHYSICS:
-      visualType = msgs::Visual::PHYSICS;
+      visualType = gazebo::msgs::Visual::PHYSICS;
       break;
     default:
       gzerr << "Cannot convert visual type. Defaults to 'msgs::Visual::ENTITY'"
@@ -3607,10 +3608,7 @@ void Visual::AddPendingChild(std::pair<VisualType,
 /////////////////////////////////////////////////
 void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
 {
-  if (_msg.has_lighting())
-  {
-    this->SetLighting(_msg.lighting());
-  }
+  this->SetLighting(_msg.lighting());
 
   if (_msg.has_script())
   {
@@ -3619,8 +3617,7 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
       RenderEngine::Instance()->AddResourcePath(
           _msg.script().uri(i));
     }
-    if (_msg.script().has_name() &&
-        !_msg.script().name().empty())
+    if (!_msg.script().name().empty())
     {
       this->SetMaterial(_msg.script().name());
     }
@@ -3654,34 +3651,31 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
           _msg.emissive().a()));
   }
 
-  if (_msg.has_shader_type())
+  if (_msg.shader_type() == ignition::msgs::Material::VERTEX)
   {
-    if (_msg.shader_type() == ignition::msgs::Material::VERTEX)
-    {
-      this->SetShaderType("vertex");
-    }
-    else if (_msg.shader_type() == ignition::msgs::Material::PIXEL)
-    {
-      this->SetShaderType("pixel");
-    }
-    else if (_msg.shader_type() ==
-        ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
-    {
-      this->SetShaderType("normal_map_object_space");
-    }
-    else if (_msg.shader_type() ==
-        ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
-    {
-      this->SetShaderType("normal_map_tangent_space");
-    }
-    else
-    {
-      gzerr << "Unrecognized shader type" << std::endl;
-    }
-
-    if (_msg.has_normal_map())
-      this->SetNormalMap(_msg.normal_map());
+    this->SetShaderType("vertex");
   }
+  else if (_msg.shader_type() == ignition::msgs::Material::PIXEL)
+  {
+    this->SetShaderType("pixel");
+  }
+  else if (_msg.shader_type() ==
+      ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+  {
+    this->SetShaderType("normal_map_object_space");
+  }
+  else if (_msg.shader_type() ==
+      ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+  {
+    this->SetShaderType("normal_map_tangent_space");
+  }
+  else
+  {
+    gzerr << "Unrecognized shader type" << std::endl;
+  }
+
+  if (!_msg.normal_map().empty())
+    this->SetNormalMap(_msg.normal_map());
 }
 
 /////////////////////////////////////////////////

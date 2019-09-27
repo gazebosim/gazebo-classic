@@ -363,7 +363,7 @@ namespace gazebo
       /// \brief Get the bounding box for the link and all the child
       /// elements.
       /// \return The link's bounding box.
-      public: virtual ignition::math::Box BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Set the linear damping factor.
       /// \param[in] _damping Linear damping factor.
@@ -518,7 +518,8 @@ namespace gazebo
       /// \brief Returns the visual message specified by its name
       /// \param[in] name of the visual message
       /// \return visual message
-      public: msgs::Visual GetVisualMessage(const std::string &_name) const;
+      public: gazebo::msgs::Visual GetVisualMessage(
+                  const std::string &_name) const;
 
       /// \brief Freeze link to ground (inertial frame).
       /// \param[in] _static if true, freeze link to ground.  Otherwise

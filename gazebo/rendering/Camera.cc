@@ -1788,7 +1788,7 @@ bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)
   {
-    ignition::math::Box bbox = _visual->BoundingBox();
+    ignition::math::AxisAlignedBox bbox = _visual->BoundingBox();
     Ogre::AxisAlignedBox box;
     box.setMinimum(bbox.Min().X(), bbox.Min().Y(), bbox.Min().Z());
     box.setMaximum(bbox.Max().X(), bbox.Max().Y(), bbox.Max().Z());

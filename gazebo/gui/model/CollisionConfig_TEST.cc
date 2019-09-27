@@ -38,7 +38,7 @@ void CollisionConfig_TEST::CollisionUpdates()
 {
   gazebo::gui::CollisionConfig cc;
 
-  msgs::Collision c1, c2, c3;
+  gazebo::msgs::Collision c1, c2, c3;
 
   cc.AddCollision("c1", &c1);
   cc.AddCollision("c2", &c2);
@@ -51,7 +51,7 @@ void CollisionConfig_TEST::CollisionUpdates()
   QVERIFY(cc.GetData("c3") != NULL);
   QVERIFY(cc.GetData("NotFound") == NULL);
 
-  msgs::CollisionPtr collisionMsgPtr(new msgs::Collision);
+  gazebo::msgs::CollisionPtr collisionMsgPtr(new gazebo::msgs::Collision);
   collisionMsgPtr->set_laser_retro(0.0000789);
 
   cc.UpdateCollision("c1", collisionMsgPtr);
@@ -83,7 +83,7 @@ void CollisionConfig_TEST::CollisionUpdates()
 void CollisionConfig_TEST::GeometryUpdates()
 {
   gazebo::gui::CollisionConfig cc;
-  msgs::Collision c1;
+  gazebo::msgs::Collision c1;
 
   cc.AddCollision("c1", &c1);
 
@@ -169,7 +169,7 @@ void CollisionConfig_TEST::OnApply()
 void CollisionConfig_TEST::Restore()
 {
   CollisionConfig cc;
-  msgs::Collision c1, c2, c3;
+  gazebo::msgs::Collision c1, c2, c3;
 
   cc.AddCollision("c1", &c1);
   cc.AddCollision("c2", &c2);

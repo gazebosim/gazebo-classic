@@ -722,7 +722,7 @@ void ModelTreeWidget::OnAddModelPlugin()
 /////////////////////////////////////////////////
 void ModelTreeWidget::OnModelPluginApply()
 {
-  msgs::Plugin *msg = this->modelPluginInspector->Data();
+  gazebo::msgs::Plugin *msg = this->modelPluginInspector->Data();
 
   // User command from tree
   model::Events::requestModelPluginInsertion(msg->name(), msg->filename(),

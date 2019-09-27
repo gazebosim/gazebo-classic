@@ -175,7 +175,7 @@ void MEUserCmd::Undo()
   else if (this->dataPtr->type == MEUserCmd::DELETING_MODEL_PLUGIN &&
       this->dataPtr->sdf)
   {
-    auto pluginMsg = msgs::PluginFromSDF(this->dataPtr->sdf);
+    auto pluginMsg = gazebo::msgs::PluginFromSDF(this->dataPtr->sdf);
 
     model::Events::requestModelPluginInsertion(pluginMsg.name(),
         pluginMsg.filename(), pluginMsg.innerxml(), false);
@@ -251,7 +251,7 @@ void MEUserCmd::Redo()
   else if (this->dataPtr->type == MEUserCmd::INSERTING_MODEL_PLUGIN &&
      !this->dataPtr->scopedName.empty())
   {
-    auto pluginMsg = msgs::PluginFromSDF(this->dataPtr->sdf);
+    auto pluginMsg = gazebo::msgs::PluginFromSDF(this->dataPtr->sdf);
 
     model::Events::requestModelPluginInsertion(pluginMsg.name(),
         pluginMsg.filename(), pluginMsg.innerxml(), false);

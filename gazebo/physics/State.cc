@@ -24,13 +24,14 @@ using namespace physics;
 /////////////////////////////////////////////////
 State::State()
 {
-  this->wallTime = common::Time::GetWallTime();
+  this->wallTime = gazebo::common::Time::GetWallTime();
 }
 
 /////////////////////////////////////////////////
-State::State(const std::string &_name, const common::Time &_realTime,
-             const common::Time &_simTime, const uint64_t _iterations)
-: name(_name), wallTime(common::Time::GetWallTime()), realTime(_realTime),
+State::State(const std::string &_name, const gazebo::common::Time &_realTime,
+             const gazebo::common::Time &_simTime, const uint64_t _iterations)
+: name(_name), wallTime(gazebo::common::Time::GetWallTime()),
+  realTime(_realTime),
   simTime(_simTime), iterations(_iterations)
 {
 }
@@ -58,19 +59,19 @@ void State::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-common::Time State::GetWallTime() const
+gazebo::common::Time State::GetWallTime() const
 {
   return this->wallTime;
 }
 
 /////////////////////////////////////////////////
-common::Time State::GetRealTime() const
+gazebo::common::Time State::GetRealTime() const
 {
   return this->realTime;
 }
 
 /////////////////////////////////////////////////
-common::Time State::GetSimTime() const
+gazebo::common::Time State::GetSimTime() const
 {
   return this->simTime;
 }
@@ -109,19 +110,19 @@ State State::operator-(const State &_state) const
 }
 
 /////////////////////////////////////////////////
-void State::SetWallTime(const common::Time &_time)
+void State::SetWallTime(const gazebo::common::Time &_time)
 {
   this->wallTime = _time;
 }
 
 /////////////////////////////////////////////////
-void State::SetRealTime(const common::Time &_time)
+void State::SetRealTime(const gazebo::common::Time &_time)
 {
   this->realTime = _time;
 }
 
 /////////////////////////////////////////////////
-void State::SetSimTime(const common::Time &_time)
+void State::SetSimTime(const gazebo::common::Time &_time)
 {
   this->simTime = _time;
 }

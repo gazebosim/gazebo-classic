@@ -45,11 +45,11 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
 
   // ConfigWidget
   this->dataPtr->configWidget = new ConfigWidget;
-  msgs::Joint jointMsg;
+  gazebo::msgs::Joint jointMsg;
   this->dataPtr->configWidget->Load(&jointMsg);
 
   // Fill with SDF default values
-  sdf::ElementPtr jointElem = msgs::JointToSDF(jointMsg);
+  sdf::ElementPtr jointElem = gazebo::msgs::JointToSDF(jointMsg);
   sdf::ElementPtr axisElem = jointElem->GetElement("axis");
   sdf::ElementPtr axisLimitElem = axisElem->GetElement("limit");
   sdf::ElementPtr odeElem = jointElem->GetElement("physics")->GetElement("ode");
@@ -299,7 +299,7 @@ void JointInspector::SetPose(const ignition::math::Pose3d &_pose)
 }
 
 /////////////////////////////////////////////////
-msgs::Joint *JointInspector::Data() const
+gazebo::msgs::Joint *JointInspector::Data() const
 {
   std::string currentParent =
       this->dataPtr->configWidget->EnumWidgetValue("parentCombo");
@@ -313,7 +313,7 @@ msgs::Joint *JointInspector::Data() const
   }
 
   // Get updated message from widget
-  msgs::Joint *msg = dynamic_cast<msgs::Joint *>(
+  gazebo::msgs::Joint *msg = dynamic_cast<gazebo::msgs::Joint *>(
       this->dataPtr->configWidget->Msg());
   if (!msg)
   {
@@ -580,8 +580,8 @@ void JointInspector::OnRemove()
 /////////////////////////////////////////////////
 void JointInspector::RestoreOriginalData()
 {
-  msgs::JointPtr jointPtr;
-  jointPtr.reset(new msgs::Joint);
+  gazebo::msgs::JointPtr jointPtr;
+  jointPtr.reset(new gazebo::msgs::Joint);
   jointPtr->CopyFrom(this->dataPtr->originalDataMsg);
 
   // Update default widgets
@@ -589,7 +589,8 @@ void JointInspector::RestoreOriginalData()
   this->Update(jointPtr);
 
   // Update joint type and parent icon
-  this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointPtr->type()).c_str()));
+  this->OnJointTypeChanged(
+      tr(gazebo::msgs::Joint_Type_Name(jointPtr->type()).c_str()));
 
   // Update custom widgets
   std::string originalParent =

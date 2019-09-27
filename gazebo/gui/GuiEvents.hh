@@ -161,10 +161,12 @@ namespace gazebo
                                          std::string)> createEntity;
 
       /// \brief indicates a model has been updated
-      public: static event::EventT<void (const msgs::Model &)> modelUpdate;
+      public: static event::EventT<
+              void (const gazebo::msgs::Model &)> modelUpdate;
 
       /// \brief An event to notify light updates.
-      public: static event::EventT<void (const msgs::Light &)> lightUpdate;
+      public: static event::EventT<
+              void (const gazebo::msgs::Light &)> lightUpdate;
 
       /// \brief An event to trigger full screen mode.
       public: static event::EventT<void (bool)> fullScreen;

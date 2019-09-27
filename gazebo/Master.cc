@@ -101,32 +101,33 @@ void Master::Init(uint16_t _port)
 void Master::OnAccept(transport::ConnectionPtr _newConnection)
 {
   // Send the gazebo version string
-  msgs::GzString versionMsg;
+  gazebo::msgs::GzString versionMsg;
   versionMsg.set_data(std::string("gazebo ") + GAZEBO_VERSION);
-  _newConnection->EnqueueMsg(msgs::Package("version_init", versionMsg), true);
+  _newConnection->EnqueueMsg(
+      gazebo::msgs::Package("version_init", versionMsg), true);
 
   // Send all the current topic namespaces
-  msgs::GzString_V namespacesMsg;
+  gazebo::msgs::GzString_V namespacesMsg;
   std::list<std::string>::iterator iter;
   for (iter = this->dataPtr->worldNames.begin();
        iter != this->dataPtr->worldNames.end(); ++iter)
   {
     namespacesMsg.add_data(*iter);
   }
-  _newConnection->EnqueueMsg(msgs::Package("topic_namepaces_init",
+  _newConnection->EnqueueMsg(gazebo::msgs::Package("topic_namepaces_init",
                               namespacesMsg), true);
 
   // Send all the publishers
-  msgs::Publishers publishersMsg;
+  gazebo::msgs::Publishers publishersMsg;
   PubList::iterator pubiter;
   for (pubiter = this->dataPtr->publishers.begin();
        pubiter != this->dataPtr->publishers.end(); ++pubiter)
   {
-    msgs::Publish *pub = publishersMsg.add_publisher();
+    gazebo::msgs::Publish *pub = publishersMsg.add_publisher();
     pub->CopyFrom(pubiter->first);
   }
   _newConnection->EnqueueMsg(
-      msgs::Package("publishers_init", publishersMsg), true);
+      gazebo::msgs::Package("publishers_init", publishersMsg), true);
 
   // Add the connection to our list
   {
@@ -197,12 +198,12 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
   if (!conn || !conn->IsOpen())
     return;
 
-  msgs::Packet packet;
+  gazebo::msgs::Packet packet;
   packet.ParseFromString(_data);
 
   if (packet.type() == "register_topic_namespace")
   {
-    msgs::GzString worldNameMsg;
+    gazebo::msgs::GzString worldNameMsg;
     worldNameMsg.ParseFromString(packet.serialized_data());
 
     std::list<std::string>::iterator iter;
@@ -220,43 +221,43 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
           iter2 != this->dataPtr->connections.end(); ++iter2)
       {
         iter2->second->EnqueueMsg(
-            msgs::Package("topic_namespace_add", worldNameMsg));
+            gazebo::msgs::Package("topic_namespace_add", worldNameMsg));
       }
     }
   }
   else if (packet.type() == "advertise")
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->connectionMutex);
-    msgs::Publish pub;
+    gazebo::msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
 
     Connection_M::iterator iter2;
     for (iter2 = this->dataPtr->connections.begin();
          iter2 != this->dataPtr->connections.end(); ++iter2)
     {
-      iter2->second->EnqueueMsg(msgs::Package("publisher_add", pub));
+      iter2->second->EnqueueMsg(gazebo::msgs::Package("publisher_add", pub));
     }
 
     this->dataPtr->publishers.push_back(std::make_pair(pub, conn));
 
     this->SendSubscribers(pub.topic(),
-        msgs::Package("publisher_advertise", pub));
+        gazebo::msgs::Package("publisher_advertise", pub));
   }
   else if (packet.type() == "unadvertise")
   {
-    msgs::Publish pub;
+    gazebo::msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
     this->RemovePublisher(pub);
   }
   else if (packet.type() == "unsubscribe")
   {
-    msgs::Subscribe sub;
+    gazebo::msgs::Subscribe sub;
     sub.ParseFromString(packet.serialized_data());
     this->RemoveSubscriber(sub);
   }
   else if (packet.type() == "subscribe")
   {
-    msgs::Subscribe sub;
+    gazebo::msgs::Subscribe sub;
     sub.ParseFromString(packet.serialized_data());
 
     this->dataPtr->subscribers.push_back(std::make_pair(sub, conn));
@@ -269,31 +270,32 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     {
       if (iter->first.topic() == sub.topic())
       {
-        conn->EnqueueMsg(msgs::Package("publisher_subscribe", iter->first));
+        conn->EnqueueMsg(
+            gazebo::msgs::Package("publisher_subscribe", iter->first));
       }
     }
   }
   else if (packet.type() == "request")
   {
-    msgs::Request req;
+    gazebo::msgs::Request req;
     req.ParseFromString(packet.serialized_data());
 
     if (req.request() == "get_publishers")
     {
-      msgs::Publishers msg;
+      gazebo::msgs::Publishers msg;
       PubList::iterator iter;
       for (iter = this->dataPtr->publishers.begin();
           iter != this->dataPtr->publishers.end(); ++iter)
       {
-        msgs::Publish *pub = msg.add_publisher();
+        gazebo::msgs::Publish *pub = msg.add_publisher();
         pub->CopyFrom(iter->first);
       }
-      conn->EnqueueMsg(msgs::Package("publisher_list", msg), true);
+      conn->EnqueueMsg(gazebo::msgs::Package("publisher_list", msg), true);
     }
     else if (req.request() == "get_topics")
     {
       std::set<std::string> topics;
-      msgs::GzString_V msg;
+      gazebo::msgs::GzString_V msg;
 
       // Add all topics that are published
       for (PubList::iterator iter = this->dataPtr->publishers.begin();
@@ -317,12 +319,12 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       }
 
       // Send the topic list message
-      conn->EnqueueMsg(msgs::Package("topic_list", msg), true);
+      conn->EnqueueMsg(gazebo::msgs::Package("topic_list", msg), true);
     }
     else if (req.request() == "topic_info")
     {
-      msgs::Publish pub = this->GetPublisher(req.data());
-      msgs::TopicInfo ti;
+      gazebo::msgs::Publish pub = this->GetPublisher(req.data());
+      gazebo::msgs::TopicInfo ti;
       ti.set_msg_type(pub.msg_type());
 
       PubList::iterator piter;
@@ -334,7 +336,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       {
         if (piter->first.topic() == req.data())
         {
-          msgs::Publish *pubPtr = ti.add_publisher();
+          gazebo::msgs::Publish *pubPtr = ti.add_publisher();
           pubPtr->CopyFrom(piter->first);
         }
       }
@@ -350,23 +352,24 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
           // info message type based on a subscriber's message type.
           if (!ti.has_msg_type() || ti.msg_type().empty())
             ti.set_msg_type(siter->first.msg_type());
-          msgs::Subscribe *sub = ti.add_subscriber();
+          gazebo::msgs::Subscribe *sub = ti.add_subscriber();
           sub->CopyFrom(siter->first);
         }
       }
 
-      conn->EnqueueMsg(msgs::Package("topic_info_response", ti));
+      conn->EnqueueMsg(gazebo::msgs::Package("topic_info_response", ti));
     }
     else if (req.request() == "get_topic_namespaces")
     {
-      msgs::GzString_V msg;
+      gazebo::msgs::GzString_V msg;
       std::list<std::string>::iterator iter;
       for (iter = this->dataPtr->worldNames.begin();
           iter != this->dataPtr->worldNames.end(); ++iter)
       {
         msg.add_data(*iter);
       }
-      conn->EnqueueMsg(msgs::Package("get_topic_namespaces_response", msg));
+      conn->EnqueueMsg(
+          gazebo::msgs::Package("get_topic_namespaces_response", msg));
     }
     else
     {
@@ -494,7 +497,7 @@ void Master::RemoveConnection(Connection_M::iterator _connIter)
 }
 
 /////////////////////////////////////////////////
-void Master::RemovePublisher(const msgs::Publish _pub)
+void Master::RemovePublisher(const gazebo::msgs::Publish _pub)
 {
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->connectionMutex);
@@ -502,11 +505,12 @@ void Master::RemovePublisher(const msgs::Publish _pub)
     for (iter2 = this->dataPtr->connections.begin();
         iter2 != this->dataPtr->connections.end(); ++iter2)
     {
-      iter2->second->EnqueueMsg(msgs::Package("publisher_del", _pub));
+      iter2->second->EnqueueMsg(gazebo::msgs::Package("publisher_del", _pub));
     }
   }
 
-  this->SendSubscribers(_pub.topic(), msgs::Package("unadvertise", _pub));
+  this->SendSubscribers(_pub.topic(),
+      gazebo::msgs::Package("unadvertise", _pub));
 
   PubList::iterator pubIter = this->dataPtr->publishers.begin();
   while (pubIter != this->dataPtr->publishers.end())
@@ -523,7 +527,7 @@ void Master::RemovePublisher(const msgs::Publish _pub)
 }
 
 /////////////////////////////////////////////////
-void Master::RemoveSubscriber(const msgs::Subscribe _sub)
+void Master::RemoveSubscriber(const gazebo::msgs::Subscribe _sub)
 {
   // Find all publishers of the topic, and remove the subscriptions
   for (PubList::iterator iter = this->dataPtr->publishers.begin();
@@ -531,7 +535,7 @@ void Master::RemoveSubscriber(const msgs::Subscribe _sub)
   {
     if (iter->first.topic() == _sub.topic())
     {
-      iter->second->EnqueueMsg(msgs::Package("unsubscribe", _sub));
+      iter->second->EnqueueMsg(gazebo::msgs::Package("unsubscribe", _sub));
     }
   }
 
@@ -583,9 +587,9 @@ void Master::Fini()
 }
 
 //////////////////////////////////////////////////
-msgs::Publish Master::GetPublisher(const std::string &_topic)
+gazebo::msgs::Publish Master::GetPublisher(const std::string &_topic)
 {
-  msgs::Publish msg;
+  gazebo::msgs::Publish msg;
 
   PubList::iterator iter;
 

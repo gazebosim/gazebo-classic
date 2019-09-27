@@ -811,9 +811,9 @@ ModelPtr Link::GetModel() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Link::BoundingBox() const
+ignition::math::AxisAlignedBox Link::BoundingBox() const
 {
-  ignition::math::Box box;
+  ignition::math::AxisAlignedBox box;
 
   box.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
       ignition::math::MAX_D);
@@ -1738,7 +1738,7 @@ bool Link::ContainsLink(const Link_V &_vector, const LinkPtr &_value)
 }
 
 /////////////////////////////////////////////////
-msgs::Visual Link::GetVisualMessage(const std::string &_name) const
+gazebo::msgs::Visual Link::GetVisualMessage(const std::string &_name) const
 {
   msgs::Visual result;
 

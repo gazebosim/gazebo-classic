@@ -126,10 +126,10 @@ void ModelCreator_TEST::NestedModel()
   // Create a box model and add it to the model creator
   double mass = 1.0;
   ignition::math::Vector3d size = ignition::math::Vector3d::One;
-  msgs::Model model;
+  gazebo::msgs::Model model;
   model.set_name("box_model");
-  msgs::AddBoxLink(model, mass, size);
-  sdf::ElementPtr boxModelSDF = msgs::ModelToSDF(model);
+  gazebo::msgs::AddBoxLink(model, mass, size);
+  sdf::ElementPtr boxModelSDF = gazebo::msgs::ModelToSDF(model);
 
   modelCreator->AddEntity(boxModelSDF);
 
@@ -447,10 +447,10 @@ void ModelCreator_TEST::NestedModelSelection()
   // a box nested model
   double mass = 1.0;
   ignition::math::Vector3d size = ignition::math::Vector3d::One;
-  msgs::Model model;
+  gazebo::msgs::Model model;
   model.set_name("box_model");
-  msgs::AddBoxLink(model, mass, size);
-  sdf::ElementPtr boxModelSDF = msgs::ModelToSDF(model);
+  gazebo::msgs::AddBoxLink(model, mass, size);
+  sdf::ElementPtr boxModelSDF = gazebo::msgs::ModelToSDF(model);
 
   modelCreator->AddModel(boxModelSDF);
 
@@ -642,10 +642,10 @@ void ModelCreator_TEST::CopyPaste()
   // a box nested model
   double mass = 1.0;
   ignition::math::Vector3d size = ignition::math::Vector3d::One;
-  msgs::Model model;
+  gazebo::msgs::Model model;
   model.set_name("box_model");
-  msgs::AddBoxLink(model, mass, size);
-  sdf::ElementPtr boxModelSDF = msgs::ModelToSDF(model);
+  gazebo::msgs::AddBoxLink(model, mass, size);
+  sdf::ElementPtr boxModelSDF = gazebo::msgs::ModelToSDF(model);
   modelCreator->AddModel(boxModelSDF);
 
   /// Verify it has been added

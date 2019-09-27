@@ -133,7 +133,7 @@ void VisualConfig::Reset()
 
 /////////////////////////////////////////////////
 void VisualConfig::AddVisual(const std::string &_name,
-    const msgs::Visual *_visualMsg)
+    const gazebo::msgs::Visual *_visualMsg)
 {
   // Header button
   QRadioButton *headerButton = new QRadioButton();
@@ -191,13 +191,13 @@ void VisualConfig::AddVisual(const std::string &_name,
   headerWidget->setLayout(headerLayout);
 
   // ConfigWidget
-  msgs::Visual msgToLoad;
+  gazebo::msgs::Visual msgToLoad;
   if (_visualMsg)
     msgToLoad = *_visualMsg;
 
   // set default values
   // TODO: auto-fill them with SDF defaults
-  msgs::Material *matMsg = msgToLoad.mutable_material();
+  gazebo::msgs::Material *matMsg = msgToLoad.mutable_material();
   if (!matMsg->has_lighting())
       matMsg->set_lighting(true);
 
@@ -391,12 +391,13 @@ void VisualConfig::OnShowVisual(const int _id)
 }
 
 /////////////////////////////////////////////////
-msgs::Visual *VisualConfig::GetData(const std::string &_name) const
+gazebo::msgs::Visual *VisualConfig::GetData(const std::string &_name) const
 {
   for (auto const &it : this->configs)
   {
     if (it.second->name == _name)
-      return dynamic_cast<msgs::Visual *>(it.second->configWidget->Msg());
+      return dynamic_cast<gazebo::msgs::Visual *>(
+          it.second->configWidget->Msg());
   }
   return NULL;
 }
@@ -553,8 +554,8 @@ void VisualConfigData::OnToggleItem(bool _checked)
 /////////////////////////////////////////////////
 void VisualConfigData::RestoreOriginalData()
 {
-  msgs::VisualPtr visualPtr;
-  visualPtr.reset(new msgs::Visual);
+  gazebo::msgs::VisualPtr visualPtr;
+  visualPtr.reset(new gazebo::msgs::Visual);
   visualPtr->CopyFrom(this->originalDataMsg);
 
   // Update default widgets

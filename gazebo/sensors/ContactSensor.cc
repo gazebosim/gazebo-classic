@@ -68,7 +68,7 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
       != "__default_topic__")
   {
     // This will create a topic based on the name specified in SDF.
-    this->dataPtr->contactsPub = this->node->Advertise<msgs::Contacts>(
+    this->dataPtr->contactsPub = this->node->Advertise<gazebo::msgs::Contacts>(
       this->sdf->GetElement("contact")->Get<std::string>("topic"),
       100);
   }
@@ -81,7 +81,7 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     boost::replace_all(topicName, "::", "/");
 
     this->dataPtr->contactsPub =
-      this->node->Advertise<msgs::Contacts>(topicName, 100);
+      this->node->Advertise<gazebo::msgs::Contacts>(topicName, 100);
   }
 }
 
@@ -186,7 +186,8 @@ bool ContactSensor::UpdateImpl(const bool /*_force*/)
         }
 
         // Copy the contact message.
-        msgs::Contact *contactMsg = this->dataPtr->contactsMsg.add_contact();
+        gazebo::msgs::Contact *contactMsg =
+          this->dataPtr->contactsMsg.add_contact();
         contactMsg->CopyFrom((*iter)->contact(i));
       }
     }
@@ -196,7 +197,7 @@ bool ContactSensor::UpdateImpl(const bool /*_force*/)
   this->dataPtr->incomingContacts.clear();
 
   this->lastMeasurementTime = this->world->SimTime();
-  msgs::Set(this->dataPtr->contactsMsg.mutable_time(),
+  gazebo::msgs::Set(this->dataPtr->contactsMsg.mutable_time(),
             this->lastMeasurementTime);
 
   // Generate a outgoing message only if someone is listening.
@@ -261,7 +262,7 @@ unsigned int ContactSensor::GetCollisionContactCount(
 }
 
 //////////////////////////////////////////////////
-msgs::Contacts ContactSensor::Contacts() const
+gazebo::msgs::Contacts ContactSensor::Contacts() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   return this->dataPtr->contactsMsg;

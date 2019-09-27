@@ -87,7 +87,7 @@ void Collision::Fini()
 {
   if (this->requestPub)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete",
+    gazebo::msgs::Request *msg = gazebo::msgs::CreateRequest("entity_delete",
         this->GetScopedName()+"__COLLISION_VISUAL__");
     this->requestPub->Publish(*msg, true);
     delete msg;
@@ -288,9 +288,9 @@ void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Collision::FillMsg(msgs::Collision &_msg)
+void Collision::FillMsg(gazebo::msgs::Collision &_msg)
 {
-  msgs::Set(_msg.mutable_pose(), this->RelativePose());
+  gazebo::msgs::Set(_msg.mutable_pose(), this->RelativePose());
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
   _msg.set_laser_retro(this->GetLaserRetro());
@@ -298,7 +298,7 @@ void Collision::FillMsg(msgs::Collision &_msg)
   this->shape->FillMsg(*_msg.mutable_geometry());
   this->surface->FillMsg(*_msg.mutable_surface());
 
-  msgs::Set(this->visualMsg->mutable_pose(), this->RelativePose());
+  gazebo::msgs::Set(this->visualMsg->mutable_pose(), this->RelativePose());
 
   if (!this->HasType(physics::Base::SENSOR_COLLISION))
   {
@@ -310,7 +310,7 @@ void Collision::FillMsg(msgs::Collision &_msg)
 }
 
 //////////////////////////////////////////////////
-void Collision::ProcessMsg(const msgs::Collision &_msg)
+void Collision::ProcessMsg(const gazebo::msgs::Collision &_msg)
 {
   if (_msg.id() != this->GetId())
   {
@@ -325,7 +325,7 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
   if (_msg.has_pose())
   {
     this->link->SetEnabled(true);
-    this->SetRelativePose(msgs::ConvertIgn(_msg.pose()));
+    this->SetRelativePose(gazebo::msgs::ConvertIgn(_msg.pose()));
   }
 
   if (_msg.has_geometry())
@@ -342,9 +342,9 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
 }
 
 /////////////////////////////////////////////////
-msgs::Visual Collision::CreateCollisionVisual()
+gazebo::msgs::Visual Collision::CreateCollisionVisual()
 {
-  msgs::Visual msg;
+  gazebo::msgs::Visual msg;
   msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
 
   // Put in a unique ID because this is a special visual.
@@ -353,14 +353,15 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.set_parent_id(this->parent->GetId());
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
-  msg.set_type(msgs::Visual::COLLISION);
-  msgs::Set(msg.mutable_pose(), this->RelativePose());
+  msg.set_type(gazebo::msgs::Visual::COLLISION);
+  gazebo::msgs::Set(msg.mutable_pose(), this->RelativePose());
   msg.mutable_material()->mutable_script()->add_uri(
       "file://media/materials/scripts/gazebo.material");
   msg.mutable_material()->mutable_script()->set_name(
       "Gazebo/OrangeTransparent");
-  msgs::Geometry *geom = msg.mutable_geometry();
-  geom->CopyFrom(msgs::GeometryFromSDF(this->sdf->GetElement("geometry")));
+  gazebo::msgs::Geometry *geom = msg.mutable_geometry();
+  geom->CopyFrom(gazebo::msgs::GeometryFromSDF(
+        this->sdf->GetElement("geometry")));
 
   return msg;
 }

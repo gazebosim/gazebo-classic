@@ -521,7 +521,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
   // or handle model_sdf requests in world.
   auto response = transport::request(gui::get_world(), "world_sdf");
 
-  msgs::GzString msg;
+  gazebo::msgs::GzString msg;
   // Make sure the response is correct
   if (response->type() == msg.GetTypeName())
   {
@@ -1159,17 +1159,17 @@ LinkData *ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 {
   LinkData *link = new LinkData();
 
-  msgs::Model model;
+  gazebo::msgs::Model model;
   double mass = 1.0;
 
   // set reasonable inertial values based on geometry
   std::string geomType = _visual->GetGeometryType();
   if (geomType == "cylinder")
-    msgs::AddCylinderLink(model, mass, 0.5, 1.0);
+    gazebo::msgs::AddCylinderLink(model, mass, 0.5, 1.0);
   else if (geomType == "sphere")
-    msgs::AddSphereLink(model, mass, 0.5);
+    gazebo::msgs::AddSphereLink(model, mass, 0.5);
   else
-    msgs::AddBoxLink(model, mass, ignition::math::Vector3d::One);
+    gazebo::msgs::AddBoxLink(model, mass, ignition::math::Vector3d::One);
   link->Load(msgs::LinkToSDF(model.link(0)));
 
   MainWindow *mainWindow = gui::get_main_window();
@@ -1456,7 +1456,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     ModelData::UpdateRenderGroup(colVisual);
 
     // Add to link
-    msgs::Collision colMsg = msgs::CollisionFromSDF(collisionElem);
+    gazebo::msgs::Collision colMsg = gazebo::msgs::CollisionFromSDF(collisionElem);
     link->AddCollision(colVisual, &colMsg);
 
     collisionElem = collisionElem->GetNextElement("collision");
@@ -1759,7 +1759,7 @@ void ModelCreator::CreateTheEntity()
     return;
   }
 
-  msgs::Factory msg;
+  gazebo::msgs::Factory msg;
   // Create a new name if the model exists
   auto modelElem = this->dataPtr->modelSDF->Root()->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
@@ -1776,7 +1776,7 @@ void ModelCreator::CreateTheEntity()
   }
 
   msg.set_sdf(this->dataPtr->modelSDF->ToString());
-  msgs::Set(msg.mutable_pose(), this->dataPtr->modelPose);
+  gazebo::msgs::Set(msg.mutable_pose(), this->dataPtr->modelPose);
   this->dataPtr->makerPub->Publish(msg);
 }
 
@@ -2780,7 +2780,7 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
   for (auto const &it : _link->visuals)
   {
     rendering::VisualPtr visual = it.first;
-    msgs::Visual visualMsg = it.second;
+    gazebo::msgs::Visual visualMsg = it.second;
     sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
 
     visualElem->GetElement("transparency")->Set<double>(
@@ -2791,7 +2791,7 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
   // Add collisions
   for (auto const &colIt : _link->collisions)
   {
-    sdf::ElementPtr collisionElem = msgs::CollisionToSDF(colIt.second);
+    sdf::ElementPtr collisionElem = gazebo::msgs::CollisionToSDF(colIt.second);
     newLinkElem->InsertElement(collisionElem);
   }
   return newLinkElem;

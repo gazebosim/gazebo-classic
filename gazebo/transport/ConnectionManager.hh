@@ -91,7 +91,7 @@ namespace gazebo
 
       /// \brief Unsubscribe from a topic
       /// \param[in] _sub A subscription object
-      public: void Unsubscribe(const msgs::Subscribe &_sub);
+      public: void Unsubscribe(const gazebo::msgs::Subscribe &_sub);
 
       /// \brief Unsubscribe from a topic
       /// \param[in] _topic The topic to unsubscribe from
@@ -111,7 +111,8 @@ namespace gazebo
 
       /// \brief Explicitly update the publisher list
       /// \param[out] _publishers The updated list of publishers is written here
-      public: void GetAllPublishers(std::list<msgs::Publish> &_publishers);
+      public: void GetAllPublishers(
+                  std::list<gazebo::msgs::Publish> &_publishers);
 
       /// \brief Remove a connection from the manager
       /// \param[in] _conn The connection to be removed
@@ -187,7 +188,7 @@ namespace gazebo
       private: boost::recursive_mutex masterMessagesMutex;
       private: boost::recursive_mutex connectionMutex;
 
-      private: std::list<msgs::Publish> publishers;
+      private: std::list<gazebo::msgs::Publish> publishers;
       private: std::list<std::string> namespaces;
       private: std::list<std::string> masterMessages;
 

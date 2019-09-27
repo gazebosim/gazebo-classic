@@ -482,7 +482,7 @@ namespace gazebo
       public: bool dirty;
 
       /// \brief Msg containing joint data.
-      public: msgs::JointPtr jointMsg;
+      public: gazebo::msgs::JointPtr jointMsg;
 
       /// \brief Inspector for configuring joint properties.
       public: JointInspector *inspector;

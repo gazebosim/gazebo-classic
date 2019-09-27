@@ -1439,7 +1439,7 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
     if (_type == "diffuse"
         && _mat->GetBlendMode() == Material::BlendMode::REPLACE)
     {
-      _mat->SetDiffuse(ignition::math::v4::Color(1, 1, 1, 1));
+      _mat->SetDiffuse(ignition::math::Color(1, 1, 1, 1));
     }
 
     _mat->SetLighting(true);

@@ -55,7 +55,7 @@ struct JointControl
   public: int decKey;
 
   /// \brief PID controller
-  public: common::PID pid;
+  public: gazebo::common::PID pid;
 };
 
 /// \brief Engine torque controller

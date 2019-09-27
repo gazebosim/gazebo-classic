@@ -63,7 +63,7 @@ namespace gazebo
       public: std::unique_ptr<Atmosphere> atmosphere;
 
       /// \brief Pointer the spherical coordinates data.
-      public: common::SphericalCoordinatesPtr sphericalCoordinates;
+      public: gazebo::common::SphericalCoordinatesPtr sphericalCoordinates;
 
       /// \brief The root of all entities in the world.
       public: BasePtr rootElement;

@@ -119,9 +119,9 @@ bool TopicCommand::RunImpl()
 void TopicCommand::List()
 {
   std::string data;
-  msgs::Packet packet;
-  msgs::Request request;
-  msgs::GzString_V topics;
+  gazebo::msgs::Packet packet;
+  gazebo::msgs::Request request;
+  gazebo::msgs::GzString_V topics;
 
   transport::ConnectionPtr connection = transport::connectToMaster();
 
@@ -145,12 +145,12 @@ void TopicCommand::List()
 }
 
 /////////////////////////////////////////////////
-msgs::TopicInfo TopicCommand::GetInfo(const std::string &_topic)
+gazebo::msgs::TopicInfo TopicCommand::GetInfo(const std::string &_topic)
 {
-  msgs::TopicInfo topicInfo;
+  gazebo::msgs::TopicInfo topicInfo;
   std::string data;
-  msgs::Request *request = msgs::CreateRequest("topic_info", _topic);
-  msgs::Packet packet;
+  gazebo::msgs::Request *request = gazebo::msgs::CreateRequest("topic_info", _topic);
+  gazebo::msgs::Packet packet;
 
   transport::ConnectionPtr connection = transport::connectToMaster();
 
@@ -175,7 +175,7 @@ msgs::TopicInfo TopicCommand::GetInfo(const std::string &_topic)
 /////////////////////////////////////////////////
 void TopicCommand::Info(const std::string &_topic)
 {
-  msgs::TopicInfo info = this->GetInfo(_topic);
+  gazebo::msgs::TopicInfo info = this->GetInfo(_topic);
   std::cout << "Type: " << info.msg_type() << "\n\n";
 
   std::cout << "Publishers:\n";
@@ -217,7 +217,7 @@ void TopicCommand::Echo(const std::string &_topic)
     return;
   }
 
-  this->echoMsg = msgs::MsgFactory::NewMsg(msgTypeName);
+  this->echoMsg = gazebo::msgs::MsgFactory::NewMsg(msgTypeName);
 
   if (!this->echoMsg)
   {
@@ -441,22 +441,22 @@ bool TopicCommand::Publish(const std::string &_topic)
   transport::ConnectionPtr connection = transport::connectToMaster();
   if (connection)
   {
-    msgs::Request *request;
-    request = msgs::CreateRequest("get_topics");
+    gazebo::msgs::Request *request;
+    request = gazebo::msgs::CreateRequest("get_topics");
     connection->EnqueueMsg(msgs::Package("request", *request), true);
     std::string topicData;
     connection->Read(topicData);
 
-    msgs::Packet packet;
+    gazebo::msgs::Packet packet;
     packet.ParseFromString(topicData);
-    msgs::GzString_V topics;
+    gazebo::msgs::GzString_V topics;
     topics.ParseFromString(packet.serialized_data());
 
     for (int i = 0; i < topics.data_size(); ++i)
     {
       if (topics.data(i) == topicName)
       {
-        request = msgs::CreateRequest("topic_info", topics.data(i));
+        request = gazebo::msgs::CreateRequest("topic_info", topics.data(i));
         connection->EnqueueMsg(msgs::Package("request", *request), true);
 
         int j = 0;
@@ -468,7 +468,7 @@ bool TopicCommand::Publish(const std::string &_topic)
         }
         while (packet.type() != "topic_info_response" && ++j < 10);
 
-        msgs::TopicInfo topicInfo;
+        gazebo::msgs::TopicInfo topicInfo;
         if (j <10)
         {
           topicInfo.ParseFromString(packet.serialized_data());
@@ -493,7 +493,7 @@ bool TopicCommand::Publish(const std::string &_topic)
 
   // Create message
   boost::shared_ptr<google::protobuf::Message> msg =
-    msgs::MsgFactory::NewMsg(msgTypeName);
+    gazebo::msgs::MsgFactory::NewMsg(msgTypeName);
   if (!msg)
   {
     std::cerr << "Unable to create message of type[" << msgTypeName << "]\n";
