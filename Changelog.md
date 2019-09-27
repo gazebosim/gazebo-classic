@@ -42,6 +42,13 @@
 1. Fix loading sdf with orthographic projection camera
     * [Pull request 3098](https://bitbucket.org/osrf/gazebo/pull-request/3098)
 
+1. Fix missing link of ignition-common in `gazebo_common`
+    * [Pull request 3127](https://bitbucket.org/osrf/gazebo/pull-request/3127)
+
+1. Fix compilation against Ogre compiled in debug mode
+    * [Pull request 3131](https://bitbucket.org/osrf/gazebo/pull-request/3131)
+    * [Pull request 3134](https://bitbucket.org/osrf/gazebo/pull-request/3134)
+
 
 ## Gazebo 10.1.0 (2019-03-28)
 
