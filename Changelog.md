@@ -8,6 +8,9 @@
 1. Fix moving model files in StaticMapPlugin
     * [Pull request 3123](https://bitbucket.org/osrf/gazebo/pull-request/3123)
 
+1. Fix crash when loading submesh with no bone assignments.
+    * [Pull request 3122](https://bitbucket.org/osrf/gazebo/pull-request/3122)
+
 1. MeshManager: add .stlb file extension support
     * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
     * [Pull request 3128](https://bitbucket.org/osrf/gazebo/pull-request/3128)
