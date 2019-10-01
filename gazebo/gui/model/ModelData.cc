@@ -1599,7 +1599,7 @@ void LinkData::OnAddCollision(const std::string &_name,
 
           if (_collisionShape == "box")
           {
-            ignition::math::Box boundingBox(max, min);
+            ignition::math::AxisAlignedBox boundingBox(max, min);
             ignition::math::Vector3d size = boundingBox.Size();
 
             geomElem->GetElement("box")->GetElement("size")->Set(size);
@@ -1614,7 +1614,7 @@ void LinkData::OnAddCollision(const std::string &_name,
           }
           else if (_collisionShape == "cylinder")
           {
-            ignition::math::Box boundingBox(max, min);
+            ignition::math::AxisAlignedBox boundingBox(max, min);
             ignition::math::Vector3d size = boundingBox.Size();
 
             double radius, length;

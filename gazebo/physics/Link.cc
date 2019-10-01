@@ -811,9 +811,9 @@ ModelPtr Link::GetModel() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Link::BoundingBox() const
+ignition::math::AxisAlignedBox Link::BoundingBox() const
 {
-  ignition::math::Box box;
+  ignition::math::AxisAlignedBox box;
 
   box.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
       ignition::math::MAX_D);

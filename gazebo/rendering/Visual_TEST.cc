@@ -153,7 +153,7 @@ TEST_F(Visual_TEST, BoundingBox)
   // verify initial bounding box
   ignition::math::Vector3d bboxMin(-0.5, -0.5, -0.5);
   ignition::math::Vector3d bboxMax(0.5, 0.5, 0.5);
-  ignition::math::Box boundingBox = visual->BoundingBox();
+  ignition::math::AxisAlignedBox boundingBox = visual->BoundingBox();
   EXPECT_EQ(boundingBox.Min(), bboxMin);
   EXPECT_EQ(boundingBox.Max(), bboxMax);
 
@@ -171,7 +171,7 @@ TEST_F(Visual_TEST, BoundingBox)
   EXPECT_EQ(newScale, ignition::math::Vector3d(2, 3, 4));
 
   // verify local bounding box dimensions remain the same
-  ignition::math::Box newBoundingBox = visual->BoundingBox();
+  ignition::math::AxisAlignedBox newBoundingBox = visual->BoundingBox();
   EXPECT_EQ(newBoundingBox.Min(), bboxMin);
   EXPECT_EQ(newBoundingBox.Max(), bboxMax);
 
@@ -186,7 +186,7 @@ TEST_F(Visual_TEST, BoundingBox)
   // create empty visual and check bounding box
   gazebo::rendering::VisualPtr emptyVis(
       new gazebo::rendering::Visual("empty_visual", scene));
-  ignition::math::Box emptyBoundingBox = emptyVis->BoundingBox();
+  ignition::math::AxisAlignedBox emptyBoundingBox = emptyVis->BoundingBox();
   EXPECT_EQ(ignition::math::Vector3d::Zero, emptyBoundingBox.Min());
   EXPECT_EQ(ignition::math::Vector3d::Zero, emptyBoundingBox.Max());
 }

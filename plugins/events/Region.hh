@@ -56,7 +56,7 @@ namespace gazebo
     public: std::string name;
 
     /// \brief The list of volumes inside this region
-    public: std::vector<ignition::math::Box> boxes;
+    public: std::vector<ignition::math::AxisAlignedBox> boxes;
   };
 
   /// \def RegionPtr

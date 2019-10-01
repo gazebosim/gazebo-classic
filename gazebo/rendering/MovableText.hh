@@ -159,7 +159,7 @@ namespace gazebo
 
       /// \brief Get the axis aligned bounding box of the text.
       /// \return The axis aligned bounding box.
-      public: ignition::math::Box AABB();
+      public: ignition::math::AxisAlignedBox AABB();
 
       /// \brief Update the text.
       public: void Update();

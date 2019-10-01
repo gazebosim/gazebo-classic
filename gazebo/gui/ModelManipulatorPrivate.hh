@@ -83,7 +83,7 @@ namespace gazebo
       public: std::vector<ignition::math::Vector3d> mouseChildVisualScale;
 
       /// \brief Bounding box of the visual attached to the mouse (for scaling).
-      public: ignition::math::Box mouseVisualBbox;
+      public: ignition::math::AxisAlignedBox mouseVisualBbox;
 
       /// \brief True to manipulate model in global frame.
       public: bool globalManip = false;

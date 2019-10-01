@@ -2131,9 +2131,9 @@ std::string Visual::GetMaterialName() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Visual::BoundingBox() const
+ignition::math::AxisAlignedBox Visual::BoundingBox() const
 {
-  ignition::math::Box box(
+  ignition::math::AxisAlignedBox box(
       ignition::math::Vector3d::Zero,
       ignition::math::Vector3d::Zero);
   this->BoundsHelper(this->GetSceneNode(), box);
@@ -2142,7 +2142,7 @@ ignition::math::Box Visual::BoundingBox() const
 
 //////////////////////////////////////////////////
 void Visual::BoundsHelper(Ogre::SceneNode *_node,
-                          ignition::math::Box &_box) const
+                          ignition::math::AxisAlignedBox &_box) const
 {
   _node->_updateBounds();
   _node->_update(false, true);
@@ -2195,7 +2195,7 @@ void Visual::BoundsHelper(Ogre::SceneNode *_node,
         max = Conversions::ConvertIgn(bb.getMaximum());
       }
 
-      _box.Merge(ignition::math::Box(min, max));
+      _box.Merge(ignition::math::AxisAlignedBox(min, max));
     }
   }
 
