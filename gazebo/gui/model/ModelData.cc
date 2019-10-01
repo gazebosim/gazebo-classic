@@ -395,9 +395,9 @@ void LinkData::UpdateInspectorScale()
 
   if (m.IsValid())
   {
-    newIxx = m.IXX();
-    newIyy = m.IYY();
-    newIzz = m.IZZ();
+    newIxx = m.Ixx();
+    newIyy = m.Iyy();
+    newIzz = m.Izz();
   }
 
   // update inspector inertia
