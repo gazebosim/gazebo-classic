@@ -520,53 +520,26 @@ void JointControlWidget::OnResponse(const std::string &_modelName,
 {
   if (_modelName == this->dataPtr->modelName)
   {
-    if (_rep.has_force())
-    {
-      auto slider = this->dataPtr->sliders[_rep.name()];
-      GZ_ASSERT(slider, "Joint force controller is null");
-      slider->SetForce(_rep.force());
-    }
+    auto slider = this->dataPtr->sliders[_rep.name()];
+    GZ_ASSERT(slider, "Joint force controller is null");
+    slider->SetForce(_rep.force());
     if (_rep.has_position())
     {
       auto slider = this->dataPtr->pidPosSliders[_rep.name()];
       GZ_ASSERT(slider, "Joint PID position controller is null");
-      if (_rep.position().has_target())
-      {
-        slider->SetPositionTarget(_rep.position().target());
-      }
-      if (_rep.position().has_p_gain())
-      {
-        slider->SetPGain(_rep.position().p_gain());
-      }
-      if (_rep.position().has_i_gain())
-      {
-        slider->SetIGain(_rep.position().i_gain());
-      }
-      if (_rep.position().has_d_gain())
-      {
-        slider->SetDGain(_rep.position().d_gain());
-      }
+      slider->SetPositionTarget(_rep.position().target());
+      slider->SetPGain(_rep.position().p_gain());
+      slider->SetIGain(_rep.position().i_gain());
+      slider->SetDGain(_rep.position().d_gain());
     }
     if (_rep.has_velocity())
     {
       auto slider = this->dataPtr->pidVelSliders[_rep.name()];
       GZ_ASSERT(slider, "Joint PID velocity controller is null");
-      if (_rep.velocity().has_target())
-      {
-        slider->SetVelocityTarget(_rep.velocity().target());
-      }
-      if (_rep.velocity().has_p_gain())
-      {
-        slider->SetPGain(_rep.velocity().p_gain());
-      }
-      if (_rep.velocity().has_i_gain())
-      {
-        slider->SetIGain(_rep.velocity().i_gain());
-      }
-      if (_rep.velocity().has_d_gain())
-      {
-        slider->SetDGain(_rep.velocity().d_gain());
-      }
+      slider->SetVelocityTarget(_rep.velocity().target());
+      slider->SetPGain(_rep.velocity().p_gain());
+      slider->SetIGain(_rep.velocity().i_gain());
+      slider->SetDGain(_rep.velocity().d_gain());
     }
   }
 }

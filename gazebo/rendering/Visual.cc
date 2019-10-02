@@ -3607,10 +3607,7 @@ void Visual::AddPendingChild(std::pair<VisualType,
 /////////////////////////////////////////////////
 void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
 {
-  if (_msg.has_lighting())
-  {
-    this->SetLighting(_msg.lighting());
-  }
+  this->SetLighting(_msg.lighting());
 
   if (_msg.has_script())
   {
@@ -3619,8 +3616,7 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
       RenderEngine::Instance()->AddResourcePath(
           _msg.script().uri(i));
     }
-    if (_msg.script().has_name() &&
-        !_msg.script().name().empty())
+    if (!_msg.script().name().empty())
     {
       this->SetMaterial(_msg.script().name());
     }
@@ -3654,34 +3650,31 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
           _msg.emissive().a()));
   }
 
-  if (_msg.has_shader_type())
+  if (_msg.shader_type() == ignition::msgs::Material::VERTEX)
   {
-    if (_msg.shader_type() == ignition::msgs::Material::VERTEX)
-    {
-      this->SetShaderType("vertex");
-    }
-    else if (_msg.shader_type() == ignition::msgs::Material::PIXEL)
-    {
-      this->SetShaderType("pixel");
-    }
-    else if (_msg.shader_type() ==
-        ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
-    {
-      this->SetShaderType("normal_map_object_space");
-    }
-    else if (_msg.shader_type() ==
-        ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
-    {
-      this->SetShaderType("normal_map_tangent_space");
-    }
-    else
-    {
-      gzerr << "Unrecognized shader type" << std::endl;
-    }
-
-    if (_msg.has_normal_map())
-      this->SetNormalMap(_msg.normal_map());
+    this->SetShaderType("vertex");
   }
+  else if (_msg.shader_type() == ignition::msgs::Material::PIXEL)
+  {
+    this->SetShaderType("pixel");
+  }
+  else if (_msg.shader_type() ==
+      ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+  {
+    this->SetShaderType("normal_map_object_space");
+  }
+  else if (_msg.shader_type() ==
+      ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+  {
+    this->SetShaderType("normal_map_tangent_space");
+  }
+  else
+  {
+    gzerr << "Unrecognized shader type" << std::endl;
+  }
+
+  if (!_msg.normal_map().empty())
+    this->SetNormalMap(_msg.normal_map());
 }
 
 /////////////////////////////////////////////////
