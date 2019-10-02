@@ -185,6 +185,7 @@ set (gtest_sources_dri
   RenderingMaterial_TEST.cc
   OriginVisual_TEST.cc
   RenderEngine_TEST.cc
+  RenderEvents_TEST.cc
   RenderingLight_TEST.cc
   RFIDVisual_TEST.cc
   RTShaderSystem_TEST.cc

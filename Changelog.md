@@ -2,6 +2,22 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Fix moving model files in StaticMapPlugin
+    * [Pull request 3123](https://bitbucket.org/osrf/gazebo/pull-request/3123)
+
+1. Fix crash when loading submesh with no bone assignments.
+    * [Pull request 3122](https://bitbucket.org/osrf/gazebo/pull-request/3122)
+
+1. MeshManager: add .stlb file extension support
+    * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
+    * [Pull request 3128](https://bitbucket.org/osrf/gazebo/pull-request/3128)
+
+1. Add Camera PreRender and PostRender events
+    * [Pull request 3118](https://bitbucket.org/osrf/gazebo/pull-request/3118)
+
+1. Fix ColladaLoader wrong node weights caused by buffer overflow bug
+    * [Pull request 3115](https://bitbucket.org/osrf/gazebo/pull-request/3115)
+
 1. ColladaLoader: use default value of 1 for stride parameter when unset.
     * [Pull request 3112](https://bitbucket.org/osrf/gazebo/pull-request/3112)
 
@@ -41,6 +57,13 @@
 
 1. Fix loading sdf with orthographic projection camera
     * [Pull request 3098](https://bitbucket.org/osrf/gazebo/pull-request/3098)
+
+1. Fix missing link of ignition-common in `gazebo_common`
+    * [Pull request 3127](https://bitbucket.org/osrf/gazebo/pull-request/3127)
+
+1. Fix compilation against Ogre compiled in debug mode
+    * [Pull request 3131](https://bitbucket.org/osrf/gazebo/pull-request/3131)
+    * [Pull request 3134](https://bitbucket.org/osrf/gazebo/pull-request/3134)
 
 
 ## Gazebo 10.1.0 (2019-03-28)
@@ -146,6 +169,25 @@
 ## Gazebo 9
 
 ## Gazebo 9.X.X (20XX-XX-XX)
+
+1. Fix moving model files in StaticMapPlugin
+    * [Pull request 3123](https://bitbucket.org/osrf/gazebo/pull-request/3123)
+
+1. Fix crash when loading submesh with no bone assignments.
+    * [Pull request 3122](https://bitbucket.org/osrf/gazebo/pull-request/3122)
+
+1. MeshManager: add .stlb file extension support
+    * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
+    * [Pull request 3128](https://bitbucket.org/osrf/gazebo/pull-request/3128)
+
+## Gazebo 9.11.0 (2019-08-29)
+
+1. Add Camera PreRender and PostRender events
+    * [Pull request 3118](https://bitbucket.org/osrf/gazebo/pull-request/3118)
+
+1. Fix ColladaLoader wrong node weights caused by buffer overflow bug
+    * [Pull request 3115](https://bitbucket.org/osrf/gazebo/pull-request/3115)
+
 
 ## Gazebo 9.10.0 (2019-07-12)
 
