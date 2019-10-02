@@ -104,10 +104,6 @@ Ogre::GpuProgramPtr MergeMaterialGeneratorImpl::GenerateVertexShader(
   Ogre::String programName = this->baseName + "VP_" +
     Ogre::StringConverter::toString(_permutation);
 
-#if OGRE_DEBUG_MODE
-  Ogre::LogManager::getSingleton().getDefaultLog()->logMessage(programSource);
-#endif
-
   // Create shader object
   Ogre::HighLevelGpuProgramPtr ptrProgram =
     Ogre::HighLevelGpuProgramManager::getSingleton().createProgram(
