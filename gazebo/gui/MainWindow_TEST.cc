@@ -1005,7 +1005,7 @@ void MainWindow_TEST::MenuBar()
   for (auto &m : menus)
   {
     auto it = mainMenusCopy.find(m->title().toStdString());
-    QVERIFY(it != mainMenus.end());
+    QVERIFY(it != mainMenusCopy.end());
     mainMenusCopy.erase(it);
   }
 
@@ -1020,7 +1020,7 @@ void MainWindow_TEST::MenuBar()
   {
     std::string title = m->title().toStdString();
     auto it = mainMenusCopy.find(title);
-    QVERIFY(it != mainMenus.end());
+    QVERIFY(it != mainMenusCopy.end());
     mainMenusCopy.erase(it);
   }
 
@@ -1034,7 +1034,7 @@ void MainWindow_TEST::MenuBar()
   {
     std::string title = m->title().toStdString();
     auto it = mainMenusCopy.find(title);
-    QVERIFY(it != mainMenus.end());
+    QVERIFY(it != mainMenusCopy.end());
     mainMenusCopy.erase(title);
   }
 
