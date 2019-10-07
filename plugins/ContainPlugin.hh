@@ -88,7 +88,6 @@ namespace gazebo
     /// \param[in] _req Request, true to enable
     /// \param[out] _res Response message indicating success or failure.
     /// \return True if successful.
-    // cppcheck-suppress unusedPrivateFunction
     private: bool EnableIgn(const ignition::msgs::Boolean &_req,
                             ignition::msgs::Boolean &_res);
 

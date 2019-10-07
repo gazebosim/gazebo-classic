@@ -180,7 +180,6 @@ namespace gazebo
 
       /// \brief Construct a URI object from a string.
       /// \param[in] _str A string.
-      // cppcheck-suppress noExplicitConstructor
       public: URI(const std::string &_str);
 
       /// \brief Copy constructor
