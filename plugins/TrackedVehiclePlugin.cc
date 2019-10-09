@@ -135,9 +135,19 @@ void TrackedVehiclePlugin::Init()
   this->dataPtr->robotNode = transport::NodePtr(new transport::Node());
   this->dataPtr->robotNode->Init(robotNamespace);
 
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
   this->dataPtr->velocityPoseSub =
       this->dataPtr->robotNode->Subscribe<msgs::Pose, TrackedVehiclePlugin>(
           "~/cmd_vel", &TrackedVehiclePlugin::OnVelMsg, this);
+
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
+
   this->dataPtr->velocityTwistSub =
       this->dataPtr->robotNode->Subscribe<msgs::Twist, TrackedVehiclePlugin>(
           "~/cmd_vel_twist", &TrackedVehiclePlugin::OnVelMsg, this);
