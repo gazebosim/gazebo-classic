@@ -61,6 +61,20 @@ namespace gazebo
               static event::ConnectionPtr ConnectNewLayer(T _subscriber)
               {return newLayer.Connect(_subscriber);}
 
+      /// \brief Connect to a camera pre-render update event.
+      /// \param[in] _subscriber Callback to trigger when event occurs.
+      /// \return Pointer the connection. This must stay in scope.
+      public: template<typename T>
+              static event::ConnectionPtr ConnectCameraPreRender(T _subscriber)
+              {return cameraPreRender.Connect(_subscriber);}
+
+      /// \brief Connect to a camera post-render update event.
+      /// \param[in] _subscriber Callback to trigger when event occurs.
+      /// \return Pointer the connection. This must stay in scope.
+      public: template<typename T>
+              static event::ConnectionPtr ConnectCameraPostRender(T _subscriber)
+              {return cameraPostRender.Connect(_subscriber);}
+
       /// \brief The event used to trigger a create scene event.
       public: static event::EventT<void (const std::string &)> createScene;
 
@@ -72,6 +86,12 @@ namespace gazebo
 
       /// \brief The event used to indicate that a new layer is present.
       public: static event::EventT<void (const int32_t)> newLayer;
+
+      /// \brief The event used to indicate a camera pre-render update event.
+      public: static event::EventT<void (const std::string &)> cameraPreRender;
+
+      /// \brief The event used to indicate a camera post-render update event.
+      public: static event::EventT<void (const std::string &)> cameraPostRender;
     };
     /// \}
   }
