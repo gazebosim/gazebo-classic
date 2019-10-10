@@ -237,11 +237,13 @@ void KeysToCmdVelPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   if (publishAsTwist)
   {
-    this->dataPtr = std::unique_ptr<KeysToCmdVelPluginPrivateTwist>(new KeysToCmdVelPluginPrivateTwist);
+    this->dataPtr = std::unique_ptr<KeysToCmdVelPluginPrivateTwist>(
+        new KeysToCmdVelPluginPrivateTwist);
   }
   else
   {
-    this->dataPtr = std::unique_ptr<KeysToCmdVelPluginPrivatePose>(new KeysToCmdVelPluginPrivatePose);
+    this->dataPtr = std::unique_ptr<KeysToCmdVelPluginPrivatePose>(
+        new KeysToCmdVelPluginPrivatePose);
   }
 
   this->LoadParam(_sdf, "cmd_vel_topic", this->dataPtr->cmdVelTopic,
