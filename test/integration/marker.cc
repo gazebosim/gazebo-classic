@@ -489,10 +489,8 @@ void Marker_TEST::CornerCases()
 
     QCOMPARE(rep.marker().size(), 1);
 
-    QVERIFY(rep.marker(0).has_ns());
     QVERIFY(rep.marker(0).ns() == "");
 
-    QVERIFY(rep.marker(0).has_id());
     QVERIFY(rep.marker(0).id() > 0);
 
     QVERIFY(rep.marker(0).type() == ignition::msgs::Marker::SPHERE);
@@ -569,10 +567,8 @@ void Marker_TEST::CornerCases()
 
     QCOMPARE(rep.marker().size(), 1);
 
-    QVERIFY(rep.marker(0).has_ns());
     QVERIFY(rep.marker(0).ns() == "the_namespace");
 
-    QVERIFY(rep.marker(0).has_id());
     QVERIFY(rep.marker(0).id() > 0);
 
     QVERIFY(rep.marker(0).type() == ignition::msgs::Marker::SPHERE);
