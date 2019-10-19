@@ -19,7 +19,7 @@
 #define GAZEBO_RENDERING_WIREBOX_HH_
 
 #include <memory>
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"

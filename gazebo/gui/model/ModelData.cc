@@ -22,7 +22,7 @@
 #endif
 
 #include <boost/thread/recursive_mutex.hpp>
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/MassMatrix3.hh>
 

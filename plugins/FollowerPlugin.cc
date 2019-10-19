@@ -19,7 +19,7 @@
 #include <mutex>
 #include <string>
 
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 
 #include <sdf/sdf.hh>
 

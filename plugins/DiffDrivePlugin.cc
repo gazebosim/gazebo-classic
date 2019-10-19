@@ -17,7 +17,7 @@
 
 #include <functional>
 
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"

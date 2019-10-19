@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 #include <ignition/math/Color.hh>
 
 // TODO: remove this line

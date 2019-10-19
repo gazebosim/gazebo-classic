@@ -24,7 +24,7 @@
 #include <ignition/transport/Node.hh>
 
 #include <ignition/math/Pose3.hh>
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 
 #include <gazebo/transport/Node.hh>
 #include <gazebo/transport/Subscriber.hh>

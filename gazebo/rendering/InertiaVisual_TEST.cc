@@ -19,7 +19,7 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderTypes.hh"

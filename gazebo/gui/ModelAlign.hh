@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 

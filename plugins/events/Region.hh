@@ -23,7 +23,7 @@
 
 #include <sdf/sdf.hh>
 #include <ignition/math/Vector3.hh>
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 
 namespace gazebo
 {
