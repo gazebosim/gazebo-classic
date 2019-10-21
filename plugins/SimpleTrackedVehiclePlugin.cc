@@ -230,6 +230,12 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
   size_t i = 0;
   const auto contacts = this->contactManager->GetContacts();
 
+  // Get the body IDs of the tracks for reference
+  const dBodyID left = dynamic_cast<physics::ODELink &>(
+    *this->tracks[Tracks::LEFT]).GetODEId();
+  const dBodyID right = dynamic_cast<physics::ODELink &>(
+    *this->tracks[Tracks::RIGHT]).GetODEId();
+
   for (auto contact : contacts)
   {
     // Beware! There may be invalid contacts beyond GetContactCount()...
@@ -253,13 +259,18 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       continue;
     }
 
-    dBodyID body1 = dynamic_cast<physics::ODELink&>(
+    dBodyID body1 = dynamic_cast<physics::ODELink &>(
       *contact->collision1->GetLink()).GetODEId();
-    dBodyID body2 = dynamic_cast<physics::ODELink& >(
+    dBodyID body2 = dynamic_cast<physics::ODELink &>(
       *contact->collision2->GetLink()).GetODEId();
-    dGeomID geom1 = dynamic_cast<physics::ODECollision& >(
+
+    // Verify one of these bodies is a track of this vehicle
+    if (body1 != left && body1 != right && body2 != left && body2 != right)
+      continue;
+
+    dGeomID geom1 = dynamic_cast<physics::ODECollision &>(
       *contact->collision1).GetCollisionId();
-    dGeomID geom2 = dynamic_cast<physics::ODECollision& >(
+    dGeomID geom2 = dynamic_cast<physics::ODECollision &>(
       *contact->collision2).GetCollisionId();
 
     bool bodiesSwapped = false;
