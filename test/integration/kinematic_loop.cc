@@ -66,7 +66,7 @@ void KinematicLoopTest::AnchoredLoop(const std::string &_physicsEngine,
   {
     physics->SetParam("solver_type", _solverType);
     EXPECT_EQ(_solverType,
-        boost::any_cast<std::string>(physics->GetParam("solver_type")));
+        std::any_cast<std::string>(physics->GetParam("solver_type")));
   }
 
   // Simulate 15s

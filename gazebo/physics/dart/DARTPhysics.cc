@@ -654,15 +654,15 @@ void DARTPhysics::DebugPrint() const
 }
 
 //////////////////////////////////////////////////
-boost::any DARTPhysics::GetParam(const std::string &_key) const
+std::any DARTPhysics::GetParam(const std::string &_key) const
 {
-  boost::any value;
+  std::any value;
   this->GetParam(_key, value);
   return value;
 }
 
 //////////////////////////////////////////////////
-bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
+bool DARTPhysics::GetParam(const std::string &_key, std::any &_value) const
 {
   if (!this->sdf->HasElement("dart"))
   {
@@ -694,36 +694,36 @@ bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
 }
 
 //////////////////////////////////////////////////
-bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
+bool DARTPhysics::SetParam(const std::string &_key, const std::any &_value)
 {
   /// \TODO fill this out, see issue #1115
   try
   {
     if (_key == "solver_type")
     {
-      this->SetSolverType(boost::any_cast<std::string>(_value));
+      this->SetSolverType(std::any_cast<std::string>(_value));
     }
     else if (_key == "max_contacts")
     {
-      int value = boost::any_cast<int>(_value);
+      int value = std::any_cast<int>(_value);
       gzerr << "Setting [" << _key << "] in DART to [" << value
             << "] not yet supported.\n";
     }
     else if (_key == "min_step_size")
     {
-      double value = boost::any_cast<double>(_value);
+      double value = std::any_cast<double>(_value);
       gzerr << "Setting [" << _key << "] in DART to [" << value
             << "] not yet supported.\n";
     }
     else if (_key == "auto_reset_forces")
     {
       this->dataPtr->resetAllForcesAfterSimulationStep =
-          boost::any_cast<bool>(_value);
+          std::any_cast<bool>(_value);
     }
     else if (_key == "collision_detector")
     {
       // set collision detector
-      std::string useCollisionDetector = boost::any_cast<std::string>(_value);
+      std::string useCollisionDetector = std::any_cast<std::string>(_value);
       std::shared_ptr<dart::collision::CollisionDetector> cd;
       if (useCollisionDetector == "bullet")
       {
@@ -775,15 +775,15 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
       // max_step_size parameter.
       if (_key == "max_step_size")
       {
-        this->dataPtr->dtWorld->setTimeStep(boost::any_cast<double>(_value));
+        this->dataPtr->dtWorld->setTimeStep(std::any_cast<double>(_value));
       }
 
       return PhysicsEngine::SetParam(_key, _value);
     }
   }
-  catch(boost::bad_any_cast &e)
+  catch(std::bad_any_cast &e)
   {
-    gzerr << "DARTPhysics::SetParam(" << _key << ") boost::any_cast error: "
+    gzerr << "DARTPhysics::SetParam(" << _key << ") std::any_cast error: "
           << e.what() << std::endl;
     return false;
   }

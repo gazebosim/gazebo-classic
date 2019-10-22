@@ -369,7 +369,7 @@ double BulletSliderJoint::PositionImpl(const unsigned int _index) const
 //////////////////////////////////////////////////
 bool BulletSliderJoint::SetParam(const std::string &_key,
     unsigned int _index,
-    const boost::any &_value)
+    const std::any &_value)
 {
   if (_index >= this->DOF())
   {
@@ -385,7 +385,7 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
       {
         this->bulletSlider->setPoweredLinMotor(true);
         this->bulletSlider->setTargetLinMotorVelocity(0.0);
-        double value = boost::any_cast<double>(_value);
+        double value = std::any_cast<double>(_value);
 #ifndef LIBBULLET_VERSION_GT_282
         // there is an upstream bug in bullet 2.82 and earlier
         // the maxLinMotorForce parameter is inadvertently divided
@@ -410,7 +410,7 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
       return BulletJoint::SetParam(_key, _index, _value);
     }
   }
-  catch(const boost::bad_any_cast &e)
+  catch(const std::bad_any_cast &e)
   {
     gzerr << "SetParam(" << _key << ")"
           << " boost any_cast error:" << e.what()

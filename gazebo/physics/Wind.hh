@@ -20,7 +20,7 @@
 #include <string>
 #include <functional>
 #include <memory>
-#include <boost/any.hpp>
+#include <any>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -61,20 +61,20 @@ namespace gazebo
       /// \param[in] _value The value to set to
       /// \return true if SetParam is successful, false if operation fails.
       public: bool SetParam(const std::string &_key,
-                            const boost::any &_value);
+                            const std::any &_value);
 
       /// \brief Get a wind parameter
       /// \param[in] _attr String key
       /// \sa SetParam
       /// \return The value of the parameter
-      public: boost::any Param(const std::string &_key) const;
+      public: std::any Param(const std::string &_key) const;
 
       /// \brief Get a wind parameter with a boolean to
       /// indicate success or failure
       /// \param[in] _key Key of the accessed param
       /// \param[out] _value Value of the accessed param
       /// \return True if the parameter was successfully retrieved
-      public: bool Param(const std::string &_key, boost::any &_value) const;
+      public: bool Param(const std::string &_key, std::any &_value) const;
 
       /// \brief virtual callback for gztopic "~/wind".
       /// \param[in] _msg Wind message.

@@ -238,7 +238,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
     {
       ignition::math::Rand::Seed(this->dataPtr->vm["seed"].as<double>());
     }
-    catch(boost::bad_any_cast &_e)
+    catch(std::bad_any_cast &_e)
     {
       gzerr << "Unable to set random number seed. Must supply a number.\n";
     }

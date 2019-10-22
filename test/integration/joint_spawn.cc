@@ -457,8 +457,8 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_LT(_joint->Position(_index), limit + g_tolerance);
     EXPECT_NEAR(_joint->UpperLimit(_index), limit, g_tolerance);
     {
-      boost::any value = _joint->GetParam("hi_stop", _index);
-      EXPECT_NEAR(boost::any_cast<double>(value), limit, g_tolerance);
+      std::any value = _joint->GetParam("hi_stop", _index);
+      EXPECT_NEAR(std::any_cast<double>(value), limit, g_tolerance);
     }
   }
 
@@ -478,8 +478,8 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_GT(_joint->Position(_index), limit - g_tolerance);
     EXPECT_NEAR(_joint->LowerLimit(_index), limit, g_tolerance);
     {
-      boost::any value = _joint->GetParam("lo_stop", _index);
-      EXPECT_NEAR(boost::any_cast<double>(value), limit, g_tolerance);
+      std::any value = _joint->GetParam("lo_stop", _index);
+      EXPECT_NEAR(std::any_cast<double>(value), limit, g_tolerance);
     }
   }
 }

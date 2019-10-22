@@ -32,22 +32,22 @@ TEST_F(PresetManagerTest, GetSetPresetParam)
   physics::Preset preset("preset1");
   EXPECT_EQ(preset.Name(), "preset1");
   std::string foo = "foo";
-  boost::any value1 = foo;
+  std::any value1 = foo;
   EXPECT_FALSE(preset.HasParam("key1"));
   EXPECT_TRUE(preset.SetParam("key1", value1));
   EXPECT_FALSE(preset.SetParam("", value1));
   EXPECT_TRUE(preset.HasParam("key1"));
   EXPECT_FALSE(preset.HasParam(""));
-  boost::any value2;
+  std::any value2;
   EXPECT_FALSE(preset.GetParam("", value2));
   EXPECT_FALSE(preset.GetParam("key_does_not_exist", value2));
   EXPECT_TRUE(preset.GetParam("key1", value2));
   try
   {
-    EXPECT_EQ(boost::any_cast<std::string>(value1),
-        boost::any_cast<std::string>(value2));
+    EXPECT_EQ(std::any_cast<std::string>(value1),
+        std::any_cast<std::string>(value2));
   }
-  catch(boost::bad_any_cast &_e)
+  catch(std::bad_any_cast &_e)
   {
     gzerr << "Bad any cast in PresetManager_TEST" << std::endl;
     FAIL();
@@ -79,7 +79,7 @@ TEST_F(PresetManagerTest, GetSetProfileParam)
   EXPECT_TRUE(presetManager->SetProfileParam("preset_1", "max_step_size",
       max_step_size));
 
-  boost::any value2;
+  std::any value2;
   EXPECT_FALSE(presetManager->GetCurrentProfileParam("param_does_not_exist",
       value2));
   EXPECT_TRUE(presetManager->GetCurrentProfileParam("max_step_size", value2));
@@ -88,9 +88,9 @@ TEST_F(PresetManagerTest, GetSetProfileParam)
 
   try
   {
-    EXPECT_DOUBLE_EQ(max_step_size, boost::any_cast<double>(value2));
+    EXPECT_DOUBLE_EQ(max_step_size, std::any_cast<double>(value2));
   }
-  catch(boost::bad_any_cast &_e)
+  catch(std::bad_any_cast &_e)
   {
     gzerr << "Bad any cast in PresetManager_TEST" << std::endl;
     FAIL();
@@ -124,7 +124,7 @@ TEST_F(PresetManagerTest, CreateRemoveProfile)
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
   physics::PresetManagerPtr presetManager = world->PresetMgr();
-  boost::any value;
+  std::any value;
 
   presetManager->RemoveProfile("preset_2");
   EXPECT_FALSE(presetManager->HasProfile("preset_2"));
@@ -153,9 +153,9 @@ TEST_F(PresetManagerTest, CreateRemoveProfile)
 
   try
   {
-    EXPECT_DOUBLE_EQ(1.0, boost::any_cast<double>(value));
+    EXPECT_DOUBLE_EQ(1.0, std::any_cast<double>(value));
   }
-  catch(boost::bad_any_cast &_e)
+  catch(std::bad_any_cast &_e)
   {
     gzerr << "Bad any cast in PresetManager_TEST" << std::endl;
     FAIL();
@@ -194,7 +194,7 @@ TEST_F(PresetManagerTest, SDF)
   {
     sdf::SDF worldSDF;
     sdf::ElementPtr physicsSDF;
-    boost::any value;
+    std::any value;
 
     worldSDF.SetFromString(
       "<sdf version = \"1.5\">\
@@ -229,12 +229,12 @@ TEST_F(PresetManagerTest, SDF)
     {
       EXPECT_TRUE(presetManager->GetCurrentProfileParam("max_step_size",
           value));
-      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), 0.03);
+      EXPECT_DOUBLE_EQ(std::any_cast<double>(value), 0.03);
       EXPECT_TRUE(presetManager->GetCurrentProfileParam("min_step_size",
           value));
-      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), 0.003);
+      EXPECT_DOUBLE_EQ(std::any_cast<double>(value), 0.003);
     }
-    catch(boost::bad_any_cast &_e)
+    catch(std::bad_any_cast &_e)
     {
       gzerr << "Bad any cast in PresetManager_TEST" << std::endl;
       FAIL();

@@ -94,7 +94,7 @@ class FakeJoint : public physics::Joint
           {return ignition::math::Vector3d::Zero;}
 
   public: virtual void SetAttribute(const std::string &, unsigned int,
-              const boost::any &)
+              const std::any &)
           {}
 
   public: virtual double GetAttribute(const std::string &,
@@ -102,7 +102,7 @@ class FakeJoint : public physics::Joint
           {return 0.0;}
 
   public: virtual bool SetParam(const std::string &, unsigned int,
-              const boost::any &)
+              const std::any &)
           {return true;}
 
   public: virtual double GetParam(const std::string &, unsigned int)

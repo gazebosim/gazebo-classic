@@ -23,7 +23,7 @@
 #include <string>
 #include <utility>
 
-#include <boost/any.hpp>
+#include <any>
 #include <boost/function.hpp>
 
 #include "gazebo/common/Assert.hh"
@@ -99,7 +99,7 @@ namespace gazebo
       /// GetCached().
       public: void Cache(const std::string &_key,
                          boost::function<void()> _func,
-                         const boost::any &_value)
+                         const std::any &_value)
       {
         Cache(_key, _func);
 
@@ -116,9 +116,9 @@ namespace gazebo
         {
           try
           {
-            return boost::any_cast<T>(cachedValResult->second);
+            return std::any_cast<T>(cachedValResult->second);
           }
-          catch(const boost::bad_any_cast &_e)
+          catch(const std::bad_any_cast &_e)
           {
             gzerr << "GetCached(" << _key << ") error:" << _e.what() << "\n";
             return T();
@@ -131,9 +131,9 @@ namespace gazebo
         {
           try
           {
-            return boost::any_cast<T>(defValResult->second);
+            return std::any_cast<T>(defValResult->second);
           }
-          catch(const boost::bad_any_cast &_e)
+          catch(const std::bad_any_cast &_e)
           {
             gzerr << "GetCached(" << _key << ") error:" << _e.what() << "\n";
             return T();
@@ -148,10 +148,10 @@ namespace gazebo
       public: std::vector<boost::function<void()>> mCachedFuncs;
 
       /// \brief Cached values.
-      public: std::map<std::string, boost::any> mCachedValues;
+      public: std::map<std::string, std::any> mCachedValues;
 
       /// \brief Default values that will be used when there is no cached value.
-      public: std::map<std::string, boost::any> mDefaultValues;
+      public: std::map<std::string, std::any> mDefaultValues;
 
       /// \brief Pointer to the DART physics engine.
       public: DARTPhysicsPtr dartPhysics;

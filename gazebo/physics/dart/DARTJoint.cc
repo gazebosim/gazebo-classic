@@ -545,7 +545,7 @@ ignition::math::Vector3d DARTJoint::LinkTorque(
 
 //////////////////////////////////////////////////
 bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
-                         const boost::any &_value)
+                         const std::any &_value)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -562,22 +562,22 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
   if (_index >= dofs)
     gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
 
-  // try because boost::any_cast can throw
+  // try because std::any_cast can throw
   try
   {
     if (_key == "hi_stop")
     {
-      this->SetUpperLimit(_index, boost::any_cast<double>(_value));
+      this->SetUpperLimit(_index, std::any_cast<double>(_value));
     }
     else if (_key == "lo_stop")
     {
-      this->SetLowerLimit(_index, boost::any_cast<double>(_value));
+      this->SetLowerLimit(_index, std::any_cast<double>(_value));
     }
     else if (_key == "friction")
     {
       GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
       this->dataPtr->dtJoint->setCoulombFriction(
-            _index, boost::any_cast<double>(_value));
+            _index, std::any_cast<double>(_value));
     }
     else
     {
@@ -585,7 +585,7 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
       return false;
     }
   }
-  catch(const boost::bad_any_cast &e)
+  catch(const std::bad_any_cast &e)
   {
     gzerr << "SetParam(" << _key << ")"
           << " boost any_cast error:" << e.what()

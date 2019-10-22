@@ -116,7 +116,7 @@ void WindTest::WindParam()
   // Test Wind::[GS]etParam()
   {
     physics::Wind &wind = world->Wind();
-    ignition::math::Vector3d vel = boost::any_cast<ignition::math::Vector3d>(
+    ignition::math::Vector3d vel = std::any_cast<ignition::math::Vector3d>(
       wind.Param("linear_velocity"));
     EXPECT_EQ(vel, msgs::ConvertIgn(windPubMsg.linear_velocity()));
 
@@ -132,13 +132,13 @@ void WindTest::WindParam()
     physics::Wind &wind = world->Wind();
     try
     {
-      boost::any value;
+      std::any value;
       ignition::math::Vector3d vel(-1.03, 0, 0);
       EXPECT_TRUE(wind.SetParam("linear_velocity", vel));
       EXPECT_TRUE(wind.Param("linear_velocity", value));
-      EXPECT_EQ(boost::any_cast<ignition::math::Vector3d>(value), vel);
+      EXPECT_EQ(std::any_cast<ignition::math::Vector3d>(value), vel);
     }
-    catch(boost::bad_any_cast &_e)
+    catch(std::bad_any_cast &_e)
     {
       std::cout << "Bad any_cast in Wind::SetParam test: " << _e.what()
                 << std::endl;
@@ -165,12 +165,12 @@ void WindTest::WindParamBool()
   physics::Wind &wind = world->Wind();
 
   // Initialize to failure conditions
-  boost::any value;
+  std::any value;
 
   // Test wind parameter(s)
   EXPECT_TRUE(wind.Param("linear_velocity", value));
   const ignition::math::Vector3d &vel =
-    boost::any_cast<ignition::math::Vector3d>(value);
+    std::any_cast<ignition::math::Vector3d>(value);
   EXPECT_NEAR(vel.X(), 0.0, 1e-6);
   EXPECT_NEAR(vel.Y(), 0.0, 1e-6);
   EXPECT_NEAR(vel.Z(), 0.0, 1e-6);

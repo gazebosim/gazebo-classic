@@ -274,15 +274,15 @@ double ODEScrewJoint::GetParam(unsigned int _parameter) const
 
 //////////////////////////////////////////////////
 bool ODEScrewJoint::SetParam(const std::string &_key,
-  unsigned int _index, const boost::any &_value)
+  unsigned int _index, const std::any &_value)
 {
   if (_key  == "thread_pitch")
   {
     try
     {
-      this->threadPitch = boost::any_cast<double>(_value);
+      this->threadPitch = std::any_cast<double>(_value);
     }
-    catch(const boost::bad_any_cast &e)
+    catch(const std::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;

@@ -93,7 +93,7 @@ namespace gazebo
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
-                                        const boost::any &_value);
+                                        const std::any &_value);
 
       // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,

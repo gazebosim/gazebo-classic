@@ -420,7 +420,7 @@ double BulletUniversalJoint::PositionImpl(const unsigned int _index) const
 //////////////////////////////////////////////////
 bool BulletUniversalJoint::SetParam(const std::string &_key,
     unsigned int _index,
-    const boost::any &_value)
+    const std::any &_value)
 {
   if (_index >= this->DOF())
   {

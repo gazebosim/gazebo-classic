@@ -305,7 +305,7 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
   // Expect friction cone model
   {
     std::string frictionModel;
-    EXPECT_NO_THROW(frictionModel = boost::any_cast<std::string>(
+    EXPECT_NO_THROW(frictionModel = std::any_cast<std::string>(
                                       physics->GetParam("friction_model")));
     EXPECT_EQ("cone_model", frictionModel);
   }

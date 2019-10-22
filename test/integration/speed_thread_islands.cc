@@ -109,7 +109,7 @@ void SpeedThreadIslandsTest::ThreadSpeedup(const std::string &_physicsEngine,
   {
     int threads;
     EXPECT_NO_THROW(
-      threads = boost::any_cast<int>(physics->GetParam("island_threads")));
+      threads = std::any_cast<int>(physics->GetParam("island_threads")));
     EXPECT_EQ(0, threads);
   }
 
@@ -130,7 +130,7 @@ void SpeedThreadIslandsTest::ThreadSpeedup(const std::string &_physicsEngine,
     int threads;
     physics->SetParam("island_threads", _threads);
     EXPECT_NO_THROW(
-      threads = boost::any_cast<int>(physics->GetParam("island_threads")));
+      threads = std::any_cast<int>(physics->GetParam("island_threads")));
     EXPECT_EQ(_threads, threads);
   }
 

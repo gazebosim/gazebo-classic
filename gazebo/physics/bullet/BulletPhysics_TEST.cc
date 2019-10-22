@@ -78,33 +78,33 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   bulletPhysics->SetParam("split_impulse_penetration_threshold",
       splitImpulsePenetrationThreshold);
 
-  boost::any value;
+  std::any value;
   value = bulletPhysics->GetParam("solver_type");
-  std::string typeRet = boost::any_cast<std::string>(value);
+  std::string typeRet = std::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
   value = bulletPhysics->GetParam("iters");
-  int itersRet = boost::any_cast<int>(value);
+  int itersRet = std::any_cast<int>(value);
   EXPECT_EQ(iters, itersRet);
   value = bulletPhysics->GetParam("sor");
-  double sorRet = boost::any_cast<double>(value);
+  double sorRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(sor, sorRet);
   value = bulletPhysics->GetParam("cfm");
-  double cfmRet = boost::any_cast<double>(value);
+  double cfmRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(cfm, cfmRet);
   value = bulletPhysics->GetParam("erp");
-  double erpRet = boost::any_cast<double>(value);
+  double erpRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(erp, erpRet);
 
   value = bulletPhysics->GetParam("contact_surface_layer");
-  double contactSurfaceLayerRet = boost::any_cast<double>(value);
+  double contactSurfaceLayerRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
 
   value = bulletPhysics->GetParam("split_impulse");
-  double splitImpulseRet = boost::any_cast<bool>(value);
+  double splitImpulseRet = std::any_cast<bool>(value);
   EXPECT_DOUBLE_EQ(splitImpulse, splitImpulseRet);
 
   value = bulletPhysics->GetParam("split_impulse_penetration_threshold");
-  double splitImpulsePenetrationThresholdRet = boost::any_cast<double>(value);
+  double splitImpulsePenetrationThresholdRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(splitImpulsePenetrationThreshold,
     splitImpulsePenetrationThresholdRet);
 
@@ -135,31 +135,31 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
       splitImpulsePenetrationThreshold);
 
   value = bulletPhysics->GetParam("solver_type");
-  typeRet = boost::any_cast<std::string>(value);
+  typeRet = std::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
   value = bulletPhysics->GetParam("iters");
-  itersRet = boost::any_cast<int>(value);
+  itersRet = std::any_cast<int>(value);
   EXPECT_EQ(iters, itersRet);
   value = bulletPhysics->GetParam("sor");
-  sorRet = boost::any_cast<double>(value);
+  sorRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(sor, sorRet);
   value = bulletPhysics->GetParam("cfm");
-  cfmRet = boost::any_cast<double>(value);
+  cfmRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(cfm, cfmRet);
   value = bulletPhysics->GetParam("erp");
-  erpRet = boost::any_cast<double>(value);
+  erpRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(erp, erpRet);
 
   value = bulletPhysics->GetParam("contact_surface_layer");
-  contactSurfaceLayerRet = boost::any_cast<double>(value);
+  contactSurfaceLayerRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
 
   value = bulletPhysics->GetParam("split_impulse");
-  splitImpulseRet = boost::any_cast<bool>(value);
+  splitImpulseRet = std::any_cast<bool>(value);
   EXPECT_DOUBLE_EQ(splitImpulse, splitImpulseRet);
 
   value = bulletPhysics->GetParam("split_impulse_penetration_threshold");
-  splitImpulsePenetrationThresholdRet = boost::any_cast<double>(value);
+  splitImpulsePenetrationThresholdRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(splitImpulsePenetrationThreshold,
     splitImpulsePenetrationThresholdRet);
 
@@ -170,13 +170,13 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   bulletPhysics->SetParam("min_step_size", minStepSize);
   bulletPhysics->SetParam("max_step_size", maxStepSize);
   value = bulletPhysics->GetParam("max_contacts");
-  maxContactsRet = boost::any_cast<int>(value);
+  maxContactsRet = std::any_cast<int>(value);
   EXPECT_DOUBLE_EQ(maxContacts, maxContactsRet);
   value = bulletPhysics->GetParam("min_step_size");
-  minStepSizeRet = boost::any_cast<double>(value);
+  minStepSizeRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(minStepSize, minStepSizeRet);
   value = bulletPhysics->GetParam("max_step_size");
-  maxStepSizeRet = boost::any_cast<double>(value);
+  maxStepSizeRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(maxStepSize, maxStepSizeRet);
 }
 

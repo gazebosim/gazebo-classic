@@ -565,7 +565,7 @@ ignition::math::Vector3d BulletJoint::LinkTorque(
 //////////////////////////////////////////////////
 bool BulletJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/,
-    const boost::any &/*_value*/)
+    const std::any &/*_value*/)
 {
   gzdbg << "Not implement in Bullet\n";
   return false;

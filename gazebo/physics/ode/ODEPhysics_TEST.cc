@@ -93,48 +93,48 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   EXPECT_TRUE(odePhysics->SetParam("extra_friction_iterations",
                                     extraFrictionIterations));
 
-  boost::any value;
+  std::any value;
   value = odePhysics->GetParam("solver_type");
-  std::string typeRet = boost::any_cast<std::string>(value);
+  std::string typeRet = std::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
   value = odePhysics->GetParam("precon_iters");
-  int preconItersRet = boost::any_cast<int>(value);
+  int preconItersRet = std::any_cast<int>(value);
   EXPECT_EQ(preconIters, preconItersRet);
   value = odePhysics->GetParam("iters");
-  int itersRet = boost::any_cast<int>(value);
+  int itersRet = std::any_cast<int>(value);
   EXPECT_EQ(iters, itersRet);
   value = odePhysics->GetParam("sor");
-  double sorRet = boost::any_cast<double>(value);
+  double sorRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(sor, sorRet);
   value = odePhysics->GetParam("cfm");
-  double cfmRet = boost::any_cast<double>(value);
+  double cfmRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(cfm, cfmRet);
   value = odePhysics->GetParam("erp");
-  double erpRet = boost::any_cast<double>(value);
+  double erpRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(erp, erpRet);
   value = odePhysics->GetParam("contact_max_correcting_vel");
-  double contactMaxCorrectingVelRet = boost::any_cast<double>(value);
+  double contactMaxCorrectingVelRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactMaxCorrectingVel, contactMaxCorrectingVelRet);
   value = odePhysics->GetParam("contact_surface_layer");
-  double contactSurfaceLayerRet = boost::any_cast<double>(value);
+  double contactSurfaceLayerRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
   value = odePhysics->GetParam("contact_residual_smoothing");
-  double contactResidualSmoothingRet = boost::any_cast<double>(value);
+  double contactResidualSmoothingRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactResidualSmoothing, contactResidualSmoothingRet);
   value = odePhysics->GetParam("contact_sor_scale");
-  double contactSorScaleRet = boost::any_cast<double>(value);
+  double contactSorScaleRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSorScale, contactSorScaleRet);
   value = odePhysics->GetParam("thread_position_correction");
-  bool threadPositionCorrectionRet = boost::any_cast<bool>(value);
+  bool threadPositionCorrectionRet = std::any_cast<bool>(value);
   EXPECT_EQ(threadPositionCorrection, threadPositionCorrectionRet);
   value = odePhysics->GetParam("experimental_row_reordering");
-  bool experimentalRowReorderingRet = boost::any_cast<bool>(value);
+  bool experimentalRowReorderingRet = std::any_cast<bool>(value);
   EXPECT_EQ(experimentalRowReordering, experimentalRowReorderingRet);
   value = odePhysics->GetParam("warm_start_factor");
-  double warmStartFactorRet = boost::any_cast<double>(value);
+  double warmStartFactorRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(warmStartFactor, warmStartFactorRet);
   value = odePhysics->GetParam("extra_friction_iterations");
-  int extraFrictionIterationsRet = boost::any_cast<int>(value);
+  int extraFrictionIterationsRet = std::any_cast<int>(value);
   EXPECT_EQ(extraFrictionIterations, extraFrictionIterationsRet);
 
   // verify against equivalent functions
@@ -189,46 +189,46 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
                                     extraFrictionIterations));
 
   value = odePhysics->GetParam("solver_type");
-  typeRet = boost::any_cast<std::string>(value);
+  typeRet = std::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
   value = odePhysics->GetParam("iters");
-  itersRet = boost::any_cast<int>(value);
+  itersRet = std::any_cast<int>(value);
   EXPECT_EQ(iters, itersRet);
   value = odePhysics->GetParam("precon_iters");
-  preconItersRet = boost::any_cast<int>(value);
+  preconItersRet = std::any_cast<int>(value);
   EXPECT_EQ(preconIters, preconItersRet);
   value = odePhysics->GetParam("sor");
-  sorRet = boost::any_cast<double>(value);
+  sorRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(sor, sorRet);
   value = odePhysics->GetParam("cfm");
-  cfmRet = boost::any_cast<double>(value);
+  cfmRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(cfm, cfmRet);
   value = odePhysics->GetParam("erp");
-  erpRet = boost::any_cast<double>(value);
+  erpRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(erp, erpRet);
   value = odePhysics->GetParam("contact_max_correcting_vel");
-  contactMaxCorrectingVelRet = boost::any_cast<double>(value);
+  contactMaxCorrectingVelRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactMaxCorrectingVel, contactMaxCorrectingVelRet);
   value = odePhysics->GetParam("contact_surface_layer");
-  contactSurfaceLayerRet = boost::any_cast<double>(value);
+  contactSurfaceLayerRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
   value = odePhysics->GetParam("contact_residual_smoothing");
-  contactResidualSmoothingRet = boost::any_cast<double>(value);
+  contactResidualSmoothingRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactResidualSmoothing, contactResidualSmoothingRet);
   value = odePhysics->GetParam("contact_sor_scale");
-  contactSorScaleRet = boost::any_cast<double>(value);
+  contactSorScaleRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSorScale, contactSorScaleRet);
   value = odePhysics->GetParam("thread_position_correction");
-  threadPositionCorrectionRet = boost::any_cast<bool>(value);
+  threadPositionCorrectionRet = std::any_cast<bool>(value);
   EXPECT_EQ(threadPositionCorrection, threadPositionCorrectionRet);
   value = odePhysics->GetParam("experimental_row_reordering");
-  experimentalRowReorderingRet = boost::any_cast<bool>(value);
+  experimentalRowReorderingRet = std::any_cast<bool>(value);
   EXPECT_EQ(experimentalRowReordering, experimentalRowReorderingRet);
   value = odePhysics->GetParam("warm_start_factor");
-  warmStartFactorRet = boost::any_cast<double>(value);
+  warmStartFactorRet = std::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(warmStartFactor, warmStartFactorRet);
   value = odePhysics->GetParam("extra_friction_iterations");
-  extraFrictionIterationsRet = boost::any_cast<int>(value);
+  extraFrictionIterationsRet = std::any_cast<int>(value);
   EXPECT_EQ(extraFrictionIterations, extraFrictionIterationsRet);
 
   EXPECT_EQ(type, odePhysics->GetStepType());
@@ -262,8 +262,8 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
         EXPECT_TRUE(odePhysics->SetParam(key, flag));
 
         // Check both keys
-        EXPECT_EQ(flag, boost::any_cast<bool>(odePhysics->GetParam(key1)));
-        EXPECT_EQ(flag, boost::any_cast<bool>(odePhysics->GetParam(key2)));
+        EXPECT_EQ(flag, std::any_cast<bool>(odePhysics->GetParam(key1)));
+        EXPECT_EQ(flag, std::any_cast<bool>(odePhysics->GetParam(key2)));
       }
     }
   }
@@ -274,7 +274,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     const std::string frictionModel = "pyramid_model";
     EXPECT_EQ(odePhysics->GetFrictionModel(), frictionModel);
     std::string param;
-    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+    EXPECT_NO_THROW(param = std::any_cast<std::string>(
       odePhysics->GetParam("friction_model")));
     EXPECT_EQ(param, frictionModel);
   }
@@ -285,7 +285,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     odePhysics->SetFrictionModel(frictionModel);
     EXPECT_EQ(odePhysics->GetFrictionModel(), frictionModel);
     std::string param;
-    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+    EXPECT_NO_THROW(param = std::any_cast<std::string>(
       odePhysics->GetParam("friction_model")));
     EXPECT_EQ(param, frictionModel);
   }
@@ -296,7 +296,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     odePhysics->SetParam("friction_model", frictionModel);
     EXPECT_EQ(odePhysics->GetFrictionModel(), frictionModel);
     std::string param;
-    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+    EXPECT_NO_THROW(param = std::any_cast<std::string>(
       odePhysics->GetParam("friction_model")));
     EXPECT_EQ(param, frictionModel);
   }
@@ -306,7 +306,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     // island_threads should be 0 by default
     int islandThreads = 1;
     EXPECT_NO_THROW(islandThreads =
-      boost::any_cast<int>(odePhysics->GetParam("island_threads")));
+      std::any_cast<int>(odePhysics->GetParam("island_threads")));
     EXPECT_FALSE(islandThreads);
 
     // try enabling threads, then disabling
@@ -315,7 +315,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     {
       odePhysics->SetParam("island_threads", islandThreadsSet);
       EXPECT_NO_THROW(islandThreads =
-        boost::any_cast<int>(odePhysics->GetParam("island_threads")));
+        std::any_cast<int>(odePhysics->GetParam("island_threads")));
       EXPECT_EQ(islandThreads, islandThreadsSet);
     }
   }
@@ -326,7 +326,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     // ode_quiet should be off by default
     bool odeQuiet = true;
     EXPECT_NO_THROW(
-      odeQuiet = boost::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
+      odeQuiet = std::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
     EXPECT_FALSE(odeQuiet);
 
     // try turning it on, then off again
@@ -335,7 +335,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     {
       odePhysics->SetParam("ode_quiet", odeQuietSet);
       EXPECT_NO_THROW(
-        odeQuiet = boost::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
+        odeQuiet = std::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
       EXPECT_EQ(odeQuiet, odeQuietSet);
     }
   }
@@ -346,7 +346,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     const std::string worldSolverType = "ODE_DANTZIG";
     EXPECT_EQ(odePhysics->GetWorldStepSolverType(), worldSolverType);
     std::string param;
-    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+    EXPECT_NO_THROW(param = std::any_cast<std::string>(
       odePhysics->GetParam("world_step_solver")));
     EXPECT_EQ(param, worldSolverType);
   }
@@ -357,7 +357,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     odePhysics->SetWorldStepSolverType(worldSolverType);
     EXPECT_EQ(odePhysics->GetWorldStepSolverType(), worldSolverType);
     std::string param;
-    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+    EXPECT_NO_THROW(param = std::any_cast<std::string>(
       odePhysics->GetParam("world_step_solver")));
     EXPECT_EQ(param, worldSolverType);
   }
@@ -368,7 +368,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     odePhysics->SetParam("world_step_solver", worldSolverType);
     EXPECT_EQ(odePhysics->GetWorldStepSolverType(), worldSolverType);
     std::string param;
-    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+    EXPECT_NO_THROW(param = std::any_cast<std::string>(
       odePhysics->GetParam("world_step_solver")));
     EXPECT_EQ(param, worldSolverType);
   }

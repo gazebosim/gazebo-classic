@@ -17,6 +17,9 @@ New mandatory dependencies: `ign-fuel-tools3`, `ign-common3`.
 1. All instances of `ignition::math::Box` in the API are changed to `ignition::math::AxisAlignedBox`
    to match the changes in ignition-math6.
 
+1. All instances of `boost::any` in the API are changed to `std::any`
+   to match the changes in sdformat8.
+
 ## Gazebo 9.x to 10.x
 
 ### Additions

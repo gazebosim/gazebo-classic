@@ -358,17 +358,17 @@ void ODELink::UpdateSurface()
       if (g->IsPlaceable() && g->GetCollisionId())
       {
         // Set max_vel and min_depth
-        boost::any value;
+        std::any value;
         if (g->GetODESurface()->maxVel < 0 && this->GetWorld()->
             Physics()->GetParam("contact_max_correcting_vel", value))
         {
           try
           {
-            g->GetODESurface()->maxVel = boost::any_cast<double>(value);
+            g->GetODESurface()->maxVel = std::any_cast<double>(value);
           }
-          catch(boost::bad_any_cast &_e)
+          catch(std::bad_any_cast &_e)
           {
-            gzerr << "Failed boost::any_cast in ODELink.cc: " << _e.what();
+            gzerr << "Failed std::any_cast in ODELink.cc: " << _e.what();
           }
         }
         // Set surface properties max_vel and min_depth

@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_PHYSICS_PRESETMANAGER_PRIVATE_HH_
 #define _GAZEBO_PHYSICS_PRESETMANAGER_PRIVATE_HH_
 
+#include <any>
 #include <map>
 #include <string>
 #include <mutex>
@@ -41,7 +42,7 @@ namespace gazebo
       public: std::string name;
 
       /// \brief Map of key, parameter pairs
-      public: std::map<std::string, boost::any> parameterMap;
+      public: std::map<std::string, std::any> parameterMap;
 
       /// \brief SDF for the physics element represented by this object
       public: sdf::ElementPtr elementSDF;

@@ -258,7 +258,7 @@ void ODEUniversalJoint::SetLowerLimit(const unsigned int _index,
 
 //////////////////////////////////////////////////
 bool ODEUniversalJoint::SetParam(
-  const std::string &_key, unsigned int _index, const boost::any &_value)
+  const std::string &_key, unsigned int _index, const std::any &_value)
 {
   // Axis parameters for multi-axis joints use a group bitmask
   // to identify the variable.
@@ -280,24 +280,24 @@ bool ODEUniversalJoint::SetParam(
   {
     if (_key == "stop_erp")
     {
-      this->SetParam(dParamStopERP | group, boost::any_cast<double>(_value));
+      this->SetParam(dParamStopERP | group, std::any_cast<double>(_value));
     }
     else if (_key == "stop_cfm")
     {
-      this->SetParam(dParamStopCFM | group, boost::any_cast<double>(_value));
+      this->SetParam(dParamStopCFM | group, std::any_cast<double>(_value));
     }
     else if (_key == "friction")
     {
       this->SetParam(dParamVel | group, 0.0);
-      this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
+      this->SetParam(dParamFMax | group, std::any_cast<double>(_value));
     }
     else if (_key == "hi_stop")
     {
-      this->SetParam(dParamHiStop | group, boost::any_cast<double>(_value));
+      this->SetParam(dParamHiStop | group, std::any_cast<double>(_value));
     }
     else if (_key == "lo_stop")
     {
-      this->SetParam(dParamLoStop | group, boost::any_cast<double>(_value));
+      this->SetParam(dParamLoStop | group, std::any_cast<double>(_value));
     }
     else
     {
@@ -305,7 +305,7 @@ bool ODEUniversalJoint::SetParam(
       return ODEJoint::SetParam(_key, _index, _value);
     }
   }
-  catch(const boost::bad_any_cast &e)
+  catch(const std::bad_any_cast &e)
   {
     gzerr << "boost any_cast error during "
           << "SetParam('" << _key << "'): "

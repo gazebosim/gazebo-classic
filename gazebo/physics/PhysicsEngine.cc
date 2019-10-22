@@ -221,7 +221,7 @@ void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
 //////////////////////////////////////////////////
 bool PhysicsEngine::SetParam(const std::string &_key,
-    const boost::any &_value)
+    const std::any &_value)
 {
   try
   {
@@ -231,23 +231,23 @@ bool PhysicsEngine::SetParam(const std::string &_key,
       return false;
     }
     if (_key == "max_step_size")
-      this->SetMaxStepSize(boost::any_cast<double>(_value));
+      this->SetMaxStepSize(std::any_cast<double>(_value));
     else if (_key == "real_time_update_rate")
-      this->SetRealTimeUpdateRate(boost::any_cast<double>(_value));
+      this->SetRealTimeUpdateRate(std::any_cast<double>(_value));
     else if (_key == "real_time_factor")
-      this->SetTargetRealTimeFactor(boost::any_cast<double>(_value));
+      this->SetTargetRealTimeFactor(std::any_cast<double>(_value));
     else if (_key == "gravity")
     {
-      boost::any copy = boost::lexical_cast<ignition::math::Vector3d>
-          (boost::any_cast<ignition::math::Vector3d>(_value));
-      this->SetGravity(boost::any_cast<ignition::math::Vector3d>(copy));
+      std::any copy = boost::lexical_cast<ignition::math::Vector3d>
+          (std::any_cast<ignition::math::Vector3d>(_value));
+      this->SetGravity(std::any_cast<ignition::math::Vector3d>(copy));
     }
     else if (_key == "magnetic_field")
     {
-      boost::any copy = boost::lexical_cast<ignition::math::Vector3d>
-          (boost::any_cast<ignition::math::Vector3d>(_value));
+      std::any copy = boost::lexical_cast<ignition::math::Vector3d>
+          (std::any_cast<ignition::math::Vector3d>(_value));
       this->world->SetMagneticField(
-          boost::any_cast<ignition::math::Vector3d>(copy));
+          std::any_cast<ignition::math::Vector3d>(copy));
     }
     else
     {
@@ -256,7 +256,7 @@ bool PhysicsEngine::SetParam(const std::string &_key,
       return false;
     }
   }
-  catch(boost::bad_any_cast &_e)
+  catch(std::bad_any_cast &_e)
   {
     gzerr << "Caught bad any_cast in PhysicsEngine::SetParam: " << _e.what()
           << std::endl;
@@ -272,16 +272,16 @@ bool PhysicsEngine::SetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-boost::any PhysicsEngine::GetParam(const std::string &_key) const
+std::any PhysicsEngine::GetParam(const std::string &_key) const
 {
-  boost::any value;
+  std::any value;
   this->PhysicsEngine::GetParam(_key, value);
   return value;
 }
 
 //////////////////////////////////////////////////
 bool PhysicsEngine::GetParam(const std::string &_key,
-    boost::any &_value) const
+    std::any &_value) const
 {
   if (_key == "type")
     _value = this->GetType();

@@ -18,7 +18,7 @@
 #ifndef _GAZEBO_PHYSICS_PRESETMANAGER_HH_
 #define _GAZEBO_PHYSICS_PRESETMANAGER_HH_
 
-#include <boost/any.hpp>
+#include <any>
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
@@ -54,12 +54,12 @@ namespace gazebo
       /// \param[in] _key The key of the parameter to retrieve.
       /// \param[out] _value The parameter value at the input key.
       /// \return True if the parameter exists in the map, false otherwise.
-      public: bool GetParam(const std::string &_key, boost::any &_value) const;
+      public: bool GetParam(const std::string &_key, std::any &_value) const;
 
       /// \brief Set a profile parameter.
       /// \param[in] _key The key of the parameter to change.
       /// \param[in] _value The new value of the parameter.
-      public: bool SetParam(const std::string &_key, const boost::any &_value);
+      public: bool SetParam(const std::string &_key, const std::any &_value);
 
       /// \brief Check if profile parameter is set.
       /// \param[in] _key The profile key to check.
@@ -132,7 +132,7 @@ namespace gazebo
       /// \param[in] _value The value of the parameter to change.
       /// \return True if setting the parameter was successful.
       public: bool SetProfileParam(const std::string &_profileName,
-          const std::string &_key, const boost::any &_value);
+          const std::string &_key, const std::any &_value);
 
       /// \brief Get a parameter for a certain profile.
       /// \param[in] _name The name of the accessed profile.
@@ -140,21 +140,21 @@ namespace gazebo
       /// \param[out] _value The value of the accessed parameter.
       /// \return True if the parameter existed in profile "_name".
       public: bool GetProfileParam(const std::string &_name,
-          const std::string &_key, boost::any &_value) const;
+          const std::string &_key, std::any &_value) const;
 
       /// \brief Set a parameter for the current profile.
       /// \param[in] _key The key of the parameter to be set.
       /// \param[in] _value The value of the parameter to be set.
       /// \return True if setting the parameter was successful.
       public: bool SetCurrentProfileParam(const std::string &_key,
-          const boost::any &_value);
+          const std::any &_value);
 
       /// \brief Get a parameter for the current profile.
       /// \param[in] _key The key of the accessed parameter.
       /// \param[out] _value The value of the accessed parameter.
       /// \return True if the parameter existed in profile "_name".
       public: bool GetCurrentProfileParam(const std::string &_key,
-          boost::any &_value);
+          std::any &_value);
 
       /// \brief Create a new profile. A profile created in this way will store
       /// all of the current parameter values of the physics engine.

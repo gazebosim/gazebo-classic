@@ -18,7 +18,7 @@
 #ifndef _SIMBODY_JOINT_HH_
 #define _SIMBODY_JOINT_HH_
 
-#include <boost/any.hpp>
+#include <any>
 #include <string>
 
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
@@ -96,7 +96,7 @@ namespace gazebo
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
-                                        const boost::any &_value)
+                                        const std::any &_value)
             override;
 
       // Documentation inherited.

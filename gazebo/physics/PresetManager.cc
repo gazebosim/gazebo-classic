@@ -24,13 +24,13 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-template<typename T> bool CastAnyValue(const boost::any &_value, T &_return)
+template<typename T> bool CastAnyValue(const std::any &_value, T &_return)
 {
   try
   {
-    _return = boost::any_cast<T>(_value);
+    _return = std::any_cast<T>(_value);
   }
-  catch(boost::bad_any_cast &_e)
+  catch(std::bad_any_cast &_e)
   {
     return false;
   }
@@ -140,7 +140,7 @@ bool Preset::HasParam(const std::string &_key) const
 }
 
 //////////////////////////////////////////////////
-bool Preset::GetParam(const std::string &_key, boost::any &_value) const
+bool Preset::GetParam(const std::string &_key, std::any &_value) const
 {
   bool result = true;
 
@@ -159,7 +159,7 @@ bool Preset::GetParam(const std::string &_key, boost::any &_value) const
 }
 
 //////////////////////////////////////////////////
-bool Preset::SetParam(const std::string &_key, const boost::any &_value)
+bool Preset::SetParam(const std::string &_key, const std::any &_value)
 {
   bool result = true;
 
@@ -304,7 +304,7 @@ std::vector<std::string> PresetManager::AllProfiles() const
 
 //////////////////////////////////////////////////
 bool PresetManager::SetProfileParam(const std::string &_profileName,
-    const std::string &_key, const boost::any &_value)
+    const std::string &_key, const std::any &_value)
 {
   if (_profileName == this->CurrentProfile())
   {
@@ -337,7 +337,7 @@ bool PresetManager::SetProfileParam(const std::string &_profileName,
 
 //////////////////////////////////////////////////
 bool PresetManager::GetProfileParam(const std::string &_name,
-    const std::string &_key, boost::any &_value) const
+    const std::string &_key, std::any &_value) const
 {
   if (!this->HasProfile(_name))
   {
@@ -348,7 +348,7 @@ bool PresetManager::GetProfileParam(const std::string &_name,
 
 //////////////////////////////////////////////////
 bool PresetManager::SetCurrentProfileParam(const std::string &_key,
-    const boost::any &_value)
+    const std::any &_value)
 {
   if (this->CurrentProfile().empty() || this->CurrentPreset() == NULL)
   {
@@ -366,7 +366,7 @@ bool PresetManager::SetCurrentProfileParam(const std::string &_key,
   {
     return this->dataPtr->physicsEngine->SetParam(_key, _value);
   }
-  catch(const boost::bad_any_cast &e)
+  catch(const std::bad_any_cast &e)
   {
     gzerr << "Couldn't set physics engine parameter[" << e.what()
           << "]" << std::endl;
@@ -377,7 +377,7 @@ bool PresetManager::SetCurrentProfileParam(const std::string &_key,
 
 //////////////////////////////////////////////////
 bool PresetManager::GetCurrentProfileParam(const std::string &_key,
-    boost::any &_value)
+    std::any &_value)
 {
   if (this->CurrentProfile().empty())
   {
@@ -553,7 +553,7 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
   for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;
         elem = elem->GetNextElement())
   {
-    boost::any value;
+    std::any value;
     if (_preset.GetParam(elem->GetName(), value) && elem->GetValue())
     {
       // cast based on type in SDF

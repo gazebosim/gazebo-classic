@@ -483,7 +483,7 @@ ignition::math::Vector3d SimbodyJoint::LinkTorque(
 
 //////////////////////////////////////////////////
 bool SimbodyJoint::SetParam(const std::string &/*_key*/,
-    unsigned int /*_index*/, const boost::any &/*_value*/)
+    unsigned int /*_index*/, const std::any &/*_value*/)
 {
   gzerr << "Not implement in Simbody\n";
   return false;

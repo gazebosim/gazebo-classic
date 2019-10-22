@@ -147,14 +147,14 @@ const ignition::math::Vector3d& Wind::LinearVel(void) const
 
 //////////////////////////////////////////////////
 bool Wind::SetParam(const std::string &_key,
-    const boost::any &_value)
+    const std::any &_value)
 {
   try
   {
     if (_key == "linear_velocity")
     {
       ignition::math::Vector3d vel =
-          boost::any_cast<ignition::math::Vector3d>(_value);
+          std::any_cast<ignition::math::Vector3d>(_value);
       this->SetLinearVel(vel);
     }
     else
@@ -163,7 +163,7 @@ bool Wind::SetParam(const std::string &_key,
       return false;
     }
   }
-  catch(boost::bad_any_cast &_e)
+  catch(std::bad_any_cast &_e)
   {
     gzerr << "Caught bad any_cast in Wind::SetParam: " << _e.what()
           << std::endl;
@@ -179,16 +179,16 @@ bool Wind::SetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-boost::any Wind::Param(const std::string &_key) const
+std::any Wind::Param(const std::string &_key) const
 {
-  boost::any value;
+  std::any value;
   this->Param(_key, value);
   return value;
 }
 
 //////////////////////////////////////////////////
 bool Wind::Param(const std::string &_key,
-    boost::any &_value) const
+    std::any &_value) const
 {
   if (_key == "linear_velocity")
     _value = this->LinearVel();

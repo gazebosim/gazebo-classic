@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/any.hpp>
+#include <any>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 
@@ -416,10 +416,10 @@ namespace gazebo
       /// \param[in] _value Value of the attribute.
       public: virtual bool SetParam(const std::string &_key,
                                     unsigned int _index,
-                                    const boost::any &_value) = 0;
+                                    const std::any &_value) = 0;
 
       /// \brief Get a non-generic parameter for the joint.
-      /// \sa SetParam(const std::string &, unsigned int, const boost::any)
+      /// \sa SetParam(const std::string &, unsigned int, const std::any)
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       public: virtual double GetParam(const std::string &_key,

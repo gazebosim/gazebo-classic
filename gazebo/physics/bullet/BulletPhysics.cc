@@ -337,9 +337,9 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   // http://web.archive.org/web/20120430155635/http://bulletphysics.org/
   //     mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse
   info.m_splitImpulse =
-      boost::any_cast<bool>(this->GetParam("split_impulse"));
+      std::any_cast<bool>(this->GetParam("split_impulse"));
   info.m_splitImpulsePenetrationThreshold =
-    boost::any_cast<double>(
+    std::any_cast<double>(
     this->GetParam("split_impulse_penetration_threshold"));
 
   // Use multiple friction directions.
@@ -354,9 +354,9 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   info.m_erp = bulletElem->GetElement("constraints")->Get<double>("erp");
 
   info.m_numIterations =
-      boost::any_cast<int>(this->GetParam("iters"));
+      std::any_cast<int>(this->GetParam("iters"));
   info.m_sor =
-      boost::any_cast<double>(this->GetParam("sor"));
+      std::any_cast<double>(this->GetParam("sor"));
 
   gzlog << " debug physics: "
         << " iters[" << info.m_numIterations
@@ -402,19 +402,19 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_solver_type(this->solverType);
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(
-      boost::any_cast<double>(this->GetParam("min_step_size")));
+      std::any_cast<double>(this->GetParam("min_step_size")));
     physicsMsg.set_iters(
-      boost::any_cast<int>(this->GetParam("iters")));
+      std::any_cast<int>(this->GetParam("iters")));
     physicsMsg.set_enable_physics(this->world->PhysicsEnabled());
     physicsMsg.set_sor(
-      boost::any_cast<double>(this->GetParam("sor")));
+      std::any_cast<double>(this->GetParam("sor")));
     physicsMsg.set_cfm(
-      boost::any_cast<double>(this->GetParam("cfm")));
+      std::any_cast<double>(this->GetParam("cfm")));
     physicsMsg.set_erp(
-      boost::any_cast<double>(this->GetParam("erp")));
+      std::any_cast<double>(this->GetParam("erp")));
 
     physicsMsg.set_contact_surface_layer(
-      boost::any_cast<double>(this->GetParam("contact_surface_layer")));
+      std::any_cast<double>(this->GetParam("contact_surface_layer")));
 
     physicsMsg.mutable_gravity()->CopyFrom(
       msgs::Convert(this->world->Gravity()));
@@ -567,7 +567,7 @@ void BulletPhysics::SetSORPGSIters(unsigned int _iters)
 }
 
 //////////////////////////////////////////////////
-bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
+bool BulletPhysics::SetParam(const std::string &_key, const std::any &_value)
 {
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != nullptr, "Bullet SDF element does not exist");
@@ -578,7 +578,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   {
     if (_key == "solver_type")
     {
-      std::string value = boost::any_cast<std::string>(_value);
+      std::string value = std::any_cast<std::string>(_value);
       if (value == "sequential_impulse")
       {
         bulletElem->GetElement("solver")->GetElement("type")->Set(value);
@@ -593,56 +593,56 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
     }
     else if (_key == "cfm")
     {
-      double value = boost::any_cast<double>(_value);
+      double value = std::any_cast<double>(_value);
       bulletElem->GetElement("constraints")->GetElement("cfm")->Set(value);
       info.m_globalCfm = value;
     }
     else if (_key == "erp")
     {
-      double value = boost::any_cast<double>(_value);
+      double value = std::any_cast<double>(_value);
       bulletElem->GetElement("constraints")->GetElement("erp")->Set(value);
       info.m_erp = value;
     }
     else if (_key == "iters")
     {
-      int value = boost::any_cast<int>(_value);
+      int value = std::any_cast<int>(_value);
       bulletElem->GetElement("solver")->GetElement("iters")->Set(value);
       info.m_numIterations = value;
     }
     else if (_key == "sor")
     {
-      double value = boost::any_cast<double>(_value);
+      double value = std::any_cast<double>(_value);
       bulletElem->GetElement("solver")->GetElement("sor")->Set(value);
       info.m_sor = value;
     }
     else if (_key == "contact_surface_layer")
     {
-      double value = boost::any_cast<double>(_value);
+      double value = std::any_cast<double>(_value);
       bulletElem->GetElement("constraints")->GetElement(
           "contact_surface_layer")->Set(value);
     }
     else if (_key == "split_impulse")
     {
-      bool value = boost::any_cast<bool>(_value);
+      bool value = std::any_cast<bool>(_value);
       bulletElem->GetElement("constraints")->GetElement(
           "split_impulse")->Set(value);
     }
     else if (_key == "split_impulse_penetration_threshold")
     {
-      double value = boost::any_cast<double>(_value);
+      double value = std::any_cast<double>(_value);
       bulletElem->GetElement("constraints")->GetElement(
           "split_impulse_penetration_threshold")->Set(value);
     }
     else if (_key == "max_contacts")
     {
       /// TODO: Implement max contacts param
-      int value = boost::any_cast<int>(_value);
+      int value = std::any_cast<int>(_value);
       this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
     }
     else if (_key == "min_step_size")
     {
       /// TODO: Implement min step size param
-      double value = boost::any_cast<double>(_value);
+      double value = std::any_cast<double>(_value);
       bulletElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
     }
     else
@@ -650,9 +650,9 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
       return PhysicsEngine::SetParam(_key, _value);
     }
   }
-  catch(boost::bad_any_cast &e)
+  catch(std::bad_any_cast &e)
   {
-    gzerr << "BulletPhysics::SetParam(" << _key << ") boost::any_cast error: "
+    gzerr << "BulletPhysics::SetParam(" << _key << ") std::any_cast error: "
           << e.what() << std::endl;
     return false;
   }
@@ -661,15 +661,15 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 }
 
 //////////////////////////////////////////////////
-boost::any BulletPhysics::GetParam(const std::string &_key) const
+std::any BulletPhysics::GetParam(const std::string &_key) const
 {
-  boost::any value;
+  std::any value;
   this->GetParam(_key, value);
   return value;
 }
 
 //////////////////////////////////////////////////
-bool BulletPhysics::GetParam(const std::string &_key, boost::any &_value) const
+bool BulletPhysics::GetParam(const std::string &_key, std::any &_value) const
 {
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != nullptr, "Bullet SDF element does not exist");

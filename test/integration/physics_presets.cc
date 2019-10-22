@@ -44,43 +44,43 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
   }
   try
   {
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(
+    EXPECT_FLOAT_EQ(std::any_cast<double>(
         physicsEngine->GetParam("max_step_size")), 0.01);
     if (physicsEngineName == "ode" || physicsEngineName == "bullet")
     {
-      EXPECT_FLOAT_EQ(boost::any_cast<double>(
+      EXPECT_FLOAT_EQ(std::any_cast<double>(
           physicsEngine->GetParam("min_step_size")), 0.001);
-      EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("cfm")),
+      EXPECT_FLOAT_EQ(std::any_cast<double>(physicsEngine->GetParam("cfm")),
           0.01);
-      EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("erp")),
+      EXPECT_FLOAT_EQ(std::any_cast<double>(physicsEngine->GetParam("erp")),
           0.3);
-      EXPECT_FLOAT_EQ(boost::any_cast<double>(
+      EXPECT_FLOAT_EQ(std::any_cast<double>(
           physicsEngine->GetParam("contact_surface_layer")), 0.002);
-      EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("sor")),
+      EXPECT_FLOAT_EQ(std::any_cast<double>(physicsEngine->GetParam("sor")),
           1.4);
-      EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 50);
+      EXPECT_EQ(std::any_cast<int>(physicsEngine->GetParam("iters")), 50);
     }
     if (physicsEngineName == "ode")
     {
-      EXPECT_TRUE(boost::any_cast<bool>(
+      EXPECT_TRUE(std::any_cast<bool>(
           physicsEngine->GetParam("inertia_ratio_reduction")));
-      EXPECT_FLOAT_EQ(boost::any_cast<double>(
+      EXPECT_FLOAT_EQ(std::any_cast<double>(
           physicsEngine->GetParam("contact_max_correcting_vel")), 200);
     }
     if (physicsEngineName == "bullet")
     {
-      EXPECT_FALSE(boost::any_cast<bool>(
+      EXPECT_FALSE(std::any_cast<bool>(
           physicsEngine->GetParam("split_impulse")));
     }
     if (physicsEngineName == "simbody")
     {
       EXPECT_FLOAT_EQ(
-          boost::any_cast<double>(physicsEngine->GetParam("accuracy")), 0.01);
-      EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam(
+          std::any_cast<double>(physicsEngine->GetParam("accuracy")), 0.01);
+      EXPECT_FLOAT_EQ(std::any_cast<double>(physicsEngine->GetParam(
           "max_transient_velocity")), 0.001);
     }
   }
-  catch(const boost::bad_any_cast& e)
+  catch(const std::bad_any_cast& e)
   {
     FAIL();
   }
@@ -135,17 +135,17 @@ TEST_F(PresetManagerTest, SetProfileParam)
   EXPECT_TRUE(presetManager->SetCurrentProfileParam("max_step_size", 10.0));
   try
   {
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(
+    EXPECT_FLOAT_EQ(std::any_cast<double>(
         physicsEngine->GetParam("max_step_size")), 10.0);
 
     // preset_2 is not the current profile, so we do not expect to see a change
     // in the physics engine when we change preset_2.
     EXPECT_TRUE(presetManager->SetProfileParam("preset_2", "max_step_size",
         20));
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(
+    EXPECT_FLOAT_EQ(std::any_cast<double>(
         physicsEngine->GetParam("max_step_size")), 10.0);
   }
-  catch(const boost::bad_any_cast& e)
+  catch(const std::bad_any_cast& e)
   {
     FAIL();
   }
@@ -175,17 +175,17 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
 
   try
   {
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(
+    EXPECT_FLOAT_EQ(std::any_cast<double>(
         physicsEngine->GetParam("max_step_size")), 0.02);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(
+    EXPECT_FLOAT_EQ(std::any_cast<double>(
         physicsEngine->GetParam("min_step_size")), 0.002);
-    EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 100);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("cfm")),
+    EXPECT_EQ(std::any_cast<int>(physicsEngine->GetParam("iters")), 100);
+    EXPECT_FLOAT_EQ(std::any_cast<double>(physicsEngine->GetParam("cfm")),
         0.02);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("erp")),
+    EXPECT_FLOAT_EQ(std::any_cast<double>(physicsEngine->GetParam("erp")),
         0.6);
   }
-  catch(const boost::bad_any_cast& e)
+  catch(const std::bad_any_cast& e)
   {
     FAIL();
   }
@@ -231,17 +231,17 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
   presetManager->CurrentProfile("preset_3");
   try
   {
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(
+    EXPECT_FLOAT_EQ(std::any_cast<double>(
         physicsEngine->GetParam("max_step_size")), 0.03);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(
+    EXPECT_FLOAT_EQ(std::any_cast<double>(
         physicsEngine->GetParam("min_step_size")), 0.003);
-    EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 150);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("cfm")),
+    EXPECT_EQ(std::any_cast<int>(physicsEngine->GetParam("iters")), 150);
+    EXPECT_FLOAT_EQ(std::any_cast<double>(physicsEngine->GetParam("cfm")),
         0.03);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("erp")),
+    EXPECT_FLOAT_EQ(std::any_cast<double>(physicsEngine->GetParam("erp")),
         0.7);
   }
-  catch(const boost::bad_any_cast& e)
+  catch(const std::bad_any_cast& e)
   {
     FAIL();
   }
@@ -261,25 +261,25 @@ TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
   }
   try
   {
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(
+    EXPECT_FLOAT_EQ(std::any_cast<double>(
         physicsEngine->GetParam("max_step_size")), 0.001);
-    EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 50);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("cfm")),
+    EXPECT_EQ(std::any_cast<int>(physicsEngine->GetParam("iters")), 50);
+    EXPECT_FLOAT_EQ(std::any_cast<double>(physicsEngine->GetParam("cfm")),
         0.0);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("erp")),
+    EXPECT_FLOAT_EQ(std::any_cast<double>(physicsEngine->GetParam("erp")),
         0.2);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(
+    EXPECT_FLOAT_EQ(std::any_cast<double>(
         physicsEngine->GetParam("contact_max_correcting_vel")), 100);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(
+    EXPECT_FLOAT_EQ(std::any_cast<double>(
         physicsEngine->GetParam("contact_surface_layer")), 0.001);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("sor")),
+    EXPECT_FLOAT_EQ(std::any_cast<double>(physicsEngine->GetParam("sor")),
         1.3);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(
+    EXPECT_FLOAT_EQ(std::any_cast<double>(
         physicsEngine->GetParam("min_step_size")), 0.0001);
-    EXPECT_FALSE(boost::any_cast<bool>(
+    EXPECT_FALSE(std::any_cast<bool>(
         physicsEngine->GetParam("inertia_ratio_reduction")));
   }
-  catch(const boost::bad_any_cast& e)
+  catch(const std::bad_any_cast& e)
   {
     FAIL();
   }

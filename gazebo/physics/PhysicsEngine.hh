@@ -18,7 +18,7 @@
 #define _PHYSICSENGINE_HH_
 
 #include <boost/thread/recursive_mutex.hpp>
-#include <boost/any.hpp>
+#include <any>
 #include <string>
 #include <ignition/transport/Node.hh>
 
@@ -219,13 +219,13 @@ namespace gazebo
       /// \param[in] _value The value to set to
       /// \return true if SetParam is successful, false if operation fails.
       public: virtual bool SetParam(const std::string &_key,
-                  const boost::any &_value);
+                  const std::any &_value);
 
       /// \brief Get an parameter of the physics engine
       /// \param[in] _attr String key
       /// \sa SetParam
       /// \return The value of the parameter
-      public: virtual boost::any GetParam(const std::string &_key) const;
+      public: virtual std::any GetParam(const std::string &_key) const;
 
       /// \brief Get a parameter from the physics engine with a boolean to
       /// indicate success or failure
@@ -233,7 +233,7 @@ namespace gazebo
       /// \param[out] _value Value of the accessed param
       /// \return True if the parameter was successfully retrieved
       public: virtual bool GetParam(const std::string &_key,
-                  boost::any &_value) const;
+                  std::any &_value) const;
 
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;

@@ -390,7 +390,7 @@ void ODEJoint::SetAxis(const unsigned int _index,
 
 //////////////////////////////////////////////////
 bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
-                        const boost::any &_value)
+                        const std::any &_value)
 {
   // Axis parameters for multi-axis joints use a group bitmask
   // to identify the variable.
@@ -411,60 +411,60 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
       return false;
   };
 
-  // try because boost::any_cast can throw
+  // try because std::any_cast can throw
   try
   {
     if (_key == "fudge_factor")
     {
-      this->SetParam(dParamFudgeFactor, boost::any_cast<double>(_value));
+      this->SetParam(dParamFudgeFactor, std::any_cast<double>(_value));
     }
     else if (_key == "suspension_erp")
     {
-      this->SetParam(dParamSuspensionERP, boost::any_cast<double>(_value));
+      this->SetParam(dParamSuspensionERP, std::any_cast<double>(_value));
     }
     else if (_key == "suspension_cfm")
     {
-      this->SetParam(dParamSuspensionCFM, boost::any_cast<double>(_value));
+      this->SetParam(dParamSuspensionCFM, std::any_cast<double>(_value));
     }
     else if (_key == "stop_erp")
     {
-      this->SetParam(dParamStopERP | group, boost::any_cast<double>(_value));
+      this->SetParam(dParamStopERP | group, std::any_cast<double>(_value));
     }
     else if (_key == "stop_cfm")
     {
-      this->SetParam(dParamStopCFM | group, boost::any_cast<double>(_value));
+      this->SetParam(dParamStopCFM | group, std::any_cast<double>(_value));
     }
     else if (_key == "erp")
     {
-      this->SetParam(dParamERP, boost::any_cast<double>(_value));
+      this->SetParam(dParamERP, std::any_cast<double>(_value));
     }
     else if (_key == "cfm")
     {
-      this->SetParam(dParamCFM, boost::any_cast<double>(_value));
+      this->SetParam(dParamCFM, std::any_cast<double>(_value));
     }
     else if (_key == "fmax")
     {
-      this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
+      this->SetParam(dParamFMax | group, std::any_cast<double>(_value));
     }
     else if (_key == "friction")
     {
       // To represent Coulomb friction,
       //  set FMax to friction value
       //  set Vel to 0
-      this->SetParam(group | dParamFMax, boost::any_cast<double>(_value));
+      this->SetParam(group | dParamFMax, std::any_cast<double>(_value));
       this->SetParam(group | dParamVel, 0.0);
     }
     else if (_key == "vel")
     {
-      this->SetParam(dParamVel | group, boost::any_cast<double>(_value));
+      this->SetParam(dParamVel | group, std::any_cast<double>(_value));
     }
     else if (_key == "hi_stop")
     {
-      this->SetParam(dParamHiStop | group, boost::any_cast<double>(_value));
+      this->SetParam(dParamHiStop | group, std::any_cast<double>(_value));
     }
     else if (_key == "lo_stop")
     {
-      this->SetParam(dParamLoStop | group, boost::any_cast<double>(_value));
+      this->SetParam(dParamLoStop | group, std::any_cast<double>(_value));
     }
     else if (_key == "thread_pitch")
     {
@@ -472,7 +472,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
         dynamic_cast<ScrewJoint<ODEJoint>* >(this);
       if (screwJoint != nullptr)
       {
-        screwJoint->SetThreadPitch(boost::any_cast<double>(_value));
+        screwJoint->SetThreadPitch(std::any_cast<double>(_value));
       }
       else
       {
@@ -487,7 +487,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
         dynamic_cast<GearboxJoint<ODEJoint>* >(this);
       if (gearboxJoint != nullptr)
       {
-        gearboxJoint->SetGearboxRatio(boost::any_cast<double>(_value));
+        gearboxJoint->SetGearboxRatio(std::any_cast<double>(_value));
       }
       else
       {
@@ -502,7 +502,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
       return false;
     }
   }
-  catch(const boost::bad_any_cast &e)
+  catch(const std::bad_any_cast &e)
   {
     gzerr << "SetParam(" << _key << ")"
           << " boost any_cast error:" << e.what()

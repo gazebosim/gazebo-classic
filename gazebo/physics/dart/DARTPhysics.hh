@@ -140,15 +140,15 @@ namespace gazebo
       public: virtual void DebugPrint() const;
 
       // Documentation inherited
-      public: virtual boost::any GetParam(const std::string &_key) const;
+      public: virtual std::any GetParam(const std::string &_key) const;
 
       // Documentation inherited
       public: virtual bool GetParam(const std::string &_key,
-                  boost::any &_value) const;
+                  std::any &_value) const;
 
       // Documentation inherited
       public: virtual bool SetParam(const std::string &_key,
-                  const boost::any &_value);
+                  const std::any &_value);
 
       /// \brief Get pointer to DART World associated with this DART Physics.
       /// \return The pointer to DART World.

@@ -222,15 +222,15 @@ namespace gazebo
       public: bool simbodyPhysicsStepped;
 
       // Documentation inherited
-      public: virtual boost::any GetParam(const std::string &_key) const;
+      public: virtual std::any GetParam(const std::string &_key) const;
 
       // Documentation inherited
       public: virtual bool GetParam(const std::string &_key,
-                  boost::any &_value) const;
+                  std::any &_value) const;
 
       // Documentation inherited
       public: virtual bool SetParam(const std::string &_key,
-                  const boost::any &_value);
+                  const std::any &_value);
 
       /// \brief contact material stiffness.  See sdf description for details.
       private: double contactMaterialStiffness;

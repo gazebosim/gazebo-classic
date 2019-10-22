@@ -254,7 +254,7 @@ double DARTScrewJoint::GetParam(const std::string &_key, unsigned int _index)
 //////////////////////////////////////////////////
 bool DARTScrewJoint::SetParam(const std::string &_key,
                               unsigned int _index,
-                              const boost::any &_value)
+                              const std::any &_value)
 {
   if (_index >= this->DOF())
   {
@@ -272,12 +272,12 @@ bool DARTScrewJoint::SetParam(const std::string &_key,
 
   GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
-  // try because boost::any_cast can throw
+  // try because std::any_cast can throw
   try
   {
     if (_key  == "thread_pitch")
     {
-      this->SetThreadPitch(boost::any_cast<double>(_value));
+      this->SetThreadPitch(std::any_cast<double>(_value));
       return true;
     }
     else if (_key == "friction")
@@ -285,7 +285,7 @@ bool DARTScrewJoint::SetParam(const std::string &_key,
       if (_index == 0)
       {
         this->dataPtr->dtJoint->setCoulombFriction(
-              _index, boost::any_cast<double>(_value));
+              _index, std::any_cast<double>(_value));
         return true;
       }
       else if (_index == 1)
@@ -301,7 +301,7 @@ bool DARTScrewJoint::SetParam(const std::string &_key,
       }
     }
   }
-  catch(const boost::bad_any_cast &_e)
+  catch(const std::bad_any_cast &_e)
   {
     gzerr << "SetParam(" << _key << ")"
           << " boost any_cast error:" << _e.what()

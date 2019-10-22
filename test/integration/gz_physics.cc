@@ -89,15 +89,15 @@ TEST_F(GzPhysics, Iters)
   // Change iterations
   {
     custom_exec("gz physics -i 35");
-    boost::any iters = world->Physics()->GetParam("iters");
-    EXPECT_EQ(boost::any_cast<int>(iters), 35);
+    std::any iters = world->Physics()->GetParam("iters");
+    EXPECT_EQ(std::any_cast<int>(iters), 35);
   }
 
   // Change iterations
   {
     custom_exec("gz physics -i 200");
-    boost::any iters = world->Physics()->GetParam("iters");
-    EXPECT_EQ(boost::any_cast<int>(iters), 200);
+    std::any iters = world->Physics()->GetParam("iters");
+    EXPECT_EQ(std::any_cast<int>(iters), 200);
   }
 }
 

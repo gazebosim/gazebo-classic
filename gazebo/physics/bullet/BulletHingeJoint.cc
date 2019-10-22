@@ -385,7 +385,7 @@ ignition::math::Vector3d BulletHingeJoint::GlobalAxis(
 //////////////////////////////////////////////////
 bool BulletHingeJoint::SetParam(const std::string &_key,
     unsigned int _index,
-    const boost::any &_value)
+    const std::any &_value)
 {
   if (_index >= this->DOF())
   {
@@ -404,7 +404,7 @@ bool BulletHingeJoint::SetParam(const std::string &_key,
         // this means the friction will change when the step size changes.
         double dt = this->world->Physics()->GetMaxStepSize();
         this->bulletHinge->enableAngularMotor(true, 0.0,
-          dt * boost::any_cast<double>(_value));
+          dt * std::any_cast<double>(_value));
       }
       else
       {
@@ -422,7 +422,7 @@ bool BulletHingeJoint::SetParam(const std::string &_key,
       return BulletJoint::SetParam(_key, _index, _value);
     }
   }
-  catch(const boost::bad_any_cast &e)
+  catch(const std::bad_any_cast &e)
   {
     gzerr << "SetParam(" << _key << ")"
           << " boost any_cast error:" << e.what()

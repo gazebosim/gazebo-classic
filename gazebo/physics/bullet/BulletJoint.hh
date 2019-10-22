@@ -22,7 +22,7 @@
 #ifndef _BULLETJOINT_HH_
 #define _BULLETJOINT_HH_
 
-#include <boost/any.hpp>
+#include <any>
 #include <string>
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
@@ -104,7 +104,7 @@ namespace gazebo
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
-                                        const boost::any &_value) override;
+                                        const std::any &_value) override;
 
       // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,

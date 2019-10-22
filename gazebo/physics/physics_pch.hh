@@ -24,7 +24,7 @@
 #include <algorithm>
 #include <atomic>
 #include <boost/algorithm/string.hpp>
-#include <boost/any.hpp>
+#include <any>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/function.hpp>
