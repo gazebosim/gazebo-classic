@@ -34,10 +34,9 @@ set (headers
   TransportTypes.hh
 )
 
-set (transport_headers "" CACHE INTERNAL "transport headers" FORCE)
+set (transport_headers "")
 foreach (hdr ${headers})
-  APPEND_TO_CACHED_STRING(transport_headers "Transport Headers"
-    "#include \"gazebo/transport/${hdr}\"\n")
+  set (transport_headers "${transport_headers}#include \"gazebo/transport/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/transport.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/transport.hh )
