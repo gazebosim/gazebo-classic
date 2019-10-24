@@ -11,6 +11,10 @@
 1. Fix crash when loading submesh with no bone assignments.
     * [Pull request 3122](https://bitbucket.org/osrf/gazebo/pull-request/3122)
 
+1. Fix cmake warnings about multi-line strings.
+    * [Pull request 3138](https://bitbucket.org/osrf/gazebo/pull-request/3138)
+    * [Issue #2664](https://bitbucket.org/osrf/gazebo/issues/2664)
+
 1. MeshManager: add .stlb file extension support
     * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
     * [Pull request 3128](https://bitbucket.org/osrf/gazebo/pull-request/3128)
