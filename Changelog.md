@@ -2,6 +2,9 @@
 
 ## Gazebo 9.XX.X (2019-XX-XX)
 
+1. ODEBallJoint: reduce console output.
+    * [Pull request 3132](https://bitbucket.org/osrf/gazebo/pull-request/3132)
+
 1. Fix moving model files in StaticMapPlugin
     * [Pull request 3123](https://bitbucket.org/osrf/gazebo/pull-request/3123)
 
