@@ -44,9 +44,9 @@ TEST_F(JointControllerTest, PositionControl)
   ignition::transport::Node node;
   const std::string topic = "/" + model->GetScopedName() + "/joint_cmd";
   ignition::transport::Node::Publisher jointPub =
-      node.Advertise<ignition::msgs::JointCmd>(topic);
+      node.Advertise<gazebo::msgs::JointCmd>(topic);
 
-  ignition::msgs::JointCmd msg;
+  gazebo::msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
   msg.mutable_position()->set_target(1.0);
   msg.mutable_position()->set_p_gain(10);
@@ -76,9 +76,9 @@ TEST_F(JointControllerTest, VelocityControl)
   ignition::transport::Node node;
   const std::string topic = "/" + model->GetScopedName() + "/joint_cmd";
   ignition::transport::Node::Publisher jointPub =
-      node.Advertise<ignition::msgs::JointCmd>(topic);
+      node.Advertise<gazebo::msgs::JointCmd>(topic);
 
-  ignition::msgs::JointCmd msg;
+  gazebo::msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
   msg.mutable_velocity()->set_target(0.2);
   msg.mutable_velocity()->set_p_gain(10.0);
@@ -131,9 +131,9 @@ TEST_F(JointControllerTest, JointCmd)
   ignition::transport::Node node;
   const std::string topic = "/" + model->GetScopedName() + "/joint_cmd";
   ignition::transport::Node::Publisher jointPub =
-      node.Advertise<ignition::msgs::JointCmd>(topic);
+      node.Advertise<gazebo::msgs::JointCmd>(topic);
 
-  ignition::msgs::JointCmd msg;
+  gazebo::msgs::JointCmd msg;
   msg.set_name(jointName);
   msg.set_force(3);
 

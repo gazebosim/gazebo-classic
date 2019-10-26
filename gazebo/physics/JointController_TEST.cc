@@ -317,7 +317,7 @@ TEST_F(JointControllerTest, JointCmd)
   boost::replace_all(modelName, "::", "/");
 
   ignition::msgs::StringMsg req;
-  ignition::msgs::JointCmd rep;
+  gazebo::msgs::JointCmd rep;
   bool result;
   unsigned int timeout = 5000;
 
@@ -327,15 +327,26 @@ TEST_F(JointControllerTest, JointCmd)
   EXPECT_TRUE(executed && result);
 
   // Check the retrieved joint controller parameters
+  EXPECT_TRUE(!rep.has_force());
 
+  EXPECT_TRUE(rep.has_position());
+  EXPECT_TRUE(rep.position().has_target());
   EXPECT_DOUBLE_EQ(rep.position().target(), 12.3);
+  EXPECT_TRUE(rep.position().has_p_gain());
   EXPECT_DOUBLE_EQ(rep.position().p_gain(), 4);
+  EXPECT_TRUE(rep.position().has_i_gain());
   EXPECT_DOUBLE_EQ(rep.position().i_gain(), 1);
+  EXPECT_TRUE(rep.position().has_d_gain());
   EXPECT_DOUBLE_EQ(rep.position().d_gain(), 9);
 
+  EXPECT_TRUE(rep.has_velocity());
+  EXPECT_TRUE(rep.velocity().has_target());
   EXPECT_DOUBLE_EQ(rep.velocity().target(), 3.21);
+  EXPECT_TRUE(rep.velocity().has_p_gain());
   EXPECT_DOUBLE_EQ(rep.velocity().p_gain(), 4);
+  EXPECT_TRUE(rep.velocity().has_i_gain());
   EXPECT_DOUBLE_EQ(rep.velocity().i_gain(), 1);
+  EXPECT_TRUE(rep.velocity().has_d_gain());
   EXPECT_DOUBLE_EQ(rep.velocity().d_gain(), 9);
 }
 

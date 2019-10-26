@@ -15,6 +15,8 @@
  *
 */
 
+#include <gazebo/msgs/joint_cmd.pb.h>
+
 #include <algorithm>
 #include <regex>
 
@@ -22,7 +24,6 @@
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/Joint.hh>
 
-#include <ignition/msgs.hh>
 #include <ignition/transport.hh>
 
 #include "JointControlPlugin.hh"
@@ -47,7 +48,7 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   std::string modelName = _model->GetScopedName();
   modelName = std::regex_replace(modelName, std::regex("::"), "/");
   ignition::transport::Node::Publisher jointPub =
-      node.Advertise<ignition::msgs::JointCmd>("/" + modelName + "/joint_cmd");
+      node.Advertise<gazebo::msgs::JointCmd>("/" + modelName + "/joint_cmd");
 
   // Loop over controller definitions
   sdf::ElementPtr child = _sdf->GetFirstElement();
@@ -57,7 +58,7 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
       if (child->HasAttribute("type"))
       {
-        ignition::msgs::JointCmd msg;
+        gazebo::msgs::JointCmd msg;
         std::string controllerType = child->Get<std::string>("type");
 
         if (controllerType == "force")
