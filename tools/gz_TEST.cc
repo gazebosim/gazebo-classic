@@ -158,7 +158,7 @@ void fini()
 }
 
 /////////////////////////////////////////////////
-void JointCmdCB(const ignition::msgs::JointCmd &_msg)
+void JointCmdCB(const gazebo::msgs::JointCmd &_msg)
 {
   boost::mutex::scoped_lock lock(g_mutex);
   g_msgDebugOut = _msg.DebugString();
@@ -241,7 +241,7 @@ TEST_F(gzTest, Joint)
     waitForMsg("gz joint -w default -m simple_arm "
         "-j arm_shoulder_pan_joint -f 10");
 
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
     msg.set_force(10);
 
@@ -254,7 +254,7 @@ TEST_F(gzTest, Joint)
         "-j arm_shoulder_pan_joint --pos-t 1.5707 --pos-p 1.2 "
         "--pos-i 0.01 --pos-d 0.2");
 
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
     msg.mutable_position()->set_target(1.5707);
     msg.mutable_position()->set_p_gain(1.2);
@@ -270,7 +270,7 @@ TEST_F(gzTest, Joint)
         "-j arm_shoulder_pan_joint --vel-t 1.5707 --vel-p 1.2 "
         "--vel-i 0.01 --vel-d 0.2");
 
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
     msg.mutable_velocity()->set_target(1.5707);
     msg.mutable_velocity()->set_p_gain(1.2);
