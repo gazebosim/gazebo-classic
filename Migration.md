@@ -17,6 +17,11 @@ New mandatory dependencies: `ign-fuel-tools3`, `ign-common3`.
 1. All instances of `ignition::math::Box` in the API are changed to `ignition::math::AxisAlignedBox`
    to match the changes in ignition-math6.
 
+1. **gazebo/physics/JointController.hh**
+   Use `gazebo::msgs::JointCmd` instead of `ignition::msgs::JointCmd` in the
+   since the ign-msgs4 proto file uses `proto3`, which doesn't allow optional
+   fields and breaks existing functionality.
+
 ## Gazebo 9.x to 10.x
 
 ### Additions

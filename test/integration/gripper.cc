@@ -56,9 +56,9 @@ TEST_F(GripperTest, Close)
 
   ignition::transport::Node ignNode;
   ignition::transport::Node::Publisher jointPub =
-    ignNode.Advertise<ignition::msgs::JointCmd>("/simple_gripper/joint_cmd");
+    ignNode.Advertise<gazebo::msgs::JointCmd>("/simple_gripper/joint_cmd");
 
-  ignition::msgs::JointCmd msg;
+  gazebo::msgs::JointCmd msg;
   msg.set_name("simple_gripper::palm_right_finger");
   msg.set_force(0.6);
   jointPub.Publish(msg);
@@ -108,9 +108,9 @@ TEST_F(GripperTest, CloseOpen)
 
   ignition::transport::Node ignNode;
   ignition::transport::Node::Publisher jointPub =
-    ignNode.Advertise<ignition::msgs::JointCmd>("/simple_gripper/joint_cmd");
+    ignNode.Advertise<gazebo::msgs::JointCmd>("/simple_gripper/joint_cmd");
 
-  ignition::msgs::JointCmd msg;
+  gazebo::msgs::JointCmd msg;
   msg.set_name("simple_gripper::palm_right_finger");
   msg.set_force(0.6);
   jointPub.Publish(msg);
