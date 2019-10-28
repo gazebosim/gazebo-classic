@@ -2697,7 +2697,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
-    this->ProcessMaterialMsg(msgs::ConvertIgnMsg(_msg->material()));
+    this->ProcessMaterialMsg(_msg->material());
   }
 
   if (_msg->has_transparency())
@@ -3618,6 +3618,86 @@ void Visual::AddPendingChild(std::pair<VisualType,
   msg->CopyFrom(*_pair.second);
 
   this->dataPtr->pendingChildren.push_back(std::make_pair(_pair.first, msg));
+}
+
+/////////////////////////////////////////////////
+void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
+{
+  if (_msg.has_lighting())
+  {
+    this->SetLighting(_msg.lighting());
+  }
+
+  if (_msg.has_script())
+  {
+    for (int i = 0; i < _msg.script().uri_size(); ++i)
+    {
+      RenderEngine::Instance()->AddResourcePath(
+          _msg.script().uri(i));
+    }
+    if (_msg.script().has_name() &&
+        !_msg.script().name().empty())
+    {
+      this->SetMaterial(_msg.script().name());
+    }
+  }
+
+  if (_msg.has_ambient())
+  {
+    this->SetAmbient(ignition::math::Color(
+          _msg.ambient().r(), _msg.ambient().g(), _msg.ambient().b(),
+          _msg.ambient().a()));
+  }
+
+  if (_msg.has_diffuse())
+  {
+    this->SetDiffuse(ignition::math::Color(
+          _msg.diffuse().r(), _msg.diffuse().g(), _msg.diffuse().b(),
+          _msg.diffuse().a()));
+  }
+
+  if (_msg.has_specular())
+  {
+    this->SetSpecular(ignition::math::Color(
+          _msg.specular().r(), _msg.specular().g(), _msg.specular().b(),
+          _msg.specular().a()));
+  }
+
+  if (_msg.has_emissive())
+  {
+    this->SetEmissive(ignition::math::Color(
+          _msg.emissive().r(), _msg.emissive().g(), _msg.emissive().b(),
+          _msg.emissive().a()));
+  }
+
+  if (_msg.has_shader_type())
+  {
+    if (_msg.shader_type() == msgs::Material::VERTEX)
+    {
+      this->SetShaderType("vertex");
+    }
+    else if (_msg.shader_type() == msgs::Material::PIXEL)
+    {
+      this->SetShaderType("pixel");
+    }
+    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+    {
+      this->SetShaderType("normal_map_object_space");
+    }
+    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+    {
+      this->SetShaderType("normal_map_tangent_space");
+    }
+    else
+    {
+      gzerr << "Unrecognized shader type" << std::endl;
+    }
+
+    if (_msg.has_normal_map())
+    {
+      this->SetNormalMap(_msg.normal_map());
+    }
+  }
 }
 
 /////////////////////////////////////////////////
