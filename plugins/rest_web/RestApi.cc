@@ -119,7 +119,10 @@ static int TraceRequest(CURL *_handle,
   {
     case CURLINFO_TEXT:
       if (trace_requests)
+      {
         fprintf(stderr, "== Info: %s", _data);
+      }
+      [[fallthrough]];
     // in case a new one is introduced to shock us
     default:
       return 0;
