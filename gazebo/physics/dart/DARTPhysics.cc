@@ -169,6 +169,16 @@ class LinkPair
             }
           }
 
+  /// \brief Assignment operator
+  /// \param[in] _c Link pair to copy
+  /// \return *this
+  public: LinkPair &operator =(const LinkPair& _linkPair)
+          {
+            this->dtLink1 = _linkPair.dtLink1;
+            this->dtLink2 = _linkPair.dtLink2;
+            return *this;
+          }
+
   /// \brief Comparison operator
   /// \param[in] c the link pair
   /// \return true if this is lower than \e c
