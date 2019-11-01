@@ -317,7 +317,6 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
         tmp.Y(-_pos.X() * this->dataPtr->sinHea - _pos.Y() *
             this->dataPtr->cosHea);
       }
-      [[fallthrough]];
 
     case GLOBAL:
       {
@@ -426,7 +425,6 @@ ignition::math::Vector3d SphericalCoordinates::VelocityTransform(
             this->dataPtr->sinHea);
       tmp.Y(-_vel.X() * this->dataPtr->sinHea - _vel.Y() *
             this->dataPtr->cosHea);
-      [[fallthrough]];
     // spherical
     case GLOBAL:
       tmp = this->dataPtr->rotGlobalToECEF * tmp;
