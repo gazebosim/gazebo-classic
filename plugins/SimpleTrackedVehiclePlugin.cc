@@ -259,18 +259,18 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       continue;
     }
 
-    dBodyID body1 = dynamic_cast<physics::ODELink &>(
+    dBodyID body1 = dynamic_cast<physics::ODELink&>(
       *contact->collision1->GetLink()).GetODEId();
-    dBodyID body2 = dynamic_cast<physics::ODELink &>(
+    dBodyID body2 = dynamic_cast<physics::ODELink&>(
       *contact->collision2->GetLink()).GetODEId();
 
     // Verify one of these bodies is a track of this vehicle
     if (body1 != left && body1 != right && body2 != left && body2 != right)
       continue;
 
-    dGeomID geom1 = dynamic_cast<physics::ODECollision &>(
+    dGeomID geom1 = dynamic_cast<physics::ODECollision&>(
       *contact->collision1).GetCollisionId();
-    dGeomID geom2 = dynamic_cast<physics::ODECollision &>(
+    dGeomID geom2 = dynamic_cast<physics::ODECollision&>(
       *contact->collision2).GetCollisionId();
 
     bool bodiesSwapped = false;
