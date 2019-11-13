@@ -690,7 +690,9 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
     // here we expect much lower energy loss
     world->Reset();
     if (_physicsEngine == "ode")
+    {
       EXPECT_TRUE(physicsEngine->SetParam("contact_max_correcting_vel", 100.0));
+    }
 
     int steps = 10;  // @todo: make this more general
     for (int i = 0; i < steps; i ++)

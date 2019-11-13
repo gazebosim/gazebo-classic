@@ -66,8 +66,6 @@ namespace gazebo
     //////////////////////////////////////////////////
     /// \TODO FIXME hardcoded initial values for now
     template<typename T>
-    // false positive. Same code is fine if we remove the namespaces
-    // cppcheck-suppress uninitMemberVar
     MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate() :
       valWindowSize(4),
       sum(T()),
@@ -119,8 +117,6 @@ namespace gazebo
 
     //////////////////////////////////////////////////
     template<typename T>
-    // false positive. Same code is fine if we remove the namespaces
-    // cppcheck-suppress uninitMemberVar
     MovingWindowFilter<T>::MovingWindowFilter()
       : dataPtr(new MovingWindowFilterPrivate<T>())
     {
