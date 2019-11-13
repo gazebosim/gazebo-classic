@@ -258,13 +258,13 @@ bool PhysicsEngine::SetParam(const std::string &_key,
   }
   catch(boost::bad_any_cast &_e)
   {
-    gzerr << "Caught bad any_cast in PhysicsEngine::SetParam: " << _e.what()
+    gzerr << "Caught boost::bad_any_cast in SetParam: " << _e.what()
           << std::endl;
     return false;
   }
   catch(boost::bad_lexical_cast &_e)
   {
-    gzerr << "Caught bad lexical_cast in PhysicsEngine::SetParam: " << _e.what()
+    gzerr << "Caught bad lexical_cast in SetParam: " << _e.what()
           << std::endl;
     return false;
   }

@@ -652,7 +652,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   }
   catch(boost::bad_any_cast &e)
   {
-    gzerr << "BulletPhysics::SetParam(" << _key << ") boost::any_cast error: "
+    gzerr << "SetParam(" << _key << ") boost::any_cast error: "
           << e.what() << std::endl;
     return false;
   }
