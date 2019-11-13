@@ -160,7 +160,7 @@ void ColladaExporter::ExportGeometrySource(
     const gazebo::common::SubMesh *_subMesh,
     TiXmlElement *_meshXml, GeometryType _type, const char *_meshID)
 {
-  char sourceId[100], sourceArrayId[100];
+  char sourceId[100], sourceArrayId[107];
   std::ostringstream fillData;
   fillData.precision(8);
   fillData << std::fixed;
@@ -281,7 +281,7 @@ void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
       ExportGeometrySource(subMesh, meshXml, UVMAP, meshId);
     }
 
-    char attributeValue[100];
+    char attributeValue[111];
 
     TiXmlElement *verticesXml = new TiXmlElement("vertices");
     meshXml->LinkEndChild(verticesXml);
@@ -589,7 +589,7 @@ void ColladaExporter::ExportVisualScenes(
 
   for (unsigned int i = 0; i < this->dataPtr->subMeshCount; ++i)
   {
-    char meshId[100], materialId[100], attributeValue[100];
+    char meshId[100], materialId[100], attributeValue[101];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
     snprintf(materialId, sizeof(materialId), "material_%u", i);
 
