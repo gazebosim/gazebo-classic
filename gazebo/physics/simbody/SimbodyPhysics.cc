@@ -1656,55 +1656,61 @@ bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
   {
     if (_key == "accuracy")
     {
-      this->integ->setAccuracy(boost::any_cast<double>(_value));
+      this->integ->setAccuracy(any_cast<double>(_value));
     }
     else if (_key == "max_transient_velocity")
     {
-      this->contact.setTransitionVelocity(boost::any_cast<double>(_value));
+      this->contact.setTransitionVelocity(any_cast<double>(_value));
     }
     else if (_key == "stiffness")
     {
-      this->contactMaterialStiffness = boost::any_cast<double>(_value);
+      this->contactMaterialStiffness = any_cast<double>(_value);
     }
     else if (_key == "dissipation")
     {
-      this->contactMaterialDissipation = boost::any_cast<double>(_value);
+      this->contactMaterialDissipation = any_cast<double>(_value);
     }
     else if (_key == "plastic_coef_restitution")
     {
       this->contactMaterialPlasticCoefRestitution =
-          boost::any_cast<double>(_value);
+          any_cast<double>(_value);
     }
     else if (_key == "plastic_impact_velocity")
     {
       this->contactMaterialPlasticImpactVelocity =
-          boost::any_cast<double>(_value);
+          any_cast<double>(_value);
     }
     else if (_key == "static_friction")
     {
-      this->contactMaterialStaticFriction = boost::any_cast<double>(_value);
+      this->contactMaterialStaticFriction = any_cast<double>(_value);
     }
     else if (_key == "dynamic_friction")
     {
-      this->contactMaterialDynamicFriction = boost::any_cast<double>(_value);
+      this->contactMaterialDynamicFriction = any_cast<double>(_value);
     }
     else if (_key == "viscous_friction")
     {
-      this->contactMaterialViscousFriction = boost::any_cast<double>(_value);
+      this->contactMaterialViscousFriction = any_cast<double>(_value);
     }
     else if (_key == "override_impact_capture_velocity")
     {
       this->contactMaterialPlasticImpactVelocity =
-          boost::any_cast<double>(_value);
+          any_cast<double>(_value);
     }
     else if (_key == "override_stiction_transition_velocity")
     {
-      this->contactImpactCaptureVelocity = boost::any_cast<double>(_value);
+      this->contactImpactCaptureVelocity = any_cast<double>(_value);
     }
     else
     {
       return PhysicsEngine::SetParam(_key, _value);
     }
+  }
+  catch(std::bad_any_cast &e)
+  {
+    gzerr << "SetParam(" << _key << ") std::any_cast error: "
+          << e.what() << std::endl;
+    return false;
   }
   catch(boost::bad_any_cast &e)
   {
