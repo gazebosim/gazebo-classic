@@ -2,11 +2,18 @@
 
 ## Gazebo 9.XX.X (2019-XX-XX)
 
+1. ODEBallJoint: reduce console output.
+    * [Pull request 3132](https://bitbucket.org/osrf/gazebo/pull-request/3132)
+
 1. Fix moving model files in StaticMapPlugin
     * [Pull request 3123](https://bitbucket.org/osrf/gazebo/pull-request/3123)
 
 1. Fix crash when loading submesh with no bone assignments.
     * [Pull request 3122](https://bitbucket.org/osrf/gazebo/pull-request/3122)
+
+1. Fix cmake warnings about multi-line strings.
+    * [Pull request 3138](https://bitbucket.org/osrf/gazebo/pull-request/3138)
+    * [Issue #2664](https://bitbucket.org/osrf/gazebo/issues/2664)
 
 1. MeshManager: add .stlb file extension support
     * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
