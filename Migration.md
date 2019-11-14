@@ -22,6 +22,15 @@ New mandatory dependencies: `ign-fuel-tools3`, `ign-common3`.
    since the ign-msgs4 proto file uses `proto3`, which doesn't allow optional
    fields and breaks existing functionality.
 
+1. **gazebo/rendering/MarkerManager.cc**
+    The `/marker` ignition transport service allows specifying the `id` field
+    of a marker to be created. If the `id` field is not specified, a random,
+    valid `id` is generated as a convenience for the user.
+    Due to the upgrade to `ign-msgs4`, which uses `proto3` syntax, an `id`
+    of `0` is indistinguishable from an unset `id`.
+    As such, an `id` of `0` will now trigger a random `id` to be generated,
+    and non-zero `id` values should be used instead.
+
 ## Gazebo 9.x to 10.x
 
 ### Additions
