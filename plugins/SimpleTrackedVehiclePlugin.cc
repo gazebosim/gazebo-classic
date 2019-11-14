@@ -29,9 +29,27 @@
 
 #include "plugins/SimpleTrackedVehiclePlugin.hh"
 
+namespace gazebo
+{
+using namespace std;
+unordered_map<string, unordered_map<Tracks, physics::Link_V> > globalTracks;
+}
+
 using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(SimpleTrackedVehiclePlugin)
+
+SimpleTrackedVehiclePlugin::~SimpleTrackedVehiclePlugin()
+{
+  if (this->body != nullptr)
+  {
+    const auto name = this->body->GetModel()->GetScopedName();
+    if (globalTracks.find(name) != globalTracks.end())
+    {
+      globalTracks.erase(name);
+    }
+  }
+}
 
 void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
                                       sdf::ElementPtr _sdf)
@@ -81,10 +99,14 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
           << this->body->GetName() << std::endl;
   }
 
-  this->tracks[Tracks::LEFT] = physics::Link_V();
-  this->tracks[Tracks::LEFT].push_back(_model->GetLink(
-      _sdf->GetElement("left_track")->Get<std::string>()));
-  if (this->tracks[Tracks::LEFT].at(0) == nullptr)
+  globalTracks.emplace(_model->GetScopedName(),
+      std::unordered_map<Tracks, physics::Link_V>());
+  auto& gtracks = globalTracks.at(_model->GetScopedName());
+
+  this->tracks[Tracks::LEFT] = _model->GetLink(
+      _sdf->GetElement("left_track")->Get<std::string>());
+  gtracks[Tracks::LEFT].push_back(this->tracks[Tracks::LEFT]);
+  if (gtracks[Tracks::LEFT].at(0) == nullptr)
   {
     gzerr << "SimpleTrackedVehiclePlugin: <left_track> link does not exist."
           << std::endl;
@@ -93,13 +115,13 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
   else
   {
     gzmsg << "SimpleTrackedVehiclePlugin: Successfully added left track link "
-          << this->tracks[Tracks::LEFT].at(0)->GetName() << std::endl;
+          << gtracks[Tracks::LEFT].at(0)->GetName() << std::endl;
   }
 
-  this->tracks[Tracks::RIGHT] = physics::Link_V();
-  this->tracks[Tracks::RIGHT].push_back(_model->GetLink(
-      _sdf->GetElement("right_track")->Get<std::string>()));
-  if (this->tracks[Tracks::RIGHT].at(0) == nullptr)
+  this->tracks[Tracks::RIGHT] = _model->GetLink(
+      _sdf->GetElement("right_track")->Get<std::string>());
+  gtracks[Tracks::RIGHT].push_back(this->tracks[Tracks::RIGHT]);
+  if (gtracks[Tracks::RIGHT].at(0) == nullptr)
   {
     gzerr << "SimpleTrackedVehiclePlugin: <right_track> link does not exist."
           << std::endl;
@@ -108,7 +130,7 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
   else
   {
     gzmsg << "SimpleTrackedVehiclePlugin: Successfully added right track link "
-          << this->tracks[Tracks::RIGHT].at(0)->GetName() << std::endl;
+          << gtracks[Tracks::RIGHT].at(0)->GetName() << std::endl;
   }
 
   if (_sdf->HasElement("left_flipper"))
@@ -125,7 +147,7 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
       }
       else
       {
-        this->tracks[Tracks::LEFT].push_back(flipperLink);
+        gtracks[Tracks::LEFT].push_back(flipperLink);
         gzmsg << "SimpleTrackedVehiclePlugin: Successfully added left flipper "
                  "link '" << flipperName << "'" << std::endl;
       }
@@ -147,7 +169,7 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
       }
       else
       {
-        this->tracks[Tracks::RIGHT].push_back(flipperLink);
+        gtracks[Tracks::RIGHT].push_back(flipperLink);
         gzmsg << "SimpleTrackedVehiclePlugin: Successfully added right flipper "
                  "link '" << flipperName << "'" << std::endl;
       }
@@ -201,7 +223,8 @@ void SimpleTrackedVehiclePlugin::SetTrackVelocityImpl(double _left,
 
 void SimpleTrackedVehiclePlugin::UpdateTrackSurface()
 {
-  for (auto trackSide : this->tracks)
+  auto& gtracks = globalTracks.at(this->body->GetModel()->GetScopedName());
+  for (auto trackSide : gtracks)
   {
     for (auto track : trackSide.second)
     {
@@ -237,7 +260,8 @@ void SimpleTrackedVehiclePlugin::SetGeomCategories()
     }
   }
 
-  for (auto trackSide : this->tracks)
+  auto& gtracks = globalTracks.at(this->body->GetModel()->GetScopedName());
+  for (auto trackSide : gtracks)
   {
     for (auto trackLink : trackSide.second)
     {
@@ -251,6 +275,12 @@ void SimpleTrackedVehiclePlugin::SetGeomCategories()
       }
     }
   }
+}
+
+size_t SimpleTrackedVehiclePlugin::GetNumTracks(const Tracks side) const
+{
+  auto& gtracks = globalTracks.at(this->body->GetModel()->GetScopedName());
+  return gtracks[side].size();
 }
 
 void SimpleTrackedVehiclePlugin::DriveTracks(

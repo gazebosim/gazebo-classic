@@ -65,7 +65,7 @@ namespace gazebo {
   {
     public: SimpleTrackedVehiclePlugin() = default;
 
-    public: virtual ~SimpleTrackedVehiclePlugin() = default;
+    public: virtual ~SimpleTrackedVehiclePlugin();
 
     /// \brief Called when the plugin is loaded
     /// \param[in] model Pointer to the model for which the plugin is loaded
@@ -92,13 +92,15 @@ namespace gazebo {
     protected: physics::LinkPtr body;
 
     /// \brief The tracks controlled by this plugin.
-    protected: std::unordered_map<Tracks, physics::Link_V> tracks;
+    protected: std::unordered_map<Tracks, physics::LinkPtr> tracks;
 
     /// \brief Desired velocities of the tracks.
     protected: std::unordered_map<Tracks, double> trackVelocity;
 
     /// \brief Compute and apply the forces that make the tracks move.
     protected: void DriveTracks(const common::UpdateInfo &/*_unused*/);
+
+    public: size_t GetNumTracks(Tracks side) const;
 
     /// \brief Set collide categories and bits of all geometries to the
     ///        required values.

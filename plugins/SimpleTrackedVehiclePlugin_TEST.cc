@@ -110,11 +110,6 @@ class TestSimpleTrackedVehiclePlugin : public SimpleTrackedVehiclePlugin
         _drivingStraight, _bodyPose, _bodyYAxisGlobal, _centerOfRotation,
         _contactWorldPosition, _contactNormal, _beltDirection);
   }
-
-  public: size_t GetNumTracks(Tracks side)
-  {
-    return this->tracks[side].size();
-  }
 };
 
 msgs::Link* AddTrack(msgs::Model &_model, const std::string &_name,
