@@ -53,6 +53,10 @@ namespace gazebo {
   /// <body>  Body of the vehicle to which the two tracks are connected.
   /// <left_track>  The left track link's name.
   /// <right_track>  The right track link's name.
+  /// <left_flipper>  The name of a left flipper link.
+  ///     Can appear multiple times.
+  /// <right_flipper>  The name of a right flipper link.
+  ///     Can appear multiple times.
   /// <collide_without_contact_bitmask> Collision bitmask that will be set to
   ///     the whole vehicle (default is 1u).
 
@@ -88,7 +92,7 @@ namespace gazebo {
     protected: physics::LinkPtr body;
 
     /// \brief The tracks controlled by this plugin.
-    protected: std::unordered_map<Tracks, physics::LinkPtr> tracks;
+    protected: std::unordered_map<Tracks, physics::Link_V> tracks;
 
     /// \brief Desired velocities of the tracks.
     protected: std::unordered_map<Tracks, double> trackVelocity;

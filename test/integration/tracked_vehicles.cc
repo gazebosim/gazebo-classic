@@ -184,6 +184,49 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   EXPECT_NEAR(model->WorldPose().Rot().Pitch(), 0.0, 1e-1);
   EXPECT_NEAR(model->WorldPose().Rot().Yaw(),
               beforeStairsPose.Rot().Yaw(), 0.5);  // The driving is wild
+
+  // Test driving over an obstacle that requires flippers. Without them, the
+  // robot would get stuck in front of the obstacle.
+
+  this->world->Reset();
+
+  const auto beforeBoxPose = ignition::math::Pose3d(
+      2, -0.5, 0.1,
+      0, 0, ignition::math::Angle::HalfPi.Radian());
+  model->SetWorldPose(beforeBoxPose);
+
+  // Let the model settle down.
+  this->world->Step(300);
+
+  // we go backwards because we have the CoG in the back
+  msgs::Set(&msg, ignition::math::Pose3d(-forwardSpeed, 0, 0, 0, 0, 0));
+  pub->Publish(msg, true);
+  this->world->Step(4000);
+
+  // The box is at (2, -2, 0), we start at (2, -0.5, 0), and want to pass
+  // at least a bit behind the box (2, -3, 0). The driving is a bit wild.
+  EXPECT_NEAR(model->WorldPose().Pos().X(), 2.0, 0.1);  // The driving is wild
+  EXPECT_LT(model->WorldPose().Pos().Y(), -3);
+  EXPECT_NEAR(model->WorldPose().Pos().Z(), 0.0, 1e-1);
+  EXPECT_NEAR(model->WorldPose().Rot().Roll(), 0.0, 1e-1);
+  EXPECT_NEAR(model->WorldPose().Rot().Pitch(), 0.0, 1e-1);
+  EXPECT_NEAR(model->WorldPose().Rot().Yaw(),
+              beforeBoxPose.Rot().Yaw(), 0.25);  // The driving is wild
+  // And we go back, which is a somewhat easier way
+
+  msgs::Set(&msg, ignition::math::Pose3d(forwardSpeed, 0, 0, 0, 0, 0));
+  pub->Publish(msg, true);
+  this->world->Step(4000);
+
+  // We start at (2, -0.5, 0), we go back, and it should be a bit faster than
+  // the previous traversal, so we should end up beyond the starting point.
+  EXPECT_NEAR(model->WorldPose().Pos().X(), 2.0, 0.1);  // The driving is wild
+  EXPECT_GT(model->WorldPose().Pos().Y(), -0.5);
+  EXPECT_NEAR(model->WorldPose().Pos().Z(), 0.0, 1e-1);
+  EXPECT_NEAR(model->WorldPose().Rot().Roll(), 0.0, 1e-1);
+  EXPECT_NEAR(model->WorldPose().Rot().Pitch(), 0.0, 1e-1);
+  EXPECT_NEAR(model->WorldPose().Rot().Yaw(),
+              beforeBoxPose.Rot().Yaw(), 0.25);  // The driving is wild
 }
 
 //// Test that the WheelTracked vehicle is moving as expected.

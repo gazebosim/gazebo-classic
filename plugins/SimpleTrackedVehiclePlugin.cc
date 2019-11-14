@@ -75,23 +75,84 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
           << std::endl;
     throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
   }
+  else
+  {
+    gzmsg << "SimpleTrackedVehiclePlugin: Successfully added robot body link "
+          << this->body->GetName() << std::endl;
+  }
 
-  this->tracks[Tracks::LEFT] = _model->GetLink(
-      _sdf->GetElement("left_track")->Get<std::string>());
-  if (this->tracks[Tracks::LEFT] == nullptr)
+  this->tracks[Tracks::LEFT] = physics::Link_V();
+  this->tracks[Tracks::LEFT].push_back(_model->GetLink(
+      _sdf->GetElement("left_track")->Get<std::string>()));
+  if (this->tracks[Tracks::LEFT].at(0) == nullptr)
   {
     gzerr << "SimpleTrackedVehiclePlugin: <left_track> link does not exist."
           << std::endl;
     throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
   }
+  else
+  {
+    gzmsg << "SimpleTrackedVehiclePlugin: Successfully added left track link "
+          << this->tracks[Tracks::LEFT].at(0)->GetName() << std::endl;
+  }
 
-  this->tracks[Tracks::RIGHT] = _model->GetLink(
-      _sdf->GetElement("right_track")->Get<std::string>());
-  if (this->tracks[Tracks::RIGHT] == nullptr)
+  this->tracks[Tracks::RIGHT] = physics::Link_V();
+  this->tracks[Tracks::RIGHT].push_back(_model->GetLink(
+      _sdf->GetElement("right_track")->Get<std::string>()));
+  if (this->tracks[Tracks::RIGHT].at(0) == nullptr)
   {
     gzerr << "SimpleTrackedVehiclePlugin: <right_track> link does not exist."
           << std::endl;
     throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
+  }
+  else
+  {
+    gzmsg << "SimpleTrackedVehiclePlugin: Successfully added right track link "
+          << this->tracks[Tracks::RIGHT].at(0)->GetName() << std::endl;
+  }
+
+  if (_sdf->HasElement("left_flipper"))
+  {
+    auto flipper = _sdf->GetElement("left_flipper");
+    while (flipper)
+    {
+      const auto flipperName = flipper->Get<std::string>();
+      const auto flipperLink = _model->GetLink(flipperName);
+      if (flipperLink == nullptr)
+      {
+        gzerr << "SimpleTrackedVehiclePlugin: <left_flipper> link '"
+              << flipperName << "' does not exist." << std::endl;
+      }
+      else
+      {
+        this->tracks[Tracks::LEFT].push_back(flipperLink);
+        gzmsg << "SimpleTrackedVehiclePlugin: Successfully added left flipper "
+                 "link '" << flipperName << "'" << std::endl;
+      }
+      flipper = flipper->GetNextElement("left_flipper");
+    }
+  }
+
+  if (_sdf->HasElement("right_flipper"))
+  {
+    auto flipper = _sdf->GetElement("right_flipper");
+    while (flipper)
+    {
+      const auto flipperName = flipper->Get<std::string>();
+      const auto flipperLink = _model->GetLink(flipperName);
+      if (flipperLink == nullptr)
+      {
+        gzerr << "SimpleTrackedVehiclePlugin: <right_flipper> link '"
+              << flipperName << "' does not exist." << std::endl;
+      }
+      else
+      {
+        this->tracks[Tracks::RIGHT].push_back(flipperLink);
+        gzmsg << "SimpleTrackedVehiclePlugin: Successfully added right flipper "
+                 "link '" << flipperName << "'" << std::endl;
+      }
+      flipper = flipper->GetNextElement("right_flipper");
+    }
   }
 
   this->LoadParam(_sdf, "collide_without_contact_bitmask",
@@ -140,9 +201,12 @@ void SimpleTrackedVehiclePlugin::SetTrackVelocityImpl(double _left,
 
 void SimpleTrackedVehiclePlugin::UpdateTrackSurface()
 {
-  for (auto track : this->tracks )
+  for (auto trackSide : this->tracks)
   {
-    this->SetLinkMu(track.second);
+    for (auto track : trackSide.second)
+    {
+      this->SetLinkMu(track);
+    }
   }
 }
 
@@ -173,16 +237,18 @@ void SimpleTrackedVehiclePlugin::SetGeomCategories()
     }
   }
 
-  for (auto track : this->tracks)
+  for (auto trackSide : this->tracks)
   {
-    auto trackLink = track.second;
-    for (auto const &collision : trackLink->GetCollisions())
+    for (auto trackLink : trackSide.second)
     {
       auto bits = ROBOT_CATEGORY | BELT_CATEGORY;
-      if (track.first == Tracks::LEFT)
+      if (trackSide.first == Tracks::LEFT)
         bits |= LEFT_CATEGORY;
 
-      collision->SetCategoryBits(bits);
+      for (auto const &collision : trackLink->GetCollisions())
+      {
+        collision->SetCategoryBits(bits);
+      }
     }
   }
 }
@@ -229,12 +295,7 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
   ////////////////////////////////////////////////////////////////////////
   size_t i = 0;
   const auto contacts = this->contactManager->GetContacts();
-
-  // Get the body IDs of the tracks for reference
-  const dBodyID left = dynamic_cast<physics::ODELink &>(
-    *this->tracks[Tracks::LEFT]).GetODEId();
-  const dBodyID right = dynamic_cast<physics::ODELink &>(
-    *this->tracks[Tracks::RIGHT]).GetODEId();
+  const auto model = this->body->GetModel();
 
   for (auto contact : contacts)
   {
@@ -259,14 +320,17 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       continue;
     }
 
+    if (model != contact->collision1->GetLink()->GetModel() &&
+        model != contact->collision2->GetLink()->GetModel())
+    {
+      // Verify one of the collisions' bodies is a track of this vehicle
+      continue;
+    }
+
     dBodyID body1 = dynamic_cast<physics::ODELink&>(
       *contact->collision1->GetLink()).GetODEId();
     dBodyID body2 = dynamic_cast<physics::ODELink& >(
       *contact->collision2->GetLink()).GetODEId();
-
-    // Verify one of these bodies is a track of this vehicle
-    if (body1 != left && body1 != right && body2 != left && body2 != right)
-      continue;
 
     dGeomID geom1 = dynamic_cast<physics::ODECollision& >(
       *contact->collision1).GetCollisionId();
