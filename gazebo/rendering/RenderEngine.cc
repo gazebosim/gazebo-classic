@@ -430,6 +430,12 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/Plugin_BSPSceneManager");
     plugins.push_back(path+"/Plugin_OctreeSceneManager");
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    // OGRE 1.11 moved FreeImage codec support to a plugin
+    // See: https://github.com/OGRECave/ogre/blob/master/Docs/1.11-Notes.md
+    plugins.push_back(path + "/Codec_FreeImage");
+#endif
+
 #ifdef HAVE_OCULUS
     plugins.push_back(path+"/Plugin_CgProgramManager");
 #endif
