@@ -47,26 +47,22 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
   std::string sourceFilename = _file->name();
   boost::replace_last(sourceFilename, ".proto", ".pb.cc");
 
-  // Add boost shared point include
+  // Suppress expected warnings
   {
     std::unique_ptr<io::ZeroCopyOutputStream> output(
         _generator_context->OpenForInsert(headerFilename, "includes"));
     io::Printer printer(output.get(), '$');
 
-    printer.Print("#pragma GCC system_header", "name", "includes");
-  }
-
-  // Add boost shared point include
-  {
-    std::unique_ptr<io::ZeroCopyOutputStream> output(
-        _generator_context->OpenForInsert(sourceFilename, "includes"));
-    io::Printer printer(output.get(), '$');
-
-    printer.Print("#pragma GCC diagnostic ignored \"-Wshadow\"", "name",
+    printer.Print("#ifndef _MSC_VER\n", "name", "includes");
+    printer.Print("#pragma GCC system_header\n", "name", "includes");
+    printer.Print("#pragma GCC diagnostic ignored \"-Wshadow\"\n", "name",
                   "includes");
+    printer.Print("#pragma GCC diagnostic ignored \"-Wunused-parameter\"\n",
+        "name", "includes");
+    printer.Print("#endif\n", "name", "includes");
   }
 
-
+  // Add boost shared pointer include
   {
     std::unique_ptr<io::ZeroCopyOutputStream> output(
         _generator_context->OpenForInsert(headerFilename, "includes"));
@@ -78,7 +74,7 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
         "name", "includes");
   }
 
-  // Add boost shared typedef
+  // Add boost shared pointer typedef
   {
     std::unique_ptr<io::ZeroCopyOutputStream> output(
         _generator_context->OpenForInsert(headerFilename, "namespace_scope"));
