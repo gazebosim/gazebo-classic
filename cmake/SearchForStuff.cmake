@@ -357,7 +357,9 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
 
   if (NOT OGRE_FOUND)
-    # Workaround for CMake bug https://gitlab.kitware.com/cmake/cmake/issues/17135
+    # Workaround for CMake bug https://gitlab.kitware.com/cmake/cmake/issues/17135, 
+    # that prevents to successfully run a find_package(<package>) call if before there
+    # was a failed call to pkg_check_modules(<package> <package>)
     unset(OGRE_FOUND CACHE)
     # If OGRE was not found, try with the standard find_package(OGRE)
     find_package(OGRE COMPONENTS RTShaderSystem Terrain Overlay Paging)
