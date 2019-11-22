@@ -91,12 +91,6 @@ endif ()
 ########################################
 # Find packages
 
-# In Visual Studio we use configure.bat to trick all path cmake
-# variables so let's consider that as a replacement for pkgconfig
-if (MSVC)
-  set (PKG_CONFIG_FOUND TRUE)
-endif()
-
 find_package(CURL)
 if (CURL_FOUND)
   # FindCURL.cmake distributed with CMake exports
@@ -108,6 +102,12 @@ if (CURL_FOUND)
   #       CURL_INCLUDE_DIRS and CURL_LIBRARIES provided by FindCURL.cmake
   set(CURL_INCLUDEDIR ${CURL_INCLUDE_DIRS})
 endif ()
+
+# In Visual Studio we use configure.bat to trick all path cmake
+# variables so let's consider that as a replacement for pkgconfig
+if (MSVC)
+  set (PKG_CONFIG_FOUND TRUE)
+endif()
 
 if (PKG_CONFIG_FOUND)
   if (NOT CURL_FOUND)
