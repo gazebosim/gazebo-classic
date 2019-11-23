@@ -53,6 +53,13 @@
 using namespace gazebo;
 using namespace rendering;
 
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 11
+using Ogre::TechniqueType;
+using Ogre::HIGH_LOD;
+using Ogre::RENDER_COMPOSITE_MAP;
+using Ogre::LOW_LOD;
+#endif
+
 const double HeightmapPrivate::loadRadiusFactor = 1.0;
 const double HeightmapPrivate::holdRadiusFactor = 1.15;
 const boost::filesystem::path HeightmapPrivate::pagingDirname = "paging";
@@ -1163,8 +1170,13 @@ void Heightmap::SetupShadows(bool _enableShadows)
   Ogre::TerrainMaterialGeneratorPtr matGen =
       this->dataPtr->terrainGlobals->getDefaultMaterialGenerator();
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 11
   matProfile = static_cast<GzTerrainMatGen::SM2Profile*>(
       matGen->getActiveProfile());
+#else
+  matProfile = static_cast<Ogre::TerrainMaterialGeneratorA::SM2Profile*>(
+      matGen->getActiveProfile());
+#endif
   if (!matProfile)
   {
     // using custom material script so ignore setting shadows
@@ -1270,6 +1282,7 @@ void Heightmap::CreateMaterial()
   }
   else
   {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 11
     // use default material
     // RTSS PSSM shadows compatible terrain material
     if (!this->dataPtr->gzMatGen)
@@ -1279,6 +1292,16 @@ void Heightmap::CreateMaterial()
     ptr.bind(this->dataPtr->gzMatGen);
 
     this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(ptr);
+#else
+    // init custom material generator
+    Ogre::TerrainMaterialGeneratorPtr terrainMaterialGenerator;
+    TerrainMaterial *terrainMaterial = OGRE_NEW TerrainMaterial("Gazebo/Grey");
+    if (this->dataPtr->splitTerrain)
+      terrainMaterial->setGridSize(this->dataPtr->numTerrainSubdivisions);
+    terrainMaterialGenerator.bind(terrainMaterial);
+    this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(
+        terrainMaterialGenerator);
+#endif
 
     this->SetupShadows(true);
   }
@@ -1296,6 +1319,7 @@ unsigned int Heightmap::TerrainSubdivisionCount() const
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 11
 
 /////////////////////////////////////////////////
 GzTerrainMatGen::GzTerrainMatGen()
@@ -1376,10 +1400,11 @@ void GzTerrainMatGen::SM2Profile::addTechnique(
     // }
 
     // check SM3 features
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
     this->mSM3Available =
       Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0");
-
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
+#endif
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8 && OGRE_VERSION_MINOR <= 11
     this->mSM4Available =
       Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0");
 #endif
@@ -1608,6 +1633,7 @@ void GzTerrainMatGen::SM2Profile::UpdateParams(const Ogre::MaterialPtr &_mat,
 void GzTerrainMatGen::SM2Profile::UpdateParamsForCompositeMap(
     const Ogre::MaterialPtr &_mat, const Ogre::Terrain *_terrain)
 {
+  // Only tested for Ogre 1.11 & 1.12
   static_cast<GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*>(
       this->mShaderGen)->updateParams(this, _mat, _terrain, true);
 }
@@ -3220,6 +3246,9 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
 
   return ret;
 }
+
+// #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 11
+#endif
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
