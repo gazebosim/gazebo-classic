@@ -159,17 +159,16 @@ set (DARTplugins
   GravityCompensationPlugin
 )
 
-set(GAZEBO_PLUGIN_INSTALL_DIR
-  ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/
-)
-
 add_library(TrackedVehiclePlugin STATIC TrackedVehiclePlugin.cc)
 target_link_libraries(TrackedVehiclePlugin
         libgazebo
         ${ogre_libraries}
         ${IGNITION-TRANSPORT_LIBRARIES}
         )
-install (TARGETS TrackedVehiclePlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+install (TARGETS TrackedVehiclePlugin
+         LIBRARY DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+         ARCHIVE DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+         RUNTIME DESTINATION ${GAZEBO_PLUGIN_BIN_INSTALL_DIR})
 gz_install_includes("plugins" TrackedVehiclePlugin.hh)
 
 foreach (src ${plugins_single_header})
@@ -179,7 +178,10 @@ foreach (src ${plugins_single_header})
     ${ogre_libraries}
     ${IGNITION-TRANSPORT_LIBRARIES}
   )
-  install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+  install (TARGETS ${src}
+           LIBRARY DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+           ARCHIVE DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+           RUNTIME DESTINATION ${GAZEBO_PLUGIN_BIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()
 
@@ -198,7 +200,10 @@ foreach (src ${plugins_private_header})
     ${ogre_libraries}
     ${IGNITION-TRANSPORT_LIBRARIES}
   )
-  install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+  install (TARGETS ${src}
+           LIBRARY DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+           ARCHIVE DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+           RUNTIME DESTINATION ${GAZEBO_PLUGIN_BIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
   gz_install_includes("plugins" ${src}Private.hh)
 endforeach ()
@@ -214,7 +219,10 @@ foreach (src ${GUIplugins})
                         ${Qt5Widgets_LIBRARIES}
                         ${IGNITION-TRANSPORT_LIBRARIES}
 )
-  install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+  install (TARGETS ${src}
+           LIBRARY DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+           ARCHIVE DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+           RUNTIME DESTINATION ${GAZEBO_PLUGIN_BIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()
 
@@ -225,7 +233,10 @@ if (HAVE_DART_URDF)
       libgazebo
       ${DART_LIBRARIES}
     )
-    install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+    install (TARGETS ${src}
+             LIBRARY DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+             ARCHIVE DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+             RUNTIME DESTINATION ${GAZEBO_PLUGIN_BIN_INSTALL_DIR})
     gz_install_includes("plugins" ${src}.hh)
   endforeach ()
 endif()
@@ -234,7 +245,7 @@ endif()
 # Plus, set RPATH to the directory so they can dynamically link.
 target_link_libraries(LedPlugin FlashLightPlugin)
 set_target_properties(
-  LedPlugin PROPERTIES INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR})
+  LedPlugin PROPERTIES INSTALL_RPATH ${GAZEBO_PLUGIN_LIB_INSTALL_DIR})
 
 add_subdirectory(events)
 
