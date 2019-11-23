@@ -25,7 +25,7 @@
 namespace gazebo
 {
   /// \brief A plugin for breakable joints, based on a ForceTorque sensor plugin
-  class GAZEBO_VISIBLE BreakableJointPlugin : public SensorPlugin
+  class GZ_PLUGIN_VISIBLE BreakableJointPlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: BreakableJointPlugin();

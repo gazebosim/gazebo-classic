@@ -27,7 +27,7 @@ namespace gazebo
   class GimbalSmall2dPluginPrivate;
 
   /// \brief A plugin for controlling the angle of a gimbal joint
-  class GAZEBO_VISIBLE GimbalSmall2dPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE GimbalSmall2dPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: GimbalSmall2dPlugin();

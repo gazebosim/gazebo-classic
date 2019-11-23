@@ -31,7 +31,7 @@ namespace gazebo
   class LedSettingPrivate;
 
   /// \brief Internal data class to hold individual LED light settings.
-  class GAZEBO_VISIBLE LedSetting: public FlashLightSetting
+  class GZ_PLUGIN_VISIBLE LedSetting: public FlashLightSetting
   {
     /// \brief Constructor.
     public: LedSetting(
@@ -98,7 +98,7 @@ namespace gazebo
   /// </model>
   /// \endverbatim
   ///
-  class GAZEBO_VISIBLE LedPlugin : public FlashLightPlugin
+  class GZ_PLUGIN_VISIBLE LedPlugin : public FlashLightPlugin
   {
     /// \brief Constructor.
     public: LedPlugin();
