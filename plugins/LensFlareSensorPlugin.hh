@@ -29,7 +29,7 @@ namespace gazebo
   /// sensor
   /// The plugin has the following optional parameter:
   /// <scale>     Scale of lens flare. Must be greater than 0
-  class GAZEBO_VISIBLE LensFlareSensorPlugin : public SensorPlugin
+  class GZ_PLUGIN_VISIBLE LensFlareSensorPlugin : public SensorPlugin
   {
     /// \brief Constructor.
     public: LensFlareSensorPlugin();
