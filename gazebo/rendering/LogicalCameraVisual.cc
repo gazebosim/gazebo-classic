@@ -117,7 +117,8 @@ void LogicalCameraVisual::Load(const msgs::LogicalCameraSensor &_msg)
   line->AddPoint(ignition::math::Vector3d(
         _msg.far_clip(), farWidth, -farHeight));
 
-  line->setMaterial("Gazebo/WhiteGlow");
+
+  GZ_OGRE_SET_MATERIAL_BY_NAME(line, "Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   // Draw green lines from the near clipping plane to the origin
@@ -138,7 +139,7 @@ void LogicalCameraVisual::Load(const msgs::LogicalCameraSensor &_msg)
   sourceLine->AddPoint(ignition::math::Vector3d(
         _msg.near_clip(), nearWidth, -nearHeight));
 
-  sourceLine->setMaterial("Gazebo/PurpleGlow");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(sourceLine, "Gazebo/PurpleGlow");
   sourceLine->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);

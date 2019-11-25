@@ -28,7 +28,7 @@ namespace gazebo
 
   /// \brief A GUI plugin that captures key strokes from gzclient GUI
   /// and publishes over gz transport topic `~/keyboard/keypress`
-  class GAZEBO_VISIBLE KeyboardGUIPlugin : public GUIPlugin
+  class GZ_PLUGIN_VISIBLE KeyboardGUIPlugin : public GUIPlugin
   {
     Q_OBJECT
 

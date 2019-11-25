@@ -682,7 +682,15 @@ namespace SkyX { namespace VClouds
     buffer->lock(Ogre::HardwareBuffer::HBL_DISCARD);
     const Ogre::PixelBox &pb = buffer->getCurrentLock();
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    // Ogre 1.11 changed Ogre::PixelBox::data from void* to uchar*, hence
+    // reinterpret_cast is required here. static_cast is not allowed between
+    // pointers of unrelated types (see, for instance, Standard § 3.9.1
+    // Fundamental types).
+    Ogre::uint32 *pbptr = reinterpret_cast < Ogre::uint32*>(pb.data);
+#else
     Ogre::uint32 *pbptr = static_cast < Ogre::uint32*>(pb.data);
+#endif
     size_t x, y, z;
 
     for (z = pb.front; z < pb.back; z++)

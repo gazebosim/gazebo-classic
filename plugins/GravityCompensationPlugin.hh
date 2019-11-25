@@ -33,7 +33,7 @@ namespace gazebo
   // Forward declare private data class.
   class GravityCompensationPluginPrivate;
 
-  class GAZEBO_VISIBLE ModelResourceRetriever :
+  class GZ_PLUGIN_VISIBLE ModelResourceRetriever :
       public virtual dart::common::LocalResourceRetriever
   {
     /// \brief Destructor.
@@ -52,7 +52,7 @@ namespace gazebo
   using ModelResourceRetrieverPtr = std::shared_ptr<ModelResourceRetriever>;
 
   /// \brief Plugin that provides gravity compensation.
-  class GAZEBO_VISIBLE GravityCompensationPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE GravityCompensationPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: GravityCompensationPlugin();

@@ -31,7 +31,7 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE VehiclePlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE VehiclePlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: VehiclePlugin();

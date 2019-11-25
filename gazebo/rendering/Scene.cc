@@ -3136,8 +3136,14 @@ void Scene::SetShadowsEnabled(bool _value)
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
     this->dataPtr->manager->setShadowTechnique(
         Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    this->dataPtr->manager->setShadowTextureCasterMaterial(
+        Ogre::MaterialManager::getSingleton().getByName(
+            "DeferredRendering/Shadows/RSMCaster_Spot"));
+#else
     this->dataPtr->manager->setShadowTextureCasterMaterial(
         "DeferredRendering/Shadows/RSMCaster_Spot");
+#endif
     this->dataPtr->manager->setShadowTextureCount(1);
     this->dataPtr->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and
