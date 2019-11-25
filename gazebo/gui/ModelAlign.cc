@@ -99,7 +99,7 @@ void ModelAlign::Init()
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::Transform(const ignition::math::Box &_bbox,
+void ModelAlign::Transform(const ignition::math::AxisAlignedBox &_bbox,
     const ignition::math::Pose3d &_worldPose,
     std::vector<ignition::math::Vector3d> &_vertices)
 {

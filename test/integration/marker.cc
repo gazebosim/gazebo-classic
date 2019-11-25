@@ -73,7 +73,7 @@ void Marker_TEST::AddRemove()
   // Create the marker message
   ignition::msgs::Marker markerMsg;
   markerMsg.set_ns("default");
-  markerMsg.set_id(0);
+  markerMsg.set_id(10);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::SPHERE);
 
@@ -86,7 +86,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene != nullptr);
 
   gazebo::rendering::VisualPtr vis =
-    scene->GetVisual("__GZ_MARKER_VISUAL_default_0");
+    scene->GetVisual("__GZ_MARKER_VISUAL_default_10");
   QVERIFY(vis != nullptr);
 
   // Remove the shape
@@ -95,7 +95,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
 
   // Add a box
   gzmsg << "Add box" << std::endl;
@@ -104,7 +104,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") != nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") != nullptr);
 
   // Add a cylinder
   gzmsg << "Add cylinder" << std::endl;
@@ -117,7 +117,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") != nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") != nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") != nullptr);
 
   // Delete everything
@@ -126,7 +126,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
 
   // Draw a vertical line using LINE_LIST
@@ -143,7 +143,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") != nullptr);
 
@@ -165,7 +165,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") != nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") != nullptr);
@@ -176,7 +176,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
@@ -198,7 +198,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
@@ -210,7 +210,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
@@ -227,7 +227,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
@@ -240,7 +240,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
@@ -266,7 +266,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
@@ -279,7 +279,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
@@ -311,7 +311,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
@@ -325,7 +325,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
@@ -355,7 +355,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(node.Request(topicName, markerMsg));
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_10") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
@@ -489,10 +489,8 @@ void Marker_TEST::CornerCases()
 
     QCOMPARE(rep.marker().size(), 1);
 
-    QVERIFY(rep.marker(0).has_ns());
     QVERIFY(rep.marker(0).ns() == "");
 
-    QVERIFY(rep.marker(0).has_id());
     QVERIFY(rep.marker(0).id() > 0);
 
     QVERIFY(rep.marker(0).type() == ignition::msgs::Marker::SPHERE);
@@ -569,10 +567,8 @@ void Marker_TEST::CornerCases()
 
     QCOMPARE(rep.marker().size(), 1);
 
-    QVERIFY(rep.marker(0).has_ns());
     QVERIFY(rep.marker(0).ns() == "the_namespace");
 
-    QVERIFY(rep.marker(0).has_id());
     QVERIFY(rep.marker(0).id() > 0);
 
     QVERIFY(rep.marker(0).type() == ignition::msgs::Marker::SPHERE);

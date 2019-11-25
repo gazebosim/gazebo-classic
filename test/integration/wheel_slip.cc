@@ -151,9 +151,9 @@ TEST_F(WheelSlipTest, TireDrum)
   Load("worlds/tire_drum_test.world", true);
 
   // joint command publishers
-  this->tireJointCmdPub = this->ignNode.Advertise<ignition::msgs::JointCmd>(
+  this->tireJointCmdPub = this->ignNode.Advertise<gazebo::msgs::JointCmd>(
       "/tire/joint_cmd");
-  this->drumJointCmdPub = this->ignNode.Advertise<ignition::msgs::JointCmd>(
+  this->drumJointCmdPub = this->ignNode.Advertise<gazebo::msgs::JointCmd>(
       "/drum/joint_cmd");
 
   // slip compliance publishers
@@ -370,7 +370,7 @@ void WheelSlipTest::SetCommands(const WheelSlipState &_state)
   const double drumLimit = 1e6;
 
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name("drum::joint");
 
     auto pid = msg.mutable_velocity();
@@ -384,7 +384,7 @@ void WheelSlipTest::SetCommands(const WheelSlipState &_state)
   }
 
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name("tire::axel_wheel");
 
     auto pid = msg.mutable_velocity();
@@ -399,7 +399,7 @@ void WheelSlipTest::SetCommands(const WheelSlipState &_state)
   }
 
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name("tire::world_upright");
     msg.set_force(-_state.suspForce);
 

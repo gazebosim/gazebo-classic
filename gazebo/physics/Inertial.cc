@@ -93,12 +93,12 @@ Inertial::Inertial(const ignition::math::Inertiald &_inertial)
   this->SetMass(_inertial.MassMatrix().Mass());
   this->SetCoG(_inertial.Pose());
   this->SetInertiaMatrix(
-      _inertial.MassMatrix().IXX(),
-      _inertial.MassMatrix().IYY(),
-      _inertial.MassMatrix().IZZ(),
-      _inertial.MassMatrix().IXY(),
-      _inertial.MassMatrix().IXZ(),
-      _inertial.MassMatrix().IYZ());
+      _inertial.MassMatrix().Ixx(),
+      _inertial.MassMatrix().Iyy(),
+      _inertial.MassMatrix().Izz(),
+      _inertial.MassMatrix().Ixy(),
+      _inertial.MassMatrix().Ixz(),
+      _inertial.MassMatrix().Iyz());
 }
 
 //////////////////////////////////////////////////

@@ -5,6 +5,32 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 10.x to 11.0
+
+### Build system
+
+New versions in mandatory dependencies: `ign-transport7`, `ign-msgs4`, `ign-math6`, `sdformat8`.
+New mandatory dependencies: `ign-fuel-tools3`, `ign-common3`.
+
+### Modifications
+
+1. All instances of `ignition::math::Box` in the API are changed to `ignition::math::AxisAlignedBox`
+   to match the changes in ignition-math6.
+
+1. **gazebo/physics/JointController.hh**
+   Use `gazebo::msgs::JointCmd` instead of `ignition::msgs::JointCmd` in the
+   since the ign-msgs4 proto file uses `proto3`, which doesn't allow optional
+   fields and breaks existing functionality.
+
+1. **gazebo/rendering/MarkerManager.cc**
+    The `/marker` ignition transport service allows specifying the `id` field
+    of a marker to be created. If the `id` field is not specified, a random,
+    valid `id` is generated as a convenience for the user.
+    Due to the upgrade to `ign-msgs4`, which uses `proto3` syntax, an `id`
+    of `0` is indistinguishable from an unset `id`.
+    As such, an `id` of `0` will now trigger a random `id` to be generated,
+    and non-zero `id` values should be used instead.
+
 ## Gazebo 9.x to 10.x
 
 ### Additions

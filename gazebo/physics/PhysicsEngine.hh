@@ -18,6 +18,7 @@
 #define _PHYSICSENGINE_HH_
 
 #include <boost/thread/recursive_mutex.hpp>
+#include <boost/any.hpp>
 #include <string>
 #include <ignition/transport/Node.hh>
 

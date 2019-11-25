@@ -317,7 +317,7 @@ TEST_F(JointControllerTest, JointCmd)
   boost::replace_all(modelName, "::", "/");
 
   ignition::msgs::StringMsg req;
-  ignition::msgs::JointCmd rep;
+  gazebo::msgs::JointCmd rep;
   bool result;
   unsigned int timeout = 5000;
 

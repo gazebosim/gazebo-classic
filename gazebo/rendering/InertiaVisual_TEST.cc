@@ -19,7 +19,7 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -116,7 +116,7 @@ TEST_F(InertiaVisual_TEST, InertiaRotation)
   EXPECT_LT(sleep, maxSleep);
 
   // expect bounding box of size 0.1 x 0.4 x 0.9
-  const ignition::math::Box box(-0.05, -0.2, -0.45,
+  const ignition::math::AxisAlignedBox box(-0.05, -0.2, -0.45,
                                  0.05,  0.2,  0.45);
   for (const auto name : inertiaVisualNames)
   {

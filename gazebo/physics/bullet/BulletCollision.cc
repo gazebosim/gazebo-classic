@@ -135,16 +135,16 @@ unsigned int BulletCollision::GetCollideBits() const
 }*/
 
 //////////////////////////////////////////////////
-ignition::math::Box BulletCollision::BoundingBox() const
+ignition::math::AxisAlignedBox BulletCollision::BoundingBox() const
 {
-  ignition::math::Box result;
+  ignition::math::AxisAlignedBox result;
   if (this->collisionShape)
   {
     btVector3 btMin, btMax;
     btTransform relPose = BulletTypes::ConvertPose(this->RelativePose());
     this->collisionShape->getAabb(relPose, btMin, btMax);
 
-    result = ignition::math::Box(
+    result = ignition::math::AxisAlignedBox(
         ignition::math::Vector3d(btMin.x(), btMin.y(), btMin.z()),
         ignition::math::Vector3d(btMax.x(), btMax.y(), btMax.z()));
 

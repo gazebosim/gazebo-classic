@@ -394,7 +394,7 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
     std::string topic = "/" + _modelName + "/joint_cmd";
     boost::replace_all(topic, "::", "/");
     this->dataPtr->jointPub =
-        this->dataPtr->node.Advertise<ignition::msgs::JointCmd>(topic);
+        this->dataPtr->node.Advertise<gazebo::msgs::JointCmd>(topic);
     if (!this->dataPtr->jointPub)
     {
       gzerr << "Error advertising topic [" << topic << "]\n";
@@ -426,7 +426,7 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
     std::string service = "/" + _modelName + "/joint_cmd_req";
     boost::replace_all(service, "::", "/");
 
-    std::function<void(const ignition::msgs::JointCmd &, const bool)> callback =
+    std::function<void(const gazebo::msgs::JointCmd &, const bool)> callback =
         std::bind(&JointControlWidget::ResponseCallback, this, _modelName,
         std::placeholders::_1, std::placeholders::_2);
 
@@ -491,9 +491,9 @@ JointControlWidget::JointControlWidget(QWidget *_parent)
   this->setLayout(mainLayout);
 
   connect(this, SIGNAL(repReceived(const std::string &,
-      const ignition::msgs::JointCmd &)),
+      const gazebo::msgs::JointCmd &)),
       this, SLOT(OnResponse(const std::string &,
-      const ignition::msgs::JointCmd &)),
+      const gazebo::msgs::JointCmd &)),
       Qt::QueuedConnection);
 }
 
@@ -504,7 +504,7 @@ JointControlWidget::~JointControlWidget()
 
 /////////////////////////////////////////////////
 void JointControlWidget::ResponseCallback(const std::string &_modelName,
-    const ignition::msgs::JointCmd &_rep, const bool _result)
+    const gazebo::msgs::JointCmd &_rep, const bool _result)
 {
   if (_result)
   {
@@ -516,7 +516,7 @@ void JointControlWidget::ResponseCallback(const std::string &_modelName,
 
 /////////////////////////////////////////////////
 void JointControlWidget::OnResponse(const std::string &_modelName,
-    const ignition::msgs::JointCmd &_rep)
+    const gazebo::msgs::JointCmd &_rep)
 {
   if (_modelName == this->dataPtr->modelName)
   {
@@ -578,7 +578,7 @@ void JointControlWidget::OnReset()
        this->dataPtr->sliders.begin();
        iter != this->dataPtr->sliders.end(); ++iter)
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name(iter->first);
     msg.set_reset(true);
     this->dataPtr->jointPub.Publish(msg);
@@ -608,7 +608,7 @@ void JointControlWidget::OnForceChanged(double _value, const std::string &_name)
   iter = this->dataPtr->sliders.find(_name);
   if (iter != this->dataPtr->sliders.end())
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.set_force(_value);
     this->dataPtr->jointPub.Publish(msg);
@@ -623,7 +623,7 @@ void JointControlWidget::OnPIDPosChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_target(_value);
     this->dataPtr->jointPub.Publish(msg);
@@ -638,7 +638,7 @@ void JointControlWidget::OnPPosGainChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_p_gain(_value);
     this->dataPtr->jointPub.Publish(msg);
@@ -653,7 +653,7 @@ void JointControlWidget::OnDPosGainChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_d_gain(_value);
     this->dataPtr->jointPub.Publish(msg);
@@ -668,7 +668,7 @@ void JointControlWidget::OnIPosGainChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_i_gain(_value);
     this->dataPtr->jointPub.Publish(msg);
@@ -697,7 +697,7 @@ void JointControlWidget::OnPIDVelChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_target(_value);
     this->dataPtr->jointPub.Publish(msg);
@@ -712,7 +712,7 @@ void JointControlWidget::OnPVelGainChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_p_gain(_value);
     this->dataPtr->jointPub.Publish(msg);
@@ -727,7 +727,7 @@ void JointControlWidget::OnDVelGainChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_d_gain(_value);
     this->dataPtr->jointPub.Publish(msg);
@@ -742,7 +742,7 @@ void JointControlWidget::OnIVelGainChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    ignition::msgs::JointCmd msg;
+    gazebo::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_i_gain(_value);
     this->dataPtr->jointPub.Publish(msg);
