@@ -286,6 +286,10 @@ target_link_libraries(gazebo_ode
   ${CCD_LIBRARIES}
   ${Boost_LIBRARIES})
 
+if (HAVE_BULLET)
+  target_link_libraries(gazebo_ode ${BULLET_LIBRARIES})
+endif()
+
 if (HAVE_DART)
   target_link_libraries(gazebo_ode ${DART_LIBRARIES})
 endif()
