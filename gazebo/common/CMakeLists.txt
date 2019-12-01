@@ -220,42 +220,44 @@ set_property(
 )
 
 target_link_libraries(gazebo_common
-  gazebo_math
-  ${IGNITION-MATH_LIBRARIES}
-  ${libdl_library}
-  ${libtool_library}
-  ${Boost_LIBRARIES}
-  ${freeimage_LIBRARIES}
-  ${tinyxml_LIBRARIES}
-  ${libavcodec_LIBRARIES}
-  ${libavformat_LIBRARIES}
-  ${libavutil_LIBRARIES}
-  ${CURL_LIBRARIES}
-  ${libswscale_LIBRARIES}
-  ${libtar_LIBRARIES}
-  ${TBB_LIBRARIES}
-  ${SDFormat_LIBRARIES}
+  PUBLIC
+    gazebo_math
+    ${Boost_LIBRARIES}
+    ${CURL_LIBRARIES}
+    ${IGNITION-MATH_LIBRARIES}
+    ${freeimage_LIBRARIES}
+    ${libtar_LIBRARIES}
+    ${SDFormat_LIBRARIES}
+    ${tinyxml_LIBRARIES}
+  PRIVATE
+    ${libdl_library}
+    ${libtool_library}
+    ${libavcodec_LIBRARIES}
+    ${libavformat_LIBRARIES}
+    ${libavutil_LIBRARIES}
+    ${libswscale_LIBRARIES}
+    ${TBB_LIBRARIES}
 )
 
 if (UNIX)
-  target_link_libraries(gazebo_common pthread)
+  target_link_libraries(gazebo_common PRIVATE pthread)
 endif()
 
 if (UNIX AND NOT APPLE)
   # rt is used for clock_gettime, which is not available on apple or windows
-  target_link_libraries(gazebo_common rt)
+  target_link_libraries(gazebo_common PRIVATE rt)
 endif()
 
 if (HAVE_GTS)
-  target_link_libraries(gazebo_common ${gts_LIBRARIES})
+  target_link_libraries(gazebo_common PRIVATE ${gts_LIBRARIES})
 endif()
 
 if (HAVE_OPENAL)
-  target_link_libraries(gazebo_common ${OPENAL_LIBRARY})
+  target_link_libraries(gazebo_common PRIVATE ${OPENAL_LIBRARY})
 endif()
 
 if (HAVE_GDAL)
-  target_link_libraries(gazebo_common ${GDAL_LIBRARY})
+  target_link_libraries(gazebo_common PRIVATE ${GDAL_LIBRARY})
 endif()
 
 gz_install_library(gazebo_common)
