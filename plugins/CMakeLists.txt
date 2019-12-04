@@ -76,6 +76,7 @@ if (HAVE_UUID)
 endif()
 
 set (plugins_single_header
+  # ModelScalePlugin
   ActorPlugin
   ActuatorPlugin
   AmbientOcclusionVisualPlugin
