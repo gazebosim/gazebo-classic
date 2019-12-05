@@ -1673,6 +1673,21 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     vm->mutable_scale()->set_y(_msg.scale().y());
     vm->mutable_scale()->set_z(_msg.scale().z());
     this->dataPtr->modelVisualMsgs.push_back(vm);
+
+    // TODO debugging
+    // ignition::math::Vector3d scale(_msg.scale().x(), _msg.scale().y(), _msg.scale().z());
+    // if (scale == ignition::math::Vector3d::One)
+    // {
+    //   boost::shared_ptr<msgs::Visual> vm2(new msgs::Visual);
+    //   if (_msg.has_id())
+    //     vm2->set_id(_msg.id());
+    //   if (_msg.has_name())
+    //     vm2->set_name(_msg.name());
+    //   vm2->mutable_scale()->set_x(5.0);
+    //   vm2->mutable_scale()->set_y(5.0);
+    //   vm2->mutable_scale()->set_z(5.0);
+    //   this->dataPtr->modelVisualMsgs.push_back(vm2);
+    // }
   }
 
   for (int j = 0; j < _msg.joint_size(); ++j)
