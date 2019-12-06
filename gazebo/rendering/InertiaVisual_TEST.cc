@@ -117,7 +117,7 @@ TEST_F(InertiaVisual_TEST, InertiaRotation)
 
   // expect bounding box of size 0.1 x 0.4 x 0.9
   const ignition::math::AxisAlignedBox box(-0.05, -0.2, -0.45,
-                                 0.05,  0.2,  0.45);
+                                            0.05,  0.2,  0.45);
   for (const auto name : inertiaVisualNames)
   {
     gzdbg << "Check bounding box for "
