@@ -43,6 +43,7 @@ set (sources
   Event.cc
   Events.cc
   Exception.cc
+  FuelModelDatabase.cc
   HeightmapData.cc
   Image.cc
   ImageHeightmap.cc
@@ -99,6 +100,7 @@ set (headers
   Event.hh
   Events.hh
   Exception.hh
+  FuelModelDatabase.hh
   MovingWindowFilter.hh
   HeightmapData.hh
   Image.hh
@@ -144,6 +146,7 @@ set (gtest_sources
   EnumIface_TEST.cc
   Exception_TEST.cc
   Event_TEST.cc
+  FuelModelDatabase_TEST.cc
   HeightmapData_TEST.cc
   Image_TEST.cc
   ImageHeightmap_TEST.cc
@@ -199,21 +202,6 @@ endif()
 
 set (headers_install ${headers})
 
-# Do not install fuel_tools headers.
-if (HAVE_IGNITION_FUEL_TOOLS)
-  set (headers ${headers}
-    FuelModelDatabase.hh
-  )
-
-  set (sources ${sources}
-    FuelModelDatabase.cc
-  )
-
-  set (gtest_sources ${gtest_sources}
-    FuelModelDatabase_TEST.cc
-  )
-endif()
-
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common ${tinyxml_LIBRARIES})
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
@@ -246,43 +234,46 @@ target_compile_definitions(gazebo_common
 )
 
 target_link_libraries(gazebo_common
-  ${IGNITION-MATH_LIBRARIES}
-  ${libdl_library}
-  ${libtool_library}
-  ${Boost_LIBRARIES}
-  ${freeimage_LIBRARIES}
-  ${tinyxml_LIBRARIES}
-  ${libavcodec_LIBRARIES}
-  ${libavformat_LIBRARIES}
-  ${libavutil_LIBRARIES}
-  ${libavdevice_LIBRARIES}
-  ${CURL_LIBRARIES}
-  ${libswscale_LIBRARIES}
-  ${libtar_LIBRARIES}
-  ${TBB_LIBRARIES}
-  ${SDFormat_LIBRARIES}
-  ${IGNITION-FUEL_TOOLS_LIBRARIES}
+  PUBLIC
+    ${Boost_LIBRARIES}
+    ${CURL_LIBRARIES}
+    ${freeimage_LIBRARIES}
+    ${IGNITION-COMMON_LIBRARIES}
+    ${IGNITION-FUEL_TOOLS_LIBRARIES}
+    ${IGNITION-MATH_LIBRARIES}
+    ${libtar_LIBRARIES}
+    ${SDFormat_LIBRARIES}
+    ${tinyxml_LIBRARIES}
+  PRIVATE
+    ${libdl_library}
+    ${libtool_library}
+    ${libavcodec_LIBRARIES}
+    ${libavformat_LIBRARIES}
+    ${libavutil_LIBRARIES}
+    ${libavdevice_LIBRARIES}
+    ${libswscale_LIBRARIES}
+    ${TBB_LIBRARIES}
 )
 
 if (UNIX)
-  target_link_libraries(gazebo_common pthread)
+  target_link_libraries(gazebo_common PRIVATE pthread)
 endif()
 
 if (UNIX AND NOT APPLE)
   # rt is used for clock_gettime, which is not available on apple or windows
-  target_link_libraries(gazebo_common rt)
+  target_link_libraries(gazebo_common PRIVATE rt)
 endif()
 
 if (HAVE_GTS)
-  target_link_libraries(gazebo_common ${gts_LIBRARIES})
+  target_link_libraries(gazebo_common PRIVATE ${gts_LIBRARIES})
 endif()
 
 if (HAVE_OPENAL)
-  target_link_libraries(gazebo_common ${OPENAL_LIBRARY})
+  target_link_libraries(gazebo_common PRIVATE ${OPENAL_LIBRARY})
 endif()
 
 if (HAVE_GDAL)
-  target_link_libraries(gazebo_common ${GDAL_LIBRARY})
+  target_link_libraries(gazebo_common PRIVATE ${GDAL_LIBRARY})
 endif()
 
 if (USE_PCH)

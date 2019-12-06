@@ -148,7 +148,9 @@ TEST_F(GzLog, RecordFilter)
     double simTime = std::stod(ns) / 1e9;
     EXPECT_GT(simTime, 0);
     if (prevSimTime >= 0)
+    {
       EXPECT_FLOAT_EQ(simTime - prevSimTime, period);
+    }
     prevSimTime = simTime;
 
     // verify model name - only models matching the filter string should exist

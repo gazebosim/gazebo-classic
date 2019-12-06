@@ -231,23 +231,23 @@ bool PhysicsEngine::SetParam(const std::string &_key,
       return false;
     }
     if (_key == "max_step_size")
-      this->SetMaxStepSize(boost::any_cast<double>(_value));
+      this->SetMaxStepSize(any_cast<double>(_value));
     else if (_key == "real_time_update_rate")
-      this->SetRealTimeUpdateRate(boost::any_cast<double>(_value));
+      this->SetRealTimeUpdateRate(any_cast<double>(_value));
     else if (_key == "real_time_factor")
-      this->SetTargetRealTimeFactor(boost::any_cast<double>(_value));
+      this->SetTargetRealTimeFactor(any_cast<double>(_value));
     else if (_key == "gravity")
     {
       boost::any copy = boost::lexical_cast<ignition::math::Vector3d>
-          (boost::any_cast<ignition::math::Vector3d>(_value));
-      this->SetGravity(boost::any_cast<ignition::math::Vector3d>(copy));
+          (any_cast<ignition::math::Vector3d>(_value));
+      this->SetGravity(any_cast<ignition::math::Vector3d>(copy));
     }
     else if (_key == "magnetic_field")
     {
       boost::any copy = boost::lexical_cast<ignition::math::Vector3d>
-          (boost::any_cast<ignition::math::Vector3d>(_value));
+          (any_cast<ignition::math::Vector3d>(_value));
       this->world->SetMagneticField(
-          boost::any_cast<ignition::math::Vector3d>(copy));
+          any_cast<ignition::math::Vector3d>(copy));
     }
     else
     {
@@ -256,15 +256,21 @@ bool PhysicsEngine::SetParam(const std::string &_key,
       return false;
     }
   }
+  catch(std::bad_any_cast &_e)
+  {
+    gzerr << "SetParam(" << _key << ") std::any_cast error: " << _e.what()
+          << std::endl;
+    return false;
+  }
   catch(boost::bad_any_cast &_e)
   {
-    gzerr << "Caught bad any_cast in PhysicsEngine::SetParam: " << _e.what()
+    gzerr << "SetParam(" << _key << ") boost::any_cast error: " << _e.what()
           << std::endl;
     return false;
   }
   catch(boost::bad_lexical_cast &_e)
   {
-    gzerr << "Caught bad lexical_cast in PhysicsEngine::SetParam: " << _e.what()
+    gzerr << "SetParam(" << _key << ") bad lexical_cast: " << _e.what()
           << std::endl;
     return false;
   }

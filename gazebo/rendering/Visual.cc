@@ -2416,15 +2416,31 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
 
       if (_mesh->HasSkeleton())
       {
-        common::Skeleton *skel = _mesh->GetSkeleton();
-        for (unsigned int j = 0; j < subMesh.GetNodeAssignmentsCount(); j++)
+        if (subMesh.GetNodeAssignmentsCount() > 0)
         {
-          common::NodeAssignment na = subMesh.GetNodeAssignment(j);
+          common::Skeleton *skel = _mesh->GetSkeleton();
+          for (unsigned int j = 0; j < subMesh.GetNodeAssignmentsCount(); j++)
+          {
+            common::NodeAssignment na = subMesh.GetNodeAssignment(j);
+            Ogre::VertexBoneAssignment vba;
+            vba.vertexIndex = na.vertexIndex;
+            vba.boneIndex = ogreSkeleton->getBone(skel->GetNodeByHandle(
+                                na.nodeIndex)->GetName())->getHandle();
+            vba.weight = na.weight;
+            ogreSubMesh->addBoneAssignment(vba);
+          }
+        }
+        else
+        {
+          // When there is a skeleton associated with the mesh,
+          // OGRE requires at least 1 bone assignment to compile the blend
+          // weights.
+          // The submeshs loaded from COLLADA may not have weights so we need
+          // to add a dummy bone assignment for OGRE.
           Ogre::VertexBoneAssignment vba;
-          vba.vertexIndex = na.vertexIndex;
-          vba.boneIndex = ogreSkeleton->getBone(skel->GetNodeByHandle(
-                              na.nodeIndex)->GetName())->getHandle();
-          vba.weight = na.weight;
+          vba.vertexIndex = 0;
+          vba.boneIndex = 0;
+          vba.weight = 0;
           ogreSubMesh->addBoneAssignment(vba);
         }
       }
@@ -2681,7 +2697,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
-    this->ProcessMaterialMsg(msgs::ConvertIgnMsg(_msg->material()));
+    this->ProcessMaterialMsg(_msg->material());
   }
 
   if (_msg->has_transparency())
@@ -3605,7 +3621,7 @@ void Visual::AddPendingChild(std::pair<VisualType,
 }
 
 /////////////////////////////////////////////////
-void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
+void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
 {
   if (_msg.has_lighting())
   {
@@ -3656,21 +3672,19 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
 
   if (_msg.has_shader_type())
   {
-    if (_msg.shader_type() == ignition::msgs::Material::VERTEX)
+    if (_msg.shader_type() == msgs::Material::VERTEX)
     {
       this->SetShaderType("vertex");
     }
-    else if (_msg.shader_type() == ignition::msgs::Material::PIXEL)
+    else if (_msg.shader_type() == msgs::Material::PIXEL)
     {
       this->SetShaderType("pixel");
     }
-    else if (_msg.shader_type() ==
-        ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_OBJECT_SPACE)
     {
       this->SetShaderType("normal_map_object_space");
     }
-    else if (_msg.shader_type() ==
-        ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_TANGENT_SPACE)
     {
       this->SetShaderType("normal_map_tangent_space");
     }
@@ -3680,8 +3694,83 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
     }
 
     if (_msg.has_normal_map())
+    {
       this->SetNormalMap(_msg.normal_map());
+    }
   }
+}
+
+/////////////////////////////////////////////////
+void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
+{
+  this->SetLighting(_msg.lighting());
+
+  if (_msg.has_script())
+  {
+    for (int i = 0; i < _msg.script().uri_size(); ++i)
+    {
+      RenderEngine::Instance()->AddResourcePath(
+          _msg.script().uri(i));
+    }
+    if (!_msg.script().name().empty())
+    {
+      this->SetMaterial(_msg.script().name());
+    }
+  }
+
+  if (_msg.has_ambient())
+  {
+    this->SetAmbient(ignition::math::Color(
+          _msg.ambient().r(), _msg.ambient().g(), _msg.ambient().b(),
+          _msg.ambient().a()));
+  }
+
+  if (_msg.has_diffuse())
+  {
+    this->SetDiffuse(ignition::math::Color(
+          _msg.diffuse().r(), _msg.diffuse().g(), _msg.diffuse().b(),
+          _msg.diffuse().a()));
+  }
+
+  if (_msg.has_specular())
+  {
+    this->SetSpecular(ignition::math::Color(
+          _msg.specular().r(), _msg.specular().g(), _msg.specular().b(),
+          _msg.specular().a()));
+  }
+
+  if (_msg.has_emissive())
+  {
+    this->SetEmissive(ignition::math::Color(
+          _msg.emissive().r(), _msg.emissive().g(), _msg.emissive().b(),
+          _msg.emissive().a()));
+  }
+
+  if (_msg.shader_type() == ignition::msgs::Material::VERTEX)
+  {
+    this->SetShaderType("vertex");
+  }
+  else if (_msg.shader_type() == ignition::msgs::Material::PIXEL)
+  {
+    this->SetShaderType("pixel");
+  }
+  else if (_msg.shader_type() ==
+      ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+  {
+    this->SetShaderType("normal_map_object_space");
+  }
+  else if (_msg.shader_type() ==
+      ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+  {
+    this->SetShaderType("normal_map_tangent_space");
+  }
+  else
+  {
+    gzerr << "Unrecognized shader type" << std::endl;
+  }
+
+  if (!_msg.normal_map().empty())
+    this->SetNormalMap(_msg.normal_map());
 }
 
 /////////////////////////////////////////////////

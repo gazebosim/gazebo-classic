@@ -50,7 +50,9 @@ namespace gazebo
       /// \return The name of the preset profile.
       public: std::string Name() const;
 
-      /// \brief Get a profile parameter.
+      /// \brief Get a profile parameter. If the profile was generated
+      /// from SDF, the boost::any may contain a std::any, in which case
+      /// the PhysicsEngine::any_cast helper function can be used.
       /// \param[in] _key The key of the parameter to retrieve.
       /// \param[out] _value The parameter value at the input key.
       /// \return True if the parameter exists in the map, false otherwise.
@@ -135,6 +137,9 @@ namespace gazebo
           const std::string &_key, const boost::any &_value);
 
       /// \brief Get a parameter for a certain profile.
+      /// If the profile was generated from SDF, the boost::any
+      /// may contain a std::any, in which case the
+      /// PhysicsEngine::any_cast helper function can be used.
       /// \param[in] _name The name of the accessed profile.
       /// \param[in] _key The key of the accessed parameter.
       /// \param[out] _value The value of the accessed parameter.
@@ -150,6 +155,9 @@ namespace gazebo
           const boost::any &_value);
 
       /// \brief Get a parameter for the current profile.
+      /// If the profile was generated from SDF, the boost::any
+      /// may contain a std::any, in which case the
+      /// PhysicsEngine::any_cast helper function can be used.
       /// \param[in] _key The key of the accessed parameter.
       /// \param[out] _value The value of the accessed parameter.
       /// \return True if the parameter existed in profile "_name".

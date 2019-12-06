@@ -229,10 +229,12 @@ TEST_F(PresetManagerTest, SDF)
     {
       EXPECT_TRUE(presetManager->GetCurrentProfileParam("max_step_size",
           value));
-      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), 0.03);
+      EXPECT_DOUBLE_EQ(0.03,
+          physics::PhysicsEngine::any_cast<double>(value));
       EXPECT_TRUE(presetManager->GetCurrentProfileParam("min_step_size",
           value));
-      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), 0.003);
+      EXPECT_DOUBLE_EQ(0.003,
+          physics::PhysicsEngine::any_cast<double>(value));
     }
     catch(boost::bad_any_cast &_e)
     {

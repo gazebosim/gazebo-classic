@@ -67,9 +67,11 @@ namespace gazebo
     /// \param[in] _box World axis-aligned box.
     /// \param[in] _pose Pose of the model representing the box region.
     /// \return True if the point is inside the region
-    private: bool PointInRegion(const ignition::math::Vector3d &_point,
-                                const ignition::math::AxisAlignedBox &_box,
-                                const ignition::math::Pose3d &_pose) const;
+    private: bool PointInRegion(
+        const ignition::math::Vector3d &_point,
+        const ignition::math::AxisAlignedBox &_box,
+        const ignition::math::Pose3d &_pose)
+        const;
 
     /// \brief Update box region dimensions and pose.
     /// \param[in] _size New size

@@ -651,7 +651,7 @@ bool JointCommand::RunImpl()
     return false;
   }
 
-  ignition::msgs::JointCmd msg;
+  gazebo::msgs::JointCmd msg;
   msg.set_name(modelName + "::" + jointName);
 
   if (this->vm.count("force"))
@@ -688,7 +688,7 @@ bool JointCommand::RunImpl()
   std::string topic = std::string("/") + modelName + "/joint_cmd";
 
   ignition::transport::Node ignNode;
-  auto pub = ignNode.Advertise<ignition::msgs::JointCmd>(topic);
+  auto pub = ignNode.Advertise<gazebo::msgs::JointCmd>(topic);
 
   unsigned int maxSleep = 30;
   unsigned int sleep = 0;

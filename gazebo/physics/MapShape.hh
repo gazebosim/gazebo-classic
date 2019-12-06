@@ -175,7 +175,7 @@ namespace gazebo
               {
                 std::deque<QuadNode*>::iterator iter;
 
-                printf("%sXY[%d %d] WH[%d %d] O[%d] L[%d] V[%d]\n",
+                printf("%sXY[%u %u] WH[%u %u] O[%d] L[%d] V[%d]\n",
                     _space.c_str(), x, y, width, height, occupied, leaf, valid);
                 _space += "  ";
                 for (iter = children.begin(); iter != children.end(); ++iter)

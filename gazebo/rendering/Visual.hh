@@ -683,7 +683,17 @@ namespace gazebo
                         const std::string &_name, ScenePtr _scene,
                         bool _useRTShader = true);
 
+      /// \brief Process a gazebo material message, which uses proto2
+      /// syntax that allows unset fields to be ignored, which is the
+      /// legacy behavior for gazebo10 and earlier.
+      /// \param[in] _msg The ignition material message.
+      protected: void ProcessMaterialMsg(const msgs::Material &_msg);
+
       /// \brief Process a material message.
+      /// Note that ignition msgs4 uses proto3 syntax, which does not
+      /// distinguish between unset fields and fields with a default value,
+      /// default values will be used for any fields not explicitly set when
+      /// using this function.
       /// \param[in] _msg The ignition material message.
       protected: void ProcessMaterialMsg(const ignition::msgs::Material &_msg);
 

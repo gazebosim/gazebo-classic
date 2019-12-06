@@ -63,20 +63,11 @@ else
 fi
 
 SUPPRESS=/tmp/gazebo_cpp_check.suppress
+echo > $SUPPRESS
 # (warning) Redundant code: Found a statement that begins with string constant.
-echo "*:gazebo/common/SVGLoader.cc:869" > $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 # STOP: before use this suppress list please consider to use inline
 # cppcheck-suppress comments
-
-# Not defined FREEIMAGE_COLORORDER
-echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
-
-# Disable noExplicitConstructor warnings in gazebo7 release series
-# (release expected in 01/25/2017) relaxed to 31/01/2015
-if [ $CPPCHECK_GE_169 -eq 1 ] && [ `date '+%Y%m%d'` -lt 20170131 ]; then
-  echo "noExplicitConstructor" >> $SUPPRESS
-fi
 
 #cppcheck.
 # MAKE_JOBS is used in jenkins. If not set or run manually, default to 1

@@ -190,7 +190,7 @@ void JointController::Update()
 
 /////////////////////////////////////////////////
 bool JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
-    ignition::msgs::JointCmd &_rep)
+    gazebo::msgs::JointCmd &_rep)
 {
   const std::string &jointName = _req.data();
   _rep.set_name(jointName);
@@ -239,7 +239,7 @@ bool JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
 }
 
 /////////////////////////////////////////////////
-void JointController::OnJointCommand(const ignition::msgs::JointCmd &_msg)
+void JointController::OnJointCommand(const gazebo::msgs::JointCmd &_msg)
 {
   std::map<std::string, JointPtr>::iterator iter;
   iter = this->dataPtr->joints.find(_msg.name());

@@ -855,9 +855,9 @@ VisualPtr Scene::VisualAt(CameraPtr _camera,
         _mod = Ogre::any_cast<std::string>(
             closestEntity->getUserObjectBindings().getUserAny());
       }
-      catch(boost::bad_any_cast &e)
+      catch(Ogre::Exception &e)
       {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
+        gzerr << "Ogre any_cast error:" << e.what() << "\n";
       }
     }
 
@@ -866,9 +866,9 @@ VisualPtr Scene::VisualAt(CameraPtr _camera,
       visual = this->GetVisual(Ogre::any_cast<std::string>(
             closestEntity->getUserObjectBindings().getUserAny()));
     }
-    catch(boost::bad_any_cast &e)
+    catch(Ogre::Exception &e)
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      gzerr << "Ogre any_cast error:" << e.what() << "\n";
     }
   }
 
@@ -1020,9 +1020,9 @@ void Scene::VisualsBelowPoint(const ignition::math::Vector3d &_pt,
           if (v)
             _visuals.push_back(v);
         }
-        catch(boost::bad_any_cast &e)
+        catch(Ogre::Exception &e)
         {
-          gzerr << "boost any_cast error:" << e.what() << "\n";
+          gzerr << "Ogre any_cast error:" << e.what() << "\n";
         }
       }
     }
@@ -1044,9 +1044,9 @@ VisualPtr Scene::VisualAt(CameraPtr _camera,
       visual = this->GetVisual(Ogre::any_cast<std::string>(
             closestEntity->getUserObjectBindings().getUserAny()));
     }
-    catch(boost::bad_any_cast &e)
+    catch(Ogre::Exception &e)
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      gzerr << "Ogre any_cast error:" << e.what() << "\n";
     }
   }
 

@@ -559,7 +559,9 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
       for (int row = 0; row < 3; ++row)
         for (int col = 0; col < 3; ++col)
           if (row != col)
+          {
             EXPECT_NEAR(inertia(row, col), 0.0, g_tolerance);
+          }
     }
     else
     {
