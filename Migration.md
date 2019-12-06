@@ -9,7 +9,7 @@ release will remove the deprecated code.
 
 ### Build system
 
-New versions in mandatory dependencies: `ign-transport7`, `ign-msgs4`, `ign-math6`, `sdformat8`.
+New versions in mandatory dependencies: `ign-transport7`, `ign-msgs4`, `ign-math6`, `sdformat9`.
 New mandatory dependencies: `ign-fuel-tools3`, `ign-common3`.
 
 ### Additions
