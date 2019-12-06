@@ -583,12 +583,12 @@ endif ()
 
 ########################################
 # Find SDFormat
-find_package(sdformat8 REQUIRED)
-if (sdformat8_FOUND)
-  message (STATUS "Looking for SDFormat8  - found")
+find_package(sdformat9 REQUIRED)
+if (sdformat9_FOUND)
+  message (STATUS "Looking for SDFormat9  - found")
 else ()
-  message (STATUS "Looking for SDFormat8 - not found")
-  BUILD_ERROR ("Missing: SDF version >=8. Required for reading and writing SDF files.")
+  message (STATUS "Looking for SDFormat9 - not found")
+  BUILD_ERROR ("Missing: SDF version >=9. Required for reading and writing SDF files.")
 endif()
 
 ########################################
