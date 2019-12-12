@@ -239,7 +239,7 @@ endif()
 # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
 if (MSVC)
   # Default Windows-MSVC.cmake sets MSVC warning flag to /W3. Add some extra warning excludes.
-  set(WARN_LEVEL "/wd4005 /wd4068 /wd4244 /wd4267 /wd4996 /wd4251")
+  set(WARN_LEVEL "/wd4005 /wd4068 /wd4244 /wd4267 /wd4996")
 else()
   set(WARN_LEVEL "-Wall")
 endif()
