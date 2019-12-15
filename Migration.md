@@ -9,8 +9,8 @@ release will remove the deprecated code.
 
 ### Build system
 
-New versions in mandatory dependencies: `ign-transport7`, `ign-msgs4`, `ign-math6`, `sdformat9`.
-New mandatory dependencies: `ign-fuel-tools3`, `ign-common3`.
+New versions in mandatory dependencies: `ign-transport8`, `ign-msgs5`, `ign-math6`, `sdformat9`.
+New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`.
 
 ### Modifications
 
@@ -19,14 +19,14 @@ New mandatory dependencies: `ign-fuel-tools3`, `ign-common3`.
 
 1. **gazebo/physics/JointController.hh**
    Use `gazebo::msgs::JointCmd` instead of `ignition::msgs::JointCmd` in the
-   since the ign-msgs4 proto file uses `proto3`, which doesn't allow optional
+   since the ign-msgs5 proto file uses `proto3`, which doesn't allow optional
    fields and breaks existing functionality.
 
 1. **gazebo/rendering/MarkerManager.cc**
     The `/marker` ignition transport service allows specifying the `id` field
     of a marker to be created. If the `id` field is not specified, a random,
     valid `id` is generated as a convenience for the user.
-    Due to the upgrade to `ign-msgs4`, which uses `proto3` syntax, an `id`
+    Due to the upgrade to `ign-msgs5`, which uses `proto3` syntax, an `id`
     of `0` is indistinguishable from an unset `id`.
     As such, an `id` of `0` will now trigger a random `id` to be generated,
     and non-zero `id` values should be used instead.
