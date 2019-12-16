@@ -2652,11 +2652,7 @@ void World::ProcessMessages()
             // Publish the model's scale
             msgs::Model msg;
             m->FillMsg(msg);
-            // msg.set_name(m->GetScopedName());
-            // msg.set_id(m->GetId());
             msgs::Set(msg.mutable_scale(), m->Scale());
-
-            // Not publishing for links for now
 
             // add all nested models to the queue
             Model_V models = m->NestedModels();
