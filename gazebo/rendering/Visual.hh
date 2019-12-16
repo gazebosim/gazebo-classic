@@ -690,7 +690,7 @@ namespace gazebo
       protected: void ProcessMaterialMsg(const msgs::Material &_msg);
 
       /// \brief Process a material message.
-      /// Note that ignition msgs4 uses proto3 syntax, which does not
+      /// Note that ignition msgs5+ uses proto3 syntax, which does not
       /// distinguish between unset fields and fields with a default value,
       /// default values will be used for any fields not explicitly set when
       /// using this function.
