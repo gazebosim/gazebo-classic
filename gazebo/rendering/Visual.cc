@@ -2628,21 +2628,6 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     this->MakeStatic();
     */
 
-  /////////////////////////////////////////////////
-  /// Debugging scale issue
-  if (this->dataPtr->scene->EnableVisualizations())
-  {
-    std::string s = _msg->name();
-    std::transform(s.begin(), s.end(), s.begin(),
-                   [](unsigned char c){ return std::tolower(c); });
-    if (s.find("earth") != std::string::npos)
-    {
-      std::cerr << " ======== " <<  std::endl;
-      std::cerr << _msg->DebugString() << std::endl;
-    }
-  }
-  /////////////////////////////////////////////////
-
   // Set meta information
   if (_msg->has_meta())
   {
