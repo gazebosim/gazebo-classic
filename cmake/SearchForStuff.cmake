@@ -705,7 +705,7 @@ endif ()
 
 ########################################
 # Find ignition msgs
-find_package(ignition-msgs5 QUIET)
+find_package(ignition-msgs5 5.1 QUIET)
 if (NOT ignition-msgs5_FOUND)
   message(STATUS "Looking for ignition-msgs5-config.cmake - not found")
   BUILD_ERROR ("Missing: Ignition msgs5 library (libignition-msgs5-dev).")
