@@ -200,10 +200,9 @@ set (gtest_sources_dri
 gz_build_dri_tests(${gtest_sources_dri}
   EXTRA_LIBS gazebo_rendering gazebo_test_fixture)
 
-set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
+set (rendering_headers "")
 foreach (hdr ${headers})
-  APPEND_TO_CACHED_STRING(rendering_headers
-    "Rendering Headers" "#include \"gazebo/rendering/${hdr}\"\n")
+  set (rendering_headers "${rendering_headers}#include \"gazebo/rendering/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
