@@ -246,8 +246,10 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
 
       msg.set_width(this->camera->ImageWidth());
       msg.set_height(this->camera->ImageHeight());
-      msg.set_pixel_format(common::Image::ConvertPixelFormat(
-            this->camera->ImageFormat()));
+      // TODO convert from gazebo::common::Image::PixelFormat to
+      // ignition::common::Image::PixelFormatType and re-enable this code
+      // msg.set_pixel_format(common::Image::ConvertPixelFormat(
+      //       this->camera->ImageFormat()));
 
       msg.set_step(this->camera->ImageWidth() *
           this->camera->ImageDepth());

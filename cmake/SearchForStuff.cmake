@@ -705,15 +705,15 @@ endif ()
 
 ########################################
 # Find ignition msgs
-find_package(ignition-msgs4 4.5 QUIET)
-if (NOT ignition-msgs4_FOUND)
-  message(STATUS "Looking for ignition-msgs4-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition msgs4 library (libignition-msgs4-dev).")
+find_package(ignition-msgs5 QUIET)
+if (NOT ignition-msgs5_FOUND)
+  message(STATUS "Looking for ignition-msgs5-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition msgs5 library (libignition-msgs5-dev).")
 else()
-  message(STATUS "Looking for ignition-msgs4-config.cmake - found")
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ignition-msgs4_CXX_FLAGS}")
-  include_directories(${ignition-msgs4_INCLUDE_DIRS})
-  link_directories(${ignition-msgs4_LIBRARY_DIRS})
+  message(STATUS "Looking for ignition-msgs5-config.cmake - found")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ignition-msgs5_CXX_FLAGS}")
+  include_directories(${ignition-msgs5_INCLUDE_DIRS})
+  link_directories(${ignition-msgs5_LIBRARY_DIRS})
 endif()
 
 ########################################
@@ -731,29 +731,29 @@ endif()
 
 ########################################
 # Find the Ignition_Transport library
-find_package(ignition-transport7 QUIET)
-if (NOT ignition-transport7_FOUND)
-  message(STATUS "Looking for ignition-transport7 - not found")
-  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport7-dev)")
+find_package(ignition-transport8 QUIET)
+if (NOT ignition-transport8_FOUND)
+  message(STATUS "Looking for ignition-transport8 - not found")
+  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport8-dev)")
 else()
-  message(STATUS "Looking for ignition-transport7-config.cmake - found")
+  message(STATUS "Looking for ignition-transport8-config.cmake - found")
 
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ignition-transport7_CXX_FLAGS}")
-  include_directories(${ignition-transport7_INCLUDE_DIRS})
-  link_directories(${ignition-transport7_LIBRARY_DIRS})
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ignition-transport8_CXX_FLAGS}")
+  include_directories(${ignition-transport8_INCLUDE_DIRS})
+  link_directories(${ignition-transport8_LIBRARY_DIRS})
 endif()
 
 ################################################################################
 # Find the Ignition Fuel Tools library
-find_package(ignition-fuel_tools3 QUIET)
-if (NOT ignition-fuel_tools3_FOUND)
-  message (STATUS "Looking for libignition-fuel_tools3 - not found")
-  BUILD_ERROR ("Missing: Ignition Fuel Tools (libignition-fuel-tools3-dev")
+find_package(ignition-fuel_tools4 QUIET)
+if (NOT ignition-fuel_tools4_FOUND)
+  message (STATUS "Looking for libignition-fuel_tools4 - not found")
+  BUILD_ERROR ("Missing: Ignition Fuel Tools (libignition-fuel-tools4-dev")
 else()
-  message (STATUS "Looking for libignition-fuel_tools3 - found")
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ignition-fuel_tools3_CXX_FLAGS}")
-  include_directories(${ignition-fuel_tools3_INCLUDE_DIRS})
-  link_directories(${ignition-fuel_tools3_LIBRARY_DIRS})
+  message (STATUS "Looking for libignition-fuel_tools4 - found")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ignition-fuel_tools4_CXX_FLAGS}")
+  include_directories(${ignition-fuel_tools4_INCLUDE_DIRS})
+  link_directories(${ignition-fuel_tools4_LIBRARY_DIRS})
 endif()
 
 ################################################################################

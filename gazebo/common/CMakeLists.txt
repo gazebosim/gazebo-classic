@@ -241,11 +241,11 @@ target_link_libraries(gazebo_common
     ${IGNITION-COMMON_LIBRARIES}
     ${IGNITION-FUEL_TOOLS_LIBRARIES}
     ${IGNITION-MATH_LIBRARIES}
+    ${libdl_library}
     ${libtar_LIBRARIES}
     ${SDFormat_LIBRARIES}
     ${tinyxml_LIBRARIES}
   PRIVATE
-    ${libdl_library}
     ${libtool_library}
     ${libavcodec_LIBRARIES}
     ${libavformat_LIBRARIES}
