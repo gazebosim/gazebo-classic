@@ -45,7 +45,7 @@ namespace gazebo
   //
   // - Vertical amplitude:
   //      Noise proportionnal to wind magnitude.
-  class GAZEBO_VISIBLE WindPlugin : public WorldPlugin
+  class GZ_PLUGIN_VISIBLE WindPlugin : public WorldPlugin
   {
     /// \brief Constructor.
     public: WindPlugin();

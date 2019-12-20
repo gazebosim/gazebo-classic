@@ -120,8 +120,8 @@ void ContactVisual::Update()
       dPtr->points[c]->normal->SetPoint(1, (normal*normalScale));
       dPtr->points[c]->depth->SetPoint(1, (normal*-depth*10));
 
-      dPtr->points[c]->normal->setMaterial("Gazebo/LightOn");
-      dPtr->points[c]->depth->setMaterial("Gazebo/LightOff");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->points[c]->normal, "Gazebo/LightOn");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->points[c]->depth, "Gazebo/LightOff");
       dPtr->points[c]->depth->Update();
       dPtr->points[c]->normal->Update();
       c++;
