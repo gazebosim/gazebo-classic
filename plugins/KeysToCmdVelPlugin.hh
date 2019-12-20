@@ -61,7 +61,7 @@ namespace gazebo
   ///                 the (repeatable) subelements <stop>, <accelerate>,
   ///                 <decelerate>, <left> and <right> containing the keycodes.
 
-class GAZEBO_VISIBLE KeysToCmdVelPlugin : public ModelPlugin
+class GZ_PLUGIN_VISIBLE KeysToCmdVelPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: KeysToCmdVelPlugin();

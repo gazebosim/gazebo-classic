@@ -216,10 +216,9 @@ endif()
 
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common ${tinyxml_LIBRARIES})
 
-set (common_headers "" CACHE INTERNAL "common headers" FORCE)
+set (common_headers "")
 foreach (hdr ${headers_install})
-  APPEND_TO_CACHED_STRING(common_headers
-    "Common Headers" "#include \"gazebo/common/${hdr}\"\n")
+  set (common_headers "${common_headers}#include \"gazebo/common/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_DIR}/common.hh )
 

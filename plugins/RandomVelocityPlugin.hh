@@ -64,7 +64,7 @@ namespace gazebo
   /// \endverbatim
   ///
   /// See worlds/random_velocity.world for a complete example.
-  class GAZEBO_VISIBLE RandomVelocityPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE RandomVelocityPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: RandomVelocityPlugin();

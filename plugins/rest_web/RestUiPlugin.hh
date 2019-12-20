@@ -31,7 +31,7 @@ namespace gazebo
 {
   /// \class RestUiPlugin RestUiPlugin.hh RestUiPlugin.hh
   /// \brief REST user interface plugin
-  class GAZEBO_VISIBLE RestUiPlugin : public SystemPlugin
+  class GZ_PLUGIN_VISIBLE RestUiPlugin : public SystemPlugin
   {
     /// \brief Constructor
     public: RestUiPlugin();

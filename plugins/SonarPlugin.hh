@@ -26,7 +26,7 @@
 namespace gazebo
 {
   /// \brief A sonar sensor plugin
-  class GAZEBO_VISIBLE SonarPlugin : public SensorPlugin
+  class GZ_PLUGIN_VISIBLE SonarPlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: SonarPlugin();

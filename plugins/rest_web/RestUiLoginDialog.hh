@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class RestUiLoginDialog RestUiLoginDialog.hh RestUiLoginDialog.hh
     /// \brief Provides a means to login to a webservice
-    class GAZEBO_VISIBLE RestUiLoginDialog : public QDialog
+    class GZ_PLUGIN_VISIBLE RestUiLoginDialog : public QDialog
     {
       Q_OBJECT
 

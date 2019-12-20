@@ -1092,7 +1092,8 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
         Ogre::SimpleRenderable *simpleRenderable =
             dynamic_cast<Ogre::SimpleRenderable *>(obj);
         if (simpleRenderable)
-          simpleRenderable->setMaterial(this->dataPtr->myMaterialName);
+          GZ_OGRE_SET_MATERIAL_BY_NAME(simpleRenderable,
+              this->dataPtr->myMaterialName);
       }
     }
   }
@@ -2189,7 +2190,11 @@ void Visual::BoundsHelper(Ogre::SceneNode *_node,
         transform[3][0] = transform[3][1] = transform[3][2] = 0;
         transform[3][3] = 1;
         // get oriented bounding box in object's local space
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+        bb.transform(transform);
+#else
         bb.transformAffine(transform);
+#endif
 
         min = Conversions::ConvertIgn(bb.getMinimum());
         max = Conversions::ConvertIgn(bb.getMaximum());
