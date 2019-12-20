@@ -27,7 +27,7 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE ActorPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE ActorPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: ActorPlugin();

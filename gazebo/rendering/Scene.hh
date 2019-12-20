@@ -25,6 +25,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <OGRE/OgrePrerequisites.h>
+
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Color.hh>
@@ -42,16 +44,6 @@
 namespace SkyX
 {
   class SkyX;
-}
-
-namespace Ogre
-{
-  class SceneManager;
-  class Node;
-  class Entity;
-  class Mesh;
-  class Vector3;
-  class Quaternion;
 }
 
 namespace gazebo

@@ -17,11 +17,27 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Don't pass GCC linker options to Visual Studio linker.
+    * [Pull request 3141](https://bitbucket.org/osrf/gazebo/pull-request/3141)
+
+1. Fix CMake 3.14 regression in `MSVC`/`PKG_CONFIG_FOUND` workaround.
+    * [Pull request 3125](https://bitbucket.org/osrf/gazebo/pull-request/3125)
+
+1. Allow multiple instances of SimpleTrackedVehiclePlugin.
+    * [Pull request 3140](https://bitbucket.org/osrf/gazebo/pull-request/3140)
+
+1. ODEBallJoint: reduce console output.
+    * [Pull request 3132](https://bitbucket.org/osrf/gazebo/pull-request/3132)
+
 1. Fix moving model files in StaticMapPlugin
     * [Pull request 3123](https://bitbucket.org/osrf/gazebo/pull-request/3123)
 
 1. Fix crash when loading submesh with no bone assignments.
     * [Pull request 3122](https://bitbucket.org/osrf/gazebo/pull-request/3122)
+
+1. Fix cmake warnings about multi-line strings.
+    * [Pull request 3138](https://bitbucket.org/osrf/gazebo/pull-request/3138)
+    * [Issue #2664](https://bitbucket.org/osrf/gazebo/issues/2664)
 
 1. MeshManager: add .stlb file extension support
     * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
@@ -50,6 +66,7 @@
 
 1. Fix build with DART 6.9, using 32-bit float for dart heightmap scale.
     * [Pull request 3106](https://bitbucket.org/osrf/gazebo/pull-request/3106)
+    * [Pull request 3107](https://bitbucket.org/osrf/gazebo/pull-request/3107)
 
 1. Fix kinematic loops for DART 6.8, reverting to dart 6.7 behavior
     * [Pull request 3101](https://bitbucket.org/osrf/gazebo/pull-request/3101)
@@ -70,15 +87,37 @@
     * [Pull request 2652](https://bitbucket.org/osrf/gazebo/pull-request/2652)
     * [Issue #863](https://bitbucket.org/osrf/gazebo/issues/863)
 
+1. Fix windows plugin visibility.
+    * [Pull request 3072](https://bitbucket.org/osrf/gazebo/pull-request/3072)
+
 1. Fix loading sdf with orthographic projection camera
     * [Pull request 3098](https://bitbucket.org/osrf/gazebo/pull-request/3098)
+
+1. Avoid windows macro `DELETE` conflict with `ignition::fuel_tools::REST::DELETE`.
+    * [Pull request 3143](https://bitbucket.org/osrf/gazebo/pull-request/3143)
+
+2. Fixes for finding OGRE with CMake config files.
+    * [Pull request 3126](https://bitbucket.org/osrf/gazebo/pull-request/3126)
 
 1. Fix missing link of ignition-common in `gazebo_common`
     * [Pull request 3127](https://bitbucket.org/osrf/gazebo/pull-request/3127)
 
+1. Find TBB in cmake config files.
+    * [Pull request 3135](https://bitbucket.org/osrf/gazebo/pull-request/3135)
+
+1. Fix texture loading on OGRE 1.11, 1.12.
+    * [Pull request 3150](https://bitbucket.org/osrf/gazebo/pull-request/3150)
+
+1. Fix linking of opende with `HAVE_BULLET`.
+    * [Pull request 3151](https://bitbucket.org/osrf/gazebo/pull-request/3151)
+
+1. Allow gazebo rendering to compile with Ogre 1.11 / 1.12
+    * [Pull request 3129](https://bitbucket.org/osrf/gazebo/pull-request/3129)
+
 1. Fix compilation against Ogre compiled in debug mode
     * [Pull request 3131](https://bitbucket.org/osrf/gazebo/pull-request/3131)
     * [Pull request 3134](https://bitbucket.org/osrf/gazebo/pull-request/3134)
+    * [Pull request 3142](https://bitbucket.org/osrf/gazebo/pull-request/3142)
 
 
 ## Gazebo 10.1.0 (2019-03-28)
@@ -185,11 +224,27 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Don't pass GCC linker options to Visual Studio linker.
+    * [Pull request 3153](https://bitbucket.org/osrf/gazebo/pull-request/3153)
+
+1. Fix CMake 3.14 regression in `MSVC`/`PKG_CONFIG_FOUND` workaround.
+    * [Pull request 3152](https://bitbucket.org/osrf/gazebo/pull-request/3152)
+
+1. Allow multiple instances of SimpleTrackedVehiclePlugin.
+    * [Pull request 3140](https://bitbucket.org/osrf/gazebo/pull-request/3140)
+
+1. ODEBallJoint: reduce console output.
+    * [Pull request 3132](https://bitbucket.org/osrf/gazebo/pull-request/3132)
+
 1. Fix moving model files in StaticMapPlugin
     * [Pull request 3123](https://bitbucket.org/osrf/gazebo/pull-request/3123)
 
 1. Fix crash when loading submesh with no bone assignments.
     * [Pull request 3122](https://bitbucket.org/osrf/gazebo/pull-request/3122)
+
+1. Fix cmake warnings about multi-line strings.
+    * [Pull request 3138](https://bitbucket.org/osrf/gazebo/pull-request/3138)
+    * [Issue #2664](https://bitbucket.org/osrf/gazebo/issues/2664)
 
 1. MeshManager: add .stlb file extension support
     * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)

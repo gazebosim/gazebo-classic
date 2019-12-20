@@ -26,7 +26,7 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE InitialVelocityPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE InitialVelocityPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: InitialVelocityPlugin();

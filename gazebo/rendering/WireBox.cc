@@ -28,7 +28,7 @@ WireBox::WireBox(VisualPtr _parent, const ignition::math::AxisAlignedBox &_box)
 {
   this->dataPtr->parent = _parent;
   this->dataPtr->lines = new DynamicLines(RENDERING_LINE_LIST);
-  this->dataPtr->lines->setMaterial("BaseWhiteNoLighting");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(this->dataPtr->lines, "BaseWhiteNoLighting");
   this->dataPtr->parent->AttachObject(this->dataPtr->lines);
   this->dataPtr->lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
 

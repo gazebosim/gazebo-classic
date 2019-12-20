@@ -57,7 +57,7 @@ namespace gazebo
   ///
   ///  </plugin>
   ///
-  class GAZEBO_VISIBLE MisalignmentPlugin : public WorldPlugin
+  class GZ_PLUGIN_VISIBLE MisalignmentPlugin : public WorldPlugin
   {
     // Documentation inherited
     public: MisalignmentPlugin();
