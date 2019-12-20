@@ -26,7 +26,7 @@
 
 #ifdef HAVE_IGNITION_FUEL_TOOLS
   #ifdef _WIN32
-    // DELETE is defined in winnt.h and causes a problem with 
+    // DELETE is defined in winnt.h and causes a problem with
     // ignition::fuel_tools::REST::DELETE
     #undef DELETE
   #endif

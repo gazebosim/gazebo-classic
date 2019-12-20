@@ -95,7 +95,12 @@ double ODEBallJoint::GetVelocity(unsigned int /*_index*/) const
 //////////////////////////////////////////////////
 double ODEBallJoint::PositionImpl(const unsigned int /*_index*/) const
 {
-  gzerr << "ODEBallJoint::PositionImpl not implemented" << std::endl;
+  static bool notPrintedYet = true;
+  if (notPrintedYet)
+  {
+    notPrintedYet = false;
+    gzerr << "ODEBallJoint::PositionImpl not implemented" << std::endl;
+  }
   return ignition::math::NAN_D;
 }
 
