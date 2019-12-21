@@ -34,7 +34,7 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE ArrangePlugin : public WorldPlugin
+  class GZ_PLUGIN_VISIBLE ArrangePlugin : public WorldPlugin
   {
     /// \brief Constructor.
     public: ArrangePlugin();

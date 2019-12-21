@@ -419,12 +419,19 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
     for (; it != itEnd; ++it)
     {
       struct stat st;
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+      if (stat((*it).archive->getName().c_str(), &st) == 0)
+      {
+        if ((*it).archive->getName().find("rtshaderlib") != Ogre::String::npos)
+        {
+          coreLibsPath = (*it).archive->getName() + "/";
+#else
       if (stat((*it)->archive->getName().c_str(), &st) == 0)
       {
         if ((*it)->archive->getName().find("rtshaderlib") != Ogre::String::npos)
         {
           coreLibsPath = (*it)->archive->getName() + "/";
-
+#endif
           // setup patch name for rt shader cache in tmp
           char *tmpdir;
           char *user;
@@ -562,7 +569,12 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // OGRE samples. They should be compared and tested.
   // Set up caster material - this is just a standard depth/shadow map caster
   // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+  sceneMgr->setShadowTextureCasterMaterial(
+      Ogre::MaterialManager::getSingleton().getByName("Gazebo/shadow_caster"));
+#else
   sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
+#endif
 
   // Disable fog on the caster pass.
   //  Ogre::MaterialPtr passCaterMaterial =
