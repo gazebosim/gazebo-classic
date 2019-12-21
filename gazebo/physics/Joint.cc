@@ -1340,7 +1340,7 @@ double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
 ignition::math::Pose3d Joint::SDFPoseRelativeToParent() const
 {
   ignition::math::Pose3d sdfPose;
-  this->jointSDFDom->ResolvePose(this->GetChild()->GetName(), sdfPose);
+  this->jointSDFDom->SemanticPose().Resolve(sdfPose);
   return sdfPose;
 }
 

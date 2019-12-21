@@ -1528,7 +1528,7 @@ void Link::UpdateVisualMsg()
           visualElem->Get<std::string>("name"));
 
       ignition::math::Pose3d resolvedPose;
-      visualDom->ResolvePose(resolvedPose);
+      visualDom->SemanticPose().Resolve(resolvedPose);
 
       msgs::Set(msg.mutable_pose(), resolvedPose);
 
@@ -1946,6 +1946,6 @@ const sdf::Link *Link::GetSDFDom() const
 ignition::math::Pose3d Link::SDFPoseRelativeToParent() const
 {
   ignition::math::Pose3d sdfPose;
-  this->dataPtr->linkSDFDom->ResolvePose(sdfPose);
+  this->dataPtr->linkSDFDom->SemanticPose().Resolve(sdfPose);
   return sdfPose;
 }

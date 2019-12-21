@@ -414,6 +414,6 @@ void Collision::SetWorldPoseDirty()
 ignition::math::Pose3d Collision::SDFPoseRelativeToParent() const
 {
   ignition::math::Pose3d sdfPose;
-  this->collisionSDFDom->ResolvePose(sdfPose);
+  this->collisionSDFDom->SemanticPose().Resolve(sdfPose);
   return sdfPose;
 }
