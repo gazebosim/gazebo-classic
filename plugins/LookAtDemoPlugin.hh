@@ -21,7 +21,10 @@
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
-#include <gazebo/transport/transport.hh>
+// moc parsing error of tbb headers
+#ifndef Q_MOC_RUN
+# include <gazebo/transport/transport.hh>
+#endif
 
 namespace gazebo
 {
