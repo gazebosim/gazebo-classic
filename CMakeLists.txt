@@ -379,26 +379,33 @@ else (build_errors)
   string (REPLACE ";" " -L" Boost_PKGCONFIG_LIBS "${Boost_PKGCONFIG_LIBS}")
 
   foreach (b ${Boost_LIBRARIES})
-    string(FIND ${b} "Boost::" b_target)
-    if (${b_target} EQUAL 0)
-      string(SUBSTRING ${b} 7 -1 bname_component)
-      set(bname "boost_${bname_component}")
+    if (TARGET ${b})
+      # it should be the following, but it doesn't seem to work
+      # set(bname "$<TARGET_LINKER_FILE_BASE_NAME:${b}>")
+      # TARGET_LINKER_FILE_NAME works though
+      set(bname "$<TARGET_LINKER_FILE_NAME:${b}>")
     else()
       get_filename_component(bname ${b} NAME_WE)
+      # Remove the prefix lib (not always present, like in pthread)
+      string (REPLACE "lib" "" bname "${bname}")
     endif()
     # Prefix -l if not already prefixed
     string(FIND ${bname} "-l" lprefix)
     if (NOT ${lprefix} EQUAL 0 )
       set (bname "-l${bname}")
     endif()
-    # Remove the prefix lib (not always present, like in pthread)
-    string (REPLACE "lib" "" bname "${bname}")
     set (Boost_PKGCONFIG_LIBS "${Boost_PKGCONFIG_LIBS} ${bname}")
   endforeach(b)
 
   foreach (pkgconfig ${pkgconfig_files})
-    configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
+    set(pkgconfig_input ${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in)
+    set(pkgconfig_configured ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc.configured)
+    set(pkgconfig_generated ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc)
+    configure_file(${pkgconfig_input} ${pkgconfig_configured} @ONLY)
+    file(GENERATE
+      OUTPUT ${pkgconfig_generated}
+      INPUT  ${pkgconfig_configured})
+    install(FILES ${pkgconfig_generated} DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
   endforeach()
 
   ########################################
