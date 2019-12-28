@@ -2,6 +2,10 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Fix compilation of plugins with tbb and qt 5.14.
+    * [Pull request 3164](https://bitbucket.org/osrf/gazebo/pull-request/3164)
+    * [Issue #2681](https://bitbucket.org/osrf/gazebo/issues/2681)
+
 1. Don't pass GCC linker options to Visual Studio linker.
     * [Pull request 3141](https://bitbucket.org/osrf/gazebo/pull-request/3141)
 
@@ -208,6 +212,10 @@
 ## Gazebo 9
 
 ## Gazebo 9.X.X (20XX-XX-XX)
+
+1. Fix compilation of plugins with tbb and qt 5.14.
+    * [Pull request 3164](https://bitbucket.org/osrf/gazebo/pull-request/3164)
+    * [Issue #2681](https://bitbucket.org/osrf/gazebo/issues/2681)
 
 1. Don't pass GCC linker options to Visual Studio linker.
     * [Pull request 3153](https://bitbucket.org/osrf/gazebo/pull-request/3153)
