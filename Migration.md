@@ -9,7 +9,7 @@ release will remove the deprecated code.
 
 ### Build system
 
-New versions in mandatory dependencies: `ign-transport8`, `ign-msgs5`, `ign-math6`, `sdformat8`.
+New versions in mandatory dependencies: `ign-transport8`, `ign-msgs5`, `ign-math6`, `sdformat9`.
 New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`.
 
 ### Additions
@@ -30,12 +30,12 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`.
 
 1. **gazebo/physics/PresetManager.hh**
    The PresetManager stores data internally with a map of `boost::any` values
-   and with the switch to sdformat8, the value may be stored as a `std::any`
+   and with the switch to sdformat9, the value may be stored as a `std::any`
    within a `boost::any`, making it more complex to cast to a specific type.
    This happens because the PresetManager stores the output of
    `sdf::Element::GetAny` as boost::any values in its parameterMap and
    calls `PhysicsEngine::SetParam` with these values.
-   Prior to libsdformat8, the GetAny function returned `boost::any`, but it now
+   Prior to libsdformat9, the GetAny function returned `boost::any`, but it now
    returns `std::any`. The `gazebo::physics::PhysicsEngine::any_cast` helper
    is provided to first check if a `boost::any` value contains a std::any,
    and if so, perform a `std::any_cast<T>`.
