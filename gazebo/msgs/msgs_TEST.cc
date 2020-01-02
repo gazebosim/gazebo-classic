@@ -2012,7 +2012,6 @@ TEST_F(MsgsTest, AxisFromSDF)
                <effort>2.2</effort>\
                <velocity>0.1</velocity>\
              </limit>\
-             <use_parent_model_frame>false</use_parent_model_frame>\
              <dynamics>\
                <damping>0.1</damping>\
                <friction>0.2</friction>\
@@ -2053,14 +2052,13 @@ TEST_F(MsgsTest, JointFromSDF)
            <parent>arm_base</parent>\
            <child>arm_shoulder</child>\
            <axis>\
-             <xyz>1 0 0</xyz>\
+             <xyz expressed_in='__model__'>1 0 0</xyz>\
              <limit>\
                <lower>0.1</lower>\
                <upper>3.14</upper>\
                <effort>2.4</effort>\
                <velocity>0.4</velocity>\
              </limit>\
-             <use_parent_model_frame>true</use_parent_model_frame>\
              <dynamics>\
                <damping>1.0</damping>\
                <friction>0.1</friction>\
@@ -2128,7 +2126,9 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(axisMsg.has_limit_velocity());
   EXPECT_NEAR(axisMsg.limit_velocity(), 0.4, 1e-6);
   EXPECT_TRUE(axisMsg.has_use_parent_model_frame());
-  EXPECT_EQ(axisMsg.use_parent_model_frame(), true);
+  EXPECT_EQ(axisMsg.use_parent_model_frame(), false);
+  EXPECT_TRUE(axisMsg.has_xyz_expressed_in());
+  EXPECT_EQ(axisMsg.xyz_expressed_in(), "__model__");
   EXPECT_TRUE(axisMsg.has_damping());
   EXPECT_NEAR(axisMsg.damping(), 1.0, 1e-6);
   EXPECT_TRUE(axisMsg.has_friction());
@@ -2144,28 +2144,26 @@ TEST_F(MsgsTest, JointFromSDF)
            <parent>axle</parent>\
            <child>wheel</child>\
            <axis>\
-             <xyz>0 0 1</xyz>\
+             <xyz expressed_in='__model__'>0 0 1</xyz>\
              <limit>\
                <lower>0.01</lower>\
                <upper>3.0</upper>\
                <effort>2.1</effort>\
                <velocity>0.2</velocity>\
              </limit>\
-             <use_parent_model_frame>true</use_parent_model_frame>\
              <dynamics>\
                <damping>0.8</damping>\
                <friction>0.1</friction>\
              </dynamics>\
            </axis>\
            <axis2>\
-             <xyz>0 0 1</xyz>\
+             <xyz expressed_in='__model__'>0 0 1</xyz>\
              <limit>\
                <lower>0.02</lower>\
                <upper>3.01</upper>\
                <effort>2.3</effort>\
                <velocity>0.1</velocity>\
              </limit>\
-             <use_parent_model_frame>true</use_parent_model_frame>\
              <dynamics>\
                <damping>0.9</damping>\
                <friction>0.1</friction>\
@@ -2235,7 +2233,9 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(axisGearboxMsg.has_limit_velocity());
   EXPECT_NEAR(axisGearboxMsg.limit_velocity(), 0.2, 1e-6);
   EXPECT_TRUE(axisGearboxMsg.has_use_parent_model_frame());
-  EXPECT_EQ(axisGearboxMsg.use_parent_model_frame(), true);
+  EXPECT_EQ(axisGearboxMsg.use_parent_model_frame(), false);
+  EXPECT_TRUE(axisGearboxMsg.has_xyz_expressed_in());
+  EXPECT_EQ(axisGearboxMsg.xyz_expressed_in(), "__model__");
   EXPECT_TRUE(axisGearboxMsg.has_damping());
   EXPECT_NEAR(axisGearboxMsg.damping(), 0.8, 1e-6);
   EXPECT_TRUE(axisGearboxMsg.has_friction());
@@ -2255,7 +2255,9 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(axisGearboxMsg2.has_limit_velocity());
   EXPECT_NEAR(axisGearboxMsg2.limit_velocity(), 0.1, 1e-6);
   EXPECT_TRUE(axisGearboxMsg2.has_use_parent_model_frame());
-  EXPECT_EQ(axisGearboxMsg2.use_parent_model_frame(), true);
+  EXPECT_EQ(axisGearboxMsg2.use_parent_model_frame(), false);
+  EXPECT_TRUE(axisGearboxMsg2.has_xyz_expressed_in());
+  EXPECT_EQ(axisGearboxMsg2.xyz_expressed_in(), "__model__");
   EXPECT_TRUE(axisGearboxMsg2.has_damping());
   EXPECT_NEAR(axisGearboxMsg2.damping(), 0.9, 1e-6);
   EXPECT_TRUE(axisGearboxMsg2.has_friction());
@@ -2275,14 +2277,13 @@ TEST_F(MsgsTest, JointFromSDF)
            <parent>box</parent>\
            <child>cylinder</child>\
            <axis>\
-             <xyz>0 1 0</xyz>\
+             <xyz expressed_in='__model__'>0 1 0</xyz>\
              <limit>\
                <lower>0.0</lower>\
                <upper>2.0</upper>\
                <effort>1.21</effort>\
                <velocity>0.12</velocity>\
              </limit>\
-             <use_parent_model_frame>true</use_parent_model_frame>\
              <dynamics>\
                <damping>0.5</damping>\
                <friction>0.12</friction>\
@@ -2352,7 +2353,9 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(axisScrewMsg.has_limit_velocity());
   EXPECT_NEAR(axisScrewMsg.limit_velocity(), 0.12, 1e-6);
   EXPECT_TRUE(axisScrewMsg.has_use_parent_model_frame());
-  EXPECT_EQ(axisScrewMsg.use_parent_model_frame(), true);
+  EXPECT_EQ(axisScrewMsg.use_parent_model_frame(), false);
+  EXPECT_EQ(axisScrewMsg.has_xyz_expressed_in(), true);
+  EXPECT_EQ(axisScrewMsg.xyz_expressed_in(), "__model__");
   EXPECT_TRUE(axisScrewMsg.has_damping());
   EXPECT_NEAR(axisScrewMsg.damping(), 0.5, 1e-6);
   EXPECT_TRUE(axisScrewMsg.has_friction());
@@ -3026,9 +3029,9 @@ TEST_F(MsgsTest, JointToSDF)
       auto axisElem = jointSDF->GetElement("axis");
       EXPECT_TRUE(axisElem->HasElement("xyz"));
       EXPECT_EQ(xyz1, axisElem->Get<ignition::math::Vector3d>("xyz"));
-      EXPECT_TRUE(axisElem->HasElement("use_parent_model_frame"));
-      EXPECT_EQ(useParentModelFrame1,
-                axisElem->Get<bool>("use_parent_model_frame"));
+      EXPECT_TRUE(axisElem->GetElement("xyz")->HasAttribute("expressed_in"));
+      EXPECT_EQ("__model__",
+                axisElem->GetElement("xyz")->Get<std::string>("expressed_in"));
 
       EXPECT_TRUE(axisElem->HasElement("dynamics"));
       auto axisDynamics = axisElem->GetElement("dynamics");
@@ -3054,11 +3057,13 @@ TEST_F(MsgsTest, JointToSDF)
       auto axisElem = jointSDF->GetElement("axis2");
       EXPECT_TRUE(axisElem->HasElement("xyz"));
       EXPECT_EQ(xyz2, axisElem->Get<ignition::math::Vector3d>("xyz"));
-      // use_parent_model_frame is required in axis.proto
-      // so expect to to exist even if we don't set it
-      EXPECT_TRUE(axisElem->HasElement("use_parent_model_frame"));
-      // expect false (default sdformat value)
-      EXPECT_FALSE(axisElem->Get<bool>("use_parent_model_frame"));
+      // use_parent_model_frame is required in axis.proto, but since it is
+      // false by default, the expressed_in attribute will empty. Actually, the
+      // the attribute should not even be set, but it appears that libsdformat
+      // always sets the attribute with a default value
+      EXPECT_TRUE(axisElem->GetElement("xyz")->HasAttribute("expressed_in"));
+      EXPECT_EQ("",
+                axisElem->GetElement("xyz")->Get<std::string>("expressed_in"));
 
       EXPECT_TRUE(axisElem->HasElement("dynamics"));
       auto axisDynamics = axisElem->GetElement("dynamics");
@@ -3201,9 +3206,9 @@ TEST_F(MsgsTest, JointToSDF)
       auto axisElem = jointSDF->GetElement("axis");
       EXPECT_TRUE(axisElem->HasElement("xyz"));
       EXPECT_EQ(xyz1, axisElem->Get<ignition::math::Vector3d>("xyz"));
-      EXPECT_TRUE(axisElem->HasElement("use_parent_model_frame"));
-      EXPECT_EQ(useParentModelFrame1,
-                axisElem->Get<bool>("use_parent_model_frame"));
+      EXPECT_TRUE(axisElem->GetElement("xyz")->HasAttribute("expressed_in"));
+      EXPECT_EQ("__model__",
+                axisElem->GetElement("xyz")->Get<std::string>("expressed_in"));
 
       EXPECT_TRUE(axisElem->HasElement("dynamics"));
       auto axisDynamics = axisElem->GetElement("dynamics");
@@ -3229,11 +3234,13 @@ TEST_F(MsgsTest, JointToSDF)
       auto axisElem = jointSDF->GetElement("axis2");
       EXPECT_TRUE(axisElem->HasElement("xyz"));
       EXPECT_EQ(xyz2, axisElem->Get<ignition::math::Vector3d>("xyz"));
-      // use_parent_model_frame is required in axis.proto
-      // so expect to to exist even if we don't set it
-      EXPECT_TRUE(axisElem->HasElement("use_parent_model_frame"));
-      // expect false (default sdformat value)
-      EXPECT_FALSE(axisElem->Get<bool>("use_parent_model_frame"));
+      // use_parent_model_frame is required in axis.proto, but since it is
+      // false by default, the expressed_in attribute will empty. Actually, the
+      // the attribute should not even be set, but it appears that libsdformat
+      // always sets the attribute with a default value
+      EXPECT_TRUE(axisElem->GetElement("xyz")->HasAttribute("expressed_in"));
+      EXPECT_EQ("",
+                axisElem->GetElement("xyz")->Get<std::string>("expressed_in"));
 
       EXPECT_TRUE(axisElem->HasElement("dynamics"));
       auto axisDynamics = axisElem->GetElement("dynamics");
@@ -3362,9 +3369,9 @@ TEST_F(MsgsTest, JointToSDF)
       auto axisElem = jointSDF->GetElement("axis");
       EXPECT_TRUE(axisElem->HasElement("xyz"));
       EXPECT_EQ(xyz1, axisElem->Get<ignition::math::Vector3d>("xyz"));
-      EXPECT_TRUE(axisElem->HasElement("use_parent_model_frame"));
-      EXPECT_EQ(useParentModelFrame1,
-                axisElem->Get<bool>("use_parent_model_frame"));
+      EXPECT_TRUE(axisElem->GetElement("xyz")->HasAttribute("expressed_in"));
+      EXPECT_EQ("",
+                axisElem->GetElement("xyz")->Get<std::string>("expressed_in"));
 
       EXPECT_TRUE(axisElem->HasElement("dynamics"));
       auto axisDynamics = axisElem->GetElement("dynamics");
