@@ -62,6 +62,9 @@ IOManager::~IOManager()
 
   delete this->dataPtr->io_service;
   this->dataPtr->io_service = nullptr;
+
+  delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
