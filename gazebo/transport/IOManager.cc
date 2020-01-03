@@ -37,10 +37,10 @@ IOManager::~IOManager()
   this->Stop();
 
   delete this->work;
-  this->work = NULL;
+  this->work = nullptr;
 
   delete this->io_service;
-  this->io_service = NULL;
+  this->io_service = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -52,7 +52,7 @@ void IOManager::Stop()
   {
     this->thread->join();
     delete this->thread;
-    this->thread = NULL;
+    this->thread = nullptr;
   }
 }
 
