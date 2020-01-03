@@ -255,6 +255,31 @@ namespace gazebo
       /// \return Pointer to the physics SDF element.
       public: sdf::ElementPtr GetSDF() const;
 
+      /// \brief Helper function for performing any_cast operations in
+      /// SetParam. This is useful because the PresetManager stores the
+      /// output of sdf::Element::GetAny as boost::any values in its
+      /// parameterMap and calls SetParam with these values. Prior to
+      /// libsdformat8, the GetAny function returned boost::any, but it now
+      /// returns std::any. This helper is used in SetParam to first check
+      /// if a boost::any value contains a std::any, and if so, perform a
+      /// std::any_cast<T>. Otherwise, it returns boost::any_cast<T>.
+      /// \param[in] _value Value to cast to type T.
+      /// \return Value cast to type T.
+      public:
+      template <typename T>
+      static T any_cast(const boost::any &_value)
+      {
+        try
+        {
+          auto value = boost::any_cast<std::any>(_value);
+          return std::any_cast<T>(value);
+        }
+        catch(boost::bad_any_cast &)
+        {
+          return boost::any_cast<T>(_value);
+        }
+      }
+
       /// \brief virtual callback for gztopic "~/request".
       /// \param[in] _msg Request message.
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
