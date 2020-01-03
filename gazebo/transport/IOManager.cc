@@ -14,21 +14,42 @@
  * limitations under the License.
  *
 */
+#include <atomic>
 #include <boost/bind.hpp>
+#include <boost/thread/thread.hpp>
 #include <iostream>
 #include "gazebo/transport/IOManager.hh"
 
-using namespace gazebo;
-using namespace transport;
+namespace gazebo
+{
+namespace transport
+{
+/////////////////////////////////////////////////
+class IOManagerPrivate
+{
+  /// \brief IO service.
+  public: boost::asio::io_service *io_service = nullptr;
+
+  /// \brief Use io_service::work to keep the io_service running in thread.
+  public: boost::asio::io_service::work *work = nullptr;
+
+  /// \brief Reference count of connections using this IOManager.
+  public: std::atomic_int count;
+
+  /// \brief Thread for IOManager.
+  public: boost::thread *thread = nullptr;
+};
 
 /////////////////////////////////////////////////
 IOManager::IOManager()
-  : count(0)
+  : dataPtr(new IOManagerPrivate)
 {
-  this->io_service = new boost::asio::io_service;
-  this->work = new boost::asio::io_service::work(*this->io_service);
-  this->thread = new boost::thread(boost::bind(&boost::asio::io_service::run,
-                                                this->io_service));
+  this->dataPtr->io_service = new boost::asio::io_service;
+  this->dataPtr->work = new boost::asio::io_service::work(
+      *this->dataPtr->io_service);
+  this->dataPtr->count = 0;
+  this->dataPtr->thread = new boost::thread(boost::bind(
+      &boost::asio::io_service::run, this->dataPtr->io_service));
 }
 
 /////////////////////////////////////////////////
@@ -36,46 +57,51 @@ IOManager::~IOManager()
 {
   this->Stop();
 
-  delete this->work;
-  this->work = NULL;
+  delete this->dataPtr->work;
+  this->dataPtr->work = nullptr;
 
-  delete this->io_service;
-  this->io_service = NULL;
+  delete this->dataPtr->io_service;
+  this->dataPtr->io_service = nullptr;
+
+  delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
 void IOManager::Stop()
 {
-  this->io_service->reset();
-  this->io_service->stop();
-  if (this->thread)
+  this->dataPtr->io_service->reset();
+  this->dataPtr->io_service->stop();
+  if (this->dataPtr->thread)
   {
-    this->thread->join();
-    delete this->thread;
-    this->thread = NULL;
+    this->dataPtr->thread->join();
+    delete this->dataPtr->thread;
+    this->dataPtr->thread = nullptr;
   }
 }
 
 /////////////////////////////////////////////////
 boost::asio::io_service &IOManager::GetIO()
 {
-  return *this->io_service;
+  return *this->dataPtr->io_service;
 }
 
 /////////////////////////////////////////////////
 void IOManager::IncCount()
 {
-  this->count++;
+  this->dataPtr->count++;
 }
 
 /////////////////////////////////////////////////
 void IOManager::DecCount()
 {
-  this->count--;
+  this->dataPtr->count--;
 }
 
 /////////////////////////////////////////////////
 unsigned int IOManager::GetCount() const
 {
-  return this->count;
+  return this->dataPtr->count;
+}
+}
 }
