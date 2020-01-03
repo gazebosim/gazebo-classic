@@ -213,6 +213,14 @@ class JointTest : public ServerFixture,
             {
               auto axis = jointMsg->mutable_axis1();
               msgs::Set(axis->mutable_xyz(), _opt.axis);
+              if (_opt.useParentModelFrame)
+              {
+                axis->set_xyz_expressed_in("__model__");
+              }
+              else
+              {
+                axis->set_xyz_expressed_in("");
+              }
               axis->set_use_parent_model_frame(_opt.useParentModelFrame);
             }
             // Hack: hardcode a second axis for universal joints
