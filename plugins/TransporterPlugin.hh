@@ -84,7 +84,7 @@ namespace gazebo
       </pad>
     </plugin>
    \endverbatim */
-  class GAZEBO_VISIBLE TransporterPlugin : public WorldPlugin
+  class GZ_PLUGIN_VISIBLE TransporterPlugin : public WorldPlugin
   {
     /// \brief Constructor.
     public: TransporterPlugin();

@@ -255,9 +255,6 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateFragmentShader(
   Ogre::String programName = this->baseName + "FP_" +
                              Ogre::StringConverter::toString(_permutation);
 
-#if OGRE_DEBUG_MODE
-  Ogre::LogManager::getSingleton().getDefaultLog()->logMessage(programSource);
-#endif
 
   // Create shader object
   Ogre::HighLevelGpuProgramPtr ptrProgram =

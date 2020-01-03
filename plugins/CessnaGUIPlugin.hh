@@ -23,7 +23,10 @@
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
+// moc parsing error of tbb headers
+#ifndef Q_MOC_RUN
 #include <gazebo/transport/transport.hh>
+#endif
 
 namespace gazebo
 {
@@ -43,7 +46,7 @@ namespace gazebo
   /// 1         Preset for take-off
   /// 2         Preset for cruise
   /// 3         Preset for landing
-  class GAZEBO_VISIBLE CessnaGUIPlugin : public GUIPlugin
+  class GZ_PLUGIN_VISIBLE CessnaGUIPlugin : public GUIPlugin
   {
     Q_OBJECT
 

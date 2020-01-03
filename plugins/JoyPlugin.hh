@@ -86,7 +86,7 @@ namespace gazebo
   /// 1. Playstation joysticks may require a press of the center "Ps" button
   /// before they work.
   ///
-  class GAZEBO_VISIBLE JoyPlugin : public WorldPlugin
+  class GZ_PLUGIN_VISIBLE JoyPlugin : public WorldPlugin
   {
     /// \brief Constructor.
     public: JoyPlugin();

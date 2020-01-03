@@ -104,7 +104,7 @@ void InertiaVisual::Load(const ignition::math::Pose3d &_pose,
   p6 += _pose.Pos();
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->crossLines->setMaterial("Gazebo/Green");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->crossLines, "Gazebo/Green");
   dPtr->crossLines->AddPoint(p1);
   dPtr->crossLines->AddPoint(p2);
   dPtr->crossLines->AddPoint(p3);

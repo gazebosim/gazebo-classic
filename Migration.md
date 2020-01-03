@@ -9,7 +9,7 @@ release will remove the deprecated code.
 
 ### Build system
 
-New versions in mandatory dependencies: `ign-transport8`, `ign-msgs5`, `ign-math6`, `sdformat9`.
+New versions in mandatory dependencies: `ign-transport8`, `ign-msgs5`, `ign-math6`, `sdformat8`.
 New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`.
 
 ### Additions
@@ -24,9 +24,9 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`.
    to match the changes in ignition-math6.
 
 1. **gazebo/physics/JointController.hh**
-   Use `gazebo::msgs::JointCmd` instead of `ignition::msgs::JointCmd` in the
-   since the ign-msgs5 proto file uses `proto3`, which doesn't allow optional
-   fields and breaks existing functionality.
+   Use new optional fields in `ignition::msgs::JointCmd` and
+   `ignition::msgs::PID` since the ign-msgs5 proto file uses `proto3`,
+   which doesn't allow optional fields and breaks existing functionality.
 
 1. **gazebo/physics/PresetManager.hh**
    The PresetManager stores data internally with a map of `boost::any` values

@@ -651,44 +651,64 @@ bool JointCommand::RunImpl()
     return false;
   }
 
-  gazebo::msgs::JointCmd msg;
+  ignition::msgs::JointCmd msg;
   msg.set_name(modelName + "::" + jointName);
 
   if (this->vm.count("force"))
-    msg.set_force(this->vm["force"].as<double>());
+    msg.mutable_force_optional()->set_data(this->vm["force"].as<double>());
 
   if (this->vm.count("pos-t"))
   {
-    msg.mutable_position()->set_target(this->vm["pos-t"].as<double>());
+    msg.mutable_position()->mutable_target_optional()->set_data(
+        this->vm["pos-t"].as<double>());
 
     if (this->vm.count("pos-p"))
-      msg.mutable_position()->set_p_gain(this->vm["pos-p"].as<double>());
+    {
+      msg.mutable_position()->mutable_p_gain_optional()->set_data(
+          this->vm["pos-p"].as<double>());
+    }
 
     if (this->vm.count("pos-i"))
-      msg.mutable_position()->set_i_gain(this->vm["pos-i"].as<double>());
+    {
+      msg.mutable_position()->mutable_i_gain_optional()->set_data(
+          this->vm["pos-i"].as<double>());
+    }
 
     if (this->vm.count("pos-d"))
-      msg.mutable_position()->set_d_gain(this->vm["pos-d"].as<double>());
+    {
+      msg.mutable_position()->mutable_d_gain_optional()->set_data(
+          this->vm["pos-d"].as<double>());
+    }
   }
 
   if (this->vm.count("vel-t"))
   {
-    msg.mutable_velocity()->set_target(this->vm["vel-t"].as<double>());
+    msg.mutable_velocity()->mutable_target_optional()->set_data(
+        this->vm["vel-t"].as<double>());
 
     if (this->vm.count("vel-p"))
-      msg.mutable_velocity()->set_p_gain(this->vm["vel-p"].as<double>());
+    {
+      msg.mutable_velocity()->mutable_p_gain_optional()->set_data(
+          this->vm["vel-p"].as<double>());
+    }
 
     if (this->vm.count("vel-i"))
-      msg.mutable_velocity()->set_i_gain(this->vm["vel-i"].as<double>());
+    {
+      msg.mutable_velocity()->mutable_i_gain_optional()->set_data(
+          this->vm["vel-i"].as<double>());
+    }
 
     if (this->vm.count("vel-d"))
-      msg.mutable_velocity()->set_d_gain(this->vm["vel-d"].as<double>());
+    {
+      msg.mutable_velocity()->mutable_d_gain_optional()->set_data(
+          this->vm["vel-d"].as<double>());
+    }
   }
 
   std::string topic = std::string("/") + modelName + "/joint_cmd";
 
   ignition::transport::Node ignNode;
-  auto pub = ignNode.Advertise<gazebo::msgs::JointCmd>(topic);
+  auto pub = ignNode.Advertise<ignition::msgs::JointCmd>(topic);
 
   unsigned int maxSleep = 30;
   unsigned int sleep = 0;
