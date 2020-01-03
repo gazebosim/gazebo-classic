@@ -15,8 +15,6 @@
  *
 */
 
-#include <gazebo/msgs/joint_cmd.pb.h>
-
 #include <algorithm>
 #include <regex>
 
@@ -24,6 +22,7 @@
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/Joint.hh>
 
+#include <ignition/msgs.hh>
 #include <ignition/transport.hh>
 
 #include "JointControlPlugin.hh"
@@ -48,7 +47,7 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   std::string modelName = _model->GetScopedName();
   modelName = std::regex_replace(modelName, std::regex("::"), "/");
   ignition::transport::Node::Publisher jointPub =
-      node.Advertise<gazebo::msgs::JointCmd>("/" + modelName + "/joint_cmd");
+      node.Advertise<ignition::msgs::JointCmd>("/" + modelName + "/joint_cmd");
 
   // Loop over controller definitions
   sdf::ElementPtr child = _sdf->GetFirstElement();
@@ -58,14 +57,15 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
       if (child->HasAttribute("type"))
       {
-        gazebo::msgs::JointCmd msg;
+        ignition::msgs::JointCmd msg;
         std::string controllerType = child->Get<std::string>("type");
 
         if (controllerType == "force")
         {
           if (child->HasElement("target"))
           {
-            msg.set_force(child->Get<double>("target"));
+            msg.mutable_force_optional()->set_data(
+                child->Get<double>("target"));
           }
           if (child->HasElement("pid_gains"))
           {
@@ -76,28 +76,36 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
         {
           if (child->HasElement("target"))
           {
-            msg.mutable_position()->set_target(child->Get<double>("target"));
+            msg.mutable_position()->mutable_target_optional()->set_data(
+                child->Get<double>("target"));
           }
           if (child->HasElement("pid_gains"))
           {
             auto gains = child->Get<ignition::math::Vector3d>("pid_gains");
-            msg.mutable_position()->set_p_gain(gains.X());
-            msg.mutable_position()->set_i_gain(gains.Y());
-            msg.mutable_position()->set_d_gain(gains.Z());
+            msg.mutable_position()->mutable_p_gain_optional()->set_data(
+                gains.X());
+            msg.mutable_position()->mutable_i_gain_optional()->set_data(
+                gains.Y());
+            msg.mutable_position()->mutable_d_gain_optional()->set_data(
+                gains.Z());
           }
         }
         else if (controllerType == "velocity")
         {
           if (child->HasElement("target"))
           {
-            msg.mutable_velocity()->set_target(child->Get<double>("target"));
+            msg.mutable_velocity()->mutable_target_optional()->set_data(
+                child->Get<double>("target"));
           }
           if (child->HasElement("pid_gains"))
           {
             auto gains = child->Get<ignition::math::Vector3d>("pid_gains");
-            msg.mutable_velocity()->set_p_gain(gains.X());
-            msg.mutable_velocity()->set_i_gain(gains.Y());
-            msg.mutable_velocity()->set_d_gain(gains.Z());
+            msg.mutable_velocity()->mutable_p_gain_optional()->set_data(
+                gains.X());
+            msg.mutable_velocity()->mutable_i_gain_optional()->set_data(
+                gains.Y());
+            msg.mutable_velocity()->mutable_d_gain_optional()->set_data(
+                gains.Z());
           }
         }
         else
