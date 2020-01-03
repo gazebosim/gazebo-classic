@@ -99,7 +99,7 @@ namespace gazebo
       </wheel>
     </plugin>
    \endverbatim */
-  class GAZEBO_VISIBLE WheelSlipPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE WheelSlipPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: WheelSlipPlugin();

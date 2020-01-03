@@ -54,19 +54,19 @@ void OriginVisual::Load()
 
   dPtr->xLine = this->CreateDynamicLine(
       rendering::RENDERING_LINE_LIST);
-  dPtr->xLine->setMaterial("Gazebo/Red");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->xLine, "Gazebo/Red");
   dPtr->xLine->AddPoint(ignition::math::Vector3d::Zero);
   dPtr->xLine->AddPoint(ignition::math::Vector3d::UnitX*dPtr->length);
 
   dPtr->yLine = this->CreateDynamicLine(
       rendering::RENDERING_LINE_LIST);
-  dPtr->yLine->setMaterial("Gazebo/Green");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->yLine, "Gazebo/Green");
   dPtr->yLine->AddPoint(ignition::math::Vector3d::Zero);
   dPtr->yLine->AddPoint(ignition::math::Vector3d::UnitY*dPtr->length);
 
   dPtr->zLine = this->CreateDynamicLine(
       rendering::RENDERING_LINE_LIST);
-  dPtr->zLine->setMaterial("Gazebo/Blue");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->zLine, "Gazebo/Blue");
   dPtr->zLine->AddPoint(ignition::math::Vector3d::Zero);
   dPtr->zLine->AddPoint(ignition::math::Vector3d::UnitZ*dPtr->length);
 

@@ -145,10 +145,9 @@ set (headers
   World.hh
   WorldState.hh)
 
-set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
+set (physics_headers "")
 foreach (hdr ${headers})
-  APPEND_TO_CACHED_STRING(physics_headers
-    "Physics Headers" "#include \"gazebo/physics/${hdr}\"\n")
+  set (physics_headers "${physics_headers}#include \"gazebo/physics/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)

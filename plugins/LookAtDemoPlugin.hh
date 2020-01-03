@@ -21,7 +21,10 @@
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
+// moc parsing error of tbb headers
+#ifndef Q_MOC_RUN
 #include <gazebo/transport/transport.hh>
+#endif
 
 namespace gazebo
 {
@@ -40,7 +43,7 @@ namespace gazebo
   /// "looked at"
   ///
   /// 3. "desired_z": A single axis, representing the desired Z axis.
-  class GAZEBO_VISIBLE LookAtDemoPlugin : public GUIPlugin
+  class GZ_PLUGIN_VISIBLE LookAtDemoPlugin : public GUIPlugin
   {
     Q_OBJECT
 

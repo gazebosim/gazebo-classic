@@ -45,7 +45,7 @@ namespace gazebo
   /// <imuName>     scoped name for the imu sensor
   /// <connectionTimeoutMaxCount> timeout before giving up on
   ///                             controller synchronization
-  class GAZEBO_VISIBLE ArduCopterPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE ArduCopterPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: ArduCopterPlugin();

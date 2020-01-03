@@ -25,7 +25,7 @@
 namespace gazebo
 {
   /// \brief An base class plugin for custom imu sensor processing.
-  class GAZEBO_VISIBLE ImuSensorPlugin : public SensorPlugin
+  class GZ_PLUGIN_VISIBLE ImuSensorPlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: ImuSensorPlugin();

@@ -175,7 +175,7 @@ void ApplyWrenchVisual::Load()
   // Torque line
   dPtr->torqueLine = dPtr->torqueVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->torqueLine->setMaterial(dPtr->unselectedMaterial);
+  GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->torqueLine, dPtr->unselectedMaterial);
   dPtr->torqueLine->AddPoint(0, 0, 0);
   dPtr->torqueLine->AddPoint(0, 0, 0.1);
 
