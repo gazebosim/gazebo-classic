@@ -6,6 +6,7 @@
 
 1. Update to ignition citadel dependencies, c++17, cmake 3.10.
     * [Pull request 3139](https://bitbucket.org/osrf/gazebo/pull-request/3139)
+    * [Pull request 3160](https://bitbucket.org/osrf/gazebo/pull-request/3160)
 
 1. Add helper function PhysicsEngine::any_cast to handle std::any.
     * [Pull request 3147](https://bitbucket.org/osrf/gazebo/pull-request/3147)
