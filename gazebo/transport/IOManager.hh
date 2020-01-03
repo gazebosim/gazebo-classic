@@ -14,10 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _IOMANAGER_HH_
-#define _IOMANAGER_HH_
+#ifndef GAZEBO_TRANSPORT_IOMANAGER_HH_
+#define GAZEBO_TRANSPORT_IOMANAGER_HH_
 
-#include <boost/thread/thread.hpp>
 #include <boost/asio.hpp>
 #include "gazebo/util/system.hh"
 
@@ -25,6 +24,9 @@ namespace gazebo
 {
   namespace transport
   {
+    // Forward declare private class.
+    class IOManagerPrivate;
+
     /// \addtogroup gazebo_transport
     /// \{
 
@@ -34,6 +36,7 @@ namespace gazebo
     {
       /// \brief Constructor
       public: IOManager();
+
       /// \brief Destructor
       public: ~IOManager();
 
@@ -54,13 +57,9 @@ namespace gazebo
       /// \brief Stop the IO service
       public: void Stop();
 
-      private: boost::asio::io_service *io_service;
-
-      // Use io_service::work to keep the io_service running in thread
-      private: boost::asio::io_service::work *work;
-      private: unsigned int count;
-
-      private: boost::thread *thread;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: IOManagerPrivate *dataPtr;
     };
     /// \}
   }
