@@ -7,11 +7,17 @@
 1. Update to ignition citadel dependencies, c++17, cmake 3.10.
     * [Pull request 3139](https://bitbucket.org/osrf/gazebo/pull-request/3139)
 
+1. Add helper function PhysicsEngine::any_cast to handle std::any.
+    * [Pull request 3147](https://bitbucket.org/osrf/gazebo/pull-request/3147)
+
 1. Modify build system to install dll in `<prefix>/bin` by default on Windows.
     * [Pull request 3144](https://bitbucket.org/osrf/gazebo/pull-request/3144)
 
 1. MeshManager: add .stlb file extension support.
     * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
+
+1. SVG parsing: add lineto commands v,V,h,H.
+    * [Pull request 3110](https://bitbucket.org/osrf/gazebo/pull-request/3110)
 
 ## Gazebo 10
 
