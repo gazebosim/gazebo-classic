@@ -28,7 +28,7 @@ template<typename T> bool CastAnyValue(const boost::any &_value, T &_return)
 {
   try
   {
-    _return = boost::any_cast<T>(_value);
+    _return = PhysicsEngine::any_cast<T>(_value);
   }
   catch(boost::bad_any_cast &_e)
   {
@@ -563,7 +563,8 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         if (CastAnyValue(value, v))
           elem->Set(v);
         else
-          gzerr << "SDF type did not give successful cast" << std::endl;
+          gzerr << "SDF element[" << elem->GetName()
+                << "] did not give successful cast" << std::endl;
       }
       else if (elem->GetValue()->IsType<double>())
       {
@@ -571,7 +572,8 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         if (CastAnyValue(value, v))
           elem->Set(v);
         else
-          gzerr << "SDF type did not give successful cast" << std::endl;
+          gzerr << "SDF element[" << elem->GetName()
+                << "] did not give successful cast" << std::endl;
       }
       else if (elem->GetValue()->IsType<float>())
       {
@@ -579,7 +581,8 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         if (CastAnyValue(value, v))
           elem->Set(v);
         else
-          gzerr << "SDF type did not give successful cast" << std::endl;
+          gzerr << "SDF element[" << elem->GetName()
+                << "] did not give successful cast" << std::endl;
       }
       else if (elem->GetValue()->IsType<bool>())
       {
@@ -587,7 +590,8 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         if (CastAnyValue(value, v))
           elem->Set(v);
         else
-          gzerr << "SDF type did not give successful cast" << std::endl;
+          gzerr << "SDF element[" << elem->GetName()
+                << "] did not give successful cast" << std::endl;
       }
       else if (elem->GetValue()->IsType<std::string>())
       {
@@ -595,7 +599,8 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         if (CastAnyValue(value, v))
           elem->Set(v);
         else
-          gzerr << "SDF type did not give successful cast" << std::endl;
+          gzerr << "SDF element[" << elem->GetName()
+                << "] did not give successful cast" << std::endl;
       }
       else if (elem->GetValue()->IsType<ignition::math::Vector3d>())
       {
@@ -606,7 +611,8 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
           elem->Set(v);
         }
         else
-          gzerr << "SDF type did not give successful cast" << std::endl;
+          gzerr << "SDF element[" << elem->GetName()
+                << "] did not give successful cast" << std::endl;
       }
     }
     this->GenerateSDFHelper(_preset, elem);

@@ -44,7 +44,17 @@ using namespace gazebo;
 using namespace common;
 
 /////////////////////////////////////////////////
-struct Vector3Hash : std::unary_function<const ignition::math::Vector3d,
+// std::unary_function was removed in c++17 but can be reproduced easily
+// copied from https://stackoverflow.com/a/56001387
+template <typename ArgumentType, typename ResultType>
+struct unary_function
+{
+    using argument_type = ArgumentType;
+    using result_type = ResultType;
+};
+
+/////////////////////////////////////////////////
+struct Vector3Hash : unary_function<const ignition::math::Vector3d,
   std::size_t>
 {
   std::size_t operator()(const ignition::math::Vector3d &_v) const
@@ -58,7 +68,7 @@ struct Vector3Hash : std::unary_function<const ignition::math::Vector3d,
 };
 
 /////////////////////////////////////////////////
-struct Vector2dHash : std::unary_function<const ignition::math::Vector2d,
+struct Vector2dHash : unary_function<const ignition::math::Vector2d,
   std::size_t>
 {
   std::size_t operator()(const ignition::math::Vector2d &_v) const
