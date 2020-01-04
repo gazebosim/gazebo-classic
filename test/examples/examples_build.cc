@@ -108,7 +108,7 @@ INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
   , "system_gui_plugin"
   , "trigger_light"
   , "world_edit"
-));
+),);  // NOLINT
 
 ///////////////////////////////////////////////////////////////////
 TEST_P(ExamplesBuild_Standalone, Standalone)
