@@ -22,7 +22,7 @@
 
 using namespace gazebo;
 
-typedef std::tr1::tuple<const char *, const char *, int> string2_int;
+typedef std::tuple<const char *, const char *, int> string2_int;
 
 class WorldResetTest : public ServerFixture,
                        public ::testing::WithParamInterface<string2_int>
@@ -231,10 +231,10 @@ void WorldResetTest::ModelPose(const std::string &_physicsEngine,
 /////////////////////////////////////////////////
 TEST_P(WorldResetTest, ModelPose)
 {
-  std::string physics = std::tr1::get<0>(GetParam());
+  std::string physics = std::get<0>(GetParam());
 
-  std::string worldName = std::tr1::get<1>(GetParam());
-  int resets = std::tr1::get<2>(GetParam());
+  std::string worldName = std::get<1>(GetParam());
+  int resets = std::get<2>(GetParam());
   gzdbg << "Physics engine [" << physics << "] "
         << "world name [" << worldName << "] "
         << "reset count [" << resets << "]"
@@ -333,10 +333,10 @@ void WorldResetTest::NestedModelPose(const std::string &_physicsEngine,
 /////////////////////////////////////////////////
 TEST_P(WorldResetTest, NestedModelPose)
 {
-  std::string physics = std::tr1::get<0>(GetParam());
+  std::string physics = std::get<0>(GetParam());
 
-  std::string worldName = std::tr1::get<1>(GetParam());
-  int resets = std::tr1::get<2>(GetParam());
+  std::string worldName = std::get<1>(GetParam());
+  int resets = std::get<2>(GetParam());
   gzdbg << "Physics engine [" << physics << "] "
         << "world name [" << worldName << "] "
         << "reset count [" << resets << "]"
@@ -404,9 +404,9 @@ void WorldResetTest::WorldName(const std::string &_physicsEngine,
 /////////////////////////////////////////////////
 TEST_P(WorldResetTest, WorldName)
 {
-  std::string physics = std::tr1::get<0>(GetParam());
-  std::string worldName = std::tr1::get<1>(GetParam());
-  int resets = std::tr1::get<2>(GetParam());
+  std::string physics = std::get<0>(GetParam());
+  std::string worldName = std::get<1>(GetParam());
+  int resets = std::get<2>(GetParam());
   gzdbg << "Physics engine [" << physics << "] "
         << "world name [" << worldName << "] "
         << "reset count [" << resets << "]"
