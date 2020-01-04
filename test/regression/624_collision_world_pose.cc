@@ -132,7 +132,7 @@ TEST_P(Issue624Test, CollisionWorldPose)
   CollisionWorldPose(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue624Test, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue624Test, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 /// Main

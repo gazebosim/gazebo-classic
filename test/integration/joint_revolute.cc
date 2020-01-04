@@ -765,7 +765,7 @@ TEST_P(JointTestRevolute, UnwrappedAngle)
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTestRevolute,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values("revolute")));
+  ::testing::Values("revolute")),);  // NOLINT
 
 int main(int argc, char **argv)
 {

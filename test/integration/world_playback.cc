@@ -301,7 +301,7 @@ INSTANTIATE_TEST_CASE_P(LogFiles,
                         WorldPlaybackTest,
                         ::testing::Values("state.log",
                                           "state2.log",
-                                          "state3.log"));
+                                          "state3.log"),);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
