@@ -415,14 +415,14 @@ TEST_P(WorldResetTest, WorldName)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldControlResetTest,
-    PHYSICS_ENGINE_VALUES);
+    PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldResetTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("worlds/empty.world",
                     "worlds/pr2.world",
                     "worlds/nested_model.world"),
-  ::testing::Range(1, 3)));
+  ::testing::Range(1, 3)),);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
