@@ -74,7 +74,7 @@ TEST_P(Issue2239Test, TestRevolute2JointTeleport)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue2239Test,
-  ::testing::Combine(::testing::Values("ode", "dart"), ::testing::Values("")));
+  ::testing::Combine(::testing::Values("ode", "dart"), ::testing::Values("")),);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
