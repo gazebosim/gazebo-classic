@@ -32,7 +32,7 @@
 
 using namespace gazebo;
 
-typedef std::tr1::tuple<const char *, const char *> std_string2;
+typedef std::tuple<const char *, const char *> std_string2;
 
 class JointTest : public ServerFixture,
                   public ::testing::WithParamInterface<std_string2>
@@ -65,8 +65,8 @@ class JointTest : public ServerFixture,
             if (test_info->value_param())
             {
               gzdbg << "Params: " << test_info->value_param() << std::endl;
-              this->physicsEngine = std::tr1::get<0>(GetParam());
-              this->jointType = std::tr1::get<1>(GetParam());
+              this->physicsEngine = std::get<0>(GetParam());
+              this->jointType = std::get<1>(GetParam());
             }
           }
 

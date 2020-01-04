@@ -22,6 +22,8 @@
 #include <boost/algorithm/string.hpp>
 #include <functional>
 
+#include <ignition/msgs/Utility.hh>
+
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Image.hh"
@@ -246,10 +248,8 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
 
       msg.set_width(this->camera->ImageWidth());
       msg.set_height(this->camera->ImageHeight());
-      // TODO convert from gazebo::common::Image::PixelFormat to
-      // ignition::common::Image::PixelFormatType and re-enable this code
-      // msg.set_pixel_format(common::Image::ConvertPixelFormat(
-      //       this->camera->ImageFormat()));
+      msg.set_pixel_format_type(ignition::msgs::ConvertPixelFormatType(
+            this->camera->ImageFormat()));
 
       msg.set_step(this->camera->ImageWidth() *
           this->camera->ImageDepth());

@@ -164,7 +164,7 @@ TEST_P(Issue940Test, ForceTorqueSensorFrameTest)
   ForceTorqueSensorFrameTest(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue940Test, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue940Test, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 /// Main

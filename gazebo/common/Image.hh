@@ -64,7 +64,7 @@ namespace gazebo
       "R_FLOAT32",
       "RGB_FLOAT32",
       "BAYER_RGGB8",
-      "BAYER_RGGR8",
+      "BAYER_BGGR8",
       "BAYER_GBRG8",
       "BAYER_GRBG8"
     };
@@ -92,7 +92,7 @@ namespace gazebo
                 R_FLOAT32,
                 RGB_FLOAT32,
                 BAYER_RGGB8,
-                BAYER_RGGR8,
+                BAYER_BGGR8,
                 BAYER_GBRG8,
                 BAYER_GRBG8,
                 PIXEL_FORMAT_COUNT

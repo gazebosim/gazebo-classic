@@ -608,7 +608,7 @@ TEST_P(LaserTest, LaserNoise)
   LaserUnitNoise(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, LaserTest, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, LaserTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {

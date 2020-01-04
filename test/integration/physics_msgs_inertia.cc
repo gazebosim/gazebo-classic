@@ -478,7 +478,7 @@ TEST_P(InertiaMsgsTest, SetPendulumInertia)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, InertiaMsgsTest,
-                        PHYSICS_ENGINE_VALUES);
+                        PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
