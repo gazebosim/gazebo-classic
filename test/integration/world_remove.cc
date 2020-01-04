@@ -606,7 +606,7 @@ INSTANTIATE_TEST_CASE_P(RemoveJointTypes, WorldRemoveJointsTest,
                   , "fixed"
                   , "ball"
                   , "revolute2"
-                  , "gearbox")));
+                  , "gearbox")),);  // NOLINT
 
 int main(int argc, char **argv)
 {
