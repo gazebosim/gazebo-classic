@@ -297,7 +297,7 @@ TEST_P(AltimeterSensor_TEST, NonzeroAltimeterSensorCheck)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, AltimeterSensor_TEST,
-                        PHYSICS_ENGINE_VALUES);
+                        PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

@@ -732,7 +732,7 @@ TEST_P(PhysicsFrictionTest, SphereSlip)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsFrictionTest,
-                        PHYSICS_ENGINE_VALUES);
+                        PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 INSTANTIATE_TEST_CASE_P(WorldStepSolvers, WorldStepFrictionTest,
                         WORLD_STEP_SOLVERS);
