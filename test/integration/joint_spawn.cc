@@ -468,7 +468,7 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_All,
                   , "fixed"
                   , "ball"
                   , "revolute2"
-                  , "gearbox")));
+                  , "gearbox")),);  // NOLINT
 
 // Skip prismatic, screw, and revolute2 because they allow translation
 INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_Rotational,
@@ -476,7 +476,7 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_Rotational,
   ::testing::Values("revolute"
                   , "universal"
                   , "fixed"
-                  , "ball")));
+                  , "ball")),);  // NOLINT
 
 // Skip prismatic, screw, and revolute2 because they allow translation
 INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_RotationalWorld,
@@ -484,7 +484,7 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_RotationalWorld,
   ::testing::Values("revolute"
                   , "universal"
                   , "fixed"
-                  , "ball")));
+                  , "ball")),);  // NOLINT
 
 int main(int argc, char **argv)
 {

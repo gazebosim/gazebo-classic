@@ -526,7 +526,7 @@ TEST_P(WheelTrackedVehiclePluginTestParametrized,
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines,
                         WheelTrackedVehiclePluginTestParametrized,
-                        PHYSICS_ENGINE_VALUES);
+                        PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {
