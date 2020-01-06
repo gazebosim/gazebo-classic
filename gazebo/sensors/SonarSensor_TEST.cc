@@ -21,7 +21,7 @@
 
 using namespace gazebo;
 
-typedef std::tr1::tuple<const char *, bool> const_char_bool;
+typedef std::tuple<const char *, bool> const_char_bool;
 
 class SonarSensor_TEST : public ServerFixture,
                          public ::testing::WithParamInterface<const_char_bool>
@@ -190,8 +190,8 @@ void SonarSensor_TEST::GroundPlane(const std::string &_physicsEngine)
 
 TEST_P(SonarSensor_TEST, CreateSonar)
 {
-  std::string physics = std::tr1::get<0>(GetParam());
-  bool paused = std::tr1::get<1>(GetParam());
+  std::string physics = std::get<0>(GetParam());
+  bool paused = std::get<1>(GetParam());
   gzdbg << "Physics " << physics
         << " paused " << paused
         << std::endl;
@@ -200,8 +200,8 @@ TEST_P(SonarSensor_TEST, CreateSonar)
 
 TEST_P(SonarSensor_TEST, DemoWorld)
 {
-  std::string physics = std::tr1::get<0>(GetParam());
-  bool paused = std::tr1::get<1>(GetParam());
+  std::string physics = std::get<0>(GetParam());
+  bool paused = std::get<1>(GetParam());
   gzdbg << "Physics " << physics
         << " paused " << paused
         << std::endl;
@@ -210,13 +210,13 @@ TEST_P(SonarSensor_TEST, DemoWorld)
 
 TEST_P(SonarSensor_TEST, GroundPlane)
 {
-  std::string physics = std::tr1::get<0>(GetParam());
+  std::string physics = std::get<0>(GetParam());
   GroundPlane(physics);
 }
 
 INSTANTIATE_TEST_CASE_P(SonarTests, SonarSensor_TEST,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values(false, true)));
+  ::testing::Values(false, true)),);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

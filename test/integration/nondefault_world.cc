@@ -43,7 +43,7 @@ TEST_P(NonDefaultWorld, Load)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, NonDefaultWorld,
-                        PHYSICS_ENGINE_VALUES);
+                        PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {

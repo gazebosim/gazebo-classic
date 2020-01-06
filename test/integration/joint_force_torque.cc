@@ -648,7 +648,7 @@ TEST_P(JointForceTorqueTest, JointTorqueTest)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointForceTorqueTest,
-                        PHYSICS_ENGINE_VALUES);
+                        PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {

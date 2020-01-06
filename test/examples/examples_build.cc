@@ -108,7 +108,7 @@ INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
   , "system_gui_plugin"
   , "trigger_light"
   , "world_edit"
-));
+),);  // NOLINT
 
 ///////////////////////////////////////////////////////////////////
 TEST_P(ExamplesBuild_Standalone, Standalone)
@@ -134,7 +134,7 @@ auto standaloneValues = ::testing::Values(
 #endif
   , "transporter"
 );
-INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, standaloneValues);
+INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, standaloneValues,);  // NOLINT
 
 int main(int argc, char **argv)
 {
