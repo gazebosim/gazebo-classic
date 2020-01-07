@@ -41,7 +41,7 @@ namespace gazebo
       public: transport::SubscriberPtr sonarSub;
 
       /// \brief Renders the sonar data reading.
-      public: DynamicLines *sonarRay;
+      public: DynamicLines *sonarRay{nullptr};
 
       /// \brief The current sonar message.
       public: boost::shared_ptr<msgs::SonarStamped const> sonarMsg;

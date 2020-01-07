@@ -295,6 +295,9 @@ bool SonarSensor::UpdateImpl(const bool /*_force*/)
 
   ignition::math::Pose3d referencePose =
     this->pose + this->dataPtr->parentEntity->WorldPose();
+  msgs::Set(this->dataPtr->sonarMsg.mutable_sonar()->mutable_world_pose(),
+      referencePose);
+
   ignition::math::Vector3d pos;
 
   // A 5-step hysteresis window was chosen to reduce range value from

@@ -20,8 +20,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
-
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -52,11 +50,9 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   dPtr->sonarSub = dPtr->node->Subscribe(_topicName,
       &SonarVisual::OnMsg, this, true);
 
-  dPtr->sonarRay = nullptr;
-
   dPtr->connections.push_back(
-      event::Events::ConnectPreRender(
-        boost::bind(&SonarVisual::Update, this)));
+      event::Events::ConnectRender(
+        std::bind(&SonarVisual::Update, this)));
 }
 
 /////////////////////////////////////////////////
