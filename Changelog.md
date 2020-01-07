@@ -14,6 +14,7 @@
 
 1. Allow multiple instances of SimpleTrackedVehiclePlugin.
     * [Pull request 3140](https://bitbucket.org/osrf/gazebo/pull-request/3140)
+    * [Pull request 3148](https://bitbucket.org/osrf/gazebo/pull-request/3148)
 
 1. ODEBallJoint: reduce console output.
     * [Pull request 3132](https://bitbucket.org/osrf/gazebo/pull-request/3132)

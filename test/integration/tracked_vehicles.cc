@@ -74,7 +74,10 @@ class WheeledTrackedVehiclesTest : public TrackedVehiclesTest
   }
 };
 
-void verifyPose(const physics::ModelPtr model, const ignition::math::Pose3d& pose)
+// Verify that a model's world pose is near a specified pose.
+void verifyPose(
+    const physics::ModelPtr model,
+    const ignition::math::Pose3d& pose)
 {
   EXPECT_NEAR(model->WorldPose().Pos().X(), pose.Pos().X(), 1e-1);
   EXPECT_NEAR(model->WorldPose().Pos().Y(), pose.Pos().Y(), 1e-1);
