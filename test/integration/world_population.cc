@@ -175,7 +175,7 @@ TEST_P(WorldEnvPopulationTest, LoadEnvironment)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldEnvPopulationTest,
-                        PHYSICS_ENGINE_VALUES);
+                        PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 ////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv)

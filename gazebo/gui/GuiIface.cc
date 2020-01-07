@@ -89,9 +89,9 @@ Q_DECLARE_METATYPE(std::string)
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(std::set<std::string>)
 
-// This makes it possible to use gazebo::msgs::JointCmd in signals and slots.
+// This makes it possible to use ignition::msgs::JointCmd in signals and slots.
 // qRegisterMetaType is also required, see below.
-Q_DECLARE_METATYPE(gazebo::msgs::JointCmd)
+Q_DECLARE_METATYPE(ignition::msgs::JointCmd)
 
 //////////////////////////////////////////////////
 // QT message handler that pipes qt messages into gazebo's console system.
@@ -509,9 +509,9 @@ bool gui::register_metatypes()
   // slots. Q_DECLARE_METATYPE is also required, see above.
   qRegisterMetaType< std::set<std::string> >();
 
-  // Register gazebo::msgs::JointCmd as a type that can be used in signals and
+  // Register ignition::msgs::JointCmd as a type that can be used in signals and
   // slots. Q_DECLARE_METATYPE is also required, see above.
-  qRegisterMetaType<gazebo::msgs::JointCmd>();
+  qRegisterMetaType<ignition::msgs::JointCmd>();
 
   return true;
 }

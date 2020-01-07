@@ -149,11 +149,11 @@ namespace gazebo
       /// \return True when the service request was successfully
       /// processed.
       private: bool OnJointCmdReq(const ignition::msgs::StringMsg &_req,
-          gazebo::msgs::JointCmd &_rep);
+          ignition::msgs::JointCmd &_rep);
 
       /// \brief Callback when a joint command message is received.
       /// \param[in] _msg The received message.
-      private: void OnJointCommand(const gazebo::msgs::JointCmd &_msg);
+      private: void OnJointCommand(const ignition::msgs::JointCmd &_msg);
 
       /// \brief Set the positions of a Joint by name
       ///        The position is specified in native units, which means,

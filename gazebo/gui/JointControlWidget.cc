@@ -394,7 +394,7 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
     std::string topic = "/" + _modelName + "/joint_cmd";
     boost::replace_all(topic, "::", "/");
     this->dataPtr->jointPub =
-        this->dataPtr->node.Advertise<gazebo::msgs::JointCmd>(topic);
+        this->dataPtr->node.Advertise<ignition::msgs::JointCmd>(topic);
     if (!this->dataPtr->jointPub)
     {
       gzerr << "Error advertising topic [" << topic << "]\n";
@@ -426,7 +426,7 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
     std::string service = "/" + _modelName + "/joint_cmd_req";
     boost::replace_all(service, "::", "/");
 
-    std::function<void(const gazebo::msgs::JointCmd &, const bool)> callback =
+    std::function<void(const ignition::msgs::JointCmd &, const bool)> callback =
         std::bind(&JointControlWidget::ResponseCallback, this, _modelName,
         std::placeholders::_1, std::placeholders::_2);
 
@@ -491,9 +491,9 @@ JointControlWidget::JointControlWidget(QWidget *_parent)
   this->setLayout(mainLayout);
 
   connect(this, SIGNAL(repReceived(const std::string &,
-      const gazebo::msgs::JointCmd &)),
+      const ignition::msgs::JointCmd &)),
       this, SLOT(OnResponse(const std::string &,
-      const gazebo::msgs::JointCmd &)),
+      const ignition::msgs::JointCmd &)),
       Qt::QueuedConnection);
 }
 
@@ -504,7 +504,7 @@ JointControlWidget::~JointControlWidget()
 
 /////////////////////////////////////////////////
 void JointControlWidget::ResponseCallback(const std::string &_modelName,
-    const gazebo::msgs::JointCmd &_rep, const bool _result)
+    const ignition::msgs::JointCmd &_rep, const bool _result)
 {
   if (_result)
   {
@@ -516,56 +516,56 @@ void JointControlWidget::ResponseCallback(const std::string &_modelName,
 
 /////////////////////////////////////////////////
 void JointControlWidget::OnResponse(const std::string &_modelName,
-    const gazebo::msgs::JointCmd &_rep)
+    const ignition::msgs::JointCmd &_rep)
 {
   if (_modelName == this->dataPtr->modelName)
   {
-    if (_rep.has_force())
+    if (_rep.has_force_optional())
     {
       auto slider = this->dataPtr->sliders[_rep.name()];
       GZ_ASSERT(slider, "Joint force controller is null");
-      slider->SetForce(_rep.force());
+      slider->SetForce(_rep.force_optional().data());
     }
     if (_rep.has_position())
     {
       auto slider = this->dataPtr->pidPosSliders[_rep.name()];
       GZ_ASSERT(slider, "Joint PID position controller is null");
-      if (_rep.position().has_target())
+      if (_rep.position().has_target_optional())
       {
-        slider->SetPositionTarget(_rep.position().target());
+        slider->SetPositionTarget(_rep.position().target_optional().data());
       }
-      if (_rep.position().has_p_gain())
+      if (_rep.position().has_p_gain_optional())
       {
-        slider->SetPGain(_rep.position().p_gain());
+        slider->SetPGain(_rep.position().p_gain_optional().data());
       }
-      if (_rep.position().has_i_gain())
+      if (_rep.position().has_i_gain_optional())
       {
-        slider->SetIGain(_rep.position().i_gain());
+        slider->SetIGain(_rep.position().i_gain_optional().data());
       }
-      if (_rep.position().has_d_gain())
+      if (_rep.position().has_d_gain_optional())
       {
-        slider->SetDGain(_rep.position().d_gain());
+        slider->SetDGain(_rep.position().d_gain_optional().data());
       }
     }
     if (_rep.has_velocity())
     {
       auto slider = this->dataPtr->pidVelSliders[_rep.name()];
       GZ_ASSERT(slider, "Joint PID velocity controller is null");
-      if (_rep.velocity().has_target())
+      if (_rep.velocity().has_target_optional())
       {
-        slider->SetVelocityTarget(_rep.velocity().target());
+        slider->SetVelocityTarget(_rep.velocity().target_optional().data());
       }
-      if (_rep.velocity().has_p_gain())
+      if (_rep.velocity().has_p_gain_optional())
       {
-        slider->SetPGain(_rep.velocity().p_gain());
+        slider->SetPGain(_rep.velocity().p_gain_optional().data());
       }
-      if (_rep.velocity().has_i_gain())
+      if (_rep.velocity().has_i_gain_optional())
       {
-        slider->SetIGain(_rep.velocity().i_gain());
+        slider->SetIGain(_rep.velocity().i_gain_optional().data());
       }
-      if (_rep.velocity().has_d_gain())
+      if (_rep.velocity().has_d_gain_optional())
       {
-        slider->SetDGain(_rep.velocity().d_gain());
+        slider->SetDGain(_rep.velocity().d_gain_optional().data());
       }
     }
   }
@@ -578,7 +578,7 @@ void JointControlWidget::OnReset()
        this->dataPtr->sliders.begin();
        iter != this->dataPtr->sliders.end(); ++iter)
   {
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(iter->first);
     msg.set_reset(true);
     this->dataPtr->jointPub.Publish(msg);
@@ -608,9 +608,9 @@ void JointControlWidget::OnForceChanged(double _value, const std::string &_name)
   iter = this->dataPtr->sliders.find(_name);
   if (iter != this->dataPtr->sliders.end())
   {
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
-    msg.set_force(_value);
+    msg.mutable_force_optional()->set_data(_value);
     this->dataPtr->jointPub.Publish(msg);
   }
 }
@@ -623,9 +623,9 @@ void JointControlWidget::OnPIDPosChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
-    msg.mutable_position()->set_target(_value);
+    msg.mutable_position()->mutable_target_optional()->set_data(_value);
     this->dataPtr->jointPub.Publish(msg);
   }
 }
@@ -638,9 +638,9 @@ void JointControlWidget::OnPPosGainChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
-    msg.mutable_position()->set_p_gain(_value);
+    msg.mutable_position()->mutable_p_gain_optional()->set_data(_value);
     this->dataPtr->jointPub.Publish(msg);
   }
 }
@@ -653,9 +653,9 @@ void JointControlWidget::OnDPosGainChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
-    msg.mutable_position()->set_d_gain(_value);
+    msg.mutable_position()->mutable_d_gain_optional()->set_data(_value);
     this->dataPtr->jointPub.Publish(msg);
   }
 }
@@ -668,9 +668,9 @@ void JointControlWidget::OnIPosGainChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
-    msg.mutable_position()->set_i_gain(_value);
+    msg.mutable_position()->mutable_i_gain_optional()->set_data(_value);
     this->dataPtr->jointPub.Publish(msg);
   }
 }
@@ -697,9 +697,9 @@ void JointControlWidget::OnPIDVelChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
-    msg.mutable_velocity()->set_target(_value);
+    msg.mutable_velocity()->mutable_target_optional()->set_data(_value);
     this->dataPtr->jointPub.Publish(msg);
   }
 }
@@ -712,9 +712,9 @@ void JointControlWidget::OnPVelGainChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
-    msg.mutable_velocity()->set_p_gain(_value);
+    msg.mutable_velocity()->mutable_p_gain_optional()->set_data(_value);
     this->dataPtr->jointPub.Publish(msg);
   }
 }
@@ -727,9 +727,9 @@ void JointControlWidget::OnDVelGainChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
-    msg.mutable_velocity()->set_d_gain(_value);
+    msg.mutable_velocity()->mutable_d_gain_optional()->set_data(_value);
     this->dataPtr->jointPub.Publish(msg);
   }
 }
@@ -742,9 +742,9 @@ void JointControlWidget::OnIVelGainChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
-    msg.mutable_velocity()->set_i_gain(_value);
+    msg.mutable_velocity()->mutable_i_gain_optional()->set_data(_value);
     this->dataPtr->jointPub.Publish(msg);
   }
 }
