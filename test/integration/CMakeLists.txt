@@ -38,6 +38,7 @@ set(tests
   dem.cc
   elastic_modulus.cc
   file_handling.cc
+  flash_light_plugin.cc
   gripper.cc
   gz_joint.cc
   gz_log.cc
@@ -62,8 +63,10 @@ set(tests
   keys_to_joints.cc
   kinematic_loop.cc
   laser.cc
+  led_plugin.cc
   link.cc
   logical_camera_sensor.cc
+  misalignment_plugin.cc
   model.cc
   model_database.cc
   multirayshape.cc
@@ -86,6 +89,7 @@ set(tests
   physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  plugin_interface.cc
   rayshape.cc
   region_events.cc
   rest_web.cc
@@ -103,10 +107,11 @@ set(tests
   surface_properties.cc
   swarm.cc
   touch_plugin.cc
+  tracked_vehicles.cc
   transceiver.cc
   transport.cc
   transporter.cc
-  transport_msg_count.cc
+  wheel_slip.cc
   world.cc
   world_clone.cc
   world_entity_below_point.cc
@@ -114,6 +119,13 @@ set(tests
   world_population.cc
   worlds_installed.cc
   )
+
+if (NOT WIN32)
+  set(tests
+    ${tests}
+    transport_msg_count.cc
+  )
+endif()
 
 if (HAVE_GTS)
   set(tests
@@ -150,6 +162,9 @@ endif()
 # Add plugin dependency
 add_dependencies(${TEST_TYPE}_joint_control_plugin JointControlPlugin)
 add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+add_dependencies(${TEST_TYPE}_plugin_interface PluginInterfaceTest)
+add_dependencies(${TEST_TYPE}_tracked_vehicles SimpleTrackedVehiclePlugin)
+add_dependencies(${TEST_TYPE}_tracked_vehicles WheelTrackedVehiclePlugin)
 
 set(display_tests
 )

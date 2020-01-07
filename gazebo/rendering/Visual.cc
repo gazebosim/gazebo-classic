@@ -1092,7 +1092,8 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
         Ogre::SimpleRenderable *simpleRenderable =
             dynamic_cast<Ogre::SimpleRenderable *>(obj);
         if (simpleRenderable)
-          simpleRenderable->setMaterial(this->dataPtr->myMaterialName);
+          GZ_OGRE_SET_MATERIAL_BY_NAME(simpleRenderable,
+              this->dataPtr->myMaterialName);
       }
     }
   }
@@ -1238,12 +1239,6 @@ void Visual::SetMaterialShaderParam(const std::string &_paramName,
 }
 
 /////////////////////////////////////////////////
-void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
-{
-  this->SetAmbient(_color.Ign(), _cascade);
-}
-
-/////////////////////////////////////////////////
 void Visual::SetAmbient(const ignition::math::Color &_color,
     const bool _cascade)
 {
@@ -1306,12 +1301,6 @@ void Visual::SetAmbient(const ignition::math::Color &_color,
 
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("ambient")->Set(_color);
-}
-
-/////////////////////////////////////////////////
-void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
-{
-  this->SetDiffuse(_color.Ign(), _cascade);
 }
 
 /////////////////////////////////////////////////
@@ -1384,12 +1373,6 @@ void Visual::SetDiffuse(const ignition::math::Color &_color,
       ->GetElement("diffuse")->Set(_color);
 }
 
-/////////////////////////////////////////////////
-void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
-{
-  this->SetSpecular(_color.Ign(), _cascade);
-}
-
 //////////////////////////////////////////////////
 void Visual::SetSpecular(const ignition::math::Color &_color,
     const bool _cascade)
@@ -1456,12 +1439,6 @@ void Visual::SetSpecular(const ignition::math::Color &_color,
 }
 
 //////////////////////////////////////////////////
-void Visual::SetEmissive(const common::Color &_color, const bool _cascade)
-{
-  this->SetEmissive(_color.Ign(), _cascade);
-}
-
-//////////////////////////////////////////////////
 void Visual::SetEmissive(const ignition::math::Color &_color,
     const bool _cascade)
 {
@@ -1517,35 +1494,9 @@ void Visual::SetEmissive(const ignition::math::Color &_color,
 }
 
 /////////////////////////////////////////////////
-common::Color Visual::GetAmbient() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->dataPtr->ambient;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 ignition::math::Color Visual::Ambient() const
 {
   return this->dataPtr->ambient;
-}
-
-/////////////////////////////////////////////////
-common::Color Visual::GetDiffuse() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->dataPtr->diffuse;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -1555,35 +1506,9 @@ ignition::math::Color Visual::Diffuse() const
 }
 
 /////////////////////////////////////////////////
-common::Color Visual::GetSpecular() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->dataPtr->specular;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 ignition::math::Color Visual::Specular() const
 {
   return this->dataPtr->specular;
-}
-
-/////////////////////////////////////////////////
-common::Color Visual::GetEmissive() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->dataPtr->emissive;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -2166,14 +2091,6 @@ void Visual::SetRibbonTrail(bool _value,
 }
 
 //////////////////////////////////////////////////
-void Visual::SetRibbonTrail(bool _value,
-                  const common::Color &_initialColor,
-                  const common::Color &_changeColor)
-{
-  this->SetRibbonTrail(_value, _initialColor.Ign(), _changeColor.Ign());
-}
-
-//////////////////////////////////////////////////
 DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 {
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
@@ -2273,7 +2190,11 @@ void Visual::BoundsHelper(Ogre::SceneNode *_node,
         transform[3][0] = transform[3][1] = transform[3][2] = 0;
         transform[3][3] = 1;
         // get oriented bounding box in object's local space
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+        bb.transform(transform);
+#else
         bb.transformAffine(transform);
+#endif
 
         min = Conversions::ConvertIgn(bb.getMinimum());
         max = Conversions::ConvertIgn(bb.getMaximum());
@@ -2399,7 +2320,9 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       Ogre::VertexDeclaration* vertexDecl;
       Ogre::HardwareVertexBufferSharedPtr vBuf;
       Ogre::HardwareIndexBufferSharedPtr iBuf;
+      Ogre::HardwareVertexBufferSharedPtr texBuf;
       float *vertices;
+      float *texMappings = nullptr;
       uint32_t *indices;
 
       size_t currOffset = 0;
@@ -2455,9 +2378,14 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       // TODO: specular colors
 
       // two dimensional texture coordinates
+      // allocate buffer for texture mapping, when doing animations, OGRE
+      // requires the vertex position and normals reside in their own buffer,
+      // see `https://ogrecave.github.io/ogre/api/1.11/_animation.html` under,
+      // `Vertex buffer arrangements`.
+      currOffset = 0;
       if (subMesh.GetTexCoordCount() > 0)
       {
-        vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2,
+        vertexDecl->addElement(1, currOffset, Ogre::VET_FLOAT2,
             Ogre::VES_TEXTURE_COORDINATES, 0);
         currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT2);
       }
@@ -2471,21 +2399,53 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
                  Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
                  false);
 
+      if (subMesh.GetTexCoordCount() > 0)
+      {
+        texBuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+            vertexDecl->getVertexSize(1),
+            vertexData->vertexCount,
+            Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            false);
+      }
+
       vertexData->vertexBufferBinding->setBinding(0, vBuf);
       vertices = static_cast<float*>(vBuf->lock(
                       Ogre::HardwareBuffer::HBL_DISCARD));
 
+      if (subMesh.GetTexCoordCount() > 0)
+      {
+        vertexData->vertexBufferBinding->setBinding(1, texBuf);
+        texMappings = static_cast<float*>(texBuf->lock(
+                        Ogre::HardwareBuffer::HBL_DISCARD));
+      }
+
       if (_mesh->HasSkeleton())
       {
-        common::Skeleton *skel = _mesh->GetSkeleton();
-        for (unsigned int j = 0; j < subMesh.GetNodeAssignmentsCount(); j++)
+        if (subMesh.GetNodeAssignmentsCount() > 0)
         {
-          common::NodeAssignment na = subMesh.GetNodeAssignment(j);
+          common::Skeleton *skel = _mesh->GetSkeleton();
+          for (unsigned int j = 0; j < subMesh.GetNodeAssignmentsCount(); j++)
+          {
+            common::NodeAssignment na = subMesh.GetNodeAssignment(j);
+            Ogre::VertexBoneAssignment vba;
+            vba.vertexIndex = na.vertexIndex;
+            vba.boneIndex = ogreSkeleton->getBone(skel->GetNodeByHandle(
+                                na.nodeIndex)->GetName())->getHandle();
+            vba.weight = na.weight;
+            ogreSubMesh->addBoneAssignment(vba);
+          }
+        }
+        else
+        {
+          // When there is a skeleton associated with the mesh,
+          // OGRE requires at least 1 bone assignment to compile the blend
+          // weights.
+          // The submeshs loaded from COLLADA may not have weights so we need
+          // to add a dummy bone assignment for OGRE.
           Ogre::VertexBoneAssignment vba;
-          vba.vertexIndex = na.vertexIndex;
-          vba.boneIndex = ogreSkeleton->getBone(skel->GetNodeByHandle(
-                              na.nodeIndex)->GetName())->getHandle();
-          vba.weight = na.weight;
+          vba.vertexIndex = 0;
+          vba.boneIndex = 0;
+          vba.weight = 0;
           ogreSubMesh->addBoneAssignment(vba);
         }
       }
@@ -2522,8 +2482,8 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
 
         if (subMesh.GetTexCoordCount() > 0)
         {
-          *vertices++ = subMesh.TexCoord(j).X();
-          *vertices++ = subMesh.TexCoord(j).Y();
+          *texMappings++ = subMesh.TexCoord(j).X();
+          *texMappings++ = subMesh.TexCoord(j).Y();
         }
       }
 
@@ -2546,6 +2506,10 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       // Unlock
       vBuf->unlock();
       iBuf->unlock();
+      if (subMesh.GetTexCoordCount() > 0)
+      {
+        texBuf->unlock();
+      }
     }
 
     ignition::math::Vector3d max = _mesh->Max();
@@ -2744,6 +2708,22 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_transparency())
   {
     this->SetTransparency(_msg->transparency());
+  }
+
+  // Note: sometimes a visual msg is received on the ~/visual topic
+  // before the full scene msg, which results in a visual created without
+  // its plugins loaded. So make sure we check the msg here and load the
+  // plugins if not done already.
+  if (!_msg->plugin().empty() && this->dataPtr->plugins.empty()
+      && !this->dataPtr->sdf->HasElement("plugin"))
+  {
+    for (int i = 0; i < _msg->plugin_size(); ++i)
+    {
+      sdf::ElementPtr pluginElem;
+      pluginElem = msgs::PluginToSDF(_msg->plugin(i), pluginElem);
+      this->dataPtr->sdf->InsertElement(pluginElem);
+    }
+    this->LoadPlugins();
   }
 
   /*if (msg->points.size() > 0)

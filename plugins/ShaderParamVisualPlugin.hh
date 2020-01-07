@@ -53,7 +53,7 @@ namespace gazebo
   ///      </param>
   ///    </plugin>
   /// \endverbatim
-  class GAZEBO_VISIBLE ShaderParamVisualPlugin : public VisualPlugin
+  class GZ_PLUGIN_VISIBLE ShaderParamVisualPlugin : public VisualPlugin
   {
     /// \brief Constructor.
     public: ShaderParamVisualPlugin();

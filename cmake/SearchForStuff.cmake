@@ -5,7 +5,7 @@ include (${gazebo_cmake_dir}/FindOS.cmake)
 include (FindPkgConfig)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
 
-execute_process(COMMAND pkg-config --modversion protobuf
+execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --modversion protobuf
   OUTPUT_VARIABLE PROTOBUF_VERSION
   RESULT_VARIABLE protobuf_modversion_failed)
 
@@ -91,12 +91,6 @@ endif ()
 ########################################
 # Find packages
 
-# In Visual Studio we use configure.bat to trick all path cmake
-# variables so let's consider that as a replacement for pkgconfig
-if (MSVC)
-  set (PKG_CONFIG_FOUND TRUE)
-endif()
-
 find_package(CURL)
 if (CURL_FOUND)
   # FindCURL.cmake distributed with CMake exports
@@ -108,6 +102,12 @@ if (CURL_FOUND)
   #       CURL_INCLUDE_DIRS and CURL_LIBRARIES provided by FindCURL.cmake
   set(CURL_INCLUDEDIR ${CURL_INCLUDE_DIRS})
 endif ()
+
+# In Visual Studio we use configure.bat to trick all path cmake
+# variables so let's consider that as a replacement for pkgconfig
+if (MSVC)
+  set (PKG_CONFIG_FOUND TRUE)
+endif()
 
 if (PKG_CONFIG_FOUND)
   if (NOT CURL_FOUND)
@@ -161,13 +161,16 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  set(DART_MIN_REQUIRED_VERSION 6)
-  find_package(DART ${DART_MIN_REQUIRED_VERSION} CONFIG OPTIONAL_COMPONENTS utils-urdf)
+  set(DART_MIN_REQUIRED_VERSION 6.6)
+  find_package(DART ${DART_MIN_REQUIRED_VERSION} CONFIG OPTIONAL_COMPONENTS collision-bullet collision-ode utils-urdf)
   if (DART_FOUND)
     message (STATUS "Looking for DART - found")
     set (HAVE_DART TRUE)
     if (DART_utils-urdf_FOUND)
       set (HAVE_DART_URDF TRUE)
+    endif()
+    if (DART_collision-bullet_FOUND)
+      set (HAVE_DART_BULLET TRUE)
     endif()
   else()
     message (STATUS "Looking for DART - not found")
@@ -309,21 +312,29 @@ if (PKG_CONFIG_FOUND)
     message(STATUS "TBB not found, attempting to detect manually")
     set (TBB_PKG_CONFIG "")
 
-    find_library(tbb_library tbb ENV LD_LIBRARY_PATH)
-    if (tbb_library)
-      set(TBB_FOUND true)
-      set(TBB_LIBRARIES ${tbb_library})
-    else (tbb_library)
-      BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
-    endif(tbb_library)
+    # Workaround for CMake bug https://gitlab.kitware.com/cmake/cmake/issues/17135
+    unset(TBB_FOUND CACHE)
+
+    find_package(TBB CONFIG)
+    if (TBB_FOUND)
+      set(TBB_LIBRARIES TBB::tbb)
+    endif()
+
+    if (NOT TBB_FOUND)
+      find_library(tbb_library tbb ENV LD_LIBRARY_PATH)
+      if (tbb_library)
+        set(TBB_FOUND true)
+        set(TBB_LIBRARIES ${tbb_library})
+      else (tbb_library)
+        BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
+      endif(tbb_library)
+    endif (NOT TBB_FOUND)
   endif (NOT TBB_FOUND)
 
   #################################################
   # Find OGRE
-  # On Windows, we assume that all the OGRE* defines are passed in manually
-  # to CMake.
-  if (NOT WIN32)
-    execute_process(COMMAND pkg-config --modversion OGRE
+  if (PKG_CONFIG_EXECUTABLE AND NOT DEFINED OGRE_VERSION)
+    execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --modversion OGRE
                     OUTPUT_VARIABLE OGRE_VERSION)
     string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
 
@@ -356,6 +367,10 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
 
   if (NOT OGRE_FOUND)
+    # Workaround for CMake bug https://gitlab.kitware.com/cmake/cmake/issues/17135,
+    # that prevents to successfully run a find_package(<package>) call if before there
+    # was a failed call to pkg_check_modules(<package> <package>)
+    unset(OGRE_FOUND CACHE)
     # If OGRE was not found, try with the standard find_package(OGRE)
     find_package(OGRE COMPONENTS RTShaderSystem Terrain Overlay Paging)
     # Add each component include directories to OGRE_INCLUDE_DIRS because
@@ -369,6 +384,7 @@ if (PKG_CONFIG_FOUND)
     list(APPEND OGRE_LIBRARIES ${OGRE_Terrain_LIBRARIES})
     list(APPEND OGRE_LIBRARIES ${OGRE_Overlay_LIBRARIES})
     list(APPEND OGRE_LIBRARIES ${OGRE_Paging_LIBRARIES})
+    set(OGRE_PLUGINDIR ${OGRE_PLUGIN_DIR})
   endif ()
 
   if (NOT OGRE_FOUND)
@@ -405,10 +421,8 @@ if (PKG_CONFIG_FOUND)
 
   # Also find OGRE's plugin directory, which is provided in its .pc file as the
   # `plugindir` variable.  We have to call pkg-config manually to get it.
-  # On Windows, we assume that all the OGRE* defines are passed in manually
-  # to CMake.
-  if (NOT WIN32)
-    execute_process(COMMAND pkg-config --variable=plugindir OGRE
+  if (PKG_CONFIG_EXECUTABLE)
+    execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=plugindir OGRE
                     OUTPUT_VARIABLE _pkgconfig_invoke_result
                     RESULT_VARIABLE _pkgconfig_failed)
     if(_pkgconfig_failed)
@@ -600,11 +614,11 @@ find_package(Qt5 COMPONENTS Core Widgets OpenGL Test REQUIRED)
 ########################################
 # Find Boost, if not specified manually
 include(FindBoost)
-find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex iostreams date_time)
+find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread system filesystem program_options regex iostreams date_time)
 
 if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-  BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
+  BUILD_ERROR ("Boost not found. Please install thread system filesystem program_options regex iostreams date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
 
 ########################################
@@ -742,7 +756,7 @@ endif()
 
 ################################################################################
 # Find the Ignition Fuel Tools library
-find_package(ignition-fuel_tools1 QUIET)
+find_package(ignition-fuel_tools1 1.2 QUIET)
 if (NOT ignition-fuel_tools1_FOUND)
   message (STATUS "Looking for libignition-fuel_tools1 - not found")
   BUILD_WARNING ("Ignition Fuel Tools not found, Fuel support will be disabled")

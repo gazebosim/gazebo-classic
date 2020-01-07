@@ -91,8 +91,9 @@ void TrackVisualTest::TrackVisual()
   auto camTrackPosition = cam->TrackPosition();
   QVERIFY(camTrackPosition == ignition::math::Vector3d(-1, -1, -1));
 
-  // Get camera's pose
+  // Get camera's pose and direction
   auto camPose = cam->WorldPose();
+  auto camDir = cam->Direction();
 
   // Set box model pose
   ignition::math::Pose3d newVisualPose(1, -2, 0.5, -0.1, 0.2, -0.3);
@@ -108,7 +109,9 @@ void TrackVisualTest::TrackVisual()
 
   // Check that user camera's pose changed
   auto newCamPose = cam->WorldPose();
+  auto newCamDir = cam->Direction();
   QVERIFY(newCamPose != camPose);
+  QVERIFY(newCamDir != camDir);
 
   // Change camera tracking parameters
   cam->SetTrackIsStatic(false);
@@ -145,8 +148,12 @@ void TrackVisualTest::TrackVisual()
   // Check that camera does not track any visual
   QVERIFY(!cam->TrackedVisual());
 
-  // Check that user camera's pose has not changed
-  QVERIFY(cam->WorldPose() == newCamPose);
+  // Check that user camera's position and direction has not changed
+  // Note that Gazebo may update the camera's rotation when leaving the
+  // track visual mode to compensate for changes in internal ogre camera
+  // orientation due to auto tracking
+  QVERIFY(cam->WorldPose().Pos() == newCamPose.Pos());
+  QVERIFY(cam->Direction() == newCamDir);
 
   // Clean up
   delete mainWindow;

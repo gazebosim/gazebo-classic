@@ -74,7 +74,7 @@ void SonarVisual::Load()
       reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
 
   dPtr->sonarRay = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->sonarRay->setMaterial("Gazebo/RedGlow");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->sonarRay, "Gazebo/RedGlow");
   dPtr->sonarRay->AddPoint(0, 0, 0);
   dPtr->sonarRay->AddPoint(0, 0, 0);
   dPtr->sonarRay->SetPoint(0, ignition::math::Vector3d::Zero);

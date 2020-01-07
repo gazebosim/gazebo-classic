@@ -748,6 +748,9 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     // Iterate over all the interface addresses
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
     {
+      // Only consider UP interfaces
+      if (!(ifa->ifa_flags & IFF_UP))
+        continue;
       if (ifa->ifa_addr == NULL)
         continue;
 
@@ -818,6 +821,10 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     // last non-loopback one that we find.
     for (PIP_ADAPTER_ADDRESSES curr = addrs; curr; curr = curr->Next)
     {
+      // The interface is not running.
+      if (curr->OperStatus != IfOperStatusUp)
+        continue;
+
       // Iterate over all unicast addresses for this adapter
       for (PIP_ADAPTER_UNICAST_ADDRESS unicast = curr->FirstUnicastAddress;
            unicast; unicast = unicast->Next)

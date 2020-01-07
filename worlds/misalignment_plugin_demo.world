@@ -1,0 +1,119 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <gravity>0 0 0</gravity>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!--
+         Model combines a drill with a drill bit for visualizing alignment poses
+    -->
+    <model name="wrap_drill">
+      <link name="drill_bit_link">
+        <pose>-0.004 0.135 0.239 0 -0.1 1.570796</pose>
+        <inertial>
+          <mass>0.001</mass>
+          <inertia>
+            <ixx>1e-10</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1e-10</iyy>
+            <iyz>0</iyz>
+            <izz>1e-10</izz>
+          </inertia>
+        </inertial>
+        <visual name="drill_bit_visual">
+          <pose>-0.005 0 0 0 -1.570796 0</pose>
+          <geometry>
+            <cylinder>
+              <length>0.01</length>
+              <radius>0.003</radius>
+            </cylinder>
+          </geometry>
+          <material>
+            <lighting>1</lighting>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <include>
+        <uri>model://cordless_drill</uri>
+      </include>
+
+      <joint name="visualize_drillbit_pose_joint" type="fixed">
+        <parent>drill_bit_link</parent>
+        <child>drill::link</child>
+      </joint>
+    </model>
+
+    <!--
+         Model combines a mailbox with a screw for visualizing alignment poses
+    -->
+    <model name="wrap_mailbox">
+      <pose>1 0 0 0 0 0</pose>
+      <link name="screw_link">
+        <pose>.06 -0.1 0.798 0 0 3.14159</pose>
+        <inertial>
+          <mass>0.001</mass>
+          <inertia>
+            <ixx>1e-10</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1e-10</iyy>
+            <iyz>0</iyz>
+            <izz>1e-10</izz>
+          </inertia>
+        </inertial>
+        <visual name="screw_visual">
+          <pose>0 0 0 0 1.570796 -3.14159</pose>
+          <geometry>
+            <cylinder>
+              <length>0.002</length>
+              <radius>0.003</radius>
+            </cylinder>
+          </geometry>
+          <material>
+            <lighting>1</lighting>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <include>
+        <uri>model://mailbox</uri>
+      </include>
+
+      <joint name="visualize_screw_pose_joint" type="fixed">
+        <parent>screw_link</parent>
+        <child>Mailbox::link</child>
+      </joint>
+    </model>
+
+    <!-- The output of these two plugins should be identical. They're set up
+         to test calculated misalignment is correct when a pose is non-zero. -->
+    <plugin name="alignmentDrillScrew_1" filename="libMisalignmentPlugin.so">
+      <namespace>gazebo/default/drill/alignment_1/</namespace>
+      <pose frame="drill::link">-0.004 0.135 0.239 0 -0.1 1.570796</pose>
+      <pose>1.06 -0.1 0.798 0 0 3.14159</pose>
+      <enable>true</enable>
+    </plugin>
+    <plugin name="alignmentDrillScrew_2" filename="libMisalignmentPlugin.so">
+      <namespace>gazebo/default/drill/alignment_2/</namespace>
+      <pose frame="wrap_drill::drill_bit_link">0 0 0 0 0 0</pose>
+      <pose frame="wrap_mailbox::screw_link">0 0 0 0 0 0</pose>
+      <enable>true</enable>
+    </plugin>
+
+  </world>
+</sdf>

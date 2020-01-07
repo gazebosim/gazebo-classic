@@ -103,7 +103,8 @@ void Light::Load()
   if (!parentVis)
     parentVis = this->dataPtr->scene->WorldVisual();
 
-  this->dataPtr->visual.reset(new Visual(this->Name(), parentVis, false));
+  this->dataPtr->visual.reset(
+      new Visual(this->Name(), parentVis, false));
   this->dataPtr->visual->Load();
   this->dataPtr->visual->AttachObject(this->dataPtr->light);
 
@@ -218,14 +219,14 @@ void Light::CreateVisual()
     this->dataPtr->line =
         this->dataPtr->visual->CreateDynamicLine(RENDERING_LINE_LIST);
 
-    this->dataPtr->line->setMaterial("Gazebo/LightOn");
+    GZ_OGRE_SET_MATERIAL_BY_NAME(this->dataPtr->line, "Gazebo/LightOn");
 
     this->dataPtr->line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
     this->dataPtr->visual->SetVisible(true);
 
     // Create a visual to hold the light selection object.
-    VisualPtr lightSelectionVis(new Visual(this->Name() + "_seletion",
+    VisualPtr lightSelectionVis(new Visual(this->Name() + "_selection",
         this->dataPtr->visual));
     lightSelectionVis->SetType(Visual::VT_GUI);
 
@@ -388,14 +389,20 @@ ignition::math::Quaterniond Light::Rotation() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Pose3d Light::WorldPose() const
+{
+  return this->dataPtr->visual->WorldPose();
+}
+
+//////////////////////////////////////////////////
 bool Light::SetSelected(const bool _s)
 {
   if (this->dataPtr->light->getType() != Ogre::Light::LT_DIRECTIONAL)
   {
     if (_s)
-      this->dataPtr->line->setMaterial("Gazebo/PurpleGlow");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(this->dataPtr->line, "Gazebo/PurpleGlow");
     else
-      this->dataPtr->line->setMaterial("Gazebo/LightOn");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(this->dataPtr->line, "Gazebo/LightOn");
   }
 
   return true;
@@ -404,11 +411,28 @@ bool Light::SetSelected(const bool _s)
 //////////////////////////////////////////////////
 void Light::ToggleShowVisual()
 {
-  this->dataPtr->visual->ToggleVisible();
+  this->ShowVisual(!this->dataPtr->visualize);
 }
 
 //////////////////////////////////////////////////
 void Light::ShowVisual(const bool _s)
+{
+  if (this->dataPtr->visualize == _s)
+    return;
+
+  this->dataPtr->visualize = _s;
+
+  Ogre::SceneNode *n = this->dataPtr->visual->GetSceneNode();
+  for (unsigned int i = 0; i < n->numAttachedObjects(); ++i)
+  {
+    Ogre::MovableObject *m = n->getAttachedObject(i);
+    if (m->getMovableType() != "Light")
+      m->setVisible(this->dataPtr->visualize);
+  }
+}
+
+//////////////////////////////////////////////////
+void Light::SetVisible(const bool _s)
 {
   this->dataPtr->visual->SetVisible(_s);
 }
@@ -450,12 +474,6 @@ std::string Light::LightType() const
 }
 
 //////////////////////////////////////////////////
-void Light::SetDiffuseColor(const common::Color &_color)
-{
-  this->SetDiffuseColor(_color.Ign());
-}
-
-//////////////////////////////////////////////////
 void Light::SetDiffuseColor(const ignition::math::Color &_color)
 {
   sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("diffuse");
@@ -478,12 +496,6 @@ ignition::math::Color Light::SpecularColor() const
 {
   return
       this->dataPtr->sdf->GetElement("specular")->Get<ignition::math::Color>();
-}
-
-//////////////////////////////////////////////////
-void Light::SetSpecularColor(const common::Color &_color)
-{
-  this->SetSpecularColor(_color.Ign());
 }
 
 //////////////////////////////////////////////////

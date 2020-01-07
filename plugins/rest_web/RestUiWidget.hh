@@ -38,7 +38,7 @@ namespace gazebo
 
   /// \class RestUiWidget RestUiWidget.hh RestUiWidget.hh
   /// \brief REST user interface widget
-  class GAZEBO_VISIBLE RestUiWidget : public QWidget
+  class GZ_PLUGIN_VISIBLE RestUiWidget : public QWidget
   {
     Q_OBJECT
 

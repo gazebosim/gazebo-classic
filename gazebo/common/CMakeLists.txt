@@ -1,7 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-add_definitions(-DBUILDING_DLL_GZ_COMMON)
-
 # tiny obj loader
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/tinyobjloader)
 
@@ -39,7 +37,6 @@ set (sources
   BVHLoader.cc
   ColladaExporter.cc
   ColladaLoader.cc
-  Color.cc
   CommonIface.cc
   Console.cc
   Dem.cc
@@ -78,11 +75,12 @@ set (sources
 
 if (NOT USE_EXTERNAL_TINYXML)
   include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
-  set (sources ${sources}
-       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
-       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
-       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
-       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
+  add_library (tinyxml_internal STATIC
+    ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
+    ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
+    ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
+    ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
+  set (tinyxml_LIBRARIES tinyxml_internal)
 endif()
 
 set (headers
@@ -95,7 +93,6 @@ set (headers
   ColladaLoader.hh
   CommonIface.hh
   CommonTypes.hh
-  Color.hh
   Console.hh
   Dem.hh
   EnumIface.hh
@@ -141,7 +138,6 @@ set (gtest_sources
   Battery_TEST.cc
   ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
-  Color_TEST.cc
   CommonIface_TEST.cc
   Console_TEST.cc
   Dem_TEST.cc
@@ -158,6 +154,7 @@ set (gtest_sources
   MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
   OBJLoader_TEST.cc
+  Plugin_TEST.cc
   SemanticVersion_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
@@ -217,16 +214,14 @@ if (HAVE_IGNITION_FUEL_TOOLS)
   )
 endif()
 
-gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common)
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common ${tinyxml_LIBRARIES})
 
-set (common_headers "" CACHE INTERNAL "common headers" FORCE)
+set (common_headers "")
 foreach (hdr ${headers_install})
-  APPEND_TO_CACHED_STRING(common_headers
-    "Common Headers" "#include \"gazebo/common/${hdr}\"\n")
+  set (common_headers "${common_headers}#include \"gazebo/common/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_DIR}/common.hh )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_COMMON")
 if (WIN32)
   # 0x601 = Windows 7.  TBB needs to know this.
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x601")
@@ -243,6 +238,10 @@ set_property(
   GAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}"
   GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
+)
+
+target_compile_definitions(gazebo_common
+  PRIVATE BUILDING_DLL_GZ_COMMON
 )
 
 target_link_libraries(gazebo_common
@@ -262,6 +261,7 @@ target_link_libraries(gazebo_common
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
   ${IGNITION-FUEL_TOOLS_LIBRARIES}
+  ${IGNITION-COMMON_LIBRARIES}
 )
 
 if (UNIX)

@@ -17,6 +17,10 @@
 
 #include <gtest/gtest.h>
 
+#ifdef _WIN32
+  #include <winsock.h>  // timeval
+#endif
+
 #include "gazebo/common/Time.hh"
 #include "test/util.hh"
 

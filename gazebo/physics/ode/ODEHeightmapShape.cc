@@ -40,6 +40,63 @@ dReal ODEHeightmapShape::GetHeightCallback(void *_data, int _x, int _y)
   return static_cast<ODEHeightmapShape*>(_data)->GetHeight(_x, _y);
 }
 
+
+//////////////////////////////////////////////////
+// creates the ODE height field. Only enabled if the height data type is float.
+void setOdeHeightfieldDetails(
+    const dHeightfieldDataID odeHeightfieldId,
+    const float *heights,
+    const double width,
+    const double height,
+    const std::size_t vertSize,
+    double zOffset,
+    double thickness)
+{
+  assert(width >= 2);
+  assert(height >= 2);
+  dGeomHeightfieldDataBuildSingle(
+      odeHeightfieldId,
+      heights,
+      0,
+      width,      // width (in meters)
+      height,     // height (in meters)
+      vertSize,   // width (sampling size)
+      vertSize,   // height (sampling size)
+      1.0,        // vertical (z-axis) scaling
+      zOffset,    // vertical (z-axis) offset
+      thickness,  // vertical thickness for closing the height map mesh
+      0);         // wrap mode
+}
+
+//////////////////////////////////////////////////
+// creates the ODE height field. Only enabled if the height data type is double.
+void setOdeHeightfieldDetails(
+    const dHeightfieldDataID odeHeightfieldId,
+    const double *heights,
+    const double width,
+    const double height,
+    const std::size_t vertSize,
+    double zOffset,
+    double thickness)
+{
+  assert(width >= 2);
+  assert(height >= 2);
+  dGeomHeightfieldDataBuildDouble(
+      odeHeightfieldId,
+      heights,
+      0,
+      width,      // width (in meters)
+      height,     // height (in meters)
+      vertSize,   // width (sampling size)
+      vertSize,   // height (sampling size)
+      1.0,        // vertical (z-axis) scaling
+      zOffset,    // vertical (z-axis) offset
+      thickness,  // vertical thickness for closing the height map mesh
+      0);         // wrap mode
+}
+
+
+
 //////////////////////////////////////////////////
 void ODEHeightmapShape::Init()
 {
@@ -51,27 +108,21 @@ void ODEHeightmapShape::Init()
   // Step 2: Create the ODE heightfield collision
   this->odeData = dGeomHeightfieldDataCreate();
 
+
   // Step 3: Setup a callback method for ODE
-  dGeomHeightfieldDataBuildSingle(
+  setOdeHeightfieldDetails(
       this->odeData,
-      &this->heights[0],
-      0,
+      this->heights.data(),
       // in meters
       this->Size().X(),
       // in meters
       this->Size().Y(),
-      // width sampling size
+      // number of vertices
       this->vertSize,
-      // depth sampling size (along height of image)
-      this->vertSize,
-      // vertical (z-axis) scaling
-      1.0,
       // vertical (z-axis) offset
       this->Pos().Z(),
       // vertical thickness for closing the height map mesh
-      1.0,
-      // wrap mode
-      0);
+      1.0);
 
   // Step 4: Restrict the bounds of the AABB to improve efficiency
   dGeomHeightfieldDataSetBounds(this->odeData, this->GetMinHeight(),
@@ -96,5 +147,16 @@ void ODEHeightmapShape::Init()
   q[2] = pose.Rot().Y();
   q[3] = pose.Rot().Z();
 
+  // As soon as the pose of the ODE body
+  // is changed, this will be overwritten. Probably better
+  // to use dGeomSetOffsetQuaternion and set it to just the
+  // relative rotation, e.g.:
+  //
+  // dQuaternion q;
+  // q[0] = sqrt(0.5);
+  // q[1] = sqrt(0.5);
+  // q[2] = 0;
+  // q[3] = 0;
+  // dGeomSetOffsetQuaternion(oParent->getCollisionId(), q);
   dGeomSetQuaternion(oParent->GetCollisionId(), q);
 }

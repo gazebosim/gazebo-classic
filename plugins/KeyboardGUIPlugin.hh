@@ -18,12 +18,8 @@
 #define GAZEBO_PLUGINS_KEYBOARDGUIPLUGIN_HH_
 
 #include <memory>
-#include <gazebo/common/Plugin.hh>
-
-// See: https://bugreports.qt-project.org/browse/QTBUG-22829
-#ifndef Q_MOC_RUN
-# include <gazebo/gui/gui.hh>
-#endif
+#include <gazebo/common/KeyEvent.hh>
+#include <gazebo/gui/GuiPlugin.hh>
 
 namespace gazebo
 {
@@ -32,7 +28,7 @@ namespace gazebo
 
   /// \brief A GUI plugin that captures key strokes from gzclient GUI
   /// and publishes over gz transport topic `~/keyboard/keypress`
-  class GAZEBO_VISIBLE KeyboardGUIPlugin : public GUIPlugin
+  class GZ_PLUGIN_VISIBLE KeyboardGUIPlugin : public GUIPlugin
   {
     Q_OBJECT
 

@@ -704,52 +704,6 @@ void Model::SetAngularVel(const ignition::math::Vector3d &_vel)
 }
 
 //////////////////////////////////////////////////
-void Model::SetLinearAccel(const ignition::math::Vector3d &_accel)
-{
-  gzwarn << "Model::SetLinearAccel() is deprecated and has no effect. "
-         << "Use Link::SetForce() on the link directly instead. \n";
-  for (Link_V::iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
-  {
-    if (*iter)
-    {
-      (*iter)->SetEnabled(true);
-#ifndef _WIN32
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-      (*iter)->SetLinearAccel(_accel);
-#ifndef _WIN32
-      #pragma GCC diagnostic pop
-#endif
-    }
-  }
-}
-
-//////////////////////////////////////////////////
-void Model::SetAngularAccel(const ignition::math::Vector3d &_accel)
-{
-  gzwarn << "Model::SetAngularAccel() is deprecated and has no effect. "
-         << "Use Link::SetTorque() on the link directly instead. \n";
-  for (Link_V::iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
-  {
-    if (*iter)
-    {
-      (*iter)->SetEnabled(true);
-#ifndef _WIN32
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-      (*iter)->SetAngularAccel(_accel);
-#ifndef _WIN32
-      #pragma GCC diagnostic pop
-#endif
-    }
-  }
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Model::RelativeLinearVel() const
 {
   if (this->GetLink("canonical"))

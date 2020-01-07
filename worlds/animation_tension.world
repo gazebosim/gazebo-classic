@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <actor name="model_high_tension">
+      <pose>0 0 0 0 0 0</pose>
+      <link name="box_link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>.2 .2 .2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0 0 1</ambient>
+            <diffuse>1 0 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+
+      <script>
+        <loop>false</loop>
+        <auto_start>true</auto_start>
+        <delay_start>2.0</delay_start>
+        <trajectory id='0' type='square' tension='1.0'>
+          <waypoint>
+            <time>0.0</time>
+            <pose>0 0 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>5.0</time>
+            <pose>2 0 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>8.0</time>
+            <pose>2 0 0 -0.009635 0.191045 0.490471</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <actor name="model_low_tension">
+      <pose>0 1 0 0 0 0</pose>
+      <link name="box_link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>.2 .2 .2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 1 0 1</ambient>
+            <diffuse>0 1 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+
+      <script>
+        <loop>false</loop>
+        <auto_start>true</auto_start>
+        <delay_start>2.0</delay_start>
+        <trajectory id='0' type='square' tension='0.0'>
+          <waypoint>
+            <time>0.0</time>
+            <pose>0 1 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>5.0</time>
+            <pose>2 1 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>8.0</time>
+            <pose>2 1 0 -0.009635 0.191045 0.490471</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+  </world>
+</sdf>

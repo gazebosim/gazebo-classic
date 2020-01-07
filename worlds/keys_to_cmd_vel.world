@@ -1,0 +1,169 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <!--
+        A demo world for KeysToCmdVelPlugin
+
+        Drive the vehicle by keyboard using arrows, or by publishing the
+        desired velocity to ~/<vehicle name>/cmd_vel
+        (x and yaw command the motion).
+    -->
+    <gui>
+      <plugin name="keyboard" filename="libKeyboardGUIPlugin.so"/>
+    </gui>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <model name="test_vehicle">
+
+      <pose frame=''>0 0 0 0 0 0</pose>
+
+      <link name='base_link'>
+        <pose frame=''>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <mass>2.0</mass>
+          <inertia>
+            <ixx>0.1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.1</iyy>
+            <iyz>0</iyz>
+            <izz>0.1</izz>
+          </inertia>
+        </inertial>
+        <collision name='base_link_collision'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='base_link_visual'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <gravity>1</gravity>
+        <kinematic>0</kinematic>
+      </link>
+
+      <link name='left_track'>
+        <pose frame=''>0 0.55 0 1.5701 -0 0</pose>
+        <inertial>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <mass>0.5</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='left_track_collision'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name='left_track_visual'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <gravity>1</gravity>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='left_track_j' type='revolute'>
+        <child>left_track</child>
+        <parent>base_link</parent>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+          </limit>
+          <use_parent_model_frame>1</use_parent_model_frame>
+        </axis>
+      </joint>
+
+      <link name='right_track'>
+        <pose frame=''>0 -0.55 0 -1.5701 0 0</pose>
+        <inertial>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <mass>0.5</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_track_collision'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name='right_track_visual'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <gravity>1</gravity>
+        <kinematic>0</kinematic>
+      </link>
+
+      <joint name='right_track_j' type='revolute'>
+        <child>right_track</child>
+        <parent>base_link</parent>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+          </limit>
+          <use_parent_model_frame>1</use_parent_model_frame>
+        </axis>
+      </joint>
+
+      <plugin filename="libDiffDrivePlugin.so" name="test_vehicle">
+        <body>base_link</body>
+        <left_joint>left_track_j</left_joint>
+        <right_joint>right_track_j</right_joint>
+      </plugin>
+
+      <plugin filename="libKeysToCmdVelPlugin.so" name="keyboard_control">
+        <cmd_vel_topic>~/test_vehicle/vel_cmd</cmd_vel_topic>
+        <linear_increment>0.25</linear_increment>
+        <angular_increment>0.2</angular_increment>
+      </plugin>
+
+    </model>
+</world>
+</sdf>

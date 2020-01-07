@@ -28,6 +28,9 @@ release will remove the deprecated code.
     + ***Removed:*** boost::shared_ptr<msgs::Response> request(const std::string &_worldName, const std::string &_request, const std::string &_data = "");
     + ***Replacement:*** boost::shared_ptr<msgs::Response> request(const std::string &_worldName, const std::string &_request, const std::string &_data = "", const common::Time &_timeout = -1);
     + ***Note:*** Added extra argument `_timeout`
+1. **gazebo/gui/qt_test.h**
+    + ***Removed:*** The whole header file. Note that it also won't be included into `gazebo/gui/gui.hh`.
+    + ***Replacement:*** Include `<QtTest/QtTest>` instead.
 
 ## Gazebo 8.4 to 9.x
 
