@@ -92,7 +92,7 @@ void SonarSensor::Load(const std::string &_worldName)
 
   if (this->dataPtr->radius < 0 && geometry == "cone")
   {
-    gzerr << "Sonar radius must be > 0. Current value is["
+    gzerr << "Sonar cone radius must be > 0. Current value is ["
       << this->dataPtr->radius << "]\n";
     return;
   }
@@ -154,15 +154,19 @@ void SonarSensor::Load(const std::string &_worldName)
   {
     // Use a scaled sphere mesh for the sonar collision shape.
     this->dataPtr->sonarShape->SetMesh("unit_sphere");
+
+    // Range is radius, scale is diameter
     this->dataPtr->sonarShape->SetScale(
-        ignition::math::Vector3d(range, range, range));
+        ignition::math::Vector3d(range*2, range*2, range*2));
     this->dataPtr->sonarMidPose = this->pose;
   }
   else
   {
     if (geometry != "cone")
-        gzerr << "Invalid sonar collision shape: " << geometry
-            << ". Defaults to cone." << std::endl;
+    {
+      gzerr << "Invalid sonar collision shape [" << geometry
+            << "]. Defaults to cone." << std::endl;
+    }
 
     // Use a scaled cone mesh for the sonar collision shape.
     this->dataPtr->sonarShape->SetMesh("unit_cone");

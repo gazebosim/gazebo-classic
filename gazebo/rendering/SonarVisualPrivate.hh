@@ -56,7 +56,7 @@ namespace gazebo
       public: bool receivedMsg;
 
       /// \brief Pointer to the sonar shape visual.
-      public: VisualPtr shapeVis;
+      public: VisualPtr shapeVis{nullptr};
     };
   }
 }

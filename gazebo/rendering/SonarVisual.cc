@@ -21,7 +21,6 @@
 #endif
 
 #include <boost/bind.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
@@ -53,7 +52,7 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   dPtr->sonarSub = dPtr->node->Subscribe(_topicName,
       &SonarVisual::OnMsg, this, true);
 
-  dPtr->sonarRay = NULL;
+  dPtr->sonarRay = nullptr;
 
   dPtr->connections.push_back(
       event::Events::ConnectPreRender(
@@ -116,10 +115,16 @@ void SonarVisual::Update()
   {
     std::string geom = dPtr->sonarMsg->sonar().geometry();
     if (geom != "sphere" && geom != "cone")
-       geom = "cone";
-    dPtr->shapeVis.reset(
-        new Visual(this->Name() + "_SONAR_" + boost::to_upper_copy(geom),
-            shared_from_this(), false));
+    {
+      gzwarn << "Unknown sonar geometry [" << geom << "], defaulting to [cone]"
+             << std::endl;
+      geom = "cone";
+    }
+    auto upperGeom = geom;
+    std::transform(upperGeom.begin(), upperGeom.end(), upperGeom.begin(),
+        ::toupper);
+    dPtr->shapeVis = std::make_shared<Visual>(
+        this->Name() + "_SONAR_" + upperGeom, shared_from_this(), false);
     dPtr->shapeVis->Load();
     dPtr->shapeVis->InsertMesh("unit_" + geom);
     dPtr->shapeVis->AttachMesh("unit_" + geom);
@@ -137,7 +142,7 @@ void SonarVisual::Update()
         !ignition::math::equal(dPtr->shapeVis->Scale().X(), rangeMax))
     {
       dPtr->shapeVis->SetScale(
-          ignition::math::Vector3d(rangeMax, rangeMax, rangeMax));
+          ignition::math::Vector3d(rangeMax*2, rangeMax*2, rangeMax*2));
     }
   }
   else

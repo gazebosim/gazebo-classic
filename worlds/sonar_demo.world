@@ -23,25 +23,63 @@
               <size>1 1 1</size>
             </box>
           </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
         </visual>
       </link>
     </model>
-    <model name="sonar_model">
-      <pose>0 0 -0.8 0 0 0</pose>
-      <static>false</static>
+    <model name="sonar_model_cone">
+      <static>true</static>
+      <pose>0 0 0.5 1.57 0 0</pose>
       <link name="link">
-        <pose>0 0 1.5 0 0 0</pose>
-        <gravity>false</gravity>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
         <sensor name="sonar" type="sonar">
-          <pose>0 0 0 0 -1.5707 1.5707</pose>
           <sonar>
             <min>0</min>
             <max>2.00</max>
             <geometry>cone</geometry>
             <radius>0.3</radius>
+          </sonar>
+          <always_on>1</always_on>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
+        </sensor>
+      </link>
+    </model>
+    <model name="sonar_model_sphere">
+      <static>true</static>
+      <pose>1 4 1 -1.57 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name="sonar" type="sonar">
+          <sonar>
+            <min>0</min>
+            <max>2.00</max>
+            <geometry>sphere</geometry>
           </sonar>
           <always_on>1</always_on>
           <update_rate>30</update_rate>
