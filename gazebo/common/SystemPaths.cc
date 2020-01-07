@@ -20,6 +20,7 @@
 #include <sstream>
 
 #include <boost/filesystem.hpp>
+#include <ignition/common/StringUtils.hh>
 #include <sdf/sdf.hh>
 
 #include <sys/stat.h>
@@ -41,11 +42,15 @@
 using namespace gazebo;
 using namespace common;
 
+//////////////////////////////////////////////////
+char pathDelimiter()
+{
 #ifdef _WIN32
-static const std::string PathDelimiter = ";";
+  return ';';
 #else
-static const std::string PathDelimiter = ":";
+  return ':';
 #endif
+}
 
 /// \brief Callbacks to be called in order in case a file can't be found.
 /// TODO(chapulina): Move to member variable when porting forward
@@ -198,21 +203,19 @@ void SystemPaths::UpdateModelPaths()
     path = GAZEBO_MODEL_PATH;
   }
   else
-    path = pathCStr;
-
-  /// TODO(anyone) Use something else to split string.
-  size_t pos1 = 0;
-  size_t pos2 = path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
   {
-    sdf::addURIPath("model://", path.substr(pos1, pos2-pos1));
-    this->InsertUnique(path.substr(pos1, pos2-pos1), this->modelPaths);
-    pos1 = pos2+1;
-    if (pos1 >= path.size())
-      return;
-    pos2 = path.find(PathDelimiter, pos2+1);
+    path = pathCStr;
   }
-  this->InsertUnique(path.substr(pos1, path.size()-pos1), this->modelPaths);
+
+  auto delimitedPaths = ignition::common::Split(path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
+  {
+    if (!delimitedPath.empty())
+    {
+      sdf::addURIPath("model://", delimitedPath);
+      this->InsertUnique(delimitedPath, this->modelPaths);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -227,19 +230,18 @@ void SystemPaths::UpdateGazeboPaths()
     path = GAZEBO_RESOURCE_PATH;
   }
   else
-    path = pathCStr;
-
-  size_t pos1 = 0;
-  size_t pos2 = path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
   {
-    this->InsertUnique(path.substr(pos1, pos2-pos1), this->gazeboPaths);
-    pos1 = pos2+1;
-    if (pos1 >= path.size())
-      return;
-    pos2 = path.find(PathDelimiter, pos2+1);
+    path = pathCStr;
   }
-  this->InsertUnique(path.substr(pos1, path.size()-pos1), this->gazeboPaths);
+
+  auto delimitedPaths = ignition::common::Split(path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
+  {
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->gazeboPaths);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -254,19 +256,18 @@ void SystemPaths::UpdatePluginPaths()
     path = GAZEBO_PLUGIN_PATH;
   }
   else
-    path = pathCStr;
-
-  size_t pos1 = 0;
-  size_t pos2 = path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
   {
-    this->InsertUnique(path.substr(pos1, pos2-pos1), this->pluginPaths);
-    pos1 = pos2+1;
-    if (pos1 >= path.size())
-      return;
-    pos2 = path.find(PathDelimiter, pos2+1);
+    path = pathCStr;
   }
-  this->InsertUnique(path.substr(pos1, path.size()-pos1), this->pluginPaths);
+
+  auto delimitedPaths = ignition::common::Split(path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
+  {
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->pluginPaths);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -281,19 +282,18 @@ void SystemPaths::UpdateOgrePaths()
     path = OGRE_RESOURCE_PATH;
   }
   else
-    path = pathCStr;
-
-  size_t pos1 = 0;
-  size_t pos2 = path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
   {
-    this->InsertUnique(path.substr(pos1, pos2-pos1), this->ogrePaths);
-    pos1 = pos2+1;
-    if (pos1 >= path.size())
-      return;
-    pos2 = path.find(PathDelimiter, pos2+1);
+    path = pathCStr;
   }
-  this->InsertUnique(path.substr(pos1, path.size()-pos1), this->ogrePaths);
+
+  auto delimitedPaths = ignition::common::Split(path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
+  {
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->ogrePaths);
+    }
+  }
 }
 
 
@@ -498,57 +498,53 @@ void SystemPaths::ClearModelPaths()
 /////////////////////////////////////////////////
 void SystemPaths::AddGazeboPaths(const std::string &_path)
 {
-  size_t pos1 = 0;
-  size_t pos2 = _path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
+  auto delimitedPaths = ignition::common::Split(_path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
   {
-    this->InsertUnique(_path.substr(pos1, pos2-pos1), this->gazeboPaths);
-    pos1 = pos2+1;
-    pos2 = _path.find(PathDelimiter, pos2+1);
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->gazeboPaths);
+    }
   }
-  this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->gazeboPaths);
 }
 
 /////////////////////////////////////////////////
 void SystemPaths::AddOgrePaths(const std::string &_path)
 {
-  size_t pos1 = 0;
-  size_t pos2 = _path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
+  auto delimitedPaths = ignition::common::Split(_path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
   {
-    this->InsertUnique(_path.substr(pos1, pos2-pos1), this->ogrePaths);
-    pos1 = pos2+1;
-    pos2 = _path.find(PathDelimiter, pos2+1);
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->ogrePaths);
+    }
   }
-  this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->ogrePaths);
 }
 
 /////////////////////////////////////////////////
 void SystemPaths::AddPluginPaths(const std::string &_path)
 {
-  size_t pos1 = 0;
-  size_t pos2 = _path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
+  auto delimitedPaths = ignition::common::Split(_path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
   {
-    this->InsertUnique(_path.substr(pos1, pos2-pos1), this->pluginPaths);
-    pos1 = pos2+1;
-    pos2 = _path.find(PathDelimiter, pos2+1);
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->pluginPaths);
+    }
   }
-  this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->pluginPaths);
 }
 
 /////////////////////////////////////////////////
 void SystemPaths::AddModelPaths(const std::string &_path)
 {
-  size_t pos1 = 0;
-  size_t pos2 = _path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
+  auto delimitedPaths = ignition::common::Split(_path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
   {
-    this->InsertUnique(_path.substr(pos1, pos2-pos1), this->modelPaths);
-    pos1 = pos2+1;
-    pos2 = _path.find(PathDelimiter, pos2+1);
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->modelPaths);
+    }
   }
-  this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
 }
 
 /////////////////////////////////////////////////
