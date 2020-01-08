@@ -51,7 +51,7 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
       &SonarVisual::OnMsg, this, true);
 
   dPtr->connections.push_back(
-      event::Events::ConnectRender(
+      event::Events::ConnectPreRender(
         std::bind(&SonarVisual::Update, this)));
 }
 
