@@ -86,11 +86,13 @@ void SonarSensor::Load(const std::string &_worldName)
   this->dataPtr->rangeMin = sonarElem->Get<double>("min");
   this->dataPtr->rangeMax = sonarElem->Get<double>("max");
   this->dataPtr->radius = sonarElem->Get<double>("radius");
+  const std::string geometry =
+      sonarElem->GetElement("geometry")->Get<std::string>();
   double range = this->dataPtr->rangeMax - this->dataPtr->rangeMin;
 
-  if (this->dataPtr->radius < 0)
+  if (this->dataPtr->radius < 0 && geometry == "cone")
   {
-    gzerr << "Sonar radius must be > 0. Current value is["
+    gzerr << "Sonar cone radius must be > 0. Current value is ["
       << this->dataPtr->radius << "]\n";
     return;
   }
@@ -148,17 +150,35 @@ void SonarSensor::Load(const std::string &_worldName)
   GZ_ASSERT(this->dataPtr->sonarShape != nullptr,
       "Unable to get the sonar shape from the sonar collision.");
 
-  // Use a scaled cone mesh for the sonar collision shape.
-  this->dataPtr->sonarShape->SetMesh("unit_cone");
-  this->dataPtr->sonarShape->SetScale(ignition::math::Vector3d(
+  if (geometry == "sphere")
+  {
+    // Use a scaled sphere mesh for the sonar collision shape.
+    this->dataPtr->sonarShape->SetMesh("unit_sphere");
+
+    // Range is radius, scale is diameter
+    this->dataPtr->sonarShape->SetScale(
+        ignition::math::Vector3d(range*2, range*2, range*2));
+    this->dataPtr->sonarMidPose = this->pose;
+  }
+  else
+  {
+    if (geometry != "cone")
+    {
+      gzerr << "Invalid sonar collision shape [" << geometry
+            << "]. Defaults to cone." << std::endl;
+    }
+
+    // Use a scaled cone mesh for the sonar collision shape.
+    this->dataPtr->sonarShape->SetMesh("unit_cone");
+    this->dataPtr->sonarShape->SetScale(ignition::math::Vector3d(
         this->dataPtr->radius*2.0, this->dataPtr->radius*2.0, range));
 
-  // Position the collision shape properly. Without this, the shape will be
-  // centered at the start of the sonar.
-  ignition::math::Vector3d offset(0, 0, range * 0.5);
-  offset = this->pose.Rot().RotateVector(offset);
-  this->dataPtr->sonarMidPose.Set(this->pose.Pos() - offset,
-      this->pose.Rot());
+    // Position the collision shape properly. Without this, the shape will be
+    // centered at the start of the sonar.
+    const auto offset = this->pose.Rot().RotateVector({0, 0, range * 0.5});
+    this->dataPtr->sonarMidPose.Set(this->pose.Pos() - offset,
+        this->pose.Rot());
+  }
 
   this->dataPtr->sonarCollision->SetRelativePose(this->dataPtr->sonarMidPose);
   this->dataPtr->sonarCollision->SetInitialRelativePose(
@@ -192,6 +212,7 @@ void SonarSensor::Load(const std::string &_worldName)
       this->Topic());
 
   // Initialize the message that will be published on this->dataPtr->sonarPub.
+  this->dataPtr->sonarMsg.mutable_sonar()->set_geometry(geometry);
   this->dataPtr->sonarMsg.mutable_sonar()->set_range_min(
       this->dataPtr->rangeMin);
   this->dataPtr->sonarMsg.mutable_sonar()->set_range_max(
@@ -199,8 +220,10 @@ void SonarSensor::Load(const std::string &_worldName)
   this->dataPtr->sonarMsg.mutable_sonar()->set_radius(
       this->dataPtr->radius);
 
+  ignition::math::Pose3d referencePose =
+    this->pose + this->dataPtr->parentEntity->WorldPose();
   msgs::Set(this->dataPtr->sonarMsg.mutable_sonar()->mutable_world_pose(),
-      this->dataPtr->sonarMidPose);
+      referencePose);
   this->dataPtr->sonarMsg.mutable_sonar()->set_range(0);
 }
 
@@ -249,6 +272,12 @@ double SonarSensor::Radius() const
 }
 
 //////////////////////////////////////////////////
+std::string SonarSensor::Geometry() const
+{
+  return this->dataPtr->sonarMsg.sonar().geometry();
+}
+
+//////////////////////////////////////////////////
 double SonarSensor::Range()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -266,6 +295,9 @@ bool SonarSensor::UpdateImpl(const bool /*_force*/)
 
   ignition::math::Pose3d referencePose =
     this->pose + this->dataPtr->parentEntity->WorldPose();
+  msgs::Set(this->dataPtr->sonarMsg.mutable_sonar()->mutable_world_pose(),
+      referencePose);
+
   ignition::math::Vector3d pos;
 
   // A 5-step hysteresis window was chosen to reduce range value from
@@ -312,6 +344,8 @@ bool SonarSensor::UpdateImpl(const bool /*_force*/)
         if (len < this->dataPtr->sonarMsg.sonar().range())
         {
           this->dataPtr->sonarMsg.mutable_sonar()->set_range(len);
+          msgs::Set(this->dataPtr->sonarMsg.mutable_sonar()->mutable_contact(),
+              referencePose.Rot().RotateVectorReverse(pos));
         }
       }
     }
@@ -357,4 +391,3 @@ event::ConnectionPtr SonarSensor::ConnectUpdate(
 {
   return this->dataPtr->update.Connect(_subscriber);
 }
-
