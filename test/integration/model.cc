@@ -136,6 +136,7 @@ TEST_F(ModelTest, SetScale)
   EXPECT_DOUBLE_EQ(s, modelMsg.scale().z());
 
   // verify geometry of the visual msg received
+  ASSERT_GE(modelMsg.link_size(), 1);
   msgs::Link linkMsg = modelMsg.link(0);
   msgs::Visual receivedVisualMsg;
   for (int i = 0; i < linkMsg.visual_size(); ++i)
