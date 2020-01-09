@@ -68,20 +68,9 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
 
   // i = 0: joint between child link and parent link
   // i = 1: joint between child link and world
-  // i = 2: joint between world and parent link
-  for (int i = 0; i < 3; ++i)
+  for (int i = 0; i < 2; ++i)
   {
-    gzdbg << "SpawnJoint " << _jointType;
-    if (i / 2)
-    {
-      opt.worldChild = true;
-      std::cout << " world";
-    }
-    else
-    {
-      opt.worldChild = false;
-      std::cout << " child";
-    }
+    gzdbg << "SpawnJoint " << _jointType << " child";
     if (i % 2)
     {
       opt.worldParent = true;
@@ -93,13 +82,6 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
       std::cout << " parent";
     }
     std::cout << std::endl;
-
-    if (opt.worldChild && _physicsEngine == "dart")
-    {
-      gzerr << "dart seg-faults without a child link, skipping sub-test"
-            << std::endl;
-      break;
-    }
 
     // spawn joint using using parent model frame to define joint axis
     {
@@ -128,13 +110,6 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
       physics::JointPtr joint = SpawnJoint(opt);
       ASSERT_TRUE(joint != NULL);
 
-      if (opt.worldChild)
-      {
-        gzdbg << "  where parent is world.\n";
-        this->CheckJointProperties(joint,
-          ignition::math::Vector3d(cos(Aj), sin(Aj), 0));
-      }
-      else
       {
         gzdbg << "  where parent is another link (not world).\n";
         this->CheckJointProperties(joint,
