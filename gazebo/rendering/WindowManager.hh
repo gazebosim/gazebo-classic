@@ -17,6 +17,11 @@
 #ifndef _GAZEBO_RENDERING_WINDOWMANAGER_HH_
 #define _GAZEBO_RENDERING_WINDOWMANAGER_HH_
 
+#ifdef _WIN32
+  // Oh, yeah, CreateWindow is taken, too.
+  #undef CreateWindow
+#endif
+
 #include <memory>
 #include <string>
 
