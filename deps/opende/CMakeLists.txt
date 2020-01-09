@@ -269,7 +269,9 @@ if (WIN32)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWIN32 -DODE_DLL")
 endif()
 
-set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
+if (NOT MSVC)
+  set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
+endif()
 
 if (WIN32)
   add_library(gazebo_ode SHARED ${sources})

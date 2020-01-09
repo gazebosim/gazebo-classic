@@ -990,7 +990,6 @@
             </joint>
 
             <plugin name='wheel_tracked_vehicle_controller' filename='libWheelTrackedVehiclePlugin.so'>
-                <robot_namespace>wheel_tracked</robot_namespace>
                 <left_joint>left_track_wheel1_j</left_joint>
                 <right_joint>right_track_wheel1_j</right_joint>
                 <left_joint>left_track_wheel2_j</left_joint>
@@ -1009,7 +1008,7 @@
                 <right_joint>right_track_wheel8_j</right_joint>
                 <!-- It'd be nicer to have a higher value here, but there's bug
                  https://bitbucket.org/osrf/gazebo/issues/2068
-                 TODO fixed in gazebo8 -->
+                 TODO The bug was already fixed but it is still broken. -->
                 <track_mu>1.0</track_mu>
                 <track_mu2>0.5</track_mu2>
             </plugin>

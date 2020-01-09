@@ -2,6 +2,20 @@
 
 ## Gazebo 9.XX.X (2019-XX-XX)
 
+1. Fix compilation of plugins with tbb and qt 5.14.
+    * [Pull request 3164](https://bitbucket.org/osrf/gazebo/pull-request/3164)
+    * [Issue #2681](https://bitbucket.org/osrf/gazebo/issues/2681)
+
+1. Don't pass GCC linker options to Visual Studio linker.
+    * [Pull request 3153](https://bitbucket.org/osrf/gazebo/pull-request/3153)
+
+1. Fix CMake 3.14 regression in `MSVC`/`PKG_CONFIG_FOUND` workaround.
+    * [Pull request 3152](https://bitbucket.org/osrf/gazebo/pull-request/3152)
+
+1. Allow multiple instances of SimpleTrackedVehiclePlugin.
+    * [Pull request 3140](https://bitbucket.org/osrf/gazebo/pull-request/3140)
+    * [Pull request 3148](https://bitbucket.org/osrf/gazebo/pull-request/3148)
+
 1. ODEBallJoint: reduce console output.
     * [Pull request 3132](https://bitbucket.org/osrf/gazebo/pull-request/3132)
 
