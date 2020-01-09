@@ -33,6 +33,9 @@
     * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
     * [Pull request 3128](https://bitbucket.org/osrf/gazebo/pull-request/3128)
 
+1. SystemPaths: fix race condition in PathDelimiter initialization, `missing call to sdf::addURIPath`.
+    * [Pull request 3170](https://bitbucket.org/osrf/gazebo/pull-request/3170)
+
 ## Gazebo 9.11.0 (2019-08-29)
 
 1. Add Camera PreRender and PostRender events
