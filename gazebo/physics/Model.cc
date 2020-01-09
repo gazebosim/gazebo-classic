@@ -779,9 +779,9 @@ ignition::math::Vector3d Model::WorldAngularAccel() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Model::BoundingBox() const
+ignition::math::AxisAlignedBox Model::BoundingBox() const
 {
-  ignition::math::Box box;
+  ignition::math::AxisAlignedBox box;
 
   box.Min().Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.Max().Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
@@ -790,7 +790,7 @@ ignition::math::Box Model::BoundingBox() const
   {
     if (iter)
     {
-      ignition::math::Box linkBox;
+      ignition::math::AxisAlignedBox linkBox;
       linkBox = iter->BoundingBox();
       box += linkBox;
     }

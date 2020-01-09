@@ -23,6 +23,8 @@
 
 #include <gtest/gtest.h>
 
+#include <ignition/common/URI.hh>
+
 #include "gazebo/common/FuelModelDatabase.hh"
 
 using namespace gazebo;
@@ -54,7 +56,7 @@ TEST(FuelModelDatabaseTest, FuelDown)
         };
 
   ignition::fuel_tools::ServerConfig srv;
-  srv.URL("___bad_server___");
+  srv.SetUrl(ignition::common::URI("___bad_server___"));
   fuelDB->Models(srv, cb);
 
   // We now wait for a while unless the callback is executed and wake us up.

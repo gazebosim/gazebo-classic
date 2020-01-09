@@ -59,7 +59,7 @@ namespace gazebo
       public: virtual void SetCollideBits(unsigned int _bits);
 
       // Documentation inherited
-      public: virtual ignition::math::Box BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Set the collision shape.
       /// \param[in] _shape SimTK geometry to use as the collision

@@ -134,7 +134,7 @@ void COMVisual::Load()
 
   // Get the link's bounding box
   VisualPtr vis = this->GetScene()->GetVisual(dPtr->linkName);
-  ignition::math::Box box;
+  ignition::math::AxisAlignedBox box;
 
   if (vis)
     box = vis->BoundingBox();

@@ -342,12 +342,12 @@ TEST_F(MsgsTest, ConvertMsgsInertialToMath)
   auto inertial = msgs::Convert(msg);
 
   EXPECT_DOUBLE_EQ(12.0, inertial.MassMatrix().Mass());
-  EXPECT_DOUBLE_EQ(2.0, inertial.MassMatrix().IXX());
-  EXPECT_DOUBLE_EQ(3.0, inertial.MassMatrix().IYY());
-  EXPECT_DOUBLE_EQ(4.0, inertial.MassMatrix().IZZ());
-  EXPECT_DOUBLE_EQ(0.1, inertial.MassMatrix().IXY());
-  EXPECT_DOUBLE_EQ(0.2, inertial.MassMatrix().IXZ());
-  EXPECT_DOUBLE_EQ(0.3, inertial.MassMatrix().IYZ());
+  EXPECT_DOUBLE_EQ(2.0, inertial.MassMatrix().Ixx());
+  EXPECT_DOUBLE_EQ(3.0, inertial.MassMatrix().Iyy());
+  EXPECT_DOUBLE_EQ(4.0, inertial.MassMatrix().Izz());
+  EXPECT_DOUBLE_EQ(0.1, inertial.MassMatrix().Ixy());
+  EXPECT_DOUBLE_EQ(0.2, inertial.MassMatrix().Ixz());
+  EXPECT_DOUBLE_EQ(0.3, inertial.MassMatrix().Iyz());
   EXPECT_EQ(pose, inertial.Pose());
 }
 

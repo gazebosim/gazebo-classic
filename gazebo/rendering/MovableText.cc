@@ -361,10 +361,10 @@ bool MovableText::ShowOnTop() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box MovableText::AABB()
+ignition::math::AxisAlignedBox MovableText::AABB()
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
-  return ignition::math::Box(
+  return ignition::math::AxisAlignedBox(
       ignition::math::Vector3d(this->dataPtr->aabb->getMinimum().x,
                     this->dataPtr->aabb->getMinimum().y,
                     this->dataPtr->aabb->getMinimum().z),

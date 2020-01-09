@@ -22,7 +22,7 @@
 #endif
 
 #include <boost/thread/recursive_mutex.hpp>
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/MassMatrix3.hh>
 
@@ -395,9 +395,9 @@ void LinkData::UpdateInspectorScale()
 
   if (m.IsValid())
   {
-    newIxx = m.IXX();
-    newIyy = m.IYY();
-    newIzz = m.IZZ();
+    newIxx = m.Ixx();
+    newIyy = m.Iyy();
+    newIzz = m.Izz();
   }
 
   // update inspector inertia
@@ -1599,7 +1599,7 @@ void LinkData::OnAddCollision(const std::string &_name,
 
           if (_collisionShape == "box")
           {
-            ignition::math::Box boundingBox(max, min);
+            ignition::math::AxisAlignedBox boundingBox(max, min);
             ignition::math::Vector3d size = boundingBox.Size();
 
             geomElem->GetElement("box")->GetElement("size")->Set(size);
@@ -1614,7 +1614,7 @@ void LinkData::OnAddCollision(const std::string &_name,
           }
           else if (_collisionShape == "cylinder")
           {
-            ignition::math::Box boundingBox(max, min);
+            ignition::math::AxisAlignedBox boundingBox(max, min);
             ignition::math::Vector3d size = boundingBox.Size();
 
             double radius, length;

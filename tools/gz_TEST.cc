@@ -243,7 +243,7 @@ TEST_F(gzTest, Joint)
 
     ignition::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
-    msg.set_force(10);
+    msg.mutable_force_optional()->set_data(10);
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -256,10 +256,10 @@ TEST_F(gzTest, Joint)
 
     ignition::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
-    msg.mutable_position()->set_target(1.5707);
-    msg.mutable_position()->set_p_gain(1.2);
-    msg.mutable_position()->set_i_gain(0.01);
-    msg.mutable_position()->set_d_gain(0.2);
+    msg.mutable_position()->mutable_target_optional()->set_data(1.5707);
+    msg.mutable_position()->mutable_p_gain_optional()->set_data(1.2);
+    msg.mutable_position()->mutable_i_gain_optional()->set_data(0.01);
+    msg.mutable_position()->mutable_d_gain_optional()->set_data(0.2);
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -272,10 +272,10 @@ TEST_F(gzTest, Joint)
 
     ignition::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
-    msg.mutable_velocity()->set_target(1.5707);
-    msg.mutable_velocity()->set_p_gain(1.2);
-    msg.mutable_velocity()->set_i_gain(0.01);
-    msg.mutable_velocity()->set_d_gain(0.2);
+    msg.mutable_velocity()->mutable_target_optional()->set_data(1.5707);
+    msg.mutable_velocity()->mutable_p_gain_optional()->set_data(1.2);
+    msg.mutable_velocity()->mutable_i_gain_optional()->set_data(0.01);
+    msg.mutable_velocity()->mutable_d_gain_optional()->set_data(0.2);
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }

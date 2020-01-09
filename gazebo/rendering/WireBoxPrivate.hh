@@ -17,7 +17,7 @@
 #ifndef GAZEBO_RENDERING_WIREBOX_PRIVATE_HH_
 #define GAZEBO_RENDERING_WIREBOX_PRIVATE_HH_
 
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -30,7 +30,7 @@ namespace gazebo
     class WireBoxPrivate
     {
       /// \brief Copy of bounding box.
-      public: ignition::math::Box box;
+      public: ignition::math::AxisAlignedBox box;
 
       /// \brief The lines which outline the box.
       public: DynamicLines *lines;

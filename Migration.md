@@ -5,6 +5,54 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 10.x to 11.0
+
+### Build system
+
+New versions in mandatory dependencies: `ign-transport8`, `ign-msgs5`, `ign-math6`, `sdformat8`.
+New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`.
+
+### Additions
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + public: template <typename T>
+      static T any\_cast<T>(const boost::any &)
+
+### Modifications
+
+1. All instances of `ignition::math::Box` in the API are changed to `ignition::math::AxisAlignedBox`
+   to match the changes in ignition-math6.
+
+1. **gazebo/physics/JointController.hh**
+   Use new optional fields in `ignition::msgs::JointCmd` and
+   `ignition::msgs::PID` since the ign-msgs5 proto file uses `proto3`,
+   which doesn't allow optional fields and breaks existing functionality.
+
+1. **gazebo/physics/PresetManager.hh**
+   The PresetManager stores data internally with a map of `boost::any` values
+   and with the switch to sdformat8, the value may be stored as a `std::any`
+   within a `boost::any`, making it more complex to cast to a specific type.
+   This happens because the PresetManager stores the output of
+   `sdf::Element::GetAny` as boost::any values in its parameterMap and
+   calls `PhysicsEngine::SetParam` with these values.
+   Prior to libsdformat8, the GetAny function returned `boost::any`, but it now
+   returns `std::any`. The `gazebo::physics::PhysicsEngine::any_cast` helper
+   is provided to first check if a `boost::any` value contains a std::any,
+   and if so, perform a `std::any_cast<T>`.
+   Otherwise, it returns `boost::any_cast<T>`.
+   This `any_cast` helper should be used with `boost::any` values provided by
+   `Preset::GetParam`, `PresetManager::GetProfileParam`, and
+   `PresetManager::GetCurrentProfileParam`.
+
+1. **gazebo/rendering/MarkerManager.cc**
+    The `/marker` ignition transport service allows specifying the `id` field
+    of a marker to be created. If the `id` field is not specified, a random,
+    valid `id` is generated as a convenience for the user.
+    Due to the upgrade to `ign-msgs5`, which uses `proto3` syntax, an `id`
+    of `0` is indistinguishable from an unset `id`.
+    As such, an `id` of `0` will now trigger a random `id` to be generated,
+    and non-zero `id` values should be used instead.
+
 ## Gazebo 9.x to 10.x
 
 ### Additions

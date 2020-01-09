@@ -42,10 +42,8 @@
 #include <ignition/msgs/plugin_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
 
-#ifdef HAVE_IGNITION_FUEL_TOOLS
-  #include <ignition/common/URI.hh>
-  #include "gazebo/common/FuelModelDatabase.hh"
-#endif
+#include <ignition/common/URI.hh>
+#include "gazebo/common/FuelModelDatabase.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -165,9 +163,7 @@ World::World(const std::string &_name)
 
   // Make sure dbs are initialized
   common::ModelDatabase::Instance();
-#ifdef HAVE_IGNITION_FUEL_TOOLS
   common::FuelModelDatabase::Instance();
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1978,7 +1974,6 @@ void World::ProcessFactoryMsgs()
               !factoryMsg.sdf_filename().empty())
       {
         std::string filename;
-#ifdef HAVE_IGNITION_FUEL_TOOLS
         // If http(s), look at Fuel
         auto uri = ignition::common::URI(factoryMsg.sdf_filename());
         if (uri.Valid() && (uri.Scheme() == "https" || uri.Scheme() == "http"))
@@ -1988,7 +1983,6 @@ void World::ProcessFactoryMsgs()
         }
         // Otherwise, look at database
         else
-#endif
         {
           filename = common::ModelDatabase::Instance()->GetModelFile(
               factoryMsg.sdf_filename());

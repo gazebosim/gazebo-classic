@@ -202,12 +202,12 @@ namespace gazebo
     void Set(msgs::Inertial *_i, const ignition::math::MassMatrix3d &_m)
     {
       _i->set_mass(_m.Mass());
-      _i->set_ixx(_m.IXX());
-      _i->set_iyy(_m.IYY());
-      _i->set_izz(_m.IZZ());
-      _i->set_ixy(_m.IXY());
-      _i->set_ixz(_m.IXZ());
-      _i->set_iyz(_m.IYZ());
+      _i->set_ixx(_m.Ixx());
+      _i->set_iyy(_m.Iyy());
+      _i->set_izz(_m.Izz());
+      _i->set_ixy(_m.Ixy());
+      _i->set_ixz(_m.Ixz());
+      _i->set_iyz(_m.Iyz());
     }
 
     /////////////////////////////////////////////////
@@ -3260,14 +3260,10 @@ namespace gazebo
     {
       ignition::msgs::Color result;
 
-      if (_msg.has_r())
-        result.set_r(_msg.r());
-      if (_msg.has_g())
-        result.set_g(_msg.g());
-      if (_msg.has_b())
-        result.set_b(_msg.b());
-      if (_msg.has_a())
-        result.set_a(_msg.a());
+      result.set_r(_msg.r());
+      result.set_g(_msg.g());
+      result.set_b(_msg.b());
+      result.set_a(_msg.a());
 
       return result;
     }
@@ -3276,15 +3272,10 @@ namespace gazebo
     msgs::Color ConvertIgnMsg(const ignition::msgs::Color &_msg)
     {
       msgs::Color result;
-
-      if (_msg.has_r())
-        result.set_r(_msg.r());
-      if (_msg.has_g())
-        result.set_g(_msg.g());
-      if (_msg.has_b())
-        result.set_b(_msg.b());
-      if (_msg.has_a())
-        result.set_a(_msg.a());
+      result.set_r(_msg.r());
+      result.set_g(_msg.g());
+      result.set_b(_msg.b());
+      result.set_a(_msg.a());
 
       return result;
     }
@@ -3375,8 +3366,7 @@ namespace gazebo
         result.add_uri(s);
       }
 
-      if (_script.has_name())
-        result.set_name(_script.name());
+      result.set_name(_script.name());
 
       return result;
     }
@@ -3413,10 +3403,8 @@ namespace gazebo
 
       if (_msg.has_script())
         result.mutable_script()->CopyFrom(ConvertIgnMsg(_msg.script()));
-      if (_msg.has_shader_type())
-        result.set_shader_type(ConvertIgnMsg(_msg.shader_type()));
-      if (_msg.has_normal_map())
-        result.set_normal_map(_msg.normal_map());
+      result.set_shader_type(ConvertIgnMsg(_msg.shader_type()));
+      result.set_normal_map(_msg.normal_map());
       if (_msg.has_ambient())
         result.mutable_ambient()->CopyFrom(ConvertIgnMsg(_msg.ambient()));
       if (_msg.has_diffuse())
@@ -3425,8 +3413,7 @@ namespace gazebo
         result.mutable_specular()->CopyFrom(ConvertIgnMsg(_msg.specular()));
       if (_msg.has_emissive())
         result.mutable_emissive()->CopyFrom(ConvertIgnMsg(_msg.emissive()));
-      if (_msg.has_lighting())
-        result.set_lighting(_msg.lighting());
+      result.set_lighting(_msg.lighting());
 
       return result;
     }

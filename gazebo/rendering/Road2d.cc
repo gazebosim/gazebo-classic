@@ -178,7 +178,7 @@ void RoadSegment::Load(msgs::Road _msg)
 
   ignition::math::Vector3d pA, pB, tangent;
 
-  ignition::math::Box bounds;
+  ignition::math::AxisAlignedBox bounds;
   bounds.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
                    ignition::math::MAX_D);
   bounds.Max().Set(ignition::math::MIN_D, ignition::math::MIN_D,

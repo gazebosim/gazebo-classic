@@ -374,11 +374,11 @@ void WheelSlipTest::SetCommands(const WheelSlipState &_state)
     msg.set_name("drum::joint");
 
     auto pid = msg.mutable_velocity();
-    pid->set_target(_state.drumSpeed);
-    pid->set_p_gain(drumSpinP);
-    pid->set_i_gain(drumSpinI);
-    pid->set_d_gain(drumSpinD);
-    pid->set_limit(drumLimit);
+    pid->mutable_target_optional()->set_data(_state.drumSpeed);
+    pid->mutable_p_gain_optional()->set_data(drumSpinP);
+    pid->mutable_i_gain_optional()->set_data(drumSpinI);
+    pid->mutable_d_gain_optional()->set_data(drumSpinD);
+    pid->mutable_limit_optional()->set_data(drumLimit);
 
     this->drumJointCmdPub.Publish(msg);
   }
@@ -388,12 +388,12 @@ void WheelSlipTest::SetCommands(const WheelSlipState &_state)
     msg.set_name("tire::axel_wheel");
 
     auto pid = msg.mutable_velocity();
-    pid->set_target(_state.wheelSpeed);
-    pid->set_p_gain(_state.wheelSpeedGain);
-    pid->set_i_gain(wheelSpinI);
-    pid->set_d_gain(wheelSpinD);
+    pid->mutable_target_optional()->set_data(_state.wheelSpeed);
+    pid->mutable_p_gain_optional()->set_data(_state.wheelSpeedGain);
+    pid->mutable_i_gain_optional()->set_data(wheelSpinI);
+    pid->mutable_d_gain_optional()->set_data(wheelSpinD);
 
-    msg.set_force(_state.wheelTorque);
+    msg.mutable_force_optional()->set_data(_state.wheelTorque);
 
     this->tireJointCmdPub.Publish(msg);
   }
@@ -401,7 +401,7 @@ void WheelSlipTest::SetCommands(const WheelSlipState &_state)
   {
     ignition::msgs::JointCmd msg;
     msg.set_name("tire::world_upright");
-    msg.set_force(-_state.suspForce);
+    msg.mutable_force_optional()->set_data(-_state.suspForce);
 
     this->tireJointCmdPub.Publish(msg);
   }

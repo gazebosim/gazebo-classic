@@ -75,7 +75,7 @@ namespace gazebo
       public: virtual void SetCollideBits(unsigned int bits);
 
       // Documentation inherited.
-      public: virtual ignition::math::Box BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Get the collision's space ID
       /// \return The collision's space ID
