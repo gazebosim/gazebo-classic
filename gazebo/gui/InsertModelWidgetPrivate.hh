@@ -24,15 +24,13 @@
 #include <vector>
 #include <boost/thread/mutex.hpp>
 
-#ifdef HAVE_IGNITION_FUEL_TOOLS
-  #ifdef _WIN32
-    // DELETE is defined in winnt.h and causes a problem with
-    // ignition::fuel_tools::REST::DELETE
-    #undef DELETE
-  #endif
-  #include <ignition/fuel_tools/FuelClient.hh>
-  #include <ignition/fuel_tools/ModelIdentifier.hh>
+#ifdef _WIN32
+  // DELETE is defined in winnt.h and causes a problem with
+  // ignition::fuel_tools::REST::DELETE
+  #undef DELETE
 #endif
+#include <ignition/fuel_tools/FuelClient.hh>
+#include <ignition/fuel_tools/ModelIdentifier.hh>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
@@ -45,7 +43,6 @@ namespace gazebo
 {
   namespace gui
   {
-#ifdef HAVE_IGNITION_FUEL_TOOLS
     /// \brief Details to manage an Ignition Fuel server.
     class FuelDatabaseDetails
     {
@@ -56,7 +53,6 @@ namespace gazebo
       /// It contains elements which uniquely identify models.
       public: std::vector<ignition::fuel_tools::ModelIdentifier> modelBuffer;
     };
-#endif
 
     /// \brief Private class attributes for InsertModelWidget.
     class InsertModelWidgetPrivate
@@ -82,7 +78,6 @@ namespace gazebo
       /// \brief Cache for the names added to fileTreeWidget
       public: std::set<std::string> localFilenameCache;
 
-#ifdef HAVE_IGNITION_FUEL_TOOLS
       /// \brief Stores details about all Fuel servers providing assets.
       /// The key is the server name and the value is the class that captures
       /// multiple information about the server.
@@ -90,7 +85,6 @@ namespace gazebo
 
       /// \brief A client for using Ignition Fuel services.
       public: std::unique_ptr<ignition::fuel_tools::FuelClient> fuelClient;
-#endif
     };
   }
 }
