@@ -29,10 +29,20 @@
 
 #include "plugins/SimpleTrackedVehiclePlugin.hh"
 
+namespace std {
+template<class T>
+class hash<boost::shared_ptr<T>> {
+  public: size_t operator()(const boost::shared_ptr<T>& key) const {
+    return (size_t)key.get();
+  }
+};
+}
+
 namespace gazebo
 {
 using namespace std;
-unordered_map<string, unordered_map<Tracks, physics::Link_V> > globalTracks;
+using namespace physics;
+unordered_map<LinkPtr, unordered_map<Tracks, Link_V> > globalTracks;
 }
 
 using namespace gazebo;
@@ -43,10 +53,9 @@ SimpleTrackedVehiclePlugin::~SimpleTrackedVehiclePlugin()
 {
   if (this->body != nullptr)
   {
-    const auto name = this->body->GetModel()->GetScopedName();
-    if (globalTracks.find(name) != globalTracks.end())
+    if (globalTracks.find(this->body) != globalTracks.end())
     {
-      globalTracks.erase(name);
+      globalTracks.erase(this->body);
     }
   }
 }
@@ -99,9 +108,9 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
           << this->body->GetName() << std::endl;
   }
 
-  globalTracks.emplace(_model->GetScopedName(),
+  globalTracks.emplace(this->body,
       std::unordered_map<Tracks, physics::Link_V>());
-  auto& gtracks = globalTracks.at(_model->GetScopedName());
+  auto& gtracks = globalTracks.at(this->body);
 
   this->tracks[Tracks::LEFT] = _model->GetLink(
       _sdf->GetElement("left_track")->Get<std::string>());
@@ -223,7 +232,7 @@ void SimpleTrackedVehiclePlugin::SetTrackVelocityImpl(double _left,
 
 void SimpleTrackedVehiclePlugin::UpdateTrackSurface()
 {
-  auto& gtracks = globalTracks.at(this->body->GetModel()->GetScopedName());
+  auto& gtracks = globalTracks.at(this->body);
   for (auto trackSide : gtracks)
   {
     for (auto track : trackSide.second)
@@ -260,7 +269,7 @@ void SimpleTrackedVehiclePlugin::SetGeomCategories()
     }
   }
 
-  auto& gtracks = globalTracks.at(this->body->GetModel()->GetScopedName());
+  auto& gtracks = globalTracks.at(this->body);
   for (auto trackSide : gtracks)
   {
     for (auto trackLink : trackSide.second)
@@ -279,7 +288,7 @@ void SimpleTrackedVehiclePlugin::SetGeomCategories()
 
 size_t SimpleTrackedVehiclePlugin::GetNumTracks(const Tracks side) const
 {
-  auto& gtracks = globalTracks.at(this->body->GetModel()->GetScopedName());
+  auto& gtracks = globalTracks.at(this->body);
   return gtracks[side].size();
 }
 
