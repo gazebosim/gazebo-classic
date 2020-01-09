@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/#include <boost/algorithm/string.hpp>
+*/
+#include <boost/algorithm/string.hpp>
 #include <functional>
 
 #include "gazebo/common/Events.hh"
