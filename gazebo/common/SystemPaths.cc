@@ -216,6 +216,7 @@ void SystemPaths::UpdateModelPaths()
       return;
     pos2 = path.find(pathDelimiter(), pos2+1);
   }
+  sdf::addURIPath("model://", path.substr(pos1, path.size()-pos1));
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->modelPaths);
 }
 
