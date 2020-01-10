@@ -759,6 +759,23 @@ else()
 endif()
 
 ################################################################################
+# Find the Ignition Common library
+find_package(ignition-common3 QUIET
+  COMPONENTS
+    profiler
+  OPTIONAL_COMPONENTS
+    graphics)
+if (NOT ignition-common3_FOUND)
+  message(STATUS "Looking for ignition-common3 - not found")
+  BUILD_ERROR ("Missing: Ignition Common (libignition-common3-dev")
+else()
+  message (STATUS "Looking for libignition-common3 - found")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ignition-common3_CXX_FLAGS}")
+  include_directories(${ignition-common3_INCLUDE_DIRS})
+  link_directories(${ignition-common3_LIBRARY_DIRS})
+endif()
+
+################################################################################
 # Find the Ignition Fuel Tools library
 find_package(ignition-fuel_tools4 QUIET)
 if (NOT ignition-fuel_tools4_FOUND)
@@ -769,19 +786,6 @@ else()
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ignition-fuel_tools4_CXX_FLAGS}")
   include_directories(${ignition-fuel_tools4_INCLUDE_DIRS})
   link_directories(${ignition-fuel_tools4_LIBRARY_DIRS})
-endif()
-
-################################################################################
-# Find the Ignition Common library
-find_package(ignition-common3 QUIET)
-if (NOT ignition-common3_FOUND)
-  message(STATUS "Looking for ignition-common3 - not found")
-  BUILD_ERROR ("Missing: Ignition Common (libignition-common3-dev")
-else()
-  message (STATUS "Looking for libignition-common3 - found")
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ignition-common3_CXX_FLAGS}")
-  include_directories(${ignition-common3_INCLUDE_DIRS})
-  link_directories(${ignition-common3_LIBRARY_DIRS})
 endif()
 
 ################################################
