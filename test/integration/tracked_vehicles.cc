@@ -60,8 +60,8 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   ASSERT_NE(model, nullptr);
   ASSERT_EQ(model->GetName(), "simple_tracked");
 
-  transport::PublisherPtr pub = this->node->Advertise<msgs::Pose>(
-    "~/simple_tracked/cmd_vel");
+  transport::PublisherPtr pub = this->node->Advertise<msgs::Twist>(
+    "~/simple_tracked/cmd_vel_twist");
   pub->WaitForConnection();
 
   // Move the robot somewhere to free space without obstacles.
@@ -75,8 +75,9 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   const auto startPose = model->WorldPose();
 
   const double forwardSpeed = 1.0;
-  msgs::Pose msg;
-  msgs::Set(&msg, ignition::math::Pose3d(forwardSpeed, 0, 0, 0, 0, 0));
+  msgs::Twist msg;
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(forwardSpeed, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0));
   pub->Publish(msg, true);
   this->world->Step(1000);
 
@@ -96,7 +97,9 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   // Take care when changing this value - if too high, it could get restricted
   // by the max speed of the tracks.
   const double rotationSpeed = 0.25;
-  msgs::Set(&msg, ignition::math::Pose3d(0, 0, 0, 0, 0, rotationSpeed));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(0, 0, 0));
+  msgs::Set(msg.mutable_angular(),
+    ignition::math::Vector3d(0, 0, rotationSpeed));
   pub->Publish(msg, true);
   this->world->Step(1000);
 
@@ -116,7 +119,8 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
 
   const auto lastPose = model->WorldPose();
 
-  msgs::Set(&msg, ignition::math::Pose3d(0.5, 0, 0, 0, 0, 0.2));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(0.5, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0.2));
   pub->Publish(msg, true);
   this->world->Step(1000);
 
@@ -141,7 +145,8 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   // Let the model settle down.
   this->world->Step(300);
 
-  msgs::Set(&msg, ignition::math::Pose3d(forwardSpeed, 0, 0, 0, 0, 0));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(forwardSpeed, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0));
   pub->Publish(msg, true);
   this->world->Step(3500);
 
@@ -170,7 +175,8 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   // Let the model settle down.
   this->world->Step(300);
 
-  msgs::Set(&msg, ignition::math::Pose3d(forwardSpeed, 0, 0, 0, 0, 0));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(forwardSpeed, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0));
   pub->Publish(msg, true);
   this->world->Step(2000);
 
@@ -194,8 +200,8 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
   ASSERT_NE(model, nullptr);
   ASSERT_EQ(model->GetName(), "wheel_tracked");
 
-  transport::PublisherPtr pub = node->Advertise<msgs::Pose>(
-    "~/wheel_tracked/cmd_vel");
+  transport::PublisherPtr pub = node->Advertise<msgs::Twist>(
+    "~/wheel_tracked/cmd_vel_twist");
   pub->WaitForConnection();
 
   // Move the robot somewhere to free space without obstacles.
@@ -209,8 +215,9 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
   const auto startPose = model->WorldPose();
 
   const double forwardSpeed = 1.0;
-  msgs::Pose msg;
-  msgs::Set(&msg, ignition::math::Pose3d(forwardSpeed, 0, 0, 0, 0, 0));
+  msgs::Twist msg;
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(forwardSpeed, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0));
   pub->Publish(msg, true);
   this->world->Step(1000);
 
@@ -230,7 +237,9 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
   // Take care when changing this value - if too high, it could get restricted
   // by the max speed of the tracks.
   const double rotationSpeed = 0.25;
-  msgs::Set(&msg, ignition::math::Pose3d(0, 0, 0, 0, 0, rotationSpeed));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(0, 0, 0));
+  msgs::Set(msg.mutable_angular(),
+    ignition::math::Vector3d(0, 0, rotationSpeed));
   pub->Publish(msg, true);
   this->world->Step(1000);
 
@@ -247,7 +256,8 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
 
   const auto lastPose = model->WorldPose();
 
-  msgs::Set(&msg, ignition::math::Pose3d(0.5, 0, 0, 0, 0, 0.2));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(0.5, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0.2));
   pub->Publish(msg, true);
   this->world->Step(1000);
 
@@ -272,7 +282,8 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
   // Let the model settle down.
   this->world->Step(300);
 
-  msgs::Set(&msg, ignition::math::Pose3d(forwardSpeed, 0, 0, 0, 0, 0));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(forwardSpeed, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0));
   pub->Publish(msg, true);
   this->world->Step(3500);
 

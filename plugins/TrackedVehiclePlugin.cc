@@ -24,6 +24,11 @@
 
 using namespace gazebo;
 
+namespace gazebo
+{
+  bool trackedVehiclePoseWarningIssued = false;
+}
+
 /// \brief Private data class
 class gazebo::TrackedVehiclePluginPrivate
 {
@@ -213,6 +218,12 @@ void TrackedVehiclePlugin::SetBodyVelocity(
 
 void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
 {
+  if (!trackedVehiclePoseWarningIssued)
+  {
+    gzwarn << "Controlling tracked vehicles via Pose messages is deprecated. "
+              "Use the Twist API via ~/cmd_vel_twist." << std::endl;
+    trackedVehiclePoseWarningIssued = true;
+  }
   const auto yaw = msgs::ConvertIgn(_msg->orientation()).Euler().Z();
   this->SetBodyVelocity(_msg->position().x(), yaw);
 }
