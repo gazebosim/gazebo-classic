@@ -6,6 +6,13 @@
     * [Pull request 3164](https://bitbucket.org/osrf/gazebo/pull-request/3164)
     * [Issue #2681](https://bitbucket.org/osrf/gazebo/issues/2681)
 
+1. Windows: reduce WinSock header inclusion to limit name conflicts.
+    * [Pull request 3158](https://bitbucket.org/osrf/gazebo/pull-request/3158)
+
+1. Fix deadlock between `World::OnRequest` and `TopicManager::AddNode`.
+    * [Pull request 3155](https://bitbucket.org/osrf/gazebo/pull-request/3155)
+    * [Issue #2679](https://bitbucket.org/osrf/gazebo/issues/2679)
+
 1. Don't pass GCC linker options to Visual Studio linker.
     * [Pull request 3153](https://bitbucket.org/osrf/gazebo/pull-request/3153)
 
