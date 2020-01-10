@@ -21,8 +21,11 @@
 1. SVG parsing: add lineto commands v,V,h,H.
     * [Pull request 3110](https://bitbucket.org/osrf/gazebo/pull-request/3110)
 
-1. IOManager: PIMPL-ize class and use atomic_int for reference count.
+1. IOManager: PIMPL-ize class and use `atomic_int` for reference count.
     * [Pull request 3167](https://bitbucket.org/osrf/gazebo/pull-request/3167)
+
+1. MeshManager: PIMPL-ize class.
+    * [Pull request 3171](https://bitbucket.org/osrf/gazebo/pull-request/3171)
 
 ## Gazebo 10
 
