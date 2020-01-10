@@ -43,6 +43,10 @@
 1. SystemPaths: fix race condition in PathDelimiter initialization, `missing call to sdf::addURIPath`.
     * [Pull request 3170](https://bitbucket.org/osrf/gazebo/pull-request/3170)
 
+1. Actor: update collision pose when using ActorPlugin.
+    * [Pull request 3108](https://bitbucket.org/osrf/gazebo/pull-request/3108)
+    * [Issue #2433](https://bitbucket.org/osrf/gazebo/issues/2433)
+
 ## Gazebo 9.11.0 (2019-08-29)
 
 1. Add Camera PreRender and PostRender events
