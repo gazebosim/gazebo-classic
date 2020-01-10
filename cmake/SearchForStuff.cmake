@@ -762,9 +762,8 @@ endif()
 # Find the Ignition Common library
 find_package(ignition-common3 QUIET
   COMPONENTS
-    profiler
-  OPTIONAL_COMPONENTS
-    graphics)
+    graphics
+    profiler)
 if (NOT ignition-common3_FOUND)
   message(STATUS "Looking for ignition-common3 - not found")
   BUILD_ERROR ("Missing: Ignition Common (libignition-common3-dev")
