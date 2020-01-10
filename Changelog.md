@@ -19,6 +19,9 @@
 1. Fix CMake 3.14 regression in `MSVC`/`PKG_CONFIG_FOUND` workaround.
     * [Pull request 3152](https://bitbucket.org/osrf/gazebo/pull-request/3152)
 
+1. Add Twist message and use in `cmd_vel_twist` of TrackedVehiclePlugin.
+    * [Pull request 3116](https://bitbucket.org/osrf/gazebo/pull-request/3116)
+
 1. Allow multiple instances of SimpleTrackedVehiclePlugin.
     * [Pull request 3140](https://bitbucket.org/osrf/gazebo/pull-request/3140)
     * [Pull request 3148](https://bitbucket.org/osrf/gazebo/pull-request/3148)
