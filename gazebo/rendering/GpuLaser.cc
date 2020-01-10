@@ -25,9 +25,6 @@
 #ifndef _WIN32
   #include <dirent.h>
 #else
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
   #include "gazebo/common/win_dirent.h"
 #endif
 
@@ -76,29 +73,7 @@ GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
 //////////////////////////////////////////////////
 GpuLaser::~GpuLaser()
 {
-  delete [] this->dataPtr->laserBuffer;
-  delete [] this->dataPtr->laserScan;
-
-  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
-  {
-    if (this->dataPtr->firstPassTextures[i])
-    {
-      Ogre::TextureManager::getSingleton().remove(
-          this->dataPtr->firstPassTextures[i]->getName());
-    }
-  }
-  if (this->dataPtr->secondPassTexture)
-  {
-    Ogre::TextureManager::getSingleton().remove(
-        this->dataPtr->secondPassTexture->getName());
-  }
-
-  if (this->scene && this->dataPtr->orthoCam)
-    this->scene->OgreSceneManager()->destroyCamera(this->dataPtr->orthoCam);
-
-  this->dataPtr->visual.reset();
-  this->dataPtr->texIdx.clear();
-  this->dataPtr->texCount = 0;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -124,6 +99,37 @@ void GpuLaser::Init()
 //////////////////////////////////////////////////
 void GpuLaser::Fini()
 {
+  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
+  {
+    if (this->dataPtr->firstPassTextures[i])
+    {
+      Ogre::TextureManager::getSingleton().remove(
+          this->dataPtr->firstPassTextures[i]->getName());
+      this->dataPtr->firstPassTextures[i] = nullptr;
+    }
+  }
+  if (this->dataPtr->secondPassTexture)
+  {
+    Ogre::TextureManager::getSingleton().remove(
+        this->dataPtr->secondPassTexture->getName());
+    this->dataPtr->secondPassTexture = nullptr;
+  }
+
+  if (this->dataPtr->orthoCam)
+  {
+    this->scene->OgreSceneManager()->destroyCamera(this->dataPtr->orthoCam);
+    this->dataPtr->orthoCam = nullptr;
+  }
+
+  this->dataPtr->visual.reset();
+  this->dataPtr->texIdx.clear();
+  this->dataPtr->texCount = 0;
+
+  delete [] this->dataPtr->laserBuffer;
+  this->dataPtr->laserBuffer = nullptr;
+  delete [] this->dataPtr->laserScan;
+  this->dataPtr->laserScan = nullptr;
+
   Camera::Fini();
 }
 
@@ -225,7 +231,6 @@ void GpuLaser::PostRender()
   {
     this->dataPtr->firstPassTargets[i]->swapBuffers();
   }
-
   this->dataPtr->secondPassTarget->swapBuffers();
 
   if (this->newData && this->captureData)
@@ -387,21 +392,21 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
   autoParamDataSource.setCurrentCamera(this->camera, true);
 
   pass->_updateAutoParams(&autoParamDataSource,
-      Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
+      Ogre::GPV_GLOBAL | Ogre::GPV_PER_OBJECT);
   pass->getFragmentProgramParameters()->setNamedConstant("retro", retro[0]);
   renderSys->bindGpuProgram(
       pass->getVertexProgram()->_getBindingDelegate());
 
   renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
       pass->getVertexProgramParameters(),
-      Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
+      Ogre::GPV_GLOBAL | Ogre::GPV_PER_OBJECT);
 
   renderSys->bindGpuProgram(
       pass->getFragmentProgram()->_getBindingDelegate());
 
   renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM,
       pass->getFragmentProgramParameters(),
-      Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
+      Ogre::GPV_GLOBAL | Ogre::GPV_PER_OBJECT);
 }
 
 //////////////////////////////////////////////////
@@ -749,8 +754,8 @@ void GpuLaser::CreateCanvas()
 
   this->dataPtr->visual->SetPose(pose);
 
-  this->dataPtr->visual->SetMaterial("Gazebo/Green");
-  this->dataPtr->visual->SetAmbient(ignition::math::Color(0, 1, 0, 1));
+  this->dataPtr->visual->SetDiffuse(ignition::math::Color(0, 1, 0, 0));
+  this->dataPtr->visual->SetAmbient(ignition::math::Color(0, 1, 0, 0));
   this->dataPtr->visual->SetVisible(true);
   this->scene->AddVisual(this->dataPtr->visual);
 }

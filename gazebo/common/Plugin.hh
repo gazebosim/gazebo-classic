@@ -17,15 +17,6 @@
 #ifndef _GZ_PLUGIN_HH_
 #define _GZ_PLUGIN_HH_
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  // This was put here because all the plugins are going to use it
-  // This doesn't guarantee something else won't cause it,
-  // but this saves putting this in every plugin
-#include <Winsock2.h>
-#endif
-
 #ifndef _WIN32
   #include <unistd.h>
 #endif
@@ -40,6 +31,7 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/SystemPaths.hh"
@@ -152,8 +144,12 @@ namespace gazebo
                   const std::string winSuffix(".dll");
                   filename.replace(soSuffix, winSuffix.length(), winSuffix);
                 }
-                // remove the lib prefix
-                filename.erase(0, 3);
+                size_t libPrefix = filename.find("lib");
+                if (libPrefix == 0)
+                {
+                  // remove the lib prefix
+                  filename.erase(0, 3);
+                }
               }
 #endif  // ifdef __APPLE__
 
@@ -161,6 +157,8 @@ namespace gazebo
                    iter!= pluginPaths.end(); ++iter)
               {
                 fullname = (*iter)+std::string("/")+filename;
+                fullname = boost::filesystem::path(fullname)
+                    .make_preferred().string();
                 if (stat(fullname.c_str(), &st) == 0)
                 {
                   found = true;

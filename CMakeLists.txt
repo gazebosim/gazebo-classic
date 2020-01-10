@@ -10,7 +10,7 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_MAJOR_VERSION 9)
-set (GAZEBO_MINOR_VERSION 6)
+set (GAZEBO_MINOR_VERSION 11)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
@@ -155,8 +155,11 @@ message (STATUS "----------------------------------------\n")
 set(GAZEBO_DEFAULT_MASTER_HOST localhost)
 set(GAZEBO_DEFAULT_MASTER_PORT 11345)
 set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
+FILE(TO_NATIVE_PATH "${GAZEBO_PLUGIN_PATH}" GAZEBO_PLUGIN_PATH)
 set(GAZEBO_MODEL_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/models)
+FILE(TO_NATIVE_PATH "${GAZEBO_MODEL_PATH}" GAZEBO_MODEL_PATH)
 set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION})
+FILE(TO_NATIVE_PATH "${GAZEBO_RESOURCE_PATH}" GAZEBO_RESOURCE_PATH)
 set(GAZEBO_MODEL_DATABASE_URI http://models.gazebosim.org)
 set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
 # Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
@@ -322,6 +325,12 @@ else (build_errors)
   # Also install the setup.sh in an unversioned location
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
 
+  if (WIN32)
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.bat.in ${PROJECT_BINARY_DIR}/setup.bat @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.bat DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/)
+    # Also install the setup.bat in an unversioned location
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.bat DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
+  endif ()
 
   if (DEFINED CMAKE_CXX_FLAGS)
     message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
@@ -371,8 +380,11 @@ else (build_errors)
 
   foreach (b ${Boost_LIBRARIES})
     get_filename_component(bname ${b} NAME_WE)
-    # Prefix always -l
-    set (bname "-l${bname}")
+    # Prefix -l if not already prefixed
+    string(FIND ${bname} "-l" lprefix)
+    if (NOT ${lprefix} EQUAL 0 )
+      set (bname "-l${bname}")
+    endif()
     # Remove the prefix lib (not always present, like in pthread)
     string (REPLACE "lib" "" bname "${bname}")
     set (Boost_PKGCONFIG_LIBS "${Boost_PKGCONFIG_LIBS} ${bname}")

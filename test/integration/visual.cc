@@ -42,6 +42,20 @@ int imageCount = 0;
 int imageCount2 = 0;
 
 /////////////////////////////////////////////////
+#ifdef _WIN32
+static int setenv(const char *envname, const char *envval, int overwrite)
+{
+  char *original = getenv(envname);
+  if (!original || !!overwrite)
+  {
+    std::string envstring = std::string(envname) + "=" + envval;
+    return _putenv(envstring.c_str());
+  }
+  return 0;
+}
+#endif
+
+/////////////////////////////////////////////////
 void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
                   const unsigned char *_image,
                   unsigned int _width, unsigned int _height,

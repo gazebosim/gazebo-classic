@@ -1,7 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-add_definitions(-DBUILDING_DLL_GZ_UTIL)
-
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
@@ -59,21 +57,19 @@ set (gtest_sources
 
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_util)
 
-set (util_headers "" CACHE INTERNAL "util headers" FORCE)
+set (util_headers "")
 foreach (hdr ${headers})
-  APPEND_TO_CACHED_STRING(util_headers
-    "Utility Headers" "#include \"gazebo/util/${hdr}\"\n")
+  set (util_headers "${util_headers}#include \"gazebo/util/${hdr}\"\n")
 endforeach()
 
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/util.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/util.hh )
 
-
-if (WIN32)
-  add_definitions(-DBUILDING_DLL)
-endif()
-
 gz_add_library(gazebo_util ${sources})
+
+target_compile_definitions(gazebo_util
+  PRIVATE BUILDING_DLL_GZ_UTIL BUILDING_DLL
+)
 
 add_dependencies(gazebo_util
   gazebo_common
@@ -99,7 +95,6 @@ endif()
 
 if (WIN32)
   include_directories(IGNITION-MSGS_INCLUDE_DIR)
-  set_target_properties(gazebo_util PROPERTIES COMPILE_FLAGS "/FIignition/msgs/System.hh")
 endif()
 
 

@@ -41,11 +41,15 @@
 using namespace gazebo;
 using namespace common;
 
+//////////////////////////////////////////////////
+char pathDelimiter()
+{
 #ifdef _WIN32
-static const std::string PathDelimiter = ";";
+  return ';';
 #else
-static const std::string PathDelimiter = ":";
+  return ':';
 #endif
+}
 
 /// \brief Callbacks to be called in order in case a file can't be found.
 /// TODO(chapulina): Move to member variable when porting forward
@@ -202,14 +206,17 @@ void SystemPaths::UpdateModelPaths()
 
   /// TODO(anyone) Use something else to split string.
   size_t pos1 = 0;
-  size_t pos2 = path.find(PathDelimiter);
+  size_t pos2 = path.find(pathDelimiter());
   while (pos2 != std::string::npos)
   {
     sdf::addURIPath("model://", path.substr(pos1, pos2-pos1));
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->modelPaths);
     pos1 = pos2+1;
-    pos2 = path.find(PathDelimiter, pos2+1);
+    if (pos1 >= path.size())
+      return;
+    pos2 = path.find(pathDelimiter(), pos2+1);
   }
+  sdf::addURIPath("model://", path.substr(pos1, path.size()-pos1));
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->modelPaths);
 }
 
@@ -228,12 +235,14 @@ void SystemPaths::UpdateGazeboPaths()
     path = pathCStr;
 
   size_t pos1 = 0;
-  size_t pos2 = path.find(PathDelimiter);
+  size_t pos2 = path.find(pathDelimiter());
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->gazeboPaths);
     pos1 = pos2+1;
-    pos2 = path.find(PathDelimiter, pos2+1);
+    if (pos1 >= path.size())
+      return;
+    pos2 = path.find(pathDelimiter(), pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->gazeboPaths);
 }
@@ -253,12 +262,14 @@ void SystemPaths::UpdatePluginPaths()
     path = pathCStr;
 
   size_t pos1 = 0;
-  size_t pos2 = path.find(PathDelimiter);
+  size_t pos2 = path.find(pathDelimiter());
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->pluginPaths);
     pos1 = pos2+1;
-    pos2 = path.find(PathDelimiter, pos2+1);
+    if (pos1 >= path.size())
+      return;
+    pos2 = path.find(pathDelimiter(), pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->pluginPaths);
 }
@@ -278,12 +289,14 @@ void SystemPaths::UpdateOgrePaths()
     path = pathCStr;
 
   size_t pos1 = 0;
-  size_t pos2 = path.find(PathDelimiter);
+  size_t pos2 = path.find(pathDelimiter());
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->ogrePaths);
     pos1 = pos2+1;
-    pos2 = path.find(PathDelimiter, pos2+1);
+    if (pos1 >= path.size())
+      return;
+    pos2 = path.find(pathDelimiter(), pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->ogrePaths);
 }
@@ -332,6 +345,12 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   return filename;
 }
 
+static bool isAbsolute(const std::string &_filename)
+{
+  boost::filesystem::path path(_filename);
+  return path.is_absolute();
+}
+
 //////////////////////////////////////////////////
 std::string SystemPaths::FindFile(const std::string &_filename,
                                   bool _searchLocalPath)
@@ -347,7 +366,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
     path = boost::filesystem::path(this->FindFileURI(_filename));
   }
   // Handle as local absolute path
-  else if (_filename[0] == '/')
+  else if (isAbsolute(_filename))
   {
     path = boost::filesystem::path(_filename);
     // absolute paths are not portable, e.g. when running world or
@@ -485,12 +504,12 @@ void SystemPaths::ClearModelPaths()
 void SystemPaths::AddGazeboPaths(const std::string &_path)
 {
   size_t pos1 = 0;
-  size_t pos2 = _path.find(PathDelimiter);
+  size_t pos2 = _path.find(pathDelimiter());
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(_path.substr(pos1, pos2-pos1), this->gazeboPaths);
     pos1 = pos2+1;
-    pos2 = _path.find(PathDelimiter, pos2+1);
+    pos2 = _path.find(pathDelimiter(), pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->gazeboPaths);
 }
@@ -499,12 +518,12 @@ void SystemPaths::AddGazeboPaths(const std::string &_path)
 void SystemPaths::AddOgrePaths(const std::string &_path)
 {
   size_t pos1 = 0;
-  size_t pos2 = _path.find(PathDelimiter);
+  size_t pos2 = _path.find(pathDelimiter());
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(_path.substr(pos1, pos2-pos1), this->ogrePaths);
     pos1 = pos2+1;
-    pos2 = _path.find(PathDelimiter, pos2+1);
+    pos2 = _path.find(pathDelimiter(), pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->ogrePaths);
 }
@@ -513,12 +532,12 @@ void SystemPaths::AddOgrePaths(const std::string &_path)
 void SystemPaths::AddPluginPaths(const std::string &_path)
 {
   size_t pos1 = 0;
-  size_t pos2 = _path.find(PathDelimiter);
+  size_t pos2 = _path.find(pathDelimiter());
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(_path.substr(pos1, pos2-pos1), this->pluginPaths);
     pos1 = pos2+1;
-    pos2 = _path.find(PathDelimiter, pos2+1);
+    pos2 = _path.find(pathDelimiter(), pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->pluginPaths);
 }
@@ -527,12 +546,12 @@ void SystemPaths::AddPluginPaths(const std::string &_path)
 void SystemPaths::AddModelPaths(const std::string &_path)
 {
   size_t pos1 = 0;
-  size_t pos2 = _path.find(PathDelimiter);
+  size_t pos2 = _path.find(pathDelimiter());
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(_path.substr(pos1, pos2-pos1), this->modelPaths);
     pos1 = pos2+1;
-    pos2 = _path.find(PathDelimiter, pos2+1);
+    pos2 = _path.find(pathDelimiter(), pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
 }

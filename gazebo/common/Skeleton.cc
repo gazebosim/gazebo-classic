@@ -54,6 +54,12 @@ SkeletonNode* Skeleton::GetRootNode()
 }
 
 //////////////////////////////////////////////////
+const SkeletonNode* Skeleton::GetRootNode() const
+{
+  return this->root;
+}
+
+//////////////////////////////////////////////////
 SkeletonNode* Skeleton::GetNodeByName(std::string _name)
 {
   for (std::map<unsigned int, SkeletonNode*>::iterator iter =
@@ -198,6 +204,7 @@ NodeMap Skeleton::GetNodes()
 //////////////////////////////////////////////////
 void Skeleton::SetNumVertAttached(unsigned int _vertices)
 {
+  this->rawNW.clear();
   this->rawNW.resize(_vertices);
 }
 
@@ -211,9 +218,8 @@ void Skeleton::AddVertNodeWeight(unsigned int _vertex, std::string _node,
 //////////////////////////////////////////////////
 unsigned int Skeleton::GetNumVertNodeWeights(unsigned int _vertex)
 {
-  if (_vertex > this->rawNW.size())
+  if (_vertex >= this->rawNW.size())
     return 0;
-
   return this->rawNW[_vertex].size();
 }
 
@@ -287,6 +293,12 @@ void SkeletonNode::SetName(std::string _name)
 
 //////////////////////////////////////////////////
 std::string SkeletonNode::GetName()
+{
+  return this->name;
+}
+
+//////////////////////////////////////////////////
+std::string SkeletonNode::Name() const
 {
   return this->name;
 }
@@ -485,6 +497,12 @@ void SkeletonNode::SetInverseBindTransform(
 ignition::math::Matrix4d SkeletonNode::InverseBindTransform()
 {
   return this->invBindTransform;
+}
+
+//////////////////////////////////////////////////
+bool SkeletonNode::HasInvBindTransform()
+{
+  return this->invBindTransform != ignition::math::Matrix4d::Zero;
 }
 
 //////////////////////////////////////////////////

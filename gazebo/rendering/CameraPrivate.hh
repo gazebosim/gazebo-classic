@@ -117,6 +117,16 @@ namespace gazebo
 
       /// \brief Fixed axis to yaw around.
       public: ignition::math::Vector3d yawFixedAxis;
+
+      /// \brief Camera projection matrix
+      /// \todo(anyone) Use the protected version of this variable in Camera.hh
+      /// when merging forward
+      public: ignition::math::Matrix4d cameraProjectionMatrix;
+
+      /// \brief Flag for signaling the usage of camera intrinsics within OGRE
+      /// \todo(anyone) Use the protected version of this variable in Camera.hh
+      /// when merging forward
+      public: bool cameraUsingIntrinsics = false;
     };
   }
 }
