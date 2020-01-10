@@ -6,11 +6,21 @@
     * [Pull request 3164](https://bitbucket.org/osrf/gazebo/pull-request/3164)
     * [Issue #2681](https://bitbucket.org/osrf/gazebo/issues/2681)
 
+1. Windows: reduce WinSock header inclusion to limit name conflicts.
+    * [Pull request 3158](https://bitbucket.org/osrf/gazebo/pull-request/3158)
+
+1. Fix deadlock between `World::OnRequest` and `TopicManager::AddNode`.
+    * [Pull request 3155](https://bitbucket.org/osrf/gazebo/pull-request/3155)
+    * [Issue #2679](https://bitbucket.org/osrf/gazebo/issues/2679)
+
 1. Don't pass GCC linker options to Visual Studio linker.
     * [Pull request 3153](https://bitbucket.org/osrf/gazebo/pull-request/3153)
 
 1. Fix CMake 3.14 regression in `MSVC`/`PKG_CONFIG_FOUND` workaround.
     * [Pull request 3152](https://bitbucket.org/osrf/gazebo/pull-request/3152)
+
+1. Add Twist message and use in `cmd_vel_twist` of TrackedVehiclePlugin.
+    * [Pull request 3116](https://bitbucket.org/osrf/gazebo/pull-request/3116)
 
 1. Allow multiple instances of SimpleTrackedVehiclePlugin.
     * [Pull request 3140](https://bitbucket.org/osrf/gazebo/pull-request/3140)
@@ -32,6 +42,13 @@
 1. MeshManager: add .stlb file extension support
     * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
     * [Pull request 3128](https://bitbucket.org/osrf/gazebo/pull-request/3128)
+
+1. SystemPaths: fix race condition in PathDelimiter initialization, `missing call to sdf::addURIPath`.
+    * [Pull request 3170](https://bitbucket.org/osrf/gazebo/pull-request/3170)
+
+1. Actor: update collision pose when using ActorPlugin.
+    * [Pull request 3108](https://bitbucket.org/osrf/gazebo/pull-request/3108)
+    * [Issue #2433](https://bitbucket.org/osrf/gazebo/issues/2433)
 
 ## Gazebo 9.11.0 (2019-08-29)
 
