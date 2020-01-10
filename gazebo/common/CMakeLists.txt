@@ -237,7 +237,7 @@ target_link_libraries(gazebo_common
     ${Boost_LIBRARIES}
     ${CURL_LIBRARIES}
     ${freeimage_LIBRARIES}
-    ${IGNITION-COMMON_LIBRARIES}
+    ignition-common3::graphics
     ${IGNITION-FUEL_TOOLS_LIBRARIES}
     ${IGNITION-MATH_LIBRARIES}
     ${libdl_library}

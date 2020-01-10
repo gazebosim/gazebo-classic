@@ -206,10 +206,10 @@ list(APPEND @PKG_NAME@_INCLUDE_DIRS ${IGNITION-MSGS_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARY_DIRS ${IGNITION-MSGS_LIBRARY_DIRS})
 list(APPEND @PKG_NAME@_LIBRARIES ${IGNITION-MSGS_LIBRARIES})
 
-find_package(ignition-common3 REQUIRED)
+find_package(ignition-common3 REQUIRED COMPONENTS graphics)
 list(APPEND @PKG_NAME@_INCLUDE_DIRS ${ignition-common3_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARY_DIRS ${ignition-common3_LIBRARY_DIRS})
-list(APPEND @PKG_NAME@_LIBRARIES ${ignition-common3_LIBRARIES})
+list(APPEND @PKG_NAME@_LIBRARIES ignition-common3::ignition-common3-graphics)
 
 find_package(ignition-fuel_tools4 REQUIRED)
 list(APPEND @PKG_NAME@_INCLUDE_DIRS ${IGNITION-FUEL_TOOLS_INCLUDE_DIRS})
