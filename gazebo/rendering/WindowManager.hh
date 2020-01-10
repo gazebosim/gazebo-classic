@@ -19,7 +19,6 @@
 
 #ifdef _WIN32
   // Oh, yeah, CreateWindow is taken, too.
-  #include <windows.h>
   #undef CreateWindow
 #endif
 
