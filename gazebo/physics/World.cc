@@ -2654,9 +2654,32 @@ void World::ProcessMessages()
             ModelPtr m = modelList.front();
             modelList.pop_front();
 
-            // Publish the model's scale
+            // Publish the model's scale and visual geometry data at the same
+            // time to fix race condition on client side when updating visuals
             msgs::Model msg;
-            m->FillMsg(msg);
+            msg.set_name(m->GetScopedName());
+            msg.set_id(m->GetId());
+            Link_V links = m->GetLinks();
+            for (auto l : links)
+            {
+              msgs::Link *linkMsg = msg.add_link();
+              linkMsg->set_id(l->GetId());
+              linkMsg->set_name(l->GetScopedName());
+
+              // have to call Link::FillMsg in order to keep visual msgs
+              // up-to-date with latest sdf values.
+              msgs::Link tmpMsg;
+              l->FillMsg(tmpMsg);
+
+              auto visualMsgs = l->Visuals();
+              for (auto v : visualMsgs)
+              {
+                msgs::Visual *visualMsg = linkMsg->add_visual();
+                visualMsg->CopyFrom(v.second);
+              }
+            }
+
+            // set scale
             msgs::Set(msg.mutable_scale(), m->Scale());
 
             // add all nested models to the queue
