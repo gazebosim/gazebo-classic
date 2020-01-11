@@ -111,6 +111,7 @@ set(tests
   transceiver.cc
   transport.cc
   transporter.cc
+  variable_gearbox_plugin.cc
   wheel_slip.cc
   world.cc
   world_clone.cc
@@ -210,6 +211,7 @@ set(qt_tests
 gz_build_qt_tests(${qt_tests})
 
 if (VALID_DRI_DISPLAY)
+  add_dependencies(${TEST_TYPE}_heightmap HeightmapLODPlugin)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
