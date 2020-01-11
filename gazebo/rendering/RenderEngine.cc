@@ -584,8 +584,10 @@ void RenderEngine::SetupResources()
 #endif
       archNames.push_back(
           std::make_pair(prefix + "/rtshaderlib", "General"));
+#if (OGRE_RESOURCEMANAGER_STRICT == 0)
       archNames.push_back(
           std::make_pair(prefix + "/materials/programs", "General"));
+#endif
       archNames.push_back(
           std::make_pair(prefix + "/materials/scripts", "General"));
       archNames.push_back(
@@ -606,6 +608,19 @@ void RenderEngine::SetupResources()
           std::make_pair(prefix + "/gui/layouts", "Layouts"));
       archNames.push_back(
           std::make_pair(prefix + "/gui/animations", "Animations"));
+#if (OGRE_RESOURCEMANAGER_STRICT != 0)
+    try
+    {
+      Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+          boost::filesystem::path(prefix + "/materials/programs").make_preferred().string(),
+          "FileSystem", "General", true);
+    }
+    catch(Ogre::Exception &/*_e*/)
+    {
+      gzthrow("Unable to load Ogre Resources. Make sure the resources path "
+          "in the world file is set correctly.");
+    }
+#endif
     }
   }
 
