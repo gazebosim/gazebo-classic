@@ -2655,7 +2655,8 @@ void World::ProcessMessages()
             modelList.pop_front();
 
             // Publish the model's scale and visual geometry data at the same
-            // time to fix race condition on client side when updating visuals
+            // time to fix race condition on rendering side when updating
+            // visuals
             msgs::Model msg;
             msg.set_name(m->GetScopedName());
             msg.set_id(m->GetId());
