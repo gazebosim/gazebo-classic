@@ -14,13 +14,6 @@
  * limitations under the License.
  *
 */
-
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
@@ -122,6 +115,7 @@ void TopicManager::RemoveNode(unsigned int _id)
       }
 
       // Remove the node from all subscriptions.
+      boost::mutex::scoped_lock subscriber_lock(this->subscriberMutex);
       for (SubNodeMap::iterator siter = this->subscribedNodes.begin();
            siter != this->subscribedNodes.end(); ++siter)
       {
@@ -228,6 +222,7 @@ PublicationPtr TopicManager::FindPublication(const std::string &_topic)
 //////////////////////////////////////////////////
 SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 {
+  boost::mutex::scoped_lock lock(this->subscriberMutex);
   // Create a subscription (essentially a callback that gets
   // fired every time a Publish occurs on the corresponding
   // topic
@@ -295,6 +290,7 @@ void TopicManager::DisconnectSubFromPub(const std::string &topic,
 //////////////////////////////////////////////////
 void TopicManager::ConnectSubscribers(const std::string &_topic)
 {
+  boost::mutex::scoped_lock lock(this->subscriberMutex);
   SubNodeMap::iterator nodeIter = this->subscribedNodes.find(_topic);
 
   if (nodeIter != this->subscribedNodes.end())
@@ -321,7 +317,6 @@ void TopicManager::ConnectSubscribers(const std::string &_topic)
 //////////////////////////////////////////////////
 void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
 {
-  boost::mutex::scoped_lock lock(this->subscriberMutex);
   this->UpdatePublications(_pub.topic(), _pub.msg_type());
 
   PublicationPtr publication = this->FindPublication(_pub.topic());
@@ -340,6 +335,7 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
             _pub.msg_type()));
 
       bool latched = false;
+      boost::mutex::scoped_lock lock(this->subscriberMutex);
       SubNodeMap::iterator nodeIter = this->subscribedNodes.find(_pub.topic());
 
       // Find if any local node has a latched subscriber for the new topic

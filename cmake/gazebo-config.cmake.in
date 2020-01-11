@@ -148,7 +148,7 @@ foreach(lib @PKG_LIBRARIES@)
 endforeach()
 
 # Get the install prefix for OGRE
-execute_process(COMMAND pkg-config --variable=prefix OGRE
+execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=prefix OGRE
   OUTPUT_VARIABLE OGRE_INSTALL_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # Add the OGRE cmake path to CMAKE_MODULE_PATH
@@ -172,14 +172,20 @@ list(APPEND @PKG_NAME@_INCLUDE_DIRS ${SDFormat_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARIES ${SDFormat_LIBRARIES})
 
 # Find OGRE
-find_package(OGRE REQUIRED)
+find_package(OGRE REQUIRED COMPONENTS Terrain Paging)
 list(APPEND @PKG_NAME@_INCLUDE_DIRS ${OGRE_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARIES ${OGRE_LIBRARIES})
 # When including OGRE, also include the Terrain and Paging components
-list(APPEND GAZEBO_INCLUDE_DIRS ${OGRE_Terrain_INCLUDE_DIRS}
-  ${OGRE_Paging_INCLUDE_DIRS})
-list(APPEND GAZEBO_LIBRARIES ${OGRE_Terrain_LIBRARIES}
-  ${OGRE_Paging_LIBRARIES})
+list(APPEND GAZEBO_INCLUDE_DIRS
+  ${OGRE_Terrain_INCLUDE_DIRS}
+  ${OGRE_Paging_INCLUDE_DIRS}
+  ${OGRE-Terrain_INCLUDE_DIRS}
+  ${OGRE-Paging_INCLUDE_DIRS})
+list(APPEND GAZEBO_LIBRARIES
+  ${OGRE_Terrain_LIBRARIES}
+  ${OGRE_Paging_LIBRARIES}
+  ${OGRE-Terrain_LIBRARIES}
+  ${OGRE-Paging_LIBRARIES})
 
 # Find Ignition Math
 find_package(ignition-math4 REQUIRED)

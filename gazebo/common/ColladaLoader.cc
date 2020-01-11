@@ -130,6 +130,9 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 
   this->LoadScene(mesh);
 
+  if (mesh->HasSkeleton())
+    ApplyInvBindTransform(mesh->GetSkeleton());
+
   // This will make the model the correct size.
   mesh->Scale(this->dataPtr->meter);
   if (mesh->HasSkeleton())
@@ -228,6 +231,8 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
       bindMatXml = bindMatXml->NextSiblingElement("bind_material");
     }
 
+    if (_mesh->GetSkeleton())
+      _mesh->GetSkeleton()->SetNumVertAttached(0);
     this->LoadGeometry(geomXml, transform, _mesh);
     instGeomXml = instGeomXml->NextSiblingElement("instance_geometry");
   }
@@ -455,7 +460,6 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
             ignition::math::parseFloat(strs[id + 15]));
 
     skeleton->GetNodeByName(joints[i])->SetInverseBindTransform(mat);
-    skeleton->GetNodeByName(joints[i])->SetModelTransform(mat.Inverse(), false);
   }
 
   TiXmlElement *vertWeightsXml = skinXml->FirstChildElement("vertex_weights");
@@ -641,8 +645,14 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
         frameTransXml->FirstChildElement("technique_common");
       accessor = accessor->FirstChildElement("accessor");
 
-      unsigned int stride =
-        ignition::math::parseInt(accessor->Attribute("stride"));
+      // stride is optional, default to 1
+      unsigned int stride = 1;
+      auto *strideAttribute = accessor->Attribute("stride");
+      if (strideAttribute)
+      {
+        stride = static_cast<unsigned int>(
+            ignition::math::parseInt(strideAttribute));
+      }
 
       SkeletonNode *targetNode = _skel->GetNodeById(targetBone);
       if (targetNode == nullptr)
@@ -1940,7 +1950,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   // indices, used for identifying vertices that can be shared.
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
 
-  unsigned int *values = new unsigned int[offsetSize];
+  std::vector<unsigned int> values(offsetSize);
   std::vector<std::string> strs;
 
   boost::split(strs, pStr, boost::is_any_of(" \t"));
@@ -1948,7 +1958,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
     for (unsigned int i = 0; i < offsetSize; ++i)
-      values[i] = ignition::math::parseInt(strs[j+i]);
+      values.at(i) = ignition::math::parseInt(strs[j+i]);
 
     unsigned int daeVertIndex = 0;
     bool addIndex = !hasVertices;
@@ -1959,7 +1969,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     {
       // Get the vertex position index value. If the position is a duplicate
       // then reset the index to the first instance of the duplicated position
-      daeVertIndex = values[*inputs[VERTEX].begin()];
+      daeVertIndex = values.at(*inputs[VERTEX].begin());
       if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
         daeVertIndex = positionDupMap[daeVertIndex];
 
@@ -1986,7 +1996,8 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
             // Get the vertex normal index value. If the normal is a duplicate
             // then reset the index to the first instance of the duplicated
             // position
-            unsigned int remappedNormalIndex = values[*inputs[NORMAL].begin()];
+            unsigned int remappedNormalIndex =
+              values.at(*inputs[NORMAL].begin());
             if (normalDupMap.find(remappedNormalIndex) != normalDupMap.end())
               remappedNormalIndex = normalDupMap[remappedNormalIndex];
 
@@ -1999,7 +2010,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
             // duplicate then reset the index to the first instance of the
             // duplicated texcoord
             unsigned int remappedTexcoordIndex =
-                values[*inputs[TEXCOORD].begin()];
+                values.at(*inputs[TEXCOORD].begin());
             if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
               remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
 
@@ -2038,10 +2049,10 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
         {
           Skeleton *skel = _mesh->GetSkeleton();
           for (unsigned int i = 0;
-              i < skel->GetNumVertNodeWeights(values[daeVertIndex]); ++i)
+              i < skel->GetNumVertNodeWeights(daeVertIndex); ++i)
           {
             std::pair<std::string, double> node_weight =
-              skel->GetVertNodeWeight(values[daeVertIndex], i);
+              skel->GetVertNodeWeight(daeVertIndex, i);
             SkeletonNode *node =
                 _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
             subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
@@ -2053,7 +2064,8 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       }
       if (hasNormals)
       {
-        unsigned int inputRemappedNormalIndex = values[*inputs[NORMAL].begin()];
+        unsigned int inputRemappedNormalIndex =
+          values.at(*inputs[NORMAL].begin());
         if (normalDupMap.find(inputRemappedNormalIndex) != normalDupMap.end())
           inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
         subMesh->AddNormal(norms[inputRemappedNormalIndex]);
@@ -2062,7 +2074,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       if (hasTexcoords)
       {
         unsigned int inputRemappedTexcoordIndex =
-            values[*inputs[TEXCOORD].begin()];
+            values.at(*inputs[TEXCOORD].begin());
         if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
           inputRemappedTexcoordIndex = texDupMap[inputRemappedTexcoordIndex];
         subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].X(),
@@ -2080,7 +2092,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     }
   }
 
-  delete [] values;
   _mesh->AddSubMesh(subMesh.release());
 }
 
@@ -2227,6 +2238,7 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
   }
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::MergeSkeleton(Skeleton *_skeleton, SkeletonNode *_mergeNode)
 {
   if (_skeleton->GetNodeById(_mergeNode->GetId()))
@@ -2259,4 +2271,21 @@ void ColladaLoader::MergeSkeleton(Skeleton *_skeleton, SkeletonNode *_mergeNode)
   _mergeNode->SetParent(dummyRoot);
   dummyRoot->SetTransform(ignition::math::Matrix4d::Identity);
   _skeleton->SetRootNode(dummyRoot);
+}
+
+/////////////////////////////////////////////////
+void ColladaLoader::ApplyInvBindTransform(Skeleton *_skeleton)
+{
+  std::list<SkeletonNode*> queue;
+  queue.push_back(_skeleton->GetRootNode());
+
+  while (!queue.empty())
+  {
+    SkeletonNode *node = queue.front();
+    if (node->HasInvBindTransform())
+      node->SetModelTransform(node->InverseBindTransform().Inverse(), false);
+    for (unsigned int i = 0; i < node->GetChildCount(); i++)
+      queue.push_back(node->GetChild(i));
+    queue.pop_front();
+  }
 }

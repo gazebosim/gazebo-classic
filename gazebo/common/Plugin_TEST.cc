@@ -40,7 +40,7 @@ class PluginTest : public gazebo::testing::AutoLogFixture
 std::string expectedFilename(const std::string &_pluginName)
 {
 #ifdef _WIN32
-  return _pluginName + ".dll");
+  return _pluginName + ".dll";
 #elif __APPLE__
   return "lib" + _pluginName + ".dylib";
 #endif

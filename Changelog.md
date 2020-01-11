@@ -1,6 +1,137 @@
 ## Gazebo 9
 
-## Gazebo 9.X.X (20XX-XX-XX)
+## Gazebo 9.XX.X (2019-XX-XX)
+
+1. Fix compilation of plugins with tbb and qt 5.14.
+    * [Pull request 3164](https://bitbucket.org/osrf/gazebo/pull-request/3164)
+    * [Issue #2681](https://bitbucket.org/osrf/gazebo/issues/2681)
+
+1. Windows: reduce WinSock header inclusion to limit name conflicts.
+    * [Pull request 3158](https://bitbucket.org/osrf/gazebo/pull-request/3158)
+
+1. Fix deadlock between `World::OnRequest` and `TopicManager::AddNode`.
+    * [Pull request 3155](https://bitbucket.org/osrf/gazebo/pull-request/3155)
+    * [Issue #2679](https://bitbucket.org/osrf/gazebo/issues/2679)
+
+1. Don't pass GCC linker options to Visual Studio linker.
+    * [Pull request 3153](https://bitbucket.org/osrf/gazebo/pull-request/3153)
+
+1. Fix CMake 3.14 regression in `MSVC`/`PKG_CONFIG_FOUND` workaround.
+    * [Pull request 3152](https://bitbucket.org/osrf/gazebo/pull-request/3152)
+
+1. Add Twist message and use in `cmd_vel_twist` of TrackedVehiclePlugin.
+    * [Pull request 3116](https://bitbucket.org/osrf/gazebo/pull-request/3116)
+
+1. Allow multiple instances of SimpleTrackedVehiclePlugin.
+    * [Pull request 3140](https://bitbucket.org/osrf/gazebo/pull-request/3140)
+    * [Pull request 3148](https://bitbucket.org/osrf/gazebo/pull-request/3148)
+
+1. ODEBallJoint: reduce console output.
+    * [Pull request 3132](https://bitbucket.org/osrf/gazebo/pull-request/3132)
+
+1. Fix moving model files in StaticMapPlugin
+    * [Pull request 3123](https://bitbucket.org/osrf/gazebo/pull-request/3123)
+
+1. Fix crash when loading submesh with no bone assignments.
+    * [Pull request 3122](https://bitbucket.org/osrf/gazebo/pull-request/3122)
+
+1. Fix cmake warnings about multi-line strings.
+    * [Pull request 3138](https://bitbucket.org/osrf/gazebo/pull-request/3138)
+    * [Issue #2664](https://bitbucket.org/osrf/gazebo/issues/2664)
+
+1. MeshManager: add .stlb file extension support
+    * [Pull request 3124](https://bitbucket.org/osrf/gazebo/pull-request/3124)
+    * [Pull request 3128](https://bitbucket.org/osrf/gazebo/pull-request/3128)
+
+1. SystemPaths: fix race condition in PathDelimiter initialization, `missing call to sdf::addURIPath`.
+    * [Pull request 3170](https://bitbucket.org/osrf/gazebo/pull-request/3170)
+
+1. Actor: update collision pose when using ActorPlugin.
+    * [Pull request 3108](https://bitbucket.org/osrf/gazebo/pull-request/3108)
+    * [Issue #2433](https://bitbucket.org/osrf/gazebo/issues/2433)
+
+## Gazebo 9.11.0 (2019-08-29)
+
+1. Add Camera PreRender and PostRender events
+    * [Pull request 3118](https://bitbucket.org/osrf/gazebo/pull-request/3118)
+
+1. Fix ColladaLoader wrong node weights caused by buffer overflow bug
+    * [Pull request 3115](https://bitbucket.org/osrf/gazebo/pull-request/3115)
+
+
+## Gazebo 9.10.0 (2019-07-12)
+
+1. ColladaLoader: use default value of 1 for stride parameter when unset.
+    * [Pull request 3112](https://bitbucket.org/osrf/gazebo/pull-request/3112)
+
+1. TopicManager: lock subscriberMutex anywhere subscribedNodes is used
+    * [Pull request 3096](https://bitbucket.org/osrf/gazebo/pull-request/3096)
+
+1. Export `OGRE-*` cmake variables in addition to `OGRE_*` variables
+    * [Pull request 3109](https://bitbucket.org/osrf/gazebo/pull-request/3109)
+
+1. Fix race conditions in `Master::ProcessMessage` and `Publisher::OnPublishComplete`
+    * [Pull request 3103](https://bitbucket.org/osrf/gazebo/pull-request/3103)
+
+## Gazebo 9.9.0 (2019-05-23)
+
+1. Backport camera intrinsics feature
+    * [Pull request 3099](https://bitbucket.org/osrf/gazebo/pull-request/3099)
+
+1. Fix kinematic loops for DART 6.8, reverting to dart 6.7 behavior
+    * [Pull request 3101](https://bitbucket.org/osrf/gazebo/pull-request/3101)
+
+1. Enable extra kinematic loop test for DART 6.8+
+    * [Pull request 3104](https://bitbucket.org/osrf/gazebo/pull-request/3104)
+
+1. Lens flare: use light world pose at each time step instead of only at initialization
+    * [Pull request 3093](https://bitbucket.org/osrf/gazebo/pull-request/3093)
+
+1. LinkPlot3dPlugin: read optional `<model>` tag to find links in nested models
+    * [Pull request 3095](https://bitbucket.org/osrf/gazebo/pull-request/3095)
+
+1. Refactor ODE gearbox joint implementation to match hinge joint
+    * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
+
+1. Make the GPU laser warp artifact transparent
+    * [Pull request 3100](https://bitbucket.org/osrf/gazebo/pull-request/3100)
+
+1. Added support for tracked vehicles
+    * [Pull request 2652](https://bitbucket.org/osrf/gazebo/pull-request/2652)
+    * [Issue #863](https://bitbucket.org/osrf/gazebo/issues/863)
+
+1. Fix loading sdf with orthographic projection camera
+    * [Pull request 3098](https://bitbucket.org/osrf/gazebo/pull-request/3098)
+
+## Gazebo 9.8.0 (2019-04-10)
+
+1. Fix kinematic loops for DART 6.7 and later
+    * [Pull request 3086](https://bitbucket.org/osrf/gazebo/pull-request/3086)
+    * [Issue 2605](https://bitbucket.org/osrf/gazebo/issues/2605)
+
+1. Port introspection manager performance fix
+    * [Pull request 3074](https://bitbucket.org/osrf/gazebo/pull-request/3074)
+
+1. Windows: enable dynamic linking.
+    * [Pull request 3068](https://bitbucket.org/osrf/gazebo/pull-request/3068)
+
+1. Windows: fixing path-related issues.
+    * [Pull request 3069](https://bitbucket.org/osrf/gazebo/pull-request/3069)
+
+1. Windows: add setup.bat.in helper script template
+    * [Pull request 3070](https://bitbucket.org/osrf/gazebo/pull-request/3070)
+
+1. Fix mal-formed pkgconfig file: don't prepend duplicate -l
+    * [Pull request 3080](https://bitbucket.org/osrf/gazebo/pull-request/3080)
+    * [Issue 2600](https://bitbucket.org/osrf/gazebo/issues/2600)
+
+## Gazebo 9.7.0 (2019-03-13)
+
+1. Windows: fix test compilation
+    * [Pull request 3082](https://bitbucket.org/osrf/gazebo/pull-request/3082)
+
+1. Heightmap: cast shadows if `<cast_shadows>` tag is set
+    * [Pull request 3083](https://bitbucket.org/osrf/gazebo/pull-request/3083)
 
 1. Windows: ignore disabled interfaces in `Connection::GetLocalEndpoint()`
     * [Pull request 3079](https://bitbucket.org/osrf/gazebo/pull-request/3079)
@@ -9,6 +140,7 @@
     * [Pull request 3077](https://bitbucket.org/osrf/gazebo/pull-request/3077)
 
 1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
+    * [Pull request 3084](https://bitbucket.org/osrf/gazebo/pull-request/3084)
     * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
     * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
 
@@ -83,9 +215,6 @@
 1. Boost 1.68 support
     * [Pull request 3030](https://bitbucket.org/osrf/gazebo/pull-request/3030)
 
-1. Refactor ODE gearbox joint implementation to match hinge joint
-    * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
-
 1. Use new sha1.hpp header location for recent boost
     * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
 
@@ -101,6 +230,8 @@
 
 1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
     * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
+    * [Pull request 2997](https://bitbucket.org/osrf/gazebo/pull-request/2997)
 
 1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
     * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
@@ -1213,7 +1344,16 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
-1. Use new sha1.hpp header location for recent boost
+## Gazebo 7.15.0 (2018-03-26)
+
+1. Don't search for boost signals component (support boost 1.69)
+    * [Pull request 3089](https://bitbucket.org/osrf/gazebo/pull-request/3089)
+    * [Issue 2577](https://bitbucket.org/osrf/gazebo/issues/2577)
+
+1. Refactor ODE gearbox joint implementation to match hinge joint
+    * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
+
+1. Use new sha1.hpp header location for recent boost (support boost 1.68)
     * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
 
 1. Add MisalignmentPlugin which reports alignment between two poses
@@ -1230,6 +1370,8 @@
 
 1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
     * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
+    * [Pull request 2997](https://bitbucket.org/osrf/gazebo/pull-request/2997)
 
 1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
     * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
