@@ -2667,16 +2667,24 @@ void World::ProcessMessages()
               linkMsg->set_id(l->GetId());
               linkMsg->set_name(l->GetScopedName());
 
-              // have to call Link::FillMsg in order to keep visual msgs
-              // up-to-date with latest sdf values.
+              // tmpMsg is unused. The Link::FillMsg call is made in order to
+              // keep link's visual msgs up-to-date with latest sdf values.
+              // The for loop below does the actual copy of visual geom msg.
               msgs::Link tmpMsg;
               l->FillMsg(tmpMsg);
 
               auto visualMsgs = l->Visuals();
               for (auto v : visualMsgs)
               {
+                if (!v.second.has_geometry())
+                  continue;
                 msgs::Visual *visualMsg = linkMsg->add_visual();
-                visualMsg->CopyFrom(v.second);
+                visualMsg->set_name(v.second.name());
+                visualMsg->set_id(v.second.id());
+                visualMsg->set_parent_name(v.second.parent_name());
+                visualMsg->set_parent_id(v.second.parent_id());
+                auto geomMsg = visualMsg->mutable_geometry();
+                geomMsg->CopyFrom(v.second.geometry());
               }
             }
 
