@@ -159,6 +159,7 @@ add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 add_dependencies(${TEST_TYPE}_plugin_interface PluginInterfaceTest)
 add_dependencies(${TEST_TYPE}_tracked_vehicles SimpleTrackedVehiclePlugin)
 add_dependencies(${TEST_TYPE}_tracked_vehicles WheelTrackedVehiclePlugin)
+add_dependencies(${TEST_TYPE}_variable_gearbox_plugin VariableGearboxPlugin)
 
 set(display_tests
 )

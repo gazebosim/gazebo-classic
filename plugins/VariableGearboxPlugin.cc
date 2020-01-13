@@ -273,8 +273,8 @@ void VariableGearboxPlugin::OnUpdate(const common::UpdateInfo & /*_info*/)
   double ratio;
   double refInput;
   double refOutput;
-  double inputAngle = this->dataPtr->inputJoint->GetAngle(0).Radian();
-  // double outputAngle = this->dataPtr->outputJoint->GetAngle(0).Radian();
+  double inputAngle = this->dataPtr->inputJoint->Position(0);
+  // double outputAngle = this->dataPtr->outputJoint->Position(0);
 
   // the Load function should print an error message and return
   // before setting up this callback if no parameters are found.

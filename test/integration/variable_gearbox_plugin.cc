@@ -31,7 +31,7 @@ TEST_F(VariableGearboxTest, DemoJointTypes)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_NE(world, nullptr);
 
-  physics::ModelPtr model = world->GetModel("parent");
+  physics::ModelPtr model = world->ModelByName("parent");
   ASSERT_NE(model, nullptr);
 
   const std::string prefix = "demo_joint_types::gearbox_";
