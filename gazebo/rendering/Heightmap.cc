@@ -1400,11 +1400,9 @@ void GzTerrainMatGen::SM2Profile::addTechnique(
     // }
 
     // check SM3 features
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
     this->mSM3Available =
       Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0");
-#endif
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8 && OGRE_VERSION_MINOR <= 11
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8
     this->mSM4Available =
       Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0");
 #endif
