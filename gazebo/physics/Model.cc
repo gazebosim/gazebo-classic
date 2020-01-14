@@ -29,6 +29,7 @@
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/SemanticVersion.hh>
 #include <ignition/msgs/plugin_v.pb.h>
 #include <sstream>
 
@@ -78,14 +79,25 @@ void Model::Load(sdf::ElementPtr _sdf)
 {
   // Create a DOM object to compute the resolved initial pose (with frame
   // semantics)
-  sdf::Errors errors = this->modelSDFDom.Load(_sdf);
-  if (!errors.empty())
+  if (_sdf->GetName() == "model")
   {
-    for (const auto &error : errors)
+    ignition::math::SemanticVersion sdfOriginalVersion(_sdf->OriginalVersion());
+    if (sdfOriginalVersion >= ignition::math::SemanticVersion(1, 7))
     {
-      gzerr << error << "\n";
+      // Only <model> is supported right now, <actor> is not supported.
+      this->modelSDFDom = std::make_unique<sdf::Model>();
+      sdf::Errors errors = this->modelSDFDom->Load(_sdf);
+      if (!errors.empty())
+      {
+        this->modelSDFDom.reset();
+
+        for (const auto &error : errors)
+        {
+          gzerr << error << "\n";
+        }
+        return;
+      }
     }
-    return;
   }
 
   Entity::Load(_sdf);
@@ -541,7 +553,7 @@ const sdf::ElementPtr Model::GetSDF()
 
 const sdf::Model *Model::GetSDFDom() const
 {
-  return &this->modelSDFDom;
+  return this->modelSDFDom.get();
 }
 
 //////////////////////////////////////////////////
@@ -1795,4 +1807,13 @@ void Model::PluginInfo(const common::URI &_pluginUri,
 
   gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
       << std::endl;
+}
+
+std::optional<sdf::SemanticPose> Model::SDFSemanticPose() const
+{
+  if (nullptr != this->modelSDFDom)
+  {
+    return this->modelSDFDom->SemanticPose();
+  }
+  return std::nullopt;
 }

@@ -115,8 +115,11 @@ void Joint::Load(sdf::ElementPtr _sdf)
 {
   if (nullptr != this->model)
   {
-    this->jointSDFDom = this->model->GetSDFDom()->JointByName(
-        _sdf->Get<std::string>("name"));
+    auto *modelDom = this->model->GetSDFDom();
+    if (nullptr != modelDom)
+    {
+      this->jointSDFDom = modelDom->JointByName(_sdf->Get<std::string>("name"));
+    }
   }
 
   Base::Load(_sdf);
@@ -1345,11 +1348,13 @@ double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Pose3d Joint::SDFPoseRelativeToParent() const
+std::optional<sdf::SemanticPose> Joint::SDFSemanticPose() const
 {
-  ignition::math::Pose3d sdfPose;
-  this->jointSDFDom->SemanticPose().Resolve(sdfPose);
-  return sdfPose;
+  if (nullptr != this->jointSDFDom)
+  {
+    return this->jointSDFDom->SemanticPose();
+  }
+  return std::nullopt;
 }
 
 //////////////////////////////////////////////////

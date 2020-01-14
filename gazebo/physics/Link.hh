@@ -619,8 +619,8 @@ namespace gazebo
       public: const sdf::Link *GetSDFDom() const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Pose3d SDFPoseRelativeToParent()
-                  const override;
+      public: std::optional<sdf::SemanticPose> SDFSemanticPose() const override;
+
       /// \def Visuals_M
       /// \brief Map of unique ID to visual message.
       typedef std::map<uint32_t, msgs::Visual> Visuals_M;

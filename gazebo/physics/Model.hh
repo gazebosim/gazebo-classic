@@ -465,6 +465,9 @@ namespace gazebo
       public: void PluginInfo(const common::URI &_pluginUri,
           ignition::msgs::Plugin_V &_plugins, bool &_success);
 
+      // Documentation inherited.
+      public: std::optional<sdf::SemanticPose> SDFSemanticPose() const override;
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
@@ -541,7 +544,7 @@ namespace gazebo
       private: std::mutex receiveMutex;
 
       /// \brief SDF Model DOM object
-      private: sdf::Model modelSDFDom;
+      private: std::unique_ptr<sdf::Model> modelSDFDom;
     };
     /// \}
   }

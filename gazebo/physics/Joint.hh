@@ -582,7 +582,7 @@ namespace gazebo
       public: double GetWorldEnergyPotentialSpring(unsigned int _index) const;
 
       /// \brief Documentation inherited
-      public: virtual ignition::math::Pose3d SDFPoseRelativeToParent()
+      public: virtual std::optional<sdf::SemanticPose> SDFSemanticPose()
                   const override;
       /// \brief Helper function to get the position of an axis.
       ///
@@ -712,7 +712,7 @@ namespace gazebo
       private: double stopDissipation[MAX_JOINT_AXIS];
 
       /// \brief SDF Joint DOM object
-      private: const sdf::Joint *jointSDFDom;
+      private: const sdf::Joint *jointSDFDom{nullptr};
     };
     /// \}
   }

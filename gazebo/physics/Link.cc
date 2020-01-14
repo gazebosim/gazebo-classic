@@ -121,7 +121,7 @@ class gazebo::physics::LinkPrivate
 #endif
 
   /// \brief SDF Link DOM object
-  public: const sdf::Link *linkSDFDom;
+  public: const sdf::Link *linkSDFDom{nullptr};
 };
 
 using namespace gazebo;
@@ -147,8 +147,15 @@ Link::~Link()
 //////////////////////////////////////////////////
 void Link::Load(sdf::ElementPtr _sdf)
 {
-  this->dataPtr->linkSDFDom =
-      this->GetModel()->GetSDFDom()->LinkByName(_sdf->Get<std::string>("name"));
+  if (nullptr != this->GetModel())
+  {
+    auto *modelDom = this->GetModel()->GetSDFDom();
+    if (nullptr != modelDom)
+    {
+      this->dataPtr->linkSDFDom =
+        modelDom->LinkByName(_sdf->Get<std::string>("name"));
+    }
+  }
 
   Entity::Load(_sdf);
 
@@ -1524,14 +1531,14 @@ void Link::UpdateVisualMsg()
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
       // The function `VisualFromSDF` does not support frame semantics so we
       // need to update the pose of the msg object.
-      auto *visualDom = this->dataPtr->linkSDFDom->VisualByName(
-          visualElem->Get<std::string>("name"));
+      if (nullptr != this->dataPtr->linkSDFDom)
+      {
+        // TODO (addisu) Check the assumption that visualDom is always valid
+        auto *visualDom = this->dataPtr->linkSDFDom->VisualByName(msg.name());
 
-      ignition::math::Pose3d resolvedPose;
-      visualDom->SemanticPose().Resolve(resolvedPose);
-
-      msgs::Set(msg.mutable_pose(), resolvedPose);
-
+        msgs::Set(msg.mutable_pose(),
+                  Base::ResolveSdfPose(visualDom->SemanticPose()));
+      }
       bool newVis = true;
       std::string linkName = this->GetScopedName();
 
@@ -1923,6 +1930,7 @@ void Link::LoadLight(sdf::ElementPtr _sdf)
   LightPtr light(new physics::Light(shared_from_this()));
   light->SetStatic(true);
   light->ProcessMsg(msgs::LightFromSDF(_sdf));
+
   light->SetWorld(this->world);
   light->Load(_sdf);
   this->dataPtr->lights.push_back(light);
@@ -1943,9 +1951,11 @@ const sdf::Link *Link::GetSDFDom() const
   return this->dataPtr->linkSDFDom;
 }
 
-ignition::math::Pose3d Link::SDFPoseRelativeToParent() const
+std::optional<sdf::SemanticPose> Link::SDFSemanticPose() const
 {
-  ignition::math::Pose3d sdfPose;
-  this->dataPtr->linkSDFDom->SemanticPose().Resolve(sdfPose);
-  return sdfPose;
+  if (nullptr != this->dataPtr->linkSDFDom)
+  {
+    return this->dataPtr->linkSDFDom->SemanticPose();
+  }
+  return std::nullopt;
 }

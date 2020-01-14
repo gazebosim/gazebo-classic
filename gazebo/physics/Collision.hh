@@ -192,8 +192,9 @@ namespace gazebo
       public: virtual const ignition::math::Pose3d &WorldPose() const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Pose3d SDFPoseRelativeToParent()
+      public: virtual std::optional<sdf::SemanticPose> SDFSemanticPose()
                   const override;
+
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.
       private: msgs::Visual CreateCollisionVisual();
@@ -226,7 +227,7 @@ namespace gazebo
       private: mutable bool worldPoseDirty;
 
       /// \brief SDF Collision DOM object
-      private: const sdf::Collision *collisionSDFDom;
+      private: const sdf::Collision *collisionSDFDom{nullptr};
     };
     /// \}
   }

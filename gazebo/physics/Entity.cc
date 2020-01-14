@@ -641,6 +641,7 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
+  // TODO(addisu) Check if this needs semantic pose
   ignition::math::Pose3d newPose = _sdf->Get<ignition::math::Pose3d>("pose");
   if (newPose != this->RelativePose())
   {

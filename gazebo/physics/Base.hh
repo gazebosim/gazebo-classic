@@ -25,6 +25,7 @@
 #endif
 
 #include <boost/enable_shared_from_this.hpp>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -322,11 +323,21 @@ namespace gazebo
       /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr GetSDF();
 
-      /// \brief Get the SDF pose of the object relative to its parent. Objects
-      /// that support frame semantics need to override this function and
-      /// provide the pose of the object relative to its XML parent.
-      /// \return The pose of the object relative to its parent.
-      public: virtual ignition::math::Pose3d SDFPoseRelativeToParent() const;
+      /// \brief Get the SDF SemanticPose object associated with the pose of
+      /// this object.  Objects that support frame semantics need to
+      /// override this function and provide this function.
+      public: virtual std::optional<sdf::SemanticPose> SDFSemanticPose() const;
+
+      /// \brief Get the SDF pose of the object according to the sdf 1.6
+      /// convention. This convention is that the pose of an element is relative
+      /// to its parent XML element, except for joints, whose pose is relative
+      /// to the child link.
+      /// \return The pose of the object resolved according to the sdf 1.6
+      /// convention
+      public: ignition::math::Pose3d SDFPoseRelativeToParent() const;
+
+      public: ignition::math::Pose3d ResolveSdfPose(
+                  const sdf::SemanticPose &_semPose) const;
 
       /// \brief Register items in the introspection service.
       protected: virtual void RegisterIntrospectionItems();

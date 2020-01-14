@@ -133,6 +133,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     // pose
     Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
     gzdbg << "pose" << T.matrix() << std::endl;
+    // TODO(addisu) Check if this needs semantic pose
     if (softCollElem->HasElement("pose"))
     {
       T = DARTTypes::ConvPose(

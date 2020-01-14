@@ -364,6 +364,9 @@ namespace gazebo
 
       /// \brief Node for ignition transport communication.
       public: ignition::transport::Node ignNode;
+
+      /// \brief SDF World DOM object
+      public: std::unique_ptr<sdf::World> worldSDFDom;
     };
   }
 }

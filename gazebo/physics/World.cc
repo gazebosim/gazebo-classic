@@ -178,6 +178,25 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->loaded = false;
   this->dataPtr->sdf = _sdf;
 
+  // Create a DOM object to compute the resolved initial pose (with frame
+  // semantics)
+  ignition::math::SemanticVersion sdfOriginalVersion(_sdf->OriginalVersion());
+  if (sdfOriginalVersion >= ignition::math::SemanticVersion(1, 7))
+  {
+    this->dataPtr->worldSDFDom = std::make_unique<sdf::World>();
+    sdf::Errors errors = this->dataPtr->worldSDFDom->Load(_sdf);
+    if (!errors.empty())
+    {
+      this->dataPtr->worldSDFDom.reset();
+
+      for (const auto &error : errors)
+      {
+        gzerr << error << "\n";
+      }
+      return;
+    }
+  }
+
   if (this->dataPtr->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
            << this->dataPtr->name << "]) overwrites sdf world name\n!";
@@ -357,6 +376,11 @@ const sdf::ElementPtr World::SDF()
 {
   this->UpdateStateSDF();
   return this->dataPtr->sdf;
+}
+
+const sdf::World *World::GetSDFDom() const
+{
+  return this->dataPtr->worldSDFDom.get();
 }
 
 //////////////////////////////////////////////////

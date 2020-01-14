@@ -460,8 +460,44 @@ const sdf::ElementPtr Base::GetSDF()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Pose3d Base::SDFPoseRelativeToParent() const
+std::optional<sdf::SemanticPose> Base::SDFSemanticPose() const
 {
-  return this->sdf->Get<ignition::math::Pose3d>("pose");
+  return std::nullopt;
 }
 
+//////////////////////////////////////////////////
+ignition::math::Pose3d Base::SDFPoseRelativeToParent() const
+{
+  auto semPose = this->SDFSemanticPose();
+  if (semPose.has_value())
+  {
+    return this->ResolveSdfPose(*semPose);
+  }
+  else
+  {
+    return this->sdf->Get<ignition::math::Pose3d>("pose");
+  }
+}
+
+ignition::math::Pose3d Base::ResolveSdfPose(
+    const sdf::SemanticPose &_semPose) const
+{
+  ignition::math::Pose3d pose;
+  ::sdf::Errors errors = _semPose.Resolve(pose);
+  if (!errors.empty())
+  {
+    if (!_semPose.RelativeTo().empty())
+    {
+      gzerr << "There was an error in SemanticPose::Resolve\n";
+      for (const auto &err : errors)
+      {
+        gzerr << err.Message() << std::endl;
+      }
+      gzerr << "There is no optimal fallback since the relative_to attribute["
+            << _semPose.RelativeTo() << "] of the pose is not empty. "
+            << "Falling back to using the raw Pose.\n";
+    }
+    pose = _semPose.RawPose();
+  }
+  return pose;
+}

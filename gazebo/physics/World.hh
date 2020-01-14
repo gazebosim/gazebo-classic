@@ -97,6 +97,10 @@ namespace gazebo
       /// \return The SDF
       public: const sdf::ElementPtr SDF();
 
+      /// \brief Get the SDF DOM for the world.
+      /// \return The SDF DOM for this world.
+      public: const sdf::World *GetSDFDom() const;
+
       /// \brief Save a world to a file.
       /// Save the current world and its state to a file.
       /// \param[in] _filename Name of the file to save into.

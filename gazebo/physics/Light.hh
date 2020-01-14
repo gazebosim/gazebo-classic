@@ -41,6 +41,10 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Light();
 
+      /// \brief Load the light.
+      /// \param[in] _sdf SDF parameters to load from.
+      public: void Load(sdf::ElementPtr _sdf) override;
+
       /// \brief Initialize the light.
       public: void Init();
 
@@ -69,6 +73,9 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual const ignition::math::Pose3d &WorldPose() const;
+
+      // Documentation inherited.
+      public: std::optional<sdf::SemanticPose> SDFSemanticPose() const override;
 
       /// \brief Pointer to private data
       private: std::unique_ptr<LightPrivate> dataPtr;
