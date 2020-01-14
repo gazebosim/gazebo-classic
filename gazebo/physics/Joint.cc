@@ -640,7 +640,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
     axis->set_limit_velocity(this->GetVelocityLimit(i));
     axis->set_damping(this->GetDamping(i));
     axis->set_friction(this->GetParam("friction", i));
-    axis->set_use_parent_model_frame(this->axisParentModelFrame[i]);
+    axis->set_use_parent_model_frame(false);
     if (this->axisParentModelFrame[i])
     {
       axis->set_xyz_expressed_in("__model__");

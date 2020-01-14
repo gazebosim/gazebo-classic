@@ -221,7 +221,7 @@ class JointTest : public ServerFixture,
               {
                 axis->set_xyz_expressed_in("");
               }
-              axis->set_use_parent_model_frame(_opt.useParentModelFrame);
+              axis->set_use_parent_model_frame(false);
             }
             // Hack: hardcode a second axis for universal joints
             if (_opt.type == "universal" || _opt.type == "revolute2")
