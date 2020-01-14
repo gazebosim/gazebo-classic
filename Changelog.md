@@ -108,6 +108,10 @@
     * [Pull request 3134](https://bitbucket.org/osrf/gazebo/pull-request/3134)
     * [Pull request 3142](https://bitbucket.org/osrf/gazebo/pull-request/3142)
 
+1. SonarSensor: allow spherical collision shape.
+    * [Pull request 3038](https://bitbucket.org/osrf/gazebo/pull-request/3038)
+    * [Pull request 3169](https://bitbucket.org/osrf/gazebo/pull-request/3169)
+    * [Pull request 3172](https://bitbucket.org/osrf/gazebo/pull-request/3172)
 
 ## Gazebo 10.1.0 (2019-03-28)
 

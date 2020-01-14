@@ -28,7 +28,7 @@
     </model>
     <model name="sonar_model_cone">
       <static>true</static>
-      <pose>0 0 0.5 1.57 0 0</pose>
+      <pose>0 0 0.5 1.5707 0 0</pose>
       <link name="link">
         <collision name="collision">
           <geometry>
