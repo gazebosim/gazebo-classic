@@ -41,7 +41,7 @@ namespace gazebo
       public: transport::SubscriberPtr sonarSub;
 
       /// \brief Renders the sonar data reading.
-      public: DynamicLines *sonarRay{nullptr};
+      public: DynamicLines *sonarRay = nullptr;
 
       /// \brief The current sonar message.
       public: boost::shared_ptr<msgs::SonarStamped const> sonarMsg;
@@ -56,7 +56,7 @@ namespace gazebo
       public: bool receivedMsg;
 
       /// \brief Pointer to the sonar shape visual.
-      public: VisualPtr shapeVis{nullptr};
+      public: VisualPtr shapeVis = nullptr;
     };
   }
 }
