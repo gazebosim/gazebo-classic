@@ -2654,6 +2654,11 @@ void World::ProcessMessages()
             ModelPtr m = modelList.front();
             modelList.pop_front();
 
+            // add all nested models to the queue
+            Model_V models = m->NestedModels();
+            for (auto const &n : models)
+              modelList.push_back(n);
+
             // Publish the model's scale and visual geometry data at the same
             // time to fix race condition on rendering side when updating
             // visuals
@@ -2692,11 +2697,6 @@ void World::ProcessMessages()
 
             // set scale
             msgs::Set(msg.mutable_scale(), m->Scale());
-
-            // add all nested models to the queue
-            Model_V models = m->NestedModels();
-            for (auto const &n : models)
-              modelList.push_back(n);
 
             this->dataPtr->modelPub->Publish(msg);
           }
