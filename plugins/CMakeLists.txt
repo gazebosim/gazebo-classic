@@ -127,6 +127,7 @@ set (plugins_single_header
   SphereAtlasDemoPlugin
   StaticMapPlugin
   TouchPlugin
+  VariableGearboxPlugin
   VehiclePlugin
   WheelSlipPlugin
   WheelTrackedVehiclePlugin

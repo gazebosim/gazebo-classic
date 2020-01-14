@@ -18,6 +18,8 @@
 #ifndef _ODEGEARBOXJOINT_HH_
 #define _ODEGEARBOXJOINT_HH_
 
+#include <string>
+
 #include "gazebo/physics/GearboxJoint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
 #include "gazebo/util/system.hh"
@@ -80,6 +82,15 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetParam(unsigned int _parameter, double _value);
+
+      // Documentation inherited.
+      public: virtual double GetParam(const std::string &_key,
+                                      unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual bool SetParam(const std::string &_key,
+                                    unsigned int _index,
+                                    const boost::any &_value);
 
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
