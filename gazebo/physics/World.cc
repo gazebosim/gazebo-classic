@@ -2670,8 +2670,10 @@ void World::ProcessMessages()
               // tmpMsg is unused. The Link::FillMsg call is made in order to
               // keep link's visual msgs up-to-date with latest sdf values.
               // The for loop below does the actual copy of visual geom msg.
-              msgs::Link tmpMsg;
-              l->FillMsg(tmpMsg);
+              {
+                msgs::Link tmpMsg;
+                l->FillMsg(tmpMsg);
+              }
 
               auto visualMsgs = l->Visuals();
               for (auto v : visualMsgs)
