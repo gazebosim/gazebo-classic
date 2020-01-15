@@ -270,7 +270,8 @@
             </plugin>
 
             <plugin filename="libKeysToCmdVelPlugin.so" name="keyboard_control">
-                <cmd_vel_topic>~/simple_tracked/cmd_vel</cmd_vel_topic>
+                <publish_as_twist>true</publish_as_twist>
+                <cmd_vel_topic>~/simple_tracked/cmd_vel_twist</cmd_vel_topic>
             </plugin>
 
         </model>
