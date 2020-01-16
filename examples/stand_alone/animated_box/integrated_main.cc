@@ -63,6 +63,9 @@ int main(int _argc, char **_argv)
 
   try
   {
+    // Print console messages
+    gazebo::common::Console::SetQuiet(false);
+
     // load gazebo server
     gazebo::setupServer(_argc, _argv);
 
