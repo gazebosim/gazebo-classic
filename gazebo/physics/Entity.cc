@@ -103,7 +103,7 @@ void Entity::Load(sdf::ElementPtr _sdf)
     if (this->parent && this->parentEntity)
     {
       this->worldPose =
-          this->SDFPoseRelativeToParent() + this->parentEntity->worldPose;
+          this->parentEntity->worldPose * this->SDFPoseRelativeToParent();
     }
     else
     {
