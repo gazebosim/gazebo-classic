@@ -84,18 +84,33 @@ void Model::Load(sdf::ElementPtr _sdf)
     ignition::math::SemanticVersion sdfOriginalVersion(_sdf->OriginalVersion());
     if (sdfOriginalVersion >= ignition::math::SemanticVersion(1, 7))
     {
+      // If the model is initialized without a containing world, we create an
+      // isolated/standalone DOM object for the world. Otherwise, we'd obtain
+      // the model DOM from the world DOM.
+      //
       // Only <model> is supported right now, <actor> is not supported.
-      this->modelSDFDom = std::make_unique<sdf::Model>();
-      sdf::Errors errors = this->modelSDFDom->Load(_sdf);
-      if (!errors.empty())
+      const auto *worldDom = this->GetWorld()->GetSDFDom();
+      const std::string modelName = _sdf->Get<std::string>("name");
+      if (nullptr != worldDom && !modelName.empty())
       {
-        this->modelSDFDom.reset();
+        this->modelSDFDom = worldDom->ModelByName(modelName);
+      }
 
-        for (const auto &error : errors)
+      if (nullptr == this->modelSDFDom)
+      {
+        this->modelSDFDomIsolated = std::make_unique<sdf::Model>();
+        sdf::Errors errors = this->modelSDFDomIsolated->Load(_sdf);
+        if (!errors.empty())
         {
-          gzerr << error << "\n";
+          this->modelSDFDomIsolated.reset();
+
+          for (const auto &error : errors)
+          {
+            gzerr << error << "\n";
+          }
+          return;
         }
-        return;
+        this->modelSDFDom = this->modelSDFDomIsolated.get();
       }
     }
   }
@@ -553,7 +568,7 @@ const sdf::ElementPtr Model::GetSDF()
 
 const sdf::Model *Model::GetSDFDom() const
 {
-  return this->modelSDFDom.get();
+  return this->modelSDFDom;
 }
 
 //////////////////////////////////////////////////

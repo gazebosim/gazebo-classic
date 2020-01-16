@@ -543,8 +543,13 @@ namespace gazebo
       /// \brief Mutex to protect incoming message buffers.
       private: std::mutex receiveMutex;
 
+      /// \brief SDF Model DOM object created by loading a model isolated from
+      /// its world. This is used when a model is spawned without a world
+      /// containing it.
+      private: std::unique_ptr<sdf::Model> modelSDFDomIsolated;
+
       /// \brief SDF Model DOM object
-      private: std::unique_ptr<sdf::Model> modelSDFDom;
+      private: const sdf::Model *modelSDFDom{nullptr};
     };
     /// \}
   }
