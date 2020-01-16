@@ -87,7 +87,7 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     {
       gzdbg << "test case with joint axis specified in parent model frame.\n";
       opt.useParentModelFrame = true;
-      physics::JointPtr jointUseParentModelFrame = SpawnJoint(opt);
+      physics::JointPtr jointUseParentModelFrame = SpawnJoint(opt, "1.6");
       ASSERT_TRUE(jointUseParentModelFrame != NULL);
 
       if (opt.worldParent)
@@ -107,14 +107,19 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     {
       gzdbg << "test case with joint axis specified in child link frame.\n";
       opt.useParentModelFrame = false;
-      physics::JointPtr joint = SpawnJoint(opt);
+      physics::JointPtr joint = SpawnJoint(opt, "1.6");
       ASSERT_TRUE(joint != NULL);
 
+      if (opt.worldParent)
+      {
+        gzdbg << "  where parent is world.\n";
+      }
+      else
       {
         gzdbg << "  where parent is another link (not world).\n";
-        this->CheckJointProperties(joint,
-          ignition::math::Vector3d(cos(Am+Al+Aj), sin(Am+Al+Aj), 0));
       }
+      this->CheckJointProperties(joint,
+        ignition::math::Vector3d(cos(Am+Al+Aj), sin(Am+Al+Aj), 0));
     }
   }
 }
