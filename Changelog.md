@@ -2,6 +2,9 @@
 
 ## Gazebo 9.XX.X (2019-XX-XX)
 
+1. Workaround for race condition when setting model scale.
+    * [Pull request 3159](https://bitbucket.org/osrf/gazebo/pull-request/3159)
+
 1. Fix compilation of plugins with tbb and qt 5.14.
     * [Pull request 3164](https://bitbucket.org/osrf/gazebo/pull-request/3164)
     * [Issue #2681](https://bitbucket.org/osrf/gazebo/issues/2681)

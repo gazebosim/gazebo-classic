@@ -2648,18 +2648,49 @@ void World::ProcessMessages()
             ModelPtr m = modelList.front();
             modelList.pop_front();
 
-            // Publish the model's scale
-            msgs::Model msg;
-            msg.set_name(m->GetScopedName());
-            msg.set_id(m->GetId());
-            msgs::Set(msg.mutable_scale(), m->Scale());
-
-            // Not publishing for links for now
-
             // add all nested models to the queue
             Model_V models = m->NestedModels();
             for (auto const &n : models)
               modelList.push_back(n);
+
+            // Publish the model's scale and visual geometry data at the same
+            // time to fix race condition on rendering side when updating
+            // visuals
+            msgs::Model msg;
+            msg.set_name(m->GetScopedName());
+            msg.set_id(m->GetId());
+            Link_V links = m->GetLinks();
+            for (auto l : links)
+            {
+              msgs::Link *linkMsg = msg.add_link();
+              linkMsg->set_id(l->GetId());
+              linkMsg->set_name(l->GetScopedName());
+
+              // tmpMsg is unused. The Link::FillMsg call is made in order to
+              // keep link's visual msgs up-to-date with latest sdf values.
+              // The for loop below does the actual copy of visual geom msg.
+              {
+                msgs::Link tmpMsg;
+                l->FillMsg(tmpMsg);
+              }
+
+              auto visualMsgs = l->Visuals();
+              for (auto v : visualMsgs)
+              {
+                if (!v.second.has_geometry())
+                  continue;
+                msgs::Visual *visualMsg = linkMsg->add_visual();
+                visualMsg->set_name(v.second.name());
+                visualMsg->set_id(v.second.id());
+                visualMsg->set_parent_name(v.second.parent_name());
+                visualMsg->set_parent_id(v.second.parent_id());
+                auto geomMsg = visualMsg->mutable_geometry();
+                geomMsg->CopyFrom(v.second.geometry());
+              }
+            }
+
+            // set scale
+            msgs::Set(msg.mutable_scale(), m->Scale());
 
             this->dataPtr->modelPub->Publish(msg);
           }
