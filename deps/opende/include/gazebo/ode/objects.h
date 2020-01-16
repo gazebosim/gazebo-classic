@@ -2938,6 +2938,28 @@ ODE_API dReal dJointGetGearboxParam(dJointID, int parameter);
 ODE_API void dJointSetGearboxRatio( dJointID j, dReal value );
 
 /**
+ * @brief set gearbox reference angle 1
+ * @remarks
+ * This is the reference angle for body 1 used to compute the gearbox
+ * position constraint. The constraint takes the form
+ * (angle1 - refAngle1) = -ratio * (angle2 - refAngle2).
+ * Defaults to 0.
+ * @ingroup joints
+ */
+ODE_API void dJointSetGearboxReferenceAngle1( dJointID j, dReal value );
+
+/**
+ * @brief set gearbox reference angle 2
+ * @remarks
+ * This is the reference angle for body 2 used to compute the gearbox
+ * position constraint. The constraint takes the form
+ * (angle1 - refAngle1) = -ratio * (angle2 - refAngle2).
+ * Defaults to 0.
+ * @ingroup joints
+ */
+ODE_API void dJointSetGearboxReferenceAngle2( dJointID j, dReal value );
+
+/**
  * @brief set gearbox reference body
  * @remarks
  * This is used to get the joint angle of the two bodies, so
@@ -2969,6 +2991,18 @@ ODE_API void dJointSetGearboxReferenceBody2( dJointID j, dBodyID b );
  * @ingroup joints
  */
 ODE_API dReal dJointGetGearboxRatio( dJointID j );
+
+/**
+ * @brief get gearbox reference angle 1
+ * @ingroup joints
+ */
+ODE_API dReal dJointGetGearboxReferenceAngle1( dJointID j );
+
+/**
+ * @brief get gearbox reference angle 2
+ * @ingroup joints
+ */
+ODE_API dReal dJointGetGearboxReferenceAngle2( dJointID j );
 
 /**
  * @brief Get the joint anchor point, in world coordinates.

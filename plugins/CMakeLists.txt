@@ -128,6 +128,7 @@ set (plugins_single_header
   StaticMapPlugin
   StopWorldPlugin
   TouchPlugin
+  VariableGearboxPlugin
   VehiclePlugin
   WheelSlipPlugin
   WheelTrackedVehiclePlugin

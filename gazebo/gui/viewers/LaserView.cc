@@ -141,7 +141,13 @@ void LaserView::resizeEvent(QResizeEvent *_event)
 void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
 {
   // Update the Hz and Bandwidth info
+#if GOOGLE_PROTOBUF_VERSION < 3001000
   this->OnMsg(msgs::Convert(_msg->time()), _msg->ByteSize());
+#else
+  // ByteSizeLong appeared in version 3.1 of Protobuf, and ByteSize
+  // became deprecated.
+  this->OnMsg(msgs::Convert(_msg->time()), _msg->ByteSizeLong());
+#endif
 
   this->laserItem->Clear();
 
