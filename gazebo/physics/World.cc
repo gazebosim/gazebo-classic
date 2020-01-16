@@ -130,6 +130,7 @@ World::World(const std::string &_name)
   this->dataPtr->thread = nullptr;
   this->dataPtr->logThread = nullptr;
   this->dataPtr->stop = false;
+  this->dataPtr->sensorsInitialized = false;
 
   this->dataPtr->currentStateBuffer = 0;
   this->dataPtr->stateToggle = 0;
