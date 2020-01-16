@@ -336,8 +336,15 @@ namespace gazebo
       /// convention
       public: ignition::math::Pose3d SDFPoseRelativeToParent() const;
 
+      /// \brief Helper function for resolving SDF poses with a SemanticPose
+      /// object. If there are errors resolving the pose, return the raw pose
+      /// instead.
+      /// \param[in] _semPose SemanticPose object to resolve.
+      /// \param[in] _resolveTo Name of frame to resolve to.
+      /// \return Resolved pose.
       public: ignition::math::Pose3d ResolveSdfPose(
-                  const sdf::SemanticPose &_semPose) const;
+                  const sdf::SemanticPose &_semPose,
+                  const std::string &_resolveTo = "") const;
 
       /// \brief Register items in the introspection service.
       protected: virtual void RegisterIntrospectionItems();

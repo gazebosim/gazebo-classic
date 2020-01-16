@@ -479,11 +479,13 @@ ignition::math::Pose3d Base::SDFPoseRelativeToParent() const
   }
 }
 
+//////////////////////////////////////////////////
 ignition::math::Pose3d Base::ResolveSdfPose(
-    const sdf::SemanticPose &_semPose) const
+    const sdf::SemanticPose &_semPose,
+    const std::string &_resolveTo) const
 {
   ignition::math::Pose3d pose;
-  ::sdf::Errors errors = _semPose.Resolve(pose);
+  ::sdf::Errors errors = _semPose.Resolve(pose, _resolveTo);
   if (!errors.empty())
   {
     if (!_semPose.RelativeTo().empty())
