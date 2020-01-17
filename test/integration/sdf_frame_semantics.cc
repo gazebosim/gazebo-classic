@@ -85,6 +85,9 @@ TEST_P(SdfFrameSemanticsTest, LinkRelativeToJoint)
         <pose relative_to="L1">0.5 0 1 0 0 0</pose>
         <parent>L1</parent>
         <child>L2</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
       </joint>
     </model>
   </sdf>
@@ -128,11 +131,17 @@ TEST_P(SdfFrameSemanticsTest, JointRelativeTo)
       <joint name="J1" type="revolute">
         <parent>L1</parent>
         <child>L2</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
       </joint>
       <joint name="J2" type="revolute">
         <pose relative_to="L2"/>
         <parent>L2</parent>
         <child>L3</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
       </joint>
     </model>
   </sdf>
@@ -293,6 +302,9 @@ TEST_P(SdfFrameSemanticsTest, ExplicitFramesWithJoints)
         <pose relative_to="F1"/>
         <parent>L1</parent>
         <child>L2</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
       </joint>
     </model>
   </sdf>
@@ -405,6 +417,64 @@ TEST_P(SdfFrameSemanticsTest, ImplicitModelFrames)
   EXPECT_EQ(expLinkWorldPose, link2->WorldPose());
   EXPECT_EQ(expM2Pose, model2->RelativePose());
   EXPECT_EQ(expM2Pose, model2->WorldPose());
+}
+
+TEST_P(SdfFrameSemanticsTest, JointAxisXyzExpressedIn)
+{
+  this->LoadWorld();
+  const std::string modelSdf = R"sdf(
+  <sdf version="1.7">
+    <model name="M">
+      <pose>1.0 0 0 0 0 0</pose>
+      <link name="L1">
+        <pose>0 0 1 0 -1.5707963267948966 0</pose>
+      </link>
+      <link name="L2">
+        <pose>0.0 0 2 0 0 0</pose>
+      </link>
+      <link name="L3">
+        <pose>0.0 0 3 3.14159265358979 0 0</pose>
+      </link>
+      <joint name="J1" type="revolute">
+        <parent>L1</parent>
+        <child>L2</child>
+        <axis>
+          <xyz expressed_in="L1">1 0 0</xyz>
+        </axis>
+      </joint>
+      <joint name="J2" type="revolute">
+        <parent>L2</parent>
+        <child>L3</child>
+        <axis>
+          <xyz expressed_in="__model__">0 0 1</xyz>
+        </axis>
+      </joint>
+    </model>
+  </sdf>
+  )sdf";
+
+  this->SpawnSDF(modelSdf);
+
+  auto model = this->GetModel("M");
+  ASSERT_NE(nullptr, model);
+
+  auto link2 = model->GetLink("L2");
+  ASSERT_NE(nullptr, link2);
+  auto joint1 = model->GetJoint("J1");
+  ASSERT_NE(nullptr, joint1);
+  auto joint2 = model->GetJoint("J2");
+  ASSERT_NE(nullptr, joint2);
+  // Expect the xyz of both joints to point in the world +z direction
+  ignition::math::Vector3d expGlobalAxis(0, 0, 1);
+  EXPECT_EQ(expGlobalAxis, joint1->GlobalAxis(0));
+  EXPECT_EQ(expGlobalAxis, joint2->GlobalAxis(0));
+
+  // Step once and check, the vector should still be close to their initial
+  // values
+  this->world->Step(1);
+
+  EXPECT_EQ(expGlobalAxis, joint1->GlobalAxis(0));
+  EXPECT_EQ(expGlobalAxis, joint2->GlobalAxis(0));
 }
 
 TEST_P(SdfFrameSemanticsTest, ExplicitWorldFrames)
