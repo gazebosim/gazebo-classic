@@ -496,7 +496,8 @@ ignition::math::Pose3d Base::ResolveSdfPose(
         gzerr << err.Message() << std::endl;
       }
       gzerr << "There is no optimal fallback since the relative_to attribute["
-            << _semPose.RelativeTo() << "] of the pose is not empty. "
+            << _semPose.RelativeTo() << "] does not match the _resolveTo "
+            << "argument[" << _resolveTo << "]. "
             << "Falling back to using the raw Pose.\n";
     }
     pose = _semPose.RawPose();
