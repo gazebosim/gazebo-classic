@@ -173,7 +173,7 @@ void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   std::ostringstream sdfStream;
-  sdfStream << "<sdf version='" << SDF_VERSION << "'>"
+  sdfStream << "<sdf version='" << "1.6" << "'>"
     << "<model name ='model_00'>"
     << "  <pose>0 0 1 0 0 0</pose>"
     << "  <model name ='model_01'>"
