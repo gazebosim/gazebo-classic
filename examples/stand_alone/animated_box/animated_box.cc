@@ -70,6 +70,7 @@ namespace gazebo
 
         // set the animation
         _parent->SetAnimation(anim);
+        std::cout << "Animated_box plugin is loaded" << std::endl;
     }
 
     // Pointer to the model

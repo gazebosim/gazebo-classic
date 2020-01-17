@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <sstream>
 #include <limits>
 #include <algorithm>
@@ -671,19 +665,24 @@ void Actor::Update()
   if (tinfo->translated)
     rootPos.X() = 0.0;
   ignition::math::Pose3d actorPose;
-  actorPose.Pos() = modelPose.Pos() + modelPose.Rot().RotateVector(rootPos);
-  if (!this->customTrajectoryInfo)
-    actorPose.Rot() = modelPose.Rot() * rootRot;
-  else
-    actorPose.Rot() = modelPose.Rot() * this->WorldPose().Rot();
 
-  ignition::math::Matrix4d rootM(actorPose.Rot());
   if (!this->customTrajectoryInfo)
   {
-    rootM.SetTranslation(actorPose.Pos());
+    actorPose.Pos() = modelPose.Pos() + modelPose.Rot().RotateVector(rootPos);
+    actorPose.Rot() = modelPose.Rot() * rootRot;
+  }
+  else
+  {
+    actorPose.Pos() = this->WorldPose().Pos();
+    actorPose.Rot() = this->WorldPose().Rot();
+  }
 
-    // TODO: Possible bug here? Rotation changed after scaling. Maybe the
-    // rotation algorithm is not suppose to work on non unit quaternion.
+  ignition::math::Matrix4d rootM(actorPose.Rot());
+
+  rootM.SetTranslation(actorPose.Pos());
+
+  // TODO: Possible bug here? Rotation changed after scaling. Maybe the
+  // rotation algorithm is not suppose to work on non unit quaternion.
 //    gzdbg << "before: " << rootM.Rotation() << std::endl;
 //    rootM.Scale(this->skinScale, this->skinScale, this->skinScale);
 //    auto scaleTrans = ignition::math::Matrix4d::Identity;
@@ -691,9 +690,9 @@ void Actor::Update()
 //    rootM = scaleTrans * rootM;
 //    gzdbg << "after: " << rootM.Rotation() << std::endl;
 
-    // workaround for rotation bug
-    rootM.SetTranslation(rootM.Translation() * this->skinScale);
-  }
+  // workaround for rotation bug
+  rootM.SetTranslation(rootM.Translation() * this->skinScale);
+
   frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
 
   this->SetPose(frame, skelMap, currentTime.Double());
@@ -711,7 +710,10 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
   ignition::math::Pose3d mainLinkPose;
 
   if (this->customTrajectoryInfo)
+  {
+    mainLinkPose.Pos() = this->worldPose.Pos();
     mainLinkPose.Rot() = this->worldPose.Rot();
+  }
 
   for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
   {

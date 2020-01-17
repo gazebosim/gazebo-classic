@@ -29,6 +29,8 @@
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/msgs/pose.pb.h"
+#include "gazebo/msgs/twist.pb.h"
 #include "plugins/TrackedVehiclePlugin.hh"
 
 namespace gazebo
@@ -152,13 +154,29 @@ namespace gazebo
     /// \param[in] _right Velocity of right track.
     protected: virtual void SetTrackVelocity(double _left, double _right);
 
+    /// \brief Set new target velocity for the tracks based on the desired
+    // body motion.
+    ///
+    /// \param[in] _linear Desired linear velocity of the vehicle.
+    /// \param[in] _angular Desired angular velocity of the vehicle.
+    protected: void SetBodyVelocity(
+        double _linear, double _angular);  // TODO peci1: make virtual
+
     /// \brief Callback for setting desired body velocity.
     ///
     /// Normally, this callback converts the x/yaw message to track velocities
     /// and calls SetTrackVelocity().
     ///
     /// \param[in] _msg Pose message from external publisher
-    protected: virtual void OnVelMsg(ConstPosePtr &_msg);
+    protected: virtual void OnVelMsg(ConstPosePtr &_msg) GAZEBO_DEPRECATED(9.0);
+
+    /// \brief Callback for setting desired body velocity.
+    ///
+    /// Normally, this callback converts the x/yaw message to track velocities
+    /// and calls SetTrackVelocity().
+    ///
+    /// \param[in] _msg Twist message from external publisher
+    protected: void OnVelMsg(ConstTwistPtr &_msg);  // TODO peci1: make virtual
 
     /// \brief Mutex to protect updates
     protected: std::mutex mutex;

@@ -20,6 +20,5 @@ target_link_libraries(animated_box ${GAZEBO_LIBRARIES})
 add_executable(integrated_main integrated_main.cc)
 target_link_libraries(integrated_main ${GAZEBO_LIBRARIES} pthread)
 
-
 add_executable(independent_listener independent_listener.cc)
 target_link_libraries(independent_listener ${GAZEBO_LIBRARIES} pthread)

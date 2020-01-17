@@ -85,8 +85,16 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   requestPub->Publish(*requestMsg);
 
   int waitCount = 0, maxWaitCount = 3000;
+#if GOOGLE_PROTOBUF_VERSION < 3001000
   while (physicsResponseMsg.ByteSize() == 0 && ++waitCount < maxWaitCount)
+#else
+  // ByteSizeLong appeared in version 3.1 of Protobuf, and ByteSize
+  // became deprecated.
+  while (physicsResponseMsg.ByteSizeLong() == 0 && ++waitCount < maxWaitCount)
+#endif
+  {
     common::Time::MSleep(10);
+  }
 
   ASSERT_LT(waitCount, maxWaitCount);
 

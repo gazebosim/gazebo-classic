@@ -19,6 +19,7 @@
  * Date: 14 July 2008
  */
 
+#include <FreeImage.h>
 #include <boost/filesystem.hpp>
 #include <string>
 

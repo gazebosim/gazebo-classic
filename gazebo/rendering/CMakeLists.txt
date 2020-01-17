@@ -212,9 +212,6 @@ link_directories(
 )
 
 add_definitions(-DSKYX_LIB)
-if (WIN32)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIWinsock2.h")
-endif()
 
 gz_add_library(gazebo_rendering ${sources})
 
