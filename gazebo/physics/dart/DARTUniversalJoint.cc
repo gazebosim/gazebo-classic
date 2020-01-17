@@ -119,8 +119,7 @@ void DARTUniversalJoint::SetAxis(const unsigned int _index,
           this->dataPtr->dtJoint);
     GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
 
-    Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
-        this->AxisFrameOffset(_index).RotateVector(_axis));
+    Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(_axis);
     dtUniversalJoint->setAxis1(dtAxis);
   }
   else if (_index == 1)
@@ -130,8 +129,7 @@ void DARTUniversalJoint::SetAxis(const unsigned int _index,
           this->dataPtr->dtJoint);
     GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
 
-    Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
-        this->AxisFrameOffset(_index).RotateVector(_axis));
+    Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(_axis);
     dtUniversalJoint->setAxis2(dtAxis);
   }
   else

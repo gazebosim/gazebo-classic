@@ -14,9 +14,34 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
 
 ### Additions
 
+1. **gazebo/physics/Base.hh**
+    + public: `ignition::math::Pose3d` ResolveSdfPose(const sdf::SemanticPose &, const std::string &) const
+    + public: `ignition::math::Pose3d` SDFPoseRelativeToParent() const
+    + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const
+
+1. **gazebo/physics/Collision.hh**
+    + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
+
+1. **gazebo/physics/Joint.hh**
+    + public: `ignition::math::Vector3d` ResolveAxisXyz(const unsigned int, const std::string &) const
+    + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
+
+1. **gazebo/physics/Light.hh**
+    + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
+
+1. **gazebo/physics/Link.hh**
+    + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
+
+1. **gazebo/physics/Model.hh**
+    + public: const `sdf::Model` GetSDFDom() const
+    + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
+
 1. **gazebo/physics/PhysicsEngine.hh**
     + public: template <typename T>
       static T any\_cast<T>(const boost::any &)
+
+1. **gazebo/physics/World.hh**
+    + public: const `sdf::World` GetSDFDom() const
 
 ### Modifications
 

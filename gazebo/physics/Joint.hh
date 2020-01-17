@@ -552,6 +552,11 @@ namespace gazebo
       /// in parent link frame.
       public: ignition::math::Pose3d AnchorErrorPose() const;
 
+      //////////////////////////////////////////////////
+      public: ignition::math::Vector3d ResolveAxisXyz(
+          const unsigned int _index,
+          const std::string &_resolveTo = "") const;
+
       /// \brief Get orientation of reference frame for specified axis,
       /// relative to world frame. The value of axisParentModelFrame
       /// is used to determine the appropriate frame.
@@ -581,9 +586,10 @@ namespace gazebo
       /// \return this joint's spring potential energy,
       public: double GetWorldEnergyPotentialSpring(unsigned int _index) const;
 
-      /// \brief Documentation inherited
+      // Documentation inherited
       public: virtual std::optional<sdf::SemanticPose> SDFSemanticPose()
                   const override;
+
       /// \brief Helper function to get the position of an axis.
       ///
       /// Subclasses must override this.

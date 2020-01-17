@@ -377,7 +377,7 @@ void Joint::Init()
   if (this->DOF() >= 1 && this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    this->SetAxis(0, axisElem->Get<ignition::math::Vector3d>("xyz"));
+    this->SetAxis(0, this->ResolveAxisXyz(0));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -394,7 +394,7 @@ void Joint::Init()
   if (this->DOF() >= 2 && this->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
-    this->SetAxis(1, axisElem->Get<ignition::math::Vector3d>("xyz"));
+    this->SetAxis(1, this->ResolveAxisXyz(1));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -1263,6 +1263,79 @@ ignition::math::Pose3d Joint::ParentWorldPose() const
 ignition::math::Pose3d Joint::AnchorErrorPose() const
 {
   return this->WorldPose() - this->ParentWorldPose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Joint::ResolveAxisXyz(
+    const unsigned int _index,
+    const std::string &_resolveTo) const
+{
+  if (_index >= this->DOF())
+  {
+    gzerr << "ResolveAxisXyz error, _index[" << _index << "] out of range"
+          << std::endl;
+    return ignition::math::Vector3d::Zero;
+  }
+
+  // check if resolve-to matches expressed-in
+  if (_resolveTo == this->axisExpressedIn[_index])
+  {
+    return this->LocalAxis(_index);
+  }
+
+  // special legacy case:
+  // original sdf version < 1.7
+  // //joint/parent == world
+  // _resolveTo == ""
+  // //joint/axis/use_parent_model_frame == true
+  // this will be migrated to //joint/axis/xyz/@expressed_in == __model__
+  // but gazebo10 interpreted this joint axis in the world frame
+  auto sdfVersion =
+      ignition::math::SemanticVersion(this->sdf->OriginalVersion());
+  if (sdfVersion < ignition::math::SemanticVersion(1, 7)
+      && nullptr == this->parentLink
+      && _resolveTo.empty()
+      && "__model__" == this->axisExpressedIn[_index])
+  {
+    return this->WorldPose().Rot().Inverse() * this->LocalAxis(_index);
+  }
+
+  // try to use DOM API JointAxis::ResolveXyz
+  sdf::Errors errors;
+  if (nullptr != this->jointSDFDom)
+  {
+    auto jointAxis = this->jointSDFDom->Axis(_index);
+    if (nullptr != jointAxis)
+    {
+      ignition::math::Vector3d result;
+      errors = jointAxis->ResolveXyz(result, _resolveTo);
+      if (errors.empty())
+      {
+        return result;
+      }
+    }
+  }
+
+  // special case for expressed-in __model__ with empty resolve-to
+  if (_resolveTo.empty() && "__model__" == this->axisExpressedIn[_index])
+  {
+    auto globalAxis = this->model->WorldPose().Rot() * this->LocalAxis(_index);
+    return this->WorldPose().Rot().Inverse() * globalAxis;
+  }
+
+  gzerr << "There was an error in JointAxis::ResolveXyz\n";
+  for (const auto &err : errors)
+  {
+    gzerr << err.Message() << std::endl;
+  }
+
+  gzerr << "There is no optimal fallback since the expressed_in["
+        << this->axisExpressedIn[_index] << "] and "
+        << "_resolveTo[" << _resolveTo << "] "
+        << "parameters do not match. "
+        << "Falling back to using the raw axis xyz value.\n";
+
+  return this->LocalAxis(_index);
 }
 
 //////////////////////////////////////////////////

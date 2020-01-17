@@ -113,8 +113,7 @@ void ODEGearboxJoint::SetAxis(const unsigned int _index,
     this->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
-  auto axisFrame = this->AxisFrame(_index);
-  auto globalAxis = axisFrame.RotateVector(_axis);
+  auto globalAxis = this->WorldPose().Rot() * _axis;
 
   if (_index == 0)
   {
