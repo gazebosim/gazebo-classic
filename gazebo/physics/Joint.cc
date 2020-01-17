@@ -66,9 +66,6 @@ Joint::Joint(BasePtr _parent)
   this->stopDissipation[0] = 1.0;
   this->stopStiffness[1] = 1e8;
   this->stopDissipation[1] = 1.0;
-  // these flags are related to issue #494
-  this->axisParentModelFrame[0] = false;
-  this->axisParentModelFrame[1] = false;
 
   if (!this->sdfJoint)
   {
@@ -157,10 +154,11 @@ void Joint::Load(sdf::ElementPtr _sdf)
     }
     sdf::ElementPtr axisElem = _sdf->GetElement(axisName);
     {
-      std::string param = "use_parent_model_frame";
-      if (axisElem->HasElement(param))
+      sdf::ElementPtr xyzElem = axisElem->GetElement("xyz");
+      if (xyzElem->HasAttribute("expressed_in"))
       {
-        this->axisParentModelFrame[index] = axisElem->Get<bool>(param);
+        this->axisExpressedIn[index] =
+            xyzElem->Get<std::string>("expressed_in");
       }
 
       // Axis dynamics
@@ -644,14 +642,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
     axis->set_damping(this->GetDamping(i));
     axis->set_friction(this->GetParam("friction", i));
     axis->set_use_parent_model_frame(false);
-    if (this->axisParentModelFrame[i])
-    {
-      axis->set_xyz_expressed_in("__model__");
-    }
-    else
-    {
-      axis->set_xyz_expressed_in("");
-    }
+    axis->set_xyz_expressed_in(this->axisExpressedIn[i]);
   }
 
   if (this->GetParent())
@@ -1284,18 +1275,7 @@ ignition::math::Quaterniond Joint::AxisFrame(const unsigned int _index) const
     return ignition::math::Quaterniond::Identity;
   }
 
-  // Legacy support for specifying axis in parent model frame (#494)
-  if (this->axisParentModelFrame[_index])
-  {
-    // Use parent model frame
-    if (this->parentLink)
-      return this->parentLink->GetModel()->WorldPose().Rot();
-
-    // Parent model is world, use world frame
-    return ignition::math::Quaterniond::Identity;
-  }
-
-  return this->WorldPose().Rot();
+  return this->WorldPose().Rot() * this->AxisFrameOffset(_index);
 }
 
 //////////////////////////////////////////////////
@@ -1309,23 +1289,51 @@ ignition::math::Quaterniond Joint::AxisFrameOffset(
     return ignition::math::Quaterniond::Identity;
   }
 
-  // Legacy support for specifying axis in parent model frame (#494)
-  if (this->axisParentModelFrame[_index])
+  // expressed-in joint frame
+  if (this->axisExpressedIn[_index].empty())
   {
-    // axis is defined in parent model frame, so return the rotation
-    // from joint frame to parent model frame, or
-    // world frame in absence of parent link.
-    ignition::math::Pose3d parentModelWorldPose;
-    auto jointWorldPose = this->WorldPose();
-    if (this->parentLink)
-    {
-      parentModelWorldPose = this->parentLink->GetModel()->WorldPose();
-    }
-    return (parentModelWorldPose - jointWorldPose).Rot();
+    return ignition::math::Quaterniond::Identity;
   }
 
-  // axis is defined in the joint frame, so
-  // return the rotation from joint frame to joint frame.
+  // special legacy case:
+  // original sdf version < 1.7
+  // //joint/parent == world
+  // //joint/axis/use_parent_model_frame == true
+  // this will be migrated to //joint/axis/xyz/@expressed_in == __model__
+  // but gazebo10 interpreted this joint axis in the world frame
+  auto sdfVersion =
+      ignition::math::SemanticVersion(this->sdf->OriginalVersion());
+  if (sdfVersion < ignition::math::SemanticVersion(1, 7)
+      && nullptr == this->parentLink
+      && "__model__" == this->axisExpressedIn[_index])
+  {
+    // Parent model is world, use world frame
+    return this->WorldPose().Rot().Inverse();
+  }
+
+  // try to use DOM API
+  sdf::Errors errors;
+  if (nullptr != this->jointSDFDom)
+  {
+    return this->ResolveSdfPose(
+        this->jointSDFDom->SemanticPose(),
+        this->axisExpressedIn[_index]).Rot().Inverse();
+  }
+
+  // fallback behavior for model frame
+  if ("__model__" == this->axisExpressedIn[_index])
+  {
+    // Model frame
+    return this->WorldPose().Rot().Inverse() * this->model->WorldPose().Rot();
+  }
+
+  gzerr << "The DOM object is not available for computing the "
+        << "AxisFrameOffset.\n"
+        << "There is no optimal fallback since the expressed_in["
+        << this->axisExpressedIn[_index] << "] value is not empty or "
+        << "__model__. Falling back to the joint frame."
+        << std::endl;
+
   return ignition::math::Quaterniond::Identity;
 }
 

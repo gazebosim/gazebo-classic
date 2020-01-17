@@ -684,10 +684,9 @@ namespace gazebo
       /// clears them at the end of update step.
       protected: JointWrench wrench;
 
-      /// \brief Flags that are set to true if an axis value is expressed
-      /// in the parent model frame. Otherwise use the joint frame.
-      /// See issue #494.
-      protected: bool axisParentModelFrame[MAX_JOINT_AXIS];
+      /// \brief Expressed-in values for each axis that are checked if
+      /// the DOM has errors.
+      protected: std::string axisExpressedIn[MAX_JOINT_AXIS];
 
       /// \brief An SDF pointer that allows us to only read the joint.sdf
       /// file once, which in turns limits disk reads.

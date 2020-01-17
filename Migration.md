@@ -53,6 +53,12 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
     As such, an `id` of `0` will now trigger a random `id` to be generated,
     and non-zero `id` values should be used instead.
 
+### Deletions
+
+1. **gazebo/physics/Joint.hh**
+    + ***Removed:*** protected: bool axisParentModelFrame[]
+    + ***Replacement:*** protected: std::string axisExpressedIn[]
+
 ## Gazebo 9.x to 10.x
 
 ### Additions
