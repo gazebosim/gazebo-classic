@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>-1.5 2.0 1.2  0 0.4 -1.0</pose>
+      </camera>
+    </gui>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <model name="parent">
+      <include>
+        <uri>model://demo_joint_types</uri>
+      </include>
+      <plugin name="variable_gearbox" filename="libVariableGearboxPlugin.so">
+        <gearbox_joint_name>demo_joint_types::gearbox_demo</gearbox_joint_name>
+        <x_y_dydx>1.2  -1.2  -1.0</x_y_dydx>
+        <x_y_dydx>1.8  -7.5 -20.0</x_y_dydx>
+      </plugin>
+    </model>
+  </world>
+</sdf>

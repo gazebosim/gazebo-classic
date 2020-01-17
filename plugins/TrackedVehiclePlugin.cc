@@ -24,6 +24,11 @@
 
 using namespace gazebo;
 
+namespace gazebo
+{
+  bool trackedVehiclePoseWarningIssued = false;
+}
+
 /// \brief Private data class
 class gazebo::TrackedVehiclePluginPrivate
 {
@@ -37,7 +42,10 @@ class gazebo::TrackedVehiclePluginPrivate
   public: transport::NodePtr robotNode;
 
   /// \brief Velocity command subscriber.
-  public: transport::SubscriberPtr velocitySub;
+  public: transport::SubscriberPtr velocityPoseSub;
+
+  /// \brief Velocity command subscriber.
+  public: transport::SubscriberPtr velocityTwistSub;
 
   /// \brief Publisher of the track velocities.
   public: transport::PublisherPtr tracksVelocityPub;
@@ -132,8 +140,22 @@ void TrackedVehiclePlugin::Init()
   this->dataPtr->robotNode = transport::NodePtr(new transport::Node());
   this->dataPtr->robotNode->Init(robotNamespace);
 
-  this->dataPtr->velocitySub = this->dataPtr->robotNode->Subscribe("~/cmd_vel",
-    &TrackedVehiclePlugin::OnVelMsg, this);
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+  this->dataPtr->velocityPoseSub =
+      this->dataPtr->robotNode->Subscribe<msgs::Pose, TrackedVehiclePlugin>(
+          "~/cmd_vel", &TrackedVehiclePlugin::OnVelMsg, this);
+
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
+
+  this->dataPtr->velocityTwistSub =
+      this->dataPtr->robotNode->Subscribe<msgs::Twist, TrackedVehiclePlugin>(
+          "~/cmd_vel_twist", &TrackedVehiclePlugin::OnVelMsg, this);
 
   this->dataPtr->tracksVelocityPub =
     this->dataPtr->robotNode->Advertise<msgs::Vector2d>("~/tracks_speed", 1000);
@@ -167,19 +189,19 @@ void TrackedVehiclePlugin::SetTrackVelocity(double _left, double _right)
   this->dataPtr->tracksVelocityPub->Publish(speedMsg);
 }
 
-void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
+void TrackedVehiclePlugin::SetBodyVelocity(
+    const double _linear, const double _angular)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
 
   // Compute effective linear and angular speed.
   const auto linearSpeed = ignition::math::clamp(
-    _msg->position().x(),
+    _linear,
     -this->dataPtr->maxLinearSpeed,
     this->dataPtr->maxLinearSpeed);
 
-  const auto yaw = msgs::ConvertIgn(_msg->orientation()).Euler().Z();
   const auto angularSpeed = ignition::math::clamp(
-    yaw,
+    _angular,
     -this->dataPtr->maxAngularSpeed,
     this->dataPtr->maxAngularSpeed);
 
@@ -192,6 +214,23 @@ void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
 
   // Call the track velocity handler (which does the actual vehicle control).
   this->SetTrackVelocity(leftVelocity, rightVelocity);
+}
+
+void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
+{
+  if (!trackedVehiclePoseWarningIssued)
+  {
+    gzwarn << "Controlling tracked vehicles via Pose messages is deprecated. "
+              "Use the Twist API via ~/cmd_vel_twist." << std::endl;
+    trackedVehiclePoseWarningIssued = true;
+  }
+  const auto yaw = msgs::ConvertIgn(_msg->orientation()).Euler().Z();
+  this->SetBodyVelocity(_msg->position().x(), yaw);
+}
+
+void TrackedVehiclePlugin::OnVelMsg(ConstTwistPtr &_msg)
+{
+  this->SetBodyVelocity(_msg->linear().x(), _msg->angular().z());
 }
 
 std::string TrackedVehiclePlugin::GetRobotNamespace()
