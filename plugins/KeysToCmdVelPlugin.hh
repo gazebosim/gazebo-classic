@@ -47,6 +47,11 @@ namespace gazebo
   ///
   /// The plugin processes the following parameters:
   ///
+  /// <publish_as_twist> If true, the published message type will be Twist.
+  ///                    If false, it will be Pose. Default is false.
+  ///                    The Pose message isn't very good for angular speed
+  ///                    representation since it will always clamp the speed to
+  ///                    interval -pi to pi.
   /// <cmd_vel_topic>  The topic to which velocity commands are be published.
   ///                  Default is "~/cmd_vel".
   /// <max_linear_vel>  Maximum linear velocity commanded to the vehicle (m/s).

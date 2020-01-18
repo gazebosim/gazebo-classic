@@ -15,10 +15,6 @@
  *
  */
 #ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-
   #include <io.h>
 
   // Seems like W_OK does not exists on Windows.

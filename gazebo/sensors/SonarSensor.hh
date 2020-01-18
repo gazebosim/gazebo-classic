@@ -68,6 +68,10 @@ namespace gazebo
       /// \return The radius of the sonar cone at max range.
       public: double Radius() const;
 
+      /// \brief Get the sonar collision shape.
+      /// \return The sonar collision shape.
+      public: std::string Geometry() const;
+
       /// \brief Get detected range for a sonar.
       ///         Warning: If you are accessing all the ray data in a loop
       ///         it's possible that the Ray will update in the middle of

@@ -18,6 +18,16 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
+
+std::vector<msgs::Model> g_modelMsgs;
+std::mutex g_mutex;
+void ModelInfoCallback(ConstModelPtr &_model)
+{
+  std::lock_guard<std::mutex> lock(g_mutex);
+  g_modelMsgs.push_back(*_model.get());
+}
+
+
 class ModelTest : public ServerFixture
 {
 };
@@ -76,6 +86,74 @@ TEST_F(ModelTest, CreateLink)
   // GetLink should still return the original link
   EXPECT_EQ(link, model->GetLink(linkName));
 }
+
+/////////////////////////////////////////////////
+// Test setting scale of model and verify visual msg
+TEST_F(ModelTest, SetScale)
+{
+  Load("worlds/shapes.world");
+  physics::ModelPtr model = GetModel("sphere");
+  ASSERT_NE(model, nullptr);
+
+  physics::WorldPtr world = model->GetWorld();
+  ASSERT_NE(world, nullptr);
+
+  std::string modelTopic = "~/model/info";
+  transport::SubscriberPtr sub = node->Subscribe(modelTopic, ModelInfoCallback);
+
+  double s = 0.25;
+  ignition::math::Vector3d scale(s, s, s);
+  model->SetScale(scale, true);
+
+  // publish msg
+  int sleep = 0;
+  bool receivedMsgs = false;
+  while (!receivedMsgs && sleep++ < 100)
+  {
+    world->Step(1);
+    common::Time::MSleep(100);
+    {
+      std::lock_guard<std::mutex> lock(g_mutex);
+      receivedMsgs = !g_modelMsgs.empty();
+    }
+  }
+
+  EXPECT_FALSE(g_modelMsgs.empty());
+
+  // verify geometry of the visual msg in the link
+  std::string visualName = "sphere::link::visual";
+  physics::LinkPtr link = model->GetLink();
+  msgs::Visual visualMsg = link->GetVisualMessage(visualName);
+  EXPECT_EQ("sphere::link::visual", visualMsg.name());
+  double expectedRadius = s * 0.5;
+  EXPECT_DOUBLE_EQ(expectedRadius, visualMsg.geometry().sphere().radius());
+
+  // verify scale
+  msgs::Model modelMsg = g_modelMsgs[0];
+  EXPECT_TRUE(modelMsg.has_scale());
+  EXPECT_DOUBLE_EQ(s, modelMsg.scale().x());
+  EXPECT_DOUBLE_EQ(s, modelMsg.scale().y());
+  EXPECT_DOUBLE_EQ(s, modelMsg.scale().z());
+
+  // verify geometry of the visual msg received
+  ASSERT_GE(modelMsg.link_size(), 1);
+  msgs::Link linkMsg = modelMsg.link(0);
+  msgs::Visual receivedVisualMsg;
+  for (int i = 0; i < linkMsg.visual_size(); ++i)
+  {
+    if (linkMsg.visual(i).name() == visualName)
+    {
+      receivedVisualMsg = linkMsg.visual(i);
+      break;
+    }
+  }
+  EXPECT_EQ(visualName, receivedVisualMsg.name());
+  EXPECT_DOUBLE_EQ(expectedRadius,
+    receivedVisualMsg.geometry().sphere().radius());
+
+  g_modelMsgs.clear();
+}
+
 
 int main(int argc, char **argv)
 {
