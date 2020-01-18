@@ -15,6 +15,7 @@
  *
 */
 #include <gazebo/physics/Model.hh>
+#include <memory>
 
 #include "KeysToCmdVelPlugin.hh"
 
@@ -63,16 +64,38 @@ class CmdVelKeyboardControls
 };
 
 class KeysToCmdVelPluginPrivate {
-  public: KeysToCmdVelPluginPrivate() : keys(new CmdVelKeyboardControls),
-    keyboardControlMessage(new msgs::Pose)
+  public: KeysToCmdVelPluginPrivate() : keys(new CmdVelKeyboardControls)
   {
   }
 
+  virtual ~KeysToCmdVelPluginPrivate()
+  {
+  }
+
+  /// \brief Get the currently set linear speed.
+  /// \return The linear speed.
+  public: virtual double Linear() const = 0;
+
+  /// \brief Get the currently set angular speed.
+  /// \return The angular speed.
+  public: virtual double Angular() const = 0;
+
+  /// \brief Set desired linear speed.
+  /// \param _linear The desired linear speed.
+  public: virtual void SetLinear(double _linear) = 0;
+
+  /// \brief Set desired angular speed.
+  /// \param _angular The desired angular speed.
+  public: virtual void SetAngular(double _angular) = 0;
+
+  /// \brief Initialize the message publisher.
+  public: virtual void InitPublisher() = 0;
+
+  /// \brief Publish the cmd_vel message.
+  public: virtual void Publish() = 0;
+
   /// \brief Stores information about each tracked key.
   public: std::unique_ptr<CmdVelKeyboardControls> keys;
-
-  /// \brief The message to be sent that is updated by keypresses.
-  public: msgs::PosePtr keyboardControlMessage;
 
   /// \brief The topic to which cmd_vel messages should be published.
   public: std::string cmdVelTopic;
@@ -103,13 +126,102 @@ class KeysToCmdVelPluginPrivate {
   /// \brief Publish cmd_vel messages.
   public: transport::PublisherPtr cmdVelPub;
 };
+
+class KeysToCmdVelPluginPrivatePose : public KeysToCmdVelPluginPrivate
+{
+  public: KeysToCmdVelPluginPrivatePose() :
+    keyboardControlMessage(new msgs::Pose)
+  {
+    msgs::Set(this->keyboardControlMessage->mutable_position(),
+              ignition::math::Vector3d::Zero);
+    msgs::Set(this->keyboardControlMessage->mutable_orientation(),
+              ignition::math::Quaterniond::Identity);
+  }
+
+  double Linear() const override
+  {
+    return this->keyboardControlMessage->position().x();
+  }
+  double Angular() const override
+  {
+    return msgs::ConvertIgn(
+        this->keyboardControlMessage->orientation()).Euler().Z();
+  }
+
+  void SetLinear(const double _linear) override
+  {
+    this->keyboardControlMessage->mutable_position()->set_x(_linear);
+  }
+
+  void SetAngular(const double _angular) override
+  {
+    const auto yaw = ignition::math::Quaterniond::EulerToQuaternion(
+        0, 0, _angular);
+    msgs::Set(this->keyboardControlMessage->mutable_orientation(), yaw);
+  }
+
+  void InitPublisher() override
+  {
+    this->cmdVelPub = this->node->Advertise<msgs::Pose>(this->cmdVelTopic);
+  }
+
+  void Publish() override
+  {
+    this->cmdVelPub->Publish(*this->keyboardControlMessage);
+  }
+
+  /// \brief The message to be sent that is updated by keypresses.
+  public: msgs::PosePtr keyboardControlMessage;
+};
+
+class KeysToCmdVelPluginPrivateTwist : public KeysToCmdVelPluginPrivate
+{
+  public: KeysToCmdVelPluginPrivateTwist() :
+    keyboardControlMessage(new msgs::Twist)
+  {
+    msgs::Set(this->keyboardControlMessage->mutable_linear(),
+              ignition::math::Vector3d::Zero);
+    msgs::Set(this->keyboardControlMessage->mutable_angular(),
+              ignition::math::Vector3d::Zero);
+  }
+
+  double Linear() const override
+  {
+    return this->keyboardControlMessage->linear().x();
+  }
+  double Angular() const override
+  {
+    return this->keyboardControlMessage->angular().z();
+  }
+
+  void SetLinear(const double _linear) override
+  {
+    this->keyboardControlMessage->mutable_linear()->set_x(_linear);
+  }
+
+  void SetAngular(const double _angular) override
+  {
+    this->keyboardControlMessage->mutable_angular()->set_z(_angular);
+  }
+
+  void InitPublisher() override
+  {
+    this->cmdVelPub = this->node->Advertise<msgs::Twist>(this->cmdVelTopic);
+  }
+
+  void Publish() override
+  {
+    this->cmdVelPub->Publish(*this->keyboardControlMessage);
+  }
+
+  /// \brief The message to be sent that is updated by keypresses.
+  public: msgs::TwistPtr keyboardControlMessage;
+};
 }
 
 /////////////////////////////////////////////////
 KeysToCmdVelPlugin::KeysToCmdVelPlugin()
-  : dataPtr(new KeysToCmdVelPluginPrivate)
 {
-  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -120,6 +232,20 @@ KeysToCmdVelPlugin::~KeysToCmdVelPlugin()
 /////////////////////////////////////////////////
 void KeysToCmdVelPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
+  bool publishAsTwist;
+  this->LoadParam(_sdf, "publish_as_twist", publishAsTwist, false);
+
+  if (publishAsTwist)
+  {
+    this->dataPtr = std::unique_ptr<KeysToCmdVelPluginPrivateTwist>(
+        new KeysToCmdVelPluginPrivateTwist);
+  }
+  else
+  {
+    this->dataPtr = std::unique_ptr<KeysToCmdVelPluginPrivatePose>(
+        new KeysToCmdVelPluginPrivatePose);
+  }
+
   this->LoadParam(_sdf, "cmd_vel_topic", this->dataPtr->cmdVelTopic,
                   "~/cmd_vel");
   this->LoadParam(_sdf, "max_linear_vel", this->dataPtr->maxLinearVel, 1.0);
@@ -188,28 +314,23 @@ void KeysToCmdVelPlugin::Init()
   this->dataPtr->keyboardSub = this->dataPtr->node->Subscribe(
       "~/keyboard/keypress", &KeysToCmdVelPlugin::OnKeyPress, this, true);
 
-  this->dataPtr->cmdVelPub = this->dataPtr->node->Advertise<msgs::Pose>(
-      this->dataPtr->cmdVelTopic);
+  this->dataPtr->InitPublisher();
 }
 
 /////////////////////////////////////////////////
 void KeysToCmdVelPlugin::Reset()
 {
-  msgs::Set(this->dataPtr->keyboardControlMessage->mutable_position(),
-            ignition::math::Vector3d::Zero);
-  msgs::Set(this->dataPtr->keyboardControlMessage->mutable_orientation(),
-            ignition::math::Quaterniond::Identity);
+  this->dataPtr->SetLinear(0);
+  this->dataPtr->SetAngular(0);
 }
 
 /////////////////////////////////////////////////
 void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
 {
-  auto key = static_cast<unsigned int>(_msg->int_value());
+  const auto key = static_cast<unsigned int>(_msg->int_value());
 
   double linearVel = 0., angularVel = 0.;
   bool linearVelSet = false, angularVelSet = false;
-
-  auto &message = this->dataPtr->keyboardControlMessage;
 
   if (std::find(this->dataPtr->keys->stop.begin(),
                 this->dataPtr->keys->stop.end(), key) !=
@@ -240,7 +361,7 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
 
     if (linearVelSet)
     {
-      const auto oldLinearVel = message->position().x();
+      const auto oldLinearVel = this->dataPtr->Linear();
 
       if (!ignition::math::equal(linearVel, oldLinearVel))
       {
@@ -268,8 +389,7 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
 
     if (angularVelSet)
     {
-      const auto oldAngularVel =
-        msgs::ConvertIgn(message->orientation()).Euler().Z();
+      const auto oldAngularVel = this->dataPtr->Angular();
 
       if (!ignition::math::equal(angularVel, oldAngularVel))
       {
@@ -283,18 +403,16 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
 
   if (linearVelSet)
   {
-    message->mutable_position()->set_x(linearVel);
+    this->dataPtr->SetLinear(linearVel);
   }
 
   if (angularVelSet)
   {
-    auto yaw = ignition::math::Quaterniond::EulerToQuaternion(
-      0, 0, angularVel);
-    msgs::Set(message->mutable_orientation(), yaw);
+    this->dataPtr->SetAngular(angularVel);
   }
 
   if (linearVelSet || angularVelSet)
   {
-    this->dataPtr->cmdVelPub->Publish(*message);
+    this->dataPtr->Publish();
   }
 }

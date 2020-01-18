@@ -40,6 +40,17 @@ class SimpleTrackedVehiclesTest : public TrackedVehiclesTest
   SimpleTrackedVehiclesTest()
     : TrackedVehiclesTest("worlds/tracked_vehicle_simple.world")
   {
+    auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+
+    msgs::Factory msg;
+    msg.set_clone_model_name("simple_tracked");
+    msgs::Set(msg.mutable_pose(), ignition::math::Pose3d(
+        ignition::math::Vector3d(2, 3, 0.1),
+        ignition::math::Quaterniond::Identity));
+
+    pub->Publish(msg);
+
+    this->WaitUntilEntitySpawn("simple_tracked_clone", 100, 100);
   }
 };
 
@@ -49,8 +60,32 @@ class WheeledTrackedVehiclesTest : public TrackedVehiclesTest
   WheeledTrackedVehiclesTest()
     : TrackedVehiclesTest("worlds/tracked_vehicle_wheeled.world")
   {
+    auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+
+    msgs::Factory msg;
+    msg.set_clone_model_name("wheel_tracked");
+    msgs::Set(msg.mutable_pose(), ignition::math::Pose3d(
+        ignition::math::Vector3d(2, 3, 0.1),
+        ignition::math::Quaterniond::Identity));
+
+    pub->Publish(msg);
+
+    this->WaitUntilEntitySpawn("wheel_tracked_clone", 100, 100);
   }
 };
+
+// Verify that a model's world pose is near a specified pose.
+void verifyPose(
+    const physics::ModelPtr model,
+    const ignition::math::Pose3d& pose)
+{
+  EXPECT_NEAR(model->WorldPose().Pos().X(), pose.Pos().X(), 1e-1);
+  EXPECT_NEAR(model->WorldPose().Pos().Y(), pose.Pos().Y(), 1e-1);
+  EXPECT_NEAR(model->WorldPose().Pos().Z(), pose.Pos().Z(), 1e-2);
+  EXPECT_NEAR(model->WorldPose().Rot().Roll(), pose.Rot().Roll(), 1e-2);
+  EXPECT_NEAR(model->WorldPose().Rot().Pitch(), pose.Rot().Pitch(), 1e-2);
+  EXPECT_NEAR(model->WorldPose().Rot().Yaw(), pose.Rot().Yaw(), 1e-1);
+}
 
 // Test that the SimpleTracked vehicle is moving as expected.
 TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
@@ -60,8 +95,11 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   ASSERT_NE(model, nullptr);
   ASSERT_EQ(model->GetName(), "simple_tracked");
 
-  transport::PublisherPtr pub = this->node->Advertise<msgs::Pose>(
-    "~/simple_tracked/cmd_vel");
+  auto modelClone = this->world->ModelByName("simple_tracked_clone");
+  ASSERT_NE(modelClone, nullptr);
+
+  transport::PublisherPtr pub = this->node->Advertise<msgs::Twist>(
+    "~/simple_tracked/cmd_vel_twist");
   pub->WaitForConnection();
 
   // Move the robot somewhere to free space without obstacles.
@@ -73,10 +111,12 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   // Test straight driving - 1 sec driving, should move 1 meter forward.
 
   const auto startPose = model->WorldPose();
+  const auto startPoseClone = modelClone->WorldPose();
 
   const double forwardSpeed = 1.0;
-  msgs::Pose msg;
-  msgs::Set(&msg, ignition::math::Pose3d(forwardSpeed, 0, 0, 0, 0, 0));
+  msgs::Twist msg;
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(forwardSpeed, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0));
   pub->Publish(msg, true);
   this->world->Step(1000);
 
@@ -89,6 +129,9 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   EXPECT_NEAR(model->WorldPose().Rot().Pitch(), startPose.Rot().Pitch(), 1e-2);
   EXPECT_NEAR(model->WorldPose().Rot().Yaw(), startPose.Rot().Yaw(), 1e-1);
 
+  // The cloned model should not move
+  verifyPose(modelClone, startPoseClone);
+
   // Test rotation in place - 1 sec rotation, should turn 0.25 rad.
 
   const auto middlePose = model->WorldPose();
@@ -96,7 +139,9 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   // Take care when changing this value - if too high, it could get restricted
   // by the max speed of the tracks.
   const double rotationSpeed = 0.25;
-  msgs::Set(&msg, ignition::math::Pose3d(0, 0, 0, 0, 0, rotationSpeed));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(0, 0, 0));
+  msgs::Set(msg.mutable_angular(),
+    ignition::math::Vector3d(0, 0, rotationSpeed));
   pub->Publish(msg, true);
   this->world->Step(1000);
 
@@ -109,6 +154,9 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
               middlePose.Rot().Yaw() - rotationSpeed,
               1e-1);
 
+  // The cloned model should not move
+  verifyPose(modelClone, startPoseClone);
+
   // Test following a circular path.
 
   // This also tests the fix from commit b1836a3 still works. If not, the test
@@ -116,7 +164,8 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
 
   const auto lastPose = model->WorldPose();
 
-  msgs::Set(&msg, ignition::math::Pose3d(0.5, 0, 0, 0, 0, 0.2));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(0.5, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0.2));
   pub->Publish(msg, true);
   this->world->Step(1000);
 
@@ -128,6 +177,9 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   EXPECT_NEAR(model->WorldPose().Rot().Yaw(),
               lastPose.Rot().Yaw() - 0.37,
               1e-1);
+
+  // The cloned model should not move
+  verifyPose(modelClone, startPoseClone);
 
   // Test driving on staircase - should climb to its middle part.
 
@@ -141,7 +193,8 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   // Let the model settle down.
   this->world->Step(300);
 
-  msgs::Set(&msg, ignition::math::Pose3d(forwardSpeed, 0, 0, 0, 0, 0));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(forwardSpeed, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0));
   pub->Publish(msg, true);
   this->world->Step(3500);
 
@@ -152,6 +205,9 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   EXPECT_NEAR(model->WorldPose().Rot().Pitch(), -0.4, 1e-1);
   EXPECT_NEAR(model->WorldPose().Rot().Yaw(),
               beforeStairsPose.Rot().Yaw(), 1e-1);
+
+  // The cloned model should not move
+  verifyPose(modelClone, startPoseClone);
 
   // Test driving over a cylinder - this is a check of the bugfix
   // released in commit 6196a2a. In some cases, the track isn't the "collision
@@ -170,11 +226,12 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
   // Let the model settle down.
   this->world->Step(300);
 
-  msgs::Set(&msg, ignition::math::Pose3d(forwardSpeed, 0, 0, 0, 0, 0));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(forwardSpeed, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0));
   pub->Publish(msg, true);
   this->world->Step(2000);
 
-  // The cylinder as at (0, -3, 0), we start at (0, -2, 0), and want to pass
+  // The cylinder is at (0, -3, 0), we start at (0, -2, 0), and want to pass
   // at least a bit behind the cylinder (0, -3.5, 0). The driving is a bit wild,
   // so we don't care much about the end X position and yaw.
   EXPECT_NEAR(model->WorldPose().Pos().X(), 0.0, 0.5);  // The driving is wild
@@ -194,8 +251,11 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
   ASSERT_NE(model, nullptr);
   ASSERT_EQ(model->GetName(), "wheel_tracked");
 
-  transport::PublisherPtr pub = node->Advertise<msgs::Pose>(
-    "~/wheel_tracked/cmd_vel");
+  auto modelClone = this->world->ModelByName("wheel_tracked_clone");
+  ASSERT_NE(modelClone, nullptr);
+
+  transport::PublisherPtr pub = node->Advertise<msgs::Twist>(
+    "~/wheel_tracked/cmd_vel_twist");
   pub->WaitForConnection();
 
   // Move the robot somewhere to free space without obstacles.
@@ -207,10 +267,12 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
   // Test straight driving - 1 sec driving, should move 1 meter forward.
 
   const auto startPose = model->WorldPose();
+  const auto startPoseClone = modelClone->WorldPose();
 
   const double forwardSpeed = 1.0;
-  msgs::Pose msg;
-  msgs::Set(&msg, ignition::math::Pose3d(forwardSpeed, 0, 0, 0, 0, 0));
+  msgs::Twist msg;
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(forwardSpeed, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0));
   pub->Publish(msg, true);
   this->world->Step(1000);
 
@@ -223,6 +285,9 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
   EXPECT_NEAR(model->WorldPose().Rot().Pitch(), startPose.Rot().Pitch(), 1e-2);
   EXPECT_NEAR(model->WorldPose().Rot().Yaw(), startPose.Rot().Yaw(), 1e-1);
 
+  // The cloned model should not move
+  verifyPose(modelClone, startPoseClone);
+
   // Test rotation in place - 1 sec rotation, should turn 0.25 rad.
 
   const auto middlePose = model->WorldPose();
@@ -230,7 +295,9 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
   // Take care when changing this value - if too high, it could get restricted
   // by the max speed of the tracks.
   const double rotationSpeed = 0.25;
-  msgs::Set(&msg, ignition::math::Pose3d(0, 0, 0, 0, 0, rotationSpeed));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(0, 0, 0));
+  msgs::Set(msg.mutable_angular(),
+    ignition::math::Vector3d(0, 0, rotationSpeed));
   pub->Publish(msg, true);
   this->world->Step(1000);
 
@@ -243,11 +310,15 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
               middlePose.Rot().Yaw() - rotationSpeed,
               0.2);
 
+  // The cloned model should not move
+  verifyPose(modelClone, startPoseClone);
+
   // Test following a circular path.
 
   const auto lastPose = model->WorldPose();
 
-  msgs::Set(&msg, ignition::math::Pose3d(0.5, 0, 0, 0, 0, 0.2));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(0.5, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0.2));
   pub->Publish(msg, true);
   this->world->Step(1000);
 
@@ -259,6 +330,9 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
   EXPECT_NEAR(model->WorldPose().Rot().Yaw(),
               lastPose.Rot().Yaw() - 0.37,
               0.4);  // TODO lower to 0.2 when directional friction is fixed
+
+  // The cloned model should not move
+  verifyPose(modelClone, startPoseClone);
 
   // Test driving on staircase - should climb to its front part.
 
@@ -272,7 +346,8 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
   // Let the model settle down.
   this->world->Step(300);
 
-  msgs::Set(&msg, ignition::math::Pose3d(forwardSpeed, 0, 0, 0, 0, 0));
+  msgs::Set(msg.mutable_linear(), ignition::math::Vector3d(forwardSpeed, 0, 0));
+  msgs::Set(msg.mutable_angular(), ignition::math::Vector3d(0, 0, 0));
   pub->Publish(msg, true);
   this->world->Step(3500);
 
@@ -284,6 +359,9 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
   EXPECT_NEAR(model->WorldPose().Rot().Pitch(), -0.4, 1e-1);
   EXPECT_NEAR(model->WorldPose().Rot().Yaw(),
               beforeStairsPose.Rot().Yaw(), 1e-1);
+
+  // The cloned model should not move
+  verifyPose(modelClone, startPoseClone);
 }
 
 int main(int argc, char **argv)

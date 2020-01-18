@@ -25,9 +25,6 @@
 #ifndef _WIN32
   #include <dirent.h>
 #else
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
   #include "gazebo/common/win_dirent.h"
 #endif
 

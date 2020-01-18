@@ -85,8 +85,17 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
   requestPub->Publish(*requestMsg);
 
   int waitCount = 0, maxWaitCount = 3000;
+#if GOOGLE_PROTOBUF_VERSION < 3001000
   while (atmosphereResponseMsg.ByteSize() == 0 && ++waitCount < maxWaitCount)
+#else
+  // ByteSizeLong appeared in version 3.1 of Protobuf, and ByteSize
+  // became deprecated.
+  while (atmosphereResponseMsg.ByteSizeLong() == 0
+      && ++waitCount < maxWaitCount)
+#endif
+  {
     common::Time::MSleep(10);
+  }
 
   ASSERT_LT(waitCount, maxWaitCount);
 
