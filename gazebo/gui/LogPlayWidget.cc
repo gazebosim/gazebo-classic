@@ -110,10 +110,29 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   playLayout->addWidget(this->dataPtr->stepForwardButton);
   playLayout->addWidget(this->dataPtr->forwardButton);
 
+  // RT Factor
+  QLabel *rtFactorLabel = new QLabel("Real Time Factor: ");
+
+  this->dataPtr->rtFactorSpin = new QDoubleSpinBox();
+  this->dataPtr->rtFactorSpin->setMaximumWidth(30);
+  this->dataPtr->rtFactorSpin->setValue(0.0);
+  this->dataPtr->rtFactorSpin->setRange(0.0, 100.);
+  this->dataPtr->rtFactorSpin->setSingleStep(0.1);
+  connect(this->dataPtr->rtFactorSpin,
+          SIGNAL(valueChanged(const double)), this,
+          SLOT(OnRtFactorChanged(const double)));
+
+  QHBoxLayout *rtFactorLayout = new QHBoxLayout();
+  rtFactorLayout->addWidget(rtFactorLabel);
+  rtFactorLayout->addWidget(this->dataPtr->rtFactorSpin);
+  rtFactorLayout->setAlignment(rtFactorLabel, Qt::AlignRight);
+  rtFactorLayout->setAlignment(this->dataPtr->rtFactorSpin, Qt::AlignLeft);
+
   // Controls layout
   QVBoxLayout *controlsLayout = new QVBoxLayout();
   controlsLayout->addLayout(playLayout);
   controlsLayout->addLayout(stepLayout);
+  controlsLayout->addLayout(rtFactorLayout);
 
   // View
   this->dataPtr->view = new LogPlayView(this);
@@ -401,6 +420,14 @@ void LogPlayWidget::OnCurrentTime()
   this->dataPtr->currentHourEdit->clearFocus();
   this->dataPtr->currentMinuteEdit->clearFocus();
   this->dataPtr->currentSecondEdit->clearFocus();
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnRtFactorChanged(const double _value)
+{
+  msgs::LogPlaybackControl msg;
+  msg.set_rt_factor(_value);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
