@@ -130,6 +130,7 @@
 
 1. Allow gazebo rendering to compile with Ogre 1.11 / 1.12
     * [Pull request 3129](https://bitbucket.org/osrf/gazebo/pull-request/3129)
+    * [Pull request 3130](https://bitbucket.org/osrf/gazebo/pull-request/3130)
 
 1. Fix compilation against Ogre compiled in debug mode
     * [Pull request 3131](https://bitbucket.org/osrf/gazebo/pull-request/3131)
