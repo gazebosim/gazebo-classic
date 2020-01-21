@@ -976,7 +976,9 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(axis1Msg.damping(), 0.2);
     // only ode and bullet return correct hinge friction param value
     if (_physicsEngine == "ode" || _physicsEngine == "bullet")
+    {
       EXPECT_FLOAT_EQ(axis1Msg.friction(), 0.1);
+    }
   }
 
   {
@@ -999,7 +1001,9 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(axis1Msg.damping(), 0.3);
     // only ode returns correct screw friction param value
     if (_physicsEngine == "ode")
+    {
       EXPECT_DOUBLE_EQ(axis1Msg.friction(), 0.2);
+    }
     msgs::Joint::Screw screwMsg = jointMsg.screw();
     EXPECT_DOUBLE_EQ(screwMsg.thread_pitch(), 2);
   }
@@ -1090,7 +1094,7 @@ TEST_P(PhysicsMsgsTest, JointMsg)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsMsgsTest,
-                        PHYSICS_ENGINE_VALUES);
+                        PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

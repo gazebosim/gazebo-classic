@@ -27,6 +27,8 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 
+#include <ignition/transport.hh>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -51,7 +53,11 @@ bool custom_exec(std::string _cmd)
 std::string custom_exec_str(std::string _cmd)
 {
   _cmd += " 2>&1";
+#ifdef _WIN32
+  FILE *pipe = _popen(_cmd.c_str(), "r");
+#else
   FILE *pipe = popen(_cmd.c_str(), "r");
+#endif
 
   if (!pipe)
     return "ERROR";
@@ -65,7 +71,11 @@ std::string custom_exec_str(std::string _cmd)
       result += buffer;
   }
 
+#ifdef _WIN32
+  _pclose(pipe);
+#else
   pclose(pipe);
+#endif
   return result;
 }
 
@@ -148,10 +158,10 @@ void fini()
 }
 
 /////////////////////////////////////////////////
-void JointCmdCB(ConstJointCmdPtr &_msg)
+void JointCmdCB(const ignition::msgs::JointCmd &_msg)
 {
   boost::mutex::scoped_lock lock(g_mutex);
-  g_msgDebugOut = _msg->DebugString();
+  g_msgDebugOut = _msg.DebugString();
   g_msgCondition.notify_all();
 }
 
@@ -223,19 +233,17 @@ TEST_F(gzTest, Joint)
   std::string helpOutput = custom_exec_str("gz help joint");
   EXPECT_NE(helpOutput.find("gz joint"), std::string::npos);
 
-  gazebo::transport::NodePtr node(new gazebo::transport::Node());
-  node->Init();
-  gazebo::transport::SubscriberPtr sub =
-    node->Subscribe("~/simple_arm/joint_cmd", &JointCmdCB);
+  ignition::transport::Node ignNode;
+  ignNode.Subscribe("/simple_arm/joint_cmd", &JointCmdCB);
 
   // Test joint force
   {
     waitForMsg("gz joint -w default -m simple_arm "
         "-j arm_shoulder_pan_joint -f 10");
 
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
-    msg.set_force(10);
+    msg.mutable_force_optional()->set_data(10);
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -246,12 +254,12 @@ TEST_F(gzTest, Joint)
         "-j arm_shoulder_pan_joint --pos-t 1.5707 --pos-p 1.2 "
         "--pos-i 0.01 --pos-d 0.2");
 
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
-    msg.mutable_position()->set_target(1.5707);
-    msg.mutable_position()->set_p_gain(1.2);
-    msg.mutable_position()->set_i_gain(0.01);
-    msg.mutable_position()->set_d_gain(0.2);
+    msg.mutable_position()->mutable_target_optional()->set_data(1.5707);
+    msg.mutable_position()->mutable_p_gain_optional()->set_data(1.2);
+    msg.mutable_position()->mutable_i_gain_optional()->set_data(0.01);
+    msg.mutable_position()->mutable_d_gain_optional()->set_data(0.2);
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -262,12 +270,12 @@ TEST_F(gzTest, Joint)
         "-j arm_shoulder_pan_joint --vel-t 1.5707 --vel-p 1.2 "
         "--vel-i 0.01 --vel-d 0.2");
 
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
-    msg.mutable_velocity()->set_target(1.5707);
-    msg.mutable_velocity()->set_p_gain(1.2);
-    msg.mutable_velocity()->set_i_gain(0.01);
-    msg.mutable_velocity()->set_d_gain(0.2);
+    msg.mutable_velocity()->mutable_target_optional()->set_data(1.5707);
+    msg.mutable_velocity()->mutable_p_gain_optional()->set_data(1.2);
+    msg.mutable_velocity()->mutable_i_gain_optional()->set_data(0.01);
+    msg.mutable_velocity()->mutable_d_gain_optional()->set_data(0.2);
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -695,6 +703,15 @@ TEST_F(gzTest, Topic)
   // Request
   output = custom_exec_str("gz topic -r entity_list");
   EXPECT_NE(output.find("models {"), std::string::npos);
+
+  // Publish
+  output = custom_exec_str("gz topic -p /gazebo/default/atmosphere "
+      "-m temperature:400");
+  EXPECT_TRUE(output.empty());
+
+  // Request
+  output = custom_exec_str("gz topic -r atmosphere_info");
+  EXPECT_NE(output.find("temperature: 400"), std::string::npos);
 
   fini();
 }

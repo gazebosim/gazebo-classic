@@ -39,6 +39,8 @@ const QString ConfigWidget::redColor = "#d42b2b";
 const QString ConfigWidget::greenColor = "#3bc43b";
 const QString ConfigWidget::blueColor = "#0d0df2";
 
+GZ_ENUM_DECLARE(GZ_COMMON_VISIBLE, common::MaterialType)
+
 /////////////////////////////////////////////////
 ConfigWidget::ConfigWidget()
   : dataPtr(new ConfigWidgetPrivate())
@@ -368,13 +370,6 @@ bool ConfigWidget::SetVector3dWidgetValue(const std::string &_name,
     return this->UpdateVector3dWidget(iter->second, _value);
 
   return false;
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::SetColorWidgetValue(const std::string &_name,
-    const common::Color &_value)
-{
-  return this->SetColorWidgetValue(_name, _value.Ign());
 }
 
 /////////////////////////////////////////////////

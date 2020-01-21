@@ -60,10 +60,7 @@ namespace gazebo
       /// \param[in] _light Pointer to directional light
       public: void SetLight(LightPtr _light)
       {
-        this->dir = ignition::math::Quaterniond(_light->Rotation()) *
-            _light->Direction();
-        // set light world pos to be far away
-        this->lightWorldPos = -this->dir * 100000.0;
+        this->light = _light;
       }
 
       /// \brief Set the scale of lens flare.
@@ -99,6 +96,19 @@ namespace gazebo
         params->setNamedConstant("viewport",
             Ogre::Vector3(static_cast<double>(this->camera->ViewportWidth()),
             static_cast<double>(this->camera->ViewportHeight()), 1.0));
+
+        // use light's world position for lens flare position
+        if (this->light->Type() == "directional")
+        {
+          // Directional lights misuse position as a direction.
+          // The large multiplier is for occlusion testing and assumes the light
+          // is very far away. Larger values cause the light to disappear on
+          // some frames for some unknown reason.
+          this->lightWorldPos = -(this->light->WorldPose().Rot() *
+                                  light->Direction()) * 100000.0;
+        }
+        else
+          this->lightWorldPos = this->light->WorldPose().Pos();
 
         ignition::math::Vector3d pos;
         double lensFlareScale = 1.0;
@@ -306,14 +316,14 @@ namespace gazebo
         return s;
       };
 
+      /// \brief Pointer to light
+      private: LightPtr light;
+
       /// \brief Pointer to camera
       private: CameraPtr camera;
 
       /// \brief Dummy camera used by wide angle camera for occlusion checking
       private: CameraPtr wideAngleDummyCamera;
-
-      /// \brief Light dir in world frame
-      private: ignition::math::Vector3d dir;
 
       /// \brief Position of light in world frame
       private: ignition::math::Vector3d lightWorldPos;
@@ -418,7 +428,7 @@ void LensFlare::Update()
   for (unsigned int i = 0; i < this->dataPtr->camera->GetScene()->LightCount();
       ++i)
   {
-    LightPtr light = this->dataPtr->camera->GetScene()->GetLight(i);
+    LightPtr light = this->dataPtr->camera->GetScene()->LightByIndex(i);
     if (light->Type() == "directional")
     {
       directionalLight = light;

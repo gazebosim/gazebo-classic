@@ -153,7 +153,7 @@ TEST_F(Visual_TEST, BoundingBox)
   // verify initial bounding box
   ignition::math::Vector3d bboxMin(-0.5, -0.5, -0.5);
   ignition::math::Vector3d bboxMax(0.5, 0.5, 0.5);
-  ignition::math::Box boundingBox = visual->BoundingBox();
+  ignition::math::AxisAlignedBox boundingBox = visual->BoundingBox();
   EXPECT_EQ(boundingBox.Min(), bboxMin);
   EXPECT_EQ(boundingBox.Max(), bboxMax);
 
@@ -171,7 +171,7 @@ TEST_F(Visual_TEST, BoundingBox)
   EXPECT_EQ(newScale, ignition::math::Vector3d(2, 3, 4));
 
   // verify local bounding box dimensions remain the same
-  ignition::math::Box newBoundingBox = visual->BoundingBox();
+  ignition::math::AxisAlignedBox newBoundingBox = visual->BoundingBox();
   EXPECT_EQ(newBoundingBox.Min(), bboxMin);
   EXPECT_EQ(newBoundingBox.Max(), bboxMax);
 
@@ -186,7 +186,7 @@ TEST_F(Visual_TEST, BoundingBox)
   // create empty visual and check bounding box
   gazebo::rendering::VisualPtr emptyVis(
       new gazebo::rendering::Visual("empty_visual", scene));
-  ignition::math::Box emptyBoundingBox = emptyVis->BoundingBox();
+  ignition::math::AxisAlignedBox emptyBoundingBox = emptyVis->BoundingBox();
   EXPECT_EQ(ignition::math::Vector3d::Zero, emptyBoundingBox.Min());
   EXPECT_EQ(ignition::math::Vector3d::Zero, emptyBoundingBox.Max());
 }
@@ -1454,6 +1454,53 @@ TEST_F(Visual_TEST, GetAncestors)
   EXPECT_FALSE(world->IsDescendantOf(nullptr));
   EXPECT_FALSE(vis4->IsAncestorOf(nullptr));
   EXPECT_FALSE(vis4->IsDescendantOf(nullptr));
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, EntityDepths)
+{
+  this->Load("worlds/shapes.world");
+
+  auto scene = gazebo::rendering::get_scene();
+  ASSERT_NE(scene, nullptr);
+
+  // Wait until all models are inserted
+  int sleep = 0;
+  int maxSleep = 30;
+  rendering::VisualPtr box, sphere, cylinder, sun;
+  while ((!box || !sphere || !cylinder || !sun) && sleep < maxSleep)
+  {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
+    box = scene->GetVisual("box");
+    cylinder = scene->GetVisual("cylinder");
+    sphere = scene->GetVisual("sphere");
+    sun = scene->GetVisual("sun");
+
+    common::Time::MSleep(100);
+    sleep++;
+  }
+
+  // World
+  auto world = scene->WorldVisual();
+  ASSERT_NE(nullptr, world);
+  EXPECT_EQ(0u, world->GetDepth());
+
+  // Models
+  ASSERT_NE(nullptr, box);
+  EXPECT_EQ(1u, box->GetDepth());
+
+  ASSERT_NE(nullptr, cylinder);
+  EXPECT_EQ(1u, cylinder->GetDepth());
+
+  ASSERT_NE(nullptr, sphere);
+  EXPECT_EQ(1u, sphere->GetDepth());
+
+  // Lights
+  ASSERT_NE(nullptr, sun);
+  EXPECT_EQ(1u, sun->GetDepth());
 }
 
 /////////////////////////////////////////////////

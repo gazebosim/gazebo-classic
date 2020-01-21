@@ -18,11 +18,12 @@
  * Author: Nate Koenig
  */
 
-#ifndef _PUBLISHER_HH_
-#define _PUBLISHER_HH_
+#ifndef GAZEBO_TRANSPORT_PUBLISHER_HH_
+#define GAZEBO_TRANSPORT_PUBLISHER_HH_
 
 #include <google/protobuf/message.h>
 #include <boost/thread.hpp>
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <list>
 #include <map>
@@ -40,7 +41,8 @@ namespace gazebo
 
     /// \class Publisher Publisher.hh transport/transport.hh
     /// \brief A publisher of messages on a topic
-    class GZ_TRANSPORT_VISIBLE Publisher
+    class GZ_TRANSPORT_VISIBLE Publisher :
+        public boost::enable_shared_from_this<Publisher>
     {
       /// \brief Constructor
       /// \param[in] _topic Name of topic to be published

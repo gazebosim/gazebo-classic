@@ -283,7 +283,11 @@ namespace SkyX { namespace VClouds
       if (k < mLightnings.size())
       {
         pos = mVClouds->getGeometryManager()->getSceneNode()->
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+          _getFullTransform().inverse() *
+#else
           _getFullTransform().inverseAffine() *
+#endif
           mSceneNodes.at(k)->_getDerivedPosition();
 
         mVolCloudsLightningMaterial->

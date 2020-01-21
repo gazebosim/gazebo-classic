@@ -28,7 +28,6 @@
 #include <gazebo/gui/GuiPlugin.hh>
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
 # include <gazebo/transport/transport.hh>
-# include <gazebo/gui/gui.hh>
 #endif
 
 namespace gazebo
@@ -51,7 +50,7 @@ namespace gazebo
   /// </plugin>
   ///
   /// Note that the size has to be large enough to fit all widgets.
-  class GAZEBO_VISIBLE TimerGUIPlugin : public GUIPlugin
+  class GZ_PLUGIN_VISIBLE TimerGUIPlugin : public GUIPlugin
   {
     Q_OBJECT
 

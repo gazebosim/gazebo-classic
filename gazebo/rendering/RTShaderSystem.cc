@@ -15,13 +15,8 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <sys/stat.h>
+#include <boost/filesystem.hpp>
 
 #if defined(HAVE_OPENGL)
 
@@ -94,6 +89,8 @@ void RTShaderSystem::Init()
         Ogre::RTShader::ShaderGenerator::getSingletonPtr();
 
     // Add the shader libs resource location
+    coreLibsPath = boost::filesystem::path(coreLibsPath)
+        .make_preferred().string();
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
         coreLibsPath, "FileSystem");
 
@@ -282,8 +279,14 @@ void RTShaderSystem::GenerateShaders(const VisualPtr &_vis)
       {
         try
         {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 10
+          const Ogre::MaterialPtr& curMaterialPtr = curSubEntity->getMaterial();
+          success = this->dataPtr->shaderGenerator->createShaderBasedTechnique(
+              *curMaterialPtr,
+#else
           success = this->dataPtr->shaderGenerator->createShaderBasedTechnique(
               curMaterialName,
+#endif
               Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
               this->dataPtr->scenes[s]->Name() +
               Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -308,7 +311,9 @@ void RTShaderSystem::GenerateShaders(const VisualPtr &_vis)
             this->dataPtr->shaderGenerator->getRenderState(
                 this->dataPtr->scenes[s]->Name() +
                 Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                curMaterialName, 0);
+                curMaterialName,
+                Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+                0);
 
           // Remove all sub render states.
           renderState->reset();
@@ -408,12 +413,19 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
     for (; it != itEnd; ++it)
     {
       struct stat st;
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+      if (stat((*it).archive->getName().c_str(), &st) == 0)
+      {
+        if ((*it).archive->getName().find("rtshaderlib") != Ogre::String::npos)
+        {
+          coreLibsPath = (*it).archive->getName() + "/";
+#else
       if (stat((*it)->archive->getName().c_str(), &st) == 0)
       {
         if ((*it)->archive->getName().find("rtshaderlib") != Ogre::String::npos)
         {
           coreLibsPath = (*it)->archive->getName() + "/";
-
+#endif
           // setup patch name for rt shader cache in tmp
           char *tmpdir;
           char *user;
@@ -551,7 +563,12 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // OGRE samples. They should be compared and tested.
   // Set up caster material - this is just a standard depth/shadow map caster
   // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+  sceneMgr->setShadowTextureCasterMaterial(
+      Ogre::MaterialManager::getSingleton().getByName("Gazebo/shadow_caster"));
+#else
   sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
+#endif
 
   // Disable fog on the caster pass.
   //  Ogre::MaterialPtr passCaterMaterial =

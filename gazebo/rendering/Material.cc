@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include "gazebo/common/Color.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -187,31 +186,6 @@ void Material::Update(const gazebo::common::Material *_mat)
     texState->setTextureName(_mat->GetTextureImage());
     texState->setName(_mat->GetTextureImage());
   }
-}
-
-//////////////////////////////////////////////////
-bool Material::GetMaterialAsColor(const std::string &_materialName,
-          common::Color &_ambient, common::Color &_diffuse,
-          common::Color &_specular, common::Color &_emissive)
-{
-  ignition::math::Color ambient;
-  ignition::math::Color diffuse;
-  ignition::math::Color specular;
-  ignition::math::Color emissive;
-  bool success = MaterialAsColor(_materialName, ambient, diffuse, specular,
-      emissive);
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  _ambient = ambient;
-  _diffuse = diffuse;
-  _specular = specular;
-  _emissive = emissive;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-  return success;
 }
 
 //////////////////////////////////////////////////

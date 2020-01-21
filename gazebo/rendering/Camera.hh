@@ -29,6 +29,7 @@
 #include <sdf/sdf.hh>
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Color.hh>
+#include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector2.hh>
@@ -43,9 +44,11 @@
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"
 
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/util/system.hh"
 
 // Forward Declarations
@@ -91,12 +94,117 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Camera();
 
-      /// \brief Load the camera with a set of parmeters
+      /// \brief Load the camera with a set of parameters
       /// \param[in] _sdf The SDF camera info
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Load the camera with default parmeters
+      /// \brief Load the camera with default parameters
       public: virtual void Load();
+
+      /// \brief Updates the camera intrinsics
+      /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
+      /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
+      /// \param[in] _intrinsicsCx X coordinate of principal point in pixels
+      /// \param[in] _intrinsicsCy Y coordinate of principal point in pixels
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between
+      ///            the x and y pixel axes
+      public: void UpdateCameraIntrinsics(
+          const double _cameraIntrinsicsFx, const double _cameraIntrinsicsFy,
+          const double _cameraIntrinsicsCx, const double _cameraIntrinsicsCy,
+          const double _cameraIntrinsicsS);
+
+      /// \brief Load the camera intrinsics parameters from the sdf
+      private: virtual void LoadCameraIntrinsics();
+
+      /// \brief Computes the OpenGL NDC matrix
+      /// \param[in] _left Left vertical clipping plane
+      /// \param[in] _right Right vertical clipping plane
+      /// \param[in] _bottom Bottom horizontal clipping plane
+      /// \param[in] _top Top horizontal clipping plane
+      /// \param[in] _near Distance to the nearer depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \param[in] _far Distance to the farther depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \return OpenGL NDC (Normalized Device Coordinates) matrix
+      public: static ignition::math::Matrix4d BuildNDCMatrix(
+              const double _left, const double _right,
+              const double _bottom, const double _top,
+              const double _near, const double _far);
+
+      /// \brief Computes the OpenGL perspective matrix
+      /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
+      /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
+      /// \param[in] _intrinsicsCx X coordinate of principal point in pixels
+      /// \param[in] _intrinsicsCy Y coordinate of principal point in pixels
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between
+      ///            the x and y pixel axes
+      /// \param[in] _clipNear Distance to the nearer depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \param[in] _clipFar Distance to the farther depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \return OpenGL perspective matrix
+      public: static ignition::math::Matrix4d BuildPerspectiveMatrix(
+              const double _intrinsicsFx, const double _intrinsicsFy,
+              const double _intrinsicsCx, const double _intrinsicsCy,
+              const double _intrinsicsS,
+              const double _clipNear, const double _clipFar);
+
+      /// \brief Computes the OpenGL projection matrix by multiplying
+      ///        the OpenGL Normalized Device Coordinates matrix (NDC) with
+      ///        the OpenGL perspective matrix
+      ///        openglProjectionMatrix = ndcMatrix * perspectiveMatrix
+      /// \param[in] _imageWidth Image width (in pixels)
+      /// \param[in] _imageHeight Image height (in pixels)
+      /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
+      /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
+      /// \param[in] _intrinsicsCx X coordinate of principal point in pixels
+      /// \param[in] _intrinsicsCy Y coordinate of principal point in pixels
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between
+      ///             the x and y pixel axes
+      /// \param[in] _clipNear Distance to the nearer depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \param[in] _clipFar Distance to the farther depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \return OpenGL projection matrix
+      public: static ignition::math::Matrix4d BuildProjectionMatrix(
+              const double _imageWidth, const double _imageHeight,
+              const double _intrinsicsFx, const double _intrinsicsFy,
+              const double _intrinsicsCx, const double _intrinsicsCy,
+              const double _intrinsicsS,
+              const double _clipNear, const double _clipFar);
+
+      /// \brief Computes the OpenGL projective matrix by multiplying
+      ///        the OpenGL Normalized Device Coordinates matrix (NDC) with
+      ///        the OpenGL perspective matrix
+      ///        openglProjectiveMatrix = ndcMatrix * perspectiveMatrix
+      /// \param[in] _imageWidth Image width (in pixels)
+      /// \param[in] _imageHeight Image height (in pixels)
+      /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
+      /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
+      /// \param[in] _intrinsicsCx X coordinate of principal point in pixels
+      /// \param[in] _intrinsicsCy Y coordinate of principal point in pixels
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between
+      ///             the x and y pixel axes
+      /// \param[in] _clipNear Distance to the nearer depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \param[in] _clipFar Distance to the farther depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \return OpenGL projective matrix
+      /// \deprecated See BuildProjectionMatrix().
+      public: static ignition::math::Matrix4d BuildProjectiveMatrix(
+              const double _imageWidth, const double _imageHeight,
+              const double _intrinsicsFx, const double _intrinsicsFy,
+              const double _intrinsicsCx, const double _intrinsicsCy,
+              const double _intrinsicsS,
+              const double _clipNear, const double _clipFar);
 
       /// \brief Initialize the camera
       public: virtual void Init();
@@ -573,13 +681,6 @@ namespace gazebo
       /// \brief Set background color for viewport (if viewport is not null)
       /// \param[in] _color Background color.
       /// \return True if successful. False if viewport is null
-      /// \deprecated Use function which accepts ignition::math::Color.
-      public: virtual bool SetBackgroundColor(const common::Color &_color)
-          GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set background color for viewport (if viewport is not null)
-      /// \param[in] _color Background color.
-      /// \return True if successful. False if viewport is null
       public: virtual bool SetBackgroundColor(
           const ignition::math::Color &_color);
 
@@ -799,8 +900,17 @@ namespace gazebo
       /// \brief The OGRE camera
       protected: Ogre::Camera *camera;
 
+      /// \brief Camera projective matrix
+      protected: ignition::math::Matrix4d cameraProjectiveMatrix;
+
+      /// \brief Flag for signaling the usage of camera intrinsics within OGRE
+      protected: bool cameraUsingIntrinsics;
+
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
+
+      /// \brief Scene node that the camera is attached to.
+      protected: Ogre::SceneNode *cameraNode = nullptr;
 
       /// \brief Scene node that controls camera position and orientation.
       protected: Ogre::SceneNode *sceneNode;

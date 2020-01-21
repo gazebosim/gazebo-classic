@@ -17,17 +17,12 @@
 /* Desc: Handles pushing messages out on a named topic
  * Author: Nate Koenig
  */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/bind.hpp>
 
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/WeakBind.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -218,7 +213,8 @@ void Publisher::SendMessage()
       // (the subscriber callback SubscriptionTransport::HandleData() only
       // enqueues the message!).
       int result = this->publication->Publish(*iter,
-          boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
+          common::weakBind(&Publisher::OnPublishComplete,
+              this->shared_from_this(), _1), *pubIter);
 
       // It is possible that OnPublishComplete() was called less times than
       // initially expected, which happens when a callback of the
@@ -284,11 +280,25 @@ std::string Publisher::GetMsgType() const
 //////////////////////////////////////////////////
 void Publisher::OnPublishComplete(uint32_t _id)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  // A null node indicates that the publisher may have been destroyed
+  // so do not do anything
+  if (!this->node)
+    return;
 
-  std::map<uint32_t, int>::iterator iter = this->pubIds.find(_id);
-  if (iter != this->pubIds.end() && (--iter->second) <= 0)
-    this->pubIds.erase(iter);
+  try {
+    // This is the deeply unsatisfying way of dealing with a race
+    // condition where the publisher is destroyed before all
+    // OnPublishComplete callbacks are fired.
+    boost::mutex::scoped_lock lock(this->mutex);
+
+    std::map<uint32_t, int>::iterator iter = this->pubIds.find(_id);
+    if (iter != this->pubIds.end() && (--iter->second) <= 0)
+      this->pubIds.erase(iter);
+  }
+  catch(...)
+  {
+    return;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -312,15 +322,6 @@ void Publisher::Fini()
 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic, this->id);
-
-  common::Time slept;
-
-  // Wait for the message to be published
-  while (!this->pubIds.empty() && slept < common::Time(1, 0))
-  {
-    common::Time::MSleep(10);
-    slept += common::Time(0, 10000000);
-  }
 
   this->node.reset();
 }

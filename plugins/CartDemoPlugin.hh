@@ -33,7 +33,7 @@ namespace gazebo
   /// a position pid.
   /// this is a test for general rolling contact stability.
   /// should refine the test to be more specific in the future.
-  class GAZEBO_VISIBLE CartDemoPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE CartDemoPlugin : public ModelPlugin
   {
     public: CartDemoPlugin();
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);

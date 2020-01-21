@@ -227,6 +227,22 @@ TEST_F(ModelTest, NestedModelPluginInfo)
 }
 
 //////////////////////////////////////////////////
+TEST_F(ModelTest, BoundingBox)
+{
+  this->Load("worlds/another_box.world", true);
+
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  auto model = world->ModelByName("box");
+  ASSERT_TRUE(model != nullptr);
+
+  EXPECT_EQ(
+      ignition::math::AxisAlignedBox(-10.5, -20.5, -30.5, -9.5, -19.5, -29.5),
+      model->BoundingBox());
+}
+
+//////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

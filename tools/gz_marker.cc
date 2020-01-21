@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <tuple>
 
 #include <google/protobuf/text_format.h>
@@ -186,8 +180,8 @@ void MarkerCommand::List()
       // Organize the data
       for (int i = 0; i < rep.marker_size(); ++i)
       {
-        std::string ns = rep.marker(i).has_ns() ? rep.marker(i).ns() : "";
-        uint64_t id = rep.marker(i).has_id() ? rep.marker(i).id() : 0;
+        std::string ns = rep.marker(i).ns();
+        uint64_t id = rep.marker(i).id();
         int32_t layer = rep.marker(i).layer();
         std::string type;
         switch (rep.marker(i).type())

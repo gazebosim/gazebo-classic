@@ -215,6 +215,13 @@ TEST_F(JointControllerTest, AddJoint)
   EXPECT_EQ(velocities.size(), 1u);
   EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
 
+  // Set a joint force
+  EXPECT_TRUE(jointController->SetForce(
+        joint->GetScopedName(), 4.56));
+  std::map<std::string, double> forces = jointController->GetForces();
+  EXPECT_EQ(forces.size(), 1u);
+  EXPECT_DOUBLE_EQ(forces[joint->GetScopedName()], 4.56);
+
   // Try setting a position target on a joint that doesn't exist.
   EXPECT_FALSE(jointController->SetPositionTarget("my_bad_name", 12.3));
   positions = jointController->GetPositions();
@@ -223,6 +230,12 @@ TEST_F(JointControllerTest, AddJoint)
 
   // Try setting a velocity target on a joint that doesn't exist.
   EXPECT_FALSE(jointController->SetVelocityTarget("my_bad_name", 3.21));
+  velocities = jointController->GetVelocities();
+  EXPECT_EQ(velocities.size(), 1u);
+  EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
+
+  // Try setting a force on a joint that doesn't exist.
+  EXPECT_FALSE(jointController->SetForce("my_bad_name", 7.89));
   velocities = jointController->GetVelocities();
   EXPECT_EQ(velocities.size(), 1u);
   EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
@@ -314,27 +327,27 @@ TEST_F(JointControllerTest, JointCmd)
   EXPECT_TRUE(executed && result);
 
   // Check the retrieved joint controller parameters
-  EXPECT_TRUE(!rep.has_force());
+  EXPECT_FALSE(rep.has_force_optional());
 
   EXPECT_TRUE(rep.has_position());
-  EXPECT_TRUE(rep.position().has_target());
-  EXPECT_DOUBLE_EQ(rep.position().target(), 12.3);
-  EXPECT_TRUE(rep.position().has_p_gain());
-  EXPECT_DOUBLE_EQ(rep.position().p_gain(), 4);
-  EXPECT_TRUE(rep.position().has_i_gain());
-  EXPECT_DOUBLE_EQ(rep.position().i_gain(), 1);
-  EXPECT_TRUE(rep.position().has_d_gain());
-  EXPECT_DOUBLE_EQ(rep.position().d_gain(), 9);
+  EXPECT_TRUE(rep.position().has_target_optional());
+  EXPECT_DOUBLE_EQ(rep.position().target_optional().data(), 12.3);
+  EXPECT_TRUE(rep.position().has_p_gain_optional());
+  EXPECT_DOUBLE_EQ(rep.position().p_gain_optional().data(), 4);
+  EXPECT_TRUE(rep.position().has_i_gain_optional());
+  EXPECT_DOUBLE_EQ(rep.position().i_gain_optional().data(), 1);
+  EXPECT_TRUE(rep.position().has_d_gain_optional());
+  EXPECT_DOUBLE_EQ(rep.position().d_gain_optional().data(), 9);
 
   EXPECT_TRUE(rep.has_velocity());
-  EXPECT_TRUE(rep.velocity().has_target());
-  EXPECT_DOUBLE_EQ(rep.velocity().target(), 3.21);
-  EXPECT_TRUE(rep.velocity().has_p_gain());
-  EXPECT_DOUBLE_EQ(rep.velocity().p_gain(), 4);
-  EXPECT_TRUE(rep.velocity().has_i_gain());
-  EXPECT_DOUBLE_EQ(rep.velocity().i_gain(), 1);
-  EXPECT_TRUE(rep.velocity().has_d_gain());
-  EXPECT_DOUBLE_EQ(rep.velocity().d_gain(), 9);
+  EXPECT_TRUE(rep.velocity().has_target_optional());
+  EXPECT_DOUBLE_EQ(rep.velocity().target_optional().data(), 3.21);
+  EXPECT_TRUE(rep.velocity().has_p_gain_optional());
+  EXPECT_DOUBLE_EQ(rep.velocity().p_gain_optional().data(), 4);
+  EXPECT_TRUE(rep.velocity().has_i_gain_optional());
+  EXPECT_DOUBLE_EQ(rep.velocity().i_gain_optional().data(), 1);
+  EXPECT_TRUE(rep.velocity().has_d_gain_optional());
+  EXPECT_DOUBLE_EQ(rep.velocity().d_gain_optional().data(), 9);
 }
 
 /////////////////////////////////////////////////

@@ -28,6 +28,12 @@ GpuRayPlugin::GpuRayPlugin()
 }
 
 /////////////////////////////////////////////////
+GpuRayPlugin::~GpuRayPlugin()
+{
+  this->newLaserFrameConnection.reset();
+}
+
+/////////////////////////////////////////////////
 void GpuRayPlugin::Load(sensors::SensorPtr _sensor,
                               sdf::ElementPtr /*_sdf*/)
 {

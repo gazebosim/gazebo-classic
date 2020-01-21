@@ -66,7 +66,7 @@ namespace gazebo
   ///
   ///  </plugin>
   ///
-  class GAZEBO_VISIBLE ContainPlugin : public WorldPlugin
+  class GZ_PLUGIN_VISIBLE ContainPlugin : public WorldPlugin
   {
     // Documentation inherited
     public: ContainPlugin();
@@ -88,7 +88,6 @@ namespace gazebo
     /// \param[in] _req Request, true to enable
     /// \param[out] _res Response message indicating success or failure.
     /// \return True if successful.
-    // cppcheck-suppress unusedPrivateFunction
     private: bool EnableIgn(const ignition::msgs::Boolean &_req,
                             ignition::msgs::Boolean &_res);
 

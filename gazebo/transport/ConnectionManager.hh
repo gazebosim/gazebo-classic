@@ -31,6 +31,9 @@
 #include "gazebo/transport/Connection.hh"
 #include "gazebo/util/system.hh"
 
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_TRANSPORT_VISIBLE, gazebo, transport, ConnectionManager)
+
 namespace gazebo
 {
   namespace transport
@@ -168,7 +171,7 @@ namespace gazebo
       private: boost::mutex updateMutex;
 
       private: ConnectionPtr masterConn;
-      private: Connection *serverConn;
+      private: ConnectionPtr serverConn;
 
       private: std::list<ConnectionPtr> connections;
       protected: std::vector<event::ConnectionPtr> eventConnections;

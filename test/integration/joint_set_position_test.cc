@@ -16,6 +16,10 @@
 */
 
 #include <gtest/gtest.h>
+#include <chrono>
+#include <thread>
+#include <random>
+
 #include <ignition/math/Pose3.hh>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/test/ServerFixture.hh"
@@ -65,7 +69,7 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
 {
   // init random seed
   srand(time(NULL));
-  unsigned int seed = time(NULL);
+  std::default_random_engine seed;
 
   if (_physicsEngine == "bullet")
   {
@@ -118,7 +122,7 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
   {
     model = world->ModelByName("model_1");
     gzdbg << "waiting for model_1 to spawn\n";
-    sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   world->SetPaused(false);
 
@@ -192,8 +196,8 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
       for (physics::Joint_V::iterator ji = joints.begin();
                                       ji != joints.end(); ++ji)
       {
-        (*ji)->SetPosition(0,
-            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+        std::uniform_real_distribution<double> rnd_dist(0.0, 1.0);
+        (*ji)->SetPosition(0, rnd_dist(seed));
       }
 
       // gzdbg << "debug: running ["
@@ -242,7 +246,7 @@ void JointKinematicTest::SetJointPositionThreadedTest(
 {
   // init random seed
   srand(time(NULL));
-  unsigned int seed = time(NULL);
+  std::default_random_engine seed;
 
   if (_physicsEngine == "bullet")
   {
@@ -295,7 +299,7 @@ void JointKinematicTest::SetJointPositionThreadedTest(
   {
     model = world->ModelByName("model_1");
     gzdbg << "waiting for model_1 to spawn\n";
-    sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   world->SetPaused(false);
 
@@ -369,8 +373,8 @@ void JointKinematicTest::SetJointPositionThreadedTest(
       for (physics::Joint_V::iterator ji = joints.begin();
                                       ji != joints.end(); ++ji)
       {
-        (*ji)->SetPosition(0,
-            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+        std::uniform_real_distribution<double> rnd_dist(0.0, 1.0);
+        (*ji)->SetPosition(0, rnd_dist(seed));
       }
 
       // gzdbg << "debug: running ["
@@ -420,7 +424,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
 {
   // init random seed
   srand(time(NULL));
-  unsigned int seed = time(NULL);
+  std::default_random_engine seed;
 
   if (_physicsEngine == "bullet")
   {
@@ -473,7 +477,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
   {
     model = world->ModelByName("model_1");
     gzdbg << "waiting for model_1 to spawn\n";
-    sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   world->SetPaused(false);
 
@@ -551,8 +555,8 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
       for (physics::Joint_V::iterator ji = joints.begin();
                                       ji != joints.end(); ++ji)
       {
-        (*ji)->SetPosition(0,
-            static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+        std::uniform_real_distribution<double> rnd_dist(0.0, 1.0);
+        (*ji)->SetPosition(0, rnd_dist(seed));
       }
 
       // gzdbg << "debug: running ["
@@ -806,7 +810,7 @@ TEST_P(JointKinematicTest, SetPositionRotating)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointKinematicTest,
-  PHYSICS_ENGINE_VALUES);
+  PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {

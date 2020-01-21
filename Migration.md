@@ -5,6 +5,54 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 10.x to 11.0
+
+### Build system
+
+New versions in mandatory dependencies: `ign-transport8`, `ign-msgs5`, `ign-math6`, `sdformat8`.
+New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graphics`, `ign-common3-profiler`.
+
+### Additions
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + public: template <typename T>
+      static T any\_cast<T>(const boost::any &)
+
+### Modifications
+
+1. All instances of `ignition::math::Box` in the API are changed to `ignition::math::AxisAlignedBox`
+   to match the changes in ignition-math6.
+
+1. **gazebo/physics/JointController.hh**
+   Use new optional fields in `ignition::msgs::JointCmd` and
+   `ignition::msgs::PID` since the ign-msgs5 proto file uses `proto3`,
+   which doesn't allow optional fields and breaks existing functionality.
+
+1. **gazebo/physics/PresetManager.hh**
+   The PresetManager stores data internally with a map of `boost::any` values
+   and with the switch to sdformat8, the value may be stored as a `std::any`
+   within a `boost::any`, making it more complex to cast to a specific type.
+   This happens because the PresetManager stores the output of
+   `sdf::Element::GetAny` as boost::any values in its parameterMap and
+   calls `PhysicsEngine::SetParam` with these values.
+   Prior to libsdformat8, the GetAny function returned `boost::any`, but it now
+   returns `std::any`. The `gazebo::physics::PhysicsEngine::any_cast` helper
+   is provided to first check if a `boost::any` value contains a std::any,
+   and if so, perform a `std::any_cast<T>`.
+   Otherwise, it returns `boost::any_cast<T>`.
+   This `any_cast` helper should be used with `boost::any` values provided by
+   `Preset::GetParam`, `PresetManager::GetProfileParam`, and
+   `PresetManager::GetCurrentProfileParam`.
+
+1. **gazebo/rendering/MarkerManager.cc**
+    The `/marker` ignition transport service allows specifying the `id` field
+    of a marker to be created. If the `id` field is not specified, a random,
+    valid `id` is generated as a convenience for the user.
+    Due to the upgrade to `ign-msgs5`, which uses `proto3` syntax, an `id`
+    of `0` is indistinguishable from an unset `id`.
+    As such, an `id` of `0` will now trigger a random `id` to be generated,
+    and non-zero `id` values should be used instead.
+
 ## Gazebo 9.x to 10.x
 
 ### Additions
@@ -28,6 +76,9 @@ release will remove the deprecated code.
     + ***Removed:*** boost::shared_ptr<msgs::Response> request(const std::string &_worldName, const std::string &_request, const std::string &_data = "");
     + ***Replacement:*** boost::shared_ptr<msgs::Response> request(const std::string &_worldName, const std::string &_request, const std::string &_data = "", const common::Time &_timeout = -1);
     + ***Note:*** Added extra argument `_timeout`
+1. **gazebo/gui/qt_test.h**
+    + ***Removed:*** The whole header file. Note that it also won't be included into `gazebo/gui/gui.hh`.
+    + ***Replacement:*** Include `<QtTest/QtTest>` instead.
 
 ## Gazebo 8.4 to 9.x
 
@@ -42,7 +93,7 @@ release will remove the deprecated code.
 ### Build system
 
 New versions in mandatory dependencies: `ign-transport4`, `ign-msgs1`, `ign-math4`, `sdformat6`.
-New optional dependencies: `ign-fuel-tools`,`ign-common1` 
+New optional dependencies: `ign-fuel-tools`,`ign-common1`
 
 ### -g command line argument to load plugins in gzclient
 
@@ -140,6 +191,10 @@ New optional dependencies: `ign-fuel-tools`,`ign-common1`
     + ***Replacement:*** void SetFog(const std::string &_type, const ignition::math::Color &_color, const double _density, const double _start, const double _end)
     + common::Color AmbientColor() const now returns ignition::math::Color
     + common::Color BackgroundColor() const now returns ignition::math::Color
+    + ***Deprecation:*** LightPtr GetLight(const uint32_t _index) const;
+    + ***Replacement:*** LightPtr LightByIndex(const uint32_t _index) const;
+    + ***Deprecation:*** LightPtr GetLight(const std::string &_name) const;
+    + ***Replacement:*** LightPtr LightByName(const std::string &_name) const;
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** virtual bool SetBackgroundColor(const common::Color &_color)
     + ***Replacement:*** virtual bool SetBackgroundColor(const ignition::math::Color &_color)

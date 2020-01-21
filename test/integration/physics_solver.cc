@@ -119,7 +119,7 @@ TEST_P(PhysicsTest, DropTest)
 }
 
 INSTANTIATE_TEST_CASE_P(WorldStepSolvers, PhysicsTest,
-                        WORLD_STEP_SOLVERS);
+                        WORLD_STEP_SOLVERS,);  // NOLINT
 
 int main(int argc, char **argv)
 {

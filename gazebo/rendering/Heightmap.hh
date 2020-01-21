@@ -202,6 +202,23 @@ namespace gazebo
       /// \return Value used to compute LOD.
       public: unsigned int LOD() const;
 
+      /// \brief Set the skirt length for the heightmap LOD tiles.
+      /// \param[in] _value LOD tile skirts hide potential gaps between
+      /// tiles of different detail levels.
+      public: void SetSkirtLength(const double _value);
+
+      /// \brief Get the skirt length of LOD tiles
+      /// \return Skirt length of LOD tiles
+      public: double SkirtLength() const;
+
+      /// \brief Set the heightmap terrain to cast shadows
+      /// \param[in] _value True to cast shadows, false to not cast shadows.
+      public: void SetCastShadows(const bool _value);
+
+      /// \brief Get whether the heightmap terrain casts shadows
+      /// \return True if the heightmap terrain casts shadows
+      public: bool CastShadows() const;
+
       /// \brief Create terrain material generator. There are two types:
       /// custom material generator that support user material scripts,
       /// and a default material generator that uses our own glsl shader

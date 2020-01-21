@@ -20,6 +20,7 @@
 #include <sstream>
 
 #include <boost/filesystem.hpp>
+#include <ignition/common/StringUtils.hh>
 #include <sdf/sdf.hh>
 
 #include <sys/stat.h>
@@ -41,11 +42,19 @@
 using namespace gazebo;
 using namespace common;
 
+//////////////////////////////////////////////////
+char pathDelimiter()
+{
 #ifdef _WIN32
-static const std::string PathDelimiter = ";";
+  return ';';
 #else
-static const std::string PathDelimiter = ":";
+  return ':';
 #endif
+}
+
+/// \brief Callbacks to be called in order in case a file can't be found.
+/// TODO(chapulina): Move to member variable when porting forward
+std::vector<std::function<std::string (const std::string &)>> g_findFileCbs;
 
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
@@ -194,19 +203,19 @@ void SystemPaths::UpdateModelPaths()
     path = GAZEBO_MODEL_PATH;
   }
   else
-    path = pathCStr;
-
-  /// \TODO: Use boost to split string.
-  size_t pos1 = 0;
-  size_t pos2 = path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
   {
-    sdf::addURIPath("model://", path.substr(pos1, pos2-pos1));
-    this->InsertUnique(path.substr(pos1, pos2-pos1), this->modelPaths);
-    pos1 = pos2+1;
-    pos2 = path.find(PathDelimiter, pos2+1);
+    path = pathCStr;
   }
-  this->InsertUnique(path.substr(pos1, path.size()-pos1), this->modelPaths);
+
+  auto delimitedPaths = ignition::common::Split(path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
+  {
+    if (!delimitedPath.empty())
+    {
+      sdf::addURIPath("model://", delimitedPath);
+      this->InsertUnique(delimitedPath, this->modelPaths);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -221,17 +230,18 @@ void SystemPaths::UpdateGazeboPaths()
     path = GAZEBO_RESOURCE_PATH;
   }
   else
-    path = pathCStr;
-
-  size_t pos1 = 0;
-  size_t pos2 = path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
   {
-    this->InsertUnique(path.substr(pos1, pos2-pos1), this->gazeboPaths);
-    pos1 = pos2+1;
-    pos2 = path.find(PathDelimiter, pos2+1);
+    path = pathCStr;
   }
-  this->InsertUnique(path.substr(pos1, path.size()-pos1), this->gazeboPaths);
+
+  auto delimitedPaths = ignition::common::Split(path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
+  {
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->gazeboPaths);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -246,17 +256,18 @@ void SystemPaths::UpdatePluginPaths()
     path = GAZEBO_PLUGIN_PATH;
   }
   else
-    path = pathCStr;
-
-  size_t pos1 = 0;
-  size_t pos2 = path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
   {
-    this->InsertUnique(path.substr(pos1, pos2-pos1), this->pluginPaths);
-    pos1 = pos2+1;
-    pos2 = path.find(PathDelimiter, pos2+1);
+    path = pathCStr;
   }
-  this->InsertUnique(path.substr(pos1, path.size()-pos1), this->pluginPaths);
+
+  auto delimitedPaths = ignition::common::Split(path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
+  {
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->pluginPaths);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -271,17 +282,18 @@ void SystemPaths::UpdateOgrePaths()
     path = OGRE_RESOURCE_PATH;
   }
   else
-    path = pathCStr;
-
-  size_t pos1 = 0;
-  size_t pos2 = path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
   {
-    this->InsertUnique(path.substr(pos1, pos2-pos1), this->ogrePaths);
-    pos1 = pos2+1;
-    pos2 = path.find(PathDelimiter, pos2+1);
+    path = pathCStr;
   }
-  this->InsertUnique(path.substr(pos1, path.size()-pos1), this->ogrePaths);
+
+  auto delimitedPaths = ignition::common::Split(path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
+  {
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->ogrePaths);
+    }
+  }
 }
 
 
@@ -299,8 +311,8 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   std::string suffix = _uri.substr(index + 3, _uri.size() - index - 3);
   std::string filename;
 
-  // If trying to find a model, return the path to the users home
-  // .gazebo/models
+  // If trying to find a model, look through all currently registered model
+  // paths
   if (prefix == "model")
   {
     boost::filesystem::path path;
@@ -315,19 +327,23 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
       }
     }
 
-    // Try to download the model if it wasn't found.
+    // Try to download the model from models.gazebosim.org if it wasn't found.
     if (filename.empty())
       filename = ModelDatabase::Instance()->GetModelPath(_uri, true);
   }
   else if (prefix.empty() || prefix == "file")
   {
-    // First try to find the file on the current system
+    // Try to find the file on the current system
     filename = this->FindFile(suffix);
   }
-  else if (prefix != "http" && prefix != "https")
-    gzerr << "Unknown URI prefix[" << prefix << "]\n";
 
   return filename;
+}
+
+static bool isAbsolute(const std::string &_filename)
+{
+  boost::filesystem::path path(_filename);
+  return path.is_absolute();
 }
 
 //////////////////////////////////////////////////
@@ -339,18 +355,38 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   if (_filename.empty())
     return path.string();
 
+  // Handle as URI
   if (_filename.find("://") != std::string::npos)
   {
     path = boost::filesystem::path(this->FindFileURI(_filename));
   }
-  else if (_filename[0] == '/')
+  // Handle as local absolute path
+  else if (isAbsolute(_filename))
   {
     path = boost::filesystem::path(_filename);
+    // absolute paths are not portable, e.g. when running world or
+    // or log files on a different machine. To workaround this problem,
+    // we'll further look for these files in one of gazebo model paths.
+    // e.g. /tmp/path/to/my_file
+    //      =>  ${GAZEBO_MODEL_PATH}/tmp/path/to/my_file
+    // Gazebo log playback makes use of this feature
+    if (!boost::filesystem::exists(path))
+    {
+      for (std::list<std::string>::iterator iter = this->modelPaths.begin();
+           iter != this->modelPaths.end(); ++iter)
+      {
+        auto modelPath = boost::filesystem::path(*iter) / path;
+        if (boost::filesystem::exists(modelPath))
+        {
+          path = modelPath;
+          break;
+        }
+      }
+    }
   }
+  // Try appending to Gazebo paths
   else
   {
-    bool found = false;
-
     try
     {
       path = boost::filesystem::operator/(boost::filesystem::current_path(),
@@ -364,16 +400,16 @@ std::string SystemPaths::FindFile(const std::string &_filename,
 
     if (_searchLocalPath && boost::filesystem::exists(path))
     {
-      found = true;
+      // Do nothing
     }
     else if ((_filename[0] == '/' || _filename[0] == '.' || _searchLocalPath)
              && boost::filesystem::exists(boost::filesystem::path(_filename)))
     {
       path = boost::filesystem::path(_filename);
-      found = true;
     }
     else
     {
+      bool found = false;
       std::list<std::string> paths = this->GetGazeboPaths();
 
       for (std::list<std::string>::const_iterator iter = paths.begin();
@@ -401,19 +437,38 @@ std::string SystemPaths::FindFile(const std::string &_filename,
           }
         }
       }
-    }
 
     if (!found)
-      return std::string();
+      path = std::string();
+    }
+  }
+
+  // If still not found, try custom callbacks
+  if (path.empty())
+  {
+    for (auto cb : g_findFileCbs)
+    {
+      path = cb(_filename);
+      if (!path.empty())
+        break;
+    }
   }
 
   if (!boost::filesystem::exists(path))
   {
-    gzerr << "File or path does not exist[" << path << "]\n";
+    gzwarn << "File or path does not exist [" << path << "] ["
+           << _filename << "]" << std::endl;
     return std::string();
   }
 
   return path.string();
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddFindFileCallback(
+    std::function<std::string (const std::string &)> _cb)
+{
+  g_findFileCbs.push_back(_cb);
 }
 
 /////////////////////////////////////////////////
@@ -443,57 +498,53 @@ void SystemPaths::ClearModelPaths()
 /////////////////////////////////////////////////
 void SystemPaths::AddGazeboPaths(const std::string &_path)
 {
-  size_t pos1 = 0;
-  size_t pos2 = _path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
+  auto delimitedPaths = ignition::common::Split(_path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
   {
-    this->InsertUnique(_path.substr(pos1, pos2-pos1), this->gazeboPaths);
-    pos1 = pos2+1;
-    pos2 = _path.find(PathDelimiter, pos2+1);
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->gazeboPaths);
+    }
   }
-  this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->gazeboPaths);
 }
 
 /////////////////////////////////////////////////
 void SystemPaths::AddOgrePaths(const std::string &_path)
 {
-  size_t pos1 = 0;
-  size_t pos2 = _path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
+  auto delimitedPaths = ignition::common::Split(_path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
   {
-    this->InsertUnique(_path.substr(pos1, pos2-pos1), this->ogrePaths);
-    pos1 = pos2+1;
-    pos2 = _path.find(PathDelimiter, pos2+1);
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->ogrePaths);
+    }
   }
-  this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->ogrePaths);
 }
 
 /////////////////////////////////////////////////
 void SystemPaths::AddPluginPaths(const std::string &_path)
 {
-  size_t pos1 = 0;
-  size_t pos2 = _path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
+  auto delimitedPaths = ignition::common::Split(_path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
   {
-    this->InsertUnique(_path.substr(pos1, pos2-pos1), this->pluginPaths);
-    pos1 = pos2+1;
-    pos2 = _path.find(PathDelimiter, pos2+1);
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->pluginPaths);
+    }
   }
-  this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->pluginPaths);
 }
 
 /////////////////////////////////////////////////
 void SystemPaths::AddModelPaths(const std::string &_path)
 {
-  size_t pos1 = 0;
-  size_t pos2 = _path.find(PathDelimiter);
-  while (pos2 != std::string::npos)
+  auto delimitedPaths = ignition::common::Split(_path, pathDelimiter());
+  for (const auto &delimitedPath : delimitedPaths)
   {
-    this->InsertUnique(_path.substr(pos1, pos2-pos1), this->modelPaths);
-    pos1 = pos2+1;
-    pos2 = _path.find(PathDelimiter, pos2+1);
+    if (!delimitedPath.empty())
+    {
+      this->InsertUnique(delimitedPath, this->modelPaths);
+    }
   }
-  this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
 }
 
 /////////////////////////////////////////////////

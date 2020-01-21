@@ -64,11 +64,33 @@ const Ogre::String &CustomPSSM3::getType() const
 //////////////////////////////////////////////////
 bool CustomPSSM3::resolveParameters(Ogre::RTShader::ProgramSet *_programSet)
 {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+  Ogre::RTShader::Program* vsProgram =
+      _programSet->getCpuProgram(Ogre::GPT_VERTEX_PROGRAM);
+  Ogre::RTShader::Program* psProgram =
+      _programSet->getCpuProgram(Ogre::GPT_FRAGMENT_PROGRAM);
+#else
   Ogre::RTShader::Program* vsProgram = _programSet->getCpuVertexProgram();
   Ogre::RTShader::Program* psProgram = _programSet->getCpuFragmentProgram();
+#endif
   Ogre::RTShader::Function* vsMain = vsProgram->getEntryPointFunction();
   Ogre::RTShader::Function* psMain = psProgram->getEntryPointFunction();
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 12
+  // getParameterBySemantic was deprecated in
+  // https://github.com/OGRECave/ogre/pull/930/files
+  // All the changes for OGRE 1.12 in this file were inspired
+  // by the modifications to the OgreShaderExIntegratedPSSM3.cpp
+  // in that PR
+
+  // Get input position parameter.
+  mVSInPos = vsMain->getInputParameter(
+      Ogre::RTShader::Parameter::SPC_POSITION_OBJECT_SPACE);
+
+  // Get output position parameter.
+  mVSOutPos = vsMain->getOutputParameter(
+      Ogre::RTShader::Parameter::SPC_POSITION_PROJECTIVE_SPACE);
+#else
   // Get input position parameter.
   mVSInPos = vsMain->getParameterBySemantic(vsMain->getInputParameters(),
       Ogre::RTShader::Parameter::SPS_POSITION, 0);
@@ -76,6 +98,7 @@ bool CustomPSSM3::resolveParameters(Ogre::RTShader::ProgramSet *_programSet)
   // Get output position parameter.
   mVSOutPos = vsMain->getParameterBySemantic(vsMain->getOutputParameters(),
       Ogre::RTShader::Parameter::SPS_POSITION, 0);
+#endif
 
   // Resolve vertex shader output depth.
   mVSOutDepth = vsMain->resolveOutputParameter(
@@ -90,6 +113,17 @@ bool CustomPSSM3::resolveParameters(Ogre::RTShader::ProgramSet *_programSet)
       mVSOutDepth->getContent(),
       Ogre::GCT_FLOAT1);
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 12
+  // Get in/local diffuse parameter.
+  mPSDiffuse = psMain->getInputParameter(
+      Ogre::RTShader::Parameter::SPC_COLOR_DIFFUSE);
+
+  if (mPSDiffuse.get() == NULL)
+  {
+    mPSDiffuse = psMain->getLocalParameter(
+        Ogre::RTShader::Parameter::SPC_COLOR_DIFFUSE);
+  }
+#else
   // Get in/local diffuse parameter.
   mPSDiffuse = psMain->getParameterBySemantic(psMain->getInputParameters(),
       Ogre::RTShader::Parameter::SPS_COLOR, 0);
@@ -99,12 +133,23 @@ bool CustomPSSM3::resolveParameters(Ogre::RTShader::ProgramSet *_programSet)
         psMain->getLocalParameters(), Ogre::RTShader::Parameter::SPS_COLOR,
         0);
   }
+#endif
 
   // Resolve output diffuse parameter.
   mPSOutDiffuse = psMain->resolveOutputParameter(
       Ogre::RTShader::Parameter::SPS_COLOR, 0,
       Ogre::RTShader::Parameter::SPC_COLOR_DIFFUSE, Ogre::GCT_FLOAT4);
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 12
+  // Get in/local specular parameter.
+  mPSSpecualr = psMain->getInputParameter(
+      Ogre::RTShader::Parameter::SPC_COLOR_SPECULAR);
+  if (mPSSpecualr.get() == nullptr)
+  {
+    mPSSpecualr = psMain->getLocalParameter(
+        Ogre::RTShader::Parameter::SPC_COLOR_SPECULAR);
+  }
+#else
   // Get in/local specular parameter.
   mPSSpecualr = psMain->getParameterBySemantic(
       psMain->getInputParameters(), Ogre::RTShader::Parameter::SPS_COLOR,
@@ -115,6 +160,7 @@ bool CustomPSSM3::resolveParameters(Ogre::RTShader::ProgramSet *_programSet)
         psMain->getLocalParameters(), Ogre::RTShader::Parameter::SPS_COLOR,
         1);
   }
+#endif
 
   // Resolve computed local shadow colour parameter.
   mPSLocalShadowFactor = psMain->resolveLocalParameter(
@@ -126,8 +172,13 @@ bool CustomPSSM3::resolveParameters(Ogre::RTShader::ProgramSet *_programSet)
       (Ogre::uint16)Ogre::GPV_GLOBAL, "pssm_split_points");
 
   // Get derived scene colour.
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 12
+  mPSDerivedSceneColour = psProgram->resolveParameter(
+      Ogre::GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR, 0);
+#else
   mPSDerivedSceneColour = psProgram->resolveAutoParameterInt(
       Ogre::GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR, 0);
+#endif
 
   auto it = mShadowTextureParamsList.begin();
   int lightIndex = 0;
@@ -310,7 +361,12 @@ void CustomPSSMShadowCameraSetup::calculateShadowMappingMatrix(
     // generate projection matrix if requested
     if (_outProj != nullptr)
     {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+// Matrix4/Affine3 changes are due to https://github.com/OGRECave/ogre/pull/661
+      *_outProj = Ogre::Matrix4(Ogre::Affine3::getScale(1, 1, -1));
+#else
       *_outProj = Ogre::Matrix4::getScale(1, 1, -1);
+#endif
     }
 
     // set up camera if requested
@@ -461,7 +517,11 @@ void CustomPSSMShadowCameraSetup::getZUpFocusedShadowCamera(
   // return the standard shadow mapping matrix
   if (sceneBB.isNull())
   {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    _texCam->setCustomViewMatrix(true, Ogre::Affine3(LView));
+#else
     _texCam->setCustomViewMatrix(true, LView);
+#endif
     _texCam->setCustomProjectionMatrix(true, LProj);
     return;
   }
@@ -475,7 +535,11 @@ void CustomPSSMShadowCameraSetup::getZUpFocusedShadowCamera(
   // simply return the standard shadow mapping matrix
   if (mPointListBodyB.getPointCount() == 0)
   {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    _texCam->setCustomViewMatrix(true, Ogre::Affine3(LView));
+#else
     _texCam->setCustomViewMatrix(true, LView);
+#endif
     _texCam->setCustomProjectionMatrix(true, LProj);
     return;
   }
@@ -511,8 +575,12 @@ void CustomPSSMShadowCameraSetup::getZUpFocusedShadowCamera(
   // LProj = msLightSpaceToNormal * LProj;
 
   // set the two custom matrices
-  _texCam->setCustomViewMatrix(true, LView);
-  _texCam->setCustomProjectionMatrix(true, LProj);
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    _texCam->setCustomViewMatrix(true, Ogre::Affine3(LView));
+#else
+    _texCam->setCustomViewMatrix(true, LView);
+#endif
+    _texCam->setCustomProjectionMatrix(true, LProj);
 }
 
 //////////////////////////////////////////////////

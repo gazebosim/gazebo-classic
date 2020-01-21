@@ -14,12 +14,6 @@
  * limitations under the License.
  *
  */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/bind.hpp>
 #include <iomanip>
 
@@ -58,11 +52,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   // GLWigdet
   this->glWidget = new GLWidget(this->mainFrame);
-
-  this->msgOverlayLabel = new QLabel(this->glWidget);
-  this->msgOverlayLabel->setStyleSheet(
-      "QLabel { background-color : white; color : gray; }");
-  this->msgOverlayLabel->setVisible(false);
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
@@ -204,6 +193,13 @@ void RenderWidget::CreateScene(const std::string &_name)
 /////////////////////////////////////////////////
 void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
 {
+  if (!this->msgOverlayLabel)
+  {
+    this->msgOverlayLabel = new QLabel(this->glWidget);
+    this->msgOverlayLabel->setStyleSheet(
+        "QLabel { background-color : white; color : gray; }");
+  }
+
   std::string msg = this->baseOverlayMsg.empty() ? _msg
       : this->baseOverlayMsg + "\n" + _msg;
   this->msgOverlayLabel->setText(tr(msg.c_str()));

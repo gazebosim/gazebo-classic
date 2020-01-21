@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _TOPICMANAGER_HH_
-#define _TOPICMANAGER_HH_
+#ifndef GAZEBO_TRANSPORT_TOPICMANAGER_HH_
+#define GAZEBO_TRANSPORT_TOPICMANAGER_HH_
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
@@ -39,6 +39,9 @@
 #include "gazebo/transport/Publication.hh"
 #include "gazebo/transport/Subscriber.hh"
 #include "gazebo/util/system.hh"
+
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_TRANSPORT_VISIBLE, gazebo, transport, TopicManager)
 
 namespace gazebo
 {
@@ -96,59 +99,65 @@ namespace gazebo
       /// \param[in] _hz Update rate for the publisher. Units are
       /// 1.0/seconds.
       /// \return Pointer to the newly created Publisher
-      public: template<typename M>
-              PublisherPtr Advertise(const std::string &_topic,
+      public: PublisherPtr Advertise(const std::string &_topic,
+                                     const std::string &_msgTypeName,
                                      unsigned int _queueLimit,
                                      double _hzRate)
               {
-                google::protobuf::Message *msg = NULL;
-                M msgtype;
-                msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
-                if (!msg)
-                  gzthrow("Advertise requires a google protobuf type");
-
-                this->UpdatePublications(_topic, msg->GetTypeName());
+                this->UpdatePublications(_topic, _msgTypeName);
 
                 PublisherPtr pub = PublisherPtr(new Publisher(_topic,
-                      msg->GetTypeName(), _queueLimit, _hzRate));
-
-                std::string msgTypename;
-                PublicationPtr publication;
+                      _msgTypeName, _queueLimit, _hzRate));
 
                 // Connect all local subscription to the publisher
-                msgTypename = msg->GetTypeName();
-
-                publication = this->FindPublication(_topic);
-                GZ_ASSERT(publication != NULL, "FindPublication returned NULL");
+                PublicationPtr publication = this->FindPublication(_topic);
+                GZ_ASSERT(publication != nullptr,
+                    "FindPublication returned nullptr");
 
                 publication->AddPublisher(pub);
                 if (!publication->GetLocallyAdvertised())
                 {
-                  ConnectionManager::Instance()->Advertise(_topic, msgTypename);
+                  ConnectionManager::Instance()->Advertise(_topic,
+                      _msgTypeName);
                 }
 
                 publication->SetLocallyAdvertised(true);
                 pub->SetPublication(publication);
 
-
-                SubNodeMap::iterator iter2;
-                SubNodeMap::iterator stEnd2 = this->subscribedNodes.end();
-                for (iter2 = this->subscribedNodes.begin();
-                     iter2 != stEnd2; ++iter2)
+                for (auto &iter2 : this->subscribedNodes)
                 {
-                  if (iter2->first == _topic)
+                  if (iter2.first == _topic)
                   {
-                    std::list<NodePtr>::iterator liter;
-                    std::list<NodePtr>::iterator lEnd = iter2->second.end();
-                    for (liter = iter2->second.begin();
-                        liter != lEnd; ++liter)
+                    for (const auto liter : iter2.second)
                     {
-                      publication->AddSubscription(*liter);
+                      publication->AddSubscription(liter);
                     }
                   }
                 }
 
                 return pub;
+              }
+
+      /// \brief Advertise on a topic
+      /// \param[in] _topic The name of the topic
+      /// \param[in] _queueLimit The maximum number of outgoing messages
+      /// to queue
+      /// \param[in] _hz Update rate for the publisher. Units are
+      /// 1.0/seconds.
+      /// \return Pointer to the newly created Publisher
+      public: template<typename M>
+              PublisherPtr Advertise(const std::string &_topic,
+                                     unsigned int _queueLimit,
+                                     double _hzRate)
+              {
+                google::protobuf::Message *msg = nullptr;
+                M msgtype;
+                msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
+                if (!msg)
+                  gzthrow("Advertise requires a google protobuf type");
+
+                return this->Advertise(_topic, msg->GetTypeName(), _queueLimit,
+                        _hzRate);
               }
 
       /// \brief Unadvertise a topic

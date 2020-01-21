@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <memory>
 
 #include <string.h>
@@ -172,6 +166,8 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
       this->dataPtr->sampling = s;
     }
   }
+
+  this->SetCastShadows(_msg->cast_shadows());
 
   this->Load();
 }
@@ -503,11 +499,13 @@ void Heightmap::Load()
 
     // Add the top level terrain paging directory to the OGRE
     // ResourceGroupManager
+    boost::filesystem::path actualPagingDir =
+        this->dataPtr->gzPagingDir.make_preferred();
     if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
-          this->dataPtr->gzPagingDir.string(), "General"))
+          actualPagingDir.string(), "General"))
     {
       Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-          this->dataPtr->gzPagingDir.string(), "FileSystem", "General", true);
+          actualPagingDir.string(), "FileSystem", "General", true);
       Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
           "General");
     }
@@ -668,10 +666,19 @@ void Heightmap::Load()
 ///////////////////////////////////////////////////
 void Heightmap::SaveHeightmap()
 {
-  // Calculate blend maps
   if (this->dataPtr->terrainsImported &&
       !this->dataPtr->terrainGroup->isDerivedDataUpdateInProgress())
   {
+    // check to see if all terrains have been loaded before saving
+    Ogre::TerrainGroup::TerrainIterator ti =
+      this->dataPtr->terrainGroup->getTerrainIterator();
+    while (ti.hasMoreElements())
+    {
+      Ogre::Terrain *t = ti.getNext()->instance;
+      if (!t->isLoaded())
+        return;
+    }
+
     // saving an ogre terrain data file can take quite some time for large dems.
     gzmsg << "Saving heightmap cache data to " << (this->dataPtr->gzPagingDir /
         boost::filesystem::path(this->dataPtr->filename).stem()).string()
@@ -714,13 +721,18 @@ void Heightmap::ConfigureTerrainDefaults()
   LightPtr directionalLight;
   for (unsigned int i = 0; i < this->dataPtr->scene->LightCount(); ++i)
   {
-    LightPtr light = this->dataPtr->scene->GetLight(i);
+    LightPtr light = this->dataPtr->scene->LightByIndex(i);
     if (light->Type() == "directional")
     {
       directionalLight = light;
       break;
     }
   }
+
+  this->dataPtr->terrainGlobals->setSkirtSize(this->dataPtr->skirtLength);
+
+  this->dataPtr->terrainGlobals->setCastsDynamicShadows(
+        this->dataPtr->castShadows);
 
   this->dataPtr->terrainGlobals->setCompositeMapAmbient(
       this->dataPtr->scene->OgreSceneManager()->getAmbientLight());
@@ -863,6 +875,13 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
   if (this->dataPtr->blendHeight.size() <= 1u ||
       this->dataPtr->diffuseTextures.size() <= 1u)
     return false;
+
+  // Bounds check for following loop
+  if (_terrain->getLayerCount() < this->dataPtr->blendHeight.size() + 1)
+  {
+      gzerr << "Invalid terrain, too few layers to initialize blend map\n";
+      return false;
+  }
 
   Ogre::Real val, height;
   unsigned int i = 0;
@@ -1178,6 +1197,40 @@ void Heightmap::SetLOD(const unsigned int _value)
 unsigned int Heightmap::LOD() const
 {
   return static_cast<unsigned int>(this->dataPtr->maxPixelError);
+}
+
+/////////////////////////////////////////////////
+void Heightmap::SetSkirtLength(const double _value)
+{
+  this->dataPtr->skirtLength = _value;
+  if (this->dataPtr->terrainGlobals)
+  {
+    this->dataPtr->terrainGlobals->setSkirtSize(
+        this->dataPtr->skirtLength);
+  }
+}
+
+/////////////////////////////////////////////////
+bool Heightmap::CastShadows() const
+{
+  return this->dataPtr->castShadows;
+}
+
+/////////////////////////////////////////////////
+void Heightmap::SetCastShadows(const bool _value)
+{
+  this->dataPtr->castShadows = _value;
+  if (this->dataPtr->terrainGlobals)
+  {
+    this->dataPtr->terrainGlobals->setCastsDynamicShadows(
+        this->dataPtr->castShadows);
+  }
+}
+
+/////////////////////////////////////////////////
+double Heightmap::SkirtLength() const
+{
+  return this->dataPtr->skirtLength;
 }
 
 /////////////////////////////////////////////////

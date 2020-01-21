@@ -20,9 +20,6 @@
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #include <gazebo/rendering/MovableText.hh>
-#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
-# include <gazebo/gui/gui.hh>
-#endif
 
 namespace gazebo
 {

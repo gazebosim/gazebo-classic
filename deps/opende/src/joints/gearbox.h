@@ -29,14 +29,16 @@ struct dxJointGearbox : public dxJoint
 {
     dVector3 axis1, axis2;
     dReal ratio;        // gearbox ratio
+    dReal refAngle1;    // gearbox reference angle 1
+    dReal refAngle2;    // gearbox reference angle 2
     dReal erp;          // error reduction
     dReal cfm;          // constraint force mix in
     dxBody *refBody1;    // reference body for calculating gear angle 1
     dxBody *refBody2;    // reference body for calculating gear angle 2
     dReal cumulative_angle1;
     dReal cumulative_angle2;
-    dQuaternion qrel1;   // initial relative rotation refBody1 -> body1
-    dQuaternion qrel2;   // initial relative rotation refBody2 -> body2
+    dQuaternion qrel1;   // initial relative rotation body1 -> refBody1
+    dQuaternion qrel2;   // initial relative rotation body2 -> refBody2
     
     dxJointGearbox(dxWorld *w);
 

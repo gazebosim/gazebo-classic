@@ -42,17 +42,57 @@ CollisionConfig::CollisionConfig()
   scrollArea->setWidget(listWidget);
   scrollArea->setWidgetResizable(true);
 
-  // Add Collision button
-  QPushButton *addCollisionButton = new QPushButton(tr("+ &Another Collision"));
-  addCollisionButton->setMaximumWidth(200);
-  addCollisionButton->setDefault(false);
-  addCollisionButton->setAutoDefault(false);
-  connect(addCollisionButton, SIGNAL(clicked()), this, SLOT(OnAddCollision()));
+  // Add Collision buttons
+  this->mapperAdd = new QSignalMapper(this);
+
+  QPushButton *addCollisionButtonBox =
+    new QPushButton(tr("+ Bounding &Box"));
+  addCollisionButtonBox->setMaximumWidth(200);
+  addCollisionButtonBox->setDefault(false);
+  addCollisionButtonBox->setAutoDefault(false);
+  addCollisionButtonBox->
+    setToolTip("Add a bounding box collision shape to the link");
+  this->connect(addCollisionButtonBox, SIGNAL(clicked()),
+    this->mapperAdd, SLOT(map()));
+
+  QPushButton *addCollisionButtonCylinder =
+    new QPushButton(tr("+ Bounding &Cylinder"));
+  addCollisionButtonCylinder->setMaximumWidth(200);
+  addCollisionButtonCylinder->setDefault(false);
+  addCollisionButtonCylinder->setAutoDefault(false);
+  addCollisionButtonCylinder->
+    setToolTip("Add a bounding cylinder collision shape to the link");
+  this->connect(addCollisionButtonCylinder, SIGNAL(clicked()),
+    this->mapperAdd, SLOT(map()));
+
+  QPushButton *addCollisionButtonSphere =
+    new QPushButton(tr("+ Bounding &Sphere"));
+  addCollisionButtonSphere->setMaximumWidth(200);
+  addCollisionButtonSphere->setDefault(false);
+  addCollisionButtonSphere->setAutoDefault(false);
+  addCollisionButtonSphere->
+    setToolTip("Add a bounding sphere collision shape to the link");
+  this->connect(addCollisionButtonSphere, SIGNAL(clicked()),
+    this->mapperAdd, SLOT(map()));
+
+  this->mapperAdd->setMapping(addCollisionButtonBox,
+    QString::fromStdString("box"));
+  this->mapperAdd->setMapping(addCollisionButtonSphere,
+    QString::fromStdString("sphere"));
+  this->mapperAdd->setMapping(addCollisionButtonCylinder,
+    QString::fromStdString("cylinder"));
+  this->connect(this->mapperAdd, SIGNAL(mapped(const QString)),
+    this, SLOT(OnAddCollision(const QString)));
+
+  QHBoxLayout *buttons = new QHBoxLayout();
+  buttons->addWidget(addCollisionButtonBox);
+  buttons->addWidget(addCollisionButtonSphere);
+  buttons->addWidget(addCollisionButtonCylinder);
 
   // Main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(scrollArea);
-  mainLayout->addWidget(addCollisionButton);
+  mainLayout->addLayout(buttons);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 
@@ -103,12 +143,13 @@ void CollisionConfig::Init()
 }
 
 /////////////////////////////////////////////////
-void CollisionConfig::OnAddCollision()
+void CollisionConfig::OnAddCollision(const QString &_collisionShape)
 {
   std::stringstream collisionIndex;
+  const std::string __collisionShape = _collisionShape.toStdString();
   collisionIndex << "collision_" << this->counter;
   this->AddCollision(collisionIndex.str());
-  emit CollisionAdded(collisionIndex.str());
+  emit CollisionAdded(collisionIndex.str(), __collisionShape);
 }
 
 /////////////////////////////////////////////////
@@ -501,7 +542,7 @@ void CollisionConfig::RestoreOriginalData()
     it.second->widget->show();
 
     this->configs[it.first] = it.second;
-    emit CollisionAdded(it.second->name);
+    emit CollisionAdded(it.second->name, "");
   }
   this->deletedConfigs.clear();
 }

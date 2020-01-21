@@ -152,7 +152,7 @@ TEST_P(PolylineTest, PolylineWorld)
     PolylineWorld(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PolylineTest, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PolylineTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

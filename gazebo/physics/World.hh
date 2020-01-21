@@ -17,12 +17,6 @@
 #ifndef GAZEBO_PHYSICS_WORLD_HH_
 #define GAZEBO_PHYSICS_WORLD_HH_
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <vector>
 #include <list>
 #include <set>
@@ -117,7 +111,8 @@ namespace gazebo
       public: bool Running() const;
 
       /// \brief Stop the world.
-      /// Stop the update loop.
+      /// Request the update loop thread to stop. Wait for it to join if this
+      /// function is called from another thread. Return immediately otherwise.
       public: void Stop();
 
       /// \brief Finalize the world.
@@ -593,6 +588,10 @@ namespace gazebo
 
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
+
+      /// \brief Save model resources while recording a log, such as meshes
+      /// and textures.
+      private: void LogModelResources();
 
       /// \brief Process all incoming messages.
       private: void ProcessMessages();

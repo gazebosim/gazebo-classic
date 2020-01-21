@@ -407,9 +407,27 @@ void StaticMapPlugin::Init()
       if (common::exists(modelPath.string()))
         boost::filesystem::remove_all(modelPath);
 
-      // move new map model to gazebo model path
-      boost::filesystem::rename(tmpModelPath, modelPath);
-
+      try
+      {
+        // move new map model to gazebo model path
+        boost::filesystem::rename(tmpModelPath, modelPath);
+      }
+      catch(boost::filesystem::filesystem_error &_e)
+      {
+        // rename failed. Could be an invalid cross-device link error
+        // try copy and remove method
+        bool result = common::copyDir(tmpModelPath, modelPath);
+        if (result)
+        {
+          boost::filesystem::remove_all(tmpModelPath);
+        }
+        else
+        {
+          gzerr<< "Unable to copy model from '" << tmpModelPath.string()
+                 << "' to '" << modelPath.string() << "'" << std::endl;
+          return;
+        }
+      }
       // spawn the model
       this->dataPtr->SpawnModel("model://" + this->dataPtr->modelName,
           this->dataPtr->modelPose);

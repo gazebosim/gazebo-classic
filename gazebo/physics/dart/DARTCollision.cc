@@ -154,20 +154,21 @@ void SetVector(const size_t _i, const Float _val,
 // p. 86, function UpdateAABB
 // FIXME: I reckon this should go to ignition::math, as updating an AABB
 // with a transform is generally useful.
-ignition::math::Box UpdateAABB(const ignition::math::Box &_a,
-                               const ignition::math::Matrix4d &_m)
+ignition::math::AxisAlignedBox UpdateAABB(
+    const ignition::math::AxisAlignedBox &_a,
+    const ignition::math::Matrix4d &_m)
 {
   // construct object to be returned.
-  // Attention: If we only use the default ignition::math::Box constructor
-  // and then set min and max individually with Min()/Max(), then
+  // Attention: If we only use the default ignition::math::AxisAlignedBox
+  // constructor and then set min and max individually with Min()/Max(), then
   // the extent of the box won't be initialized to BoxPrivate::EXTENT_FINITE,
   // which in turn will lead to failures if this box is used to add onto
-  // another box with ignition::math::Box::operator+=.
+  // another box with ignition::math::AxisAlignedBox::operator+=.
   // To construct a valid return object, use the constructor which takes two
   // vectors as arguments, the values don't actually matter.
   // See also issue #72:
   // https://bitbucket.org/ignitionrobotics/ign-math/issues/72/
-  ignition::math::Box result(_a);
+  ignition::math::AxisAlignedBox result(_a);
 
   // for all 3 axes
   for (size_t i = 0; i < 3; ++i)
@@ -207,7 +208,7 @@ ignition::math::Box UpdateAABB(const ignition::math::Box &_a,
 
 
 //////////////////////////////////////////////////
-ignition::math::Box DARTCollision::BoundingBox() const
+ignition::math::AxisAlignedBox DARTCollision::BoundingBox() const
 {
   GZ_ASSERT(this->dataPtr->dtCollisionShape,
             "DARTCollision Must have a collision shape");
@@ -217,7 +218,7 @@ ignition::math::Box DARTCollision::BoundingBox() const
   const dart::math::BoundingBox& bb =
     this->dataPtr->dtCollisionShape->getShape()->getBoundingBox();
 
-  ignition::math::Box result(bb.getMin().x(),
+  ignition::math::AxisAlignedBox result(bb.getMin().x(),
                              bb.getMin().y(),
                              bb.getMin().z(),
                              bb.getMax().x(),

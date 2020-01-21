@@ -15,7 +15,7 @@
  *
 */
 
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 #include <ignition/math/Vector3.hh>
 #include "gazebo/test/ServerFixture.hh"
 
@@ -43,7 +43,7 @@ TEST_F(Issue1146Test, Reset)
   ASSERT_TRUE(coll != NULL);
 
   EXPECT_EQ(coll->CollisionBoundingBox(),
-      ignition::math::Box(
+      ignition::math::AxisAlignedBox(
         ignition::math::Vector3d(-0.5, -0.5, 0),
         ignition::math::Vector3d(0.5, 0.5, 1)));
 
@@ -51,7 +51,8 @@ TEST_F(Issue1146Test, Reset)
   model->SetWorldPose(ignition::math::Pose3d(10, 15, 20, 0, 0, 0));
 
   EXPECT_EQ(coll->CollisionBoundingBox(),
-      ignition::math::Box(ignition::math::Vector3d(9.5, 14.5, 19.5),
+      ignition::math::AxisAlignedBox(
+                ignition::math::Vector3d(9.5, 14.5, 19.5),
                 ignition::math::Vector3d(10.5, 15.5, 20.5)));
 }
 

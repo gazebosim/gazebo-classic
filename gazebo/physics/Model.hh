@@ -117,20 +117,6 @@ namespace gazebo
       /// \param[in] _vel The new angular velocity.
       public: void SetAngularVel(const ignition::math::Vector3d &_vel);
 
-      /// \brief Set the linear acceleration of the model, and all its
-      /// links.
-      /// \param[in] _vel The new linear acceleration.
-      /// \deprecated acceleration should be achieved by applying a force.
-      public: void SetLinearAccel(const ignition::math::Vector3d &_vel)
-              GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the angular acceleration of the model, and all its
-      /// links.
-      /// \param[in] _vel The new angular acceleration
-      /// \deprecated acceleration should be achieved by applying a force.
-      public: void SetAngularAccel(const ignition::math::Vector3d &_vel)
-              GAZEBO_DEPRECATED(9.0);
-
       /// \brief Get the linear velocity of the entity.
       /// \return ignition::math::Vector3d, set to 0, 0, 0
       /// if the model has no body.
@@ -173,7 +159,7 @@ namespace gazebo
 
       /// \brief Get the size of the bounding box.
       /// \return The bounding box.
-      public: virtual ignition::math::Box BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Get the number of joints.
       /// \return Get the number of joints.
@@ -409,6 +395,9 @@ namespace gazebo
       /// \param[in] _type type of joint
       /// \param[in] _parent parent link of joint
       /// \param[in] _child child link of joint
+      /// \remark This loads the joint, but does not initialize it.
+      /// Joint::Init() must be called on the returned joint to make it affect
+      /// the simulation.
       /// \return a JointPtr to the new joint created,
       ///         returns NULL JointPtr() if joint by name _name
       ///         already exists.
@@ -419,6 +408,9 @@ namespace gazebo
 
       /// \brief Create a joint for this model
       /// \param[in] _sdf SDF parameters for <joint>
+      /// \remark This loads the joint, but does not initialize it.
+      /// Joint::Init() must be called on the returned joint to make it affect
+      /// the simulation.
       /// \return a JointPtr to the new joint created,
       ///         returns NULL JointPtr() if joint by name _name
       ///         already exists.

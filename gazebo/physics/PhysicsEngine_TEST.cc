@@ -15,6 +15,7 @@
  *
 */
 
+#include <any>
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -84,8 +85,16 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   requestPub->Publish(*requestMsg);
 
   int waitCount = 0, maxWaitCount = 3000;
+#if GOOGLE_PROTOBUF_VERSION < 3001000
   while (physicsResponseMsg.ByteSize() == 0 && ++waitCount < maxWaitCount)
+#else
+  // ByteSizeLong appeared in version 3.1 of Protobuf, and ByteSize
+  // became deprecated.
+  while (physicsResponseMsg.ByteSizeLong() == 0 && ++waitCount < maxWaitCount)
+#endif
+  {
     common::Time::MSleep(10);
+  }
 
   ASSERT_LT(waitCount, maxWaitCount);
 
@@ -155,6 +164,15 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
       EXPECT_TRUE(physics->GetParam("magnetic_field", value));
       EXPECT_EQ(boost::any_cast<ignition::math::Vector3d>(value),
                 magField2);
+
+      // test with max_step_size wrapped in std::any
+      maxStepSize = 0.04;
+      EXPECT_TRUE(physics->SetParam("max_step_size", std::any(maxStepSize)));
+      EXPECT_TRUE(physics->GetParam("max_step_size", value));
+      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), maxStepSize);
+
+      // test with incorrect type in std::any and ensure that it doesn't throw
+      EXPECT_FALSE(physics->SetParam("max_step_size", std::any("wrong type")));
     }
     catch(boost::bad_any_cast &_e)
     {
@@ -225,7 +243,7 @@ TEST_P(PhysicsEngineTest, PhysicsEngineGetParamBool)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsEngineTest,
-                        PHYSICS_ENGINE_VALUES);
+                        PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {

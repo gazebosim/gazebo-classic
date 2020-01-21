@@ -35,7 +35,11 @@ std::string g_gazeboPATH;
 std::string customExec(std::string _cmd)
 {
   _cmd += " 2>/dev/null";
-  FILE* pipe = popen(_cmd.c_str(), "r");
+#ifdef _WIN32
+  FILE *pipe = _popen(_cmd.c_str(), "r");
+#else
+  FILE *pipe = popen(_cmd.c_str(), "r");
+#endif
 
   if (!pipe)
     return "ERROR";
@@ -49,7 +53,11 @@ std::string customExec(std::string _cmd)
       result += buffer;
   }
 
+#ifdef _WIN32
+  _pclose(pipe);
+#else
   pclose(pipe);
+#endif
   return result;
 }
 

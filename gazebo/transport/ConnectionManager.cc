@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/bind.hpp>
 
 #include "gazebo/msgs/msgs.hh"
@@ -70,8 +64,6 @@ ConnectionManager::ConnectionManager()
   this->stop = false;
   this->stopped = true;
 
-  this->serverConn = NULL;
-
   this->eventConnections.push_back(
       event::Events::ConnectStop(boost::bind(&ConnectionManager::Stop, this)));
 }
@@ -79,10 +71,9 @@ ConnectionManager::ConnectionManager()
 //////////////////////////////////////////////////
 ConnectionManager::~ConnectionManager()
 {
+  boost::mutex::scoped_lock lock(this->updateMutex);
   this->eventConnections.clear();
 
-  delete this->serverConn;
-  this->serverConn = NULL;
   this->Fini();
 }
 
@@ -93,8 +84,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
 {
   this->stop = false;
   this->masterConn.reset(new Connection());
-  delete this->serverConn;
-  this->serverConn = new Connection();
+  this->serverConn.reset(new Connection());
 
   // Create a new TCP server on a free port
   this->serverConn->Listen(0,
@@ -233,12 +223,14 @@ void ConnectionManager::Fini()
   {
     this->serverConn->ProcessWriteQueue();
     this->serverConn->Shutdown();
-    delete this->serverConn;
-    this->serverConn = NULL;
+    this->serverConn.reset();
   }
 
   this->eventConnections.clear();
-  this->connections.clear();
+  {
+    boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
+    this->connections.clear();
+  }
   this->publishers.clear();
   this->namespaces.clear();
   this->masterMessages.clear();
@@ -286,12 +278,11 @@ void ConnectionManager::RunUpdate()
   // TopicManagerProcessTask *task = new(tbb::task::allocate_root())
   //   TopicManagerProcessTask();
   // tbb::task::enqueue(*task);
+  boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
+
   TopicManager::Instance()->ProcessNodes();
-  {
-    boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
-    iter = this->connections.begin();
-    endIter = this->connections.end();
-  }
+  iter = this->connections.begin();
+  endIter = this->connections.end();
 
   while (iter != endIter)
   {
@@ -302,7 +293,6 @@ void ConnectionManager::RunUpdate()
     }
     else
     {
-      boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
       iter = this->connections.erase(iter);
     }
   }

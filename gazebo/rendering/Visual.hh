@@ -24,14 +24,13 @@
 #include <vector>
 
 #include <sdf/sdf.hh>
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/msgs/MessageTypes.hh>
 
-#include "gazebo/common/Color.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Time.hh"
 
@@ -236,22 +235,8 @@ namespace gazebo
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.
       /// \param[in] _cascade Whether to set this parameter in children too.
-      /// \deprecated use ignition::math::Color instead
-      public: void SetAmbient(const common::Color &_color,
-          const bool _cascade = true) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the ambient color of the visual.
-      /// \param[in] _color The ambient color.
-      /// \param[in] _cascade Whether to set this parameter in children too.
       public: void SetAmbient(const ignition::math::Color &_color,
           const bool _cascade = true);
-
-      /// \brief Set the diffuse color of the visual.
-      /// \param[in] _color Set the diffuse color.
-      /// \param[in] _cascade Whether to set this parameter in children too.
-      /// \deprecated use ignition::math::Color instead
-      public: void SetDiffuse(const common::Color &_color,
-          const bool _cascade = true) GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the diffuse color of the visual.
       /// \param[in] _color Set the diffuse color.
@@ -262,22 +247,8 @@ namespace gazebo
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
       /// \param[in] _cascade Whether to set this parameter in children too.
-      /// \deprecated use ignition::math::Color instead
-      public: void SetSpecular(const common::Color &_color,
-          const bool _cascade = true) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the specular color of the visual.
-      /// \param[in] _color Specular color.
-      /// \param[in] _cascade Whether to set this parameter in children too.
       public: void SetSpecular(const ignition::math::Color &_color,
           const bool _cascade = true);
-
-      /// \brief Set the emissive value.
-      /// \param[in] _color The emissive color.
-      /// \param[in] _cascade Whether to set this parameter in children too.
-      /// \deprecated use ignition::math::Color instead
-      public: virtual void SetEmissive(const common::Color &_color,
-          const bool _cascade = true) GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
@@ -287,17 +258,7 @@ namespace gazebo
 
       /// \brief Get the ambient color of the visual.
       /// \return Ambient color.
-      /// \deprecated use ignition::math::Color instead
-      public: common::Color GetAmbient() const GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Get the ambient color of the visual.
-      /// \return Ambient color.
       public: ignition::math::Color Ambient() const;
-
-      /// \brief Get the diffuse color of the visual.
-      /// \return Diffuse color.
-      /// \deprecated use ignition::math::Color instead
-      public: common::Color GetDiffuse() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the diffuse color of the visual.
       /// \return Diffuse color.
@@ -305,17 +266,7 @@ namespace gazebo
 
       /// \brief Get the specular color of the visual.
       /// \return Specular color.
-      /// \deprecated use ignition::math::Color instead
-      public: common::Color GetSpecular() const GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Get the specular color of the visual.
-      /// \return Specular color.
       public: ignition::math::Color Specular() const;
-
-      /// \brief Get the emissive color of the visual.
-      /// \return Emissive color.
-      /// \deprecated use ignition::math::Color instead
-      public: common::Color GetEmissive() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the emissive color of the visual.
       /// \return Emissive color.
@@ -460,22 +411,13 @@ namespace gazebo
       /// \param[in] _value True to enable ribbon trail.
       /// \param[in] _initialColor The initial color of the ribbon trail.
       /// \param[in] _changeColor Color to change too as the trail grows.
-      /// \deprecated use ignition::math::Color instead
-      public: void SetRibbonTrail(bool _value,
-                  const common::Color &_initialColor,
-                  const common::Color &_changeColor) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief True on or off a ribbon trail.
-      /// \param[in] _value True to enable ribbon trail.
-      /// \param[in] _initialColor The initial color of the ribbon trail.
-      /// \param[in] _changeColor Color to change too as the trail grows.
       public: void SetRibbonTrail(bool _value,
                   const ignition::math::Color &_initialColor,
                   const ignition::math::Color &_changeColor);
 
       /// \brief Get the bounding box for the visual.
       /// \return The bounding box in world coordinates.
-      public: ignition::math::Box BoundingBox() const;
+      public: ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Add a line to the visual.
       /// \param[in] _type The type of line to make.
@@ -741,7 +683,17 @@ namespace gazebo
                         const std::string &_name, ScenePtr _scene,
                         bool _useRTShader = true);
 
+      /// \brief Process a gazebo material message, which uses proto2
+      /// syntax that allows unset fields to be ignored, which is the
+      /// legacy behavior for gazebo10 and earlier.
+      /// \param[in] _msg The ignition material message.
+      protected: void ProcessMaterialMsg(const msgs::Material &_msg);
+
       /// \brief Process a material message.
+      /// Note that ignition msgs5+ uses proto3 syntax, which does not
+      /// distinguish between unset fields and fields with a default value,
+      /// default values will be used for any fields not explicitly set when
+      /// using this function.
       /// \param[in] _msg The ignition material message.
       protected: void ProcessMaterialMsg(const ignition::msgs::Material &_msg);
 
@@ -773,7 +725,7 @@ namespace gazebo
       /// \param[in] _node Pointer to the Ogre Node to process.
       /// \param[in] _box Current bounding box information.
       private: void BoundsHelper(Ogre::SceneNode *_node,
-                                 ignition::math::Box &_box) const;
+                                 ignition::math::AxisAlignedBox &_box) const;
 
       /// \brief Return true if the submesh should be centered.
       /// \return True if the submesh should be centered when it's inserted

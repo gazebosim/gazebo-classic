@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <functional>
 #include <mutex>
 #include <ignition/math/Triangle.hh>
@@ -416,7 +410,8 @@ void ModelSnap::Update()
         this->dataPtr->snapHighlight =
             this->dataPtr->highlightVisual->CreateDynamicLine(
             rendering::RENDERING_TRIANGLE_FAN);
-        this->dataPtr->snapHighlight->setMaterial("Gazebo/RedTransparent");
+        GZ_OGRE_SET_MATERIAL_BY_NAME(this->dataPtr->snapHighlight,
+            "Gazebo/RedTransparent");
         this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0]);
         this->dataPtr->snapHighlight->AddPoint(hoverTriangle[1]);
         this->dataPtr->snapHighlight->AddPoint(hoverTriangle[2]);
@@ -480,7 +475,7 @@ void ModelSnap::Update()
       this->dataPtr->snapLines =
           this->dataPtr->snapVisual->CreateDynamicLine(
           rendering::RENDERING_LINE_STRIP);
-      this->dataPtr->snapLines->setMaterial("Gazebo/RedGlow");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(this->dataPtr->snapLines, "Gazebo/RedGlow");
       this->dataPtr->snapLines->AddPoint(triangle[0]);
       this->dataPtr->snapLines->AddPoint(triangle[1]);
       this->dataPtr->snapLines->AddPoint(triangle[2]);

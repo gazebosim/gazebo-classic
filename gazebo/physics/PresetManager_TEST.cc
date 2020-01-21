@@ -172,7 +172,7 @@ TEST_F(PresetManagerTest, SDF)
   physics::WorldPtr world = physics::get_world("default");
   physics::PresetManagerPtr presetManager = world->PresetMgr();
 
-  EXPECT_TRUE(!presetManager->ProfileSDF("profile_does_not_exist"));
+  EXPECT_EQ(nullptr, presetManager->ProfileSDF("profile_does_not_exist"));
 
   {
     // Try to set using a bad SDF element
@@ -229,10 +229,12 @@ TEST_F(PresetManagerTest, SDF)
     {
       EXPECT_TRUE(presetManager->GetCurrentProfileParam("max_step_size",
           value));
-      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), 0.03);
+      EXPECT_DOUBLE_EQ(0.03,
+          physics::PhysicsEngine::any_cast<double>(value));
       EXPECT_TRUE(presetManager->GetCurrentProfileParam("min_step_size",
           value));
-      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), 0.003);
+      EXPECT_DOUBLE_EQ(0.003,
+          physics::PhysicsEngine::any_cast<double>(value));
     }
     catch(boost::bad_any_cast &_e)
     {
@@ -241,17 +243,63 @@ TEST_F(PresetManagerTest, SDF)
     }
 
     // GenerateSDFFromPreset
-    sdf::ElementPtr generatedPhysicsSDF = NULL;
-    presetManager->GenerateSDFFromPreset("this_preset_does_not_exist",
-        generatedPhysicsSDF);
-    // Call doesn't do anything
-    ASSERT_TRUE(generatedPhysicsSDF == NULL);
+    {
+      sdf::ElementPtr generatedPhysicsSDF;
+      presetManager->GenerateSDFFromPreset("this_preset_does_not_exist",
+          generatedPhysicsSDF);
+      // Call doesn't do anything
+      ASSERT_EQ(nullptr, generatedPhysicsSDF);
+    }
 
-    presetManager->GenerateSDFFromPreset("preset_3", generatedPhysicsSDF);
-    // Compare the SDF as strings
-    ASSERT_TRUE(generatedPhysicsSDF != NULL);
+    {
+      sdf::ElementPtr generatedPhysicsSDF;
+      presetManager->GenerateSDFFromPreset("preset_3", generatedPhysicsSDF);
+      ASSERT_NE(nullptr, generatedPhysicsSDF);
 
-    EXPECT_EQ(generatedPhysicsSDF->ToString(""), physicsSDF->ToString(""));
+      // Compare the SDF as strings
+      EXPECT_EQ(generatedPhysicsSDF->ToString(""), physicsSDF->ToString(""));
+
+      // original parameter value
+      EXPECT_TRUE(generatedPhysicsSDF->HasElement("max_step_size"));
+      EXPECT_DOUBLE_EQ(0.03,
+          generatedPhysicsSDF->Get<double>("max_step_size"));
+
+      EXPECT_TRUE(generatedPhysicsSDF->HasElement("ode"));
+      auto odeElem = generatedPhysicsSDF->GetElement("ode");
+      EXPECT_TRUE(odeElem->HasElement("solver"));
+      auto odeSolverElem = odeElem->GetElement("solver");
+      EXPECT_TRUE(odeSolverElem->HasElement("min_step_size"));
+      EXPECT_DOUBLE_EQ(0.003,
+          odeSolverElem->Get<double>("min_step_size"));
+    }
+
+    // Try changing profile parameters and confirm it is reflected in sdf
+    presetManager->SetProfileParam(
+        "preset_3", "max_step_size", 0.007);
+    // pass an std::any to confirm CastAnyValue is working
+    presetManager->SetProfileParam(
+        "preset_3", "min_step_size", std::any(0.0007));
+    {
+      sdf::ElementPtr generatedPhysicsSDF;
+      presetManager->GenerateSDFFromPreset("preset_3", generatedPhysicsSDF);
+      ASSERT_NE(nullptr, generatedPhysicsSDF);
+
+      // Compare the SDF as strings
+      EXPECT_NE(generatedPhysicsSDF->ToString(""), physicsSDF->ToString(""));
+
+      // updated parameter values
+      EXPECT_TRUE(generatedPhysicsSDF->HasElement("max_step_size"));
+      EXPECT_DOUBLE_EQ(0.007,
+          generatedPhysicsSDF->Get<double>("max_step_size"));
+
+      EXPECT_TRUE(generatedPhysicsSDF->HasElement("ode"));
+      auto odeElem = generatedPhysicsSDF->GetElement("ode");
+      EXPECT_TRUE(odeElem->HasElement("solver"));
+      auto odeSolverElem = odeElem->GetElement("solver");
+      EXPECT_TRUE(odeSolverElem->HasElement("min_step_size"));
+      EXPECT_DOUBLE_EQ(0.0007,
+          odeSolverElem->Get<double>("min_step_size"));
+    }
   }
 
   {

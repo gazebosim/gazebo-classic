@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/algorithm/string.hpp>
 #include <functional>
 #include <mutex>
@@ -62,6 +56,9 @@ class gazebo::physics::LinkPrivate
 
   /// \brief Names of all the sensors attached to the link.
   public: std::vector<std::string> sensors;
+
+  /// \brief All the lights attached to the link.
+  public: std::vector<LightPtr> lights;
 
   /// \brief All the parent joints.
   public: std::vector<JointPtr> parentJoints;
@@ -206,7 +203,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     while (lightElem)
     {
       // Create and Load a light
-      this->world->LoadLight(lightElem, shared_from_this());
+      this->LoadLight(lightElem);
       lightElem = lightElem->GetNextElement("light");
     }
   }
@@ -295,9 +292,6 @@ void Link::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Link::Init()
 {
-  this->linearAccel.Set(0, 0, 0);
-  this->angularAccel.Set(0, 0, 0);
-
   this->dataPtr->enabled = true;
 
   // Set Link pose before setting pose of child collisions
@@ -317,8 +311,6 @@ void Link::Init()
     if ((*iter)->HasType(Base::LIGHT))
     {
       LightPtr light= boost::static_pointer_cast<Light>(*iter);
-      // TODO add to lights var?
-      // this->lights.push_back(light);
       light->Init();
     }
   }
@@ -733,24 +725,6 @@ CollisionPtr Link::GetCollision(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void Link::SetLinearAccel(const ignition::math::Vector3d &_accel)
-{
-  gzwarn << "Link::SetLinearAccel() is deprecated and has "
-         << "no effect. Use Link::SetForce() instead.\n";
-  this->SetEnabled(true);
-  this->linearAccel = _accel;
-}
-
-//////////////////////////////////////////////////
-void Link::SetAngularAccel(const ignition::math::Vector3d &_accel)
-{
-  gzwarn << "Link::SetAngularAccel() is deprecated and has "
-         << "no effect. Use Link::SetTorque() instead.\n";
-  this->SetEnabled(true);
-  this->angularAccel = _accel;
-}
-
-//////////////////////////////////////////////////
 ignition::math::Pose3d Link::WorldCoGPose() const
 {
   ignition::math::Pose3d pose = this->WorldPose();
@@ -831,13 +805,14 @@ ModelPtr Link::GetModel() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Link::BoundingBox() const
+ignition::math::AxisAlignedBox Link::BoundingBox() const
 {
-  ignition::math::Box box;
+  ignition::math::AxisAlignedBox box;
 
   box.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
       ignition::math::MAX_D);
-  box.Max().Set(0, 0, 0);
+  box.Max().Set(-ignition::math::MAX_D, -ignition::math::MAX_D,
+     -ignition::math::MAX_D);
 
   for (Collision_V::const_iterator iter = this->dataPtr->collisions.begin();
        iter != this->dataPtr->collisions.end(); ++iter)
@@ -1059,6 +1034,12 @@ void Link::FillMsg(msgs::Link &_msg)
     msgs::Battery *bat = _msg.add_battery();
     bat->set_name(battery->Name());
     bat->set_voltage(battery->Voltage());
+  }
+
+  for (auto &light : this->dataPtr->lights)
+  {
+    msgs::Light *lightMsg = _msg.add_light();
+    light->FillMsg(*lightMsg);
   }
 }
 
@@ -1556,6 +1537,7 @@ void Link::UpdateVisualMsg()
         msg.set_parent_id(this->GetId());
         msg.set_is_static(this->IsStatic());
         msg.set_type(msgs::Visual::VISUAL);
+        msgs::Set(msg.mutable_scale(), this->scale);
 
         auto iter = this->visuals.find(msg.id());
         if (iter != this->visuals.end())
@@ -1913,3 +1895,24 @@ event::ConnectionPtr Link::ConnectEnabled(
   return this->dataPtr->enabledSignal.Connect(_subscriber);
 }
 
+//////////////////////////////////////////////////
+void Link::LoadLight(sdf::ElementPtr _sdf)
+{
+  // Create new light object
+  LightPtr light(new physics::Light(shared_from_this()));
+  light->SetStatic(true);
+  light->ProcessMsg(msgs::LightFromSDF(_sdf));
+  light->SetWorld(this->world);
+  light->Load(_sdf);
+  this->dataPtr->lights.push_back(light);
+  // NOTE:
+  // The light need to be added to the list on Load (before Init) for the case
+  // when a model is created from a factory message. Otherwise the model msg
+  // published to the client will not contain an entry of this light
+}
+
+//////////////////////////////////////////////////
+const Link::Visuals_M &Link::Visuals() const
+{
+  return this->visuals;
+}

@@ -63,7 +63,7 @@ namespace gazebo
 {
   std::string custom_exec(std::string _cmd);
 
-  class GAZEBO_VISIBLE ServerFixture : public testing::Test
+  class ServerFixture : public testing::Test
   {
     /// \brief Constructor
     protected: ServerFixture();
@@ -365,7 +365,6 @@ namespace gazebo
     /// \param[in] _maxRange Max range
     /// \param[in] _rangeResolution Resolution of the scan
     /// \param[in] _samples Number of samples.
-    /// \param[in] _rate Output Hz.
     /// \param[in] _noiseType Type of noise to apply.
     /// \param[in] _noiseMean Mean noise value.
     /// \param[in] _noiseStdDev Standard deviation of the noise.
@@ -378,6 +377,38 @@ namespace gazebo
                    double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
                    double _minRange = 0.08, double _maxRange = 10,
                    double _rangeResolution = 0.01, unsigned int _samples = 640,
+                   const std::string &_noiseType = "", double _noiseMean = 0.0,
+                   double _noiseStdDev = 0.0);
+
+    /// \brief Spawn a gpu laser.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _raySensorName Name of the laser.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _hMinAngle Horizontal min angle
+    /// \param[in] _hMaxAngle Horizontal max angle
+    /// \param[in] _vMinAngle Vertical min angle
+    /// \param[in] _vMaxAngle Vertical max angle
+    /// \param[in] _minRange Min range
+    /// \param[in] _maxRange Max range
+    /// \param[in] _rangeResolution Resolution of the scan
+    /// \param[in] _samples Number of samples.
+    /// \param[in] _vSamples Vertical number of samples.
+    /// \param[in] _hResolution horizontal resolution.
+    /// \param[in] _vResolution vertical resolution.
+    /// \param[in] _noiseType Type of noise to apply.
+    /// \param[in] _noiseMean Mean noise value.
+    /// \param[in] _noiseStdDev Standard deviation of the noise.
+    protected: void SpawnGpuRaySensorVertical(const std::string &_modelName,
+                   const std::string &_raySensorName,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
+                   double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                   double _vMinAngle = -1.0, double _vMaxAngle = 1.0,
+                   double _minRange = 0.08, double _maxRange = 10,
+                   double _rangeResolution = 0.01, unsigned int _samples = 640,
+                   unsigned int _vSamples = 1, double _hResolution = 1.0,
+                   double _vResolution = 1.0,
                    const std::string &_noiseType = "", double _noiseMean = 0.0,
                    double _noiseStdDev = 0.0);
 
@@ -579,40 +610,6 @@ namespace gazebo
     protected: void WaitUntilSimTime(const common::Time &_goalTime,
                                      const int _ms,
                                      const int _maxRetries) const;
-
-    /// \brief Spawn a light.
-    /// \param[in] _name Name for the light.
-    /// \param[in] _size Type of light - "spot", "directional", or "point".
-    /// \param[in] _pos Position for the light.
-    /// \param[in] _rpy Roll, pitch, yaw for the light.
-    /// \param[in] _diffuse Diffuse color of the light.
-    /// \param[in] _specular Specular color of the light.
-    /// \param[in] _direction Direction of the light ("spot" and "directional").
-    /// \param[in] _attenuationRange Range of attenuation.
-    /// \param[in] _attenuationConstant Constant component of attenuation
-    /// \param[in] _attenuationLinear Linear component of attenuation
-    /// \param[in] _attenuationQuadratic Quadratic component of attenuation
-    /// \param[in] _spotInnerAngle Inner angle ("spot" only).
-    /// \param[in] _spotOuterAngle Outer angle ("spot" only).
-    /// \param[in] _spotFallOff Fall off ("spot" only).
-    /// \param[in] _castShadows True to cast shadows.
-    /// \deprecated See SpawnLight version with ignition::math::Color.
-    protected: void SpawnLight(const std::string &_name,
-                   const std::string &_type,
-                   const ignition::math::Vector3d &_pos,
-                   const ignition::math::Vector3d &_rpy,
-                   const common::Color &_diffuse,
-                   const common::Color &_specular = common::Color::White,
-                   const ignition::math::Vector3d &_direction =
-                                               -ignition::math::Vector3d::UnitZ,
-                   double _attenuationRange = 20,
-                   double _attenuationConstant = 0.5,
-                   double _attenuationLinear = 0.01,
-                   double _attenuationQuadratic = 0.001,
-                   double _spotInnerAngle = 0,
-                   double _spotOuterAngle = 0,
-                   double _spotFallOff = 0,
-                   bool _castShadows = true) GAZEBO_DEPRECATED(9.0);
 
     /// \brief Spawn a light.
     /// \param[in] _name Name for the light.

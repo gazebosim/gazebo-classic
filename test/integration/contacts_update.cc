@@ -93,7 +93,7 @@ TEST_P(ContactsUpdate, TestTwoSpheres)
   TestTwoSpheres(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, ContactsUpdate, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, ContactsUpdate, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {

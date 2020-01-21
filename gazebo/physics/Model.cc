@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 #include <float.h>
@@ -704,52 +698,6 @@ void Model::SetAngularVel(const ignition::math::Vector3d &_vel)
 }
 
 //////////////////////////////////////////////////
-void Model::SetLinearAccel(const ignition::math::Vector3d &_accel)
-{
-  gzwarn << "Model::SetLinearAccel() is deprecated and has no effect. "
-         << "Use Link::SetForce() on the link directly instead. \n";
-  for (Link_V::iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
-  {
-    if (*iter)
-    {
-      (*iter)->SetEnabled(true);
-#ifndef _WIN32
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-      (*iter)->SetLinearAccel(_accel);
-#ifndef _WIN32
-      #pragma GCC diagnostic pop
-#endif
-    }
-  }
-}
-
-//////////////////////////////////////////////////
-void Model::SetAngularAccel(const ignition::math::Vector3d &_accel)
-{
-  gzwarn << "Model::SetAngularAccel() is deprecated and has no effect. "
-         << "Use Link::SetTorque() on the link directly instead. \n";
-  for (Link_V::iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
-  {
-    if (*iter)
-    {
-      (*iter)->SetEnabled(true);
-#ifndef _WIN32
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-      (*iter)->SetAngularAccel(_accel);
-#ifndef _WIN32
-      #pragma GCC diagnostic pop
-#endif
-    }
-  }
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Model::RelativeLinearVel() const
 {
   if (this->GetLink("canonical"))
@@ -825,9 +773,9 @@ ignition::math::Vector3d Model::WorldAngularAccel() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Model::BoundingBox() const
+ignition::math::AxisAlignedBox Model::BoundingBox() const
 {
-  ignition::math::Box box;
+  ignition::math::AxisAlignedBox box;
 
   box.Min().Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.Max().Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
@@ -836,7 +784,7 @@ ignition::math::Box Model::BoundingBox() const
   {
     if (iter)
     {
-      ignition::math::Box linkBox;
+      ignition::math::AxisAlignedBox linkBox;
       linkBox = iter->BoundingBox();
       box += linkBox;
     }

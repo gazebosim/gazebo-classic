@@ -67,8 +67,50 @@ class FactoryTest : public ServerFixture,
 
 class LightFactoryTest : public ServerFixture
 {
+  /// \brief Constructor.
+  public: LightFactoryTest():
+    responseCbCalled(false), modelInfoCbCalled(false) {}
+
+  /// \brief Response callback to get entity information.
+  /// \param[in] _msg Message holding the requested information.
+  public: void ResponseCb(ConstResponsePtr &_msg);
+
+  /// \brief Model info callback to get model information.
+  /// \param[in] _msg Message holding the model information.
+  public: void ModelInfoCb(ConstModelPtr &_msg);
+
   /// \brief Light factory publisher.
   protected: transport::PublisherPtr lightFactoryPub;
+
+  /// \brief Entity info request publisher.
+  protected: transport::PublisherPtr requestPub;
+
+  /// \brief Entity info response subscriber.
+  protected: transport::SubscriberPtr responseSub;
+
+  /// \brief True if the callback function was called.
+  protected: bool responseCbCalled;
+
+  /// \brief Response message holding the entity information.
+  protected: msgs::Response resMsg;
+
+  /// \brief Mutex for the variables accessed by the callback.
+  protected: std::mutex resMutex;
+
+  /// \brief Subscriber for model info.
+  protected: transport::SubscriberPtr modelInfoSub;
+
+  /// \brief Model message from ~/model/info
+  protected: msgs::Model modMsg;
+
+  /// \brief True if the callback for model info was called
+  protected: bool modelInfoCbCalled;
+
+  /// \brief Mutex for model info callback.
+  protected: std::mutex modMutex;
+
+  /// \brief Factory publisher.
+  protected: transport::PublisherPtr factoryPub;
 };
 
 ///////////////////////////////////////////////////
@@ -802,17 +844,17 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
     physics::InertialPtr inertialClone = linkClone->GetInertial();
     EXPECT_EQ(inertial->Mass(), inertialClone->Mass());
     EXPECT_EQ(inertial->CoG(), inertialClone->CoG());
-    // Expect Inertial MOI to match, even if Principal moments
+    // Expect Inertial Moi to match, even if Principal moments
     // and inertial frames change
     if (_physicsEngine != "bullet")
     {
-      EXPECT_EQ(inertial->Ign().MOI(), inertialClone->Ign().MOI());
+      EXPECT_EQ(inertial->Ign().Moi(), inertialClone->Ign().Moi());
     }
     else
     {
       // the default == tolerance of 1e-6, is too strict for bullet
-      EXPECT_TRUE(inertial->Ign().MOI().Equal(
-             inertialClone->Ign().MOI(), 1e-5));
+      EXPECT_TRUE(inertial->Ign().Moi().Equal(
+             inertialClone->Ign().Moi(), 1e-5));
     }
   }
 
@@ -925,6 +967,214 @@ TEST_F(LightFactoryTest, SpawnLight)
   EXPECT_EQ(light2Pose, light2->WorldPose());
 }
 
+/////////////////////////////////////////////////
+void LightFactoryTest::ResponseCb(ConstResponsePtr &_msg)
+{
+  if (_msg->request() == "entity_info")
+  {
+    std::lock_guard<std::mutex> lk(this->resMutex);
+    this->responseCbCalled = true;
+    this->resMsg = *_msg;
+  }
+}
+
+/////////////////////////////////////////////////
+void LightFactoryTest::ModelInfoCb(ConstModelPtr &_msg)
+{
+  if (_msg->name() == "test_model")
+  {
+    std::lock_guard<std::mutex> lk(this->modMutex);
+    this->modelInfoCbCalled = true;
+    this->modMsg = *_msg;
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(LightFactoryTest, SpawnModelWithLight)
+{
+  Load("worlds/empty.world");
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Create a publisher to request for entity information.
+  this->requestPub
+    = this->node->Advertise<msgs::Request>("~/request");
+  msgs::Request reqMsg;
+  reqMsg.set_request("entity_info");
+  reqMsg.set_data("test_model");
+
+  // Create a subscriber to get a response for entity information.
+  this->responseSub
+    = this->node->Subscribe<msgs::Response>("~/response",
+    &LightFactoryTest::ResponseCb, dynamic_cast<LightFactoryTest*>(this));
+
+  // Create a subscriber to get a model info.
+  this->modelInfoSub
+    = this->node->Subscribe<msgs::Model>("~/model/info",
+    &LightFactoryTest::ModelInfoCb, dynamic_cast<LightFactoryTest*>(this));
+
+  // Create a publisher to spawn a model.
+  this->factoryPub
+    = this->node->Advertise<msgs::Factory>("~/factory");
+  msgs::Factory facMsg;
+
+  // Request for entity informaiton.
+  reqMsg.set_id(0);
+  requestPub->Publish(reqMsg);
+
+  // Wait for a reponse.
+  common::Time::MSleep(1000);
+
+  // Expect there is nothing yet.
+  {
+    std::lock_guard<std::mutex> lk(this->resMutex);
+    EXPECT_TRUE(this->responseCbCalled) << "No response callback";
+    EXPECT_EQ(0, this->resMsg.id()) << "Wrong message ID";
+    EXPECT_EQ("nonexistent", this->resMsg.response());
+    this->responseCbCalled = false;
+  }
+
+  // Spawn a model which has a light under its link.
+  std::ostringstream modelStr;
+  modelStr << "<sdf version='" << SDF_VERSION << "'>"
+           << "  <model name='test_model'>"
+           << "    <link name='link'>"
+           << "      <light name='spawned_light' type='point'>"
+           << "        <pose>0 0 0 0 0 0</pose>"
+           << "        <attenuation>"
+           << "          <range>0.20</range>"
+           << "          <linear>0.10</linear>"
+           << "        </attenuation>"
+           << "        <diffuse>1 1 1 1</diffuse>"
+           << "        <specular>1 1 1 1</specular>"
+           << "      </light>"
+           << "      <visual name='marker'>"
+           << "        <pose>0 0 0 0 0 0</pose>"
+           << "        <geometry>"
+           << "          <sphere>"
+           << "            <radius>0.025</radius>"
+           << "          </sphere>"
+           << "        </geometry>"
+           << "        <material>"
+           << "          <ambient>1 1 1 1</ambient>"
+           << "          <diffuse>1 1 1 1</diffuse>"
+           << "          <specular>1 1 1 1</specular>"
+           << "          <emissive>1 1 1 1</emissive>"
+           << "        </material>"
+           << "      </visual>"
+           << "    </link>"
+           << "  </model>"
+           << "</sdf>";
+
+  facMsg.set_sdf(modelStr.str());
+  this->factoryPub->Publish(facMsg);
+
+  // Wait for it to be spawned.
+  this->WaitUntilEntitySpawn("test_model", 300, 10);
+
+  // Request for entity information.
+  reqMsg.set_id(1);
+  requestPub->Publish(reqMsg);
+
+  // Wait for a reponse.
+  common::Time::MSleep(1000);
+
+  // Verify the light exists in the physics engine.
+  {
+    std::lock_guard<std::mutex> lk(this->resMutex);
+    EXPECT_TRUE(this->responseCbCalled) << "No response callback";
+    EXPECT_EQ(1, this->resMsg.id()) << "Wrong message ID";
+    EXPECT_NE("nonexistent", this->resMsg.response())
+      << "The model does not exist.";
+    msgs::Model modelMsg;
+    modelMsg.ParseFromString(this->resMsg.serialized_data());
+    EXPECT_EQ(1, modelMsg.link_size())
+      << "The number of links must be 1.";
+    msgs::Link linkMsg = modelMsg.link(0);
+    EXPECT_EQ(1, linkMsg.light_size())
+      << "The number of lights must be 1.";
+    msgs::Light lightMsg = linkMsg.light(0);
+    EXPECT_EQ("test_model::link::spawned_light", lightMsg.name())
+      << "The name of the light is wrong.";
+  }
+
+  // Verify the correct model info has been published for the rendering engine.
+  {
+    std::lock_guard<std::mutex> lk(this->modMutex);
+    EXPECT_TRUE(this->modelInfoCbCalled) << "No model info callback";
+    EXPECT_EQ(1, this->modMsg.link_size())
+      << "The number of links must be 1.";
+    msgs::Link linkMsg = this->modMsg.link(0);
+    EXPECT_EQ(1, linkMsg.light_size())
+      << "The number of lights must be 1.";
+    msgs::Light lightMsg = linkMsg.light(0);
+    EXPECT_EQ("test_model::link::spawned_light", lightMsg.name())
+      << "The name of the light is wrong.";
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(FactoryTest, FilenameModelDatabase)
+{
+  this->Load("worlds/empty.world", true);
+
+  // Test database
+  common::SystemPaths::Instance()->AddModelPaths(
+    PROJECT_SOURCE_PATH "/test/models/testdb");
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Publish factory msg
+  msgs::Factory msg;
+  msg.set_sdf_filename("model://cococan");
+
+  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  pub->Publish(msg);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("cococan") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("cococan"));
+}
+
+//////////////////////////////////////////////////
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+TEST_F(FactoryTest, FilenameFuelURL)
+{
+  this->Load("worlds/empty.world", true);
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  msgs::Factory msg;
+  msg.set_sdf_filename(
+      "https://api.ignitionfuel.org/1.0/chapulina/models/Test box");
+
+  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  pub->Publish(msg);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("test_box") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("test_box"));
+}
+#endif
 
 //////////////////////////////////////////////////
 TEST_P(FactoryTest, InvalidMeshInsertion)
@@ -988,7 +1238,7 @@ TEST_P(FactoryTest, InvalidMeshInsertionWithWorld)
   world->Step(1);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, FactoryTest, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, FactoryTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

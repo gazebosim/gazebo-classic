@@ -68,7 +68,7 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
 
     physics::ModelPtr model = world->ModelByName("ground_plane");
     ASSERT_TRUE(model != nullptr);
-    ignition::math::Box box = model->BoundingBox();
+    ignition::math::AxisAlignedBox box = model->BoundingBox();
     EXPECT_LT(box.Min().X(), -big);
     EXPECT_LT(box.Min().Y(), -big);
     EXPECT_LT(box.Min().Z(), -big);
@@ -113,7 +113,7 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
   {
     physics::ModelPtr model = world->ModelByName("model_tshape");
     ASSERT_TRUE(model != nullptr);
-    ignition::math::Box box = model->BoundingBox();
+    ignition::math::AxisAlignedBox box = model->BoundingBox();
     gzdbg << "Bounding box for " << _physicsEngine << ": " << box << std::endl;
     static double tol = 1e-03;
     EXPECT_NEAR(box.Min().X(), -0.5, tol);
@@ -228,7 +228,7 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
     auto link = model->GetLink();
     ASSERT_TRUE(link != nullptr);
 
-    const unsigned int index = 0;
+    unsigned int index = 0;
     auto collision = link->GetCollision(index);
     ASSERT_TRUE(collision != nullptr);
 
@@ -362,7 +362,7 @@ TEST_P(PhysicsCollisionTest, PoseOffsets)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsCollisionTest,
-                        PHYSICS_ENGINE_VALUES);
+                        PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

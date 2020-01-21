@@ -15,6 +15,16 @@
  *
 */
 
+// required for HAVE_DART_BULLET define
+#include <gazebo/gazebo_config.h>
+
+#ifdef HAVE_DART_BULLET
+#include <dart/collision/bullet/bullet.hpp>
+#endif
+
+#include <dart/collision/dart/dart.hpp>
+#include <dart/collision/fcl/fcl.hpp>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -88,6 +98,15 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+std::string DARTPhysics::CollisionDetectorInUse() const
+{
+  dart::collision::CollisionDetectorPtr cd =
+    this->dataPtr->dtWorld->getConstraintSolver()->getCollisionDetector();
+  if (!cd) return "";
+  return cd->getType();
+}
+
+//////////////////////////////////////////////////
 void DARTPhysics::Init()
 {
 }
@@ -148,6 +167,16 @@ class LinkPair
               this->dtLink2 = _dtLink1;
               this->dtLink1 = _dtLink2;
             }
+          }
+
+  /// \brief Assignment operator
+  /// \param[in] _c Link pair to copy
+  /// \return *this
+  public: LinkPair &operator =(const LinkPair& _linkPair)
+          {
+            this->dtLink1 = _linkPair.dtLink1;
+            this->dtLink2 = _linkPair.dtLink2;
+            return *this;
           }
 
   /// \brief Comparison operator
@@ -565,6 +594,50 @@ std::string DARTPhysics::GetSolverType() const
 //////////////////////////////////////////////////
 void DARTPhysics::SetSolverType(const std::string &_type)
 {
+  if (_type == "dantzig")
+  {
+    // DART constraint solver refactored in 6.7, see issue 2605
+    // https://bitbucket.org/osrf/gazebo/issues/2605
+#if DART_MAJOR_MINOR_VERSION_AT_MOST(6, 6)
+    this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
+        dart::common::make_unique<dart::constraint::DantzigLCPSolver>(
+        this->dataPtr->dtWorld->getTimeStep()));
+#else
+    auto boxedLCPSolver =
+        dynamic_cast<dart::constraint::BoxedLcpConstraintSolver*>(
+        this->dataPtr->dtWorld->getConstraintSolver());
+    if (boxedLCPSolver)
+    {
+      boxedLCPSolver->setBoxedLcpSolver(
+          std::make_shared<dart::constraint::DantzigBoxedLcpSolver>());
+    }
+#endif
+  }
+  else if (_type == "pgs")
+  {
+    // DART constraint solver refactored in 6.7, see issue 2605
+    // https://bitbucket.org/osrf/gazebo/issues/2605
+#if DART_MAJOR_MINOR_VERSION_AT_MOST(6, 6)
+    this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
+        dart::common::make_unique<dart::constraint::PGSLCPSolver>(
+        this->dataPtr->dtWorld->getTimeStep()));
+#else
+    auto boxedLCPSolver =
+        dynamic_cast<dart::constraint::BoxedLcpConstraintSolver*>(
+        this->dataPtr->dtWorld->getConstraintSolver());
+    if (boxedLCPSolver)
+    {
+      boxedLCPSolver->setBoxedLcpSolver(
+          std::make_shared<dart::constraint::PgsBoxedLcpSolver>());
+    }
+#endif
+  }
+  else
+  {
+    gzerr << "Invalid step type[" << _type << "]\n";
+    return;
+  }
+
   if (this->sdf->HasElement("dart"))
   {
     sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
@@ -573,23 +646,6 @@ void DARTPhysics::SetSolverType(const std::string &_type)
     {
       dartElem->GetElement("solver")->GetElement("solver_type")->Set(_type);
     }
-  }
-
-  if (_type == "dantzig")
-  {
-    this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
-        dart::common::make_unique<dart::constraint::DantzigLCPSolver>(
-        this->dataPtr->dtWorld->getTimeStep()));
-  }
-  else if (_type == "pgs")
-  {
-    this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
-        dart::common::make_unique<dart::constraint::PGSLCPSolver>(
-        this->dataPtr->dtWorld->getTimeStep()));
-  }
-  else
-  {
-    gzerr << "Invalid step type[" << _type << "]\n";
   }
 }
 
@@ -655,24 +711,72 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
   {
     if (_key == "solver_type")
     {
-      this->SetSolverType(boost::any_cast<std::string>(_value));
+      this->SetSolverType(any_cast<std::string>(_value));
     }
     else if (_key == "max_contacts")
     {
-      int value = boost::any_cast<int>(_value);
+      int value = any_cast<int>(_value);
       gzerr << "Setting [" << _key << "] in DART to [" << value
             << "] not yet supported.\n";
     }
     else if (_key == "min_step_size")
     {
-      double value = boost::any_cast<double>(_value);
+      double value = any_cast<double>(_value);
       gzerr << "Setting [" << _key << "] in DART to [" << value
             << "] not yet supported.\n";
     }
     else if (_key == "auto_reset_forces")
     {
       this->dataPtr->resetAllForcesAfterSimulationStep =
-          boost::any_cast<bool>(_value);
+          any_cast<bool>(_value);
+    }
+    else if (_key == "collision_detector")
+    {
+      // set collision detector
+      std::string useCollisionDetector = any_cast<std::string>(_value);
+      std::shared_ptr<dart::collision::CollisionDetector> cd;
+      if (useCollisionDetector == "bullet")
+      {
+        gzdbg << "Using BULLET collision detector" << std::endl;
+#ifdef HAVE_DART_BULLET
+        cd = dart::collision::BulletCollisionDetector::create();
+#else
+        gzerr << "Required DART bullet collision package not in use. Please "
+            << "install libdart<version>-collision-bullet-dev." << std::endl;
+#endif
+      }
+      else if (useCollisionDetector == "fcl")
+      {
+        gzdbg << "Using FCL collision detector" << std::endl;
+        cd = dart::collision::FCLCollisionDetector::create();
+      }
+      else if (useCollisionDetector == "ode")
+      {
+        // ODE collision detectors have to be disabled because it causes
+        // conflicts with the version of the internally compiled ODE library.
+        // See also discussion in the PR:
+        // https://bitbucket.org/osrf/gazebo/pull-requests/2956/
+        //   dart-heightmap-with-bullet-and-ode/diff#comment-81389484
+        gzerr << "The use of the ODE collision detector with DART is disabled "
+            << "because it causes conflicts with the version of ODE used in "
+            << "Gazebo." << std::endl;
+      }
+      else if (useCollisionDetector == "dart")
+      {
+        gzdbg << "Using DART collision detector" << std::endl;
+        cd = dart::collision::DARTCollisionDetector::create();
+      }
+
+      if (cd)
+      {
+        this->dataPtr->dtWorld->getConstraintSolver()->setCollisionDetector(cd);
+      }
+      else
+      {
+        gzwarn << "collision_detector element set in SDF, but no valid "
+               << "collision detector specified (" << useCollisionDetector
+               << " not supported. Using default." << std::endl;
+      }
     }
     else
     {
@@ -681,15 +785,21 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
       // max_step_size parameter.
       if (_key == "max_step_size")
       {
-        this->dataPtr->dtWorld->setTimeStep(boost::any_cast<double>(_value));
+        this->dataPtr->dtWorld->setTimeStep(any_cast<double>(_value));
       }
 
       return PhysicsEngine::SetParam(_key, _value);
     }
   }
+  catch(std::bad_any_cast &e)
+  {
+    gzerr << "SetParam(" << _key << ") std::any_cast error: "
+          << e.what() << std::endl;
+    return false;
+  }
   catch(boost::bad_any_cast &e)
   {
-    gzerr << "DARTPhysics::SetParam(" << _key << ") boost::any_cast error: "
+    gzerr << "SetParam(" << _key << ") boost::any_cast error: "
           << e.what() << std::endl;
     return false;
   }
