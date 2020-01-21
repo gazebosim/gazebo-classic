@@ -115,6 +115,7 @@ set (msgs
   time.proto
   topic_info.proto
   track_visual.proto
+  twist.proto
   undo_redo.proto
   user_cmd.proto
   user_cmd_stats.proto
@@ -207,12 +208,11 @@ target_link_libraries(gazebo_msgs
 
 add_dependencies(gazebo_msgs gazebomsgs_out)
 
-set (message_headers "" CACHE INTERNAL "Include dirs description")
+set (message_headers "")
 
 foreach (hdr ${PROTO_HDRS})
   string (REPLACE "${CMAKE_CURRENT_BINARY_DIR}/" "" hdr ${hdr})
-  APPEND_TO_CACHED_STRING(message_headers
-    "Message Types" "#include \"${hdr}\"\n")
+  set (message_headers "${message_headers}#include \"${hdr}\"\n")
 endforeach()
 configure_file (${PROJECT_SOURCE_DIR}/gazebo/msgs/MessageTypes.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh )

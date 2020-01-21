@@ -1,5 +1,5 @@
 if (WIN32)
-  add_definitions(-DBUILDING_DLL -DBUILDING_DLL_GZ_PLUGIN)
+  add_definitions(-DBUILDING_DLL -DBUILDING_DLL_GZ_PLUGIN -DNOUSER)
 endif()
 
 if(WIN32 AND NOT UNIX)
@@ -128,6 +128,7 @@ set (plugins_single_header
   StaticMapPlugin
   StopWorldPlugin
   TouchPlugin
+  VariableGearboxPlugin
   VehiclePlugin
   WheelSlipPlugin
   WheelTrackedVehiclePlugin

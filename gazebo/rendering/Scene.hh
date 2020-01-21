@@ -25,6 +25,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <OGRE/OgrePrerequisites.h>
+
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Color.hh>
@@ -38,9 +40,6 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
-
-#include <OGRE/OgrePrerequisites.h>
-
 
 namespace SkyX
 {

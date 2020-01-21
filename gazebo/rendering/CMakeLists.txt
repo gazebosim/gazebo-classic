@@ -185,6 +185,7 @@ set (gtest_sources_dri
   RenderingMaterial_TEST.cc
   OriginVisual_TEST.cc
   RenderEngine_TEST.cc
+  RenderEvents_TEST.cc
   RenderingLight_TEST.cc
   RFIDVisual_TEST.cc
   RTShaderSystem_TEST.cc
@@ -199,10 +200,9 @@ set (gtest_sources_dri
 gz_build_dri_tests(${gtest_sources_dri}
   EXTRA_LIBS gazebo_rendering gazebo_test_fixture)
 
-set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
+set (rendering_headers "")
 foreach (hdr ${headers})
-  APPEND_TO_CACHED_STRING(rendering_headers
-    "Rendering Headers" "#include \"gazebo/rendering/${hdr}\"\n")
+  set (rendering_headers "${rendering_headers}#include \"gazebo/rendering/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
@@ -212,9 +212,6 @@ link_directories(
 )
 
 add_definitions(-DSKYX_LIB)
-if (WIN32)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIWinsock2.h")
-endif()
 
 gz_add_library(gazebo_rendering ${sources})
 

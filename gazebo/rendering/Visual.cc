@@ -1092,7 +1092,8 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
         Ogre::SimpleRenderable *simpleRenderable =
             dynamic_cast<Ogre::SimpleRenderable *>(obj);
         if (simpleRenderable)
-          GZ_OGRE_SET_MATERIAL_BY_NAME(simpleRenderable, this->dataPtr->myMaterialName);
+          GZ_OGRE_SET_MATERIAL_BY_NAME(simpleRenderable,
+              this->dataPtr->myMaterialName);
       }
     }
   }
@@ -2420,15 +2421,31 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
 
       if (_mesh->HasSkeleton())
       {
-        common::Skeleton *skel = _mesh->GetSkeleton();
-        for (unsigned int j = 0; j < subMesh.GetNodeAssignmentsCount(); j++)
+        if (subMesh.GetNodeAssignmentsCount() > 0)
         {
-          common::NodeAssignment na = subMesh.GetNodeAssignment(j);
+          common::Skeleton *skel = _mesh->GetSkeleton();
+          for (unsigned int j = 0; j < subMesh.GetNodeAssignmentsCount(); j++)
+          {
+            common::NodeAssignment na = subMesh.GetNodeAssignment(j);
+            Ogre::VertexBoneAssignment vba;
+            vba.vertexIndex = na.vertexIndex;
+            vba.boneIndex = ogreSkeleton->getBone(skel->GetNodeByHandle(
+                                na.nodeIndex)->GetName())->getHandle();
+            vba.weight = na.weight;
+            ogreSubMesh->addBoneAssignment(vba);
+          }
+        }
+        else
+        {
+          // When there is a skeleton associated with the mesh,
+          // OGRE requires at least 1 bone assignment to compile the blend
+          // weights.
+          // The submeshs loaded from COLLADA may not have weights so we need
+          // to add a dummy bone assignment for OGRE.
           Ogre::VertexBoneAssignment vba;
-          vba.vertexIndex = na.vertexIndex;
-          vba.boneIndex = ogreSkeleton->getBone(skel->GetNodeByHandle(
-                              na.nodeIndex)->GetName())->getHandle();
-          vba.weight = na.weight;
+          vba.vertexIndex = 0;
+          vba.boneIndex = 0;
+          vba.weight = 0;
           ogreSubMesh->addBoneAssignment(vba);
         }
       }

@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <sstream>
 
 #include <boost/algorithm/string.hpp>
@@ -53,6 +47,7 @@
 #include "gazebo/rendering/Distortion.hh"
 #include "gazebo/rendering/CameraPrivate.hh"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/RenderEvents.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -571,7 +566,9 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
+    Events::cameraPreRender(this->Name());
     this->renderTarget->update();
+    Events::cameraPostRender(this->Name());
   }
 }
 
@@ -2023,14 +2020,18 @@ void Camera::UpdateFOV()
 //////////////////////////////////////////////////
 float Camera::AvgFPS() const
 {
-  if (this->renderTarget) {
+  if (this->renderTarget)
+  {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
     return this->renderTarget->getStatistics().avgFPS;
 #else
     return this->renderTarget->getAverageFPS();
 #endif
-  } else
+  }
+  else
+  {
     return 0.0f;
+  }
 }
 
 //////////////////////////////////////////////////

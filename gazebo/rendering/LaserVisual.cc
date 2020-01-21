@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/bind.hpp>
 
 #include "gazebo/common/MeshManager.hh"
@@ -138,13 +132,15 @@ void LaserVisual::Update()
       // not intersected an object.
       dPtr->noHitRayStrips.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_STRIP));
-      GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->noHitRayStrips[j], "Gazebo/LightBlueLaser");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->noHitRayStrips[j],
+          "Gazebo/LightBlueLaser");
 
       // Deadzone ray fans display areas that are between the sensor's origin
       // and start of the rays.
       dPtr->deadzoneRayFans.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
-      GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->deadzoneRayFans[j], "Gazebo/BlackTransparent");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->deadzoneRayFans[j],
+          "Gazebo/BlackTransparent");
       dPtr->deadzoneRayFans[j]->AddPoint(ignition::math::Vector3d(0, 0, 0));
 
       // Individual ray lines

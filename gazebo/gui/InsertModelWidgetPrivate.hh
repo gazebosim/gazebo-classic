@@ -25,6 +25,11 @@
 #include <boost/thread/mutex.hpp>
 
 #ifdef HAVE_IGNITION_FUEL_TOOLS
+  #ifdef _WIN32
+    // DELETE is defined in winnt.h and causes a problem with
+    // ignition::fuel_tools::REST::DELETE
+    #undef DELETE
+  #endif
   #include <ignition/fuel_tools/FuelClient.hh>
   #include <ignition/fuel_tools/ModelIdentifier.hh>
 #endif

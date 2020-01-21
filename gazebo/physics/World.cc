@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <time.h>
 
 #include <tbb/parallel_for.h>
@@ -136,6 +130,7 @@ World::World(const std::string &_name)
   this->dataPtr->thread = nullptr;
   this->dataPtr->logThread = nullptr;
   this->dataPtr->stop = false;
+  this->dataPtr->sensorsInitialized = false;
 
   this->dataPtr->currentStateBuffer = 0;
   this->dataPtr->stateToggle = 0;
@@ -1959,177 +1954,182 @@ void World::ProcessFactoryMsgs()
 {
   std::list<sdf::ElementPtr> modelsToLoad, lightsToLoad;
 
+  std::list<msgs::Factory> factoryMsgsCopy;
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
-    for (auto const &factoryMsg : this->dataPtr->factoryMsgs)
+
+    std::copy(this->dataPtr->factoryMsgs.begin(),
+      this->dataPtr->factoryMsgs.end(),
+      std::back_inserter(factoryMsgsCopy));
+    this->dataPtr->factoryMsgs.clear();
+  }
+
+  for (auto const &factoryMsg : factoryMsgsCopy)
+  {
+    this->dataPtr->factorySDF->Root()->ClearElements();
+
+    if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
     {
-      this->dataPtr->factorySDF->Root()->ClearElements();
-
-      if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
+      // SDF Parsing happens here
+      if (!sdf::readString(factoryMsg.sdf(), this->dataPtr->factorySDF))
       {
-        // SDF Parsing happens here
-        if (!sdf::readString(factoryMsg.sdf(), this->dataPtr->factorySDF))
-        {
-          gzerr << "Unable to read sdf string[" << factoryMsg.sdf() << "]\n";
-          continue;
-        }
+        gzerr << "Unable to read sdf string[" << factoryMsg.sdf() << "]\n";
+        continue;
       }
-      else if (factoryMsg.has_sdf_filename() &&
-              !factoryMsg.sdf_filename().empty())
-      {
-        std::string filename;
+    }
+    else if (factoryMsg.has_sdf_filename() &&
+            !factoryMsg.sdf_filename().empty())
+    {
+      std::string filename;
 #ifdef HAVE_IGNITION_FUEL_TOOLS
-        // If http(s), look at Fuel
-        auto uri = ignition::common::URI(factoryMsg.sdf_filename());
-        if (uri.Valid() && (uri.Scheme() == "https" || uri.Scheme() == "http"))
-        {
-          filename = common::FuelModelDatabase::Instance()->ModelFile(
-              factoryMsg.sdf_filename());
-        }
-        // Otherwise, look at database
-        else
-#endif
-        {
-          filename = common::ModelDatabase::Instance()->GetModelFile(
-              factoryMsg.sdf_filename());
-        }
-
-        if (!sdf::readFile(filename, this->dataPtr->factorySDF))
-        {
-          gzerr << "Unable to read sdf file.\n";
-          continue;
-        }
-      }
-      else if (factoryMsg.has_clone_model_name())
+      // If http(s), look at Fuel
+      auto uri = ignition::common::URI(factoryMsg.sdf_filename());
+      if (uri.Valid() && (uri.Scheme() == "https" || uri.Scheme() == "http"))
       {
-        ModelPtr model = this->ModelByName(factoryMsg.clone_model_name());
-        if (!model)
-        {
-          gzerr << "Unable to clone model[" << factoryMsg.clone_model_name()
-            << "]. Model not found.\n";
-          continue;
-        }
-
-        this->dataPtr->factorySDF->Root()->InsertElement(
-            model->GetSDF()->Clone());
-
-        std::string newName = model->GetName() + "_clone";
-        newName = this->UniqueModelName(newName);
-
-        this->dataPtr->factorySDF->Root()->GetElement("model")->GetAttribute(
-            "name")->Set(newName);
+        filename = common::FuelModelDatabase::Instance()->ModelFile(
+            factoryMsg.sdf_filename());
       }
+      // Otherwise, look at database
       else
+#endif
       {
-        gzerr << "Unable to load sdf from factory message."
-          << "No SDF or SDF filename specified.\n";
+        filename = common::ModelDatabase::Instance()->GetModelFile(
+            factoryMsg.sdf_filename());
+      }
+
+      if (!sdf::readFile(filename, this->dataPtr->factorySDF))
+      {
+        gzerr << "Unable to read sdf file.\n";
+        continue;
+      }
+    }
+    else if (factoryMsg.has_clone_model_name())
+    {
+      ModelPtr model = this->ModelByName(factoryMsg.clone_model_name());
+      if (!model)
+      {
+        gzerr << "Unable to clone model[" << factoryMsg.clone_model_name()
+          << "]. Model not found.\n";
         continue;
       }
 
-      if (factoryMsg.has_edit_name())
-      {
-        BasePtr base(
-          this->dataPtr->rootElement->GetByName(factoryMsg.edit_name()));
-        if (base)
-        {
-          sdf::ElementPtr elem;
-          if (this->dataPtr->factorySDF->Root()->GetName() == "sdf")
-            elem = this->dataPtr->factorySDF->Root()->GetFirstElement();
-          else
-            elem = this->dataPtr->factorySDF->Root();
+      this->dataPtr->factorySDF->Root()->InsertElement(
+          model->GetSDF()->Clone());
 
-          base->UpdateParameters(elem);
-        }
+      std::string newName = model->GetName() + "_clone";
+      newName = this->UniqueModelName(newName);
+
+      this->dataPtr->factorySDF->Root()->GetElement("model")->GetAttribute(
+          "name")->Set(newName);
+    }
+    else
+    {
+      gzerr << "Unable to load sdf from factory message."
+        << "No SDF or SDF filename specified.\n";
+      continue;
+    }
+
+    if (factoryMsg.has_edit_name())
+    {
+      BasePtr base(
+        this->dataPtr->rootElement->GetByName(factoryMsg.edit_name()));
+      if (base)
+      {
+        sdf::ElementPtr elem;
+        if (this->dataPtr->factorySDF->Root()->GetName() == "sdf")
+          elem = this->dataPtr->factorySDF->Root()->GetFirstElement();
+        else
+          elem = this->dataPtr->factorySDF->Root();
+
+        base->UpdateParameters(elem);
+      }
+    }
+    else
+    {
+      bool isActor = false;
+      bool isModel = false;
+      bool isLight = false;
+
+      sdf::ElementPtr elem = this->dataPtr->factorySDF->Root()->Clone();
+
+      if (!elem)
+      {
+        gzerr << "Invalid SDF:";
+        this->dataPtr->factorySDF->Root()->PrintValues("");
+        continue;
+      }
+
+      if (elem->HasElement("world"))
+        elem = elem->GetElement("world");
+
+      if (elem->HasElement("model"))
+      {
+        elem = elem->GetElement("model");
+        isModel = true;
+      }
+      else if (elem->HasElement("light"))
+      {
+        elem = elem->GetElement("light");
+        isLight = true;
+      }
+      else if (elem->HasElement("actor"))
+      {
+        elem = elem->GetElement("actor");
+        isActor = true;
       }
       else
       {
-        bool isActor = false;
-        bool isModel = false;
-        bool isLight = false;
+        gzerr << "Unable to find a model, light, or actor in:\n";
+        this->dataPtr->factorySDF->Root()->PrintValues("");
+        continue;
+      }
 
-        sdf::ElementPtr elem = this->dataPtr->factorySDF->Root()->Clone();
+      elem->SetParent(this->dataPtr->sdf);
+      elem->GetParent()->InsertElement(elem);
+      if (factoryMsg.has_pose())
+      {
+        elem->GetElement("pose")->Set(msgs::ConvertIgn(factoryMsg.pose()));
+      }
 
-        if (!elem)
+      if (isActor)
+      {
+        ActorPtr actor = this->LoadActor(elem, this->dataPtr->rootElement);
+        actor->Init();
+        actor->LoadPlugins();
+      }
+      else if (isModel)
+      {
+        // Make sure model name is unique
+        auto entityName = elem->Get<std::string>("name");
+        if (entityName.empty())
         {
-          gzerr << "Invalid SDF:";
-          this->dataPtr->factorySDF->Root()->PrintValues("");
+          gzerr << "Can't load model with empty name" << std::endl;
           continue;
         }
 
-        if (elem->HasElement("world"))
-          elem = elem->GetElement("world");
-
-        if (elem->HasElement("model"))
+        // Model with the given name already exists
+        if (this->ModelByName(entityName))
         {
-          elem = elem->GetElement("model");
-          isModel = true;
-        }
-        else if (elem->HasElement("light"))
-        {
-          elem = elem->GetElement("light");
-          isLight = true;
-        }
-        else if (elem->HasElement("actor"))
-        {
-          elem = elem->GetElement("actor");
-          isActor = true;
-        }
-        else
-        {
-          gzerr << "Unable to find a model, light, or actor in:\n";
-          this->dataPtr->factorySDF->Root()->PrintValues("");
-          continue;
-        }
-
-        elem->SetParent(this->dataPtr->sdf);
-        elem->GetParent()->InsertElement(elem);
-        if (factoryMsg.has_pose())
-        {
-          elem->GetElement("pose")->Set(msgs::ConvertIgn(factoryMsg.pose()));
-        }
-
-        if (isActor)
-        {
-          ActorPtr actor = this->LoadActor(elem, this->dataPtr->rootElement);
-          actor->Init();
-          actor->LoadPlugins();
-        }
-        else if (isModel)
-        {
-          // Make sure model name is unique
-          auto entityName = elem->Get<std::string>("name");
-          if (entityName.empty())
+          // If allow renaming is disabled
+          if (!factoryMsg.allow_renaming())
           {
-            gzerr << "Can't load model with empty name" << std::endl;
+            gzwarn << "A model named [" << entityName << "] already exists "
+                  << "and allow_renaming is false. Model won't be inserted."
+                  << std::endl;
             continue;
           }
 
-          // Model with the given name already exists
-          if (this->ModelByName(entityName))
-          {
-            // If allow renaming is disabled
-            if (!factoryMsg.allow_renaming())
-            {
-              gzwarn << "A model named [" << entityName << "] already exists "
-                    << "and allow_renaming is false. Model won't be inserted."
-                    << std::endl;
-              continue;
-            }
-
-            entityName = this->UniqueModelName(entityName);
-            elem->GetAttribute("name")->Set(entityName);
-          }
-
-          modelsToLoad.push_back(elem);
+          entityName = this->UniqueModelName(entityName);
+          elem->GetAttribute("name")->Set(entityName);
         }
-        else if (isLight)
-        {
-          lightsToLoad.push_back(elem);
-        }
+
+        modelsToLoad.push_back(elem);
+      }
+      else if (isLight)
+      {
+        lightsToLoad.push_back(elem);
       }
     }
-
-    this->dataPtr->factoryMsgs.clear();
   }
 
   // Load models
@@ -2653,18 +2653,49 @@ void World::ProcessMessages()
             ModelPtr m = modelList.front();
             modelList.pop_front();
 
-            // Publish the model's scale
-            msgs::Model msg;
-            msg.set_name(m->GetScopedName());
-            msg.set_id(m->GetId());
-            msgs::Set(msg.mutable_scale(), m->Scale());
-
-            // Not publishing for links for now
-
             // add all nested models to the queue
             Model_V models = m->NestedModels();
             for (auto const &n : models)
               modelList.push_back(n);
+
+            // Publish the model's scale and visual geometry data at the same
+            // time to fix race condition on rendering side when updating
+            // visuals
+            msgs::Model msg;
+            msg.set_name(m->GetScopedName());
+            msg.set_id(m->GetId());
+            Link_V links = m->GetLinks();
+            for (auto l : links)
+            {
+              msgs::Link *linkMsg = msg.add_link();
+              linkMsg->set_id(l->GetId());
+              linkMsg->set_name(l->GetScopedName());
+
+              // tmpMsg is unused. The Link::FillMsg call is made in order to
+              // keep link's visual msgs up-to-date with latest sdf values.
+              // The for loop below does the actual copy of visual geom msg.
+              {
+                msgs::Link tmpMsg;
+                l->FillMsg(tmpMsg);
+              }
+
+              auto visualMsgs = l->Visuals();
+              for (auto v : visualMsgs)
+              {
+                if (!v.second.has_geometry())
+                  continue;
+                msgs::Visual *visualMsg = linkMsg->add_visual();
+                visualMsg->set_name(v.second.name());
+                visualMsg->set_id(v.second.id());
+                visualMsg->set_parent_name(v.second.parent_name());
+                visualMsg->set_parent_id(v.second.parent_id());
+                auto geomMsg = visualMsg->mutable_geometry();
+                geomMsg->CopyFrom(v.second.geometry());
+              }
+            }
+
+            // set scale
+            msgs::Set(msg.mutable_scale(), m->Scale());
 
             this->dataPtr->modelPub->Publish(msg);
           }
