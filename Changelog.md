@@ -5,9 +5,16 @@
 1. Fix missing road segments in camera sensors
     * [Pull request 3182](https://bitbucket.org/osrf/gazebo/pull-request/3182)
 
+1. Workaround for race condition when setting model scale.
+    * [Pull request 3159](https://bitbucket.org/osrf/gazebo/pull-request/3159)
+
 1. Fix compilation of plugins with tbb and qt 5.14.
     * [Pull request 3164](https://bitbucket.org/osrf/gazebo/pull-request/3164)
     * [Issue #2681](https://bitbucket.org/osrf/gazebo/issues/2681)
+
+1. Fix plugin loading in example by fixing uninitialized variable in World and calling `sensors::run_once()`.
+    * [Pull request 3059](https://bitbucket.org/osrf/gazebo/pull-request/3059)
+    * [Pull request 3173](https://bitbucket.org/osrf/gazebo/pull-request/3173)
 
 1. Windows: reduce WinSock header inclusion to limit name conflicts.
     * [Pull request 3158](https://bitbucket.org/osrf/gazebo/pull-request/3158)
