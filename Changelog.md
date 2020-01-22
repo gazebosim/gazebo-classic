@@ -2,6 +2,9 @@
 
 ## Gazebo 9.XX.X (2019-XX-XX)
 
+1. Fix missing road segments in camera sensors
+    * [Pull request 3182](https://bitbucket.org/osrf/gazebo/pull-request/3182)
+
 1. Fix compilation of plugins with tbb and qt 5.14.
     * [Pull request 3164](https://bitbucket.org/osrf/gazebo/pull-request/3164)
     * [Issue #2681](https://bitbucket.org/osrf/gazebo/issues/2681)
