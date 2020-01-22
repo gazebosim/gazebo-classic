@@ -71,7 +71,8 @@ namespace gazebo
     /// \param[in] _world World to initialize.
     /// \param[in] _func function to be called when Poses are available.
     GZ_PHYSICS_VISIBLE
-    void init_world(WorldPtr _world, UpdateScenePosesFunc _func);
+    void init_world(WorldPtr _world,
+                    UpdateScenePosesFunc _func = nullptr);
 
     /// \brief Run world by calling World::Run() given a pointer to it.
     /// \param[in] _world World to run.
@@ -100,7 +101,7 @@ namespace gazebo
     /// gazebo::g_worlds
     /// \param[in] _func function to be called when Poses are available.
     GZ_PHYSICS_VISIBLE
-    void init_worlds(UpdateScenePosesFunc _func);
+    void init_worlds(UpdateScenePosesFunc _func = nullptr);
 
     /// \brief Run multiple worlds stored in static variable
     /// gazebo::g_worlds

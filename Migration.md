@@ -58,12 +58,12 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
    `PresetManager::GetCurrentProfileParam`.
 
 1. **gazebo/physics/PhysicsIface.hh**, **gazebo/physics/World.hh**
-    The public API for initializing worlds is modified to require `std::function`
-    argument that can be called to directly update the poses of objects in a scene.
-    This is a public API, but it does not appear to be commonly used outside
-    of gazebo, so it is not expected to have a large impact to change it.
-    + void `physics::init_world`(WorldPtr, UpdateScenePosesFunc)
-    + void World::Init`(UpdateScenePosesFunc)
+    An optional `std::function` argument is added to the API's for
+    initializing worlds. that can be called to directly update the poses of
+    objects in a rendering Scene. See **PhysicsTypes.hh** for the
+    definition of `UpdateScenePosesFunc`.
+    + void `physics::init_world`(WorldPtr, UpdateScenePosesFunc = nullptr)
+    + void World::Init`(UpdateScenePosesFunc = nullptr)
 
 1. **gazebo/rendering/MarkerManager.cc**
     The `/marker` ignition transport service allows specifying the `id` field

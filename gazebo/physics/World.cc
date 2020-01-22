@@ -2563,6 +2563,10 @@ void World::ProcessMessages()
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
 
+    if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
+         this->dataPtr->updateScenePoses ||
+        (this->dataPtr->poseLocalPub &&
+         this->dataPtr->poseLocalPub->HasConnections()))
     {
       msgs::PosesStamped msg;
 
@@ -2627,7 +2631,10 @@ void World::ProcessMessages()
       }
 
       // Execute callback to export Pose msg
-      this->dataPtr->updateScenePoses(this->Name(), msg);
+      if (this->dataPtr->updateScenePoses)
+      {
+        this->dataPtr->updateScenePoses(this->Name(), msg);
+      }
     }
 
     this->dataPtr->publishModelPoses.clear();

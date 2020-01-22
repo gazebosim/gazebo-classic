@@ -99,7 +99,7 @@ namespace gazebo
       /// \brief Initialize the world.
       /// This is called after Load.
       /// \param[in] _func function to be called when Poses are available.
-      public: void Init(UpdateScenePosesFunc _func);
+      public: void Init(UpdateScenePosesFunc _func = nullptr);
 
       /// \brief Run the world in a thread.
       /// Run the update loop.
