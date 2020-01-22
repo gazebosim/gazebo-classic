@@ -22,6 +22,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Link.hh"
@@ -1382,7 +1383,7 @@ ignition::math::Quaterniond Joint::AxisFrameOffset(
   sdf::Errors errors;
   if (nullptr != this->jointSDFDom)
   {
-    return this->ResolveSdfPose(
+    return common::resolveSdfPose(
         this->jointSDFDom->SemanticPose(),
         this->axisExpressedIn[_index]).Rot().Inverse();
   }

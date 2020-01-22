@@ -14,8 +14,10 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
 
 ### Additions
 
+1. **gazebo/common/SdfFrameSemantics.hh**
+    + `ignition::math::Pose3d` resolveSdfPose(const sdf::SemanticPose &, const std::string &)
+
 1. **gazebo/physics/Base.hh**
-    + public: `ignition::math::Pose3d` ResolveSdfPose(const sdf::SemanticPose &, const std::string &) const
     + public: `ignition::math::Pose3d` SDFPoseRelativeToParent() const
     + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const
 

@@ -17,6 +17,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 #include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
@@ -462,36 +463,10 @@ ignition::math::Pose3d Base::SDFPoseRelativeToParent() const
   auto semPose = this->SDFSemanticPose();
   if (semPose.has_value())
   {
-    return this->ResolveSdfPose(*semPose);
+    return common::resolveSdfPose(*semPose);
   }
   else
   {
     return this->sdf->Get<ignition::math::Pose3d>("pose");
   }
-}
-
-//////////////////////////////////////////////////
-ignition::math::Pose3d Base::ResolveSdfPose(
-    const sdf::SemanticPose &_semPose,
-    const std::string &_resolveTo) const
-{
-  ignition::math::Pose3d pose;
-  ::sdf::Errors errors = _semPose.Resolve(pose, _resolveTo);
-  if (!errors.empty())
-  {
-    if (!_semPose.RelativeTo().empty())
-    {
-      gzerr << "There was an error in SemanticPose::Resolve\n";
-      for (const auto &err : errors)
-      {
-        gzerr << err.Message() << std::endl;
-      }
-      gzerr << "There is no optimal fallback since the relative_to attribute["
-            << _semPose.RelativeTo() << "] does not match the _resolveTo "
-            << "argument[" << _resolveTo << "]. "
-            << "Falling back to using the raw Pose.\n";
-    }
-    pose = _semPose.RawPose();
-  }
-  return pose;
 }

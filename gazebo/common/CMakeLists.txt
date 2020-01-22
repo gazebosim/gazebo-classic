@@ -59,6 +59,7 @@ set (sources
   MouseEvent.cc
   OBJLoader.cc
   PID.cc
+  SdfFrameSemantics.cc
   SemanticVersion.cc
   SkeletonAnimation.cc
   Skeleton.cc

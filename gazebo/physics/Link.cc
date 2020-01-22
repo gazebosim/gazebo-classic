@@ -30,6 +30,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Battery.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Light.hh"
@@ -1531,7 +1532,7 @@ void Link::UpdateVisualMsg()
         auto *visualDom = this->dataPtr->linkSDFDom->VisualByName(msg.name());
 
         msgs::Set(msg.mutable_pose(),
-                  Base::ResolveSdfPose(visualDom->SemanticPose()));
+                  common::resolveSdfPose(visualDom->SemanticPose()));
       }
       bool newVis = true;
       std::string linkName = this->GetScopedName();
