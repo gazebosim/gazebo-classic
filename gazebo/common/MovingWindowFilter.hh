@@ -66,8 +66,6 @@ namespace gazebo
     //////////////////////////////////////////////////
     /// \TODO FIXME hardcoded initial values for now
     template<typename T>
-    // false positive. Same code is fine if we remove the namespaces
-    // cppcheck-suppress uninitMemberVar
     MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate() :
       valWindowSize(4),
       sum(T()),
@@ -110,7 +108,8 @@ namespace gazebo
 
       /// \brief Allow subclasses to initialize their own data pointer.
       /// \param[in] _d Reference to data pointer.
-      protected: MovingWindowFilter<T>(MovingWindowFilterPrivate<T> &_d);
+      protected: explicit MovingWindowFilter<T>(
+                            MovingWindowFilterPrivate<T> &_d);
 
       /// \brief Data pointer.
       protected: MovingWindowFilterPrivate<T> *dataPtr;
@@ -118,8 +117,6 @@ namespace gazebo
 
     //////////////////////////////////////////////////
     template<typename T>
-    // false positive. Same code is fine if we remove the namespaces
-    // cppcheck-suppress uninitMemberVar
     MovingWindowFilter<T>::MovingWindowFilter()
       : dataPtr(new MovingWindowFilterPrivate<T>())
     {

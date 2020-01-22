@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
 #include <boost/algorithm/string.hpp>
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -60,15 +55,19 @@ void LogicalCameraSensor::Load(const std::string &_worldName,
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
   // Store parent model's name for use in the UpdateImpl function.
-  this->dataPtr->modelName = this->dataPtr->parentLink->GetModel()->GetName();
+  this->dataPtr->modelName =
+    this->dataPtr->parentLink->GetModel()->GetScopedName();
 }
 
 //////////////////////////////////////////////////
 std::string LogicalCameraSensor::Topic() const
 {
-  std::string topicName = "~/" + this->ParentName() + "/" + this->Name() +
-    "/models";
-  boost::replace_all(topicName, "::", "/");
+  std::string topicName = Sensor::Topic();
+  if (topicName.empty())
+  {
+    topicName = "~/" + this->ParentName() + "/" + this->Name() + "/models";
+    boost::replace_all(topicName, "::", "/");
+  }
 
   return topicName;
 }
@@ -111,6 +110,33 @@ void LogicalCameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
+void LogicalCameraSensorPrivate::AddVisibleModels(
+    ignition::math::Pose3d &_myPose, const physics::Model_V &_models)
+{
+  for (auto const &model : _models)
+  {
+    auto const &scopedName = model->GetScopedName();
+    auto const aabb = model->BoundingBox();
+
+    if (this->modelName != scopedName && this->frustum.Contains(aabb))
+    {
+      // Add new model msg
+      msgs::LogicalCameraImage::Model *modelMsg = this->msg.add_model();
+
+      // Set the name and pose reported by the sensor.
+      modelMsg->set_name(scopedName);
+      msgs::Set(modelMsg->mutable_pose(),
+          model->WorldPose() - _myPose);
+    }
+    // Check nested models
+    // Note, the model AABB does not necessarily contain the nested model
+    // so nested models must be searched even if the frustum does not contain
+    // the parent model.
+    AddVisibleModels(_myPose, model->NestedModels());
+  }
+}
+
+//////////////////////////////////////////////////
 bool LogicalCameraSensor::UpdateImpl(const bool _force)
 {
   // Only compute if active, or the update is forced
@@ -129,23 +155,8 @@ bool LogicalCameraSensor::UpdateImpl(const bool _force)
     // Set the camera's pose in the message.
     msgs::Set(this->dataPtr->msg.mutable_pose(), myPose);
 
-    // Check all models for inclusion in the frustum.
-    for (auto const &model : this->world->Models())
-    {
-      // Add the the model to the output if it is in the frustum, and
-      // we are not detecting ourselves.
-      if (this->dataPtr->modelName != model->GetName() &&
-          this->dataPtr->frustum.Contains(model->BoundingBox()))
-      {
-        // Add new model msg
-        msgs::LogicalCameraImage::Model *modelMsg =
-          this->dataPtr->msg.add_model();
-
-        // Set the name and pose reported by the sensor.
-        modelMsg->set_name(model->GetScopedName());
-        msgs::Set(modelMsg->mutable_pose(), model->WorldPose() - myPose);
-      }
-    }
+    // Recursively check if models and nested models are in the frustum.
+    this->dataPtr->AddVisibleModels(myPose, this->world->Models());
 
     // Send the message.
     this->dataPtr->pub->Publish(this->dataPtr->msg);

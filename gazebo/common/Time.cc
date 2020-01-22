@@ -74,7 +74,7 @@ Time::Time()
 #else
   // get clock resolution, skip sleep if resolution is larger then
   // requested sleep time
-  clock_getres(CLOCK_REALTIME, &clockResolution);
+  clock_getres(CLOCK_MONOTONIC, &clockResolution);
 #endif
 }
 
@@ -114,6 +114,18 @@ Time::Time(double _time)
 /////////////////////////////////////////////////
 Time::~Time()
 {
+}
+
+/////////////////////////////////////////////////
+Time Time::Maximum()
+{
+  // We do not maximize the nanoseconds, because then the Correct() function
+  // will overflow the seconds member data, which will make the seconds field
+  // negative. Instead, we set the nanoseconds field to one nanosecond beneath
+  // one second, so that it's as high as it can be without spilling into
+  // seconds.
+  return Time(std::numeric_limits<int32_t>::max(),
+              static_cast<int32_t>(1e9) - 1);
 }
 
 /////////////////////////////////////////////////
@@ -426,7 +438,7 @@ Time Time::Sleep(const common::Time &_time)
     result.sec = 0;
     result.nsec = 0;
 #else
-    if (clock_nanosleep(CLOCK_REALTIME, 0, &interval, &remainder) == -1)
+    if (clock_nanosleep(CLOCK_MONOTONIC, 0, &interval, &remainder) == -1)
     {
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;
@@ -435,8 +447,7 @@ Time Time::Sleep(const common::Time &_time)
   }
   else
   {
-    /// \TODO Make this a gzlog
-    gzwarn << "Sleep time is larger than clock resolution, skipping sleep\n";
+    gzlog << "Sleep time is larger than clock resolution, skipping sleep\n";
   }
 
   return result;

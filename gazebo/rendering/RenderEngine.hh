@@ -27,6 +27,9 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_RENDERING_VISIBLE, gazebo, rendering, RenderEngine)
+
 namespace Ogre
 {
   class Root;

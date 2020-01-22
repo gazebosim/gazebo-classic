@@ -23,6 +23,7 @@ set (sources
   COMVisual.cc
   ContactVisual.cc
   Conversions.cc
+  CustomPSSMShadowCameraSetup.cc
   DepthCamera.cc
   Distortion.cc
   DynamicLines.cc
@@ -34,6 +35,7 @@ set (sources
   InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
+  LensFlare.cc
   LinkFrameVisual.cc
   MarkerManager.cc
   MarkerVisual.cc
@@ -85,6 +87,7 @@ set (headers
   COMVisual.hh
   ContactVisual.hh
   Conversions.hh
+  CustomPSSMShadowCameraSetup.hh
   DepthCamera.hh
   Distortion.hh
   DynamicLines.hh
@@ -98,6 +101,7 @@ set (headers
   InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
+  LensFlare.hh
   LinkFrameVisual.hh
   LogicalCameraVisual.hh
   SonarVisual.hh
@@ -164,6 +168,7 @@ set (gtest_sources_dri
   ApplyWrenchVisual_TEST.cc
   ArrowVisual_TEST.cc
   AxisVisual_TEST.cc
+  Camera_TEST.cc
   CameraVisual_TEST.cc
   COMVisual_TEST.cc
   ContactVisual_TEST.cc
@@ -176,11 +181,14 @@ set (gtest_sources_dri
   LaserVisual_TEST.cc
   LogicalCameraVisual_TEST.cc
   LinkFrameVisual_TEST.cc
+  MovableText_TEST.cc
   RenderingMaterial_TEST.cc
   OriginVisual_TEST.cc
   RenderEngine_TEST.cc
+  RenderEvents_TEST.cc
   RenderingLight_TEST.cc
   RFIDVisual_TEST.cc
+  RTShaderSystem_TEST.cc
   Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc
@@ -192,10 +200,9 @@ set (gtest_sources_dri
 gz_build_dri_tests(${gtest_sources_dri}
   EXTRA_LIBS gazebo_rendering gazebo_test_fixture)
 
-set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
+set (rendering_headers "")
 foreach (hdr ${headers})
-  APPEND_TO_CACHED_STRING(rendering_headers
-    "Rendering Headers" "#include \"gazebo/rendering/${hdr}\"\n")
+  set (rendering_headers "${rendering_headers}#include \"gazebo/rendering/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
@@ -204,12 +211,13 @@ link_directories(
   ${ogre_library_dirs}
 )
 
-add_definitions(-DBUILDING_DLL_GZ_RENDERING -DSKYX_LIB)
-if (WIN32)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIWinsock2.h")
-endif()
+add_definitions(-DSKYX_LIB)
 
 gz_add_library(gazebo_rendering ${sources})
+
+target_compile_definitions(gazebo_rendering
+  PRIVATE BUILDING_DLL_GZ_RENDERING
+)
 
 target_link_libraries(gazebo_rendering
   gazebo_common

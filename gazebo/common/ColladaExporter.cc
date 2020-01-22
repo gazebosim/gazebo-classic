@@ -160,7 +160,7 @@ void ColladaExporter::ExportGeometrySource(
     const gazebo::common::SubMesh *_subMesh,
     TiXmlElement *_meshXml, GeometryType _type, const char *_meshID)
 {
-  char sourceId[100], sourceArrayId[100];
+  char sourceId[100], sourceArrayId[107];
   std::ostringstream fillData;
   fillData.precision(8);
   fillData << std::fixed;
@@ -281,7 +281,7 @@ void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
       ExportGeometrySource(subMesh, meshXml, UVMAP, meshId);
     }
 
-    char attributeValue[100];
+    char attributeValue[111];
 
     TiXmlElement *verticesXml = new TiXmlElement("vertices");
     meshXml->LinkEndChild(verticesXml);
@@ -479,7 +479,7 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
     techniqueXml->LinkEndChild(phongXml);
 
     // ambient
-    unsigned int RGBAcolor = material->GetAmbient().GetAsRGBA();
+    unsigned int RGBAcolor = material->Ambient().AsRGBA();
     float r = ((RGBAcolor >> 24) & 0xFF) / 255.0f;
     float g = ((RGBAcolor >> 16) & 0xFF) / 255.0f;
     float b = ((RGBAcolor >> 8) & 0xFF) / 255.0f;
@@ -494,7 +494,7 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
     ambientXml->LinkEndChild(colorXml);
 
     // emission
-    RGBAcolor = material->GetEmissive().GetAsRGBA();
+    RGBAcolor = material->Emissive().AsRGBA();
     r = ((RGBAcolor >> 24) & 0xFF) / 255.0f;
     g = ((RGBAcolor >> 16) & 0xFF) / 255.0f;
     b = ((RGBAcolor >> 8) & 0xFF) / 255.0f;
@@ -522,7 +522,7 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
     }
     else
     {
-      RGBAcolor = material->GetDiffuse().GetAsRGBA();
+      RGBAcolor = material->Diffuse().AsRGBA();
       r = ((RGBAcolor >> 24) & 0xFF) / 255.0f;
       g = ((RGBAcolor >> 16) & 0xFF) / 255.0f;
       b = ((RGBAcolor >> 8) & 0xFF) / 255.0f;
@@ -535,7 +535,7 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
     }
 
     // specular
-    RGBAcolor = material->GetSpecular().GetAsRGBA();
+    RGBAcolor = material->Specular().AsRGBA();
     r = ((RGBAcolor >> 24) & 0xFF) / 255.0f;
     g = ((RGBAcolor >> 16) & 0xFF) / 255.0f;
     b = ((RGBAcolor >> 8) & 0xFF) / 255.0f;
@@ -589,7 +589,7 @@ void ColladaExporter::ExportVisualScenes(
 
   for (unsigned int i = 0; i < this->dataPtr->subMeshCount; ++i)
   {
-    char meshId[100], materialId[100], attributeValue[100];
+    char meshId[100], materialId[100], attributeValue[101];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
     snprintf(materialId, sizeof(materialId), "material_%u", i);
 

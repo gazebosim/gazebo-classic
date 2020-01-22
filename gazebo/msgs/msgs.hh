@@ -35,7 +35,6 @@
 #include "gazebo/msgs/MessageTypes.hh"
 
 #include "gazebo/common/SphericalCoordinates.hh"
-#include "gazebo/common/Color.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Image.hh"
 
@@ -115,11 +114,11 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Any ConvertAny(const ignition::math::Vector3d &_v);
 
-    /// \brief Convert a common::Color to a msgs::Any
+    /// \brief Convert an ignition::math::Color to a msgs::Any
     /// \param[in] _c The color to convert.
     /// \return A msgs::Any object.
     GAZEBO_VISIBLE
-    msgs::Any ConvertAny(const common::Color &_c);
+    msgs::Any ConvertAny(const ignition::math::Color &_c);
 
     /// \brief Convert an ignition::math::Pose3d to a msgs::Any
     /// \param[in] _p The pose to convert.
@@ -163,11 +162,11 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Pose Convert(const ignition::math::Pose3d &_p);
 
-    /// \brief Convert a common::Color to a msgs::Color
+    /// \brief Convert an ignition::math::Color to a msgs::Color
     /// \param[in] _c The color to convert
     /// \return A msgs::Color object
     GAZEBO_VISIBLE
-    msgs::Color Convert(const common::Color &_c);
+    msgs::Color Convert(const ignition::math::Color &_c);
 
     /// \brief Convert a common::Time to a msgs::Time
     /// \param[in] _t The time to convert
@@ -255,11 +254,11 @@ namespace gazebo
     GAZEBO_VISIBLE
     void Set(common::Image &_img, const msgs::Image &_msg);
 
-    /// \brief Convert a msgs::Color to a common::Color
+    /// \brief Convert a msgs::Color to a ignition::math::Color
     /// \param[in] _c The color to convert
-    /// \return A common::Color object
+    /// \return An ignition::math::Color object
     GAZEBO_VISIBLE
-    common::Color Convert(const msgs::Color &_c);
+    ignition::math::Color Convert(const msgs::Color &_c);
 
     /// \brief Convert a msgs::Time to a common::Time
     /// \param[in] _t The time to convert
@@ -303,11 +302,11 @@ namespace gazebo
     GAZEBO_VISIBLE
     void Set(msgs::Pose *_p, const ignition::math::Pose3d &_v);
 
-    /// \brief Set a msgs::Color from a common::Color
+    /// \brief Set a msgs::Color from an ignition::math::Color
     /// \param[out] _p A msgs::Color pointer
-    /// \param[in] _v A common::Color reference
+    /// \param[in] _v An ignition::math::Color reference
     GAZEBO_VISIBLE
-    void Set(msgs::Color *_c, const common::Color &_v);
+    void Set(msgs::Color *_c, const ignition::math::Color &_v);
 
     /// \brief Set a msgs::Time from a common::Time
     /// \param[out] _p A msgs::Time pointer

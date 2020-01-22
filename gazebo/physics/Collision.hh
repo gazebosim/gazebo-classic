@@ -98,7 +98,7 @@ namespace gazebo
 
       /// \brief Get the bounding box for this collision.
       /// \return The bounding box.
-      public: virtual ignition::math::Box BoundingBox() const = 0;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const = 0;
 
       /// \brief Get the shape type.
       /// \return The shape type.
@@ -208,7 +208,7 @@ namespace gazebo
       protected: SurfaceParamsPtr surface;
 
       /// \brief The laser retro value.
-      private: float laserRetro;
+      private: float laserRetro = 0.0;
 
       /// \brief Stores collision state information.
       private: CollisionState state;

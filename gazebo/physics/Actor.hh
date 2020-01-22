@@ -19,7 +19,10 @@
 
 #include <string>
 #include <map>
+#include <memory>
 #include <vector>
+
+#include <ignition/math/Color.hh>
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/common/Time.hh"
@@ -31,12 +34,13 @@ namespace gazebo
   namespace common
   {
     class Mesh;
-    class Color;
     class Skeleton;
   }
 
   namespace physics
   {
+    class ActorPrivate;
+
     /// \brief Information about a trajectory for an Actor.
     /// This doesn't contain the keyframes information, just duration.
     class GZ_PHYSICS_VISIBLE TrajectoryInfo
@@ -143,6 +147,16 @@ namespace gazebo
       /// \sa ResetCustomTrajectory, SetScriptTime
       public: void SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo);
 
+      /// \brief Returns the actor's mesh.
+      /// \return The actor's mesh.
+      public: const common::Mesh *Mesh() const;
+
+      /// \brief Get the custom trajectory.
+      /// \return The custom trajectory or Null if SetCustomTrajectory has
+      /// never been called.
+      /// \sa ResetCustomTrajectory, SetCustomTrajectory
+      public: TrajectoryInfoPtr CustomTrajectory() const;
+
       /// \brief Reset custom trajectory of the actor.
       /// \sa SetCustomTrajectory
       public: void ResetCustomTrajectory();
@@ -187,10 +201,22 @@ namespace gazebo
       /// \param[in] _name Name of the collision object.
       /// \param[in] _pose Pose of the collision object.
       /// \param[in] _radius Radius of the collision object.
+      /// \deprecated This function is no longer used, consider removing it
       private: void AddSphereCollision(const sdf::ElementPtr &_linkSdf,
                    const std::string &_name,
                    const ignition::math::Pose3d &_pose,
                    const double _radius);
+
+      /// \brief Add a box collision object.
+      /// \param[in] _linkSdf Link to add the collision to.
+      /// \param[in] _name Name of the collision object.
+      /// \param[in] _pose Pose of the collision object.
+      /// \param[in] _size Dimensions of the collison object.
+      /// \deprecated This function is no longer used, consider removing it
+      private: void AddBoxCollision(const sdf::ElementPtr &_linkSdf,
+                   const std::string &_name,
+                   const ignition::math::Pose3d &_pose,
+                   const ignition::math::Vector3d &_size);
 
       /// \brief Add a spherical visual object.
       /// \param[in] _linkSdf Link to add the visual to.
@@ -202,7 +228,8 @@ namespace gazebo
       private: void AddSphereVisual(const sdf::ElementPtr &_linkSdf,
                    const std::string &_name,
                    const ignition::math::Pose3d &_pose, const double _radius,
-                   const std::string &_material, const common::Color &_ambient);
+                   const std::string &_material,
+                   const ignition::math::Color &_ambient);
 
       /// \brief Add a box visual object.
       /// \param[in] _linkSdf Link to add the visual to.
@@ -216,7 +243,7 @@ namespace gazebo
                    const ignition::math::Pose3d &_pose,
                    const ignition::math::Vector3d &_size,
                    const std::string &_material,
-                   const common::Color &_ambient);
+                   const ignition::math::Color &_ambient);
 
       /// \brief Add a visual to the given link which holds the actor's skin.
       /// \param[in] _linkSdf Link to add the visual to.
@@ -351,6 +378,9 @@ namespace gazebo
       /// \brief Custom trajectory.
       /// Used to control an actor with a plugin.
       private: TrajectoryInfoPtr customTrajectoryInfo;
+
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ActorPrivate> dataPtr;
     };
     /// \}
   }

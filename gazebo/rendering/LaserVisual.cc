@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/bind.hpp>
 
 #include "gazebo/common/MeshManager.hh"
@@ -132,25 +126,27 @@ void LaserVisual::Update()
       // intersected an object.
       dPtr->rayStrips.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_STRIP));
-      dPtr->rayStrips[j]->setMaterial("Gazebo/BlueLaser");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->rayStrips[j], "Gazebo/BlueLaser");
 
       // No hit ray strips fill in-between the ray lines in areas that have
       // not intersected an object.
       dPtr->noHitRayStrips.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_STRIP));
-      dPtr->noHitRayStrips[j]->setMaterial("Gazebo/LightBlueLaser");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->noHitRayStrips[j],
+          "Gazebo/LightBlueLaser");
 
       // Deadzone ray fans display areas that are between the sensor's origin
       // and start of the rays.
       dPtr->deadzoneRayFans.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
-      dPtr->deadzoneRayFans[j]->setMaterial("Gazebo/BlackTransparent");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->deadzoneRayFans[j],
+          "Gazebo/BlackTransparent");
       dPtr->deadzoneRayFans[j]->AddPoint(ignition::math::Vector3d(0, 0, 0));
 
       // Individual ray lines
       dPtr->rayLines.push_back(
           this->CreateDynamicLine(rendering::RENDERING_LINE_LIST));
-      dPtr->rayLines[j]->setMaterial("Gazebo/BlueLaser");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->rayLines[j], "Gazebo/BlueLaser");
 
       this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     }
@@ -229,7 +225,7 @@ void LaserVisual::Update()
 }
 
 /////////////////////////////////////////////////
-void LaserVisual::SetEmissive(const common::Color &/*_color*/,
+void LaserVisual::SetEmissive(const ignition::math::Color &/*_color*/,
     const bool /*_cascade*/)
 {
 }

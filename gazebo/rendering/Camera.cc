@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <sstream>
 
 #include <boost/algorithm/string.hpp>
@@ -53,6 +47,7 @@
 #include "gazebo/rendering/Distortion.hh"
 #include "gazebo/rendering/CameraPrivate.hh"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/RenderEvents.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -66,6 +61,8 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
   : dataPtr(new CameraPrivate)
 {
   this->initialized = false;
+  this->cameraProjectiveMatrix = ignition::math::Matrix4d::Identity;
+  this->cameraUsingIntrinsics = false;
   this->sdf.reset(new sdf::Element);
   sdf::initFile("camera.sdf", this->sdf);
 
@@ -188,6 +185,142 @@ void Camera::Load()
     this->dataPtr->distortion.reset(new Distortion());
     this->dataPtr->distortion->Load(this->sdf->GetElement("distortion"));
   }
+
+  this->LoadCameraIntrinsics();
+}
+
+//////////////////////////////////////////////////
+void Camera::LoadCameraIntrinsics()
+{
+  if (this->sdf->HasElement("lens"))
+  {
+    sdf::ElementPtr sdfLens = this->sdf->GetElement("lens");
+    if (sdfLens->HasElement("intrinsics"))
+    {
+      sdf::ElementPtr sdfIntrinsics = sdfLens->GetElement("intrinsics");
+      this->UpdateCameraIntrinsics(
+          sdfIntrinsics->Get<double>("fx"),
+          sdfIntrinsics->Get<double>("fy"),
+          sdfIntrinsics->Get<double>("cx"),
+          sdfIntrinsics->Get<double>("cy"),
+          sdfIntrinsics->Get<double>("s"));
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Camera::UpdateCameraIntrinsics(
+    const double _cameraIntrinsicsFx, const double _cameraIntrinsicsFy,
+    const double _cameraIntrinsicsCx, const double _cameraIntrinsicsCy,
+    const double _cameraIntrinsicsS)
+{
+  double clipNear = 0.5;
+  double clipFar = 2.5;
+
+  sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
+  if (clipElem)
+  {
+    clipNear = clipElem->Get<double>("near");
+    clipFar = clipElem->Get<double>("far");
+  }
+
+  this->cameraProjectiveMatrix = this->BuildProjectionMatrix(
+    this->imageWidth, this->imageHeight,
+    _cameraIntrinsicsFx, _cameraIntrinsicsFy,
+    _cameraIntrinsicsCx, _cameraIntrinsicsCy,
+    _cameraIntrinsicsS, clipNear, clipFar);
+
+  if (this->camera != nullptr)
+  {
+    this->camera->setCustomProjectionMatrix(true,
+        Conversions::Convert(this->cameraProjectiveMatrix));
+  }
+
+  this->cameraUsingIntrinsics = true;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::BuildNDCMatrix(
+    const double _left, const double _right,
+    const double _bottom, const double _top,
+    const double _near, const double _far)
+{
+  double inverseWidth = 1.0 / (_right - _left);
+  double inverseHeight = 1.0 / (_top - _bottom);
+  double inverseDistance = 1.0 / (_far - _near);
+
+  return ignition::math::Matrix4d(
+           2.0 * inverseWidth,
+           0.0,
+           0.0,
+           -(_right + _left) * inverseWidth,
+           0.0,
+           2.0 * inverseHeight,
+           0.0,
+           -(_top + _bottom) * inverseHeight,
+           0.0,
+           0.0,
+           -2.0 * inverseDistance,
+           -(_far + _near) * inverseDistance,
+           0.0,
+           0.0,
+           0.0,
+           1.0);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::BuildPerspectiveMatrix(
+    const double _intrinsicsFx, const double _intrinsicsFy,
+    const double _intrinsicsCx, const double _intrinsicsCy,
+    const double _intrinsicsS,
+    const double _clipNear, const double _clipFar)
+{
+  return ignition::math::Matrix4d(
+           _intrinsicsFx,
+           _intrinsicsS,
+           -_intrinsicsCx,
+           0.0,
+           0.0,
+           _intrinsicsFy,
+           -_intrinsicsCy,
+           0.0,
+           0.0,
+           0.0,
+           _clipNear + _clipFar,
+           _clipNear * _clipFar,
+           0.0,
+           0.0,
+           -1.0,
+           0.0);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::BuildProjectiveMatrix(
+    const double _imageWidth, const double _imageHeight,
+    const double _intrinsicsFx, const double _intrinsicsFy,
+    const double _intrinsicsCx, double _intrinsicsCy,
+    const double _intrinsicsS,
+    const double _clipNear, const double _clipFar)
+{
+  return BuildProjectionMatrix(_imageWidth, _imageHeight,
+    _intrinsicsFx, _intrinsicsFy, _intrinsicsCx, _intrinsicsCy, _intrinsicsS,
+    _clipNear, _clipFar);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::BuildProjectionMatrix(
+    const double _imageWidth, const double _imageHeight,
+    const double _intrinsicsFx, const double _intrinsicsFy,
+    const double _intrinsicsCx, double _intrinsicsCy,
+    const double _intrinsicsS,
+    const double _clipNear, const double _clipFar)
+{
+  return Camera::BuildNDCMatrix(
+           0, _imageWidth, 0, _imageHeight, _clipNear, _clipFar) *
+         Camera::BuildPerspectiveMatrix(
+           _intrinsicsFx, _intrinsicsFy,
+           _intrinsicsCx, _imageHeight - _intrinsicsCy,
+           _intrinsicsS, _clipNear, _clipFar);
 }
 
 //////////////////////////////////////////////////
@@ -199,7 +332,6 @@ void Camera::Init()
 
   this->CreateCamera();
 
-  this->sceneNode->attachObject(this->camera);
   this->camera->setAutoAspectRatio(true);
 
   this->sceneNode->setInheritScale(false);
@@ -257,6 +389,7 @@ void Camera::Fini()
   }
 
   this->sceneNode = NULL;
+  this->cameraNode = nullptr;
   this->viewport = NULL;
 
   this->scene.reset();
@@ -433,7 +566,9 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
+    Events::cameraPreRender(this->Name());
     this->renderTarget->update();
+    Events::cameraPostRender(this->Name());
   }
 }
 
@@ -661,8 +796,11 @@ void Camera::SetClipDist()
 
   if (this->camera)
   {
-    this->camera->setNearClipDistance(clipElem->Get<double>("near"));
-    this->camera->setFarClipDistance(clipElem->Get<double>("far"));
+    if (!this->cameraUsingIntrinsics)
+    {
+      this->camera->setNearClipDistance(clipElem->Get<double>("near"));
+      this->camera->setFarClipDistance(clipElem->Get<double>("far"));
+    }
     this->camera->setRenderingDistance(clipElem->Get<double>("far"));
   }
   else
@@ -684,7 +822,8 @@ void Camera::SetClipDist(const float _near, const float _far)
 void Camera::SetFixedYawAxis(const bool _useFixed,
     const ignition::math::Vector3d &_fixedAxis)
 {
-  this->camera->setFixedYawAxis(_useFixed, Conversions::Convert(_fixedAxis));
+  this->cameraNode->setFixedYawAxis(_useFixed,
+      Conversions::Convert(_fixedAxis));
   this->dataPtr->yawFixed = _useFixed;
   this->dataPtr->yawFixedAxis = _fixedAxis;
 }
@@ -769,10 +908,15 @@ unsigned int Camera::ImageDepth() const
 
   if (imgFmt == "L8" || imgFmt == "L_INT8")
     return 1;
+  else if (imgFmt == "L16" || imgFmt == "L_INT16" || imgFmt == "L_UINT16")
+    return 2;
   else if (imgFmt == "R8G8B8" || imgFmt == "RGB_INT8")
     return 3;
   else if (imgFmt == "B8G8R8" || imgFmt == "BGR_INT8")
     return 3;
+  else if (imgFmt == "R16G16B16" || imgFmt == "RGB_INT16"
+      || imgFmt == "RGB_UINT16")
+    return 6;
   else if ((imgFmt == "BAYER_RGGB8") || (imgFmt == "BAYER_BGGR8") ||
             (imgFmt == "BAYER_GBRG8") || (imgFmt == "BAYER_GRBG8"))
     return 1;
@@ -782,6 +926,14 @@ unsigned int Camera::ImageDepth() const
           << imgFmt << "), using default Ogre::PF_R8G8B8\n";
     return 3;
   }
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::ImageMemorySize() const
+{
+  return  Ogre::PixelUtil::getMemorySize(this->ImageWidth(),
+      this->ImageHeight(), 1, static_cast<Ogre::PixelFormat>(
+      this->imageFormat));
 }
 
 //////////////////////////////////////////////////
@@ -829,6 +981,8 @@ int Camera::OgrePixelFormat(const std::string &_format)
 
   if (_format == "L8" || _format == "L_INT8")
     result = static_cast<int>(Ogre::PF_L8);
+  else if (_format == "L16" || _format == "L_INT16" || _format == "L_UINT16")
+    result = static_cast<int>(Ogre::PF_L16);
   else if (_format == "R8G8B8" || _format == "RGB_INT8")
     result = static_cast<int>(Ogre::PF_BYTE_RGB);
   else if (_format == "B8G8R8" || _format == "BGR_INT8")
@@ -837,6 +991,9 @@ int Camera::OgrePixelFormat(const std::string &_format)
     result = static_cast<int>(Ogre::PF_FLOAT32_R);
   else if (_format == "FLOAT16")
     result = static_cast<int>(Ogre::PF_FLOAT16_R);
+  else if (_format == "R16G16B16" || _format == "RGB_INT16"
+      || _format == "RGB_UINT16")
+    result = static_cast<int>(Ogre::PF_SHORT_RGB);
   else if ((_format == "BAYER_RGGB8") ||
             (_format == "BAYER_BGGR8") ||
             (_format == "BAYER_GBRG8") ||
@@ -941,7 +1098,8 @@ unsigned int Camera::ViewportHeight() const
 //////////////////////////////////////////////////
 void Camera::SetAspectRatio(const float ratio)
 {
-  this->camera->setAspectRatio(ratio);
+  if (!this->cameraUsingIntrinsics)
+    this->camera->setAspectRatio(ratio);
 }
 
 //////////////////////////////////////////////////
@@ -1345,13 +1503,22 @@ void Camera::CreateCamera()
 {
   this->camera = this->scene->OgreSceneManager()->createCamera(
       this->scopedUniqueName);
+  this->cameraNode = this->sceneNode->createChildSceneNode(
+      this->scopedUniqueName + "_cameraNode");
+  this->cameraNode->attachObject(this->camera);
 
   if (this->sdf->HasElement("projection_type"))
     this->SetProjectionType(this->sdf->Get<std::string>("projection_type"));
 
   this->SetFixedYawAxis(false);
-  this->camera->yaw(Ogre::Degree(-90.0));
-  this->camera->roll(Ogre::Degree(-90.0));
+  this->cameraNode->yaw(Ogre::Degree(-90.0));
+  this->cameraNode->roll(Ogre::Degree(-90.0));
+
+  if (cameraUsingIntrinsics)
+  {
+    this->camera->setCustomProjectionMatrix(true,
+      Conversions::Convert(this->cameraProjectiveMatrix));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1376,6 +1543,12 @@ bool Camera::WorldPointOnPlane(const int _x, const int _y,
 }
 
 //////////////////////////////////////////////////
+double Camera::LimitFOV(const double _fov)
+{
+  return std::min(std::max(0.001, _fov), M_PI * 0.999);
+}
+
+//////////////////////////////////////////////////
 void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   this->renderTarget = _target;
@@ -1393,8 +1566,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
-    this->viewport->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor()));
+    auto const &ignBG = this->scene->BackgroundColor();
+    this->viewport->setBackgroundColour(Conversions::Convert(ignBG));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
@@ -1551,16 +1724,9 @@ bool Camera::TrackVisualImpl(const std::string &_name)
 {
   VisualPtr visual = this->scene->GetVisual(_name);
   if (visual)
-  {
     return this->TrackVisualImpl(visual);
-  }
-  else
-  {
-    this->camera->setAutoTracking(false);
-    this->dataPtr->trackedVisual.reset();
-    this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
-        Conversions::Convert(this->dataPtr->yawFixedAxis));
-  }
+
+  this->TrackVisualImpl(visual);
 
   if (_name.empty())
     return true;
@@ -1575,16 +1741,27 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   if (_visual)
   {
     this->dataPtr->trackedVisual = _visual;
-    this->camera->setAutoTracking(true, _visual->GetSceneNode());
-    this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
-
+    this->cameraNode->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+    this->cameraNode->setAutoTracking(true, _visual->GetSceneNode());
     result = true;
   }
-  else
+  else if (this->cameraNode->getAutoTrackTarget() != 0)
   {
-    this->camera->setAutoTracking(false);
+    this->cameraNode->setAutoTracking(false);
     this->dataPtr->trackedVisual.reset();
-    this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
+    auto cameraNodeDerivedRot = this->cameraNode->_getDerivedOrientation();
+    // reset cameraNode to initial pose
+    this->cameraNode->setFixedYawAxis(false);
+    this->cameraNode->setOrientation(Ogre::Quaternion::IDENTITY);
+    this->cameraNode->yaw(Ogre::Degree(-90.0));
+    this->cameraNode->roll(Ogre::Degree(-90.0));
+    // compensate for the pose change after resetting cameraNode
+    // so that the derived camera orientation remains the same
+    auto rot = cameraNodeDerivedRot *
+        this->cameraNode->_getDerivedOrientation().Inverse() *
+        this->sceneNode->_getDerivedOrientation();
+    this->SetWorldPose({this->WorldPosition(), {rot.w, rot.x, rot.y, rot.z}});
+    this->cameraNode->setFixedYawAxis(this->dataPtr->yawFixed,
         Conversions::Convert(this->dataPtr->yawFixedAxis));
   }
 
@@ -1608,12 +1785,20 @@ bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)
   {
-    ignition::math::Box bbox = _visual->BoundingBox();
+    ignition::math::AxisAlignedBox bbox = _visual->BoundingBox();
     Ogre::AxisAlignedBox box;
     box.setMinimum(bbox.Min().X(), bbox.Min().Y(), bbox.Min().Z());
     box.setMaximum(bbox.Max().X(), bbox.Max().Y(), bbox.Max().Z());
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    box.transform(_visual->GetSceneNode()->_getFullTransform());
+#else
     box.transformAffine(_visual->GetSceneNode()->_getFullTransform());
+#endif
+
+    // update cam node to ensure transform is update-to-date
+    this->cameraNode->_update(false, true);
+
     return this->camera->isVisible(box);
   }
 
@@ -1819,9 +2004,16 @@ void Camera::UpdateFOV()
 
     double hfov = this->HFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-
-    this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
+    if (this->cameraUsingIntrinsics)
+    {
+        this->camera->setCustomProjectionMatrix(true,
+          Conversions::Convert(this->cameraProjectiveMatrix));
+    }
+    else
+    {
+      this->camera->setAspectRatio(ratio);
+      this->camera->setFOVy(Ogre::Radian(this->LimitFOV(vfov)));
+    }
   }
 }
 
@@ -1829,15 +2021,27 @@ void Camera::UpdateFOV()
 float Camera::AvgFPS() const
 {
   if (this->renderTarget)
+  {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    return this->renderTarget->getStatistics().avgFPS;
+#else
     return this->renderTarget->getAverageFPS();
+#endif
+  }
   else
+  {
     return 0.0f;
+  }
 }
 
 //////////////////////////////////////////////////
 unsigned int Camera::TriangleCount() const
 {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+  return this->renderTarget->getStatistics().triangleCount;
+#else
   return this->renderTarget->getTriangleCount();
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1882,7 +2086,7 @@ std::string Camera::ProjectionType() const
 }
 
 //////////////////////////////////////////////////
-bool Camera::SetBackgroundColor(const common::Color &_color)
+bool Camera::SetBackgroundColor(const ignition::math::Color &_color)
 {
   if (this->OgreViewport())
   {

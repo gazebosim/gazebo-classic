@@ -41,7 +41,7 @@ namespace gazebo
     {
       /// \brief constructor
       /// \param[in] _what The error description
-      public: SvgError(const std::string &_what);
+      public: explicit SvgError(const std::string &_what);
     };
 
     /// \brief SVG command data structure
@@ -84,7 +84,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _samples The number of points for cubic spline segments
-      public: SVGLoader(unsigned int _samples);
+      public: explicit SVGLoader(unsigned int _samples);
 
       /// \brief destructor
       public: ~SVGLoader();

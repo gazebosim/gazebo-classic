@@ -23,7 +23,7 @@
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/EditorItem.hh"
@@ -272,7 +272,7 @@ namespace gazebo
       protected: double drawingOriginY;
 
       /// \brief Border color of the rect item.
-      protected: common::Color borderColor;
+      protected: ignition::math::Color borderColor;
 
       /// \brief Rotation angle of the rect item in degrees.
       protected: double rotationAngle;

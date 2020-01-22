@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -67,9 +61,8 @@ Joint::Joint(BasePtr _parent)
   this->stopStiffness[1] = 1e8;
   this->stopDissipation[1] = 1.0;
   // these flags are related to issue #494
-  // set default to true for backward compatibility
-  this->axisParentModelFrame[0] = true;
-  this->axisParentModelFrame[1] = true;
+  this->axisParentModelFrame[0] = false;
+  this->axisParentModelFrame[1] = false;
 
   if (!this->sdfJoint)
   {
@@ -150,9 +143,6 @@ void Joint::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr axisElem = _sdf->GetElement(axisName);
     {
       std::string param = "use_parent_model_frame";
-      // Check if "use_parent_model_frame" element exists.
-      // It has `required=1`, so if it does not exist, then SDF is old,
-      // and we should assume support for backwards compatibility
       if (axisElem->HasElement(param))
       {
         this->axisParentModelFrame[index] = axisElem->Get<bool>(param);
@@ -688,7 +678,8 @@ double Joint::Position(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPosition(unsigned int /*_index*/, double _position)
+bool Joint::SetPosition(const unsigned int /*_index*/, const double _position,
+                        const bool /*_preserveWorldVelocity*/)
 {
   // parent class doesn't do much, derived classes do all the work.
   if (this->model)
@@ -707,7 +698,9 @@ bool Joint::SetPosition(unsigned int /*_index*/, double _position)
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPositionMaximal(unsigned int _index, double _position)
+bool Joint::SetPositionMaximal(
+    const unsigned int _index, double _position,
+    const bool _preserveWorldVelocity)
 {
   // check if index is within bounds
   if (_index >= this->DOF())
@@ -789,7 +782,8 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
                                 li != connectedLinks.end(); ++li)
           {
             // set pose of each link based on child link pose change
-            (*li)->MoveFrame(childLinkPose, newChildLinkPose);
+            (*li)->MoveFrame(childLinkPose, newChildLinkPose,
+              _preserveWorldVelocity);
 
             // debug
             // gzerr << "moved " << (*li)->GetName()

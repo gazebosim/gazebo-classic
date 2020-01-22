@@ -14,33 +14,32 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MESHMANAGER_HH_
-#define _GAZEBO_MESHMANAGER_HH_
+#ifndef GAZEBO_COMMON_MESHMANAGER_HH_
+#define GAZEBO_COMMON_MESHMANAGER_HH_
 
-#include <map>
 #include <utility>
 #include <string>
 #include <vector>
-#include <boost/thread/mutex.hpp>
 
 #include <ignition/math/Plane.hh>
-#include <ignition/math/Matrix3.hh>
-#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_COMMON_VISIBLE, gazebo, common, MeshManager)
+
 namespace gazebo
 {
   namespace common
   {
-    class ColladaLoader;
-    class ColladaExporter;
-    class STLLoader;
+    // Forward declarations.
+    class MeshManagerPrivate;
     class Mesh;
-    class Plane;
     class SubMesh;
 
     /// \addtogroup gazebo_common Common
@@ -262,25 +261,12 @@ namespace gazebo
                       const ignition::math::Vector2d &_p,
                       double _tol);
 
-      /// \brief 3D mesh loader for COLLADA files
-      private: ColladaLoader *colladaLoader;
-
-      /// \brief 3D mesh exporter for COLLADA files
-      private: ColladaExporter *colladaExporter;
-
-      /// \brief 3D mesh loader for STL files
-      private: STLLoader *stlLoader;
-
-      /// \brief Dictionary of meshes, indexed by name
-      private: std::map<std::string, Mesh*> meshes;
-
-      /// \brief supported file extensions for meshes
-      private: std::vector<std::string> fileExtensions;
-
-      private: boost::mutex mutex;
-
       /// \brief Singleton implementation
       private: friend class SingletonT<MeshManager>;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: MeshManagerPrivate *dataPtr;
     };
     /// \}
   }

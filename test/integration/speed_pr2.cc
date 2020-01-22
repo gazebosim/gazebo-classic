@@ -50,7 +50,7 @@ void SpeedPR2Test::PR2World(const std::string &_physicsEngine)
   std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
             << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
-#ifdef BUILD_TYPE_RELEASE
+#ifdef GAZEBO_BUILD_TYPE_RELEASE
   EXPECT_GT(speedRatio, 0.5);
 #else
   EXPECT_GT(speedRatio, 0.3);
@@ -62,7 +62,7 @@ TEST_P(SpeedPR2Test, PR2World)
   PR2World(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, SpeedPR2Test, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, SpeedPR2Test, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {

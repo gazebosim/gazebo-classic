@@ -238,8 +238,8 @@ void VisualConfig::AddVisual(const std::string &_name,
       const std::string &)));
 
   connect(configWidget, SIGNAL(ColorValueChanged(const QString &,
-      const gazebo::common::Color &)), this,
-      SLOT(OnColorChanged(const QString &, const gazebo::common::Color &)));
+      const ignition::math::Color &)), this,
+      SLOT(OnColorChanged(const QString &, const ignition::math::Color &)));
 
   connect(configWidget, SIGNAL(DoubleValueChanged(const QString &,
       const double)), this,
@@ -436,9 +436,9 @@ void VisualConfig::Geometry(const std::string &_name,
 
 /////////////////////////////////////////////////
 void VisualConfig::SetMaterial(const std::string &_name,
-  const std::string &_materialName, const common::Color &_ambient,
-  const common::Color &_diffuse, const common::Color &_specular,
-  const common::Color &_emissive)
+  const std::string &_materialName, const ignition::math::Color &_ambient,
+  const ignition::math::Color &_diffuse, const ignition::math::Color &_specular,
+  const ignition::math::Color &_emissive)
 {
   for (auto &it : this->configs)
   {
@@ -483,7 +483,7 @@ void VisualConfig::OnGeometryChanged(const std::string &/*_name*/,
 
 /////////////////////////////////////////////////
 void VisualConfig::OnColorChanged(const QString &/*_name*/,
-    const gazebo::common::Color &/*_value*/)
+    const ignition::math::Color &/*_value*/)
 {
   emit Applied();
 }

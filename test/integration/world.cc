@@ -243,7 +243,7 @@ TEST_F(WorldTest, ModifyLight)
   {
     msgs::Light lightMsg;
     lightMsg.set_name("sun");
-    msgs::Set(lightMsg.mutable_diffuse(), common::Color(0, 1, 0));
+    msgs::Set(lightMsg.mutable_diffuse(), ignition::math::Color(0, 1, 0));
     lightModifyPub->Publish(lightMsg);
   }
 
@@ -280,7 +280,7 @@ TEST_F(WorldTest, ModifyLight)
   {
     msgs::Light lightMsg;
     lightMsg.set_name("test_light");
-    msgs::Set(lightMsg.mutable_diffuse(), common::Color(1, 0, 1));
+    msgs::Set(lightMsg.mutable_diffuse(), ignition::math::Color(1, 0, 1));
     lightMsg.set_type(msgs::Light::POINT);
     lightFactoryPub->Publish(lightMsg);
   }
@@ -333,7 +333,7 @@ TEST_F(WorldTest, ModifyLight)
   {
     msgs::Light lightMsg;
     lightMsg.set_name("test_spot_light");
-    msgs::Set(lightMsg.mutable_diffuse(), common::Color(1, 1, 0));
+    msgs::Set(lightMsg.mutable_diffuse(), ignition::math::Color(1, 1, 0));
     lightMsg.set_type(msgs::Light::SPOT);
     lightFactoryPub->Publish(lightMsg);
   }
@@ -422,7 +422,7 @@ TEST_F(WorldTest, ModifyLight)
   {
     msgs::Light lightMsg;
     lightMsg.set_name("test_light");
-    msgs::Set(lightMsg.mutable_diffuse(), common::Color(0, 0, 1));
+    msgs::Set(lightMsg.mutable_diffuse(), ignition::math::Color(0, 0, 1));
     lightMsg.set_type(msgs::Light::DIRECTIONAL);
     lightFactoryPub->Publish(lightMsg);
   }
@@ -617,7 +617,7 @@ TEST_F(WorldTest, URI)
       "data://world/default/model/model_00/model/model_01/link/link_01");
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldTest, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

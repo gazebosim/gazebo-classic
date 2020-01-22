@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/bind.hpp>
 
 #include "gazebo/common/MeshManager.hh"
@@ -150,7 +144,8 @@ void WrenchVisual::Load(ConstJointPtr &_msg)
   dPtr->forceLine = dPtr->forceVisual->CreateDynamicLine(RENDERING_LINE_LIST);
   dPtr->forceLine->AddPoint(ignition::math::Vector3d::Zero);
   dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0.1));
-  dPtr->forceLine->setMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->forceLine,
+      "__GAZEBO_TRANS_PURPLE_MATERIAL__");
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 

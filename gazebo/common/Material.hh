@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _MATERIAL_HH_
-#define _MATERIAL_HH_
+#ifndef GAZEBO_COMMON_MATERIAL_HH_
+#define GAZEBO_COMMON_MATERIAL_HH_
 
 #include <string>
 #include <iostream>
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -47,7 +47,7 @@ namespace gazebo
 
       /// \brief Create a material with a default color
       /// \param[in] _clr Color of the material
-      public: Material(const Color &_clr);
+      public: explicit Material(const ignition::math::Color &_clr);
 
       /// \brief Get the name of the material
       /// \return The name of the material
@@ -71,35 +71,35 @@ namespace gazebo
 
       /// \brief Set the ambient color
       /// \param[in] _clr The ambient color
-      public: void SetAmbient(const Color &_clr);
+      public: void SetAmbient(const ignition::math::Color &_clr);
 
       /// \brief Get the ambient color
       /// \return The ambient color
-      public: Color GetAmbient() const;
+      public: ignition::math::Color Ambient() const;
 
       /// \brief Set the diffuse color
       /// \param[in] _clr The diffuse color
-      public: void SetDiffuse(const Color &_clr);
+      public: void SetDiffuse(const ignition::math::Color &_clr);
 
       /// \brief Get the diffuse color
       /// \return The diffuse color
-      public: Color GetDiffuse() const;
+      public: ignition::math::Color Diffuse() const;
 
       /// \brief Set the specular color
       /// \param[in] _clr The specular color
-      public: void SetSpecular(const Color &_clr);
+      public: void SetSpecular(const ignition::math::Color &_clr);
 
       /// \brief Get the specular color
       /// \return The specular color
-      public: Color GetSpecular() const;
+      public: ignition::math::Color Specular() const;
 
       /// \brief Set the emissive color
       /// \param[in] _clr The emissive color
-      public: void SetEmissive(const Color &_clr);
+      public: void SetEmissive(const ignition::math::Color &_clr);
 
       /// \brief Get the emissive color
       /// \return The emissive color
-      public: Color GetEmissive() const;
+      public: ignition::math::Color Emissive() const;
 
       /// \brief Set the transparency percentage (0..1)
       /// \param[in] _t The amount of transparency (0..1)
@@ -197,16 +197,16 @@ namespace gazebo
       protected: std::string texImage;
 
       /// \brief the ambient light color
-      protected: Color ambient;
+      protected: ignition::math::Color ambient;
 
       /// \brief the diffuse ligth color
-      protected: Color diffuse;
+      protected: ignition::math::Color diffuse;
 
       /// \brief the specular light color
-      protected: Color specular;
+      protected: ignition::math::Color specular;
 
       /// \brief the emissive light color
-      protected: Color emissive;
+      protected: ignition::math::Color emissive;
 
       /// \brief transparency value in the range 0 to 1
       protected: double transparency = 0.0;

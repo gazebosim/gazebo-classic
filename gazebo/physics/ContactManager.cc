@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/algorithm/string.hpp>
 
 #include "gazebo/transport/Node.hh"
@@ -48,8 +42,11 @@ ContactManager::ContactManager()
 ContactManager::~ContactManager()
 {
   this->Clear();
-  this->node.reset();
+
   this->contactPub.reset();
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
 
   boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
   for (iter = this->customContactPublishers.begin();

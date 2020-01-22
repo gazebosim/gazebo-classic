@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
@@ -127,6 +128,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->idString = std::to_string(this->dataPtr->id);
 
   this->dataPtr->name = _name;
+  this->dataPtr->isServer = _isServer;
   this->dataPtr->manager = NULL;
   this->dataPtr->raySceneQuery = NULL;
   this->dataPtr->skyx = NULL;
@@ -153,6 +155,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       this->dataPtr->node->Subscribe("~/light/modify",
       &Scene::OnLightModifyMsg, this);
 
+  this->dataPtr->isServer = _isServer;
   if (_isServer)
   {
     this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/local/info",
@@ -201,17 +204,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  this->dataPtr->node->Fini();
-  this->dataPtr->modelMsgs.clear();
-  this->dataPtr->visualMsgs.clear();
-  this->dataPtr->lightFactoryMsgs.clear();
-  this->dataPtr->lightModifyMsgs.clear();
-  this->dataPtr->poseMsgs.clear();
-  this->dataPtr->sceneMsgs.clear();
-  this->dataPtr->jointMsgs.clear();
-  this->dataPtr->linkMsgs.clear();
-  this->dataPtr->sensorMsgs.clear();
-  this->dataPtr->roadMsgs.clear();
+  this->dataPtr->connections.clear();
 
   this->dataPtr->poseSub.reset();
   this->dataPtr->jointSub.reset();
@@ -228,6 +221,28 @@ void Scene::Clear()
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
   this->dataPtr->roadSub.reset();
+
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
+  {
+    std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+    this->dataPtr->modelMsgs.clear();
+    this->dataPtr->visualMsgs.clear();
+    this->dataPtr->lightFactoryMsgs.clear();
+    this->dataPtr->lightModifyMsgs.clear();
+    this->dataPtr->sceneMsgs.clear();
+    this->dataPtr->jointMsgs.clear();
+    this->dataPtr->linkMsgs.clear();
+    this->dataPtr->sensorMsgs.clear();
+    this->dataPtr->roadMsgs.clear();
+  }
+
+  {
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->poseMsgMutex);
+    this->dataPtr->poseMsgs.clear();
+  }
 
   this->dataPtr->joints.clear();
 
@@ -268,12 +283,18 @@ void Scene::Clear()
     this->dataPtr->userCameras[i]->Fini();
   this->dataPtr->userCameras.clear();
 
-  delete this->dataPtr->skyx;
-  this->dataPtr->skyx = NULL;
+  // FIXME: Hack to avoid segfault when deleting server sky, see issue #1757
+  if (!this->dataPtr->isServer)
+  {
+    if (this->dataPtr->skyx)
+      delete this->dataPtr->skyx;
+    if (this->dataPtr->skyxController)
+      delete this->dataPtr->skyxController;
+  }
+  this->dataPtr->skyx = nullptr;
+  this->dataPtr->skyxController = nullptr;
 
   RTShaderSystem::Instance()->RemoveScene(this->Name());
-
-  this->dataPtr->connections.clear();
 
   this->dataPtr->initialized = false;
 }
@@ -281,6 +302,8 @@ void Scene::Clear()
 //////////////////////////////////////////////////
 Scene::~Scene()
 {
+  this->Clear();
+
   delete this->dataPtr->requestMsg;
   this->dataPtr->requestMsg = NULL;
   delete this->dataPtr->receiveMutex;
@@ -288,8 +311,6 @@ Scene::~Scene()
 
   // raySceneQuery deletion handled by ogre
   this->dataPtr->raySceneQuery= NULL;
-
-  this->Clear();
 
   this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
@@ -361,7 +382,7 @@ void Scene::Init()
   {
     sdf::ElementPtr fogElem = this->dataPtr->sdf->GetElement("fog");
     this->SetFog(fogElem->Get<std::string>("type"),
-                 fogElem->Get<common::Color>("color"),
+                 fogElem->Get<ignition::math::Color>("color"),
                  fogElem->Get<double>("density"),
                  fogElem->Get<double>("start"),
                  fogElem->Get<double>("end"));
@@ -386,11 +407,14 @@ void Scene::Init()
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
-  // Initialize the marker manager
-  if (!this->dataPtr->markerManager.Init(this))
+  if (!this->dataPtr->isServer)
   {
-    gzerr << "Unable to initialize the MarkerManager. Marker visualizations "
-      << "will not work.\n";
+    // Initialize the marker manager if this is a GUI scene.
+    if (!this->dataPtr->markerManager.Init(this))
+    {
+      gzerr << "Unable to initialize the MarkerManager. Marker visualizations "
+        << "will not work.\n";
+    }
   }
 }
 
@@ -474,26 +498,26 @@ std::string Scene::Name() const
 }
 
 //////////////////////////////////////////////////
-void Scene::SetAmbientColor(const common::Color &_color)
+void Scene::SetAmbientColor(const ignition::math::Color &_color)
 {
   this->dataPtr->sdf->GetElement("ambient")->Set(_color);
 
   // Ambient lighting
-  if (this->dataPtr->manager &&
-      Conversions::Convert(this->dataPtr->manager->getAmbientLight()) != _color)
+  if (this->dataPtr->manager && Conversions::Convert(
+        this->dataPtr->manager->getAmbientLight()) != _color)
   {
     this->dataPtr->manager->setAmbientLight(Conversions::Convert(_color));
   }
 }
 
 //////////////////////////////////////////////////
-common::Color Scene::AmbientColor() const
+ignition::math::Color Scene::AmbientColor() const
 {
-  return this->dataPtr->sdf->Get<common::Color>("ambient");
+  return this->dataPtr->sdf->Get<ignition::math::Color>("ambient");
 }
 
 //////////////////////////////////////////////////
-void Scene::SetBackgroundColor(const common::Color &_color)
+void Scene::SetBackgroundColor(const ignition::math::Color &_color)
 {
   this->dataPtr->sdf->GetElement("background")->Set(_color);
 
@@ -513,16 +537,16 @@ void Scene::SetBackgroundColor(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
-common::Color Scene::BackgroundColor() const
+ignition::math::Color Scene::BackgroundColor() const
 {
-  return this->dataPtr->sdf->Get<common::Color>("background");
+  return this->dataPtr->sdf->Get<ignition::math::Color>("background");
 }
 
 //////////////////////////////////////////////////
-void Scene::CreateGrid(const uint32_t cell_count, const float cell_length,
-                       const float line_width, const common::Color &color)
+void Scene::CreateGrid(const uint32_t _cellCount, const float _cellLength,
+    const ignition::math::Color &_color)
 {
-  Grid *grid = new Grid(this, cell_count, cell_length, line_width, color);
+  Grid *grid = new Grid(this, _cellCount, _cellLength, _color);
 
   if (this->dataPtr->manager)
     grid->Init();
@@ -694,22 +718,29 @@ void Scene::RemoveCamera(const std::string &_name)
 //////////////////////////////////////////////////
 LightPtr Scene::GetLight(const std::string &_name) const
 {
-  LightPtr result;
-  std::string n = this->StripSceneName(_name);
-  Light_M::const_iterator iter = this->dataPtr->lights.find(n);
-  if (iter != this->dataPtr->lights.end())
-    result = iter->second;
-  return result;
+  return this->LightByName(_name);
 }
 
 //////////////////////////////////////////////////
-uint32_t Scene::LightCount() const
+LightPtr Scene::LightByName(const std::string &_name) const
 {
-  return this->dataPtr->lights.size();
+  for (auto &iter: this->dataPtr->lights)
+  {
+    if (iter.second->Name() == _name)
+      return iter.second;
+  }
+
+  return LightPtr();
 }
 
 //////////////////////////////////////////////////
 LightPtr Scene::GetLight(const uint32_t _index) const
+{
+  return this->LightByIndex(_index);
+}
+
+//////////////////////////////////////////////////
+LightPtr Scene::LightByIndex(const uint32_t _index) const
 {
   LightPtr result;
   if (_index < this->dataPtr->lights.size())
@@ -725,6 +756,22 @@ LightPtr Scene::GetLight(const uint32_t _index) const
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+LightPtr Scene::LightById(const uint32_t _id) const
+{
+  auto iter = this->dataPtr->lights.find(_id);
+  if (iter != this->dataPtr->lights.end())
+    return iter->second;
+
+  return LightPtr();
+}
+
+//////////////////////////////////////////////////
+uint32_t Scene::LightCount() const
+{
+  return this->dataPtr->lights.size();
 }
 
 //////////////////////////////////////////////////
@@ -808,9 +855,9 @@ VisualPtr Scene::VisualAt(CameraPtr _camera,
         _mod = Ogre::any_cast<std::string>(
             closestEntity->getUserObjectBindings().getUserAny());
       }
-      catch(boost::bad_any_cast &e)
+      catch(Ogre::Exception &e)
       {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
+        gzerr << "Ogre any_cast error:" << e.what() << "\n";
       }
     }
 
@@ -819,9 +866,9 @@ VisualPtr Scene::VisualAt(CameraPtr _camera,
       visual = this->GetVisual(Ogre::any_cast<std::string>(
             closestEntity->getUserObjectBindings().getUserAny()));
     }
-    catch(boost::bad_any_cast &e)
+    catch(Ogre::Exception &e)
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      gzerr << "Ogre any_cast error:" << e.what() << "\n";
     }
   }
 
@@ -973,9 +1020,9 @@ void Scene::VisualsBelowPoint(const ignition::math::Vector3d &_pt,
           if (v)
             _visuals.push_back(v);
         }
-        catch(boost::bad_any_cast &e)
+        catch(Ogre::Exception &e)
         {
-          gzerr << "boost any_cast error:" << e.what() << "\n";
+          gzerr << "Ogre any_cast error:" << e.what() << "\n";
         }
       }
     }
@@ -997,9 +1044,9 @@ VisualPtr Scene::VisualAt(CameraPtr _camera,
       visual = this->GetVisual(Ogre::any_cast<std::string>(
             closestEntity->getUserObjectBindings().getUserAny()));
     }
-    catch(boost::bad_any_cast &e)
+    catch(Ogre::Exception &e)
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      gzerr << "Ogre any_cast error:" << e.what() << "\n";
     }
   }
 
@@ -1103,60 +1150,84 @@ bool Scene::FirstContact(CameraPtr _camera,
 {
   _position = ignition::math::Vector3d::Zero;
 
-  ignition::math::Vector3d origin;
-  ignition::math::Vector3d dir;
-  _camera->CameraToViewportRay(_mousePos.X(), _mousePos.Y(), origin, dir);
-  Ogre::Ray mouseRay(Conversions::Convert(origin), Conversions::Convert(dir));
-
-  this->dataPtr->raySceneQuery->setSortByDistance(true);
-  this->dataPtr->raySceneQuery->setRay(mouseRay);
-
-  // Perform the scene query
-  Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
-  Ogre::RaySceneQueryResult::iterator iter = result.begin();
-
   double distance = -1.0;
 
-  // Iterate over all the results.
-  for (; iter != result.end() && distance <= 0.0; ++iter)
+  ignition::math::Vector3d origin, dir;
+  _camera->CameraToViewportRay(
+      _mousePos.X(), _mousePos.Y(), origin, dir);
+  Ogre::Ray mouseRay(Conversions::Convert(origin),
+      Conversions::Convert(dir));
+
+  UserCameraPtr userCam = boost::dynamic_pointer_cast<UserCamera>(_camera);
+  if (userCam)
   {
-    // Skip results where the distance is zero or less
-    if (iter->distance <= 0.0)
-      continue;
-
-    unsigned int flags = iter->movable->getVisibilityFlags();
-
-    // Only accept a hit if there is an entity and not a gui visual
-    if (iter->movable && iter->movable->getVisible() &&
-        iter->movable->getMovableType().compare("Entity") == 0 &&
-        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI
-        && !(flags & GZ_VISIBILITY_SELECTABLE)))
+    VisualPtr vis = userCam->Visual(_mousePos);
+    if (vis)
     {
-      Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
+      RayQuery rayQuery(_camera);
+      ignition::math::Vector3d intersect;
+      ignition::math::Triangle3d triangle;
+      rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+          intersect, triangle);
+      distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+          intersect);
+    }
+  }
+  else
+  {
+    this->dataPtr->raySceneQuery->setSortByDistance(true);
+    this->dataPtr->raySceneQuery->setRay(mouseRay);
 
-      VisualPtr vis;
-      if (!ogreEntity->getUserObjectBindings().getUserAny().isEmpty())
+    // Perform the scene query
+    Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
+    Ogre::RaySceneQueryResult::iterator iter = result.begin();
+
+
+    // Iterate over all the results.
+    for (; iter != result.end() && distance <= 0.0; ++iter)
+    {
+      // Skip results where the distance is zero or less
+      if (iter->distance <= 0.0)
+        continue;
+
+      unsigned int flags = iter->movable->getVisibilityFlags();
+
+      // Only accept a hit if there is an entity and not a gui visual
+      // and not a selection-only object (e.g. light selection ent)
+      const bool guiOrSelectable = (flags & GZ_VISIBILITY_GUI)
+          || (flags & GZ_VISIBILITY_SELECTABLE);
+      if (iter->movable && iter->movable->getVisible() &&
+          iter->movable->getMovableType().compare("Entity") == 0 &&
+          !(flags != GZ_VISIBILITY_ALL && guiOrSelectable))
       {
-        try
-        {
-          vis = this->GetVisual(Ogre::any_cast<std::string>(
-              ogreEntity->getUserObjectBindings().getUserAny()));
-        }
-        catch(Ogre::Exception &e)
-        {
-          gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-          continue;
-        }
-        if (!vis)
-          continue;
+        Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
-        RayQuery rayQuery(_camera);
-        ignition::math::Vector3d intersect;
-        ignition::math::Triangle3d vertices;
-        rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
-            intersect, vertices);
-        distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
-            intersect);
+        VisualPtr vis;
+        if (!ogreEntity->getUserObjectBindings().getUserAny().isEmpty())
+        {
+          try
+          {
+            vis = this->GetVisual(Ogre::any_cast<std::string>(
+                ogreEntity->getUserObjectBindings().getUserAny()));
+          }
+          catch(Ogre::Exception &e)
+          {
+            gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
+            continue;
+          }
+          if (!vis)
+            continue;
+
+          RayQuery rayQuery(_camera);
+          ignition::math::Vector3d intersect;
+          ignition::math::Triangle3d triangle;
+          if (rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+              intersect, triangle))
+          {
+            distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+                intersect);
+          }
+        }
       }
     }
   }
@@ -1278,7 +1349,8 @@ void Scene::DrawLine(const ignition::math::Vector3d &_start,
 }
 
 //////////////////////////////////////////////////
-void Scene::SetFog(const std::string &_type, const common::Color &_color,
+void Scene::SetFog(const std::string &_type,
+                   const ignition::math::Color &_color,
                    const double _density, const double _start,
                    const double _end)
 {
@@ -1300,8 +1372,10 @@ void Scene::SetFog(const std::string &_type, const common::Color &_color,
   elem->GetElement("end")->Set(_end);
 
   if (this->dataPtr->manager)
+  {
     this->dataPtr->manager->setFog(fogType, Conversions::Convert(_color),
                            _density, _start, _end);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1538,7 +1612,7 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
     }
 
     this->SetFog(elem->Get<std::string>("type"),
-                 elem->Get<common::Color>("color"),
+                 elem->Get<ignition::math::Color>("color"),
                  elem->Get<double>("density"),
                  elem->Get<double>("start"),
                  elem->Get<double>("end"));
@@ -1646,6 +1720,12 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
       boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
             _msg.link(j).sensor(k)));
       this->dataPtr->sensorMsgs.push_back(sm);
+    }
+    for (int k = 0; k < _msg.link(j).light_size(); ++k)
+    {
+      boost::shared_ptr<msgs::Light> lm(new msgs::Light(
+            _msg.link(j).light(k)));
+      this->dataPtr->lightFactoryMsgs.push_back(lm);
     }
   }
 
@@ -1836,26 +1916,6 @@ void Scene::PreRender()
       ++sensorIter;
   }
 
-  // Process the light factory messages.
-  for (lightIter = lightFactoryMsgsCopy.begin();
-      lightIter != lightFactoryMsgsCopy.end();)
-  {
-    if (this->ProcessLightFactoryMsg(*lightIter))
-      lightFactoryMsgsCopy.erase(lightIter++);
-    else
-      ++lightIter;
-  }
-
-  // Process the light modify messages.
-  for (lightIter = lightModifyMsgsCopy.begin();
-      lightIter != lightModifyMsgsCopy.end();)
-  {
-    if (this->ProcessLightModifyMsg(*lightIter))
-      lightModifyMsgsCopy.erase(lightIter++);
-    else
-      ++lightIter;
-  }
-
   // Process the model visual messages.
   for (visualIter = modelVisualMsgsCopy.begin();
       visualIter != modelVisualMsgsCopy.end();)
@@ -1915,6 +1975,27 @@ void Scene::PreRender()
       linkMsgsCopy.erase(linkIter++);
     else
       ++linkIter;
+  }
+
+  // Process the light factory messages.
+  // do this after the link and visual msgs have been processed
+  for (lightIter = lightFactoryMsgsCopy.begin();
+      lightIter != lightFactoryMsgsCopy.end();)
+  {
+    if (this->ProcessLightFactoryMsg(*lightIter))
+      lightFactoryMsgsCopy.erase(lightIter++);
+    else
+      ++lightIter;
+  }
+
+  // Process the light modify messages.
+  for (lightIter = lightModifyMsgsCopy.begin();
+      lightIter != lightModifyMsgsCopy.end();)
+  {
+    if (this->ProcessLightModifyMsg(*lightIter))
+      lightModifyMsgsCopy.erase(lightIter++);
+    else
+      ++lightIter;
   }
 
   // Process the request messages
@@ -1993,7 +2074,20 @@ void Scene::PreRender()
           ++pIter;
       }
       else
-        ++pIter;
+      {
+        // process light pose messages
+        auto lIter = this->dataPtr->lights.find(pIter->first);
+        if (lIter != this->dataPtr->lights.end())
+        {
+          ignition::math::Pose3d pose = msgs::ConvertIgn(pIter->second);
+          lIter->second->SetPosition(pose.Pos());
+          lIter->second->SetRotation(pose.Rot());
+          auto prev = pIter++;
+          this->dataPtr->poseMsgs.erase(prev);
+        }
+        else
+          ++pIter;
+      }
     }
 
     // process skeleton pose msgs
@@ -2335,12 +2429,11 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     response.set_id(_msg->id());
     response.set_request(_msg->request());
 
-    Light_M::iterator iter;
-    iter = this->dataPtr->lights.find(_msg->data());
-    if (iter != this->dataPtr->lights.end())
+    LightPtr light = this->LightByName(_msg->data());
+    if (light)
     {
       msgs::Light lightMsg;
-      iter->second->FillMsg(lightMsg);
+      light->FillMsg(lightMsg);
 
       std::string *serializedData = response.mutable_serialized_data();
       lightMsg.SerializeToString(serializedData);
@@ -2355,12 +2448,11 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   }
   else if (_msg->request() == "entity_delete")
   {
-    Light_M::iterator lightIter = this->dataPtr->lights.find(_msg->data());
-
     // Check to see if the deleted entity is a light.
-    if (lightIter != this->dataPtr->lights.end())
+    LightPtr light = this->LightByName(_msg->data());
+    if (light)
     {
-      this->dataPtr->lights.erase(lightIter);
+      this->RemoveLight(light);
     }
     // Otherwise delete a visual
     else
@@ -2666,6 +2758,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
           }
         }
         this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+        const double skirtLen = this->dataPtr->heightmapSkirtLength;
+        this->dataPtr->terrain->SetSkirtLength(skirtLen);
         this->dataPtr->terrain->LoadFromMsg(_msg);
       }
     }
@@ -2704,11 +2798,10 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   {
     // Make sure the parent visual exists before trying to add a child
     // visual
-    iter = this->dataPtr->visuals.find(_msg->parent_id());
-    if (iter == this->dataPtr->visuals.end())
-    {
+    VisualPtr parent = this->GetVisual(_msg->parent_name());
+    if (!parent)
       return false;
-    }
+
     // Do not create COM or Inertia visuals here
     if ((_msg->name().find("_COM_VISUAL__") != std::string::npos) ||
         (_msg->name().find("_INERTIA_VISUAL__") != std::string::npos))
@@ -2716,10 +2809,14 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       return false;
     }
 
-    visual.reset(new Visual(_msg->name(), iter->second));
+    visual.reset(new Visual(_msg->name(), parent));
   }
   else
   {
+    // Make sure the world visual exists before trying to add a child visual
+    if (!this->dataPtr->worldVisual)
+      return false;
+
     // Add a visual that is attached to the scene root
     visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
   }
@@ -2760,13 +2857,13 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
+    auto p = _msg->pose(i);
     PoseMsgs_M::iterator iter =
-        this->dataPtr->poseMsgs.find(_msg->pose(i).id());
+        this->dataPtr->poseMsgs.find(p.id());
     if (iter != this->dataPtr->poseMsgs.end())
-      iter->second.CopyFrom(_msg->pose(i));
+      iter->second.CopyFrom(p);
     else
-      this->dataPtr->poseMsgs.insert(
-          std::make_pair(_msg->pose(i).id(), _msg->pose(i)));
+      this->dataPtr->poseMsgs.insert(std::make_pair(p.id(), p));
   }
 }
 
@@ -2814,21 +2911,25 @@ void Scene::OnLightModifyMsg(ConstLightPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
 {
-  Light_M::iterator iter;
-  iter = this->dataPtr->lights.find(_msg->name());
+  LightPtr light;
+  if (_msg->has_id())
+    light = this->LightById(_msg->id());
+  else
+    light = this->LightByName(_msg->name());
 
-  if (iter == this->dataPtr->lights.end())
+  if (!light)
   {
-    LightPtr light(new Light(shared_from_this()));
+    light.reset(new Light(shared_from_this()));
     light->LoadFromMsg(_msg);
-    this->dataPtr->lights[_msg->name()] = light;
+    this->dataPtr->lights[light->Id()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
   }
   else
   {
     gzerr << "Light [" << _msg->name() << "] already exists."
-        << " Use topic ~/light/modify to modify it." << std::endl;
-    return false;
+          << " Use topic ~/light/modify to modify it." << std::endl;
+    // we don't want to return false because it keeps the msg in the
+    // list and causes it to be processed again and again.
   }
 
   return true;
@@ -2837,10 +2938,13 @@ bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
 {
-  Light_M::iterator iter;
-  iter = this->dataPtr->lights.find(_msg->name());
+  LightPtr light;
+  if (_msg->has_id())
+    light = this->LightById(_msg->id());
+  else
+    light = this->LightByName(_msg->name());
 
-  if (iter == this->dataPtr->lights.end())
+  if (!light)
   {
     // commented out for now as sometimes physics light messages could arrive
     // before the rendering light is created, e.g. light pose updates.
@@ -2851,7 +2955,7 @@ bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
   }
   else
   {
-    iter->second->UpdateFromMsg(_msg);
+    light->UpdateFromMsg(_msg);
     RTShaderSystem::Instance()->UpdateShaders();
   }
 
@@ -2936,7 +3040,8 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 void Scene::SetSky()
 {
   // Create SkyX
-  this->dataPtr->skyxController = new SkyX::BasicController();
+  // Pass parameter false to ensure that sky won't delete controller
+  this->dataPtr->skyxController = new SkyX::BasicController(false);
   this->dataPtr->skyx = new SkyX::SkyX(this->dataPtr->manager,
       this->dataPtr->skyxController);
   this->dataPtr->skyx->create();
@@ -3038,8 +3143,14 @@ void Scene::SetShadowsEnabled(bool _value)
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
     this->dataPtr->manager->setShadowTechnique(
         Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    this->dataPtr->manager->setShadowTextureCasterMaterial(
+        Ogre::MaterialManager::getSingleton().getByName(
+            "DeferredRendering/Shadows/RSMCaster_Spot"));
+#else
     this->dataPtr->manager->setShadowTextureCasterMaterial(
         "DeferredRendering/Shadows/RSMCaster_Spot");
+#endif
     this->dataPtr->manager->setShadowTextureCount(1);
     this->dataPtr->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and
@@ -3199,12 +3310,11 @@ void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
 /////////////////////////////////////////////////
 void Scene::AddLight(LightPtr _light)
 {
-  std::string n = this->StripSceneName(_light->Name());
-  const auto iter = this->dataPtr->lights.find(n);
-  if (iter != this->dataPtr->lights.end())
+  LightPtr light = this->LightById(_light->Id());
+  if (light)
     gzerr << "Duplicate lights detected[" << _light->Name() << "]\n";
 
-  this->dataPtr->lights[n] = _light;
+  this->dataPtr->lights[_light->Id()] = _light;
 }
 
 /////////////////////////////////////////////////
@@ -3213,8 +3323,7 @@ void Scene::RemoveLight(LightPtr _light)
   if (_light)
   {
     // Delete the light
-    std::string n = this->StripSceneName(_light->Name());
-    this->dataPtr->lights.erase(n);
+    this->dataPtr->lights.erase(_light->Id());
   }
 }
 
@@ -3223,7 +3332,8 @@ void Scene::SetGrid(const bool _enabled)
 {
   if (_enabled && this->dataPtr->grids.empty())
   {
-    Grid *grid = new Grid(this, 20, 1, 10, common::Color(0.3, 0.3, 0.3, 0.5));
+    Grid *grid = new Grid(this, 20, 1,
+        ignition::math::Color(0.3f, 0.3f, 0.3f, 0.5f));
     grid->Init();
     this->dataPtr->grids.push_back(grid);
   }
@@ -3273,6 +3383,23 @@ unsigned int Scene::HeightmapLOD() const
     return this->dataPtr->terrain->LOD();
 
   return this->dataPtr->heightmapLOD;
+}
+
+/////////////////////////////////////////////////
+void Scene::SetHeightmapSkirtLength(const double _value)
+{
+  this->dataPtr->heightmapSkirtLength = _value;
+  if (this->dataPtr->terrain)
+    this->dataPtr->terrain->SetSkirtLength(this->dataPtr->heightmapSkirtLength);
+}
+
+/////////////////////////////////////////////////
+double Scene::HeightmapSkirtLength() const
+{
+  if (this->dataPtr->terrain)
+    return this->dataPtr->terrain->SkirtLength();
+
+  return this->dataPtr->heightmapSkirtLength;
 }
 
 /////////////////////////////////////////////////

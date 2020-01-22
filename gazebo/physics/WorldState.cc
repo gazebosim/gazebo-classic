@@ -17,12 +17,6 @@
 /* Desc: A world state
  * Author: Nate Koenig
  */
-
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
 #include <boost/algorithm/string.hpp>
 
 #include "gazebo/common/Console.hh"
@@ -102,6 +96,8 @@ void WorldState::Load(const WorldPtr _world)
   this->simTime = _world->SimTime();
   this->realTime = _world->RealTime();
   this->iterations = _world->Iterations();
+  this->insertions.clear();
+  this->deletions.clear();
 
   std::string filter = worldStateFilter;
   std::list<std::string> mainParts, parts;
@@ -166,9 +162,12 @@ void WorldState::Load(const sdf::ElementPtr _elem)
 {
   // Copy the name and time information
   this->name = _elem->Get<std::string>("world_name");
-  this->simTime = _elem->Get<common::Time>("sim_time");
-  this->wallTime = _elem->Get<common::Time>("wall_time");
-  this->realTime = _elem->Get<common::Time>("real_time");
+  auto time = _elem->Get<sdf::Time>("sim_time");
+  this->simTime.Set(time.sec, time.nsec);
+  time = _elem->Get<sdf::Time>("wall_time");
+  this->wallTime.Set(time.sec, time.nsec);
+  time = _elem->Get<sdf::Time>("real_time");
+  this->realTime.Set(time.sec, time.nsec);
   this->iterations = _elem->Get<uint64_t>("iterations");
 
   // Add the model states
@@ -209,6 +208,55 @@ void WorldState::Load(const sdf::ElementPtr _elem)
             lightName, lightState));
 
       childElem = childElem->GetNextElement("light");
+    }
+  }
+
+  // Add insertions
+  this->insertions.clear();
+  if (_elem->HasElement("insertions"))
+  {
+    sdf::ElementPtr insertionsElem = _elem->GetElement("insertions");
+
+    // Models
+    if (insertionsElem->HasElement("model"))
+    {
+      sdf::ElementPtr modelElem = insertionsElem->GetElement("model");
+
+      while (modelElem)
+      {
+        this->insertions.push_back(modelElem->ToString(""));
+        modelElem = modelElem->GetNextElement("model");
+      }
+    }
+
+    // Lights
+    if (insertionsElem->HasElement("light"))
+    {
+      sdf::ElementPtr lightElem = insertionsElem->GetElement("light");
+
+      while (lightElem)
+      {
+        this->insertions.push_back(lightElem->ToString(""));
+        lightElem = lightElem->GetNextElement("light");
+      }
+    }
+  }
+
+  // Add deletions
+  this->deletions.clear();
+  if (_elem->HasElement("deletions"))
+  {
+    sdf::ElementPtr deletionsElem = _elem->GetElement("deletions");
+
+    if (deletionsElem->HasElement("name"))
+    {
+      sdf::ElementPtr nameElem = deletionsElem->GetElement("name");
+
+      while (nameElem)
+      {
+        this->deletions.push_back(nameElem->Get<std::string>());
+        nameElem = nameElem->GetNextElement("name");
+      }
     }
   }
 }
@@ -306,7 +354,50 @@ const std::vector<std::string> &WorldState::Insertions() const
 /////////////////////////////////////////////////
 void WorldState::SetInsertions(const std::vector<std::string> &_insertions)
 {
-  this->insertions = _insertions;
+  static sdf::SDFPtr rootSDF = nullptr;
+  if (rootSDF == nullptr)
+  {
+    rootSDF.reset(new sdf::SDF);
+    sdf::initFile("root.sdf", rootSDF);
+  }
+
+  // Unwrap insertions from <sdf>
+  for (const auto &insertion : _insertions)
+  {
+    rootSDF->Root()->ClearElements();
+    // <sdf>
+    if (sdf::readString(insertion, rootSDF))
+    {
+      // <model>
+      if (rootSDF->Root()->HasElement("model"))
+      {
+        this->insertions.push_back(
+            rootSDF->Root()->GetElement("model")->ToString(""));
+      }
+      // <light>
+      else if (rootSDF->Root()->HasElement("light"))
+      {
+        this->insertions.push_back(
+            rootSDF->Root()->GetElement("light")->ToString(""));
+      }
+      // <actor>
+      else if (rootSDF->Root()->HasElement("actor"))
+      {
+        this->insertions.push_back(
+            rootSDF->Root()->GetElement("actor")->ToString(""));
+      }
+      else
+      {
+        gzwarn << "Unsupported insertion [" << insertion << "]" << std::endl;
+        continue;
+      }
+    }
+    // Otherwise copy as-is without validating
+    else
+    {
+      this->insertions.push_back(insertion);
+    }
+  }
 }
 
 /////////////////////////////////////////////////

@@ -42,10 +42,16 @@ include_directories(
 
 add_library(RestWebPlugin SHARED ${server_src} )
 target_link_libraries(RestWebPlugin ${GAZEBO_libraries} gazebo_msgs)
-install (TARGETS RestWebPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+install (TARGETS RestWebPlugin
+         LIBRARY DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+         ARCHIVE DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+         RUNTIME DESTINATION ${GAZEBO_PLUGIN_BIN_INSTALL_DIR})
 gz_install_includes("plugins" ${server_inc})
 
 add_library(RestUiPlugin SHARED ${client_src} ${headers_MOC})
 target_link_libraries(RestUiPlugin ${GAZEBO_libraries} gazebo_msgs)
-install (TARGETS RestUiPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+install (TARGETS RestUiPlugin
+         LIBRARY DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+         ARCHIVE DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
+         RUNTIME DESTINATION ${GAZEBO_PLUGIN_BIN_INSTALL_DIR})
 gz_install_includes("plugins" ${client_inc})

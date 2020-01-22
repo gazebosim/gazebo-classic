@@ -103,20 +103,23 @@ TEST_P(WorldPlaybackTest, Pause)
   msg.set_pause(false);
   this->logPlaybackPub->Publish(msg);
 
+  // Wait for message to be processed
   int sleep = 0;
-  while (this->world->IsPaused() && sleep < 100)
+  int maxSleep = 3000;
+  while (this->world->IsPaused() && sleep < maxSleep)
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
     sleep++;
   }
-  EXPECT_TRUE(!this->world->IsPaused());
+  EXPECT_FALSE(this->world->IsPaused());
 
   // Send a message to pause the world.
   msg.set_pause(true);
   this->logPlaybackPub->Publish(msg);
 
+  // Wait for message to be processed
   sleep = 0;
-  while (!this->world->IsPaused() && sleep < 100)
+  while (!this->world->IsPaused() && sleep < maxSleep)
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
     sleep++;
@@ -151,7 +154,7 @@ TEST_P(WorldPlaybackTest, Step)
   expectedSimTime.Set(std::get<0>(this->features));
   msg.set_multi_step(-1);
   this->logPlaybackPub->Publish(msg);
-  this->WaitUntilSimTime(expectedSimTime, 10, 20);
+  this->WaitUntilSimTime(expectedSimTime, 10, 30);
   EXPECT_EQ(world->SimTime(), expectedSimTime);
 
   // Step +3
@@ -298,7 +301,7 @@ INSTANTIATE_TEST_CASE_P(LogFiles,
                         WorldPlaybackTest,
                         ::testing::Values("state.log",
                                           "state2.log",
-                                          "state3.log"));
+                                          "state3.log"),);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

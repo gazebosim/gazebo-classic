@@ -269,7 +269,9 @@ if (WIN32)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWIN32 -DODE_DLL")
 endif()
 
-set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
+if (NOT MSVC)
+  set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
+endif()
 
 if (WIN32)
   add_library(gazebo_ode SHARED ${sources})
@@ -284,12 +286,17 @@ target_link_libraries(gazebo_ode
   ${CCD_LIBRARIES}
   ${Boost_LIBRARIES})
 
+if (HAVE_BULLET)
+  target_link_libraries(gazebo_ode ${BULLET_LIBRARIES})
+endif()
+
 if (HAVE_DART)
   target_link_libraries(gazebo_ode ${DART_LIBRARIES})
 endif()
 
 if (HDF5_FOUND AND HDF5_INSTRUMENT)
   message(STATUS "HDF5 Found and Instrument enabled")
+  include_directories(${HDF5_INCLUDE_DIRS})
   target_link_libraries(gazebo_ode ${HDF5_LIBRARIES})
 endif()
 

@@ -301,6 +301,25 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     EXPECT_EQ(param, frictionModel);
   }
 
+  // Test island_threads
+  {
+    // island_threads should be 0 by default
+    int islandThreads = 1;
+    EXPECT_NO_THROW(islandThreads =
+      boost::any_cast<int>(odePhysics->GetParam("island_threads")));
+    EXPECT_FALSE(islandThreads);
+
+    // try enabling threads, then disabling
+    std::vector<int> threads = {1, 2, 3, 0};
+    for (auto const islandThreadsSet : threads)
+    {
+      odePhysics->SetParam("island_threads", islandThreadsSet);
+      EXPECT_NO_THROW(islandThreads =
+        boost::any_cast<int>(odePhysics->GetParam("island_threads")));
+      EXPECT_EQ(islandThreads, islandThreadsSet);
+    }
+  }
+
   // Test ode_quiet
   // convenient for disabling LCP internal error messages from world solver
   {
@@ -415,8 +434,16 @@ void ODEPhysics_TEST::PhysicsMsgParam()
   requestPub->Publish(*requestMsg);
 
   int waitCount = 0, maxWaitCount = 3000;
+#if GOOGLE_PROTOBUF_VERSION < 3001000
   while (physicsResponseMsg.ByteSize() == 0 && ++waitCount < maxWaitCount)
+#else
+  // ByteSizeLong appeared in version 3.1 of Protobuf, and ByteSize
+  // became deprecated.
+  while (physicsResponseMsg.ByteSizeLong() == 0 && ++waitCount < maxWaitCount)
+#endif
+  {
     common::Time::MSleep(10);
+  }
   ASSERT_LT(waitCount, maxWaitCount);
 
   EXPECT_DOUBLE_EQ(physicsResponseMsg.max_step_size(),

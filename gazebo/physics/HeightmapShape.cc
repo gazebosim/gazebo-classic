@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <algorithm>
 #include <cmath>
 #include <string>
@@ -43,6 +37,10 @@ using namespace physics;
 HeightmapShape::HeightmapShape(CollisionPtr _parent)
     : Shape(_parent)
 {
+  static_assert(
+      std::is_same<HeightType, float>::value ||
+      std::is_same<HeightType, double>::value,
+      "Height field needs to be double or float");
   this->vertSize = 0;
   this->AddType(Base::HEIGHTMAP_SHAPE);
 }
@@ -50,6 +48,11 @@ HeightmapShape::HeightmapShape(CollisionPtr _parent)
 //////////////////////////////////////////////////
 HeightmapShape::~HeightmapShape()
 {
+  this->requestSub.reset();
+  this->responsePub.reset();
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
 }
 
 //////////////////////////////////////////////////
@@ -194,6 +197,22 @@ int HeightmapShape::GetSubSampling() const
 }
 
 //////////////////////////////////////////////////
+void HeightmapShape::FillHeightfield(std::vector<float>& _heights)
+{
+  this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
+      this->Size(), this->scale, this->flipY, _heights);
+}
+
+//////////////////////////////////////////////////
+void HeightmapShape::FillHeightfield(std::vector<double>& _heights)
+{
+  std::vector<float> fHeights;
+  this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
+      this->Size(), this->scale, this->flipY, fHeights);
+  _heights = std::vector<double>(fHeights.begin(), fHeights.end());
+}
+
+//////////////////////////////////////////////////
 void HeightmapShape::Init()
 {
   this->node = transport::NodePtr(new transport::Node());
@@ -226,9 +245,8 @@ void HeightmapShape::Init()
   else
     this->scale.Z() = fabs(terrainSize.Z()) / heightmapSizeZ;
 
-  // Step 1: Construct the heightmap lookup table
-  this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
-      this->Size(), this->scale, this->flipY, this->heights);
+  // Construct the heightmap lookup table
+  this->FillHeightfield(this->heights);
 }
 
 //////////////////////////////////////////////////
@@ -299,7 +317,7 @@ ignition::math::Vector2i HeightmapShape::VertexCount() const
 }
 
 /////////////////////////////////////////////////
-float HeightmapShape::GetHeight(int _x, int _y) const
+HeightmapShape::HeightType HeightmapShape::GetHeight(int _x, int _y) const
 {
   int index =  _y * this->vertSize + _x;
   if (_x < 0 || _y < 0 || index >= static_cast<int>(this->heights.size()))
@@ -309,9 +327,9 @@ float HeightmapShape::GetHeight(int _x, int _y) const
 }
 
 /////////////////////////////////////////////////
-float HeightmapShape::GetMaxHeight() const
+HeightmapShape::HeightType HeightmapShape::GetMaxHeight() const
 {
-  float max = ignition::math::MIN_F;
+  HeightType max = -std::numeric_limits<HeightType>::max();
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] > max)
@@ -322,9 +340,9 @@ float HeightmapShape::GetMaxHeight() const
 }
 
 /////////////////////////////////////////////////
-float HeightmapShape::GetMinHeight() const
+HeightmapShape::HeightType HeightmapShape::GetMinHeight() const
 {
-  float min = ignition::math::MAX_F;
+  HeightType min = std::numeric_limits<HeightType>::max();
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] < min)

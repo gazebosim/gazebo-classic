@@ -30,6 +30,7 @@ namespace gazebo
   namespace physics
   {
     /// Forward declare private data class
+    template<typename HeightType>
     class DARTHeightmapShapePrivate;
 
     /// \addtogroup gazebo_physics_dart
@@ -40,7 +41,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Collision parent.
-      public: DARTHeightmapShape(DARTCollisionPtr _parent);
+      public: explicit DARTHeightmapShape(DARTCollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~DARTHeightmapShape();
@@ -48,9 +49,17 @@ namespace gazebo
       // Documentation inerited.
       public: virtual void Init();
 
+      // Documentation inerited.
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
+
       /// \internal
       /// \brief Pointer to private data
-      private: DARTHeightmapShapePrivate *dataPtr;
+      private: DARTHeightmapShapePrivate<HeightmapShape::HeightType> *dataPtr;
+
+      /// \internal
+      /// \brief Vector3 type that is dependent on HeightType
+      private: using Vector3 =
+                   Eigen::Matrix<HeightmapShape::HeightType, 3, 1>;
     };
     /// \}
   }

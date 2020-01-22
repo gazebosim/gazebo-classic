@@ -14,14 +14,9 @@
  * limitations under the License.
  *
  */
-
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
+#include <functional>
 #include <fstream>
+#include <cstdlib>
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
@@ -33,28 +28,47 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabase.hh"
 
+#include "gazebo/common/FuelModelDatabase.hh"
+
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/GuiEvents.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/InsertModelWidgetPrivate.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
 
+static bool gInsertModelWidgetDeleted = false;
+
+/////////////////////////////////////////////////
+// TODO: Remove this once Fuel support is fully functional
+bool usingFuel()
+{
+  auto useFuel = std::getenv("USE_IGNITION_FUEL");
+  if (!useFuel || *useFuel == '\0')
+    return false;
+
+  std::string useFuelStr(useFuel);
+  std::transform(useFuelStr.begin(), useFuelStr.end(),
+                 useFuelStr.begin(), ::tolower);
+
+  return useFuelStr != "false" && useFuelStr != "0";
+}
+
 /////////////////////////////////////////////////
 InsertModelWidget::InsertModelWidget(QWidget *_parent)
 : QWidget(_parent), dataPtr(new InsertModelWidgetPrivate)
 {
   this->setObjectName("insertModel");
-  this->dataPtr->modelDatabaseItem = NULL;
+  this->dataPtr->modelDatabaseItem = nullptr;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->dataPtr->fileTreeWidget = new QTreeWidget();
@@ -90,6 +104,9 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 
   // Update the list of models on the local system.
   this->UpdateAllLocalPaths();
+
+  // Create a top-level tree item for the Fuel models
+  this->InitializeFuelServers();
 
   // Create a top-level tree item for the path
   this->dataPtr->modelDatabaseItem =
@@ -130,10 +147,18 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
           common::SystemPaths::Instance()->updateModelRequest.Connect(
             boost::bind(&InsertModelWidget::OnModelUpdateRequest, this, _1)));
 
-  /// Non-blocking call to get all the models in the database.
+  // Non-blocking call to get all the models in the database.
   this->dataPtr->getModelsConnection =
     common::ModelDatabase::Instance()->GetModels(
         boost::bind(&InsertModelWidget::OnModels, this, _1));
+
+  // Use a signal/slot to populate the Ignition Fuel servers within the QT
+  // thread.
+  this->connect(this, SIGNAL(UpdateFuel(const std::string &)),
+      this, SLOT(OnUpdateFuel(const std::string &)));
+
+  // Populate the list of Ignition Fuel servers.
+  this->PopulateFuelServers();
 
   // Start a timer to check for the results from the ModelDatabase. We need
   // to do this so that the QT elements get added in the main thread.
@@ -166,6 +191,7 @@ void InsertModelWidget::HandleButton()
 /////////////////////////////////////////////////
 InsertModelWidget::~InsertModelWidget()
 {
+  gInsertModelWidgetDeleted = true;
   delete this->dataPtr->watcher;
   delete this->dataPtr;
   this->dataPtr = NULL;
@@ -214,7 +240,48 @@ void InsertModelWidget::Update()
     QTimer::singleShot(1000, this, SLOT(Update()));
 }
 
+/////////////////////////////////////////////////
+void InsertModelWidget::OnUpdateFuel(const std::string &_server)
+{
+  auto fuelItem = this->dataPtr->fuelDetails[_server].modelFuelItem;
+  if (!fuelItem)
+  {
+    gzerr << "No fuel item, something went wrong" << std::endl;
+    return;
+  }
 
+  fuelItem->setText(0, QString::fromStdString(_server));
+
+  if (this->dataPtr->fuelDetails[_server].modelBuffer.empty())
+    return;
+
+  // Add an item for each model
+  std::map<std::string, QTreeWidgetItem *> ownerItems;
+  for (auto id : this->dataPtr->fuelDetails[_server].modelBuffer)
+  {
+    auto ownerName = id.Owner();
+
+    QTreeWidgetItem *ownerItem = nullptr;
+    if (ownerItems.find(ownerName) != ownerItems.end())
+    {
+      ownerItem = ownerItems[ownerName];
+    }
+    else
+    {
+      ownerItem = new QTreeWidgetItem(fuelItem,
+          QStringList(QString::fromStdString(ownerName)));
+      ownerItems[ownerName] = ownerItem;
+    }
+
+    auto modelItem = new QTreeWidgetItem(ownerItem, QStringList(
+        QString::fromStdString(id.Name())));
+    modelItem->setToolTip(0, QString::fromStdString(id.UniqueName().c_str()));
+    modelItem->setData(0, Qt::UserRole, QVariant(id.UniqueName().c_str()));
+    this->dataPtr->fileTreeWidget->addTopLevelItem(modelItem);
+  }
+
+  this->dataPtr->fuelDetails[_server].modelBuffer.clear();
+}
 
 /////////////////////////////////////////////////
 void InsertModelWidget::OnModels(
@@ -228,28 +295,42 @@ void InsertModelWidget::OnModels(
 void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
-  if (_item)
+  if (!_item || !_item->parent())
+    return;
+
+  std::string path = _item->data(0, Qt::UserRole).toString().toStdString();
+  if (!path.empty())
   {
-    std::string path, filename;
+    QApplication::setOverrideCursor(Qt::BusyCursor);
 
-    if (_item->parent())
-      path = _item->parent()->text(0).toStdString() + "/";
+    std::string filename;
+    bool fuelModelSelected = false;
 
-    path = _item->data(0, Qt::UserRole).toString().toStdString();
-
-    if (!path.empty())
+    // Check if this is a model from an Ignition Fuel server.
+    for (auto const &serverEntry : this->dataPtr->fuelDetails)
     {
-      QApplication::setOverrideCursor(Qt::BusyCursor);
-      filename = common::ModelDatabase::Instance()->GetModelFile(path);
-      gui::Events::createEntity("model", filename);
-
+      if (serverEntry.second.modelFuelItem == _item->parent()->parent())
       {
-        boost::mutex::scoped_lock lock(this->dataPtr->mutex);
-        this->dataPtr->fileTreeWidget->clearSelection();
+        fuelModelSelected = true;
+        break;
       }
-
-      QApplication::setOverrideCursor(Qt::ArrowCursor);
     }
+
+    if (fuelModelSelected)
+    {
+      filename = common::FuelModelDatabase::Instance()->ModelFile(path);
+    }
+    else
+      filename = common::ModelDatabase::Instance()->GetModelFile(path);
+
+    gui::Events::createEntity("model", filename);
+
+    {
+      boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+      this->dataPtr->fileTreeWidget->clearSelection();
+    }
+
+    QApplication::setOverrideCursor(Qt::ArrowCursor);
   }
 }
 
@@ -437,4 +518,63 @@ bool InsertModelWidget::IsPathAccessible(const boost::filesystem::path &_path)
   }
 
   return false;
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::InitializeFuelServers()
+{
+  if (!usingFuel())
+    return;
+
+  // Get the list of Ignition Fuel servers.
+  auto servers = common::FuelModelDatabase::Instance()->Servers();
+
+  // Populate the list of Ignition Fuel servers.
+  for (auto const &server : servers)
+  {
+    std::string serverURL = server.Url().Str();
+    this->dataPtr->fuelDetails[serverURL];
+
+    // Create a top-level tree item for the models hosted in this Fuel server.
+    std::string label = "Connecting to " + serverURL + "...";
+    this->dataPtr->fuelDetails[serverURL].modelFuelItem =
+        new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+            QStringList(QString::fromStdString(label)));
+
+    // Add the new entry.
+    this->dataPtr->fileTreeWidget->addTopLevelItem(
+        this->dataPtr->fuelDetails[serverURL].modelFuelItem);
+  }
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::PopulateFuelServers()
+{
+  if (!usingFuel())
+    return;
+
+  // Get the list of Ignition Fuel servers.
+  auto servers = common::FuelModelDatabase::Instance()->Servers();
+
+  for (auto const &server : servers)
+  {
+    std::string serverURL = server.Url().Str();
+
+    // This lamda will be executed asynchronously when we get the list of models
+    // from this Ignition Fuel Server.
+    std::function <void(
+        const std::vector<ignition::fuel_tools::ModelIdentifier> &)> f =
+        [serverURL, this](
+            const std::vector<ignition::fuel_tools::ModelIdentifier> &_models)
+        {
+          if (!gInsertModelWidgetDeleted)
+          {
+            this->dataPtr->fuelDetails[serverURL].modelBuffer = _models;
+            // Emit the signal that populates the models for this server.
+            this->UpdateFuel(serverURL);
+          }
+        };
+
+    common::FuelModelDatabase::Instance()->Models(server, f);
+  }
 }

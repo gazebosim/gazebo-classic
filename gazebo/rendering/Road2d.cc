@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <vector>
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -178,7 +172,7 @@ void RoadSegment::Load(msgs::Road _msg)
 
   ignition::math::Vector3d pA, pB, tangent;
 
-  ignition::math::Box bounds;
+  ignition::math::AxisAlignedBox bounds;
   bounds.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
                    ignition::math::MAX_D);
   bounds.Max().Set(ignition::math::MIN_D, ignition::math::MIN_D,

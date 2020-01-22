@@ -26,6 +26,9 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
+// forward declaration
+struct timeval;
+
 namespace gazebo
 {
   namespace common
@@ -77,10 +80,12 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _tv Time to initialize to
+      // cppcheck-suppress noExplicitConstructor
       public: Time(const struct timeval &_tv);
 
       /// \brief Constructor
       /// \param[in] _tv Time to initialize to
+      // cppcheck-suppress noExplicitConstructor
       public: Time(const struct timespec &_tv);
 
       /// \brief Constructor
@@ -90,10 +95,17 @@ namespace gazebo
 
       /// \brief Constuctor
       /// \param[in] _time Time in double format sec.nsec
+      // cppcheck-suppress noExplicitConstructor
       public: Time(double _time);
 
       /// \brief Destructor
       public: virtual ~Time();
+
+      /// \brief Get a Time object that represents the maximum amount of time
+      /// that this class can represent.
+      /// \return The largest duration of time that can be represented by this
+      /// data structure. This is approximately 68 years.
+      public: static Time Maximum();
 
       /// \brief Get the wall time
       /// \return the current time

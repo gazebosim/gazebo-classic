@@ -20,6 +20,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>
+#include <gazebo/sensors/SensorsIface.hh>
 
 #include <iostream>
 
@@ -62,11 +63,22 @@ int main(int _argc, char **_argv)
 
   try
   {
+    // Print console messages
+    gazebo::common::Console::SetQuiet(false);
+
     // load gazebo server
     gazebo::setupServer(_argc, _argv);
 
     // Load a world
     gazebo::physics::WorldPtr world = gazebo::loadWorld(str);
+
+    // sensors::run_once() and sensors::run_threads() are from Server::Run()
+    // Make sure the sensors are updated once before running the world.
+    // This makes sure plugins get loaded properly.
+    gazebo::sensors::run_once(true);
+
+    // Run the sensor threads
+    gazebo::sensors::run_threads();
 
     // Create our node for communication
     gazebo::transport::NodePtr node(new gazebo::transport::Node());

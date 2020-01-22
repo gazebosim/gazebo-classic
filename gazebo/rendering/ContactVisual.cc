@@ -17,12 +17,6 @@
 /* Desc: Contact Visualization Class
  * Author: Nate Koenig
  */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/bind.hpp>
 
 #include "gazebo/common/MeshManager.hh"
@@ -120,8 +114,8 @@ void ContactVisual::Update()
       dPtr->points[c]->normal->SetPoint(1, (normal*normalScale));
       dPtr->points[c]->depth->SetPoint(1, (normal*-depth*10));
 
-      dPtr->points[c]->normal->setMaterial("Gazebo/LightOn");
-      dPtr->points[c]->depth->setMaterial("Gazebo/LightOff");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->points[c]->normal, "Gazebo/LightOn");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->points[c]->depth, "Gazebo/LightOff");
       dPtr->points[c]->depth->Update();
       dPtr->points[c]->normal->Update();
       c++;

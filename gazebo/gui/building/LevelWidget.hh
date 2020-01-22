@@ -42,7 +42,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: LevelWidget(QWidget *_parent = 0);
+      public: explicit LevelWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~LevelWidget();

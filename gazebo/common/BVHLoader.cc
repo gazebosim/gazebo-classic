@@ -72,7 +72,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
       getline(file, line);
       std::vector<std::string> words;
       boost::trim(line);
-      boost::split(words, line, boost::is_any_of("   "));
+      boost::split(words, line, boost::is_any_of(" \t"));
       if (words[0] == "ROOT" || words[0] == "JOINT")
       {
         if (words.size() < 2)
@@ -100,7 +100,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
               ignition::math::parseFloat(words[3]) * _scale);
           ignition::math::Matrix4d transform(
               ignition::math::Matrix4d::Identity);
-          transform.Translate(offset);
+          transform.SetTranslation(offset);
           node->SetTransform(transform);
         }
         else
@@ -146,7 +146,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
   getline(file, line);
   std::vector<std::string> words;
   boost::trim(line);
-  boost::split(words, line, boost::is_any_of("   "));
+  boost::split(words, line, boost::is_any_of(" \t"));
   unsigned int frameCount = 0;
   double frameTime = 0.0;
   if (words[0] != "Frames:" || words.size() < 2)
@@ -160,7 +160,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
   getline(file, line);
   words.clear();
   boost::trim(line);
-  boost::split(words, line, boost::is_any_of("   "));
+  boost::split(words, line, boost::is_any_of(" \t"));
 
   if (words.size() < 3 || words[0] != "Frame" || words[1] != "Time:")
   {
@@ -180,7 +180,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
     getline(file, line);
     words.clear();
     boost::trim(line);
-    boost::split(words, line, boost::is_any_of("   "));
+    boost::split(words, line, boost::is_any_of(" \t"));
     if (words.size() < totalChannels)
     {
       gzwarn << "Frame " << frameNo << " invalid.\n";
@@ -255,7 +255,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
         mats.pop_back();
       }
       ignition::math::Matrix4d pos(ignition::math::Matrix4d::Identity);
-      pos.Translate(translation);
+      pos.SetTranslation(translation);
       transform = pos * transform;
       animation->AddKeyFrame(node->GetName(), time, transform);
     }

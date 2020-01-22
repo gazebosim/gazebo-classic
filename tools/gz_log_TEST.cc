@@ -37,7 +37,11 @@ const std::string GZ_LOG_PATH(
 std::string custom_exec(std::string _cmd)
 {
   _cmd += " 2>/dev/null";
-  FILE* pipe = popen(_cmd.c_str(), "r");
+#ifdef _WIN32
+  FILE *pipe = _popen(_cmd.c_str(), "r");
+#else
+  FILE *pipe = popen(_cmd.c_str(), "r");
+#endif
 
   if (!pipe)
     return "ERROR";
@@ -51,7 +55,11 @@ std::string custom_exec(std::string _cmd)
       result += buffer;
   }
 
+#ifdef _WIN32
+  _pclose(pipe);
+#else
   pclose(pipe);
+#endif
   return result;
 }
 
@@ -132,6 +140,26 @@ TEST(gz_log, Echo)
     "</chunk>\n</gazebo_log>";
 
   EXPECT_EQ(validEcho, echo);
+}
+
+/////////////////////////////////////////////////
+/// Check to make sure that 'gz log -e' returns model and light insertions and
+/// deletions
+TEST(gz_log, EchoInsertionDeletion)
+{
+  std::string echo = custom_exec(std::string("gz log -e -f ") +
+      PROJECT_SOURCE_PATH + "/test/logs/insertion_deletion.log");
+  boost::trim_right(echo);
+
+  EXPECT_TRUE(echo.find("<insertions>\n<model") != std::string::npos);
+  EXPECT_TRUE(echo.find("<insertions>\n<light") != std::string::npos);
+  EXPECT_TRUE(echo.find("</insertions>") != std::string::npos);
+
+  EXPECT_TRUE(echo.find("<deletions>\n<name>unit_box</name>\n</deletions>") !=
+      std::string::npos);
+  EXPECT_TRUE(echo.find(
+      "<deletions>\n<name>user_point_light_0</name>\n</deletions>") !=
+      std::string::npos);
 }
 
 /////////////////////////////////////////////////

@@ -14,13 +14,6 @@
  * limitations under the License.
  *
  */
-
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/filesystem.hpp>
 #include <sstream>
 #include <functional>
@@ -246,7 +239,7 @@ ModelCreator::ModelCreator(QObject *_parent)
   this->dataPtr->modelCounter = 0;
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->makerPub =
       this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
   this->dataPtr->requestPub =

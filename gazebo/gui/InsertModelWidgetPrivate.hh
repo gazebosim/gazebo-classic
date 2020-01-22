@@ -14,13 +14,23 @@
  * limitations under the License.
  *
 */
-#ifndef _INSERT_MODEL_WIDGET_PRIVATE_HH_
-#define _INSERT_MODEL_WIDGET_PRIVATE_HH_
+#ifndef GAZEBO_GUI_INSERTMODELWIDGETPRIVATE_HH_
+#define GAZEBO_GUI_INSERTMODELWIDGETPRIVATE_HH_
 
-#include <string>
 #include <map>
+#include <memory>
 #include <set>
+#include <string>
+#include <vector>
 #include <boost/thread/mutex.hpp>
+
+#ifdef _WIN32
+  // DELETE is defined in winnt.h and causes a problem with
+  // ignition::fuel_tools::REST::DELETE
+  #undef DELETE
+#endif
+#include <ignition/fuel_tools/FuelClient.hh>
+#include <ignition/fuel_tools/ModelIdentifier.hh>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
@@ -33,8 +43,19 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \brief Details to manage an Ignition Fuel server.
+    class FuelDatabaseDetails
+    {
+      /// \brief Tree item that is populated with models from a Fuel server.
+      public: QTreeWidgetItem *modelFuelItem = nullptr;
+
+      /// \brief a buffer of models.
+      /// It contains elements which uniquely identify models.
+      public: std::vector<ignition::fuel_tools::ModelIdentifier> modelBuffer;
+    };
+
     /// \brief Private class attributes for InsertModelWidget.
-    class GZ_GUI_VISIBLE InsertModelWidgetPrivate
+    class InsertModelWidgetPrivate
     {
       /// \brief Widget that display all the models that can be inserted.
       public: QTreeWidget *fileTreeWidget;
@@ -56,6 +77,14 @@ namespace gazebo
 
       /// \brief Cache for the names added to fileTreeWidget
       public: std::set<std::string> localFilenameCache;
+
+      /// \brief Stores details about all Fuel servers providing assets.
+      /// The key is the server name and the value is the class that captures
+      /// multiple information about the server.
+      public: std::map<std::string, FuelDatabaseDetails> fuelDetails;
+
+      /// \brief A client for using Ignition Fuel services.
+      public: std::unique_ptr<ignition::fuel_tools::FuelClient> fuelClient;
     };
   }
 }

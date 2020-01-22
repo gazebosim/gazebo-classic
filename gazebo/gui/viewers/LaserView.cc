@@ -14,13 +14,6 @@
  * limitations under the License.
  *
  */
-
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -148,7 +141,13 @@ void LaserView::resizeEvent(QResizeEvent *_event)
 void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
 {
   // Update the Hz and Bandwidth info
+#if GOOGLE_PROTOBUF_VERSION < 3001000
   this->OnMsg(msgs::Convert(_msg->time()), _msg->ByteSize());
+#else
+  // ByteSizeLong appeared in version 3.1 of Protobuf, and ByteSize
+  // became deprecated.
+  this->OnMsg(msgs::Convert(_msg->time()), _msg->ByteSizeLong());
+#endif
 
   this->laserItem->Clear();
 
@@ -161,7 +160,8 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
   if (_msg->scan().has_vertical_count() && _msg->scan().vertical_count() !=
       static_cast<uint32_t>(this->vertScanSpin->maximum()+1))
   {
-    int max = std::max(0u, _msg->scan().vertical_count()-1);
+    int max = _msg->scan().vertical_count()-1;
+    max = std::max(0, max);
     rayOffset = std::min(rayOffset, max);
 
     if (this->vertScanSpin->value() > max)

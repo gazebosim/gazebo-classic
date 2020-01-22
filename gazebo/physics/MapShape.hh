@@ -152,7 +152,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent quad tree node.
-      public: QuadNode(QuadNode *_parent)
+      public: explicit QuadNode(QuadNode *_parent)
               : x(0), y(0), width(0), height(0)
               {
                 parent = _parent;
@@ -175,7 +175,7 @@ namespace gazebo
               {
                 std::deque<QuadNode*>::iterator iter;
 
-                printf("%sXY[%d %d] WH[%d %d] O[%d] L[%d] V[%d]\n",
+                printf("%sXY[%u %u] WH[%u %u] O[%d] L[%d] V[%d]\n",
                     _space.c_str(), x, y, width, height, occupied, leaf, valid);
                 _space += "  ";
                 for (iter = children.begin(); iter != children.end(); ++iter)

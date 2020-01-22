@@ -18,9 +18,6 @@
 #ifndef _WIN32
   #include <dirent.h>
 #else
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
   #include "gazebo/common/win_dirent.h"
 #endif
 
@@ -146,8 +143,10 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
     this->dataPtr->pcdViewport =
         this->dataPtr->pcdTarget->addViewport(this->camera);
     this->dataPtr->pcdViewport->setClearEveryFrame(true);
+
+    auto const &ignBG = this->scene->BackgroundColor();
     this->dataPtr->pcdViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor()));
+        Conversions::Convert(ignBG));
     this->dataPtr->pcdViewport->setOverlaysEnabled(false);
     this->dataPtr->pcdViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
@@ -384,8 +383,8 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
     // Setup the viewport to use the texture
     this->depthViewport = this->depthTarget->addViewport(this->camera);
     this->depthViewport->setClearEveryFrame(true);
-    this->depthViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor()));
+    auto const &ignBG = this->scene->BackgroundColor();
+    this->depthViewport->setBackgroundColour(Conversions::Convert(ignBG));
     this->depthViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
@@ -396,7 +395,7 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     // gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
     this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
+    this->camera->setFOVy(Ogre::Radian(this->LimitFOV(vfov)));
   }
 }
 

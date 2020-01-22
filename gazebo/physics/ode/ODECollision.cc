@@ -19,12 +19,6 @@
  * Date: 13 Feb 2006
  */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <sstream>
 
 #include "gazebo/common/Assert.hh"
@@ -58,6 +52,8 @@ ODECollision::~ODECollision()
   if (this->collisionId)
     dGeomDestroy(this->collisionId);
   this->collisionId = nullptr;
+
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -174,7 +170,7 @@ void ODECollision::SetCollideBits(unsigned int _bits)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box ODECollision::BoundingBox() const
+ignition::math::AxisAlignedBox ODECollision::BoundingBox() const
 {
   dReal aabb[6];
   memset(aabb, 0, 6 * sizeof(dReal));
@@ -182,7 +178,7 @@ ignition::math::Box ODECollision::BoundingBox() const
   // if (this->collisionId && this->type != Shape::PLANE)
   dGeomGetAABB(this->collisionId, aabb);
 
-  ignition::math::Box box(
+  ignition::math::AxisAlignedBox box(
       ignition::math::Vector3d(aabb[0], aabb[2], aabb[4]),
       ignition::math::Vector3d(aabb[1], aabb[3], aabb[5]));
 

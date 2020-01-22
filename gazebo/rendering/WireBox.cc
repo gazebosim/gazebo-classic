@@ -23,12 +23,12 @@ using namespace gazebo;
 using namespace rendering;
 
 /////////////////////////////////////////////////
-WireBox::WireBox(VisualPtr _parent, const ignition::math::Box &_box)
+WireBox::WireBox(VisualPtr _parent, const ignition::math::AxisAlignedBox &_box)
   : dataPtr(new WireBoxPrivate)
 {
   this->dataPtr->parent = _parent;
   this->dataPtr->lines = new DynamicLines(RENDERING_LINE_LIST);
-  this->dataPtr->lines->setMaterial("BaseWhiteNoLighting");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(this->dataPtr->lines, "BaseWhiteNoLighting");
   this->dataPtr->parent->AttachObject(this->dataPtr->lines);
   this->dataPtr->lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
@@ -42,7 +42,7 @@ WireBox::~WireBox()
 }
 
 /////////////////////////////////////////////////
-void WireBox::Init(const ignition::math::Box &_box)
+void WireBox::Init(const ignition::math::AxisAlignedBox &_box)
 {
   this->dataPtr->box = _box;
   ignition::math::Vector3d max = _box.Max();
@@ -114,7 +114,7 @@ bool WireBox::Visible() const
 }
 
 /////////////////////////////////////////////////
-ignition::math::Box WireBox::Box() const
+ignition::math::AxisAlignedBox WireBox::Box() const
 {
   return this->dataPtr->box;
 }

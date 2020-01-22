@@ -26,7 +26,7 @@
 namespace gazebo
 {
   /// \brief An base class plugin for custom force torque sensor processing.
-  class GAZEBO_VISIBLE ForceTorquePlugin : public SensorPlugin
+  class GZ_PLUGIN_VISIBLE ForceTorquePlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: ForceTorquePlugin();

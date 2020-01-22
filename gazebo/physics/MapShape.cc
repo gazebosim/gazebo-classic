@@ -14,11 +14,7 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
+#include <ignition/math/Color.hh>
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <string.h>
@@ -407,7 +403,7 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
                                  unsigned int &freePixels,
                                  unsigned int &occPixels)
 {
-  common::Color pixColor;
+  ignition::math::Color pixColor;
   unsigned char v;
   unsigned int x, y;
 
@@ -417,10 +413,10 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
   {
     for (x = xStart; x < xStart + width; x++)
     {
-      pixColor = this->mapImage->GetPixel(x, y);
+      pixColor = this->mapImage->Pixel(x, y);
 
       v = (unsigned char)(255 *
-          ((pixColor.r + pixColor.g + pixColor.b) / 3.0));
+          ((pixColor.R() + pixColor.G() + pixColor.B()) / 3.0));
       // if (this->sdf->Get<bool>("negative"))
         // v = 255 - v;
 

@@ -20,12 +20,12 @@
 #include <string>
 #include <iostream>
 #include <sdf/sdf.hh>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/Color.hh"
 #include "gazebo/util/system.hh"
 
 namespace Ogre
@@ -104,6 +104,10 @@ namespace gazebo
       /// \return The rotation of the light
       public: ignition::math::Quaterniond Rotation() const;
 
+      /// \brief Get the world pose of the light
+      /// \return The world pose of the light
+      public: ignition::math::Pose3d WorldPose() const;
+
       /// \brief Set whether this entity has been selected by the user through
       /// the gui.
       /// \param[in] _s Set to True when the light is selected by the user.
@@ -115,6 +119,11 @@ namespace gazebo
       /// \brief Set whether to show the visual
       /// \param[in] _s Set to true to draw a representation of the light.
       public: void ShowVisual(const bool _s);
+
+      /// \brief Set whether the light will be visible
+      /// \param[in] _s Set to true to make the light visible,
+      /// false to turn the light off.
+      public: void SetVisible(const bool _s);
 
       /// \brief Get whether the light is visible.
       /// \return True if the light is visible.
@@ -130,19 +139,19 @@ namespace gazebo
 
       /// \brief Set the diffuse color
       /// \param[in] _color Light diffuse color.
-      public: void SetDiffuseColor(const common::Color &_color);
+      public: void SetDiffuseColor(const ignition::math::Color &_color);
 
       /// \brief Get the diffuse color
       /// \return The light's diffuse color.
-      public: common::Color DiffuseColor() const;
+      public: ignition::math::Color DiffuseColor() const;
 
       /// \brief Set the specular color
       /// \param[in] _color The specular color
-      public: void SetSpecularColor(const common::Color &_color);
+      public: void SetSpecularColor(const ignition::math::Color &_color);
 
       /// \brief Get the specular color
       /// \return  The specular color
-      public: common::Color SpecularColor() const;
+      public: ignition::math::Color SpecularColor() const;
 
       /// \brief Set the direction
       /// \param[in] _dir Set the light's direction. Only applicable to spot and
@@ -197,6 +206,10 @@ namespace gazebo
       /// \param[in] _scene Scene to contain the light.
       /// \return a clone of the light
       public: LightPtr Clone(const std::string &_name, ScenePtr _scene);
+
+      /// \brief Get the id associated with this light
+      /// \return Unique Light id
+      public: uint32_t Id() const;
 
       /// \brief On pose change callback
       protected: virtual void OnPoseChange() {}

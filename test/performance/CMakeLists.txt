@@ -18,7 +18,7 @@ if (HAVE_BULLET)
 endif()
 
 # Per issue #802, these tests are not yet portable
-if (NOT APPLE)
+if (NOT APPLE AND NOT WIN32)
   set(tests
     RAMLibrary_TEST.cc
   )
@@ -27,6 +27,7 @@ if (NOT APPLE)
   set(fixture_tests
     factory_stress.cc
     image_convert_stress.cc
+    introspectionmanager_stress.cc
     sensor_stress.cc
     set_world_pose.cc
     transport_stress.cc

@@ -36,12 +36,54 @@ namespace gazebo
     /// \param[in] names A vector of strings, one for each enum value.
     /// \sa EnumIface
     /// \sa EnumIterator
+    /// \deprecated Use GZ_ENUM_VISIBILITY instead.
     #define GZ_ENUM(enumType, begin, end, ...) \
     template<> GZ_COMMON_VISIBLE enumType \
     common::EnumIface<enumType>::range[] = {begin, end}; \
     template<> GZ_COMMON_VISIBLE \
     std::vector<std::string> common::EnumIface<enumType>::names = {__VA_ARGS__};
 
+    /// \brief A macro that allows an enum to have an iterator and string
+    /// conversion.
+    /// \param[in] visibility DLL export macro
+    /// \param[in] enumType Enum type
+    /// \param[in] begin Enum value that marks the beginning of the enum
+    /// values.
+    /// \param[in] end Enum value that marks the end of the enum values.
+    /// \param[in] names A vector of strings, one for each enum value.
+    /// \sa EnumIface
+    /// \sa EnumIterator
+#ifndef _MSC_VER
+    #define GZ_ENUM_VISIBILITY(visibility, enumType, begin, end, ...) \
+    template<> visibility enumType \
+    common::EnumIface<enumType>::range[] = {begin, end}; \
+    template<> visibility std::vector<std::string> \
+    common::EnumIface<enumType>::names = {__VA_ARGS__};
+#else
+    #define GZ_ENUM_VISIBILITY(visibility, enumType, begin, end, ...) \
+    template<> enumType \
+    common::EnumIface<enumType>::range[] = {begin, end}; \
+    template<> std::vector<std::string> \
+    common::EnumIface<enumType>::names = {__VA_ARGS__}; \
+    template class visibility common::EnumIface<enumType>;
+#endif
+
+    /// \brief A macro that declares an enum usage across the shared
+    /// library boundary.
+    /// \param[in] visibility DLL export macro
+    /// \param[in] enumType Enum type
+    /// \sa EnumIface
+#ifndef _MSC_VER
+    #define GZ_ENUM_DECLARE(visibility, enumType)
+#else
+    #define GZ_ENUM_DECLARE(visibility, enumType) \
+    template class visibility common::EnumIface<enumType>;
+#endif
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundefined-var-template"
+#endif
     /// \brief Enum interface. Use this interface to convert an enum to
     /// a string, and set an enum from a string.
     template<typename T>
@@ -100,6 +142,9 @@ namespace gazebo
       /// use this directly.
       public: static std::vector<std::string> names;
     };
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
     /// \brief An iterator over enum types.
     ///
@@ -114,7 +159,8 @@ namespace gazebo
     ///   MY_TYPE_END
     /// };
     ///
-    /// GZ_ENUM(MyType, MY_TYPE_BEGIN, MY_TYPE_END,
+    /// GZ_ENUM_VISIBILITY(GZ_MY_TYPE_VISIBLE, MyType,
+    ///  MY_TYPE_BEGIN, MY_TYPE_END,
     ///  "TYPE1",
     ///  "TYPE2",
     ///  "MY_TYPE_END")
@@ -140,6 +186,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _c Enum value
+      // cppcheck-suppress noExplicitConstructor
       public: EnumIterator(const Enum _c) : c(_c)
       {
         GZ_ASSERT(this->c >= this->Begin() && this->c <= this->End(),

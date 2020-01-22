@@ -47,7 +47,7 @@ Material::Material()
 }
 
 //////////////////////////////////////////////////
-Material::Material(const Color &_clr)
+Material::Material(const ignition::math::Color &_clr)
 {
   this->name = "gazebo_material_" + boost::lexical_cast<std::string>(counter++);
   this->blendMode = REPLACE;
@@ -102,49 +102,49 @@ std::string Material::GetTextureImage() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetAmbient(const Color &_clr)
+void Material::SetAmbient(const ignition::math::Color &_clr)
 {
   this->ambient = _clr;
 }
 
 //////////////////////////////////////////////////
-Color Material::GetAmbient() const
+ignition::math::Color Material::Ambient() const
 {
   return this->ambient;
 }
 
 //////////////////////////////////////////////////
-void Material::SetDiffuse(const Color &_clr)
+void Material::SetDiffuse(const ignition::math::Color &_clr)
 {
   this->diffuse = _clr;
 }
 
 //////////////////////////////////////////////////
-Color Material::GetDiffuse() const
+ignition::math::Color Material::Diffuse() const
 {
   return this->diffuse;
 }
 
 //////////////////////////////////////////////////
-void Material::SetSpecular(const Color &_clr)
+void Material::SetSpecular(const ignition::math::Color &_clr)
 {
   this->specular = _clr;
 }
 
 //////////////////////////////////////////////////
-Color Material::GetSpecular() const
+ignition::math::Color Material::Specular() const
 {
   return this->specular;
 }
 
 //////////////////////////////////////////////////
-void Material::SetEmissive(const Color &_clr)
+void Material::SetEmissive(const ignition::math::Color &_clr)
 {
   this->emissive = _clr;
 }
 
 //////////////////////////////////////////////////
-Color Material::GetEmissive() const
+ignition::math::Color Material::Emissive() const
 {
   return this->emissive;
 }

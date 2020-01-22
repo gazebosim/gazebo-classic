@@ -41,7 +41,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyCollision : public Collision
     {
       /// \brief Constructor
-      public: SimbodyCollision(LinkPtr _parent);
+      public: explicit SimbodyCollision(LinkPtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyCollision();
@@ -59,7 +59,7 @@ namespace gazebo
       public: virtual void SetCollideBits(unsigned int _bits);
 
       // Documentation inherited
-      public: virtual ignition::math::Box BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Set the collision shape.
       /// \param[in] _shape SimTK geometry to use as the collision

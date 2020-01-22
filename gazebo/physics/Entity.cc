@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -39,6 +33,7 @@
 #include "gazebo/physics/RayShape.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -184,9 +179,9 @@ ignition::math::Pose3d Entity::InitialRelativePose() const
 
 
 //////////////////////////////////////////////////
-ignition::math::Box Entity::BoundingBox() const
+ignition::math::AxisAlignedBox Entity::BoundingBox() const
 {
-  return ignition::math::Box(
+  return ignition::math::AxisAlignedBox(
       ignition::math::Vector3d::Zero, ignition::math::Vector3d::One);
 }
 
@@ -251,11 +246,11 @@ ignition::math::Pose3d Entity::RelativePose() const
   }
   else if (this->parent && this->parentEntity)
   {
-    return this->worldPose - this->parentEntity->WorldPose();
+    return this->WorldPose() - this->parentEntity->WorldPose();
   }
   else
   {
-    return this->worldPose;
+    return this->WorldPose();
   }
 }
 
@@ -358,6 +353,12 @@ void Entity::SetWorldPoseModel(
                 boost::static_pointer_cast<Collision>(*iterC);
             entityC->SetWorldPoseDirty();
           }
+          else if ((*iterC)->HasType(LIGHT))
+          {
+            LightPtr entityC =
+                boost::static_pointer_cast<Light>(*iterC);
+            entityC->SetWorldPoseDirty();
+          }
         }
       }
       else if (entity->HasType(MODEL))
@@ -436,6 +437,11 @@ void Entity::SetWorldPoseDefault(const ignition::math::Pose3d &_pose,
       if (childPtr->HasType(COLLISION))
       {
         CollisionPtr entityC = boost::static_pointer_cast<Collision>(childPtr);
+        entityC->SetWorldPoseDirty();
+      }
+      else if (childPtr->HasType(LIGHT))
+      {
+        LightPtr entityC = boost::static_pointer_cast<Light>(childPtr);
         entityC->SetWorldPoseDirty();
       }
     }
@@ -668,19 +674,20 @@ const ignition::math::Pose3d &Entity::DirtyPose() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Entity::CollisionBoundingBox() const
+ignition::math::AxisAlignedBox Entity::CollisionBoundingBox() const
 {
   BasePtr base = boost::const_pointer_cast<Base>(shared_from_this());
   return this->CollisionBoundingBoxHelper(base);
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box Entity::CollisionBoundingBoxHelper(BasePtr _base) const
+ignition::math::AxisAlignedBox Entity::CollisionBoundingBoxHelper(
+    BasePtr _base) const
 {
   if (_base->HasType(COLLISION))
     return boost::dynamic_pointer_cast<Collision>(_base)->BoundingBox();
 
-  ignition::math::Box box;
+  ignition::math::AxisAlignedBox box;
 
   for (unsigned int i = 0; i < _base->GetChildCount(); i++)
   {
@@ -694,8 +701,8 @@ ignition::math::Box Entity::CollisionBoundingBoxHelper(BasePtr _base) const
 void Entity::PlaceOnEntity(const std::string &_entityName)
 {
   EntityPtr onEntity = this->GetWorld()->EntityByName(_entityName);
-  ignition::math::Box box = this->CollisionBoundingBox();
-  ignition::math::Box onBox = onEntity->CollisionBoundingBox();
+  ignition::math::AxisAlignedBox box = this->CollisionBoundingBox();
+  ignition::math::AxisAlignedBox onBox = onEntity->CollisionBoundingBox();
 
   ignition::math::Pose3d p = onEntity->WorldPose();
   p.Pos().Z() = onBox.Max().Z() + box.ZLength()*0.5;
@@ -710,7 +717,7 @@ void Entity::GetNearestEntityBelow(double &_distBelow,
   RayShapePtr rayShape = boost::dynamic_pointer_cast<RayShape>(
     this->GetWorld()->Physics()->CreateShape("ray", CollisionPtr()));
 
-  ignition::math::Box box = this->CollisionBoundingBox();
+  ignition::math::AxisAlignedBox box = this->CollisionBoundingBox();
   ignition::math::Vector3d start = this->WorldPose().Pos();
   ignition::math::Vector3d end = start;
   start.Z() = box.Min().Z() - 0.00001;

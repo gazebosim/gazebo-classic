@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/bind.hpp>
 
 #include "gazebo/transport/transport.hh"
@@ -75,7 +69,7 @@ void TransmitterVisual::Load()
   TransmitterVisualPrivate *dPtr =
       reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);
   dPtr->points = this->CreateDynamicLine(rendering::RENDERING_POINT_LIST);
-  dPtr->points->setMaterial("Gazebo/PointCloud");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->points, "Gazebo/PointCloud");
 }
 
 /////////////////////////////////////////////////
@@ -129,7 +123,7 @@ void TransmitterVisual::Update()
     strength = 1.0 - (strength / 255.0);
 
     // Set the color in gray scale
-    common::Color color(strength, strength, strength);
+    ignition::math::Color color(strength, strength, strength);
     dPtr->points->SetColor(i, color);
   }
 }

@@ -31,6 +31,9 @@
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/util/system.hh"
 
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_SENSORS_VISIBLE, gazebo, sensors, SensorManager)
+
 namespace gazebo
 {
   /// \ingroup gazebo_sensors
@@ -114,6 +117,10 @@ namespace gazebo
       /// \brief Finalize all the sensors
       public: void Fini();
 
+      /// \brief Get whether there's at least one sensor container running.
+      /// \return True if running.
+      public: bool Running() const;
+
       /// \brief Get all the sensor types
       /// \param[out] All the sensor types.
       public: void GetSensorTypes(std::vector<std::string> &_types) const;
@@ -194,6 +201,10 @@ namespace gazebo
 
                  /// \brief Stop the run thread.
                  public: void Stop();
+
+                 /// \brief Get whether running or stopped.
+                 /// \return True if running.
+                 public: bool Running() const;
 
                  /// \brief Update the sensors.
                  /// \param[in] _force True to force the sensors to update,
@@ -292,7 +303,8 @@ namespace gazebo
       /// \brief Pointer to the sim time event handler.
       private: SimTimeEventHandler *simTimeEventHandler;
 
-      /// \brief All the worlds that have sensors.
+      /// \brief All the worlds whose sensors have been initialized. This
+      /// includes worlds without sensors..
       private: std::map<std::string, physics::WorldPtr> worlds;
 
       /// \brief Connect to the time reset event.

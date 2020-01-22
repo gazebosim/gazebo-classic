@@ -66,8 +66,8 @@ class gazebo::rendering::MarkerManagerPrivate
 
   /// \brief Service callback that returns a list of markers.
   /// \param[out] _rep Service reply
-  /// \param[out] _result True on success.
-  public: void OnList(ignition::msgs::Marker_V &_rep, bool &_result);
+  /// \return True on success.
+  public: bool OnList(ignition::msgs::Marker_V &_rep);
 
   /// \brief Receive messages from the world_stats topic
   /// \param[in] _msg The world stats message
@@ -203,7 +203,7 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 {
   // Get the namespace, if it exists. Otherwise, use the global namespace
   std::string ns;
-  if (_msg.has_ns())
+  if (!_msg.ns().empty())
     ns = _msg.ns();
 
   // Get the namespace that the marker belongs to
@@ -211,7 +211,7 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 
   // If an id is given
   size_t id;
-  if (_msg.has_id())
+  if (_msg.id() != 0)
   {
     id = _msg.id();
   }
@@ -334,10 +334,9 @@ void MarkerManagerPrivate::OnMarkerMsg(const ignition::msgs::Marker &_req)
 }
 
 /////////////////////////////////////////////////
-void MarkerManagerPrivate::OnList(ignition::msgs::Marker_V &_rep, bool &_result)
+bool MarkerManagerPrivate::OnList(ignition::msgs::Marker_V &_rep)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
-  _result = true;
   _rep.clear_marker();
 
   // Create the list of markers
@@ -353,6 +352,8 @@ void MarkerManagerPrivate::OnList(ignition::msgs::Marker_V &_rep, bool &_result)
       iter->second->FillMsg(*markerMsg);
     }
   }
+
+  return true;
 }
 
 /////////////////////////////////////////////////

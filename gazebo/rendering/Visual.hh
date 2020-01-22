@@ -24,13 +24,13 @@
 #include <vector>
 
 #include <sdf/sdf.hh>
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/msgs/MessageTypes.hh>
 
-#include "gazebo/common/Color.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Time.hh"
 
@@ -220,45 +220,57 @@ namespace gazebo
       public: void SetMaterial(const std::string &_materialName,
                                bool _unique = true, const bool _cascade = true);
 
+      /// \brief Set a shader program parameter associated to this visual's
+      /// material
+      /// \param[in] _paramName Name of shader parameter
+      /// \param[in] _shaderType Type of shader. Supported types:
+      /// vertex, fragment
+      /// \param[in] _value Value to set the parameter to. The value string can
+      /// be a number (int, float) or a space delimited array of numbers
+      /// (floats). The value type must match the type defined in the shaders.
+      /// Note: Setting vec2/float2 params is only supported in ogre1.9+
+      public: void SetMaterialShaderParam(const std::string &_paramName,
+          const std::string &_shaderType, const std::string &_value);
+
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.
       /// \param[in] _cascade Whether to set this parameter in children too.
-      public: void SetAmbient(const common::Color &_color,
+      public: void SetAmbient(const ignition::math::Color &_color,
           const bool _cascade = true);
 
       /// \brief Set the diffuse color of the visual.
       /// \param[in] _color Set the diffuse color.
       /// \param[in] _cascade Whether to set this parameter in children too.
-      public: void SetDiffuse(const common::Color &_color,
+      public: void SetDiffuse(const ignition::math::Color &_color,
           const bool _cascade = true);
 
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
       /// \param[in] _cascade Whether to set this parameter in children too.
-      public: void SetSpecular(const common::Color &_color,
+      public: void SetSpecular(const ignition::math::Color &_color,
           const bool _cascade = true);
 
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
       /// \param[in] _cascade Whether to set this parameter in children too.
-      public: virtual void SetEmissive(const common::Color &_color,
+      public: virtual void SetEmissive(const ignition::math::Color &_color,
           const bool _cascade = true);
 
       /// \brief Get the ambient color of the visual.
       /// \return Ambient color.
-      public: common::Color GetAmbient() const;
+      public: ignition::math::Color Ambient() const;
 
       /// \brief Get the diffuse color of the visual.
       /// \return Diffuse color.
-      public: common::Color GetDiffuse() const;
+      public: ignition::math::Color Diffuse() const;
 
       /// \brief Get the specular color of the visual.
       /// \return Specular color.
-      public: common::Color GetSpecular() const;
+      public: ignition::math::Color Specular() const;
 
       /// \brief Get the emissive color of the visual.
       /// \return Emissive color.
-      public: common::Color GetEmissive() const;
+      public: ignition::math::Color Emissive() const;
 
       /// \brief Enable or disable wireframe for this visual.
       /// \param[in] _show True to enable wireframe for this visual.
@@ -400,12 +412,12 @@ namespace gazebo
       /// \param[in] _initialColor The initial color of the ribbon trail.
       /// \param[in] _changeColor Color to change too as the trail grows.
       public: void SetRibbonTrail(bool _value,
-                  const common::Color &_initialColor,
-                  const common::Color &_changeColor);
+                  const ignition::math::Color &_initialColor,
+                  const ignition::math::Color &_changeColor);
 
       /// \brief Get the bounding box for the visual.
       /// \return The bounding box in world coordinates.
-      public: ignition::math::Box BoundingBox() const;
+      public: ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Add a line to the visual.
       /// \param[in] _type The type of line to make.
@@ -671,7 +683,17 @@ namespace gazebo
                         const std::string &_name, ScenePtr _scene,
                         bool _useRTShader = true);
 
+      /// \brief Process a gazebo material message, which uses proto2
+      /// syntax that allows unset fields to be ignored, which is the
+      /// legacy behavior for gazebo10 and earlier.
+      /// \param[in] _msg The ignition material message.
+      protected: void ProcessMaterialMsg(const msgs::Material &_msg);
+
       /// \brief Process a material message.
+      /// Note that ignition msgs5+ uses proto3 syntax, which does not
+      /// distinguish between unset fields and fields with a default value,
+      /// default values will be used for any fields not explicitly set when
+      /// using this function.
       /// \param[in] _msg The ignition material message.
       protected: void ProcessMaterialMsg(const ignition::msgs::Material &_msg);
 
@@ -703,7 +725,7 @@ namespace gazebo
       /// \param[in] _node Pointer to the Ogre Node to process.
       /// \param[in] _box Current bounding box information.
       private: void BoundsHelper(Ogre::SceneNode *_node,
-                                 ignition::math::Box &_box) const;
+                                 ignition::math::AxisAlignedBox &_box) const;
 
       /// \brief Return true if the submesh should be centered.
       /// \return True if the submesh should be centered when it's inserted

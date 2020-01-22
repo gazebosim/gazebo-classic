@@ -28,6 +28,9 @@
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/util/system.hh"
 
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_RENDERING_VISIBLE, gazebo, rendering, RTShaderSystem)
+
 namespace gazebo
 {
   namespace rendering
@@ -133,6 +136,36 @@ namespace gazebo
       /// \return Size of the shadow texture. The default size is 1024.
       public: unsigned int ShadowTextureSize() const;
 
+      /// \brief Set the shadow clip distances.
+      /// \param[in] _near Near clip distance.
+      /// \param[in] _far Far clip distance.
+      public: void SetShadowClipDist(const double _near, const double _far);
+
+      /// \brief Get the shadow near clip distance.
+      /// \return Near clip distance.
+      public: double ShadowNearClip() const;
+
+      /// \brief Get the shadow far clip distance.
+      /// \return Far clip distance.
+      public: double ShadowFarClip() const;
+
+      /// \brief Set the PSSM lambda value for determining how linear or
+      /// logarithmic choice of split points will be.
+      /// \param[in] _lambda PSSM split point lambda.
+      public: void SetShadowSplitLambda(const double _lambda);
+
+      /// \brief Get the PSSM split point lambda value.
+      /// \return PSSM split point lambda.
+      public: double ShadowSplitLambda() const;
+
+      /// \brief Set the overlap between PSSM shadow maps.
+      /// \param[in] _padding PSSM split point overlap.
+      public: void SetShadowSplitPadding(const double _padding);
+
+      /// \brief Get the PSSM split point overlap.
+      /// \return PSSM split point overlap.
+      public: double ShadowSplitPadding() const;
+
       /// \brief Get paths for the shader system
       /// \param[out] _coreLibsPath Path to the core libraries.
       /// \param[out] _cachePath Path to where the generated shaders are
@@ -143,6 +176,9 @@ namespace gazebo
       /// \brief Update the shaders for a visual.
       /// \param[in] _vis Pointer to the visual to update.
       private: void UpdateShaders(VisualPtr _vis);
+
+      /// \brief Re-apply shadows. Call this if a shadow paramenter is changed.
+      private: void ReapplyShadows();
 
       /// \brief Make the RTShader system a singleton.
       private: friend class SingletonT<RTShaderSystem>;

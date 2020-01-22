@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/MouseEvent.hh"
@@ -454,7 +455,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 
         if (this->dataPtr->hoverVis)
         {
-          this->dataPtr->hoverVis->SetEmissive(common::Color(0, 0, 0));
+          this->dataPtr->hoverVis->SetEmissive(ignition::math::Color(0, 0, 0));
           this->dataPtr->hoverVis.reset();
         }
       }
@@ -505,7 +506,8 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
   jointData->parent = _parent;
   jointData->line = jointLine;
   jointData->type = this->dataPtr->jointType;
-  jointData->line->setMaterial(this->jointMaterials[jointData->type]);
+  GZ_OGRE_SET_MATERIAL_BY_NAME(jointData->line,
+                               this->jointMaterials[jointData->type]);
 
   return jointData;
 }
@@ -612,7 +614,7 @@ void JointMaker::Stop()
 
   this->AddJoint(JointMaker::JOINT_NONE);
   if (this->dataPtr->hoverVis)
-    this->dataPtr->hoverVis->SetEmissive(common::Color(0, 0, 0));
+    this->dataPtr->hoverVis->SetEmissive(ignition::math::Color(0, 0, 0));
   this->dataPtr->hoverVis.reset();
 
   if (this->dataPtr->jointCreationDialog &&
@@ -650,7 +652,8 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   if (vis)
   {
     if (this->dataPtr->hoverVis)
-      this->dataPtr->hoverVis->SetEmissive(common::Color(0.0, 0.0, 0.0));
+      this->dataPtr->hoverVis->SetEmissive(
+          ignition::math::Color(0.0, 0.0, 0.0));
 
     // only highlight editor links by making sure it's not an item in the
     // gui tree widget or a joint hotspot.
@@ -664,7 +667,8 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
       if (!this->dataPtr->newJoint || (this->dataPtr->newJoint->parent &&
            this->dataPtr->hoverVis != this->dataPtr->newJoint->parent))
       {
-        this->dataPtr->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
+        this->dataPtr->hoverVis->SetEmissive(
+            ignition::math::Color(0.5, 0.5, 0.5));
       }
     }
   }
@@ -1218,7 +1222,7 @@ void JointData::Update()
   // Line
   if (this->line)
   {
-    this->line->setMaterial(material);
+    GZ_OGRE_SET_MATERIAL_BY_NAME(this->line, material);
 
     // Parent - child
     if (this->child && this->jointVisual)
@@ -1845,11 +1849,11 @@ void JointMaker::SetVisualMoved(const rendering::VisualPtr &_vis,
   {
     if (_moved)
     {
-      _vis->SetEmissive(common::Color(0, 0, 1, 1));
+      _vis->SetEmissive(ignition::math::Color(0, 0, 1, 1));
     }
     else
     {
-      _vis->SetEmissive(common::Color(0, 0, 0, 1));
+      _vis->SetEmissive(ignition::math::Color(0, 0, 0, 1));
     }
   }
 }

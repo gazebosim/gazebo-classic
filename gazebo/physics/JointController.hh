@@ -94,7 +94,7 @@ namespace gazebo
       /// \param[in] _target Position target.
       /// \return False if the joint was not found.
       public: bool SetPositionTarget(const std::string &_jointName,
-                  double _target);
+                  const double _target);
 
       /// \brief Set the velocity PID values for a joint.
       /// \param[in] _jointName Scoped name of the joint.
@@ -107,7 +107,14 @@ namespace gazebo
       /// \param[in] _target Velocity target.
       /// \return False if the joint was not found.
       public: bool SetVelocityTarget(const std::string &_jointName,
-                  double _target);
+                  const double _target);
+
+      /// \brief Set the applied effort for the specified joint.
+      /// This force will persist across time steps.
+      /// \param[in] _jointName Scoped name of the joint.
+      /// \param[in] _force Force to apply.
+      /// \return False if the joint was not found.
+      public: bool SetForce(const std::string &_jointName, const double _force);
 
       /// \brief Get all the position PID controllers.
       /// \return A map<joint_name, PID> for all the position PID
@@ -139,19 +146,14 @@ namespace gazebo
       /// name.
       /// \param[out] _rep The service response. The response will contain
       /// the parameters of the joint controller(s).
-      /// \param[out] _result True when the service request was successfully
+      /// \return True when the service request was successfully
       /// processed.
-      private: void OnJointCmdReq(const ignition::msgs::StringMsg &_req,
-          ignition::msgs::JointCmd &_rep, bool &_result);
+      private: bool OnJointCmdReq(const ignition::msgs::StringMsg &_req,
+          ignition::msgs::JointCmd &_rep);
 
       /// \brief Callback when a joint command message is received.
       /// \param[in] _msg The received message.
       private: void OnJointCommand(const ignition::msgs::JointCmd &_msg);
-
-      /// \brief Callback when a joint command message is received.
-      /// \param[in] _msg The received message.
-      /// \deprecated See JointController::OnJointCommand.
-      private: void OnJointCmd(ConstJointCmdPtr &_msg);
 
       /// \brief Set the positions of a Joint by name
       ///        The position is specified in native units, which means,

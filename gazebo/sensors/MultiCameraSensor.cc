@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/algorithm/string.hpp>
 #include <functional>
 #include <ignition/math/Pose3.hh>
@@ -232,13 +226,18 @@ rendering::CameraPtr MultiCameraSensor::Camera(const unsigned int _index) const
 //////////////////////////////////////////////////
 void MultiCameraSensor::Render()
 {
-  if (this->dataPtr->cameras.empty() || !this->IsActive() ||
-      !this->NeedsUpdate())
+  if (!this->IsActive() || !this->NeedsUpdate())
   {
     return;
   }
 
   // Update all the cameras
+  std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
+  if (this->dataPtr->cameras.empty())
+  {
+    return;
+  }
+
   for (auto iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {

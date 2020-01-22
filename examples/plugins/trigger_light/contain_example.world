@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<sdf version='1.6'>
+  <world name='default'>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://lamp_post</uri>
+      <pose frame=''>-3 -3 0 0 0 1.570796</pose>
+    </include>
+    <include>
+      <uri>model://ladder_60deg_0rails</uri>
+      <pose>0 0.15396 0.266667 0 -0 0</pose>
+    </include>
+    <model name='unit_sphere'>
+      <pose frame=''>0 1 3 0 0 0</pose>
+      <link name='only_link'>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </visual>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+    <light name='post_light' type='spot'>
+      <attenuation>
+        <range>0</range>
+        <linear>0.05</linear>
+      </attenuation>
+      <specular>1 1 1 1</specular>
+      <spot>
+        <inner_angle>0.5</inner_angle>
+        <outer_angle>1</outer_angle>
+        <falloff>1</falloff>
+      </spot>
+      <pose>-0.2 -3 9 0 0 0</pose>
+    </light>
+    <!-- Launch ContainPlugin -->
+    <plugin name='ContainPlugin' filename='libContainPlugin.so'>
+      <enabled>true</enabled>
+      <entity>unit_sphere::only_link</entity>
+      <namespace>contain_example</namespace>
+      <pose>0 -3 0.5 0 0 0</pose>
+      <geometry>
+        <box>
+          <size>4 4 1</size>
+        </box>
+      </geometry>
+    </plugin>
+    <!-- Launch example plugin -->
+    <plugin name='AutomaticLight' filename='libTurnOnLightPlugin.so'/>
+</world>
+</sdf>

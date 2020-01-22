@@ -77,7 +77,7 @@ namespace gazebo
           std::map<std::string, CurveVariableSet>::iterator;
 
       /// \brief Constructor.
-      public: TopicCurve(const std::string &_topic);
+      public: explicit TopicCurve(const std::string &_topic);
 
       /// \brief Destructor.
       public: ~TopicCurve();
@@ -147,7 +147,7 @@ namespace gazebo
 void TopicTime::Init()
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  this->node->TryInit(common::Time::Maximum());
 
   this->subscriber = this->node->Subscribe("~/world_stats",
       &TopicTime::OnStats, this);
@@ -179,7 +179,7 @@ common::Time TopicTime::LastSimTime()
 TopicCurve::TopicCurve(const std::string &_topic)
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  this->node->TryInit(common::Time::Maximum());
 
   this->topic = _topic;
 

@@ -14,13 +14,6 @@
  * limitations under the License.
  *
 */
-
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -91,7 +84,7 @@ void ModelAlign::Init()
   }
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
@@ -99,7 +92,7 @@ void ModelAlign::Init()
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::Transform(const ignition::math::Box &_bbox,
+void ModelAlign::Transform(const ignition::math::AxisAlignedBox &_bbox,
     const ignition::math::Pose3d &_worldPose,
     std::vector<ignition::math::Vector3d> &_vertices)
 {

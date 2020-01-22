@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <boost/lexical_cast.hpp>
+
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 
@@ -67,7 +70,7 @@ void SpeedTest::BallTest(const std::string &_physicsEngine)
   std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
             << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
-#ifdef BUILD_TYPE_RELEASE
+#ifdef GAZEBO_BUILD_TYPE_RELEASE
   EXPECT_GT(speedRatio, 0.02);
 #else
   EXPECT_GT(speedRatio, 0.01);
@@ -106,7 +109,7 @@ void SpeedTest::ShapesWorld(const std::string &_physicsEngine)
   std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
             << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
-#ifdef BUILD_TYPE_RELEASE
+#ifdef GAZEBO_BUILD_TYPE_RELEASE
   EXPECT_GT(speedRatio, 0.08);
 #else
   EXPECT_GT(speedRatio, 0.01);
@@ -152,7 +155,7 @@ TEST_P(SpeedTest, UnthrottledStep)
   UnthrottledStep(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, SpeedTest, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, SpeedTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {

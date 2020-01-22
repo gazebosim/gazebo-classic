@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Color.hh>
+
 #include "gazebo/util/system.hh"
 
 namespace Ogre
@@ -33,11 +35,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Color;
-  }
-
   namespace rendering
   {
     class Scene;
@@ -60,11 +57,9 @@ namespace gazebo
       /// \param[in] _scene The scene this object is part of
       /// \param[in] _cellCount The number of cells to draw
       /// \param[in] _cellLength The size of each cell
-      /// \param[in] _lineWidth The width of the lines to use
       /// \param[in] _color The color of the grid
       public: Grid(Scene *_scene, const uint32_t _cellCount,
-          const float _cellLength, const float _lineWidth,
-          const common::Color &_color);
+          const float _cellLength, const ignition::math::Color &_color);
 
       /// \brief Destructor
       public: ~Grid();
@@ -88,11 +83,11 @@ namespace gazebo
 
       /// \brief Sets the color of the grid
       /// \param[in] _color The grid color
-      public: void SetColor(const common::Color &_color);
+      public: void SetColor(const ignition::math::Color &_color);
 
       /// \brief Return the grid color
       /// \return The grid color
-      public: common::Color Color() const;
+      public: ignition::math::Color Color() const;
 
       /// \brief Set the number of cells
       /// \param[in] _count The number of cells
@@ -109,14 +104,6 @@ namespace gazebo
       /// \brief Get the cell length
       /// \return The cell length
       public: float CellLength() const;
-
-      /// \brief Set the line width
-      /// \param[in] _width The width of the grid
-      public: void SetLineWidth(const float _width);
-
-      /// \brief Get the width of the grid line
-      /// \return The line width
-      public: float LineWidth() const;
 
       /// \brief Set the height of the grid
       /// \param[in] _count Grid height

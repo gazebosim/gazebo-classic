@@ -15,6 +15,7 @@
  *
 */
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Matrix4.hh>
 
 #include "gazebo/common/MeshManager.hh"
@@ -114,8 +115,8 @@ void ApplyWrenchVisual::Load()
   dPtr->forceVisual->GetSceneNode()->setInheritScale(false);
 
   // Force text
-  common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
-  rendering::Material::GetMaterialAsColor(dPtr->unselectedMaterial,
+  ignition::math::Color matAmbient, matDiffuse, matSpecular, matEmissive;
+  rendering::Material::MaterialAsColor(dPtr->unselectedMaterial,
       matAmbient, matDiffuse, matSpecular, matEmissive);
   dPtr->forceText.Load(this->Name()+"__FORCE_TEXT__",
       "0N", "Arial", 0.03, matAmbient);
@@ -174,7 +175,7 @@ void ApplyWrenchVisual::Load()
   // Torque line
   dPtr->torqueLine = dPtr->torqueVisual->
       CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->torqueLine->setMaterial(dPtr->unselectedMaterial);
+  GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->torqueLine, dPtr->unselectedMaterial);
   dPtr->torqueLine->AddPoint(0, 0, 0);
   dPtr->torqueLine->AddPoint(0, 0, 0.1);
 

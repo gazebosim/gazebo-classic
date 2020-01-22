@@ -24,7 +24,7 @@
 #include <ignition/transport/Node.hh>
 
 #include <ignition/math/Pose3.hh>
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 
 #include <gazebo/transport/Node.hh>
 #include <gazebo/transport/Subscriber.hh>
@@ -47,7 +47,7 @@ namespace gazebo
       public: ignition::math::Pose3d incomingPose;
 
       /// \brief Box that defines the activation region of the transporter.
-      public: ignition::math::Box outgoingBox;
+      public: ignition::math::AxisAlignedBox outgoingBox;
 
       /// \brief True if the pad should automatically teleport.
       /// False will cause the pad to wait for an activation

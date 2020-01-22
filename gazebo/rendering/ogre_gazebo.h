@@ -31,12 +31,12 @@
 #include <OGRE/OgrePlugin.h>
 #include <OGRE/OgreDataStream.h>
 #include <OGRE/OgreLogManager.h>
-#include <OGRE/OgreWindowEventUtilities.h>
 #include <OGRE/OgreSceneQuery.h>
 #include <OGRE/OgreRoot.h>
 #include <OGRE/OgreSceneManager.h>
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreVector3.h>
+#include <OGRE/OgreMatrix4.h>
 #include <OGRE/OgreManualObject.h>
 #include <OGRE/OgreMaterialManager.h>
 #include <OGRE/OgreColourValue.h>
@@ -65,6 +65,11 @@
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 7
 #include <OGRE/RTShaderSystem/OgreRTShaderSystem.h>
+#include <OGRE/RTShaderSystem/OgreShaderProgramSet.h>
+#include <OGRE/RTShaderSystem/OgreShaderGLSLProgramWriter.h>
+#include <OGRE/RTShaderSystem/OgreShaderProgramWriterManager.h>
+#include <OGRE/RTShaderSystem/OgreShaderFunction.h>
+#include <OGRE/RTShaderSystem/OgreShaderProgram.h>
 #endif
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
@@ -75,6 +80,24 @@
 #include <OGRE/Overlay/OgreOverlaySystem.h>
 #else
 #include <OGRE/OgreFontManager.h>
+#endif
+
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 11
+// The  <OGRE/OgreWindowEventUtilities.h> header has always been included in
+// public headers for Gazebo <= 10, but was moved to the Bites component in
+// Ogre 1.11 (see  https://github.com/OGRECave/ogre/pull/647). As it is not
+// used at all in Gazebo, we can just include it for Ogre <= 1.10 to avoid
+// breaking transitive includes in downstream projects.
+// In Gazebo 11, this can be removed.
+#include <OGRE/OgreWindowEventUtilities.h>
+#endif
+
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+#define GZ_OGRE_SET_MATERIAL_BY_NAME(ptr, name) \
+  (ptr)->setMaterial(Ogre::MaterialManager::getSingleton().getByName(name))
+#else
+#define GZ_OGRE_SET_MATERIAL_BY_NAME(ptr, name) \
+  (ptr)->setMaterial(name)
 #endif
 
 #endif

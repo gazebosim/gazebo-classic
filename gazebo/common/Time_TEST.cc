@@ -15,8 +15,11 @@
  *
 */
 
-#include <sys/time.h>
 #include <gtest/gtest.h>
+
+#ifdef _WIN32
+  #include <winsock.h>  // timeval
+#endif
 
 #include "gazebo/common/Time.hh"
 #include "test/util.hh"
@@ -29,7 +32,8 @@ class TimeTest : public gazebo::testing::AutoLogFixture { };
 TEST_F(TimeTest, Time)
 {
   struct timeval tv;
-  gettimeofday(&tv, nullptr);
+  tv.tv_sec = 10;
+  tv.tv_usec = 100;
   common::Time time(tv);
   EXPECT_EQ(time.sec, tv.tv_sec);
   EXPECT_EQ(time.nsec, tv.tv_usec * 1000);
@@ -225,6 +229,27 @@ TEST_F(TimeTest, String)
   // Large time
   time = common::Time(1234567890, 123456789);
   EXPECT_EQ(time.FormattedString(), "14288 23:31:30.123");
+}
+
+/////////////////////////////////////////////////
+TEST_F(TimeTest, Maximum)
+{
+  const common::Time maximum = common::Time::Maximum();
+
+  const common::Time zeroTime = common::Time(0, 0);
+  EXPECT_LT(zeroTime, maximum);
+  EXPECT_GT(maximum, zeroTime);
+  EXPECT_NE(zeroTime, maximum);
+
+  // This time is very large, but it is still not technically the maximum that
+  // we are able to represent.
+  const common::Time veryLargeTime =
+      common::Time(std::numeric_limits<int32_t>::max(), 0);
+  EXPECT_LT(veryLargeTime, maximum);
+  EXPECT_GT(maximum, veryLargeTime);
+  EXPECT_NE(veryLargeTime, maximum);
+
+  EXPECT_EQ(common::Time::Maximum(), maximum);
 }
 
 /////////////////////////////////////////////////

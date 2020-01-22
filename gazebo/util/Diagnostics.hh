@@ -29,6 +29,9 @@
 #include "gazebo/util/UtilTypes.hh"
 #include "gazebo/util/system.hh"
 
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_UTIL_VISIBLE, gazebo, util, DiagnosticManager)
+
 namespace gazebo
 {
   namespace util
@@ -83,6 +86,10 @@ namespace gazebo
       /// \brief Initialize to report diagnostics about a world.
       /// \param[in] _worldName Name of the world.
       public: void Init(const std::string &_worldName);
+
+      /// \brief Finish reporting diagnostics for a world.
+      /// Write all remaining log data to disk.
+      public: void Fini();
 
       /// \brief Start a new timer instance
       /// \param[in] _name Name of the timer.
@@ -153,7 +160,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _name Name of the timer
-      public: DiagnosticTimer(const std::string &_name);
+      public: explicit DiagnosticTimer(const std::string &_name);
 
       /// \brief Destructor
       public: virtual ~DiagnosticTimer();
@@ -171,6 +178,10 @@ namespace gazebo
       /// \brief Get the name of the timer
       /// \return The name of timer
       public: const std::string Name() const;
+
+      /// \brief Insert data for statistics computation.
+      public: void InsertData(const std::string &_name,
+                              const common::Time &_time);
 
       /// \internal
       /// \brief Private data pointer

@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/bind.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -114,7 +108,7 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   line->AddPoint(ignition::math::Vector3d(0, 0, 0));
   line->AddPoint(ignition::math::Vector3d(dist, width*0.5, -height*0.5));
 
-  line->setMaterial("Gazebo/WhiteGlow");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(line, "Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->AttachObject(planeEnt);

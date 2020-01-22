@@ -14,12 +14,6 @@
  * limitations under the License.
  *
  */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
@@ -55,6 +49,8 @@ UserCmd::UserCmd(const unsigned int _id,
 UserCmd::~UserCmd()
 {
   this->dataPtr->world.reset();
+  this->dataPtr->startState.SetWorld(WorldPtr());
+  this->dataPtr->endState.SetWorld(WorldPtr());
 
   delete this->dataPtr;
   this->dataPtr = NULL;
@@ -146,6 +142,8 @@ UserCmdManager::~UserCmdManager()
     this->dataPtr->userCmdSub.reset();
     this->dataPtr->undoRedoSub.reset();
 
+    if (this->dataPtr->node)
+      this->dataPtr->node->Fini();
     this->dataPtr->node.reset();
   }
 

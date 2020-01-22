@@ -17,6 +17,11 @@
 
 #include <cmath>
 
+#include <gazebo/gazebo_config.h>
+#ifdef HAVE_DART
+#include <dart/config.hpp>
+#endif
+
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/physics.hh"
@@ -32,7 +37,9 @@ class KinematicLoopTest : public ServerFixture,
 {
   /// \brief Spawn a 3-link kinematic chain anchored to the world.
   /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void AnchoredLoop(const std::string &_physicsEngine);
+  /// \param[in] _solverEngine Type of solver to use (optional).
+  public: void AnchoredLoop(const std::string &_physicsEngine,
+                            const std::string &_solverType = "");
 
   /// \brief Spawn a 4-link kinematic loop and drop it.
   /// \param[in] _physicsEngine Type of physics engine to use.
@@ -40,7 +47,8 @@ class KinematicLoopTest : public ServerFixture,
 };
 
 /////////////////////////////////////////////////
-void KinematicLoopTest::AnchoredLoop(const std::string &_physicsEngine)
+void KinematicLoopTest::AnchoredLoop(const std::string &_physicsEngine,
+                                     const std::string &_solverType)
 {
   Load("worlds/anchored_loop.world", true, _physicsEngine);
   auto world = physics::get_world("default");
@@ -52,6 +60,14 @@ void KinematicLoopTest::AnchoredLoop(const std::string &_physicsEngine)
   auto physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   physics->SetRealTimeUpdateRate(0.0);
+
+  // Set solver_type
+  if (!_solverType.empty())
+  {
+    physics->SetParam("solver_type", _solverType);
+    EXPECT_EQ(_solverType,
+        boost::any_cast<std::string>(physics->GetParam("solver_type")));
+  }
 
   // Simulate 15s
   const double dt = physics->GetMaxStepSize();
@@ -140,13 +156,23 @@ TEST_P(KinematicLoopTest, AnchoredLoop)
 }
 
 /////////////////////////////////////////////////
+#ifdef HAVE_DART
+#if DART_MAJOR_MINOR_VERSION_AT_LEAST(6, 8)
+TEST_F(KinematicLoopTest, AnchoredLoopDARTDantzig)
+{
+  AnchoredLoop("dart", "dantzig");
+}
+#endif
+#endif
+
+/////////////////////////////////////////////////
 TEST_P(KinematicLoopTest, FreeLoop)
 {
   FreeLoop(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, KinematicLoopTest,
-                        PHYSICS_ENGINE_VALUES);
+                        PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

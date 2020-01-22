@@ -602,7 +602,9 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   {
     EXPECT_TRUE(physics->SetParam("iters", 100));
     if (_physicsEngine == "ode")
+    {
       EXPECT_TRUE(physics->SetParam("contact_max_correcting_vel", 0));
+    }
   }
 
   world->Step(1);
@@ -683,7 +685,7 @@ TEST_P(ContactSensor, TorqueTest)
   TorqueTest(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, ContactSensor, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, ContactSensor, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {

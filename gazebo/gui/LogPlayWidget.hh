@@ -38,7 +38,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent widget, commonly a TimePanel.
-      public: LogPlayWidget(QWidget *_parent = 0);
+      public: explicit LogPlayWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~LogPlayWidget();
@@ -88,6 +88,10 @@ namespace gazebo
 
       /// \brief Callback when the current time has been edited.
       public slots: void OnCurrentTime();
+
+      /// \brief Change log play real time factor.
+      /// \param[in] _value New real time factor.
+      public slots: void OnRtFactorChanged(const double _value);
 
       /// \brief Qt signal to show the play button.
       signals: void ShowPlay();
@@ -157,7 +161,7 @@ namespace gazebo
 
       /// \brief Constructor;
       /// \param[in] _parent Parent widget.
-      public: LogPlayView(LogPlayWidget *_parent = 0);
+      public: explicit LogPlayView(LogPlayWidget *_parent = 0);
 
       /// \brief Set the position of the current time item.
       /// \param[in] _time Current time.

@@ -35,9 +35,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   this->dataPtr->timePanel = dynamic_cast<TimePanel *>(_parent);
 
-  QSize bigSize(70, 70);
-  QSize bigIconSize(40, 40);
-
   // Empty space on the left
   QWidget *leftSpacer = new QWidget();
   leftSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -110,10 +107,28 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   playLayout->addWidget(this->dataPtr->stepForwardButton);
   playLayout->addWidget(this->dataPtr->forwardButton);
 
+  // RT Factor
+  QLabel *rtFactorLabel = new QLabel("Real Time Factor: ");
+
+  auto rtFactorSpin = new QDoubleSpinBox();
+  rtFactorSpin->setMaximumWidth(30);
+  rtFactorSpin->setValue(0.0);
+  rtFactorSpin->setRange(0.0, 100.);
+  rtFactorSpin->setSingleStep(0.1);
+  this->connect(rtFactorSpin, SIGNAL(valueChanged(const double)), this,
+      SLOT(OnRtFactorChanged(const double)));
+
+  QHBoxLayout *rtFactorLayout = new QHBoxLayout();
+  rtFactorLayout->addWidget(rtFactorLabel);
+  rtFactorLayout->addWidget(rtFactorSpin);
+  rtFactorLayout->setAlignment(rtFactorLabel, Qt::AlignRight);
+  rtFactorLayout->setAlignment(rtFactorSpin, Qt::AlignLeft);
+
   // Controls layout
   QVBoxLayout *controlsLayout = new QVBoxLayout();
   controlsLayout->addLayout(playLayout);
   controlsLayout->addLayout(stepLayout);
+  controlsLayout->addLayout(rtFactorLayout);
 
   // View
   this->dataPtr->view = new LogPlayView(this);
@@ -235,7 +250,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   // Transport
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   this->dataPtr->logPlaybackControlPub = this->dataPtr->node->
       Advertise<msgs::LogPlaybackControl>("~/playback_control");
@@ -401,6 +416,14 @@ void LogPlayWidget::OnCurrentTime()
   this->dataPtr->currentHourEdit->clearFocus();
   this->dataPtr->currentMinuteEdit->clearFocus();
   this->dataPtr->currentSecondEdit->clearFocus();
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnRtFactorChanged(const double _value)
+{
+  msgs::LogPlaybackControl msg;
+  msg.set_rt_factor(_value);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////

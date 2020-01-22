@@ -284,11 +284,11 @@ void DARTLink::UpdateMass()
 
     for (auto slaveNode : this->dataPtr->dtSlaveNodes)
     {
-      slaveNode->setMass(mass);
-      slaveNode->setMomentOfInertia(
+      slaveNode.first->setMass(mass);
+      slaveNode.first->setMomentOfInertia(
         I_link(0, 0), I_link(1, 1), I_link(2, 2),
         I_link(0, 1), I_link(0, 2), I_link(1, 2));
-      slaveNode->setLocalCOM(cog);
+      slaveNode.first->setLocalCOM(cog);
     }
   }
 }
@@ -330,11 +330,6 @@ void DARTLink::OnPoseChange()
     // the last three components of the generalized coordinates without any
     // conversion.
     freeJoint->setPositions(dart::dynamics::FreeJoint::convertToPositions(Q));
-  }
-  else
-  {
-    gzdbg << "OnPoseChange() doesn't make sense if the parent joint "
-          << "is not a FreeJoint (6-dof).\n";
   }
 }
 
@@ -484,7 +479,7 @@ void DARTLink::SetAngularVel(const ignition::math::Vector3d &_vel)
   }
   else
   {
-    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint "
+    gzdbg << "DARTLink::SetAngularVel() doesn't make sense if the parent joint "
           << "is not free joint (6-dof).\n";
   }
 }
@@ -736,7 +731,7 @@ void DARTLink::SetGravityMode(bool _mode)
   this->dataPtr->dtBodyNode->setGravityMode(_mode);
   for (auto slaveNode : this->dataPtr->dtSlaveNodes)
   {
-    slaveNode->setGravityMode(_mode);
+    slaveNode.first->setGravityMode(_mode);
   }
 }
 
@@ -1006,7 +1001,34 @@ void DARTLink::SetDARTBodyNode(dart::dynamics::BodyNode *_dtBodyNode)
 //////////////////////////////////////////////////
 void DARTLink::AddSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode)
 {
-  this->dataPtr->dtSlaveNodes.push_back(_dtBodyNode);
+  dart::constraint::WeldJointConstraintPtr dtWeldJointConst;
+  dtWeldJointConst.reset(new dart::constraint::WeldJointConstraint(
+      this->dataPtr->dtBodyNode, _dtBodyNode));
+  this->DARTWorld()->getConstraintSolver()->addConstraint(dtWeldJointConst);
+  this->dataPtr->dtSlaveNodes.push_back(std::pair<dart::dynamics::BodyNode *,
+      dart::constraint::WeldJointConstraintPtr>(_dtBodyNode, dtWeldJointConst));
+  this->UpdateMass();
+}
+
+//////////////////////////////////////////////////
+bool DARTLink::RemoveSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode)
+{
+  for (auto iter = this->dataPtr->dtSlaveNodes.begin();
+      iter != this->dataPtr->dtSlaveNodes.end(); ++iter)
+  {
+    if (iter->first == _dtBodyNode)
+    {
+      // Remove the weld constraint between the slave and master body nodes
+      this->DARTWorld()->getConstraintSolver()->removeConstraint(iter->second);
+      // Remove the slave body node from the skeleton
+      iter->first->remove();
+      // Redestribute the link's mass between the remaining body nodes
+      this->dataPtr->dtSlaveNodes.erase(iter);
+      this->UpdateMass();
+      return true;
+    }
+  }
+  return false;
 }
 
 //////////////////////////////////////////////////

@@ -14,12 +14,7 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
+#include <condition_variable>
 #include <list>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -34,8 +29,8 @@
 using namespace gazebo;
 
 boost::thread *g_runThread = NULL;
-boost::condition_variable g_responseCondition;
-boost::mutex requestMutex;
+std::condition_variable g_responseCondition;
+std::mutex requestMutex;
 bool g_stopped = true;
 bool g_minimalComms = false;
 
@@ -176,7 +171,7 @@ void on_response(ConstResponsePtr &_msg)
   if (iter == g_requests.end())
     return;
 
-  boost::mutex::scoped_lock lock(requestMutex);
+  std::unique_lock<std::mutex> lock(requestMutex);
   boost::shared_ptr<msgs::Response> response(new msgs::Response);
   response->CopyFrom(*_msg);
   g_responses.push_back(response);
@@ -193,33 +188,48 @@ void transport::get_topic_namespaces(std::list<std::string> &_namespaces)
 /////////////////////////////////////////////////
 boost::shared_ptr<msgs::Response> transport::request(
     const std::string &_worldName, const std::string &_request,
-    const std::string &_data)
+    const std::string &_data, const common::Time &_timeout)
 {
-  msgs::Request *request = msgs::CreateRequest(_request, _data);
-
-  g_requests.push_back(request);
+  boost::shared_ptr<msgs::Response> response;
+  auto deadline = std::chrono::system_clock::now() +
+    std::chrono::duration<double>(_timeout.Double());
 
   NodePtr node = NodePtr(new Node());
   node->Init(_worldName);
 
-  SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
-
   PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
-  requestPub->WaitForConnection();
+  if (!requestPub->WaitForConnection(_timeout))
+  {
+    std::cerr << "Unable to create a connection to topic ~/request.\n";
+    node->Fini();
+    node.reset();
+    return response;
+  }
 
-  boost::mutex::scoped_lock lock(requestMutex);
-  requestPub->Publish(*request, true);
+  msgs::Request *request = msgs::CreateRequest(_request, _data);
+  g_requests.push_back(request);
 
-  boost::shared_ptr<msgs::Response> response;
-  std::list<boost::shared_ptr<msgs::Response> >::iterator iter;
+  SubscriberPtr responseSub = node->Subscribe("~/response", &on_response, true);
+
+  std::unique_lock<std::mutex> lock(requestMutex);
+  requestPub->Publish(*request);
 
   bool valid = false;
   while (!valid && !g_stopped)
   {
     // Wait for a response
-    g_responseCondition.wait(lock);
+    if (_timeout > 0)
+    {
+      if (g_responseCondition.wait_until(lock, deadline) ==
+          std::cv_status::timeout)
+      break;
+    }
+    else
+    {
+      g_responseCondition.wait(lock);
+    }
 
-    for (iter = g_responses.begin(); iter != g_responses.end(); ++iter)
+    for (auto iter = g_responses.begin(); iter != g_responses.end(); ++iter)
     {
       if ((*iter)->id() == request->id())
       {
@@ -410,6 +420,14 @@ transport::ConnectionPtr transport::connectToMaster()
 /////////////////////////////////////////////////
 bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
 {
+  // If the ConnectionManager has not been initialized, then there is no point
+  // in waiting for namespaces.
+  if (!ConnectionManager::Instance()->IsInitialized())
+  {
+    gzerr << "ConnectionManager has not been initialized!\n";
+    return false;
+  }
+
   std::list<std::string> namespaces;
   gazebo::common::Time startTime = gazebo::common::Time::GetWallTime();
 
@@ -427,7 +445,5 @@ bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
     gazebo::common::Time::Sleep(waitTime);
   }
 
-  if (gazebo::common::Time::GetWallTime() - startTime <= _maxWait)
-    return true;
-  return false;
+  return !namespaces.empty();
 }

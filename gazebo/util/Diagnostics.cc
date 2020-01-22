@@ -14,14 +14,9 @@
  * limitations under the License.
  *
  */
-#ifdef _WIN32
-  #include <algorithm>
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <functional>
+#include <iomanip>
+#include <ignition/math/SignalStats.hh>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
@@ -64,16 +59,25 @@ DiagnosticManager::DiagnosticManager()
 #endif
 
   this->dataPtr->logPath = this->dataPtr->logPath / "diagnostics" / timeStr;
-
-  // Make sure the path exists.
-  if (!boost::filesystem::exists(this->dataPtr->logPath))
-    boost::filesystem::create_directories(this->dataPtr->logPath);
 }
 
 //////////////////////////////////////////////////
 DiagnosticManager::~DiagnosticManager()
 {
+  this->Fini();
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::Fini()
+{
   this->dataPtr->updateConnection.reset();
+
+  this->dataPtr->timers.clear();
+
+  this->dataPtr->pub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
 }
 
 //////////////////////////////////////////////////
@@ -209,7 +213,7 @@ common::Time DiagnosticManager::Time(const int _index) const
 //////////////////////////////////////////////////
 std::string DiagnosticManager::Label(const int _index) const
 {
-  if (_index < 0 || static_cast<size_t>(_index) > this->dataPtr->timers.size())
+  if (_index < 0 || static_cast<size_t>(_index) >= this->dataPtr->timers.size())
   {
     gzerr << "Invalid index of[" << _index << "]. Must be between 0 and "
       << this->dataPtr->timers.size()-1 << ", inclusive.\n";
@@ -250,9 +254,16 @@ DiagnosticTimer::DiagnosticTimer(const std::string &_name)
 : Timer(),
   dataPtr(new DiagnosticTimerPrivate)
 {
-  boost::filesystem::path logPath;
+  boost::filesystem::path logPath = DiagnosticManager::Instance()->LogPath();
 
-  logPath = DiagnosticManager::Instance()->LogPath() / (_name + ".log");
+  // Make sure the path exists.
+  if (!boost::filesystem::exists(logPath))
+  {
+    gzmsg << "Creating diagnostics folder " << logPath << std::endl;
+    boost::filesystem::create_directories(logPath);
+  }
+
+  logPath /= (_name + ".log");
   this->dataPtr->log.open(logPath.string().c_str(),
       std::ios::out | std::ios::app);
 
@@ -264,6 +275,25 @@ DiagnosticTimer::DiagnosticTimer(const std::string &_name)
 DiagnosticTimer::~DiagnosticTimer()
 {
   this->Stop();
+  for (auto const &measurement: this->dataPtr->stats)
+  {
+    std::ostringstream scopedName;
+    if (measurement.first != this->dataPtr->name)
+    {
+      scopedName << this->dataPtr->name << "::";
+    }
+    scopedName << measurement.first;
+
+    this->dataPtr->log << std::setw(50) << std::left << scopedName.str();
+    for (const auto &stat: measurement.second.Map())
+    {
+      this->dataPtr->log
+          << std::setw(7) << stat.first
+          << std::setw(15) << std::scientific << stat.second;
+    }
+    this->dataPtr->log << std::endl;
+  }
+  this->dataPtr->log.flush();
   this->dataPtr->log.close();
 }
 
@@ -273,18 +303,18 @@ void DiagnosticTimer::Start()
   // Only start if not running.
   if (!this->GetRunning())
   {
+    // Make sure the previous lap is reset
+    this->dataPtr->prevLap = this->GetElapsed();
+
     // Start the timer
     Timer::Start();
-
-    // Make sure the prev lap is reset
-    this->dataPtr->prevLap.Set(0, 0);
   }
 }
 
 //////////////////////////////////////////////////
 void DiagnosticTimer::Stop()
 {
-  // Only stop is currently running
+  // Only stop if currently running
   if (this->GetRunning())
   {
     // Stop the timer
@@ -292,17 +322,17 @@ void DiagnosticTimer::Stop()
 
     common::Time elapsed = this->GetElapsed();
     common::Time currTime = common::Time::GetWallTime();
+    this->dataPtr->cumulativeTime += elapsed;
 
-    // Write out the total elapsed time.
-    this->dataPtr->log << this->dataPtr->name << " " << currTime << " "
-      << elapsed.Double() << std::endl;
-    this->dataPtr->log.flush();
+    // Record the total elapsed time.
+    this->InsertData(this->dataPtr->name, elapsed.Double());
 
     DiagnosticManager::Instance()->AddTime(this->dataPtr->name,
         currTime, elapsed);
 
-    // Reset the lap time
+    // Reset the lap time and timer
     this->dataPtr->prevLap.Set(0, 0);
+    this->Reset();
   }
 }
 
@@ -314,14 +344,13 @@ void DiagnosticTimer::Lap(const std::string &_prefix)
   common::Time delta = elapsed - this->dataPtr->prevLap;
   common::Time currTime = common::Time::GetWallTime();
 
-  // Write out the delta time.
-  this->dataPtr->log << this->dataPtr->name << ":" << _prefix << " " <<
-    currTime << " " << delta.Double() << std::endl;
+  // Record the delta time.
+  this->InsertData(_prefix, elapsed.Double());
 
   DiagnosticManager::Instance()->AddTime(this->dataPtr->name + ":" + _prefix,
       currTime, delta);
 
-  // Store the prev lap time.
+  // Store the previous lap time.
   this->dataPtr->prevLap = elapsed;
 }
 
@@ -330,3 +359,20 @@ const std::string DiagnosticTimer::Name() const
 {
   return this->dataPtr->name;
 }
+
+//////////////////////////////////////////////////
+void DiagnosticTimer::InsertData(const std::string &_name,
+                                 const common::Time &_time)
+{
+  const auto inserted = this->dataPtr->stats.insert(
+      std::make_pair(_name, ignition::math::SignalStats()));
+  const auto &iter = inserted.first;
+
+  if (inserted.second)
+  {
+    iter->second.InsertStatistics("mean,maxAbs,min,var");
+  }
+
+  iter->second.InsertData(_time.Double());
+}
+

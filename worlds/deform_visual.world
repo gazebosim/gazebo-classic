@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="sphere">
+      <pose>1.0 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/deform.material</uri>
+              <name>Gazebo/Deform</name>
+            </script>
+          </material>
+          <plugin name="shader_param" filename="libShaderParamVisualPlugin.so">
+            <param>
+              <type>vertex</type>
+              <name>time</name>
+              <value>TIME</value>
+            </param>
+            <param>
+              <type>fragment</type>
+              <name>ambient</name>
+              <value>1.0 0.0 0.0 1.0</value>
+            </param>
+            <param>
+              <type>fragment</type>
+              <name>diffuse</name>
+              <value>1.0 0.0 0.0 1.0</value>
+            </param>
+            <param>
+              <type>fragment</type>
+              <name>specular</name>
+              <value>0.7 0.5 0.5 1.0</value>
+            </param>
+          </plugin>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

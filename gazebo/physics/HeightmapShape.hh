@@ -44,6 +44,9 @@ namespace gazebo
     /// N*N+1 pixels per side, where N is an integer.
     class GZ_PHYSICS_VISIBLE HeightmapShape : public Shape
     {
+      /// \brief height field type, float or double
+      public: typedef float HeightType;
+
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision object.
       public: explicit HeightmapShape(CollisionPtr _parent);
@@ -84,7 +87,7 @@ namespace gazebo
       /// \param[in] _x X position.
       /// \param[in] _y Y position.
       /// \return The height at a the specified location.
-      public: float GetHeight(int _x, int _y) const;
+      public: HeightType GetHeight(int _x, int _y) const;
 
       /// \brief Fill a geometry message with this shape's data. Raw height
       /// data are not packed in this message to minimize packet size.
@@ -105,11 +108,11 @@ namespace gazebo
 
       /// \brief Get the maximum height.
       /// \return The maximum height.
-      public: float GetMaxHeight() const;
+      public: HeightType GetMaxHeight() const;
 
       /// \brief Get the minimum height.
       /// \return The minimum height.
-      public: float GetMinHeight() const;
+      public: HeightType GetMinHeight() const;
 
       /// \brief Get the amount of subsampling.
       /// \return Amount of subsampling.
@@ -132,8 +135,16 @@ namespace gazebo
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
 
+      /// \brief Fills the heightmap data (float) into the vector
+      /// by calling HeightmapData::FillHeightMap with \e heights
+      /// \param[in] heights height field to fill with data.
+      public: void FillHeightfield(std::vector<float>& heights);
+
+      /// \brief Version of FillHeightfield() for double vectors.
+      public: void FillHeightfield(std::vector<double>& heights);
+
       /// \brief Lookup table of heights.
-      protected: std::vector<float> heights;
+      protected: std::vector<HeightType> heights;
 
       /// \brief Image used to generate the heights.
       protected: common::ImageHeightmap img;

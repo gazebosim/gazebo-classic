@@ -34,9 +34,9 @@ class JointTestRevolute : public JointTest
   public: void PendulumEnergy(const std::string &_physicsEngine);
 
   /// \brief Spin joints several rotations and verify that the angles
-  /// wrap properly.
+  /// are properly unwrapped.
   /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void WrapAngle(const std::string &_physicsEngine);
+  public: void UnwrappedAngle(const std::string &_physicsEngine);
 
   /// \brief Load 8 double pendulums arranged in a circle.
   /// Measure angular velocity of links, and verify proper axis orientation.
@@ -100,7 +100,7 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
 }
 
 ////////////////////////////////////////////////////////////
-void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
+void JointTestRevolute::UnwrappedAngle(const std::string &_physicsEngine)
 {
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
@@ -120,6 +120,10 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     gzdbg << "SpawnJoint " << jointType << " child world" << std::endl;
     physics::JointPtr joint = SpawnJoint(jointType, false, true);
     ASSERT_TRUE(joint != NULL);
+
+    // expect large joint limits
+    EXPECT_DOUBLE_EQ(-1e16, joint->LowerLimit(0));
+    EXPECT_DOUBLE_EQ(+1e16, joint->UpperLimit(0));
 
     // set velocity to 2 pi rad/s and step forward 1.5 seconds.
     // angle should reach 3 pi rad.
@@ -686,7 +690,9 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
     // here we expect much lower energy loss
     world->Reset();
     if (_physicsEngine == "ode")
+    {
       EXPECT_TRUE(physicsEngine->SetParam("contact_max_correcting_vel", 100.0));
+    }
 
     int steps = 10;  // @todo: make this more general
     for (int i = 0; i < steps; i ++)
@@ -752,14 +758,14 @@ TEST_P(JointTestRevolute, SimplePendulum)
   SimplePendulum(this->physicsEngine);
 }
 
-TEST_P(JointTestRevolute, WrapAngle)
+TEST_P(JointTestRevolute, UnwrappedAngle)
 {
-  WrapAngle(this->physicsEngine);
+  UnwrappedAngle(this->physicsEngine);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTestRevolute,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values("revolute")));
+  ::testing::Values("revolute")),);  // NOLINT
 
 int main(int argc, char **argv)
 {

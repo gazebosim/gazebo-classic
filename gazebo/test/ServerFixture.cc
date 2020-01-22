@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-#include <Winsock2.h>
-#endif
-
 #include <boost/algorithm/string.hpp>
 #include <stdio.h>
 #include <string>
@@ -811,7 +805,6 @@ sensors::SonarSensorPtr ServerFixture::SpawnSonar(const std::string &_modelName,
       sensors::get_sensor(_sonarName));
 }
 
-
 /////////////////////////////////////////////////
 void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
@@ -819,6 +812,25 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     double _hMinAngle, double _hMaxAngle,
     double _minRange, double _maxRange,
     double _rangeResolution, unsigned int _samples,
+    const std::string &_noiseType, double _noiseMean,
+    double _noiseStdDev)
+{
+  this->SpawnGpuRaySensorVertical(_modelName, _raySensorName, _pos,
+      _rpy, _hMinAngle, _hMaxAngle, 0, 0, _minRange, _maxRange,
+      _rangeResolution, _samples, 1, 1, 1, _noiseType, _noiseMean,
+      _noiseStdDev);
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::SpawnGpuRaySensorVertical(const std::string &_modelName,
+    const std::string &_raySensorName,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    double _hMinAngle, double _hMaxAngle,
+    double _vMinAngle, double _vMaxAngle,
+    double _minRange, double _maxRange,
+    double _rangeResolution, unsigned int _samples,
+    unsigned int _vSamples, double _hResolution,
+    double _vResolution,
     const std::string &_noiseType, double _noiseMean,
     double _noiseStdDev)
 {
@@ -845,10 +857,16 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     << "      <scan>"
     << "        <horizontal>"
     << "          <samples>" << _samples << "</samples>"
-    << "          <resolution> 1 </resolution>"
+    << "          <resolution>" << _hResolution << "</resolution>"
     << "          <min_angle>" << _hMinAngle << "</min_angle>"
     << "          <max_angle>" << _hMaxAngle << "</max_angle>"
     << "        </horizontal>"
+    << "        <vertical>"
+    << "          <samples>" << _vSamples << "</samples>samples>"
+    << "          <resolution>" << _vResolution << "</resolution>"
+    << "          <min_angle>" << _vMinAngle << "</min_angle>"
+    << "          <max_angle>" << _vMaxAngle << "</max_angle>"
+    << "        </vertical>"
     << "      </scan>"
     << "      <range>"
     << "        <min>" << _minRange << "</min>"
@@ -1405,17 +1423,17 @@ void ServerFixture::SpawnLight(const std::string &_name,
     const std::string &_type,
     const ignition::math::Vector3d &_pos,
     const ignition::math::Vector3d &_rpy,
-    const common::Color &_diffuse,
-    const common::Color &_specular,
+    const ignition::math::Color &_diffuse,
+    const ignition::math::Color &_specular,
     const ignition::math::Vector3d &_direction,
-    double _attenuationRange,
-    double _attenuationConstant,
-    double _attenuationLinear,
-    double _attenuationQuadratic,
-    double _spotInnerAngle,
-    double _spotOuterAngle,
-    double _spotFallOff,
-    bool _castShadows)
+    const double _attenuationRange,
+    const double _attenuationConstant,
+    const double _attenuationLinear,
+    const double _attenuationQuadratic,
+    const double _spotInnerAngle,
+    const double _spotOuterAngle,
+    const double _spotFallOff,
+    const bool _castShadows)
 {
   msgs::Factory msg;
   std::ostringstream newLightStr;

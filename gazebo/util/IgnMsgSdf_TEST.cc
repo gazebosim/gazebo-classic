@@ -36,11 +36,6 @@ TEST_F(IgnMsgSdfTest, ConvertNotSupportedType)
        </sdf>", sdf));
 
   auto msg = util::Convert<ignition::msgs::WorldControl>(sdf);
-  EXPECT_FALSE(msg.has_pause());
-  EXPECT_FALSE(msg.has_step());
-  EXPECT_FALSE(msg.has_multi_step());
-  EXPECT_FALSE(msg.has_reset());
-  EXPECT_FALSE(msg.has_seed());
 }
 
 /////////////////////////////////////////////////
@@ -56,9 +51,6 @@ TEST_F(IgnMsgSdfTest, ConvertWrongType)
 
   // Error message is printed
   auto msg = util::Convert<ignition::msgs::Plugin>(sdf);
-  EXPECT_FALSE(msg.has_name());
-  EXPECT_FALSE(msg.has_filename());
-  EXPECT_FALSE(msg.has_innerxml());
   EXPECT_EQ(msg.DebugString(), "");
 }
 
@@ -76,12 +68,9 @@ TEST_F(IgnMsgSdfTest, PluginSdfToIgnMsg)
        </sdf>", sdf));
   auto msg = util::Convert<ignition::msgs::Plugin>(sdf);
 
-  EXPECT_TRUE(msg.has_name());
   EXPECT_EQ(msg.name(), "plugin_name");
-  EXPECT_TRUE(msg.has_filename());
   EXPECT_EQ(msg.filename(), "plugin_filename");
-  EXPECT_TRUE(msg.has_innerxml());
-  EXPECT_EQ(msg.innerxml(), "<param1>1</param1>\n<param2>true</param2>\n");
+  EXPECT_EQ(msg.innerxml(), "<param1>1</param1>\n<param2>1</param2>\n");
 }
 
 /////////////////////////////////////////////////

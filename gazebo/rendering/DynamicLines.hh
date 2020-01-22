@@ -17,8 +17,10 @@
 #ifndef GAZEBO_RENDERING_DYNAMICLINES_HH
 #define GAZEBO_RENDERING_DYNAMICLINES_HH
 
+#include <memory>
 #include <vector>
 #include <string>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -31,6 +33,9 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
+
+    /// \brief Forward declaration
+    class DynamicLinesPrivate;
 
     /// \class DynamicLines DynamicLines.hh rendering/rendering.hh
     /// \brief Class for drawing lines that can change
@@ -54,17 +59,17 @@ namespace gazebo
 
       /// \brief Add a point to the point list
       /// \param[in] _pt ignition::math::Vector3d point
-      /// \param[in] _color common::Color Point color
+      /// \param[in] _color ignition::math::Color Point color
       public: void AddPoint(const ignition::math::Vector3d &_pt,
-            const common::Color &_color = common::Color::White);
+            const ignition::math::Color &_color = ignition::math::Color::White);
 
       /// \brief Add a point to the point list.
       /// \param[in] _x X position
       /// \param[in] _y Y position
       /// \param[in] _z Z position
-      /// \param[in] _color common::Color Point color
-      public: void AddPoint(double _x, double _y, double _z,
-            const common::Color &_color = common::Color::White);
+      /// \param[in] _color ignition::math::Color Point color
+      public: void AddPoint(const double _x, const double _y, const double _z,
+            const ignition::math::Color &_color = ignition::math::Color::White);
 
       /// \brief Change the location of an existing point in the point list
       /// \param[in] _index Index of the point to set
@@ -74,8 +79,10 @@ namespace gazebo
 
       /// \brief Change the color of an existing point in the point list
       /// \param[in] _index Index of the point to set
-      /// \param[in] _color common::Color Pixelcolor color to set the point to
-      public: void SetColor(unsigned int _index, const common::Color &_color);
+      /// \param[in] _color ignition::math::Color Pixelcolor color to set the
+      /// point to
+      public: void SetColor(const unsigned int _index,
+                            const ignition::math::Color &_color);
 
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return
@@ -109,8 +116,8 @@ namespace gazebo
       /// \brief Used to indicate if the lines require an update
       private: bool dirty;
 
-      /// \brief List of colors
-      private: std::vector<common::Color> colors;
+      /// \brief private implementation
+      private: std::unique_ptr<DynamicLinesPrivate> dataPtr;
     };
     /// \}
   }

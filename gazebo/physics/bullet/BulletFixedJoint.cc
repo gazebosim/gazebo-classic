@@ -77,11 +77,11 @@ void BulletFixedJoint::Init()
   // Check if parentLink exists. If not, the parent will be the world.
   if (this->parentLink)
   {
-    // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->WorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of parent.
+    pose = this->parentLink->WorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotParent -= pose.Pos();
-    // Rotate pivot offset and axis into body-fixed frame of parent.
+    // Rotate pivot offset and axis into body-fixed inertial frame of parent.
     pivotParent = pose.Rot().RotateVectorReverse(pivotParent);
     axisParent = pose.Rot().RotateVectorReverse(axis);
     axisParent = axisParent.Normalize();
@@ -89,11 +89,11 @@ void BulletFixedJoint::Init()
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
   {
-    // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->WorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of child.
+    pose = this->childLink->WorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotChild -= pose.Pos();
-    // Rotate pivot offset and axis into body-fixed frame of child.
+    // Rotate pivot offset and axis into body-fixed inertial frame of child.
     pivotChild = pose.Rot().RotateVectorReverse(pivotChild);
     axisChild = pose.Rot().RotateVectorReverse(axis);
     axisChild = axisChild.Normalize();
@@ -144,7 +144,8 @@ void BulletFixedJoint::Init()
   // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletFixed;
 
-  this->bulletFixed->setLimit(0.0, 0.0);
+  const auto offset = this->bulletFixed->getHingeAngle();
+  this->bulletFixed->setLimit(offset, offset);
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is null");

@@ -17,15 +17,10 @@
 #ifndef GAZEBO_PHYSICS_INERTIAL_HH_
 #define GAZEBO_PHYSICS_INERTIAL_HH_
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <string>
 #include <memory>
 
+#include <ignition/math/Inertial.hh>
 #include <sdf/sdf.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Quaternion.hh>
@@ -56,6 +51,11 @@ namespace gazebo
       /// \param[in] _mass Mass value in kg if using metric.
       public: explicit Inertial(const double _mass);
 
+      /// \brief Constructor from ignition::math::Inertial.
+      /// \param[in] _inertial Ignition inertial object to copy.
+      // cppcheck-suppress noExplicitConstructor
+      public: Inertial(const ignition::math::Inertiald &_inertial);
+
       /// \brief Copy constructor.
       /// \param[in] _inertial Inertial element to copy
       public: Inertial(const Inertial &_inertial);
@@ -73,6 +73,9 @@ namespace gazebo
 
       /// \brief Reset all the mass properties.
       public: void Reset();
+
+      /// \brief Return copy of Inertial in ignition format.
+      public: ignition::math::Inertiald Ign() const;
 
       /// \brief Set the mass.
       /// \param[in] _m Mass value in kilograms.
@@ -191,6 +194,11 @@ namespace gazebo
       /// \param[in] _inertial Inertial to copy.
       /// \return Reference to this object.
       public: Inertial &operator=(const Inertial &_inertial);
+
+      /// \brief Equal operator.
+      /// \param[in] _inertial Ignition inertial to copy.
+      /// \return Reference to this object.
+      public: Inertial &operator=(const ignition::math::Inertiald &_inertial);
 
       /// \brief Addition operator.
       /// Assuming both CG and Moment of Inertia (MOI) are defined

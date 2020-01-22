@@ -101,13 +101,8 @@ Ogre::GpuProgramPtr MergeMaterialGeneratorImpl::GenerateVertexShader(
 
   Ogre::String programSource = ss.str();
 
-  std::cout << programSource << "\n";
   Ogre::String programName = this->baseName + "VP_" +
     Ogre::StringConverter::toString(_permutation);
-
-#if OGRE_DEBUG_MODE
-  Ogre::LogManager::getSingleton().getDefaultLog()->logMessage(programSource);
-#endif
 
   // Create shader object
   Ogre::HighLevelGpuProgramPtr ptrProgram =
@@ -293,11 +288,6 @@ Ogre::GpuProgramPtr MergeMaterialGeneratorImpl::GenerateFragmentShader(
   Ogre::String programSource = ss.str();
   Ogre::String programName = this->baseName + "FP_" +
     Ogre::StringConverter::toString(_permutation);
-
-  std::cout << programSource << "\n";
-#if OGRE_DEBUG_MODE
-  Ogre::LogManager::getSingleton().getDefaultLog()->logMessage(programSource);
-#endif
 
   // Create shader object
   Ogre::HighLevelGpuProgramPtr ptrProgram =

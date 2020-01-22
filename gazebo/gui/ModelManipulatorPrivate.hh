@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include <ignition/math/Box.hh>
+#include <ignition/math/AxisAlignedBox.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
@@ -83,7 +83,7 @@ namespace gazebo
       public: std::vector<ignition::math::Vector3d> mouseChildVisualScale;
 
       /// \brief Bounding box of the visual attached to the mouse (for scaling).
-      public: ignition::math::Box mouseVisualBbox;
+      public: ignition::math::AxisAlignedBox mouseVisualBbox;
 
       /// \brief True to manipulate model in global frame.
       public: bool globalManip = false;

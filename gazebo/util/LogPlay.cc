@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
 #include <gazebo/gazebo_config.h>
 
 #ifndef USE_EXTERNAL_TINYXML2
@@ -125,8 +120,13 @@ void LogPlay::Open(const std::string &_logFile)
   {
     gzerr << "Unable to load file[" << _logFile << "]. "
       << "Check the Gazebo server log file for more information.\n";
+#ifdef TINYXML2_MAJOR_VERSION_GE_6
+    const char *errorStr1 = this->dataPtr->xmlDoc.ErrorStr();
+    const char *errorStr2 = nullptr;
+#else
     const char *errorStr1 = this->dataPtr->xmlDoc.GetErrorStr1();
     const char *errorStr2 = this->dataPtr->xmlDoc.GetErrorStr2();
+#endif
     if (errorStr1)
       gzlog << "Log Error 1:\n" << errorStr1 << std::endl;
     if (errorStr2)

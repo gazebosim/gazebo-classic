@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include "gazebo/common/Color.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -151,28 +150,28 @@ void Material::Update(const gazebo::common::Material *_mat)
 
   Ogre::Pass *pass = matPtr->getTechnique(0)->getPass(0);
 
-  common::Color ambient =  _mat->GetAmbient();
-  common::Color diffuse =  _mat->GetDiffuse();
-  common::Color specular = _mat->GetSpecular();
-  common::Color emissive = _mat->GetEmissive();
+  auto ambient =  _mat->Ambient();
+  auto diffuse =  _mat->Diffuse();
+  auto specular = _mat->Specular();
+  auto emissive = _mat->Emissive();
   float transparency = _mat->GetTransparency();
 
   // use transparency value if specified otherwise use diffuse alpha value
-  double alpha = transparency > 0 ? 1.0 - transparency : diffuse.a;
-  diffuse.a = alpha;
-  pass->setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-  pass->setAmbient(ambient.r, ambient.g, ambient.b);
+  double alpha = transparency > 0 ? 1.0 - transparency : diffuse.A();
+  diffuse.A() = alpha;
+  pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
+  pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
   pass->setDepthWriteEnabled(_mat->GetDepthWrite());
 
-  if (diffuse.a < 1.0)
+  if (diffuse.A() < 1.0)
   {
     // set up pass for rendering transparency
     pass->setDepthWriteEnabled(false);
     pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
   }
 
-  pass->setSpecular(specular.r, specular.g, specular.b, specular.a);
-  pass->setSelfIllumination(emissive.r, emissive.g, emissive.b);
+  pass->setSpecular(specular.R(), specular.G(), specular.B(), specular.A());
+  pass->setSelfIllumination(emissive.R(), emissive.G(), emissive.B());
   pass->setShininess(_mat->GetShininess());
   pass->setLightingEnabled(_mat->GetLighting());
 
@@ -190,9 +189,9 @@ void Material::Update(const gazebo::common::Material *_mat)
 }
 
 //////////////////////////////////////////////////
-bool Material::GetMaterialAsColor(const std::string &_materialName,
-          common::Color &_ambient, common::Color &_diffuse,
-          common::Color &_specular, common::Color &_emissive)
+bool Material::MaterialAsColor(const std::string &_materialName,
+          ignition::math::Color &_ambient, ignition::math::Color &_diffuse,
+          ignition::math::Color &_specular, ignition::math::Color &_emissive)
 {
   Ogre::MaterialPtr matPtr;
 

@@ -217,7 +217,7 @@ namespace gazebo
       /// \brief Simulation stop signal
       public: static EventT<void ()> stop;
 
-      /// \brief Simulation stop signal
+      /// \brief Simulation SIGINT/SIGTERM signal
       public: static EventT<void ()> sigInt;
 
       /// \brief A world has been created

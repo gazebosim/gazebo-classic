@@ -77,6 +77,18 @@ namespace gazebo
     /// a topic selector.
     private: void View(const std::string &_topic);
 
+    /// \brief Publish message on to a topic.
+    /// \param[in] _topic Topic to publish message to.
+    /// \return True on success
+    private: bool Publish(const std::string &_topic);
+
+    /// \brief Send a request.
+    /// \param[in] _space Namespace of all topics.
+    /// \param[in] _requestType Type of request.
+    /// \return True on success
+    private: bool Request(const std::string &_space,
+                     const std::string &_requestType);
+
     /// \brief Message used to hold data received from EchoCB().
     private: boost::shared_ptr<google::protobuf::Message> echoMsg;
 

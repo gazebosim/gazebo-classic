@@ -5,14 +5,102 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 10.x to 11.0
+
+### Build system
+
+New versions in mandatory dependencies: `ign-transport8`, `ign-msgs5`, `ign-math6`, `sdformat8`.
+New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graphics`, `ign-common3-profiler`.
+
+### Additions
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + public: template <typename T>
+      static T any\_cast<T>(const boost::any &)
+
+### Modifications
+
+1. All instances of `ignition::math::Box` in the API are changed to `ignition::math::AxisAlignedBox`
+   to match the changes in ignition-math6.
+
+1. **gazebo/physics/JointController.hh**
+   Use new optional fields in `ignition::msgs::JointCmd` and
+   `ignition::msgs::PID` since the ign-msgs5 proto file uses `proto3`,
+   which doesn't allow optional fields and breaks existing functionality.
+
+1. **gazebo/physics/PresetManager.hh**
+   The PresetManager stores data internally with a map of `boost::any` values
+   and with the switch to sdformat8, the value may be stored as a `std::any`
+   within a `boost::any`, making it more complex to cast to a specific type.
+   This happens because the PresetManager stores the output of
+   `sdf::Element::GetAny` as boost::any values in its parameterMap and
+   calls `PhysicsEngine::SetParam` with these values.
+   Prior to libsdformat8, the GetAny function returned `boost::any`, but it now
+   returns `std::any`. The `gazebo::physics::PhysicsEngine::any_cast` helper
+   is provided to first check if a `boost::any` value contains a std::any,
+   and if so, perform a `std::any_cast<T>`.
+   Otherwise, it returns `boost::any_cast<T>`.
+   This `any_cast` helper should be used with `boost::any` values provided by
+   `Preset::GetParam`, `PresetManager::GetProfileParam`, and
+   `PresetManager::GetCurrentProfileParam`.
+
+1. **gazebo/rendering/MarkerManager.cc**
+    The `/marker` ignition transport service allows specifying the `id` field
+    of a marker to be created. If the `id` field is not specified, a random,
+    valid `id` is generated as a convenience for the user.
+    Due to the upgrade to `ign-msgs5`, which uses `proto3` syntax, an `id`
+    of `0` is indistinguishable from an unset `id`.
+    As such, an `id` of `0` will now trigger a random `id` to be generated,
+    and non-zero `id` values should be used instead.
+
+## Gazebo 9.x to 10.x
+
+### Additions
+1. **gazebo/physics/dart/DARTLink.hh**
+    + public: void AddSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+    + public: bool RemoveSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+1. **gazebo/physics/dart/DARTJoint.hh**
+    + public: virtual void SetName(const std::string &_name);
+1. **gazebo/physics/dart/DARTPhysics.hh**
+    + public: std::string GetSolverType() const;
+    + public: void SetSolverType(const std::string &_type);
+
+### Modifications
+
+1. **gazebo/physics/Model.hh**
+    + Made `CreateJoint` virtual
+    + Made `RemoveJoint` virtual
+1. WindPlugin now requires setting `<force_approximation_scaling_factor>` to
+   enable mass based force approximation. Set to 1.0 for original behavior.
+1. **gazebo/transport/TransportIface.hh**
+    + ***Removed:*** boost::shared_ptr<msgs::Response> request(const std::string &_worldName, const std::string &_request, const std::string &_data = "");
+    + ***Replacement:*** boost::shared_ptr<msgs::Response> request(const std::string &_worldName, const std::string &_request, const std::string &_data = "", const common::Time &_timeout = -1);
+    + ***Note:*** Added extra argument `_timeout`
+1. **gazebo/gui/qt_test.h**
+    + ***Removed:*** The whole header file. Note that it also won't be included into `gazebo/gui/gui.hh`.
+    + ***Replacement:*** Include `<QtTest/QtTest>` instead.
+
+## Gazebo 8.4 to 9.x
+
+### Models with duplicate names will not be inserted
+
+1. Prior to gazebo 8.4, multiple models with the same name could be inserted
+   into a world and simulated, though they were not fully functional.
+   Now models with duplicate names are not allowed to be inserted.
+
 ## Gazebo 8.x to 9.x
+
+### Build system
+
+New versions in mandatory dependencies: `ign-transport4`, `ign-msgs1`, `ign-math4`, `sdformat6`.
+New optional dependencies: `ign-fuel-tools`,`ign-common1`
 
 ### -g command line argument to load plugins in gzclient
 
 1. During the gazebo 8.x series the `-g` was used to load System plugins in the
    client side instead of GUI plugins. In gazebo 9.x the `-g` loads GUI
    plugins. The `--gui-client-plugin` argument introduced in gazebo 8.2 load GUI
-   plugins and will remain the exactly the same.   
+   plugins and will remain the exactly the same.
 
 ### Additions
 
@@ -21,11 +109,14 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. ***Modified:*** Many constructors with 1 argument were marked as explicit.
 1. **gazebo/gui/JointControlWidget.hh**
     + ***Removed:*** gazebo::transport::Publisher for topic(s) `~/.../joint_cmd`
     + ***Replacement:*** ignition::transport::Publisher for topic(s) `/.../joint_cmd`
+1. **gazebo/physics/**
+    + ***Modified:*** Many constructors with 1 argument in physics classes were marked as explicit.
 1. **gazebo/physics/Link.hh**
-    + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel); 
+    + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel);
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
     + ***Deprecation:***  void SetAngularAccel(const ignition::math::Vector3d &_accel);
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
@@ -34,8 +125,18 @@ release will remove the deprecated code.
     + ***Replacement:*** None. Calls now deprecated SetLinearAccel() on all links.
     + ***Deprecation:*** void SetAngularAccel(const ignition::math::Vector3d &_vel);
     + ***Replacement:*** None. Calls now deprecated SetAngularAccel() on all links.
-
-
+1. **gazebo/sensors/CameraSensor.cc**
+    + ***Modified:*** Ignition transport topic now uses ignition::msgs::Image instead of ignition::msgs::ImageStamped
+1. **gazebo/sensors/WideAngleCameraSensor.cc**
+    + ***Modified:*** Ignition transport topic now uses ignition::msgs::Image instead of ignition::msgs::ImageStamped
+1. **gazebo/gui/ConfigWidget.hh**
+    + ColorValueChanged signal now uses ignition::math::Color instead of gazebo::common::Color
+1. **gazebo/common/Material.hh**
+    + Changed `protected: Color ambient;` to `protected: ignition::math::Color ambient;`
+    + Changed `protected: Color diffuse;` to `protected: ignition::math::Color diffuse;`
+    + Changed `protected: Color specular;` to `protected: ignition::math::Color specular;`
+    + Changed `protected: Color emissive;` to `protected: ignition::math::Color emissive;`
+1. `BUILD_TYPE_*` macros renamed to `GAZEBO_BUILD_TYPE_*`
 
 ### Deprecations
 
@@ -43,7 +144,7 @@ release will remove the deprecated code.
     + ***Deprecation:*** private: void OnJointCmd(ConstJointCmdPtr &_msg);
     + ***Replacement:*** private: void OnJointCommand(const ignition::msgs::JointCmd &_msg);
 1. **gazebo/physics/Link.hh**
-    + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel); 
+    + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel);
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
     + ***Deprecation:***  void SetAngularAccel(const ignition::math::Vector3d &_accel);
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
@@ -52,11 +153,150 @@ release will remove the deprecated code.
     + ***Replacement:*** None. Calls now deprecated SetLinearAccel() on all links.
     + ***Deprecation:*** void SetAngularAccel(const ignition::math::Vector3d &_vel);
     + ***Replacement:*** None. Calls now deprecated SetAngularAccel() on all links.
-
 1. **gazebo/rendering/GpuLaser.hh**
-    + ***Deprecation:*** const float* LaserData() const
+    + ***Deprecation:*** const float\* LaserData() const
     + ***Replacement:*** Call GpuLaser::DataIter LaserDataBegin() const
         iterate until reaching GpuLaser::DataIter LaserDataEnd() const
+1. **gazebo/rendering/Conversions.hh**
+    + ***Deprecation:*** Ogre::ColourValue Convert(const common::Color &_clr)
+    + ***Replacement:*** Ogre::ColourValue Convert(const ignition::math::Color &_clr)
+    + common::Color Convert(const Ogre::ColourValue &_clr) now returns ignition::math::Color
+1. **gazebo/rendering/Material.hh**
+    + ***Deprecation:*** bool GetMaterialAsColor(const std::string &_materialName, common::Color &_ambient, common::Color &_diffuse, common::Color &_specular, common::Color &_emissive)
+    + ***Replacement:*** bool MaterialAsColor(const std::string &_materialName, ignition::math::Color &_ambient, ignition::math::Color &_diffuse, ignition::math::Color &_specular, ignition::math::Color &_emissive)
+1. **gazebo/rendering/Visual.hh**
+    + ***Deprecation:*** void SetAmbient(const common::Color &_color, const bool _cascade = true)
+    + ***Replacement:*** void SetAmbient(const ignition::math::Color &_color, const bool _cascade = true)
+    + ***Deprecation:*** void SetDiffuse(const common::Color &_color, const bool _cascade = true)
+    + ***Replacement:*** void SetDiffuse(const ignition::math::Color &_color, const bool _cascade = true)
+    + ***Deprecation:*** void SetSpecular(const common::Color &_color, const bool _cascade = true)
+    + ***Replacement:*** void SetSpecular(const ignition::math::Color &_color, const bool _cascade = true)
+    + ***Deprecation:*** void SetEmissive(const common::Color &_color, const bool _cascade = true)
+    + ***Replacement:*** void SetEmissive(const ignition::math::Color &_color, const bool _cascade = true)
+    + ***Deprecation:*** common::Color GetAmbient() const
+    + ***Replacement:*** ignition::math::Color Ambient() const
+    + ***Deprecation:*** common::Color GetDiffuse() const
+    + ***Replacement:*** ignition::math::Color Diffuse()
+    + ***Deprecation:*** common::Color GetSpecular() const
+    + ***Replacement:*** ignition::math::Color Specular() const
+    + ***Deprecation:*** common::Color GetEmissive() const
+    + ***Replacement:*** ignition::math::Color Emissive()
+    + ***Deprecation:*** void SetRibbonTrail(bool _value, const common::Color &_initialColor, const common::Color &_changeColor)
+    + ***Replacement:*** void SetRibbonTrail(bool _value, const ignition::math::Color &_initialColor, const ignition::math::Color &_changeColor)
+1. **gazebo/rendering/LaserVisual.hh**
+    + virtual void SetEmissive(const common::Color &_color, const bool _cascade = true) now accepts ignition::math::Color
+1. **gazebo/rendering/Scene.hh**
+    + ***Deprecation:*** void SetAmbientColor(const common::Color &_color)
+    + ***Replacement:*** void SetAmbientColor(const ignition::math::Color &_color)
+    + ***Deprecation:*** void SetBackgroundColor(const common::Color &_color)
+    + ***Replacement:*** void SetBackgroundColor(const ignition::math::Color &_color)
+    + ***Deprecation:*** void CreateGrid(const uint32_t _cellCount, const float _cellLength, const float _lineWidth, const common::Color &_color)
+    + ***Replacement:*** void CreateGrid(const uint32_t _cellCount, const float _cellLength, const ignition::math::Color &_color)
+    + ***Deprecation:*** void SetFog(const std::string &_type, const common::Color &_color, const double _density, const double _start, const double _end)
+    + ***Replacement:*** void SetFog(const std::string &_type, const ignition::math::Color &_color, const double _density, const double _start, const double _end)
+    + common::Color AmbientColor() const now returns ignition::math::Color
+    + common::Color BackgroundColor() const now returns ignition::math::Color
+    + ***Deprecation:*** LightPtr GetLight(const uint32_t _index) const;
+    + ***Replacement:*** LightPtr LightByIndex(const uint32_t _index) const;
+    + ***Deprecation:*** LightPtr GetLight(const std::string &_name) const;
+    + ***Replacement:*** LightPtr LightByName(const std::string &_name) const;
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** virtual bool SetBackgroundColor(const common::Color &_color)
+    + ***Replacement:*** virtual bool SetBackgroundColor(const ignition::math::Color &_color)
+1. **gazebo/rendering/WideAngleCamera.hh**
+    + bool SetBackgroundColor(const common::Color &_color) now accepts ignition::math::Color
+1. **gazebo/rendering/Grid.hh**
+    + ***Deprecation:*** Grid(Scene *_scene, const uint32_t _cellCount, const float _cellLength, const float _lineWidth, const common::Color &_color)
+    + ***Replacement:*** Grid(Scene *_scene, const uint32_t _cellCount, const float _cellLength, const ignition::math::Color &_color)
+    + ***Deprecation:*** void SetColor(const common::Color &_color)
+    + ***Replacement:*** void SetColor(const ignition::math::Color &_color)
+    + ***Deprecation:*** void SetLineWidth(const float _width)
+    + ***Replacement:*** None, grid lines are always 1px wide.
+    + ***Deprecation:*** float LineWidth() const
+    + ***Replacement:*** None, grid lines are always 1px wide.
+    + common::Color Color() const now returns ignition::math::Color
+1. **gazebo/rendering/Light.hh**
+    + ***Deprecation:*** void SetDiffuseColor(const common::Color &_color)
+    + ***Replacement:*** void SetDiffuseColor(const ignition::math::Color &_color)
+    + ***Deprecation:*** void SetSpecularColor(const common::Color &_color)
+    + ***Replacement:*** void SetSpecularColor(const ignition::math::Color &_color)
+    + common::Color DiffuseColor() const now returns ignition::math::Color DiffuseColor() const
+    + common::Color SpecularColor() const now returns ignition::math::Color SpecularColor() const
+1. **gazebo/rendering/DynamicLines.hh**
+    + ***Deprecation:*** void AddPoint(const ignition::math::Vector3d &_pt, const common::Color &_color)
+    + ***Replacement:*** void AddPoint(const ignition::math::Vector3d &_pt, const ignition::math::Color &_color = ignition::math::Color::White)
+    + ***Deprecation:*** void AddPoint(double _x, double _y, double _z, const common::Color &_color)
+    + ***Replacement:*** void AddPoint(const double _x, const double _y, const double _z, const ignition::math::Color &_color = ignition::math::Color::White)
+    + ***Deprecation:*** void SetColor(unsigned int _index, const common::Color &_color)
+    + ***Replacement:*** void SetColor(const unsigned int _index, const ignition::math::Color &_color)
+1. **gazebo/rendering/MovableText.hh**
+    + ***Deprecation:*** void Load(const std::string &_name, const std::string &_text, const std::string &_fontName, float _charHeight, const common::Color &_color)
+    + ***Replacement:*** void Load(const std::string &_name, const std::string &_text, const std::string &_fontName = "Arial", float _charHeight = 1.0, const ignition::math::Color &_color = ignition::math::Color::White)
+    + ***Deprecation:*** const std::string &GetFont() const
+    + ***Replacement:*** const std::string &FontName() const
+    + ***Deprecation:*** const std::string &GetText() const
+    + ***Replacement:*** const std::string &Text() const
+    + ***Deprecation:*** void SetColor(const common::Color &_color)
+    + ***Replacement:*** void SetColor(const ignition::math::Color &_color)
+    + ***Deprecation:*** const common::Color GetColor() const
+    + ***Replacement:*** const ignition::math::Color &Color() const
+    + ***Deprecation:*** float GetCharHeight() const
+    + ***Replacement:*** float CharHeight() const
+    + ***Deprecation:*** float GetSpaceWidth() const
+    + ***Replacement:*** float SpaceWidth() const
+    + ***Deprecation:*** float GetBaseline() const
+    + ***Replacement:*** float Baseline() const
+    + ***Deprecation:*** bool GetShowOnTop() const
+    + ***Replacement:*** bool ShowOnTop() const
+    + ***Deprecation:*** void _setupGeometry()
+    + ***Replacement:*** void SetupGeometry()
+    + ***Deprecation:*** void _updateColors()
+    + ***Replacement:*** void UpdateColors()
+1. **gazebo/gui/building/BuildingModelManip.hh**
+    + BuildingModelManip::Color() now returns ignition::math::Color()
+1. **gazebo/msgs/msgs.hh**
+    + ***Deprecation:*** msgs::Any ConvertAny(const common::Color &_c)
+    + ***Replacement:*** msgs::Any ConvertAny(const ignition::math::Color &_c)
+    + ***Deprecation:*** msgs::Color Convert(const common::Color &_c)
+    + ***Replacement:*** msgs::Color Convert(const ignition::math::Color &_c)
+    + ***Deprecation:*** void Set(msgs::Color *_c, const common::Color &_v)
+    + ***Replacement:*** void Set(msgs::Color *_c, const ignition::math::Color &_v)
+    + Convert(const msgs::Color &_c) now returns ignition::math::Color()
+1. **gazebo/gui/Conversions.hh**
+    + ***Deprecation:*** QColor Convert(const common::Color &_clr)
+    + ***Replacement:*** QColor Convert(const ignition::math::Color &_clr)
+    + common::Color Convert(const QColor &_clr) now returns ignition::math::Color
+1. **gazebo/gui/ConfigWidget.hh**
+    + ***Deprecation:*** bool SetColorWidgetValue(const std::string &_name, const common::Color &_value)
+    + ***Replacement:*** bool SetColorWidgetValue(const std::string &_name, const ignition::math::Color &_value)
+    + common::Color ColorWidgetValue(const std::string &_name) const now returns ignition::math::Color
+1. **gazebo/common/Material.hh**
+    + ***Deprecation:*** explicit Material(const Color &_clr)
+    + ***Replacement:*** explicit Material(const ignition::math::Color &_clr)
+    + ***Deprecation:*** void SetAmbient(const Color &_clr)
+    + ***Replacement:*** void SetAmbient(const ignition::math::Color &_clr)
+    + ***Deprecation:*** void SetDiffuse(const Color &_clr)
+    + ***Replacement:*** void SetDiffuse(const ignition::math::Color &_clr)
+    + ***Deprecation:*** void SetSpecular(const Color &_clr)
+    + ***Replacement:*** void SetSpecular(const ignition::math::Color &_clr)
+    + ***Deprecation:*** void SetEmissive(const Color &_clr)
+    + ***Replacement:*** void SetEmissive(const ignition::math::Color &_clr)
+    + Color GetAmbient() const now returns ignition::math::Color
+    + Color GetDiffuse() const now returns ignition::math::Color
+    + Color GetSpecular() const now returns ignition::math::Color
+    + Color GetEmissive() const now returns ignition::math::Color
+1. **gazebo/common/Image.hh**
+    + ***Deprecation:*** Color GetPixel(unsigned int _x, unsigned int _y) const
+    + ***Replacement:*** ignition::math::Color Pixel(unsigned int _x, unsigned int _y) const
+    + ***Deprecation:*** Color GetAvgColor()
+    + ***Replacement:*** ignition::math::Color AvgColor()
+    + ***Deprecation:*** Color GetMaxColor() const
+    + ***Replacement:*** ignition::math::Color MaxColor() const
+1. **gazebo/test/ServerFixture.hh**
+    + ***Deprecation:*** SpawnLight function that accepts common::Color
+    + ***Replacement:*** SpawnLight function that accepts ignition::math::Color
+1. **gazebo/common/Color.hh**
+    + gazebo::common::Color is deprecated, use ignition::math::Color instead.
 
 ## Gazebo 7.X to 8.X
 
@@ -204,6 +444,12 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual bool MoveToPosition(const math::Pose &_pose, double _time)
 
 ### Deprecations
+
+1. **plugins/ContainPlugin.hh**
+    + ***Deprecation:*** Gazebo transport publisher on <namespace>/contain
+    + ***Replacement:*** Ignition transport publisher on <namespace>/contain
+    + ***Deprecation:*** Gazebo transport subscriber on <namespace>/enable
+    + ***Replacement:*** Ignition transport service on <namespace>/enable
 
 1. **gazebo/physics/RayShape.hh**
     + ***Deprecation:*** void SetPoints(const math::Vector3 &_posStart, const math::Vector3 &_posEnd)
@@ -1183,6 +1429,14 @@ release will remove the deprecated code.
 1. **gazebo/physics/Link.hh**
     + std::vector<std::string> cgVisuals
 
+## Gazebo 7.10.0 to 7.X
+
+### Modifications
+
+1. Shadows ambient factor has been reduced - they will now appear darker than before. Also increased shadow texture resolution and reduced effect of jagged shadow edges.
+   Please see [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-request/2805)
+   for more details.
+
 ## Gazebo 7.9.0 to 7.X
 
 ### Modifications
@@ -1202,7 +1456,7 @@ release will remove the deprecated code.
    See [pull request 2715](https://bitbucket.org/osrf/gazebo/pull-requests/2715/add-log-record-filter-options)
    for further details.
 
-## Gazebo 7.3.1 to 7.4
+## Gazebo 7.3.1 to 7.X
 
 ### Deprecations
 

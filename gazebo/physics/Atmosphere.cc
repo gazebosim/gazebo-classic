@@ -14,13 +14,6 @@
  * limitations under the License.
  *
 */
-
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -41,7 +34,7 @@ namespace gazebo
     {
       /// \brief Class constructor.
       /// \param[in] _world The reference to the world.
-      public: AtmospherePrivate(physics::World &_world)
+      public: explicit AtmospherePrivate(physics::World &_world)
         : world(_world)
       {
       }
@@ -108,6 +101,9 @@ Atmosphere::Atmosphere(physics::World &_world)
 //////////////////////////////////////////////////
 Atmosphere::~Atmosphere()
 {
+  this->dataPtr->atmosphereSub.reset();
+  this->dataPtr->requestSub.reset();
+  this->dataPtr->responsePub.reset();
   // Must call fini on node to remove it from topic manager.
   this->dataPtr->node->Fini();
 }

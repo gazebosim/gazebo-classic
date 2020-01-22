@@ -15,8 +15,6 @@
  *
 */
 
-#include <unistd.h>
-
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 
@@ -97,7 +95,7 @@ TEST_P(BandwidthTest, Bandwidth)
   Bandwidth(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, BandwidthTest, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, BandwidthTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {

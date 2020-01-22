@@ -27,6 +27,8 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 
+#include <ignition/transport.hh>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -51,7 +53,11 @@ bool custom_exec(std::string _cmd)
 std::string custom_exec_str(std::string _cmd)
 {
   _cmd += " 2>&1";
+#ifdef _WIN32
+  FILE *pipe = _popen(_cmd.c_str(), "r");
+#else
   FILE *pipe = popen(_cmd.c_str(), "r");
+#endif
 
   if (!pipe)
     return "ERROR";
@@ -65,7 +71,11 @@ std::string custom_exec_str(std::string _cmd)
       result += buffer;
   }
 
+#ifdef _WIN32
+  _pclose(pipe);
+#else
   pclose(pipe);
+#endif
   return result;
 }
 
@@ -148,10 +158,10 @@ void fini()
 }
 
 /////////////////////////////////////////////////
-void JointCmdCB(ConstJointCmdPtr &_msg)
+void JointCmdCB(const ignition::msgs::JointCmd &_msg)
 {
   boost::mutex::scoped_lock lock(g_mutex);
-  g_msgDebugOut = _msg->DebugString();
+  g_msgDebugOut = _msg.DebugString();
   g_msgCondition.notify_all();
 }
 
@@ -223,19 +233,17 @@ TEST_F(gzTest, Joint)
   std::string helpOutput = custom_exec_str("gz help joint");
   EXPECT_NE(helpOutput.find("gz joint"), std::string::npos);
 
-  gazebo::transport::NodePtr node(new gazebo::transport::Node());
-  node->Init();
-  gazebo::transport::SubscriberPtr sub =
-    node->Subscribe("~/simple_arm/joint_cmd", &JointCmdCB);
+  ignition::transport::Node ignNode;
+  ignNode.Subscribe("/simple_arm/joint_cmd", &JointCmdCB);
 
   // Test joint force
   {
     waitForMsg("gz joint -w default -m simple_arm "
         "-j arm_shoulder_pan_joint -f 10");
 
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
-    msg.set_force(10);
+    msg.mutable_force_optional()->set_data(10);
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -246,12 +254,12 @@ TEST_F(gzTest, Joint)
         "-j arm_shoulder_pan_joint --pos-t 1.5707 --pos-p 1.2 "
         "--pos-i 0.01 --pos-d 0.2");
 
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
-    msg.mutable_position()->set_target(1.5707);
-    msg.mutable_position()->set_p_gain(1.2);
-    msg.mutable_position()->set_i_gain(0.01);
-    msg.mutable_position()->set_d_gain(0.2);
+    msg.mutable_position()->mutable_target_optional()->set_data(1.5707);
+    msg.mutable_position()->mutable_p_gain_optional()->set_data(1.2);
+    msg.mutable_position()->mutable_i_gain_optional()->set_data(0.01);
+    msg.mutable_position()->mutable_d_gain_optional()->set_data(0.2);
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -262,12 +270,12 @@ TEST_F(gzTest, Joint)
         "-j arm_shoulder_pan_joint --vel-t 1.5707 --vel-p 1.2 "
         "--vel-i 0.01 --vel-d 0.2");
 
-    gazebo::msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name("simple_arm::arm_shoulder_pan_joint");
-    msg.mutable_velocity()->set_target(1.5707);
-    msg.mutable_velocity()->set_p_gain(1.2);
-    msg.mutable_velocity()->set_i_gain(0.01);
-    msg.mutable_velocity()->set_d_gain(0.2);
+    msg.mutable_velocity()->mutable_target_optional()->set_data(1.5707);
+    msg.mutable_velocity()->mutable_p_gain_optional()->set_data(1.2);
+    msg.mutable_velocity()->mutable_i_gain_optional()->set_data(0.01);
+    msg.mutable_velocity()->mutable_d_gain_optional()->set_data(0.2);
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -692,6 +700,19 @@ TEST_F(gzTest, Topic)
   output = custom_exec_str("gz topic -b /gazebo/default/world_stats -d 10");
   EXPECT_NE(output.find("Total["), std::string::npos);
 
+  // Request
+  output = custom_exec_str("gz topic -r entity_list");
+  EXPECT_NE(output.find("models {"), std::string::npos);
+
+  // Publish
+  output = custom_exec_str("gz topic -p /gazebo/default/atmosphere "
+      "-m temperature:400");
+  EXPECT_TRUE(output.empty());
+
+  // Request
+  output = custom_exec_str("gz topic -r atmosphere_info");
+  EXPECT_NE(output.find("temperature: 400"), std::string::npos);
+
   fini();
 }
 
@@ -706,10 +727,10 @@ TEST_F(gzTest, SDF)
   // Regenerate each sum using:
   // gz sdf -d -v <major.minor> | sha1sum'
   std::map<std::string, std::string> descSums;
-  descSums["1.0"] = "a02fbc1275100569c99d860044563f669934c0fc";
-  descSums["1.2"] = "f524458ace57d6aabbbc2303da208f65af37ef53";
-  descSums["1.3"] = "74a3aa8d31f97328175f43d03410be55631fa0e1";
-  descSums["1.4"] = "057f26137669d9d7eeb5a8c6f51e4f4077d9ddcf";
+  descSums["1.0"] = "c69f2dcf512a58fd63b1ba604c3e3f23069afcae";
+  descSums["1.2"] = "a78a9127ce11ecbd90126654dfa991949f12ff27";
+  descSums["1.3"] = "f3dfff3a79eeca7a962f75ce537c94df8db4d81b";
+  descSums["1.4"] = "e4de8b88e2ddc9d88d5b335ca88c5b046ed8f068";
   // descSums["1.5"] = "dddf642e1259439ce47b4664f853ac9f32432762";
 
   // Test each descSum
@@ -728,7 +749,7 @@ TEST_F(gzTest, SDF)
   docSums["1.0"] = "4cf955ada785adf72503744604ffadcdf13ec0d2";
   docSums["1.2"] = "27f9d91080ce8aa18eac27c9d899fde2d4b78785";
   docSums["1.3"] = "ad80986d42eae97baf277118f52d7e8b951d8ea1";
-  docSums["1.4"] = "153ddd6ba6797c37c7fcddb2be5362c9969d97a1";
+  docSums["1.4"] = "bb4c725f2a29b32d413cd490c9a221cd27b36997";
   // docSums["1.5"] = "4e99e3a1e3497a0262d5253cbff12be4758e3c16";
 
   // Test each docSum

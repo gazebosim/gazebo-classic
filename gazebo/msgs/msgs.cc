@@ -17,6 +17,7 @@
 
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
+#include <ignition/math/MassMatrix3.hh>
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/common/CommonIface.hh"
@@ -160,12 +161,12 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    void Set(msgs::Color *_c, const common::Color &_v)
+    void Set(msgs::Color *_c, const ignition::math::Color &_v)
     {
-      _c->set_r(_v.r);
-      _c->set_g(_v.g);
-      _c->set_b(_v.b);
-      _c->set_a(_v.a);
+      _c->set_r(_v.R());
+      _c->set_g(_v.G());
+      _c->set_b(_v.B());
+      _c->set_a(_v.A());
     }
 
     /////////////////////////////////////////////
@@ -201,12 +202,12 @@ namespace gazebo
     void Set(msgs::Inertial *_i, const ignition::math::MassMatrix3d &_m)
     {
       _i->set_mass(_m.Mass());
-      _i->set_ixx(_m.IXX());
-      _i->set_iyy(_m.IYY());
-      _i->set_izz(_m.IZZ());
-      _i->set_ixy(_m.IXY());
-      _i->set_ixz(_m.IXZ());
-      _i->set_iyz(_m.IYZ());
+      _i->set_ixx(_m.Ixx());
+      _i->set_iyy(_m.Iyy());
+      _i->set_izz(_m.Izz());
+      _i->set_ixy(_m.Ixy());
+      _i->set_ixz(_m.Ixz());
+      _i->set_iyz(_m.Iyz());
     }
 
     /////////////////////////////////////////////////
@@ -308,7 +309,7 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const common::Color &_c)
+    msgs::Any ConvertAny(const ignition::math::Color &_c)
     {
       msgs::Any result;
       result.set_type(msgs::Any::COLOR);
@@ -383,13 +384,13 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    msgs::Color Convert(const common::Color &_c)
+    msgs::Color Convert(const ignition::math::Color &_c)
     {
       msgs::Color result;
-      result.set_r(_c.r);
-      result.set_g(_c.g);
-      result.set_b(_c.b);
-      result.set_a(_c.a);
+      result.set_r(_c.R());
+      result.set_g(_c.G());
+      result.set_b(_c.B());
+      result.set_a(_c.A());
       return result;
     }
 
@@ -670,9 +671,9 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    common::Color Convert(const msgs::Color &_c)
+    ignition::math::Color Convert(const msgs::Color &_c)
     {
-      return common::Color(_c.r(), _c.g(), _c.b(), _c.a());
+      return ignition::math::Color(_c.r(), _c.g(), _c.b(), _c.a());
     }
 
     /////////////////////////////////////////////
@@ -822,13 +823,13 @@ namespace gazebo
       if (_sdf->HasElement("diffuse"))
       {
         result.mutable_diffuse()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("diffuse")));
+            Convert(_sdf->Get<ignition::math::Color>("diffuse")));
       }
 
       if (_sdf->HasElement("specular"))
       {
         result.mutable_specular()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("specular")));
+            Convert(_sdf->Get<ignition::math::Color>("specular")));
       }
 
       if (_sdf->HasElement("attenuation"))
@@ -1113,16 +1114,16 @@ namespace gazebo
 
         if (elem->HasElement("ambient"))
           msgs::Set(matMsg->mutable_ambient(),
-              elem->Get<common::Color>("ambient"));
+              elem->Get<ignition::math::Color>("ambient"));
         if (elem->HasElement("diffuse"))
           msgs::Set(matMsg->mutable_diffuse(),
-              elem->Get<common::Color>("diffuse"));
+              elem->Get<ignition::math::Color>("diffuse"));
         if (elem->HasElement("specular"))
           msgs::Set(matMsg->mutable_specular(),
-              elem->Get<common::Color>("specular"));
+              elem->Get<ignition::math::Color>("specular"));
         if (elem->HasElement("emissive"))
           msgs::Set(matMsg->mutable_emissive(),
-              elem->Get<common::Color>("emissive"));
+              elem->Get<ignition::math::Color>("emissive"));
       }
 
       // Set the origin of the visual
@@ -1706,7 +1707,7 @@ namespace gazebo
         gzthrow(std::string("Unknown fog type[") + type + "]");
 
       result.mutable_color()->CopyFrom(
-          Convert(_sdf->Get<common::Color>("color")));
+          Convert(_sdf->Get<ignition::math::Color>("color")));
 
       result.set_density(_sdf->Get<double>("density"));
       result.set_start(_sdf->Get<double>("start"));
@@ -1733,12 +1734,12 @@ namespace gazebo
 
       if (_sdf->HasElement("ambient"))
         result.mutable_ambient()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("ambient")));
+            Convert(_sdf->Get<ignition::math::Color>("ambient")));
 
       if (_sdf->HasElement("background"))
       {
         result.mutable_background()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("background")));
+            Convert(_sdf->Get<ignition::math::Color>("background")));
       }
 
       if (_sdf->HasElement("sky"))
@@ -1757,7 +1758,7 @@ namespace gazebo
           skyMsg->set_humidity(cloudsElem->Get<double>("humidity"));
           skyMsg->set_mean_cloud_size(cloudsElem->Get<double>("mean_size"));
           msgs::Set(skyMsg->mutable_cloud_ambient(),
-                    cloudsElem->Get<common::Color>("ambient"));
+                    cloudsElem->Get<ignition::math::Color>("ambient"));
         }
       }
 
@@ -2967,21 +2968,14 @@ namespace gazebo
       int linkCount = _model.link_size();
       auto link = _model.mutable_link(linkCount-1);
 
-      auto inertial = link->mutable_inertial();
-      inertial->set_mass(_mass);
+      ignition::math::MassMatrix3d m;
+      if (!m.SetFromBox(_mass, _size))
       {
-        double dx = _size.X();
-        double dy = _size.Y();
-        double dz = _size.Z();
-        double ixx = _mass/12.0 * (dy*dy + dz*dz);
-        double iyy = _mass/12.0 * (dz*dz + dx*dx);
-        double izz = _mass/12.0 * (dx*dx + dy*dy);
-        inertial->set_ixx(ixx);
-        inertial->set_iyy(iyy);
-        inertial->set_izz(izz);
-        inertial->set_ixy(0.0);
-        inertial->set_ixz(0.0);
-        inertial->set_iyz(0.0);
+        gzerr << "Error computing inertia, not setting" << std::endl;
+      }
+      else
+      {
+        msgs::Set(link->mutable_inertial(), m);
       }
     }
 
@@ -3000,17 +2994,15 @@ namespace gazebo
       int linkCount = _model.link_size();
       auto link = _model.mutable_link(linkCount-1);
 
-      auto inertial = link->mutable_inertial();
-      inertial->set_mass(_mass);
-      const double r2 = _radius * _radius;
-      const double ixx = _mass * (0.25 * r2 + _length*_length / 12.0);
-      const double izz = _mass * 0.5 * r2;
-      inertial->set_ixx(ixx);
-      inertial->set_iyy(ixx);
-      inertial->set_izz(izz);
-      inertial->set_ixy(0.0);
-      inertial->set_ixz(0.0);
-      inertial->set_iyz(0.0);
+      ignition::math::MassMatrix3d m;
+      if (!m.SetFromCylinderZ(_mass, _length, _radius))
+      {
+        gzerr << "Error computing inertia, not setting" << std::endl;
+      }
+      else
+      {
+        msgs::Set(link->mutable_inertial(), m);
+      }
     }
 
     ////////////////////////////////////////////////////////
@@ -3025,15 +3017,15 @@ namespace gazebo
       int linkCount = _model.link_size();
       auto link = _model.mutable_link(linkCount-1);
 
-      auto inertial = link->mutable_inertial();
-      inertial->set_mass(_mass);
-      const double ixx = _mass * 0.4 * _radius * _radius;
-      inertial->set_ixx(ixx);
-      inertial->set_iyy(ixx);
-      inertial->set_izz(ixx);
-      inertial->set_ixy(0.0);
-      inertial->set_ixz(0.0);
-      inertial->set_iyz(0.0);
+      ignition::math::MassMatrix3d m;
+      if (!m.SetFromSphere(_mass, _radius))
+      {
+        gzerr << "Error computing inertia, not setting" << std::endl;
+      }
+      else
+      {
+        msgs::Set(link->mutable_inertial(), m);
+      }
     }
 
     ////////////////////////////////////////////////////////
@@ -3268,14 +3260,10 @@ namespace gazebo
     {
       ignition::msgs::Color result;
 
-      if (_msg.has_r())
-        result.set_r(_msg.r());
-      if (_msg.has_g())
-        result.set_g(_msg.g());
-      if (_msg.has_b())
-        result.set_b(_msg.b());
-      if (_msg.has_a())
-        result.set_a(_msg.a());
+      result.set_r(_msg.r());
+      result.set_g(_msg.g());
+      result.set_b(_msg.b());
+      result.set_a(_msg.a());
 
       return result;
     }
@@ -3284,15 +3272,10 @@ namespace gazebo
     msgs::Color ConvertIgnMsg(const ignition::msgs::Color &_msg)
     {
       msgs::Color result;
-
-      if (_msg.has_r())
-        result.set_r(_msg.r());
-      if (_msg.has_g())
-        result.set_g(_msg.g());
-      if (_msg.has_b())
-        result.set_b(_msg.b());
-      if (_msg.has_a())
-        result.set_a(_msg.a());
+      result.set_r(_msg.r());
+      result.set_g(_msg.g());
+      result.set_b(_msg.b());
+      result.set_a(_msg.a());
 
       return result;
     }
@@ -3383,8 +3366,7 @@ namespace gazebo
         result.add_uri(s);
       }
 
-      if (_script.has_name())
-        result.set_name(_script.name());
+      result.set_name(_script.name());
 
       return result;
     }
@@ -3421,10 +3403,8 @@ namespace gazebo
 
       if (_msg.has_script())
         result.mutable_script()->CopyFrom(ConvertIgnMsg(_msg.script()));
-      if (_msg.has_shader_type())
-        result.set_shader_type(ConvertIgnMsg(_msg.shader_type()));
-      if (_msg.has_normal_map())
-        result.set_normal_map(_msg.normal_map());
+      result.set_shader_type(ConvertIgnMsg(_msg.shader_type()));
+      result.set_normal_map(_msg.normal_map());
       if (_msg.has_ambient())
         result.mutable_ambient()->CopyFrom(ConvertIgnMsg(_msg.ambient()));
       if (_msg.has_diffuse())
@@ -3433,8 +3413,7 @@ namespace gazebo
         result.mutable_specular()->CopyFrom(ConvertIgnMsg(_msg.specular()));
       if (_msg.has_emissive())
         result.mutable_emissive()->CopyFrom(ConvertIgnMsg(_msg.emissive()));
-      if (_msg.has_lighting())
-        result.set_lighting(_msg.lighting());
+      result.set_lighting(_msg.lighting());
 
       return result;
     }

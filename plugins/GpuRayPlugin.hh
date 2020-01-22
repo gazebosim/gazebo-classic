@@ -27,9 +27,11 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE GpuRayPlugin : public SensorPlugin
+  class GZ_PLUGIN_VISIBLE GpuRayPlugin : public SensorPlugin
   {
     public: GpuRayPlugin();
+
+    public: virtual ~GpuRayPlugin();
 
     public: void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 

@@ -37,7 +37,7 @@ namespace gazebo
   ///   <light>         SDF element. More than one <light> can be attached.
   ///     <pose>        Offset pose of the light in the link frame.
   ///     <light_name>  Name of the light in the world.
-  class GAZEBO_VISIBLE AttachLightPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE AttachLightPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: AttachLightPlugin();
@@ -47,6 +47,10 @@ namespace gazebo
 
     /// \brief Main loop to update the pose of lights
     private: void OnUpdate();
+
+    /// \brief Request callback for handling deletion events.
+    /// \param[in] _msg The message data.
+    public: void OnRequest(ConstRequestPtr &_msg);
 
     /// \brief Pointer to private data
     private: std::unique_ptr<AttachLightPluginPrivate> dataPtr;

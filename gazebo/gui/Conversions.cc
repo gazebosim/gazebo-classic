@@ -15,8 +15,6 @@
  *
 */
 
-#include "gazebo/common/Color.hh"
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Conversions.hh"
 
@@ -24,18 +22,21 @@ using namespace gazebo;
 using namespace gui;
 
 //////////////////////////////////////////////////
-QColor Conversions::Convert(const common::Color &_color)
+QColor Conversions::Convert(const ignition::math::Color &_color)
 {
-  return QColor(_color.r*255.0, _color.g*255.0, _color.b*255.0, _color.a*255.0);
+  return QColor(_color.R()*255.0,
+                _color.G()*255.0,
+                _color.B()*255.0,
+                _color.A()*255.0);
 }
 
 //////////////////////////////////////////////////
-common::Color Conversions::Convert(const QColor &_color)
+ignition::math::Color Conversions::Convert(const QColor &_color)
 {
-  return common::Color(_color.red() / 255.0,
-                       _color.green() / 255.0,
-                       _color.blue() / 255.0,
-                       _color.alpha() / 255.0);
+  return ignition::math::Color(_color.red() / 255.0,
+                               _color.green() / 255.0,
+                               _color.blue() / 255.0,
+                               _color.alpha() / 255.0);
 }
 
 //////////////////////////////////////////////////

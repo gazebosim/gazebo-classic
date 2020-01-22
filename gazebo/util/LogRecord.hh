@@ -18,6 +18,7 @@
 #define _GAZEBO_UTIL_LOGRECORD_HH_
 
 #include <fstream>
+#include <set>
 #include <string>
 
 #include "gazebo/msgs/msgs.hh"
@@ -25,6 +26,9 @@
 #include "gazebo/util/system.hh"
 
 #define GZ_LOG_VERSION "1.0"
+
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_UTIL_VISIBLE, gazebo, util, LogRecord)
 
 namespace gazebo
 {
@@ -46,6 +50,10 @@ namespace gazebo
 
       /// \brief Log filter string
       public: std::string filter;
+
+      /// \brief Recording resources. True will record state logs
+      /// together with model meshes and materials.
+      public: bool recordResources = false;
     };
 
     // Forward declare private data class
@@ -145,6 +153,15 @@ namespace gazebo
       /// \param[in] _filter New log record filter regex string
       public: void SetFilter(const std::string &_filter);
 
+      /// \brief Get whether the model meshes and materials are saved when
+      /// recording.
+      /// \return True if model meshes and materials are saved when recording.
+      public: bool RecordResources() const;
+
+      /// \brief Set whether to save model meshes and materials when recording.
+      /// \param[in] _record True to save model resources when recording.
+      public: void SetRecordResources(const bool _record);
+
       /// \brief Get whether the logger is ready to start, which implies
       /// that any previous runs have finished.
       // \return True if logger is ready to start.
@@ -197,6 +214,15 @@ namespace gazebo
       /// \brief Return true if an Update has not yet been completed.
       /// \return True if an Update has not yet been completed.
       public: bool FirstUpdate() const;
+
+      /// \brief Return true if all the models are saved successfully.
+      /// \return True if all the models are saved successfully.
+      public: bool SaveModels(const std::set<std::string> &models);
+
+      /// \brief Return true if all the files are saved successfully.
+      /// \return True if all the files are saved successfully, and false if
+      /// there are errors saving the files.
+      public: bool SaveFiles(const std::set<std::string> &resources);
 
       /// \brief Write all logs.
       /// \param[in] _force True to skip waiting on dataAvailableCondition.

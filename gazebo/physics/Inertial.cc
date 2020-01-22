@@ -84,6 +84,24 @@ Inertial::Inertial(const double _m)
 }
 
 //////////////////////////////////////////////////
+Inertial::Inertial(const ignition::math::Inertiald &_inertial)
+  : dataPtr(new InertialPrivate)
+{
+  this->dataPtr->sdf.reset(new sdf::Element);
+  initFile("inertial.sdf", this->dataPtr->sdf);
+
+  this->SetMass(_inertial.MassMatrix().Mass());
+  this->SetCoG(_inertial.Pose());
+  this->SetInertiaMatrix(
+      _inertial.MassMatrix().Ixx(),
+      _inertial.MassMatrix().Iyy(),
+      _inertial.MassMatrix().Izz(),
+      _inertial.MassMatrix().Ixy(),
+      _inertial.MassMatrix().Ixz(),
+      _inertial.MassMatrix().Iyz());
+}
+
+//////////////////////////////////////////////////
 Inertial::Inertial(const Inertial &_inertial)
   : dataPtr(new InertialPrivate)
 {
@@ -114,6 +132,8 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   ignition::math::Pose3d pose =
     this->dataPtr->sdf->Get<ignition::math::Pose3d>("pose");
   this->SetCoG(pose);
+  this->dataPtr->sdf->GetElement("pose")->GetValue()->SetUpdateFunc(
+      std::bind(&Inertial::Pose, this));
 
   // if (this->dataPtr->sdf->HasElement("inertia"))
   // Do the following whether an inertia element was specified or not.
@@ -462,3 +482,26 @@ ignition::math::Pose3d Inertial::Pose() const
 {
   return ignition::math::Pose3d(this->dataPtr->cog);
 }
+
+//////////////////////////////////////////////////
+ignition::math::Inertiald Inertial::Ign() const
+{
+  return ignition::math::Inertiald(
+          ignition::math::MassMatrix3d(
+            this->Mass(),
+            this->PrincipalMoments(),
+            this->ProductsOfInertia()),
+          this->dataPtr->cog);
+}
+
+//////////////////////////////////////////////////
+Inertial &Inertial::operator=(const ignition::math::Inertiald &_inertial)
+{
+  this->dataPtr->mass = _inertial.MassMatrix().Mass();
+  this->dataPtr->cog = _inertial.Pose();
+  this->dataPtr->principals = _inertial.MassMatrix().DiagonalMoments();
+  this->dataPtr->products = _inertial.MassMatrix().OffDiagonalMoments();
+
+  return *this;
+}
+

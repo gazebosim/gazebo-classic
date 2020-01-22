@@ -21,15 +21,15 @@ using namespace rendering;
 
 
 //////////////////////////////////////////////////
-Ogre::ColourValue Conversions::Convert(const common::Color &_color)
+Ogre::ColourValue Conversions::Convert(const ignition::math::Color &_color)
 {
-  return Ogre::ColourValue(_color.r, _color.g, _color.b, _color.a);
+  return Ogre::ColourValue(_color.R(), _color.G(), _color.B(), _color.A());
 }
 
 //////////////////////////////////////////////////
-common::Color Conversions::Convert(const Ogre::ColourValue &_clr)
+ignition::math::Color Conversions::Convert(const Ogre::ColourValue &_clr)
 {
-  return common::Color(_clr.r, _clr.g, _clr.b, _clr.a);
+  return ignition::math::Color(_clr.r, _clr.g, _clr.b, _clr.a);
 }
 
 //////////////////////////////////////////////////

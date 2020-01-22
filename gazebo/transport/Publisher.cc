@@ -17,17 +17,12 @@
 /* Desc: Handles pushing messages out on a named topic
  * Author: Nate Koenig
  */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/bind.hpp>
 
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/WeakBind.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -169,7 +164,9 @@ void Publisher::SendMessage()
   {
     boost::mutex::scoped_lock lock(this->mutex);
     if (!this->pubIds.empty() || this->messages.empty())
+    {
       return;
+    }
 
     for (unsigned int i = 0; i < this->messages.size(); ++i)
     {
@@ -192,14 +189,61 @@ void Publisher::SendMessage()
     for (std::list<MessagePtr>::iterator iter = localBuffer.begin();
         iter != localBuffer.end(); ++iter, ++pubIter)
     {
-      // Send the latest message.
-      int result = this->publication->Publish(*iter,
-          boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
+      // Expected number of calls to the callback function
+      // Publisher::OnPublishComplete() triggered by subscriber callbacks.
+      // If there are no subscriber callbacks, OnPublishComplete()
+      // will be called exactly once instead.
+      int expRemoteCalls = this->publication->GetCallbackCount();
+      {
+        boost::mutex::scoped_lock lock(this->mutex);
+        // Set the minimum expected times OnPublishComplete() has to be
+        // called for this message ID. Only once the expected amount
+        // of calls has been made, SendMessage() can be called again to
+        // send off any new messages (see condition !this->pubIds.empty() in
+        // the beginning of this function). This ensures that messages
+        // are sent out in the right order. OnPublishComplete() will decrease
+        // this counter.
+        this->pubIds[*pubIter] = std::max(1, expRemoteCalls);
+      }
 
-      if (result > 0)
-        this->pubIds[*pubIter] = result;
-      else
-        this->pubIds.erase(*pubIter);
+      // Send the latest message.
+      // The result will be the number of calls to OnPublishComplete()
+      // which will have been triggered by remote subscribers. The actual
+      // calling of OnPublishComplete() happens asynchronously though
+      // (the subscriber callback SubscriptionTransport::HandleData() only
+      // enqueues the message!).
+      int result = this->publication->Publish(*iter,
+          common::weakBind(&Publisher::OnPublishComplete,
+              this->shared_from_this(), _1), *pubIter);
+
+      // It is possible that OnPublishComplete() was called less times than
+      // initially expected, which happens when a callback of the
+      // transport::Publication was found invalid and deleted. In this case
+      // we have to adjust the counter for this message ID.
+      // Technically, subscriber callbacks could meanwhile also have been added,
+      // in which case it would not be safe to increase the pubIds counter,
+      // because it's quite possible that a call to OnPublishComplete was
+      // already done and the entry has already been deleted - then we would
+      // just re-add it here.
+      int diff = result - expRemoteCalls;
+      if (diff < 0)
+      {
+        boost::mutex::scoped_lock lock(this->mutex);
+        // Check that the entry still exists. If it doesn't, OnPublishComplete()
+        // has already been called the expected amount of times.
+        std::map<uint32_t, int>::iterator pIt = this->pubIds.find(*pubIter);
+        if (pIt != this->pubIds.end())
+        {
+          pIt->second += diff;
+          // If OnPublishComplete() was already called as many times as
+          // expected (it will reflect in the value of pIt->second), then
+          // we have to delete the entry of the publication ID (which is
+          // what last call of OnPublishComplete() would have done if it was
+          // called the expected amount of times).
+          if (pIt->second <= 0)
+            this->pubIds.erase(pIt);
+        }
+      }
     }
 
     // Clear the local buffer.
@@ -236,11 +280,25 @@ std::string Publisher::GetMsgType() const
 //////////////////////////////////////////////////
 void Publisher::OnPublishComplete(uint32_t _id)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  // A null node indicates that the publisher may have been destroyed
+  // so do not do anything
+  if (!this->node)
+    return;
 
-  std::map<uint32_t, int>::iterator iter = this->pubIds.find(_id);
-  if (iter != this->pubIds.end() && (--iter->second) <= 0)
-    this->pubIds.erase(iter);
+  try {
+    // This is the deeply unsatisfying way of dealing with a race
+    // condition where the publisher is destroyed before all
+    // OnPublishComplete callbacks are fired.
+    boost::mutex::scoped_lock lock(this->mutex);
+
+    std::map<uint32_t, int>::iterator iter = this->pubIds.find(_id);
+    if (iter != this->pubIds.end() && (--iter->second) <= 0)
+      this->pubIds.erase(iter);
+  }
+  catch(...)
+  {
+    return;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -250,22 +308,20 @@ void Publisher::SetPublication(PublicationPtr _publication)
 }
 
 //////////////////////////////////////////////////
+unsigned int Publisher::GetRemoteSubscriptionCount()
+{
+  return this->publication->GetRemoteSubscriptionCount();
+}
+
+//////////////////////////////////////////////////
 void Publisher::Fini()
 {
   if (!this->messages.empty())
     this->SendMessage();
+  this->messages.clear();
 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic, this->id);
-
-  common::Time slept;
-
-  // Wait for the message to be published
-  while (!this->pubIds.empty() && slept < common::Time(1, 0))
-  {
-    common::Time::MSleep(10);
-    slept += common::Time(0, 10000000);
-  }
 
   this->node.reset();
 }

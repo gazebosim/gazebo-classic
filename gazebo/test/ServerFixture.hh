@@ -63,7 +63,7 @@ namespace gazebo
 {
   std::string custom_exec(std::string _cmd);
 
-  class GAZEBO_VISIBLE ServerFixture : public testing::Test
+  class ServerFixture : public testing::Test
   {
     /// \brief Constructor
     protected: ServerFixture();
@@ -246,6 +246,7 @@ namespace gazebo
     /// \param[in] _noiseType Type of noise to apply.
     /// \param[in] _noiseMean Mean noise value.
     /// \param[in] _noiseStdDev Standard deviation of the noise.
+    /// \param[in] _distortion Flag to enable distortion.
     /// \param[in] _distortionK1 Distortion coefficient k1.
     /// \param[in] _distortionK2 Distortion coefficient k2.
     /// \param[in] _distortionK3 Distortion coefficient k3.
@@ -364,7 +365,6 @@ namespace gazebo
     /// \param[in] _maxRange Max range
     /// \param[in] _rangeResolution Resolution of the scan
     /// \param[in] _samples Number of samples.
-    /// \param[in] _rate Output Hz.
     /// \param[in] _noiseType Type of noise to apply.
     /// \param[in] _noiseMean Mean noise value.
     /// \param[in] _noiseStdDev Standard deviation of the noise.
@@ -377,6 +377,38 @@ namespace gazebo
                    double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
                    double _minRange = 0.08, double _maxRange = 10,
                    double _rangeResolution = 0.01, unsigned int _samples = 640,
+                   const std::string &_noiseType = "", double _noiseMean = 0.0,
+                   double _noiseStdDev = 0.0);
+
+    /// \brief Spawn a gpu laser.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _raySensorName Name of the laser.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _hMinAngle Horizontal min angle
+    /// \param[in] _hMaxAngle Horizontal max angle
+    /// \param[in] _vMinAngle Vertical min angle
+    /// \param[in] _vMaxAngle Vertical max angle
+    /// \param[in] _minRange Min range
+    /// \param[in] _maxRange Max range
+    /// \param[in] _rangeResolution Resolution of the scan
+    /// \param[in] _samples Number of samples.
+    /// \param[in] _vSamples Vertical number of samples.
+    /// \param[in] _hResolution horizontal resolution.
+    /// \param[in] _vResolution vertical resolution.
+    /// \param[in] _noiseType Type of noise to apply.
+    /// \param[in] _noiseMean Mean noise value.
+    /// \param[in] _noiseStdDev Standard deviation of the noise.
+    protected: void SpawnGpuRaySensorVertical(const std::string &_modelName,
+                   const std::string &_raySensorName,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
+                   double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                   double _vMinAngle = -1.0, double _vMaxAngle = 1.0,
+                   double _minRange = 0.08, double _maxRange = 10,
+                   double _rangeResolution = 0.01, unsigned int _samples = 640,
+                   unsigned int _vSamples = 1, double _hResolution = 1.0,
+                   double _vResolution = 1.0,
                    const std::string &_noiseType = "", double _noiseMean = 0.0,
                    double _noiseStdDev = 0.0);
 
@@ -581,7 +613,7 @@ namespace gazebo
 
     /// \brief Spawn a light.
     /// \param[in] _name Name for the light.
-    /// \param[in] _size Type of light - "spot", "directional", or "point".
+    /// \param[in] _type Type of light - "spot", "directional", or "point".
     /// \param[in] _pos Position for the light.
     /// \param[in] _rpy Roll, pitch, yaw for the light.
     /// \param[in] _diffuse Diffuse color of the light.
@@ -601,18 +633,20 @@ namespace gazebo
                    ignition::math::Vector3d::Zero,
                    const ignition::math::Vector3d &_rpy =
                    ignition::math::Vector3d::Zero,
-                   const common::Color &_diffuse = common::Color::White,
-                   const common::Color &_specular = common::Color::White,
+                   const ignition::math::Color &_diffuse =
+                                                ignition::math::Color::White,
+                   const ignition::math::Color &_specular =
+                                                ignition::math::Color::White,
                    const ignition::math::Vector3d &_direction =
                                                -ignition::math::Vector3d::UnitZ,
-                   double _attenuationRange = 20,
-                   double _attenuationConstant = 0.5,
-                   double _attenuationLinear = 0.01,
-                   double _attenuationQuadratic = 0.001,
-                   double _spotInnerAngle = 0,
-                   double _spotOuterAngle = 0,
-                   double _spotFallOff = 0,
-                   bool _castShadows = true);
+                   const double _attenuationRange = 20,
+                   const double _attenuationConstant = 0.5,
+                   const double _attenuationLinear = 0.01,
+                   const double _attenuationQuadratic = 0.001,
+                   const double _spotInnerAngle = 0,
+                   const double _spotOuterAngle = 0,
+                   const double _spotFallOff = 0,
+                   const bool _castShadows = true);
 
     /// \brief Spawn a cylinder
     /// \param[in] _name Name for the model.

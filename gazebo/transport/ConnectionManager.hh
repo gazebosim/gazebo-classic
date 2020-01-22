@@ -31,6 +31,9 @@
 #include "gazebo/transport/Connection.hh"
 #include "gazebo/util/system.hh"
 
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_TRANSPORT_VISIBLE, gazebo, transport, ConnectionManager)
+
 namespace gazebo
 {
   namespace transport
@@ -58,6 +61,10 @@ namespace gazebo
       public: bool Init(const std::string &_masterHost,
                         unsigned int _masterPort,
                         uint32_t _timeoutIterations = 30);
+
+      /// \brief Is the manager initialized?
+      /// \return true if initialized, false otherwise
+      public: bool IsInitialized() const;
 
       /// \brief Run the connection manager loop.  Does not return until
       /// stopped.
@@ -164,7 +171,7 @@ namespace gazebo
       private: boost::mutex updateMutex;
 
       private: ConnectionPtr masterConn;
-      private: Connection *serverConn;
+      private: ConnectionPtr serverConn;
 
       private: std::list<ConnectionPtr> connections;
       protected: std::vector<event::ConnectionPtr> eventConnections;

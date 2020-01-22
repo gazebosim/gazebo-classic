@@ -14,13 +14,6 @@
  * limitations under the License.
  *
  */
-
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <functional>
 
 #include <google/protobuf/descriptor.h>
@@ -285,10 +278,20 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
     else if (lItem)
     {
       rendering::LightPtr light =
-        gui::get_active_camera()->GetScene()->GetLight(
+        gui::get_active_camera()->GetScene()->LightByName(
             this->dataPtr->selectedEntityName);
 
-      light->FillMsg(this->dataPtr->lightMsg);
+      if (light)
+      {
+        light->FillMsg(this->dataPtr->lightMsg);
+      }
+      else
+      {
+        gzerr << "Unable to get Light ["
+              << this->dataPtr->selectedEntityName
+              << "]."
+              << std::endl;
+      }
       this->dataPtr->propTreeBrowser->clear();
       this->dataPtr->fillTypes.push_back("Light");
 
@@ -654,6 +657,8 @@ QTreeWidgetItem *ModelListWidget::ListItem(const std::string &_name,
 void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 {
   QTreeWidgetItem *item = this->dataPtr->modelTreeWidget->itemAt(_pt);
+  if (!item)
+    return;
 
   // Check to see if the selected item is a model
   int i = this->dataPtr->modelsItem->indexOfChild(item);
@@ -783,6 +788,8 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
       msg.set_spot_falloff(this->dataPtr->variantManager->value(
             this->ChildItem((*iter), "falloff")).toDouble());
     }
+    else if ((*iter)->propertyName().toStdString() == "direction")
+      this->FillVector3Msg((*iter), msg.mutable_direction());
   }
 
   /// \TODO: Allow users to change light type
@@ -2855,7 +2862,10 @@ void ModelListWidget::InitTransport(const std::string &_name)
   }
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(_name);
+  if (_name.empty())
+    this->dataPtr->node->TryInit(common::Time::Maximum());
+  else
+    this->dataPtr->node->Init(_name);
 
   this->dataPtr->modelPub = this->dataPtr->node->Advertise<msgs::Model>(
       "~/model/modify");
@@ -3287,7 +3297,24 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
                _msg.specular().b()*255, _msg.specular().a()*255);
     item->setValue(clr);
   }
+
   this->dataPtr->propTreeBrowser->addProperty(item);
+  QtProperty *directionItem = this->dataPtr->variantManager->addProperty(
+    QtVariantPropertyManager::groupTypeId(),
+      tr("direction"));
+
+  this->dataPtr->propTreeBrowser->addProperty(directionItem);
+  if (_msg.has_direction())
+    this->FillVector3dProperty(_msg.direction(), directionItem);
+  else
+  {
+    msgs::Vector3d xyz;
+    xyz.set_x(0.0);
+    xyz.set_y(0.0);
+    xyz.set_z(0.0);
+    this->FillVector3dProperty(xyz, directionItem);
+  }
+
 
   item = this->dataPtr->variantManager->addProperty(QVariant::Double,
       tr("range"));

@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/transport/TransportIface.hh"
@@ -157,3 +151,10 @@ void sensors::enable()
 {
   g_disable = false;
 }
+
+/////////////////////////////////////////////////
+bool sensors::running()
+{
+  return sensors::SensorManager::Instance()->Running();
+}
+
