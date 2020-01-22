@@ -41,10 +41,7 @@ namespace gazebo
       public: transport::SubscriberPtr sonarSub;
 
       /// \brief Renders the sonar data reading.
-      public: DynamicLines *sonarRay;
-
-      /// \brief Renders the sonar cone.
-      public: Ogre::SceneNode *coneNode;
+      public: DynamicLines *sonarRay = nullptr;
 
       /// \brief The current sonar message.
       public: boost::shared_ptr<msgs::SonarStamped const> sonarMsg;
@@ -58,8 +55,8 @@ namespace gazebo
       /// \brief True if we have received a message.
       public: bool receivedMsg;
 
-      /// \brief Pointer to the sonar cone visual.
-      public: VisualPtr coneVis;
+      /// \brief Pointer to the sonar shape visual.
+      public: VisualPtr shapeVis = nullptr;
     };
   }
 }

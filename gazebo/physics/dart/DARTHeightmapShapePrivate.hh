@@ -27,13 +27,62 @@ namespace gazebo
   {
     /// \internal
     /// \brief Private data class for DARTHeightmapShape
+    template<typename HeightType>
     class DARTHeightmapShapePrivate
     {
+      typedef dart::dynamics::HeightmapShape<HeightType> DartHeightmapShape;
+      typedef boost::shared_ptr<const DartHeightmapShape>
+        HeightmapShapeConstPtr;
+      typedef boost::shared_ptr<DartHeightmapShape>
+        HeightmapShapePtr;
+
       /// \brief Constructor
       public: DARTHeightmapShapePrivate() = default;
 
       /// \brief Default destructor
       public: ~DARTHeightmapShapePrivate() = default;
+
+      // \brief returns the shape
+      public: dart::dynamics::ShapeNodePtr ShapeNode() const
+      {
+        return this->dtHeightmapShape;
+      }
+
+      // \brief returns the shape
+      // This method returns the raw pointer because converting from
+      // std to boost shared pointers still has to be added.
+      public: const DartHeightmapShape* Shape() const
+      {
+        GZ_ASSERT(this->dtHeightmapShape, "HeightmapShape is NULL");
+        return static_cast<DartHeightmapShape*>
+                       (this->dtHeightmapShape->getShape().get());
+      }
+
+      // \brief returns the shape
+      // This method returns the raw pointer because converting from
+      // std to boost shared pointers still has to be added.
+      public: DartHeightmapShape* Shape()
+      {
+        GZ_ASSERT(this->dtHeightmapShape, "HeightmapShape is NULL");
+        return static_cast<DartHeightmapShape*>
+                       (this->dtHeightmapShape->getShape().get());
+      }
+
+      /// \brief Creates the shape
+      /// \param[in] _bodyNode the body node to use for the shape
+      public: void CreateShape(const dart::dynamics::BodyNodePtr &_bodyNode)
+      {
+        GZ_ASSERT(_bodyNode, "BodyNode is NULL");
+        dart::dynamics::ShapePtr shape(new DartHeightmapShape());
+        dart::dynamics::ShapeNode *node = _bodyNode->createShapeNodeWith<
+                                      dart::dynamics::VisualAspect,
+                                      dart::dynamics::CollisionAspect,
+                                      dart::dynamics::DynamicsAspect>(shape);
+        this->dtHeightmapShape.set(node);
+      }
+
+      /// \brief DART cylinder shape
+      private: dart::dynamics::ShapeNodePtr dtHeightmapShape;
     };
   }
 }

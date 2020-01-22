@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include "gazebo/common/Console.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -89,7 +83,8 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
   bool dynamicRenderableCalled = false;
 
   // Set the type of visual
-  if (this->dPtr->msg.type() != _msg.type() && _msg.has_type())
+  if (this->dPtr->msg.type() != _msg.type() &&
+      _msg.type() != ignition::msgs::Marker::NONE)
   {
     this->dPtr->msg.set_type(_msg.type());
     switch (_msg.type())
@@ -151,7 +146,7 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
   }
 
   // Attach marker to a parent visual, if specified in the message.
-  if (_msg.has_parent())
+  if (!_msg.parent().empty())
   {
     // Detach from existing parent. Only detach if a parent exists
     // and is not the root node when the new parent name is not empty.
@@ -170,11 +165,8 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
       gzerr << "No visual with the name[" << _msg.parent() << "]\n";
   }
 
-  if (_msg.has_layer())
-  {
-    rendering::Events::newLayer(_msg.layer());
-    this->SetLayer(_msg.layer());
-  }
+  rendering::Events::newLayer(_msg.layer());
+  this->SetLayer(_msg.layer());
 
   if (!dynamicRenderableCalled &&
       _msg.point_size() && this->dPtr->dynamicRenderable)
@@ -231,7 +223,7 @@ void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
   else
   {
     // Change render operation, if present
-    if (_msg.has_type())
+    if (_msg.type() != ignition::msgs::Marker::NONE)
     {
       switch (_msg.type())
       {

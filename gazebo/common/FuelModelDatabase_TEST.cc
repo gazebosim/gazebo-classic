@@ -18,11 +18,12 @@
 #include <chrono>
 #include <condition_variable>
 #include <functional>
-#include <map>
 #include <mutex>
-#include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
+
+#include <ignition/common/URI.hh>
 
 #include "gazebo/common/FuelModelDatabase.hh"
 
@@ -40,8 +41,10 @@ TEST(FuelModelDatabaseTest, FuelDown)
   std::condition_variable cv;
   bool cbExecuted = false;
 
-  std::function<void(const std::map<std::string, std::string> &)> cb =
-        [&cbExecuted, &cv](const std::map<std::string, std::string> &_models)
+  std::function <void(
+      const std::vector<ignition::fuel_tools::ModelIdentifier> &)> cb =
+      [&cbExecuted, &cv](
+      const std::vector<ignition::fuel_tools::ModelIdentifier> &_models)
         {
           cbExecuted = true;
 
@@ -53,7 +56,7 @@ TEST(FuelModelDatabaseTest, FuelDown)
         };
 
   ignition::fuel_tools::ServerConfig srv;
-  srv.URL("___bad_server___");
+  srv.SetUrl(ignition::common::URI("___bad_server___"));
   fuelDB->Models(srv, cb);
 
   // We now wait for a while unless the callback is executed and wake us up.

@@ -16,9 +16,6 @@
 */
 
 #ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
   // snprintf is available since VS 2015
   #if defined(_MSC_VER) && (_MSC_VER < 1900)
     #define snprintf _snprintf
@@ -164,6 +161,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
      "Recording period (seconds).")
     ("record_filter", po::value<std::string>()->default_value(""),
      "Recording filter (supports wildcard and regular expression).")
+    ("record_resources", "Recording with model meshes and materials.")
     ("seed",  po::value<double>(), "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
@@ -265,6 +263,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
       this->dataPtr->vm["record_path"].as<std::string>();
     this->dataPtr->params["record_encoding"] =
       this->dataPtr->vm["record_encoding"].as<std::string>();
+    if (this->dataPtr->vm.count("record_resources"))
+      this->dataPtr->params["record_resources"] = "true";
   }
 
   if (this->dataPtr->vm.count("iters"))
@@ -292,7 +292,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
   // this->dataPtr->ProcessPrarams.
   //
   // Set the parameter to playback a log file. The log file contains the
-  // world description, so don't try to reead the world file from the
+  // world description, so don't try to read the world file from the
   // command line.
   if (this->dataPtr->vm.count("play"))
   {
@@ -506,6 +506,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
 /////////////////////////////////////////////////
 void Server::SigInt(int)
 {
+  event::Events::stop();
   ServerPrivate::stop = true;
 
   // Signal to plugins/etc that a shutdown event has occured
@@ -515,6 +516,7 @@ void Server::SigInt(int)
 /////////////////////////////////////////////////
 void Server::Stop()
 {
+  event::Events::stop();
   this->dataPtr->stop = true;
 }
 
@@ -538,11 +540,15 @@ void Server::Run()
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
-  if (sigaction(SIGTERM, &sigact, NULL))
-  {
-    std::cerr << "sigaction(15) failed while setting up for SIGTERM"
-              << std::endl;
-  }
+
+  // The following was added in
+  // https://bitbucket.org/osrf/gazebo/pull-requests/2923, but it is causing
+  // shutdown issues when gazebo is used with ros.
+  // if (sigaction(SIGTERM, &sigact, NULL))
+  // {
+  //   std::cerr << "sigaction(15) failed while setting up for SIGTERM"
+  //             << std::endl;
+  // }
 #endif
 
   if (this->dataPtr->stop)
@@ -614,6 +620,8 @@ void Server::ProcessParams()
       params.path = iter->second;
       params.period = this->dataPtr->vm["record_period"].as<double>();
       params.filter = this->dataPtr->vm["record_filter"].as<std::string>();
+      params.recordResources =
+          this->dataPtr->params.count("record_resources") > 0;
       util::LogRecord::Instance()->Start(params);
     }
   }

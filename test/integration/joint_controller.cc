@@ -48,10 +48,10 @@ TEST_F(JointControllerTest, PositionControl)
 
   ignition::msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
-  msg.mutable_position()->set_target(1.0);
-  msg.mutable_position()->set_p_gain(10);
-  msg.mutable_position()->set_i_gain(0.1);
-  msg.mutable_position()->set_d_gain(4.5);
+  msg.mutable_position()->mutable_target_optional()->set_data(1.0);
+  msg.mutable_position()->mutable_p_gain_optional()->set_data(10);
+  msg.mutable_position()->mutable_i_gain_optional()->set_data(0.1);
+  msg.mutable_position()->mutable_d_gain_optional()->set_data(4.5);
   jointPub.Publish(msg);
 
   world->Step(5000);
@@ -80,10 +80,10 @@ TEST_F(JointControllerTest, VelocityControl)
 
   ignition::msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
-  msg.mutable_velocity()->set_target(0.2);
-  msg.mutable_velocity()->set_p_gain(10.0);
-  msg.mutable_velocity()->set_i_gain(0.1);
-  msg.mutable_velocity()->set_d_gain(0.1);
+  msg.mutable_velocity()->mutable_target_optional()->set_data(0.2);
+  msg.mutable_velocity()->mutable_p_gain_optional()->set_data(10.0);
+  msg.mutable_velocity()->mutable_i_gain_optional()->set_data(0.1);
+  msg.mutable_velocity()->mutable_d_gain_optional()->set_data(0.1);
   jointPub.Publish(msg);
 
   world->Step(5000);
@@ -135,17 +135,17 @@ TEST_F(JointControllerTest, JointCmd)
 
   ignition::msgs::JointCmd msg;
   msg.set_name(jointName);
-  msg.set_force(3);
+  msg.mutable_force_optional()->set_data(3);
 
-  msg.mutable_position()->set_target(12.3);
-  msg.mutable_position()->set_p_gain(4);
-  msg.mutable_position()->set_i_gain(1);
-  msg.mutable_position()->set_d_gain(9);
+  msg.mutable_position()->mutable_target_optional()->set_data(12.3);
+  msg.mutable_position()->mutable_p_gain_optional()->set_data(4);
+  msg.mutable_position()->mutable_i_gain_optional()->set_data(1);
+  msg.mutable_position()->mutable_d_gain_optional()->set_data(9);
 
-  msg.mutable_velocity()->set_target(3.21);
-  msg.mutable_velocity()->set_p_gain(4);
-  msg.mutable_velocity()->set_i_gain(1);
-  msg.mutable_velocity()->set_d_gain(9);
+  msg.mutable_velocity()->mutable_target_optional()->set_data(3.21);
+  msg.mutable_velocity()->mutable_p_gain_optional()->set_data(4);
+  msg.mutable_velocity()->mutable_i_gain_optional()->set_data(1);
+  msg.mutable_velocity()->mutable_d_gain_optional()->set_data(9);
 
   jointPub.Publish(msg);
   world->Step(5000);

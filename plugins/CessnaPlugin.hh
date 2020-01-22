@@ -61,7 +61,7 @@ namespace gazebo
   ///
   /// The plugin will advertise the following topic with the current state:
   /// "~/<model_name>/state"
-  class GAZEBO_VISIBLE CessnaPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE CessnaPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: CessnaPlugin();

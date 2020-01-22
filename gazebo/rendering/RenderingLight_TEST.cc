@@ -28,6 +28,36 @@ class Light_TEST : public RenderingFixture
 };
 
 /////////////////////////////////////////////////
+TEST_F(Light_TEST, LightPoseTest)
+{
+  Load("worlds/empty.world");
+
+  rendering::ScenePtr scene = rendering::get_scene("default");
+
+  if (!scene)
+    scene = rendering::create_scene("default", false);
+
+  EXPECT_TRUE(scene != nullptr);
+
+  // create a visual as light parent
+  rendering::VisualPtr parentVis(
+      new rendering::Visual("light_parent", scene, false));
+  parentVis->Load();
+
+  ignition::math::Pose3d testPose(1, 2, 3, 0, 1.57, 3.14);
+  parentVis->SetWorldPose(testPose);
+
+  // create a light and attach it to parent visual
+  rendering::LightPtr light(new gazebo::rendering::Light(scene));
+  msgs::Light msg;
+  msg.set_name("light_parent::light");
+  light->LoadFromMsg(msg);
+
+  // verify pose
+  EXPECT_EQ(testPose, light->WorldPose());
+}
+
+/////////////////////////////////////////////////
 TEST_F(Light_TEST, LightVisualTest)
 {
   Load("worlds/empty.world");
@@ -100,6 +130,36 @@ TEST_F(Light_TEST, CastShadows)
   EXPECT_FALSE(pointLight->CastShadows());
   scene->RemoveLight(pointLight);
   pointLight.reset();
+}
+
+//////////////////////////////////////////////////
+TEST_F(Light_TEST, SetVisible)
+{
+  this->Load("worlds/empty.world");
+
+  auto scene = gazebo::rendering::get_scene("default");
+
+  if (!scene)
+    scene = gazebo::rendering::create_scene("default", false);
+
+  EXPECT_TRUE(scene != nullptr);
+
+  // Create a light
+  gazebo::rendering::LightPtr light = gazebo::rendering::LightPtr(
+      new gazebo::rendering::Light(scene));
+  ASSERT_TRUE(light != nullptr);
+
+  light->Load();
+
+  EXPECT_TRUE(light->Visible());
+  light->SetVisible(false);
+  EXPECT_FALSE(light->Visible());
+  light->SetVisible(true);
+  EXPECT_TRUE(light->Visible());
+
+  // disable visualization - light should still be visible
+  light->ShowVisual(false);
+  EXPECT_TRUE(light->Visible());
 }
 
 /////////////////////////////////////////////////

@@ -134,7 +134,7 @@ void COMVisual::Load()
 
   // Get the link's bounding box
   VisualPtr vis = this->GetScene()->GetVisual(dPtr->linkName);
-  ignition::math::Box box;
+  ignition::math::AxisAlignedBox box;
 
   if (vis)
     box = vis->BoundingBox();
@@ -183,7 +183,7 @@ void COMVisual::Load()
   p6 += dPtr->inertiaPose.Pos();
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->crossLines->setMaterial("Gazebo/Green");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->crossLines, "Gazebo/Green");
   dPtr->crossLines->AddPoint(p1);
   dPtr->crossLines->AddPoint(p2);
   dPtr->crossLines->AddPoint(p3);

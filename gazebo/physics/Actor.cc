@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <sstream>
 #include <limits>
 #include <algorithm>
@@ -41,13 +35,18 @@
 
 #include "gazebo/transport/Node.hh"
 
+/// \brief Private data for Actor class
+class gazebo::physics::ActorPrivate
+{
+};
+
 using namespace gazebo;
 using namespace physics;
 using namespace common;
 
 //////////////////////////////////////////////////
 Actor::Actor(BasePtr _parent)
-  : Model(_parent)
+  : Model(_parent), dataPtr(new ActorPrivate)
 {
   this->AddType(ACTOR);
   this->pathLength = 0.0;
@@ -173,12 +172,7 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
   }
 
   this->skeleton = this->mesh->GetSkeleton();
-  if (!this->skeleton)
-  {
-    gzwarn << "Null skeleton in file [" << this->skinFile << "]" << std::endl;
-    return false;
-  }
-  this->skeleton->Scale(this->skinScale);
+  this->SetScale({this->skinScale, this->skinScale, this->skinScale});
 
   auto actorName = this->GetName();
 
@@ -289,6 +283,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
     while (trajSdf)
     {
       auto trajType = trajSdf->Get<std::string>("type");
+      double tension = trajSdf->Get<double>("tension", 0.0).first;
 
       TrajectoryInfo tinfo;
       tinfo.id = trajSdf->Get<int>("id");
@@ -325,7 +320,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
         std::stringstream animName;
         animName << tinfo.type << "_" << tinfo.id;
         common::PoseAnimation *anim = new common::PoseAnimation(animName.str(),
-                                                          last->first, false);
+            last->first, false, tension);
 
         // Create a keyframe for each point
         for (auto pIter = points.begin(); pIter != points.end(); ++pIter)
@@ -427,7 +422,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
   {
     MeshManager::Instance()->Load(animFile);
 
-    const Mesh *animMesh = nullptr;
+    const class Mesh *animMesh = nullptr;
     if (MeshManager::Instance()->HasMesh(animFile))
     {
       animMesh = MeshManager::Instance()->GetMesh(animFile);
@@ -657,8 +652,12 @@ void Actor::Update()
 
   this->lastTraj = tinfo->id;
 
-  ignition::math::Matrix4d rootTrans =
-    frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
+  ignition::math::Matrix4d rootTrans = ignition::math::Matrix4d::Identity;
+  auto iter = frame.find(skelMap[this->skeleton->GetRootNode()->GetName()]);
+  if (iter != frame.end())
+  {
+    rootTrans = frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
+  }
 
   ignition::math::Vector3d rootPos = rootTrans.Translation();
   ignition::math::Quaterniond rootRot = rootTrans.Rotation();
@@ -666,15 +665,33 @@ void Actor::Update()
   if (tinfo->translated)
     rootPos.X() = 0.0;
   ignition::math::Pose3d actorPose;
-  actorPose.Pos() = modelPose.Pos() + modelPose.Rot().RotateVector(rootPos);
+
   if (!this->customTrajectoryInfo)
+  {
+    actorPose.Pos() = modelPose.Pos() + modelPose.Rot().RotateVector(rootPos);
     actorPose.Rot() = modelPose.Rot() * rootRot;
+  }
   else
-    actorPose.Rot() = modelPose.Rot() * this->WorldPose().Rot();
+  {
+    actorPose.Pos() = this->WorldPose().Pos();
+    actorPose.Rot() = this->WorldPose().Rot();
+  }
 
   ignition::math::Matrix4d rootM(actorPose.Rot());
-  if (!this->customTrajectoryInfo)
-    rootM.SetTranslation(actorPose.Pos());
+
+  rootM.SetTranslation(actorPose.Pos());
+
+  // TODO: Possible bug here? Rotation changed after scaling. Maybe the
+  // rotation algorithm is not suppose to work on non unit quaternion.
+//    gzdbg << "before: " << rootM.Rotation() << std::endl;
+//    rootM.Scale(this->skinScale, this->skinScale, this->skinScale);
+//    auto scaleTrans = ignition::math::Matrix4d::Identity;
+//    scaleTrans.Scale(this->skinScale, this->skinScale, this->skinScale);
+//    rootM = scaleTrans * rootM;
+//    gzdbg << "after: " << rootM.Rotation() << std::endl;
+
+  // workaround for rotation bug
+  rootM.SetTranslation(rootM.Translation() * this->skinScale);
 
   frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
 
@@ -693,7 +710,10 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
   ignition::math::Pose3d mainLinkPose;
 
   if (this->customTrajectoryInfo)
+  {
+    mainLinkPose.Pos() = this->worldPose.Pos();
     mainLinkPose.Rot() = this->worldPose.Rot();
+  }
 
   for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
   {
@@ -826,6 +846,12 @@ const Actor::SkeletonAnimation_M &Actor::SkeletonAnimations() const
 void Actor::SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo)
 {
   this->customTrajectoryInfo = _trajInfo;
+}
+
+//////////////////////////////////////////////////
+const common::Mesh *Actor::Mesh() const
+{
+  return this->mesh;
 }
 
 //////////////////////////////////////////////////

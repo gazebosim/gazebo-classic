@@ -115,6 +115,7 @@ set (msgs
   time.proto
   topic_info.proto
   track_visual.proto
+  twist.proto
   undo_redo.proto
   user_cmd.proto
   user_cmd_stats.proto
@@ -152,7 +153,7 @@ set (headers msgs.hh MsgFactory.hh)
 ###########################################################
 # Append str to a string property of a target.
 # target: string: target name.
-# property: name of target’s property. e.g: COMPILE_FLAGS, or LINK_FLAGS
+# property: name of target's property. e.g: COMPILE_FLAGS, or LINK_FLAGS
 # str: string: string to be appended to the property
 macro(my_append_target_property target property str)
   get_target_property(current_property ${target} ${property})
@@ -183,8 +184,6 @@ foreach(FIL ${msgs})
     VERBATIM )
 endforeach()
 
-add_definitions(-DBUILDING_DLL_GZ_MSGS)
-
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
 if (UNIX)
@@ -197,6 +196,10 @@ if (UNIX)
   endif()
 endif()
 
+target_compile_definitions(gazebo_msgs
+  PRIVATE BUILDING_DLL_GZ_MSGS
+)
+
 target_link_libraries(gazebo_msgs
   gazebo_common
   ${GZ_PROTOBUF_LIBRARY}
@@ -205,12 +208,11 @@ target_link_libraries(gazebo_msgs
 
 add_dependencies(gazebo_msgs gazebomsgs_out)
 
-set (message_headers "" CACHE INTERNAL "Include dirs description")
+set (message_headers "")
 
 foreach (hdr ${PROTO_HDRS})
   string (REPLACE "${CMAKE_CURRENT_BINARY_DIR}/" "" hdr ${hdr})
-  APPEND_TO_CACHED_STRING(message_headers
-    "Message Types" "#include \"${hdr}\"\n")
+  set (message_headers "${message_headers}#include \"${hdr}\"\n")
 endforeach()
 configure_file (${PROJECT_SOURCE_DIR}/gazebo/msgs/MessageTypes.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh )

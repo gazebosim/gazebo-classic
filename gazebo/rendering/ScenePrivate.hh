@@ -102,7 +102,7 @@ namespace gazebo
 
     /// \def Light_M
     /// \brief Map of lights
-    typedef std::map<std::string, LightPtr> Light_M;
+    typedef std::map<uint32_t, LightPtr> Light_M;
 
     /// \def SkeletonPoseMsgs_L
     /// \brief List of skeleton messages.
@@ -313,6 +313,9 @@ namespace gazebo
 
       /// \brief The heightmap level of detail
       public: unsigned int heightmapLOD = 0u;
+
+      /// \brief The heightmap skirt length
+      public: double heightmapSkirtLength = 1.0;
 
       /// \brief All the projectors.
       public: std::map<std::string, Projector *> projectors;

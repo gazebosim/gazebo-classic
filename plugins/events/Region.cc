@@ -42,8 +42,8 @@ void Region::Load(const sdf::ElementPtr &_sdf)
     std::string ename = child->GetName();
     if (ename == "volume")
     {
-      this->boxes.push_back(
-          ignition::math::Box(child->Get<ignition::math::Vector3d>("min"),
+      this->boxes.push_back(ignition::math::AxisAlignedBox(
+          child->Get<ignition::math::Vector3d>("min"),
           child->Get<ignition::math::Vector3d>("max")));
     }
     else if (ename == "name")

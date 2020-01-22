@@ -45,6 +45,7 @@ class PhysicsTest : public ServerFixture,
   public: void CollisionFiltering(const std::string &_physicsEngine);
   public: void JointDampingTest(const std::string &_physicsEngine);
   public: void DropStuff(const std::string &_physicsEngine);
+  public: void SpawnFixedJoint(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -1540,7 +1541,35 @@ TEST_F(PhysicsTest, ZeroMaxContactsODE)
   ASSERT_TRUE(model != NULL);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);
+/////////////////////////////////////////////////
+// This test verifies that gazebo spawns fixed joints properly for links with
+// nonzero off-diagonal inertia values.
+void PhysicsTest::SpawnFixedJoint(const std::string &_physicsEngine)
+{
+  Load("worlds/fixed_joint.world", true, _physicsEngine);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  physics::ModelPtr model = world->ModelByName("fixed_joint_test");
+  ignition::math::Pose3d pose1, pose2;
+  pose1 = model->WorldPose();
+  world->Step(100);
+  pose2 = model->WorldPose();
+  EXPECT_EQ(pose1, pose2);
+}
+
+TEST_P(PhysicsTest, SpawnFixedJoint)
+{
+  SpawnFixedJoint(GetParam());
+}
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {

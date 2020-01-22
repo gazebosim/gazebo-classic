@@ -118,7 +118,7 @@ void UserCamera::Init()
 
   // Don't yaw along variable axis, causes leaning
   this->SetFixedYawAxis(true, ignition::math::Vector3d::UnitZ);
-  this->camera->setDirection(1, 0, 0);
+  this->sceneNode->setDirection(1, 0, 0);
   this->camera->setAutoAspectRatio(false);
 
   // Right camera
@@ -457,6 +457,32 @@ void UserCamera::Resize(unsigned int _w, unsigned int _h)
 {
   this->UpdateFOV();
   this->dataPtr->viewController->Resize(_w, _h);
+
+  // reload ogre compositors on window resize
+  // otherwise some compositors can cause the client to crash
+  Ogre::CompositorManager *compMgr =
+      Ogre::CompositorManager::getSingletonPtr();
+  if (compMgr->hasCompositorChain(this->viewport))
+  {
+    Ogre::CompositorChain *chain =
+        compMgr->getCompositorChain(this->viewport);
+    std::vector<std::pair<std::string, bool>> compositors;
+    Ogre::CompositorChain::InstanceIterator it = chain->getCompositors();
+    while (it.hasMoreElements())
+    {
+      Ogre::CompositorInstance* nextCompInst = it.getNext();
+      compositors.push_back(
+          std::make_pair(nextCompInst->getCompositor()->getName(),
+          nextCompInst->getEnabled()));
+    }
+    compMgr->removeCompositorChain(this->viewport);
+    for (unsigned int i = 0; i < compositors.size(); ++i)
+    {
+      compMgr->addCompositor(this->viewport, compositors[i].first);
+      compMgr->setCompositorEnabled(this->viewport, compositors[i].first,
+          compositors[i].second);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -523,7 +549,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   start.Correct();
 
   // Center of visual
-  ignition::math::Box box = _visual->BoundingBox();
+  ignition::math::AxisAlignedBox box = _visual->BoundingBox();
   ignition::math::Vector3d visCenter = box.Center() +
     _visual->WorldPose().Pos();
   visCenter.Correct();

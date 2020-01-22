@@ -120,6 +120,7 @@ static int TraceRequest(CURL *_handle,
     case CURLINFO_TEXT:
       if (trace_requests)
         fprintf(stderr, "== Info: %s", _data);
+      return 0;
     // in case a new one is introduced to shock us
     default:
       return 0;
@@ -308,8 +309,8 @@ std::string RestApi::Request(const std::string &_reqUrl,
   // will be grown as needed by the realloc above
   chunk.memory = static_cast<char*>(malloc(1));
   chunk.size = 0;            // no data at this point
-  bool secure = false;
-  if (!secure)
+  // bool secure = false;
+  // if (!secure)
   {
     // skip peer verification
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);

@@ -130,16 +130,6 @@ void MovableText::Load(const std::string &_name,
                        const std::string &_text,
                        const std::string &_fontName,
                        const float _charHeight,
-                       const common::Color &_color)
-{
-  this->Load(_name, _text, _fontName, _charHeight, _color.Ign());
-}
-
-//////////////////////////////////////////////////
-void MovableText::Load(const std::string &_name,
-                       const std::string &_text,
-                       const std::string &_fontName,
-                       const float _charHeight,
                        const ignition::math::Color &_color)
 {
   {
@@ -234,12 +224,6 @@ void MovableText::SetFontName(const std::string &_newFontName)
 }
 
 //////////////////////////////////////////////////
-const std::string &MovableText::GetFont() const
-{
-  return this->dataPtr->fontName;
-}
-
-//////////////////////////////////////////////////
 const std::string &MovableText::FontName() const
 {
   return this->dataPtr->fontName;
@@ -258,21 +242,9 @@ void MovableText::SetText(const std::string &newText)
 }
 
 //////////////////////////////////////////////////
-const std::string &MovableText::GetText() const
-{
-  return this->dataPtr->text;
-}
-
-//////////////////////////////////////////////////
 const std::string &MovableText::Text() const
 {
   return this->dataPtr->text;
-}
-
-//////////////////////////////////////////////////
-void MovableText::SetColor(const common::Color &_newColor)
-{
-  this->SetColor(_newColor.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -285,20 +257,6 @@ void MovableText::SetColor(const ignition::math::Color &_newColor)
     this->dataPtr->color = _newColor;
     this->dataPtr->updateColors = true;
   }
-}
-
-//////////////////////////////////////////////////
-const common::Color MovableText::GetColor() const
-{
-  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Color();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -321,13 +279,6 @@ void MovableText::SetCharHeight(float _height)
 }
 
 //////////////////////////////////////////////////
-float MovableText::GetCharHeight() const
-{
-  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
-  return this->dataPtr->charHeight;
-}
-
-//////////////////////////////////////////////////
 float MovableText::CharHeight() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
@@ -344,13 +295,6 @@ void MovableText::SetSpaceWidth(float _width)
     this->dataPtr->spaceWidth = _width;
     this->dataPtr->needUpdate = true;
   }
-}
-
-//////////////////////////////////////////////////
-float MovableText::GetSpaceWidth() const
-{
-  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
-  return this->dataPtr->spaceWidth;
 }
 
 //////////////////////////////////////////////////
@@ -389,13 +333,6 @@ void MovableText::SetBaseline(float _base)
 }
 
 //////////////////////////////////////////////////
-float MovableText::GetBaseline() const
-{
-  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
-  return this->dataPtr->baseline;
-}
-
-//////////////////////////////////////////////////
 float MovableText::Baseline() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
@@ -417,13 +354,6 @@ void MovableText::SetShowOnTop(bool show)
 }
 
 //////////////////////////////////////////////////
-bool MovableText::GetShowOnTop() const
-{
-  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
-  return this->dataPtr->onTop;
-}
-
-//////////////////////////////////////////////////
 bool MovableText::ShowOnTop() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
@@ -431,22 +361,16 @@ bool MovableText::ShowOnTop() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box MovableText::AABB()
+ignition::math::AxisAlignedBox MovableText::AABB()
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
-  return ignition::math::Box(
+  return ignition::math::AxisAlignedBox(
       ignition::math::Vector3d(this->dataPtr->aabb->getMinimum().x,
                     this->dataPtr->aabb->getMinimum().y,
                     this->dataPtr->aabb->getMinimum().z),
       ignition::math::Vector3d(this->dataPtr->aabb->getMaximum().x,
                     this->dataPtr->aabb->getMaximum().y,
                     this->dataPtr->aabb->getMaximum().z));
-}
-
-//////////////////////////////////////////////////
-void MovableText::_setupGeometry()
-{
-  this->SetupGeometry();
 }
 
 //////////////////////////////////////////////////
@@ -778,12 +702,6 @@ void MovableText::SetupGeometry()
     this->UpdateColors();
 
   this->dataPtr->needUpdate = false;
-}
-
-//////////////////////////////////////////////////
-void MovableText::_updateColors()
-{
-  this->UpdateColors();
 }
 
 //////////////////////////////////////////////////

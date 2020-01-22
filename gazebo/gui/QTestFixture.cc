@@ -33,6 +33,20 @@
 #include "gazebo/util/LogRecord.hh"
 
 /////////////////////////////////////////////////
+#ifdef _WIN32
+static int setenv(const char *envname, const char *envval, int overwrite)
+{
+  char *original = getenv(envname);
+  if (!original || !!overwrite)
+  {
+    std::string envstring = std::string(envname) + "=" + envval;
+    return _putenv(envstring.c_str());
+  }
+  return 0;
+}
+#endif
+
+/////////////////////////////////////////////////
 QTestFixture::QTestFixture()
   : server(NULL), serverThread(NULL),
     resMaxPercentChange(0), shareMaxPercentChange(0),

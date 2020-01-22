@@ -24,7 +24,7 @@
 namespace gazebo
 {
   /// \brief A plugin that manages a linear battery consumer.
-  class GAZEBO_VISIBLE LinearBatteryConsumerPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE LinearBatteryConsumerPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: LinearBatteryConsumerPlugin();

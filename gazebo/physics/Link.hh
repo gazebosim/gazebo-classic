@@ -17,12 +17,6 @@
 #ifndef GAZEBO_PHYSICS_LINK_HH_
 #define GAZEBO_PHYSICS_LINK_HH_
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <map>
 #include <vector>
 #include <string>
@@ -161,20 +155,6 @@ namespace gazebo
       /// \param[in] _vel Angular velocity.
       public: virtual void SetAngularVel(
                   const ignition::math::Vector3d &_vel) = 0;
-
-      /// \brief Set the linear acceleration of the body.
-      /// \param[in] _accel Linear acceleration.
-      /// \deprecated acceleration should be achieved by setting
-      ///     force, see SetForce()
-      public: void SetLinearAccel(const ignition::math::Vector3d &_accel)
-              GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the angular acceleration of the body.
-      /// \param[in] _accel Angular acceleration.
-      /// \deprecated acceleration should be achieved by setting
-      ///     force, see SetForce()
-      public: void SetAngularAccel(const ignition::math::Vector3d &_accel)
-              GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the force applied to the body.
       /// \param[in] _force Force value.
@@ -377,7 +357,7 @@ namespace gazebo
       /// \brief Get the bounding box for the link and all the child
       /// elements.
       /// \return The link's bounding box.
-      public: virtual ignition::math::Box BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
 
       /// \brief Set the linear damping factor.
       /// \param[in] _damping Linear damping factor.
@@ -628,12 +608,24 @@ namespace gazebo
       public: bool SetVisualPose(const uint32_t _id,
                                  const ignition::math::Pose3d &_pose);
 
+      /// \def Visuals_M
+      /// \brief Map of unique ID to visual message.
+      typedef std::map<uint32_t, msgs::Visual> Visuals_M;
+
+      /// \brief Return the link visual elements.
+      /// \return a map of unique ID to visual message
+      public: const Visuals_M &Visuals() const;
+
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
 
       /// \brief Load a new collision helper function.
       /// \param[in] _sdf SDF element used to load the collision.
       private: void LoadCollision(sdf::ElementPtr _sdf);
+
+      /// \brief Load a light.
+      /// \param[in] _sdf SDF element
+      private: void LoadLight(sdf::ElementPtr _sdf);
 
       /// \brief Set the inertial properties based on the collision
       /// entities.
@@ -678,20 +670,8 @@ namespace gazebo
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 
-      /// \def Visuals_M
-      /// \brief Map of unique ID to visual message.
-      typedef std::map<uint32_t, msgs::Visual> Visuals_M;
-
       /// \brief Link visual elements.
       protected: Visuals_M visuals;
-
-      /// \brief Linear acceleration.
-      /// deprecated
-      protected: ignition::math::Vector3d linearAccel;
-
-      /// \brief Angular acceleration.
-      /// deprecated
-      protected: ignition::math::Vector3d angularAccel;
 
       /// \brief Offsets for the attached models.
       protected: std::vector<ignition::math::Pose3d> attachedModelsOffset;

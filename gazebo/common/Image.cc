@@ -19,6 +19,7 @@
  * Date: 14 July 2008
  */
 
+#include <FreeImage.h>
 #include <boost/filesystem.hpp>
 #include <string>
 
@@ -264,19 +265,6 @@ unsigned int Image::GetBPP() const
 }
 
 //////////////////////////////////////////////////
-Color Image::GetPixel(unsigned int _x, unsigned int _y) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Pixel(_x, _y);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Color Image::Pixel(const unsigned int _x,
                                    const unsigned int _y) const
 {
@@ -328,19 +316,6 @@ ignition::math::Color Image::Pixel(const unsigned int _x,
 }
 
 //////////////////////////////////////////////////
-Color Image::GetAvgColor()
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->AvgColor();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Color Image::AvgColor()
 {
   unsigned int x, y;
@@ -364,19 +339,6 @@ ignition::math::Color Image::AvgColor()
   bsum /= (this->GetWidth() * this->GetHeight());
 
   return ignition::math::Color(rsum, gsum, bsum);
-}
-
-//////////////////////////////////////////////////
-Color Image::GetMaxColor() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->MaxColor();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

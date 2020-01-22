@@ -54,17 +54,18 @@ TEST_F(GripperTest, Close)
   leftJoint->SetForce(0, -0.5);
   rightJoint->SetForce(0, 0.5);
 
-  transport::PublisherPtr jointPub = this->node->Advertise<msgs::JointCmd>(
-        "~/simple_gripper/joint_cmd");
+  ignition::transport::Node ignNode;
+  ignition::transport::Node::Publisher jointPub =
+    ignNode.Advertise<ignition::msgs::JointCmd>("/simple_gripper/joint_cmd");
 
-  msgs::JointCmd msg;
+  ignition::msgs::JointCmd msg;
   msg.set_name("simple_gripper::palm_right_finger");
-  msg.set_force(0.6);
-  jointPub->Publish(msg);
+  msg.mutable_force_optional()->set_data(0.6);
+  jointPub.Publish(msg);
 
   msg.set_name("simple_gripper::palm_left_finger");
-  msg.set_force(-0.6);
-  jointPub->Publish(msg);
+  msg.mutable_force_optional()->set_data(-0.6);
+  jointPub.Publish(msg);
 
   int i = 0;
   while (!gripper->IsAttached() && i < 100)
@@ -105,17 +106,18 @@ TEST_F(GripperTest, CloseOpen)
   leftJoint->SetForce(0, -0.5);
   rightJoint->SetForce(0, 0.5);
 
-  transport::PublisherPtr jointPub = this->node->Advertise<msgs::JointCmd>(
-        "~/simple_gripper/joint_cmd");
+  ignition::transport::Node ignNode;
+  ignition::transport::Node::Publisher jointPub =
+    ignNode.Advertise<ignition::msgs::JointCmd>("/simple_gripper/joint_cmd");
 
-  msgs::JointCmd msg;
+  ignition::msgs::JointCmd msg;
   msg.set_name("simple_gripper::palm_right_finger");
-  msg.set_force(0.6);
-  jointPub->Publish(msg);
+  msg.mutable_force_optional()->set_data(0.6);
+  jointPub.Publish(msg);
 
   msg.set_name("simple_gripper::palm_left_finger");
-  msg.set_force(-0.6);
-  jointPub->Publish(msg);
+  msg.mutable_force_optional()->set_data(-0.6);
+  jointPub.Publish(msg);
 
   int i = 0;
   while (!gripper->IsAttached() && i < 100)
@@ -130,12 +132,12 @@ TEST_F(GripperTest, CloseOpen)
 
   // Open the gripper.
   msg.set_name("simple_gripper::palm_right_finger");
-  msg.set_force(-0.6);
-  jointPub->Publish(msg);
+  msg.mutable_force_optional()->set_data(-0.6);
+  jointPub.Publish(msg);
 
   msg.set_name("simple_gripper::palm_left_finger");
-  msg.set_force(0.6);
-  jointPub->Publish(msg);
+  msg.mutable_force_optional()->set_data(0.6);
+  jointPub.Publish(msg);
 
   i = 0;
   while (gripper->IsAttached() && i < 100)

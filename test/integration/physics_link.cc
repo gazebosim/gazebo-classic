@@ -559,7 +559,9 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
       for (int row = 0; row < 3; ++row)
         for (int col = 0; col < 3; ++col)
           if (row != col)
+          {
             EXPECT_NEAR(inertia(row, col), 0.0, g_tolerance);
+          }
     }
     else
     {
@@ -855,7 +857,7 @@ TEST_P(PhysicsLinkTest, SetVelocity)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsLinkTest,
-                        PHYSICS_ENGINE_VALUES);
+                        PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

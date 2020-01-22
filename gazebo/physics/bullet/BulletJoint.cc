@@ -582,5 +582,69 @@ double BulletJoint::GetParam(const std::string &_key,
 bool BulletJoint::SetPosition(const unsigned int _index, const double _position,
                               const bool _preserveWorldVelocity)
 {
+  // The code inside this ifdef is only relevant for versions of bullet greater
+  // than 2.82. Any versions earlier than that will be broken no matter what.
+#ifdef LIBBULLET_VERSION_GT_282
+  // The following code fixes issue 2430 without breaking ABI. The key is to
+  // take relatively small steps towards a target position so that the
+  // accumulated angle doesn't bug out and reset itself from receiving too large
+  // of a change all at once.
+  if (this->HasType(Base::HINGE_JOINT))
+  {
+    double currentAngle = this->Position(0);
+
+    const double maxSupportedAngle = 1e12;
+    if (   std::abs(currentAngle) > maxSupportedAngle
+        || std::abs(_position) > maxSupportedAngle)
+    {
+      // If either the current or the target angle are absurdly large, we will
+      // get permanently stuck in the while-loop below, because trying to
+      // increment currentAngle by delta will (eventually) not be able to modify
+      // its floating point value.
+      //
+      // We put this check here to make sure that we can't get permanently stuck
+      // in the loop.
+      gzerr << "For Bullet hinge joints, the function Joint::SetPosition(~) "
+            << "does not support positions larger than [" << maxSupportedAngle
+            << "] radians. Your joint currently has an angle of ["
+            << currentAngle << "] radians, and you are requesting an angle of ["
+            << _position << "] radians.\n";
+
+      // We can still call Joint::SetPositionMaximal in the normal way to reset
+      // this joint angle. The end result should put this joint angle within
+      // the range of [-pi, pi]. That should at least bring it back to a sane
+      // state, even if it's not exactly what the user asked for.
+      Joint::SetPositionMaximal(_index, _position, _preserveWorldVelocity);
+
+      return false;
+    }
+
+    // Based on the source code of Bullet, the largest position change that
+    // shouldn't bug out is 0.3 radians, so we keep our changes a little bit
+    // below that.
+    const double delta = 0.25;
+
+    do
+    {
+      if (std::abs(_position - currentAngle) > delta)
+      {
+        currentAngle += _position > currentAngle? delta : -delta;
+      }
+      else
+      {
+        currentAngle = _position;
+      }
+
+      if (!Joint::SetPositionMaximal(_index, currentAngle,
+                                     _preserveWorldVelocity))
+      {
+        return false;
+      }
+    } while ( std::abs(currentAngle - _position) > 1e-16);
+
+    return true;
+  }
+#endif
+
   return Joint::SetPositionMaximal(_index, _position, _preserveWorldVelocity);
 }

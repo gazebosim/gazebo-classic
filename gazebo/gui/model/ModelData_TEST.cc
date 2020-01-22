@@ -17,8 +17,11 @@
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/model/CollisionConfig.hh"
 #include "gazebo/gui/model/ModelData.hh"
 #include "gazebo/gui/model/ModelData_TEST.hh"
+
+#define tol 10e-5
 
 using namespace gazebo;
 
@@ -1266,6 +1269,220 @@ void ModelData_TEST::PolylineMomentOfInertia()
   QVERIFY(fabs(expectedIz - I.Z()) < 1e-3);
 
   delete col;
+}
+
+/////////////////////////////////////////////////
+void ModelData_TEST::BoundingCollision()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  auto cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+
+  auto scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Box visual
+  {
+    // Create a link with a box visual
+    ignition::math::Vector3d size(0.1, 0.2, 0.3);
+    msgs::Model model;
+    msgs::AddBoxLink(model, 1.0, size);
+
+    auto link = new gui::LinkData();
+    link->Load(msgs::LinkToSDF(model.link(0)));
+
+    rendering::VisualPtr linkVis(new rendering::Visual("box_link", scene));
+    link->SetLinkVisual(linkVis);
+
+    rendering::VisualPtr vis(
+        new rendering::Visual("model::box_link::visual", linkVis));
+    vis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    link->AddVisual(vis);
+
+    // Check there are no collisions
+    QVERIFY(link->collisions.empty());
+
+    // Add 3 collisions
+    link->inspector->GetCollisionConfig()->CollisionAdded("box_col", "box");
+    link->inspector->GetCollisionConfig()->CollisionAdded("sphere_col",
+        "sphere");
+    link->inspector->GetCollisionConfig()->CollisionAdded("cylinder_col",
+        "cylinder");
+
+    QVERIFY(link->collisions.size() == 3);
+
+    for (auto col : link->collisions)
+    {
+      if (col.first->Name() == "box_link::box_col")
+      {
+        QCOMPARE(col.first->GetGeometryType(), std::string("box"));
+        QCOMPARE(col.first->GetGeometrySize(), size);
+      }
+      else if (col.first->Name() == "box_link::sphere_col")
+      {
+        QCOMPARE(col.first->GetGeometryType(), std::string("sphere"));
+        auto radius = sqrt(size.X()*size.X() + size.Y()*size.Y() +
+            size.Z()*size.Z());
+        QVERIFY(col.first->GetGeometrySize().X() - radius < tol);
+        QVERIFY(col.first->GetGeometrySize().Y() - radius < tol);
+        QVERIFY(col.first->GetGeometrySize().Z() - radius < tol);
+      }
+      else if (col.first->Name() == "box_link::cylinder_col")
+      {
+        QCOMPARE(col.first->GetGeometryType(), std::string("cylinder"));
+
+        auto radius = sqrt(size.Y()*size.Y() + size.Z()*size.Z());
+        QVERIFY(col.first->GetGeometrySize().X() - radius < tol);
+        QVERIFY(col.first->GetGeometrySize().Y() - radius < tol);
+
+        QCOMPARE(col.first->GetGeometrySize().Z(), size.X());
+      }
+      else
+      {
+        std::string failMsg("Bad collision name: " + col.first->Name());
+        QFAIL(failMsg.c_str());
+      }
+    }
+  }
+
+  // Sphere visual
+  {
+    // Create a link with a sphere visual
+    double visRadius = 2.5;
+    msgs::Model model;
+    msgs::AddSphereLink(model, 1.0, visRadius);
+
+    auto link = new gui::LinkData();
+    link->Load(msgs::LinkToSDF(model.link(0)));
+
+    rendering::VisualPtr linkVis(new rendering::Visual("sphere_link", scene));
+    link->SetLinkVisual(linkVis);
+
+    rendering::VisualPtr vis(
+        new rendering::Visual("model::sphere_link::visual", linkVis));
+    vis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    link->AddVisual(vis);
+
+    // Check there are no collisions
+    QVERIFY(link->collisions.empty());
+
+    // Add 3 collisions
+    link->inspector->GetCollisionConfig()->CollisionAdded("box_col", "box");
+    link->inspector->GetCollisionConfig()->CollisionAdded("sphere_col",
+        "sphere");
+    link->inspector->GetCollisionConfig()->CollisionAdded("cylinder_col",
+        "cylinder");
+
+    QVERIFY(link->collisions.size() == 3);
+
+    for (auto col : link->collisions)
+    {
+      if (col.first->Name() == "sphere_link::box_col")
+      {
+        QCOMPARE(col.first->GetGeometryType(), std::string("box"));
+      }
+      else if (col.first->Name() == "sphere_link::sphere_col")
+      {
+        QCOMPARE(col.first->GetGeometryType(), std::string("sphere"));
+      }
+      else if (col.first->Name() == "sphere_link::cylinder_col")
+      {
+        QCOMPARE(col.first->GetGeometryType(), std::string("cylinder"));
+      }
+      else
+      {
+        std::string failMsg("Bad collision name: " + col.first->Name());
+        QFAIL(failMsg.c_str());
+      }
+
+      QCOMPARE(col.first->GetGeometrySize().X(), visRadius * 2.0);
+      QCOMPARE(col.first->GetGeometrySize().Y(), visRadius * 2.0);
+      QCOMPARE(col.first->GetGeometrySize().Z(), visRadius * 2.0);
+    }
+  }
+
+  // Cylinder visual
+  {
+    // Create a link with a cylinder visual
+    double visRadius = 0.5;
+    double visLength = 1.5;
+    msgs::Model model;
+    msgs::AddCylinderLink(model, 1.0, visRadius, visLength);
+
+    auto link = new gui::LinkData();
+    link->Load(msgs::LinkToSDF(model.link(0)));
+
+    rendering::VisualPtr linkVis(new rendering::Visual("cylinder_link", scene));
+    link->SetLinkVisual(linkVis);
+
+    rendering::VisualPtr vis(
+        new rendering::Visual("model::cylinder_link::visual", linkVis));
+    vis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    link->AddVisual(vis);
+
+    // Check there are no collisions
+    QVERIFY(link->collisions.empty());
+
+    // Add 3 collisions
+    link->inspector->GetCollisionConfig()->CollisionAdded("box_col", "box");
+    link->inspector->GetCollisionConfig()->CollisionAdded("sphere_col",
+        "sphere");
+    link->inspector->GetCollisionConfig()->CollisionAdded("cylinder_col",
+        "cylinder");
+
+    QVERIFY(link->collisions.size() == 3);
+
+    for (auto col : link->collisions)
+    {
+      if (col.first->Name() == "cylinder_link::box_col")
+      {
+        QCOMPARE(col.first->GetGeometryType(), std::string("box"));
+        QCOMPARE(col.first->GetGeometrySize().X(), visRadius * 2.0);
+        QCOMPARE(col.first->GetGeometrySize().Y(), visRadius * 2.0);
+        QCOMPARE(col.first->GetGeometrySize().Z(), visLength);
+      }
+      else if (col.first->Name() == "cylinder_link::sphere_col")
+      {
+        QCOMPARE(col.first->GetGeometryType(), std::string("sphere"));
+
+        double radius = sqrt((visRadius * 2.0)*(visRadius * 2.0) +
+            visLength * visLength);
+        QVERIFY(col.first->GetGeometrySize().X() - radius < tol);
+        QVERIFY(col.first->GetGeometrySize().Y() - radius < tol);
+        QVERIFY(col.first->GetGeometrySize().Z() - radius < tol);
+      }
+      else if (col.first->Name() == "cylinder_link::cylinder_col")
+      {
+        QCOMPARE(col.first->GetGeometryType(), std::string("cylinder"));
+        QCOMPARE(col.first->GetGeometrySize().X(), visRadius * 2.0);
+        QCOMPARE(col.first->GetGeometrySize().Y(), visRadius * 2.0);
+        QCOMPARE(col.first->GetGeometrySize().Z(), visLength);
+      }
+      else
+      {
+        std::string failMsg("Bad collision name: " + col.first->Name());
+        QFAIL(failMsg.c_str());
+      }
+    }
+  }
+
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = nullptr;
 }
 
 // Generate a main function for the test

@@ -31,6 +31,9 @@ using namespace physics;
 DARTHingeJoint::DARTHingeJoint(BasePtr _parent)
   : HingeJoint<DARTJoint>(_parent)
 {
+  this->dataPtr->dtProperties.reset(
+      new dart::dynamics::RevoluteJoint::Properties(
+      *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -42,10 +45,6 @@ DARTHingeJoint::~DARTHingeJoint()
 void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
 {
   HingeJoint<DARTJoint>::Load(_sdf);
-
-  this->dataPtr->dtProperties.reset(
-        new dart::dynamics::RevoluteJoint::Properties(
-          *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -100,11 +99,7 @@ void DARTHingeJoint::SetAxis(const unsigned int _index,
     return;
   }
 
-  if (!this->dataPtr->dtJoint)
-  {
-    gzerr << " No Joint set \n";
-    return;
-  }
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   if (_index == 0)
   {
@@ -115,11 +110,6 @@ void DARTHingeJoint::SetAxis(const unsigned int _index,
 
     Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(
         this->AxisFrameOffset(0).RotateVector(_axis));
-    Eigen::Isometry3d dartTransfJointLeftToParentLink
-        = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
-    dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
-    //--------------------------------------------------------------------------
-
     dtRevoluteJoint->setAxis(dartAxis);
   }
   else

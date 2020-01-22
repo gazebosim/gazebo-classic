@@ -118,10 +118,10 @@ namespace gazebo
       /// \brief Pointer to visual that holds the canvas.
       public: VisualPtr visual;
 
-      /// \brief Image width.
+      /// \brief Image width of second pass.
       public: unsigned int w2nd;
 
-      /// \brief Image height.
+      /// \brief Image height of second pass.
       public: unsigned int h2nd;
 
       /// \brief Time taken to complete the two rendering passes.

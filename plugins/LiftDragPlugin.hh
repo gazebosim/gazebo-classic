@@ -29,7 +29,7 @@
 namespace gazebo
 {
   /// \brief A plugin that simulates lift and drag.
-  class GAZEBO_VISIBLE LiftDragPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE LiftDragPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: LiftDragPlugin();

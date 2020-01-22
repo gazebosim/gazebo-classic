@@ -25,9 +25,6 @@
 
 #ifdef HAVE_OPENAL
 
-struct ALCcontext_struct;
-struct ALCdevice_struct;
-
 namespace gazebo
 {
   namespace util
@@ -37,10 +34,10 @@ namespace gazebo
     class OpenALPrivate
     {
       /// \brief OpenAL audio context pointer.
-      public: ALCcontext_struct *context;
+      public: ALCcontext *context;
 
       /// \brief OpenAL audio device pointer.
-      public: ALCdevice_struct *audioDevice;
+      public: ALCdevice *audioDevice;
 
       /// \brief OpenAL sink pointer.
       public: OpenALSinkPtr sink;

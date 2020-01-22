@@ -33,6 +33,9 @@
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_SENSORS_VISIBLE, gazebo, sensors, SensorManager)
+
 namespace gazebo
 {
   /// \ingroup gazebo_sensors

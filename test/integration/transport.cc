@@ -15,7 +15,9 @@
  *
 */
 
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -172,7 +174,7 @@ TEST_F(TransportTest, DirectPublish)
   // Not nice to time check here but 10 seconds should be 'safe' to check
   // against
   int timeout = 1000;
-  while (not g_sceneMsg)
+  while (!g_sceneMsg)
   {
     common::Time::MSleep(10);
 
@@ -375,25 +377,27 @@ TEST_F(TransportTest, ThreadedMultiPubSubBidirectional)
 TEST_F(TransportTest, PublicationTransportNoConnection)
 {
   Load("worlds/empty.world");
-  transport::PublicationTransport pubTransport("~/no_topic", "msg::Scene");
-  ASSERT_EQ("~/no_topic", pubTransport.GetTopic());
-  ASSERT_EQ("msg::Scene", pubTransport.GetMsgType());
+  transport::PublicationTransportPtr pubTransport(
+      new transport::PublicationTransport("~/no_topic", "msg::Scene"));
+  ASSERT_EQ("~/no_topic", pubTransport->GetTopic());
+  ASSERT_EQ("msg::Scene", pubTransport->GetMsgType());
 
-  ASSERT_NO_THROW(pubTransport.Fini());
+  ASSERT_NO_THROW(pubTransport->Fini());
 }
 
 /////////////////////////////////////////////////
 TEST_F(TransportTest, PublicationTransportFiniConnection)
 {
   Load("worlds/empty.world");
-  transport::PublicationTransport pubTransport("~/no_topic", "msg::Scene");
-  ASSERT_EQ("~/no_topic", pubTransport.GetTopic());
-  ASSERT_EQ("msg::Scene", pubTransport.GetMsgType());
+  transport::PublicationTransportPtr pubTransport(
+      new transport::PublicationTransport("~/no_topic", "msg::Scene"));
+  ASSERT_EQ("~/no_topic", pubTransport->GetTopic());
+  ASSERT_EQ("msg::Scene", pubTransport->GetMsgType());
 
   transport::ConnectionPtr conn(new transport::Connection);
-  ASSERT_NO_THROW(pubTransport.Init(conn, false));
+  ASSERT_NO_THROW(pubTransport->Init(conn, false));
 
-  ASSERT_NO_THROW(pubTransport.Fini());
+  ASSERT_NO_THROW(pubTransport->Fini());
 }
 
 /////////////////////////////////////////////////

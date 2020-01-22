@@ -79,7 +79,7 @@ void LinkInspector_TEST::AppliedSignal()
   // Get push buttons
   QList<QPushButton *> pushButtons =
       linkInspector->findChildren<QPushButton *>();
-  QVERIFY(pushButtons.size() == 5);
+  QCOMPARE(pushButtons.size(), 7);
 
   // Edit link pose (13~18)
   spins[18]->setValue(2.0);
@@ -88,12 +88,12 @@ void LinkInspector_TEST::AppliedSignal()
   QVERIFY(linkInspector->isVisible());
 
   // Reset
-  pushButtons[2]->click();
+  pushButtons[4]->click();
   QCOMPARE(g_appliedSignalCount, 2u);
   QVERIFY(linkInspector->isVisible());
 
   // Ok
-  pushButtons[3]->click();
+  pushButtons[5]->click();
   QCOMPARE(g_appliedSignalCount, 3u);
   QVERIFY(!linkInspector->isVisible());
 

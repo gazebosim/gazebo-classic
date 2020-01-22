@@ -36,8 +36,36 @@
 
 #include "gazebo/common/MeshManager.hh"
 
-using namespace gazebo;
-using namespace common;
+namespace gazebo
+{
+namespace common
+{
+//////////////////////////////////////////////////
+class MeshManagerPrivate
+{
+  /// \brief 3D mesh loader for COLLADA files
+  public: ColladaLoader *colladaLoader = nullptr;
+
+  /// \brief 3D mesh exporter for COLLADA files
+  public: ColladaExporter *colladaExporter = nullptr;
+
+  /// \brief 3D mesh loader for STL files
+  public: STLLoader *stlLoader = nullptr;
+
+  // \brief 3D mesh loader for FBX files
+  // \todo The FBX loader needs to be implemented.
+  // public: FBXLoader *fbxLoader = nullptr;
+
+  /// \brief Dictionary of meshes, indexed by name
+  public: std::map<std::string, Mesh*> meshes;
+
+  /// \brief supported file extensions for meshes
+  public: std::vector<std::string> fileExtensions;
+
+  /// \brief Mutex to protect from loading the same mesh in different threads
+  /// at the same time.
+  public: boost::mutex mutex;
+};
 
 // added here for ABI compatibility
 // TODO move to header / private class when merging forward.
@@ -45,10 +73,11 @@ static OBJLoader objLoader;
 
 //////////////////////////////////////////////////
 MeshManager::MeshManager()
+  : dataPtr(new MeshManagerPrivate)
 {
-  this->colladaLoader = new ColladaLoader();
-  this->colladaExporter = new ColladaExporter();
-  this->stlLoader = new STLLoader();
+  this->dataPtr->colladaLoader = new ColladaLoader();
+  this->dataPtr->colladaExporter = new ColladaExporter();
+  this->dataPtr->stlLoader = new STLLoader();
 
   // Create some basic shapes
   this->CreatePlane("unit_plane",
@@ -78,21 +107,26 @@ MeshManager::MeshManager()
 
   this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
 
-  this->fileExtensions.push_back("stl");
-  this->fileExtensions.push_back("dae");
-  this->fileExtensions.push_back("obj");
+  this->dataPtr->fileExtensions.push_back("stl");
+  this->dataPtr->fileExtensions.push_back("stlb");
+  this->dataPtr->fileExtensions.push_back("dae");
+  this->dataPtr->fileExtensions.push_back("obj");
 }
 
 //////////////////////////////////////////////////
 MeshManager::~MeshManager()
 {
-  delete this->colladaLoader;
-  delete this->colladaExporter;
-  delete this->stlLoader;
-  std::map<std::string, Mesh*>::iterator iter;
-  for (iter = this->meshes.begin(); iter != this->meshes.end(); ++iter)
-    delete iter->second;
-  this->meshes.clear();
+  delete this->dataPtr->colladaLoader;
+  delete this->dataPtr->colladaExporter;
+  delete this->dataPtr->stlLoader;
+  for (auto &pairNameMesh : this->dataPtr->meshes)
+  {
+    delete pairNameMesh.second;
+  }
+  this->dataPtr->meshes.clear();
+
+  delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -110,17 +144,18 @@ const Mesh *MeshManager::Load(const std::string &_filename)
 
   if (this->HasMesh(_filename))
   {
-    return this->meshes[_filename];
+    return this->dataPtr->meshes[_filename];
 
     // This breaks trimesh geom. Each new trimesh should have a unique name.
     /*
-    // erase mesh from this->meshes. This allows a mesh to be modified and
+    // erase mesh from this->dataPtr->meshes.
+    // This allows a mesh to be modified and
     // inserted into gazebo again without closing gazebo.
     std::map<std::string, Mesh*>::iterator iter;
-    iter = this->meshes.find(_filename);
+    iter = this->dataPtr->meshes.find(_filename);
     delete iter->second;
     iter->second = nullptr;
-    this->meshes.erase(iter);
+    this->dataPtr->meshes.erase(iter);
     */
   }
 
@@ -134,9 +169,9 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     MeshLoader *loader = nullptr;
 
     if (extension == "stl" || extension == "stlb" || extension == "stla")
-      loader = this->stlLoader;
+      loader = this->dataPtr->stlLoader;
     else if (extension == "dae")
-      loader = this->colladaLoader;
+      loader = this->dataPtr->colladaLoader;
     else if (extension == "obj")
       loader = &objLoader;
     else
@@ -149,20 +184,20 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     {
       // This mutex prevents two threads from loading the same mesh at the
       // same time.
-      boost::mutex::scoped_lock lock(this->mutex);
+      boost::mutex::scoped_lock lock(this->dataPtr->mutex);
       if (!this->HasMesh(_filename))
       {
         if ((mesh = loader->Load(fullname)) != nullptr)
         {
           mesh->SetName(_filename);
-          this->meshes.insert(std::make_pair(_filename, mesh));
+          this->dataPtr->meshes.insert(std::make_pair(_filename, mesh));
         }
         else
           gzerr << "Unable to load mesh[" << fullname << "]\n";
       }
       else
       {
-        mesh = this->meshes[_filename];
+        mesh = this->dataPtr->meshes[_filename];
       }
     }
     catch(gazebo::common::Exception &e)
@@ -184,7 +219,7 @@ void MeshManager::Export(const Mesh *_mesh, const std::string &_filename,
 {
   if (_extension == "dae")
   {
-    this->colladaExporter->Export(_mesh, _filename, _exportTextures);
+    this->dataPtr->colladaExporter->Export(_mesh, _filename, _exportTextures);
   }
   else
   {
@@ -203,8 +238,10 @@ bool MeshManager::IsValidFilename(const std::string &_filename)
   std::transform(extension.begin(), extension.end(),
                  extension.begin(), ::tolower);
 
-  return std::find(this->fileExtensions.begin(), this->fileExtensions.end(),
-      extension) != this->fileExtensions.end();
+  return std::find(
+      this->dataPtr->fileExtensions.begin(),
+      this->dataPtr->fileExtensions.end(),
+      extension) != this->dataPtr->fileExtensions.end();
 }
 
 //////////////////////////////////////////////////
@@ -213,7 +250,7 @@ void MeshManager::GetMeshAABB(const Mesh *_mesh,
     ignition::math::Vector3d &_minXYZ, ignition::math::Vector3d &_maxXYZ)
 {
   if (this->HasMesh(_mesh->GetName()))
-    this->meshes[_mesh->GetName()]->GetAABB(_center, _minXYZ, _maxXYZ);
+    this->dataPtr->meshes[_mesh->GetName()]->GetAABB(_center, _minXYZ, _maxXYZ);
 }
 
 //////////////////////////////////////////////////
@@ -221,14 +258,14 @@ void MeshManager::GenSphericalTexCoord(const Mesh *_mesh,
     const ignition::math::Vector3d &_center)
 {
   if (this->HasMesh(_mesh->GetName()))
-    this->meshes[_mesh->GetName()]->GenSphericalTexCoord(_center);
+    this->dataPtr->meshes[_mesh->GetName()]->GenSphericalTexCoord(_center);
 }
 
 //////////////////////////////////////////////////
 void MeshManager::AddMesh(Mesh *_mesh)
 {
   if (!this->HasMesh(_mesh->GetName()))
-    this->meshes[_mesh->GetName()] = _mesh;
+    this->dataPtr->meshes[_mesh->GetName()] = _mesh;
 }
 
 //////////////////////////////////////////////////
@@ -236,9 +273,9 @@ const Mesh *MeshManager::GetMesh(const std::string &_name) const
 {
   std::map<std::string, Mesh*>::const_iterator iter;
 
-  iter = this->meshes.find(_name);
+  iter = this->dataPtr->meshes.find(_name);
 
-  if (iter != this->meshes.end())
+  if (iter != this->dataPtr->meshes.end())
     return iter->second;
 
   return nullptr;
@@ -251,9 +288,9 @@ bool MeshManager::HasMesh(const std::string &_name) const
     return false;
 
   std::map<std::string, Mesh*>::const_iterator iter;
-  iter = this->meshes.find(_name);
+  iter = this->dataPtr->meshes.find(_name);
 
-  return iter != this->meshes.end();
+  return iter != this->dataPtr->meshes.end();
 }
 
 //////////////////////////////////////////////////
@@ -273,7 +310,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
-  this->meshes.insert(std::make_pair(name, mesh));
+  this->dataPtr->meshes.insert(std::make_pair(name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -341,7 +378,7 @@ void MeshManager::CreatePlane(const std::string &_name,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -421,7 +458,7 @@ void MeshManager::CreateBox(const std::string &_name,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -722,7 +759,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     }
   }
 
-  this->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
   return;
 }
 
@@ -738,7 +775,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -839,7 +876,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
-  this->meshes.insert(std::make_pair(name, mesh));
+  this->dataPtr->meshes.insert(std::make_pair(name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -956,7 +993,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
-  this->meshes.insert(std::make_pair(name, mesh));
+  this->dataPtr->meshes.insert(std::make_pair(name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -1073,7 +1110,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
@@ -1294,7 +1331,7 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   MeshCSG csg;
   Mesh *mesh = csg.CreateBoolean(_m1, _m2, _operation, _offset);
   mesh->SetName(_name);
-  this->meshes.insert(std::make_pair(_name, mesh));
+  this->dataPtr->meshes.insert(std::make_pair(_name, mesh));
 }
 #endif
 
@@ -1348,4 +1385,6 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
       edges.push_back(e);
     }
   }
+}
+}
 }

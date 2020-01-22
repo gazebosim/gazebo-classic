@@ -18,12 +18,6 @@
 #ifndef GAZEBO_PLUGINS_REGIONEVENTBOXPLUGIN_HH_
 #define GAZEBO_PLUGINS_REGIONEVENTBOXPLUGIN_HH_
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-#include <Winsock2.h>
-#endif
-
 #include <map>
 #include <string>
 
@@ -67,8 +61,10 @@ namespace gazebo
     /// \param[in] _box World axis-aligned box.
     /// \param[in] _pose Pose of the model representing the box region.
     /// \return True if the point is inside the region
-    private: bool PointInRegion(const ignition::math::Vector3d &_point,
-        const ignition::math::Box &_box, const ignition::math::Pose3d &_pose)
+    private: bool PointInRegion(
+        const ignition::math::Vector3d &_point,
+        const ignition::math::AxisAlignedBox &_box,
+        const ignition::math::Pose3d &_pose)
         const;
 
     /// \brief Update box region dimensions and pose.
@@ -113,7 +109,7 @@ namespace gazebo
     private: ignition::math::Pose3d boxPose;
 
     /// \brief Box region
-    private: ignition::math::Box box;
+    private: ignition::math::AxisAlignedBox box;
 
     /// \brief Subscriber to model/info topic.
     private: transport::SubscriberPtr modelSub;

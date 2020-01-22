@@ -130,7 +130,7 @@ void CollisionConfig_TEST::AppliedSignal()
   // Get push buttons
   QList<QPushButton *> pushButtons =
       collisionConfig->findChildren<QPushButton *>();
-  QVERIFY(pushButtons.size() == 1);
+  QCOMPARE(pushButtons.size(), 3);
 
   // Add a collision
   pushButtons[0]->click();

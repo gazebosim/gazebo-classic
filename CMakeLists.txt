@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.6 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
 
 if(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
@@ -9,7 +9,7 @@ project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
-set (GAZEBO_MAJOR_VERSION 10)
+set (GAZEBO_MAJOR_VERSION 11)
 set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
@@ -154,10 +154,19 @@ message (STATUS "----------------------------------------\n")
 # 2. In the generation of cmake/setup.sh from cmake/setup.sh.in
 set(GAZEBO_DEFAULT_MASTER_HOST localhost)
 set(GAZEBO_DEFAULT_MASTER_PORT 11345)
-set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
+set(GAZEBO_PLUGIN_LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
+set(GAZEBO_PLUGIN_BIN_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/${BIN_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
+if(WIN32)
+  set(GAZEBO_PLUGIN_PATH ${GAZEBO_PLUGIN_BIN_INSTALL_DIR})
+else()
+  set(GAZEBO_PLUGIN_PATH ${GAZEBO_PLUGIN_LIB_INSTALL_DIR})
+endif()
+FILE(TO_NATIVE_PATH "${GAZEBO_PLUGIN_PATH}" GAZEBO_PLUGIN_PATH)
 set(GAZEBO_MODEL_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/models)
+FILE(TO_NATIVE_PATH "${GAZEBO_MODEL_PATH}" GAZEBO_MODEL_PATH)
 set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION})
-set(GAZEBO_MODEL_DATABASE_URI http://gazebosim.org/models)
+FILE(TO_NATIVE_PATH "${GAZEBO_RESOURCE_PATH}" GAZEBO_RESOURCE_PATH)
+set(GAZEBO_MODEL_DATABASE_URI http://models.gazebosim.org)
 set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
 # Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
 # we pass it to the compiler later.
@@ -288,11 +297,11 @@ message (STATUS "----------------------------------------\n")
 #################################################
 # Print warnings and errors
 if ( build_warnings )
-  message(STATUS "BUILD WARNINGS")
+  message("-- BUILD WARNINGS")
   foreach (msg ${build_warnings})
-    message(STATUS ${msg})
+    message("-- ${msg}")
   endforeach ()
-  message(STATUS "END BUILD WARNINGS\n")
+  message("-- END BUILD WARNINGS\n")
 endif (build_warnings)
 
 ########### Add uninstall target ###############
@@ -304,11 +313,11 @@ add_custom_target(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake")
 
 if (build_errors)
-  message(STATUS "BUILD ERRORS: These must be resolved before compiling.")
+  message("-- BUILD ERRORS: These must be resolved before compiling.")
   foreach (msg ${build_errors})
-    message(STATUS ${msg})
+    message("-- ${msg}")
   endforeach ()
-  message(STATUS "END BUILD ERRORS\n")
+  message("-- END BUILD ERRORS\n")
   message (FATAL_ERROR "Errors encountered in build. Please see the BUILD ERRORS above.")
 else (build_errors)
 
@@ -322,6 +331,12 @@ else (build_errors)
   # Also install the setup.sh in an unversioned location
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
 
+  if (WIN32)
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.bat.in ${PROJECT_BINARY_DIR}/setup.bat @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.bat DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/)
+    # Also install the setup.bat in an unversioned location
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.bat DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
+  endif ()
 
   if (DEFINED CMAKE_CXX_FLAGS)
     message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
@@ -371,8 +386,11 @@ else (build_errors)
 
   foreach (b ${Boost_LIBRARIES})
     get_filename_component(bname ${b} NAME_WE)
-    # Prefix always -l
-    set (bname "-l${bname}")
+    # Prefix -l if not already prefixed
+    string(FIND ${bname} "-l" lprefix)
+    if (NOT ${lprefix} EQUAL 0 )
+      set (bname "-l${bname}")
+    endif()
     # Remove the prefix lib (not always present, like in pthread)
     string (REPLACE "lib" "" bname "${bname}")
     set (Boost_PKGCONFIG_LIBS "${Boost_PKGCONFIG_LIBS} ${bname}")
