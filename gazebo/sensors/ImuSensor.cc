@@ -393,32 +393,32 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
         case IMU_ANGVEL_X_NOISE_RADIANS_PER_S:
           this->dataPtr->imuMsg.mutable_angular_velocity()->set_x(
             keyNoise.second->Apply(
-              this->dataPtr->imuMsg.angular_velocity().x()));
+              this->dataPtr->imuMsg.angular_velocity().x(), dt));
           break;
         case IMU_ANGVEL_Y_NOISE_RADIANS_PER_S:
           this->dataPtr->imuMsg.mutable_angular_velocity()->set_y(
             keyNoise.second->Apply(
-              this->dataPtr->imuMsg.angular_velocity().y()));
+              this->dataPtr->imuMsg.angular_velocity().y(), dt));
           break;
         case IMU_ANGVEL_Z_NOISE_RADIANS_PER_S:
           this->dataPtr->imuMsg.mutable_angular_velocity()->set_z(
             keyNoise.second->Apply(
-              this->dataPtr->imuMsg.angular_velocity().z()));
+              this->dataPtr->imuMsg.angular_velocity().z(), dt));
           break;
         case IMU_LINACC_X_NOISE_METERS_PER_S_SQR:
           this->dataPtr->imuMsg.mutable_linear_acceleration()->set_x(
             keyNoise.second->Apply(
-              this->dataPtr->imuMsg.linear_acceleration().x()));
+              this->dataPtr->imuMsg.linear_acceleration().x(), dt));
           break;
         case IMU_LINACC_Y_NOISE_METERS_PER_S_SQR:
           this->dataPtr->imuMsg.mutable_linear_acceleration()->set_y(
             keyNoise.second->Apply(
-              this->dataPtr->imuMsg.linear_acceleration().y()));
+              this->dataPtr->imuMsg.linear_acceleration().y(), dt));
           break;
         case IMU_LINACC_Z_NOISE_METERS_PER_S_SQR:
           this->dataPtr->imuMsg.mutable_linear_acceleration()->set_z(
             keyNoise.second->Apply(
-              this->dataPtr->imuMsg.linear_acceleration().z()));
+              this->dataPtr->imuMsg.linear_acceleration().z(), dt));
           break;
         default:
           std::ostringstream out;

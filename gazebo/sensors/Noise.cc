@@ -96,14 +96,14 @@ void Noise::SetCamera(rendering::CameraPtr /*_camera*/)
 }
 
 //////////////////////////////////////////////////
-double Noise::Apply(double _in)
+double Noise::Apply(double _in, double _dt)
 {
   if (this->type == NONE)
     return _in;
   else if (this->type == CUSTOM)
   {
     if (this->customNoiseCallback)
-      return this->customNoiseCallback(_in);
+      return this->customNoiseCallback(_in, _dt);
     else
     {
       gzerr << "Custom noise callback function not set!"
@@ -113,11 +113,11 @@ double Noise::Apply(double _in)
     }
   }
   else
-    return this->ApplyImpl(_in);
+    return this->ApplyImpl(_in, _dt);
 }
 
 //////////////////////////////////////////////////
-double Noise::ApplyImpl(double _in)
+double Noise::ApplyImpl(double _in, double /*_dt*/)
 {
   return _in;
 }
@@ -129,7 +129,7 @@ Noise::NoiseType Noise::GetNoiseType() const
 }
 
 //////////////////////////////////////////////////
-void Noise::SetCustomNoiseCallback(boost::function<double (double)> _cb)
+void Noise::SetCustomNoiseCallback(boost::function<double (double, double)> _cb)
 {
   this->type = CUSTOM;
   this->customNoiseCallback = _cb;

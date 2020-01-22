@@ -88,7 +88,9 @@ GaussianNoiseModel::GaussianNoiseModel()
     precision(0.0),
     quantized(false),
     biasMean(0),
-    biasStdDev(0)
+    biasStdDev(0),
+    dynamicBiasStdDev(0),
+    dynamicBiasCorrTime(0)
 {
 }
 
@@ -108,6 +110,10 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
     this->biasMean = _sdf->Get<double>("bias_mean");
   if (_sdf->HasElement("bias_stddev"))
     this->biasStdDev = _sdf->Get<double>("bias_stddev");
+  if (_sdf->HasElement("dynamic_bias_stddev"))
+    this->dynamicBiasStdDev = _sdf->Get<double>("dynamic_bias_stddev");
+  if (_sdf->HasElement("dynamic_bias_correlation_time"))
+    this->dynamicBiasCorrTime = _sdf->Get<double>("dynamic_bias_correlation_time");
   this->SampleBias();
 
   /// \todo Remove this, and use Noise::Print. See ImuSensor for an example
@@ -136,10 +142,33 @@ void GaussianNoiseModel::Fini()
 }
 
 //////////////////////////////////////////////////
-double GaussianNoiseModel::ApplyImpl(double _in)
+double GaussianNoiseModel::ApplyImpl(double _in, double _dt)
 {
   // Add independent (uncorrelated) Gaussian noise to each input value.
   double whiteNoise = ignition::math::Rand::DblNormal(this->mean, this->stdDev);
+
+  // Generate varying (correlated) bias for each input value.
+  // This implementation is based on the one available in Rotors:
+  // https://github.com/ethz-asl/rotors_simulator/blob/master/rotors_gazebo_plugins/src/gazebo_imu_plugin.cpp
+  //
+  // More information about the parameters and their derivation:
+  //
+  //  https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model
+  //
+  if (this->dynamicBiasStdDev > 0 &&
+      this->dynamicBiasCorrTime > 0)
+  {
+    const double sigma_b = this->dynamicBiasStdDev;
+    const double tau = this->dynamicBiasCorrTime;
+
+    const double sigma_b_d = sqrt(-sigma_b * sigma_b *
+        tau / 2 * expm1(-2 * _dt / tau));
+
+    const double phi_d = exp(-_dt / tau);
+    this->bias = phi_d * this->bias +
+      ignition::math::Rand::DblNormal(0, sigma_b_d);
+  }
+
   double output = _in + this->bias + whiteNoise;
   if (this->quantized)
   {
@@ -202,6 +231,8 @@ void GaussianNoiseModel::Print(std::ostream &_out) const
   _out << "Gaussian noise, mean[" << this->mean << "], "
     << "stdDev[" << this->stdDev << "] "
     << "bias[" << this->bias << "] "
+    << "dynamicBiasStdDev[" << this->dynamicBiasStdDev << "] "
+    << "dynamicBiasCorrTime[" << this->dynamicBiasCorrTime << "] "
     << "precision[" << this->precision << "] "
     << "quantized[" << this->quantized << "]";
 }
