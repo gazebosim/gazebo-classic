@@ -16,6 +16,10 @@
    for server-side rendering, though it is not yet enabled.
     * [Pull request 3180](https://bitbucket.org/osrf/gazebo/pull-request/3180)
 
+1. Add virtual functions to Sensor and other ABI changes needed to synchronize
+   physics and rendering sensors.
+    * [Pull request 3184](https://bitbucket.org/osrf/gazebo/pull-request/3184)
+
 1. Modify build system to install dll in `<prefix>/bin` by default on Windows.
     * [Pull request 3144](https://bitbucket.org/osrf/gazebo/pull-request/3144)
 
