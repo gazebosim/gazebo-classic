@@ -1986,7 +1986,7 @@ void World::ProcessFactoryMsgs()
 
   for (auto const &factoryMsg : factoryMsgsCopy)
   {
-    this->dataPtr->factorySDF->Root()->ClearElements();
+    this->dataPtr->factorySDF->Clear();
 
     if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
     {
@@ -2226,7 +2226,7 @@ void World::SetState(const WorldState &_state)
   auto insertions = _state.Insertions();
   for (auto const &insertion : insertions)
   {
-    this->dataPtr->factorySDF->Root()->ClearElements();
+    this->dataPtr->factorySDF->Clear();
 
     std::stringstream sdfStr;
     sdfStr << "<sdf version='" << SDF_VERSION << "'>"

@@ -15,6 +15,8 @@
  *
  */
 
+#include <chrono>
+
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 
@@ -382,6 +384,52 @@ TEST_P(SdfFrameSemanticsTest, ExplicitFramesWithVisualAndCollision)
     EXPECT_EQ(expPose, visPose);
   }
   EXPECT_EQ(expPose, collision->RelativePose());
+}
+
+//////////////////////////////////////////////////
+/// Test that it is possible to spawn multiple models each with different sdf
+/// versions.
+TEST_P(SdfFrameSemanticsTest, MultipleSDFVersionsCoexist)
+{
+  this->LoadWorld();
+  const std::string modelSDF17 = R"sdf(
+  <sdf version="1.7">
+    <model name="M1">
+      <link name="L"/>
+    </model>
+  </sdf>
+  )sdf";
+  // Valid in 1.6, but not in 1.7 because a canonical link is missing
+  const std::string modelSDF16 = R"sdf(
+  <sdf version="1.6">
+    <model name="M2">
+    </model>
+  </sdf>
+  )sdf";
+
+  auto tInit = std::chrono::high_resolution_clock::now();
+  this->SpawnSDF(modelSDF17);
+  auto tFin = std::chrono::high_resolution_clock::now();
+  int dur = std::chrono::duration_cast<std::chrono::milliseconds>(tFin - tInit)
+                .count();
+
+  // Use a factory message instead of SpawnSDF to avoid blocking for a long time
+  // since we expect (in the failing case) for this to not load successfully.
+  msgs::Factory msg;
+  msg.set_sdf(modelSDF16);
+  this->factoryPub->Publish(msg);
+  // maxWaitCount is the maximum of 5s and 4 times the time it took to spawn
+  // modelSDF17
+  int maxWaitCount = std::max(dur * 4, 5000) / 1000;
+  int waitCount = 0;
+  while (!this->HasEntity("M2") && ++waitCount < maxWaitCount)
+  {
+    using namespace std::chrono_literals;
+    std::this_thread::sleep_for(1000ms);
+  }
+
+  EXPECT_NE(nullptr, this->GetModel("M1"));
+  EXPECT_NE(nullptr, this->GetModel("M2"));
 }
 
 TEST_P(SdfFrameSemanticsTest, ImplicitModelFrames)
