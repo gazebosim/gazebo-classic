@@ -18,6 +18,19 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
     + public: template <typename T>
       static T any\_cast<T>(const boost::any &)
 
+1. **gazebo/physics/PhysicsTypes.hh**
+    + Defined function signature for API to update the poses of objects in a named scene
+    + using UpdateScenePosesFunc =
+      std::function<void(const std::string &, const msgs::PosesStamped &)>
+
+1. **gazebo/rendering/RenderingIface.hh**
+    + API for directly updating the poses of objects in a named scene
+    + void `update_scene_poses`(const std::string &, const msgs::PosesStamped &)
+
+1. **gazebo/rendering/Scene.hh**
+    + API for directly updating the poses of objects in a scene
+    + void UpdatePoses(const msgs::PosesStamped &)
+
 ### Modifications
 
 1. All instances of `ignition::math::Box` in the API are changed to `ignition::math::AxisAlignedBox`
@@ -43,6 +56,14 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
    This `any_cast` helper should be used with `boost::any` values provided by
    `Preset::GetParam`, `PresetManager::GetProfileParam`, and
    `PresetManager::GetCurrentProfileParam`.
+
+1. **gazebo/physics/PhysicsIface.hh**, **gazebo/physics/World.hh**
+    The public API for initializing worlds is modified to require `std::function`
+    argument that can be called to directly update the poses of objects in a scene.
+    This is a public API, but it does not appear to be commonly used outside
+    of gazebo, so it is not expected to have a large impact to change it.
+    + void `physics::init_world`(WorldPtr, UpdateScenePosesFunc)
+    + void World::Init`(UpdateScenePosesFunc)
 
 1. **gazebo/rendering/MarkerManager.cc**
     The `/marker` ignition transport service allows specifying the `id` field
