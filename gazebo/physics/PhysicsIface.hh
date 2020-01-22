@@ -20,8 +20,6 @@
 #include <string>
 #include <sdf/sdf.hh>
 
-#include "gazebo/msgs/poses_stamped.pb.h"
-
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
 

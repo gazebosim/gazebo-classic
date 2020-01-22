@@ -23,6 +23,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+#include "gazebo/msgs/poses_stamped.pb.h"
 #include "gazebo/util/system.hh"
 
 /// \file
