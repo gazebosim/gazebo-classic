@@ -57,13 +57,23 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
    `Preset::GetParam`, `PresetManager::GetProfileParam`, and
    `PresetManager::GetCurrentProfileParam`.
 
-1. **gazebo/physics/PhysicsIface.hh**, **gazebo/physics/World.hh**
-    An optional `std::function` argument is added to the API's for
-    initializing worlds that can be called to directly update the poses of
-    objects in a rendering Scene. See **PhysicsTypes.hh** for the
-    definition of `UpdateScenePosesFunc`.
-    + void `physics::init_world`(WorldPtr, UpdateScenePosesFunc = nullptr)
-    + void World::Init`(UpdateScenePosesFunc = nullptr)
+1. **gazebo/physics/PhysicsIface.hh**
+    + A `std::function` argument is added to the API's for initializing worlds.
+      This argument can be called to directly update the poses of
+      objects in a rendering Scene. See **PhysicsTypes.hh** for the
+      definition of `UpdateScenePosesFunc`.
+    + ***Deprecation:*** void `physics::init_world`(WorldPtr)
+    + ***Replacement:*** void `physics::init_world`(WorldPtr, UpdateScenePosesFunc)
+    + ***Deprecation:*** void `physics::init_worlds`()
+    + ***Replacement:*** void `physics::init_worlds`(UpdateScenePosesFunc)
+
+1. **gazebo/physics/World.hh**
+    + A `std::function` argument is added to the API's for initializing worlds.
+      This argument can be called to directly update the poses of
+      objects in a rendering Scene. See **PhysicsTypes.hh** for the
+      definition of `UpdateScenePosesFunc`.
+    + ***Deprecation:*** void World::Init()
+    + ***Replacement:*** void World::Init(UpdateScenePosesFunc)
 
 1. **gazebo/rendering/MarkerManager.cc**
     The `/marker` ignition transport service allows specifying the `id` field

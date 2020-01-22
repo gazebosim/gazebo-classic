@@ -98,8 +98,13 @@ namespace gazebo
 
       /// \brief Initialize the world.
       /// This is called after Load.
+      /// \deprecated See Init(UpdateScenePosesFunc)
+      public: void Init() GAZEBO_DEPRECATED(11.0);
+
+      /// \brief Initialize the world.
+      /// This is called after Load.
       /// \param[in] _func function to be called when Poses are available.
-      public: void Init(UpdateScenePosesFunc _func = nullptr);
+      public: void Init(UpdateScenePosesFunc _func);
 
       /// \brief Run the world in a thread.
       /// Run the update loop.

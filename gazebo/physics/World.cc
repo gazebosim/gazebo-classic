@@ -374,6 +374,12 @@ void World::Save(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
+void World::Init()
+{
+  this->Init(nullptr);
+}
+
+//////////////////////////////////////////////////
 void World::Init(UpdateScenePosesFunc _func)
 {
   // Initialize all the entities (i.e. Model)
