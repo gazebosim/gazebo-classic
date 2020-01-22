@@ -59,7 +59,7 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
 
 1. **gazebo/physics/PhysicsIface.hh**, **gazebo/physics/World.hh**
     An optional `std::function` argument is added to the API's for
-    initializing worlds. that can be called to directly update the poses of
+    initializing worlds that can be called to directly update the poses of
     objects in a rendering Scene. See **PhysicsTypes.hh** for the
     definition of `UpdateScenePosesFunc`.
     + void `physics::init_world`(WorldPtr, UpdateScenePosesFunc = nullptr)
