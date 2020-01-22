@@ -294,7 +294,7 @@ namespace gazebo
 
                  /// \brief used to wait for the end of prerendering
                  private: std::condition_variable conditionPrerendered;
-                };
+               };
       /// \endcond
 
       /// \brief True if SensorManager::Init has been called

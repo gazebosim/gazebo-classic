@@ -45,7 +45,7 @@ namespace gazebo
     /// \param[in] _name Name of the scene to retrieve.
     GZ_RENDERING_VISIBLE
     rendering::ScenePtr get_scene(const std::string &_name = "");
- 
+
     /// \brief directly provide Pose message to the corresponding scene.
     /// \param[in] _name Name of the scene concerned.
     /// \param[in] _msg message to be passed.
