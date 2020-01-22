@@ -102,8 +102,10 @@ double Noise::Apply(double _in, double _dt)
     return _in;
   else if (this->type == CUSTOM)
   {
-    if (this->customNoiseCallback)
-      return this->customNoiseCallback(_in, _dt);
+    if (this->customNoiseCallbackTime)
+      return this->customNoiseCallbackTime(_in, _dt);
+    else if (this->customNoiseCallback)
+      return this->customNoiseCallback(_in);
     else
     {
       gzerr << "Custom noise callback function not set!"
@@ -129,10 +131,18 @@ Noise::NoiseType Noise::GetNoiseType() const
 }
 
 //////////////////////////////////////////////////
-void Noise::SetCustomNoiseCallback(boost::function<double (double, double)> _cb)
+void Noise::SetCustomNoiseCallback(boost::function<double (double)> _cb)
 {
   this->type = CUSTOM;
   this->customNoiseCallback = _cb;
+}
+
+//////////////////////////////////////////////////
+void Noise::SetCustomNoiseCallbackTime(
+    boost::function<double (double, double)> _cb)
+{
+  this->type = CUSTOM;
+  this->customNoiseCallbackTime = _cb;
 }
 
 //////////////////////////////////////////////////

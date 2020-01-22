@@ -73,7 +73,7 @@ namespace gazebo
         /// \return Standard deviation of Gaussian noise driving bias walk
         public: double GetDynamicBiasStdDev() const;
 
-        /// \brief Accessor for dynamic bias process correlation time.
+        /// \brief Accessor for dynamic bias process correlation time (seconds).
         /// \return Correlation time of Gaussian noise process driving bias walk
         public: double GetDynamicBiasCorrelationTime() const;
 
@@ -89,12 +89,9 @@ namespace gazebo
         /// \param[in] _stddev Standard deviation of bias noise process.
         public: void SetDynamicBiasStdDev(const double _stddev);
 
-        /// \brief Set correlation time of dynamic bias process.
+        /// \brief Set correlation time of dynamic bias process, in seconds.
         /// \param[in] _stddev Standard deviation of bias noise process.
         public: void SetDynamicBiasCorrelationTime(const double _stddev);
-
-        /// \brief Accessor for dynamic bias correlation time
-        /// \return Correlation time of Gaussian noise process driving bias walk
 
         /// Documentation inherited
         public: virtual void Print(std::ostream &_out) const;

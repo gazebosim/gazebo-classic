@@ -113,7 +113,10 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("dynamic_bias_stddev"))
     this->dynamicBiasStdDev = _sdf->Get<double>("dynamic_bias_stddev");
   if (_sdf->HasElement("dynamic_bias_correlation_time"))
-    this->dynamicBiasCorrTime = _sdf->Get<double>("dynamic_bias_correlation_time");
+  {
+    this->dynamicBiasCorrTime =
+        _sdf->Get<double>("dynamic_bias_correlation_time");
+  }
   this->SampleBias();
 
   /// \todo Remove this, and use Noise::Print. See ImuSensor for an example
@@ -158,15 +161,15 @@ double GaussianNoiseModel::ApplyImpl(double _in, double _dt)
   if (this->dynamicBiasStdDev > 0 &&
       this->dynamicBiasCorrTime > 0)
   {
-    const double sigma_b = this->dynamicBiasStdDev;
+    const double sigmaB = this->dynamicBiasStdDev;
     const double tau = this->dynamicBiasCorrTime;
 
-    const double sigma_b_d = sqrt(-sigma_b * sigma_b *
+    const double sigmaBD = sqrt(-sigmaB * sigmaB *
         tau / 2 * expm1(-2 * _dt / tau));
 
-    const double phi_d = exp(-_dt / tau);
-    this->bias = phi_d * this->bias +
-      ignition::math::Rand::DblNormal(0, sigma_b_d);
+    const double phiD = exp(-_dt / tau);
+    this->bias = phiD * this->bias +
+      ignition::math::Rand::DblNormal(0, sigmaBD);
   }
 
   double output = _in + this->bias + whiteNoise;
