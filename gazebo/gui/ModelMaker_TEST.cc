@@ -209,6 +209,124 @@ void ModelMaker_TEST::FromFile()
 }
 
 /////////////////////////////////////////////////
+void ModelMaker_TEST::FromFileWithFrameSemantics()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  const std::string entityName = "box_with_frame_semantics";
+  // Check there's no box in the left panel yet
+  bool hasBox = mainWindow->HasEntityName(entityName);
+  QVERIFY(!hasBox);
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  QVERIFY(scene != NULL);
+
+  // Check there's no box in the scene yet
+  gazebo::rendering::VisualPtr vis = scene->GetVisual(entityName);
+  QVERIFY(vis == NULL);
+
+  // Create a model maker
+  gazebo::gui::ModelMaker *modelMaker = new gazebo::gui::ModelMaker();
+  QVERIFY(modelMaker != NULL);
+
+  // Model data
+  boost::filesystem::path path;
+  path = path / TEST_PATH / "models" / (entityName + ".sdf");
+
+  // Start the maker to make a box
+  modelMaker->InitFromFile(path.string());
+  modelMaker->Start();
+
+  // Check there's still no box in the left panel
+  hasBox = mainWindow->HasEntityName(entityName);
+  QVERIFY(!hasBox);
+
+  // Check there's a box in the scene -- this is the preview
+  vis = scene->GetVisual(entityName);
+  QVERIFY(vis != NULL);
+
+  // Get the rendering visuals associated with sdf links and visuals
+  auto link1Visual= scene->GetVisual(entityName + "::L1");
+  QVERIFY(link1Visual!= NULL);
+  auto link1VisVisual = scene->GetVisual(entityName + "::L1::Visual_0");
+  QVERIFY(link1VisVisual!= NULL);
+
+  auto link2Visual= scene->GetVisual(entityName + "::L2");
+  QVERIFY(link1Visual!= NULL);
+  auto link2VisVisual = scene->GetVisual(entityName + "::L2::Visual_0");
+  QVERIFY(link2VisVisual!= NULL);
+
+  // Check that the box appeared in the center of the screen
+  ignition::math::Vector3d startPos = modelMaker->EntityPosition();
+  QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
+  QVERIFY(vis->WorldPose().Pos() == startPos);
+
+  // Check that the sdf link's pose
+  // Note that WorldPose here returns the pose relative to the model frame. Not
+  // sure if this is a bug.
+  QVERIFY(link1Visual->WorldPose().Pos() ==
+          ignition::math::Vector3d(0, 0, 1.5));
+
+  QVERIFY(link2Visual->WorldPose().Pos() ==
+          ignition::math::Vector3d(0, 5, 1.5));
+
+  // Check that the sdf visual is offset
+  QVERIFY(link1VisVisual->Pose().Pos() == ignition::math::Vector3d(5, 0, -1));
+  QVERIFY(link2VisVisual->Pose().Pos() == ignition::math::Vector3d(5, -5, -1));
+
+  // Mouse move
+  gazebo::common::MouseEvent mouseEvent;
+  mouseEvent.SetType(gazebo::common::MouseEvent::MOVE);
+  modelMaker->OnMouseMove(mouseEvent);
+
+  // Check that entity moved
+  ignition::math::Vector3d pos = modelMaker->EntityPosition();
+  QVERIFY(pos != startPos);
+  QVERIFY(vis->WorldPose().Pos() == pos);
+
+  // Mouse release
+  mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
+  mouseEvent.SetButton(gazebo::common::MouseEvent::LEFT);
+  mouseEvent.SetDragging(false);
+  mouseEvent.SetPressPos(0, 0);
+  mouseEvent.SetPos(0, 0);
+  modelMaker->OnMouseRelease(mouseEvent);
+
+  // Check there's no box in the scene -- the preview is gone
+  vis = scene->GetVisual(entityName);
+  QVERIFY(vis == NULL);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Check there's a box in the scene -- this is the final model
+  vis = scene->GetVisual(entityName);
+  QVERIFY(vis != NULL);
+
+  // Check the box is in the left panel
+  hasBox = mainWindow->HasEntityName(entityName);
+  QVERIFY(hasBox);
+
+  delete modelMaker;
+
+  // Terminate
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
 void ModelMaker_TEST::FromNestedModelFile()
 {
   this->resMaxPercentChange = 5.0;

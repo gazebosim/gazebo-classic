@@ -38,6 +38,13 @@ namespace gazebo
     GZ_COMMON_VISIBLE ignition::math::Pose3d resolveSdfPose(
         const sdf::SemanticPose &_semPose, const std::string &_resolveTo="");
 
+    /// \brief Resolve all the poses that use frame semantics and update
+    /// _modelElem so that all poses are expressed in the sdf1.6 convention
+    /// (i.e. relative to the poses default `relative_to` attribute).
+    /// \param[in, out] _modelElem Model element that will have its poses
+    /// resolved
+    GZ_COMMON_VISIBLE void resolveSdfSemanticPoses(
+        const sdf::ElementPtr &_modelElem);
     /// \}
   }
 }
