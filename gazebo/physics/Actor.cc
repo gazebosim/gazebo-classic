@@ -38,6 +38,16 @@
 /// \brief Private data for Actor class
 class gazebo::physics::ActorPrivate
 {
+  /// \brief True if the animation is loaded from BVH file
+  public: bool bvhFile = false;
+
+  /// \brief Translations to align BVH skeleton to DAE skin
+  public: std::map<std::string, ignition::math::Matrix4d>
+      translationAligner;
+
+  /// \brief Rotations to align BVH skeleton to DAE skin
+  public: std::map<std::string, ignition::math::Matrix4d>
+      rotationAligner;
 };
 
 using namespace gazebo;
@@ -252,7 +262,7 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
         double phi = acos(dir.Z() / length);
 
         ignition::math::Pose3d bonePose(linkPos,
-        ignition::math::Quaterniond(0.0, phi, theta));
+            ignition::math::Quaterniond(0.0, phi, theta));
         bonePose.Rot() = pose.Rot().Inverse() * bonePose.Rot();
 
         this->AddBoxVisual(linkSdf, bone->GetName() + "_" +
@@ -417,7 +427,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
   {
     BVHLoader loader;
     skel = loader.Load(animFile, animScale);
-    this->bvhFile = true;
+    this->dataPtr->bvhFile = true;
   }
   else if (extension == "dae")
   {
@@ -490,7 +500,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
     return;
   }
 
-  if (this->bvhFile)
+  if (this->dataPtr->bvhFile)
   {
     this->AlignBvh(skel, skelMap);
   }
@@ -501,6 +511,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+// Equivalent to ignition::common::Skeleton::AddBvhAnimation
 void Actor::AlignBvh(Skeleton *_skel,
     std::map<std::string, std::string> _skelMap)
 {
@@ -520,7 +531,7 @@ void Actor::AlignBvh(Skeleton *_skel,
             == ignition::math::Vector3d::Zero)
         {
           // parent link is a virtual link (has no length)
-          this->translationAligner[animNode->GetName()] =
+          this->dataPtr->translationAligner[animNode->GetName()] =
               ignition::math::Matrix4d::Identity;
         }
       }
@@ -536,10 +547,10 @@ void Actor::AlignBvh(Skeleton *_skel,
         _skelMap[this->skeleton->GetRootNode()->GetName()])
     {
       // if this is root, then some setup is needed to match bvh and dae
-      this->translationAligner[animNode->GetName()] =
+      this->dataPtr->translationAligner[animNode->GetName()] =
           ignition::math::Matrix4d(
           this->skeleton->GetRootNode()->Transform().Rotation());
-      auto tmp = this->translationAligner[animNode->GetName()];
+      auto tmp = this->dataPtr->translationAligner[animNode->GetName()];
       tmp.SetTranslation(animNode->Transform().Translation());
       animNode->SetTransform(tmp, true);
     }
@@ -556,25 +567,25 @@ void Actor::AlignBvh(Skeleton *_skel,
     auto relativeBvh = animNode->GetChild(0)->ModelTransform().Translation()
         - animNode->ModelTransform().Translation();
 
-    auto relativeDae = skinNode->GetChild(0)->ModelTransform().Translation()
+    auto relativeSkin = skinNode->GetChild(0)->ModelTransform().Translation()
           - skinNode->ModelTransform().Translation();
 
     if (relativeBvh == ignition::math::Vector3d::Zero ||
-        relativeDae == ignition::math::Vector3d::Zero)
+        relativeSkin == ignition::math::Vector3d::Zero)
     {
       // unexpected
-      std::cerr << "Duplicated joint found! This might cause some errors!\n";
+      gzerr << "Duplicated joint found! This might cause some errors!\n";
       continue;
     }
 
     // calculate world coordinate rotation quaternion
     // (difference between link i+1 posture)
-    auto n = relativeBvh.Cross(relativeDae);
-    double theta = asin(n.Length() / (relativeDae.Length() *
+    auto n = relativeBvh.Cross(relativeSkin);
+    double theta = asin(n.Length() / (relativeSkin.Length() *
         relativeBvh.Length()));
 
     // calculate bvh to dae of link i+1
-    this->translationAligner[animNode->GetChild(0)->GetName()] =
+    this->dataPtr->translationAligner[animNode->GetChild(0)->GetName()] =
         ignition::math::Matrix4d(skinNode->ModelTransform().Rotation())
         .Inverse()
         * ignition::math::Matrix4d(ignition::math::Quaterniond(n.Normalize(),
@@ -603,23 +614,23 @@ void Actor::AlignBvh(Skeleton *_skel,
         _skelMap[this->skeleton->GetRootNode()->GetName()])
     {
       // rotation should not be aligned with root
-      this->rotationAligner[animNode->GetName()] =
+      this->dataPtr->rotationAligner[animNode->GetName()] =
           ignition::math::Matrix4d::Identity;
       continue;
     }
 
     // in case an aligner was not correctly calculated, set a value to prevent
     // nan
-    if (this->translationAligner[animNode->GetName()] ==
+    if (this->dataPtr->translationAligner[animNode->GetName()] ==
         ignition::math::Matrix4d::Zero)
     {
-      this->translationAligner[animNode->GetName()] =
+      this->dataPtr->translationAligner[animNode->GetName()] =
           ignition::math::Matrix4d::Identity;
     }
 
-    this->rotationAligner[animNode->GetName()] =
+    this->dataPtr->rotationAligner[animNode->GetName()] =
         ignition::math::Matrix4d(animNode->Transform().Rotation()).Inverse()
-        * this->translationAligner[animNode->GetName()].Inverse()
+        * this->dataPtr->translationAligner[animNode->GetName()].Inverse()
         * ignition::math::Matrix4d(skinNode->Transform().Rotation());
   }
 }
@@ -789,11 +800,13 @@ void Actor::Update()
     rootTrans = frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
   }
 
-  ignition::math::Vector3d bvhOffset = rootTrans.Translation();
-  auto daeOffset = this->skeleton->GetRootNode()->Transform().Translation();
-  // scale bvh offset to dae link length
-  ignition::math::Vector3d rootPos = 0.0 * bvhOffset.Normalize();
+  ignition::math::Vector3d rootPos = rootTrans.Translation();
   ignition::math::Quaterniond rootRot = rootTrans.Rotation();
+  // Zero root pos for BVH
+  if (this->dataPtr->bvhFile)
+  {
+    rootPos *= 0.0;
+  }
 
   if (tinfo->translated)
     rootPos.X() = 0.0;
@@ -848,7 +861,6 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
     mainLinkPose.Rot() = this->worldPose.Rot();
   }
 
-  ignition::math::Vector3d temp(0.0, 0.0, 0.0);
   for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
   {
     SkeletonNode *bone = this->skeleton->GetNodeByHandle(i);
@@ -857,7 +869,7 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
 
     if (_frame.find(_skelMap[bone->GetName()]) != _frame.end())
     {
-      if (this->bvhFile)
+      if (this->dataPtr->bvhFile)
       {
         std::string tempStr(_skelMap[bone->GetName()]);
         transform = _frame[tempStr];
@@ -870,8 +882,8 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
           transform.SetTranslation(daeOffset.Length() * bvhOffset.Normalize());
         }
 
-        transform = this->translationAligner[tempStr] * transform *
-            this->rotationAligner[tempStr];
+        transform = this->dataPtr->translationAligner[tempStr] * transform *
+            this->dataPtr->rotationAligner[tempStr];
       }
       else
       {
@@ -887,7 +899,7 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
     ignition::math::Pose3d bonePose = transform.Pose();
     if (!bonePose.IsFinite())
     {
-      std::cerr << "ACTOR: " << _time << " " << bone->GetName()
+      gzerr << "ACTOR: " << _time << " " << bone->GetName()
                 << " " << bonePose << "\n";
       bonePose.Correct();
     }
