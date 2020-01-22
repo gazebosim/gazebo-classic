@@ -2570,9 +2570,9 @@ void World::ProcessMessages()
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
 
     if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
-         // When ready to use the direct API for updating scene poses from server,
-         // uncomment the following line:
-         // this->dataPtr->updateScenePoses ||
+      // When ready to use the direct API for updating scene poses from server,
+      // uncomment the following line:
+      // this->dataPtr->updateScenePoses ||
         (this->dataPtr->poseLocalPub &&
          this->dataPtr->poseLocalPub->HasConnections()))
     {
