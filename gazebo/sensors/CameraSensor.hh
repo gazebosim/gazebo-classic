@@ -61,6 +61,21 @@ namespace gazebo
       /// \brief Initialize the camera
       public: virtual void Init();
 
+      /// \brief reset timing related members
+      protected: void ResetLastUpdateTime() override;
+
+      /// \brief Return true if the sensor needs to be updated.
+      /// \return True when sensor should be updated.
+      protected: bool NeedsUpdate() override;
+
+      /// \brief Update the sensor.
+      /// \param[in] _force True to force update, false otherwise.
+      public: void Update(bool _force) override;
+
+      /// \brief Return the next timestamp going to be used by the sensor
+      /// \return the timestamp
+      public: double NextRequiredTimestamp() const override;
+
       /// \brief Gets the topic name of the sensor
       /// \return Topic name
       public: virtual std::string Topic() const;
@@ -68,6 +83,10 @@ namespace gazebo
       /// \brief Gets the ignition topic name of the sensor
       /// \return Ignition topic name
       public: std::string TopicIgn() const;
+
+      /// \brief Set whether the sensor is active or not.
+      /// \param[in] _value True if active, false if not.
+      public: void SetActive(bool _value) override;
 
       /// \brief Returns a pointer to the rendering::Camera.
       /// \return The Pointer to the camera sensor.

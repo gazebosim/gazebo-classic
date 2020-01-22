@@ -192,6 +192,24 @@ void CameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
+void CameraSensor::SetActive(bool _value)
+{
+  Sensor::SetActive(_value);
+}
+
+//////////////////////////////////////////////////
+bool CameraSensor::NeedsUpdate()
+{
+  return Sensor::NeedsUpdate();
+}
+
+//////////////////////////////////////////////////
+void CameraSensor::Update(bool _force)
+{
+  Sensor::Update(_force);
+}
+
+//////////////////////////////////////////////////
 void CameraSensor::Render()
 {
   if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
@@ -338,5 +356,17 @@ bool CameraSensor::Rendered() const
 void CameraSensor::SetRendered(const bool _value)
 {
   this->dataPtr->rendered = _value;
+}
+
+//////////////////////////////////////////////////
+double CameraSensor::NextRequiredTimestamp() const
+{
+  return Sensor::NextRequiredTimestamp();
+}
+
+//////////////////////////////////////////////////
+void CameraSensor::ResetLastUpdateTime()
+{
+  Sensor::ResetLastUpdateTime();
 }
 
