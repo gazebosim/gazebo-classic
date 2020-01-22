@@ -368,9 +368,8 @@ namespace gazebo
       /// \brief Wait until no sensors use the current step any more
       public: std::function<void(double, double)> waitForSensors;
 
-      /// \brief callback function intended to call the scene with a Pose Msg
-      public: std::function<void(const std::string&,
-                                  const msgs::PosesStamped&)> sendPoseMsg;
+      /// \brief Callback function intended to call the scene with updated Poses
+      public: UpdateScenePosesFunc updateScenePoses;
     };
   }
 }

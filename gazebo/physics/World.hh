@@ -98,10 +98,13 @@ namespace gazebo
 
       /// \brief Initialize the world.
       /// This is called after Load.
-      /// \param[in] func function to be called when a new Pose message is built
-      public: void Init(std::function<void(
-                          const std::string &,
-                          const msgs::PosesStamped &)> _func);
+      /// \deprecated See Init(UpdateScenePosesFunc)
+      public: void Init() GAZEBO_DEPRECATED(11.0);
+
+      /// \brief Initialize the world.
+      /// This is called after Load.
+      /// \param[in] _func function to be called when Poses are available.
+      public: void Init(UpdateScenePosesFunc _func);
 
       /// \brief Run the world in a thread.
       /// Run the update loop.

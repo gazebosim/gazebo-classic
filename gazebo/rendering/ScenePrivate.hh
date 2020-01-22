@@ -221,7 +221,7 @@ namespace gazebo
       public: std::condition_variable newPoseCondition;
 
       /// \brief Flag indicating that a new pose msg is available
-      public: bool newPoseAvailable;
+      public: bool newPoseAvailable = false;
 
       /// \brief Protects flag newPoseAvailable
       public: std::mutex newPoseMutex;

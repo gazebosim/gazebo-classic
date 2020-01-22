@@ -157,7 +157,15 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       &Scene::OnLightModifyMsg, this);
 
   this->dataPtr->isServer = _isServer;
-  if (!_isServer)
+  if (_isServer)
+  {
+    this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/local/info",
+        &Scene::OnPoseMsg, this);
+  }
+  else
+  // When ready to use the direct API for updating scene poses from server,
+  // uncomment the following line and delete the if and else directly above
+  // if (!_isServer)
   {
     this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/info",
         &Scene::OnPoseMsg, this);
@@ -200,6 +208,8 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
+  this->dataPtr->initialized = false;
+
   this->dataPtr->connections.clear();
 
   this->dataPtr->poseSub.reset();
@@ -291,8 +301,6 @@ void Scene::Clear()
   this->dataPtr->skyxController = nullptr;
 
   RTShaderSystem::Instance()->RemoveScene(this->Name());
-
-  this->dataPtr->initialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -2857,7 +2865,7 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::SetPoseMsg(const msgs::PosesStamped &_msg)
+void Scene::UpdatePoses(const msgs::PosesStamped &_msg)
 {
   auto msgptr = boost::make_shared<const msgs::PosesStamped>(_msg);
   this->OnPoseMsg(msgptr);

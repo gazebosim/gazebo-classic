@@ -125,12 +125,12 @@ bool rendering::wait_for_render_request(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-void rendering::set_pose_msg(const std::string &_name,
-                             const msgs::PosesStamped &_msg)
+void rendering::update_scene_poses(const std::string &_name,
+                                   const msgs::PosesStamped &_msg)
 {
-    ScenePtr scn = get_scene(_name);
-    if (scn)
-      scn->SetPoseMsg(_msg);
+  ScenePtr scene = get_scene(_name);
+  if (scene && scene->Initialized())
+  {
+    scene->UpdatePoses(_msg);
+  }
 }
-
-

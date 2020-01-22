@@ -374,9 +374,13 @@ void World::Save(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void World::Init(std::function<void(
-                          const std::string &,
-                          const msgs::PosesStamped &)> _func)
+void World::Init()
+{
+  this->Init(nullptr);
+}
+
+//////////////////////////////////////////////////
+void World::Init(UpdateScenePosesFunc _func)
 {
   // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); ++i)
@@ -433,7 +437,7 @@ void World::Init(std::function<void(
     }
   }
 
-  this->dataPtr->sendPoseMsg = _func;
+  this->dataPtr->updateScenePoses = _func;
 
   this->dataPtr->initialized = true;
 
@@ -2575,70 +2579,83 @@ void World::ProcessMessages()
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
 
-    msgs::PosesStamped msg;
-
-    // Time stamp this PosesStamped message
-    msgs::Set(msg.mutable_time(), this->SimTime());
-
-    if (!this->dataPtr->publishModelPoses.empty() ||
-        !this->dataPtr->publishLightPoses.empty())
+    if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
+         // When ready to use the direct API for updating scene poses from server,
+         // uncomment the following line:
+         // this->dataPtr->updateScenePoses ||
+        (this->dataPtr->poseLocalPub &&
+         this->dataPtr->poseLocalPub->HasConnections()))
     {
-      for (auto const &model : this->dataPtr->publishModelPoses)
+      msgs::PosesStamped msg;
+
+      // Time stamp this PosesStamped message
+      msgs::Set(msg.mutable_time(), this->SimTime());
+
+      if (!this->dataPtr->publishModelPoses.empty() ||
+          !this->dataPtr->publishLightPoses.empty())
       {
-        std::list<ModelPtr> modelList;
-        modelList.push_back(model);
-        while (!modelList.empty())
+        for (auto const &model : this->dataPtr->publishModelPoses)
         {
-          ModelPtr m = modelList.front();
-          modelList.pop_front();
+          std::list<ModelPtr> modelList;
+          modelList.push_back(model);
+          while (!modelList.empty())
+          {
+            ModelPtr m = modelList.front();
+            modelList.pop_front();
+            msgs::Pose *poseMsg = msg.add_pose();
+
+            // Publish the model's relative pose
+            poseMsg->set_name(m->GetScopedName());
+            poseMsg->set_id(m->GetId());
+            msgs::Set(poseMsg, m->RelativePose());
+
+            // Publish each of the model's child links relative poses
+            Link_V links = m->GetLinks();
+            for (auto const &link : links)
+            {
+              poseMsg = msg.add_pose();
+              poseMsg->set_name(link->GetScopedName());
+              poseMsg->set_id(link->GetId());
+              msgs::Set(poseMsg, link->RelativePose());
+            }
+
+            // add all nested models to the queue
+            Model_V models = m->NestedModels();
+            for (auto const &n : models)
+              modelList.push_back(n);
+          }
+        }
+
+        for (auto const &light : this->dataPtr->publishLightPoses)
+        {
           msgs::Pose *poseMsg = msg.add_pose();
 
-          // Publish the model's relative pose
-          poseMsg->set_name(m->GetScopedName());
-          poseMsg->set_id(m->GetId());
-          msgs::Set(poseMsg, m->RelativePose());
-
-          // Publish each of the model's child links relative poses
-          Link_V links = m->GetLinks();
-          for (auto const &link : links)
-          {
-            poseMsg = msg.add_pose();
-            poseMsg->set_name(link->GetScopedName());
-            poseMsg->set_id(link->GetId());
-            msgs::Set(poseMsg, link->RelativePose());
-          }
-
-          // add all nested models to the queue
-          Model_V models = m->NestedModels();
-          for (auto const &n : models)
-            modelList.push_back(n);
+          // Publish the light's pose
+          poseMsg->set_name(light->GetScopedName());
+          poseMsg->set_id(light->GetId());
+          msgs::Set(poseMsg, light->RelativePose());
         }
+
+        if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())
+          this->dataPtr->posePub->Publish(msg);
       }
 
-      for (auto const &light : this->dataPtr->publishLightPoses)
+      if (this->dataPtr->poseLocalPub &&
+          this->dataPtr->poseLocalPub->HasConnections())
       {
-        msgs::Pose *poseMsg = msg.add_pose();
-
-        // Publish the light's pose
-        poseMsg->set_name(light->GetScopedName());
-        poseMsg->set_id(light->GetId());
-        msgs::Set(poseMsg, light->RelativePose());
+        // rendering::Scene depends on this timestamp, which is used by
+        // rendering sensors to time stamp their data
+        this->dataPtr->poseLocalPub->Publish(msg);
       }
 
-      if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())
-        this->dataPtr->posePub->Publish(msg);
+      // When ready to use the direct API for updating scene poses from server,
+      // uncomment the following lines:
+      // // Execute callback to export Pose msg
+      // if (this->dataPtr->updateScenePoses)
+      // {
+      //   this->dataPtr->updateScenePoses(this->Name(), msg);
+      // }
     }
-
-    if (this->dataPtr->poseLocalPub &&
-        this->dataPtr->poseLocalPub->HasConnections())
-    {
-      // rendering::Scene depends on this timestamp, which is used by
-      // rendering sensors to time stamp their data
-      this->dataPtr->poseLocalPub->Publish(msg);
-    }
-
-    // Execute callback to export Pose msg
-    this->dataPtr->sendPoseMsg(this->Name(), msg);
 
     this->dataPtr->publishModelPoses.clear();
     this->dataPtr->publishLightPoses.clear();
