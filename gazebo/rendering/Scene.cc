@@ -200,6 +200,8 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
+  this->dataPtr->initialized = false;
+
   this->dataPtr->connections.clear();
 
   this->dataPtr->poseSub.reset();
@@ -291,8 +293,6 @@ void Scene::Clear()
   this->dataPtr->skyxController = nullptr;
 
   RTShaderSystem::Instance()->RemoveScene(this->Name());
-
-  this->dataPtr->initialized = false;
 }
 
 //////////////////////////////////////////////////

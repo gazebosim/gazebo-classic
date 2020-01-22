@@ -114,6 +114,6 @@ void rendering::update_scene_poses(const std::string &_name,
                                    const msgs::PosesStamped &_msg)
 {
     ScenePtr scn = get_scene(_name);
-    if (scn)
+    if (scn && scn->Initialized())
       scn->UpdatePoses(_msg);
 }
