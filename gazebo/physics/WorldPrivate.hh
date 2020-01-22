@@ -366,9 +366,7 @@ namespace gazebo
       public: ignition::transport::Node ignNode;
 
       /// \brief Callback function intended to call the scene with updated Poses
-      public:
-          std::function<void(const std::string&, const msgs::PosesStamped&)>
-          updateScenePoses;
+      public: UpdateScenePosesFunc updateScenePoses;
     };
   }
 }
