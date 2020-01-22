@@ -113,7 +113,9 @@ void rendering::remove_scene(const std::string &_name)
 void rendering::update_scene_poses(const std::string &_name,
                                    const msgs::PosesStamped &_msg)
 {
-    ScenePtr scn = get_scene(_name);
-    if (scn && scn->Initialized())
-      scn->UpdatePoses(_msg);
+  ScenePtr scene = get_scene(_name);
+  if (scene && scene->Initialized())
+  {
+    scene->UpdatePoses(_msg);
+  }
 }
