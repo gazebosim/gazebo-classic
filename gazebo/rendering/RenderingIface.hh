@@ -52,8 +52,8 @@ namespace gazebo
     /// \param[in] _name Name of the scene concerned.
     /// \param[in] _msg message to be passed.
     GZ_RENDERING_VISIBLE
-    void set_pose_msg(const std::string &_name,
-                      const msgs::PosesStamped &_msg);
+    void update_scene_poses(const std::string &_name,
+                            const msgs::PosesStamped &_msg);
 
     /// \brief create rendering::Scene by name.
     /// \param[in] _name Name of the scene to create.

@@ -177,7 +177,7 @@ gazebo::physics::WorldPtr gazebo::loadWorld(const std::string &_worldFile)
   world = gazebo::physics::create_world();
   gazebo::physics::load_world(world, sdf->Root()->GetElement("world"));
 
-  gazebo::physics::init_world(world, rendering::set_pose_msg);
+  gazebo::physics::init_world(world, rendering::update_scene_poses);
 
   return world;
 }

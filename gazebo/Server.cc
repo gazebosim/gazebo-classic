@@ -497,7 +497,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
       << " seconds for namespaces. Giving up.\n";
   }
 
-  physics::init_worlds(rendering::set_pose_msg);
+  physics::init_worlds(rendering::update_scene_poses);
   this->dataPtr->stop = false;
 
   return true;
