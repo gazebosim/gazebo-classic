@@ -20,6 +20,8 @@
 #include <string>
 #include <sdf/sdf.hh>
 
+#include "gazebo/msgs/poses_stamped.pb.h"
+
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -69,8 +71,11 @@ namespace gazebo
 
     /// \brief Init world given a pointer to it.
     /// \param[in] _world World to initialize.
+    /// \param[in] _func function to be called when Poses are available.
     GZ_PHYSICS_VISIBLE
-    void init_world(WorldPtr _world);
+    void init_world(WorldPtr _world, std::function<void(
+                                        const std::string &,
+                                        const msgs::PosesStamped &)> _func);
 
     /// \brief Run world by calling World::Run() given a pointer to it.
     /// \param[in] _world World to run.
@@ -97,8 +102,10 @@ namespace gazebo
 
     /// \brief initialize multiple worlds stored in static variable
     /// gazebo::g_worlds
+    /// \param[in] _func function to be called when Poses are available.
     GZ_PHYSICS_VISIBLE
-    void init_worlds();
+    void init_worlds(std::function<void(const std::string&,
+                                        const msgs::PosesStamped&)> _func);
 
     /// \brief Run multiple worlds stored in static variable
     /// gazebo::g_worlds

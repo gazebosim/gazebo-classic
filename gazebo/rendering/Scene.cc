@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 
@@ -156,12 +157,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       &Scene::OnLightModifyMsg, this);
 
   this->dataPtr->isServer = _isServer;
-  if (_isServer)
-  {
-    this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/local/info",
-        &Scene::OnPoseMsg, this);
-  }
-  else
+  if (!_isServer)
   {
     this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/info",
         &Scene::OnPoseMsg, this);
@@ -2858,6 +2854,17 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
     else
       this->dataPtr->poseMsgs.insert(std::make_pair(p.id(), p));
   }
+}
+
+/////////////////////////////////////////////////
+void Scene::SetPoseMsg(const msgs::PosesStamped &_msg)
+{
+  auto msgptr = boost::make_shared<const msgs::PosesStamped>(_msg);
+  this->OnPoseMsg(msgptr);
+
+  std::unique_lock<std::mutex> lck(this->dataPtr->newPoseMutex);
+  this->dataPtr->newPoseAvailable = true;
+  this->dataPtr->newPoseCondition.notify_all();
 }
 
 /////////////////////////////////////////////////

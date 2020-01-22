@@ -364,6 +364,10 @@ namespace gazebo
 
       /// \brief Node for ignition transport communication.
       public: ignition::transport::Node ignNode;
+
+      /// \brief Callback function intended to call the scene with a Pose Msg.
+      public: std::function<void(const std::string&,
+                                  const msgs::PosesStamped&)> sendPoseMsg;
     };
   }
 }

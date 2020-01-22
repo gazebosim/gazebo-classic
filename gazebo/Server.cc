@@ -56,6 +56,8 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
+#include "gazebo/rendering/RenderingIface.hh"
+
 #include "gazebo/Master.hh"
 #include "gazebo/Server.hh"
 
@@ -495,7 +497,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
       << " seconds for namespaces. Giving up.\n";
   }
 
-  physics::init_worlds();
+  physics::init_worlds(rendering::set_pose_msg);
   this->dataPtr->stop = false;
 
   return true;

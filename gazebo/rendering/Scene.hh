@@ -558,6 +558,12 @@ namespace gazebo
       /// \return The current simulation time in Scene
       public: common::Time SimTime() const;
 
+      /// \brief Set new Poses via direct API call instead of transport.
+      /// A pointer to this function is passed to physics when initializing
+      /// a Gazebo Server.
+      /// \param[in] _msg The message data.
+      public: void SetPoseMsg(const msgs::PosesStamped& _msg);
+
       /// \brief Get the number of visuals.
       /// \return The number of visuals in the Scene.
       public: uint32_t VisualCount() const;

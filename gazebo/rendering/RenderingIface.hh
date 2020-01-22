@@ -18,6 +18,7 @@
 #define _RENDERINGIFACE_HH_
 
 #include <string>
+#include "gazebo/msgs/poses_stamped.pb.h"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -41,9 +42,16 @@ namespace gazebo
     bool fini();
 
     /// \brief get pointer to rendering::Scene by name.
-    /// \param[in] _name Name of the scene to retreive.
+    /// \param[in] _name Name of the scene to retrieve.
     GZ_RENDERING_VISIBLE
     rendering::ScenePtr get_scene(const std::string &_name = "");
+
+    /// \brief directly provide Pose message to the corresponding scene.
+    /// \param[in] _name Name of the scene concerned.
+    /// \param[in] _msg message to be passed.
+    GZ_RENDERING_VISIBLE
+    void set_pose_msg(const std::string &_name,
+                      const msgs::PosesStamped &_msg);
 
     /// \brief create rendering::Scene by name.
     /// \param[in] _name Name of the scene to create.

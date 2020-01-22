@@ -20,6 +20,7 @@
 
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Scene.hh"
 
 using namespace gazebo;
 
@@ -106,4 +107,13 @@ rendering::ScenePtr rendering::create_scene(const std::string &_name,
 void rendering::remove_scene(const std::string &_name)
 {
   rendering::RenderEngine::Instance()->RemoveScene(_name);
+}
+
+//////////////////////////////////////////////////
+void rendering::set_pose_msg(const std::string &_name,
+                             const msgs::PosesStamped &_msg)
+{
+    ScenePtr scn = get_scene(_name);
+    if (scn)
+      scn->SetPoseMsg(_msg);
 }

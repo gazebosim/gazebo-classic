@@ -374,7 +374,9 @@ void World::Save(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void World::Init()
+void World::Init(std::function<void(
+                          const std::string &,
+                          const msgs::PosesStamped &)> _func)
 {
   // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); ++i)
@@ -430,6 +432,8 @@ void World::Init()
       break;
     }
   }
+
+  this->dataPtr->sendPoseMsg = _func;
 
   this->dataPtr->initialized = true;
 
@@ -2561,9 +2565,6 @@ void World::ProcessMessages()
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
 
-    if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
-        (this->dataPtr->poseLocalPub &&
-         this->dataPtr->poseLocalPub->HasConnections()))
     {
       msgs::PosesStamped msg;
 
@@ -2626,7 +2627,11 @@ void World::ProcessMessages()
         // rendering sensors to time stamp their data
         this->dataPtr->poseLocalPub->Publish(msg);
       }
+
+      // Execute callback to export Pose msg
+      this->dataPtr->sendPoseMsg(this->Name(), msg);
     }
+
     this->dataPtr->publishModelPoses.clear();
     this->dataPtr->publishLightPoses.clear();
   }

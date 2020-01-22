@@ -30,6 +30,8 @@
 #include "gazebo/gazebo_shared.hh"
 #include "gazebo/gazebo.hh"
 
+#include "gazebo/rendering/RenderingIface.hh"
+
 boost::mutex fini_mutex;
 std::vector<gazebo::SystemPluginPtr> g_plugins;
 
@@ -175,7 +177,7 @@ gazebo::physics::WorldPtr gazebo::loadWorld(const std::string &_worldFile)
   world = gazebo::physics::create_world();
   gazebo::physics::load_world(world, sdf->Root()->GetElement("world"));
 
-  gazebo::physics::init_world(world);
+  gazebo::physics::init_world(world, rendering::set_pose_msg);
 
   return world;
 }
