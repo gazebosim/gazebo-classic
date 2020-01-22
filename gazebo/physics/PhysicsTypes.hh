@@ -244,6 +244,12 @@ namespace gazebo
     /// \brief Map of joint state
     typedef std::map<std::string, JointState> JointState_M;
 
+    /// \brief Function signature for API that updates scene poses.
+    /// \param[in] String name of scene update.
+    /// \param[in] Poses of objects in scene to update.
+    using UpdateScenePosesFunc =
+        std::function<void(const std::string &, const msgs::PosesStamped &)>;
+
     #ifndef GZ_COLLIDE_BITS
 
     /// \def GZ_ALL_COLLIDE
