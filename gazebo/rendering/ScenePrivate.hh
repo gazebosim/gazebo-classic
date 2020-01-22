@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <mutex>
+#include <condition_variable>
 
 #include <boost/unordered/unordered_map.hpp>
 
@@ -216,7 +217,10 @@ namespace gazebo
       /// \brief List of road messages to process.
       public: RoadMsgs_L roadMsgs;
 
-      /// \brief Flag indicating that a new pose msg is available.
+      /// \brief used to wake up upon new Pose available
+      public: std::condition_variable newPoseCondition;
+
+      /// \brief Flag indicating that a new pose msg is available
       public: bool newPoseAvailable;
 
       /// \brief Protects flag newPoseAvailable

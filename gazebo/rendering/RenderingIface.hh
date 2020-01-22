@@ -46,7 +46,9 @@ namespace gazebo
     GZ_RENDERING_VISIBLE
     rendering::ScenePtr get_scene(const std::string &_name = "");
 
-    /// \brief directly provide Pose message to the corresponding scene.
+    /// \brief Update Poses via direct API call instead of transport.
+    /// A pointer to this function is passed to physics when initializing
+    /// a Gazebo Server.
     /// \param[in] _name Name of the scene concerned.
     /// \param[in] _msg message to be passed.
     GZ_RENDERING_VISIBLE
