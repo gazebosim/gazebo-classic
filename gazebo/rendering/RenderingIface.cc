@@ -115,5 +115,5 @@ void rendering::update_scene_poses(const std::string &_name,
 {
     ScenePtr scn = get_scene(_name);
     if (scn)
-      scn->SetPoseMsg(_msg);
+      scn->UpdatePoses(_msg);
 }

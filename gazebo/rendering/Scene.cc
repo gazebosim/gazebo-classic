@@ -2857,7 +2857,7 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::SetPoseMsg(const msgs::PosesStamped &_msg)
+void Scene::UpdatePoses(const msgs::PosesStamped &_msg)
 {
   auto msgptr = boost::make_shared<const msgs::PosesStamped>(_msg);
   this->OnPoseMsg(msgptr);

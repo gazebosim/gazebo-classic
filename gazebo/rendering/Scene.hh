@@ -561,7 +561,7 @@ namespace gazebo
       /// \brief Update Poses of objects in the scene via direct API call
       /// instead of transport.
       /// \param[in] _msg The message data.
-      public: void SetPoseMsg(const msgs::PosesStamped& _msg);
+      public: void UpdatePoses(const msgs::PosesStamped& _msg);
 
       /// \brief Get the number of visuals.
       /// \return The number of visuals in the Scene.
