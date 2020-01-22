@@ -98,7 +98,7 @@ namespace gazebo
 
       /// \brief Initialize the world.
       /// This is called after Load.
-    /// \param[in] _func function to be called when Poses are available.
+      /// \param[in] _func function to be called when Poses are available.
       public: void Init(std::function<void(
                           const std::string &,
                           const msgs::PosesStamped &)> _func);
