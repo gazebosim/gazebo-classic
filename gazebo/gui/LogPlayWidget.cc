@@ -35,9 +35,6 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   this->dataPtr->timePanel = dynamic_cast<TimePanel *>(_parent);
 
-  QSize bigSize(70, 70);
-  QSize bigIconSize(40, 40);
-
   // Empty space on the left
   QWidget *leftSpacer = new QWidget();
   leftSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -113,20 +110,19 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   // RT Factor
   QLabel *rtFactorLabel = new QLabel("Real Time Factor: ");
 
-  this->dataPtr->rtFactorSpin = new QDoubleSpinBox();
-  this->dataPtr->rtFactorSpin->setMaximumWidth(30);
-  this->dataPtr->rtFactorSpin->setValue(0.0);
-  this->dataPtr->rtFactorSpin->setRange(0.0, 100.);
-  this->dataPtr->rtFactorSpin->setSingleStep(0.1);
-  connect(this->dataPtr->rtFactorSpin,
-          SIGNAL(valueChanged(const double)), this,
-          SLOT(OnRtFactorChanged(const double)));
+  auto rtFactorSpin = new QDoubleSpinBox();
+  rtFactorSpin->setMaximumWidth(30);
+  rtFactorSpin->setValue(0.0);
+  rtFactorSpin->setRange(0.0, 100.);
+  rtFactorSpin->setSingleStep(0.1);
+  this->connect(rtFactorSpin, SIGNAL(valueChanged(const double)), this,
+      SLOT(OnRtFactorChanged(const double)));
 
   QHBoxLayout *rtFactorLayout = new QHBoxLayout();
   rtFactorLayout->addWidget(rtFactorLabel);
-  rtFactorLayout->addWidget(this->dataPtr->rtFactorSpin);
+  rtFactorLayout->addWidget(rtFactorSpin);
   rtFactorLayout->setAlignment(rtFactorLabel, Qt::AlignRight);
-  rtFactorLayout->setAlignment(this->dataPtr->rtFactorSpin, Qt::AlignLeft);
+  rtFactorLayout->setAlignment(rtFactorSpin, Qt::AlignLeft);
 
   // Controls layout
   QVBoxLayout *controlsLayout = new QVBoxLayout();

@@ -57,9 +57,6 @@ namespace gazebo
       /// \brief Spin box which holds the step size.
       public: QSpinBox *stepSpin;
 
-      /// \brief Spin box which holds the real time factor.
-      public: QDoubleSpinBox *rtFactorSpin;
-
       /// \brief Button to play.
       public: QToolButton *playButton;
 
