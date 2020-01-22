@@ -374,9 +374,8 @@ void World::Save(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void World::Init(std::function<void(
-                          const std::string &,
-                          const msgs::PosesStamped &)> _func)
+void World::Init(
+    std::function<void(const std::string &, const msgs::PosesStamped &)> _func)
 {
   // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); ++i)
@@ -433,7 +432,7 @@ void World::Init(std::function<void(
     }
   }
 
-  this->dataPtr->sendPoseMsg = _func;
+  this->dataPtr->updateScenePoses = _func;
 
   this->dataPtr->initialized = true;
 
@@ -2629,7 +2628,7 @@ void World::ProcessMessages()
       }
 
       // Execute callback to export Pose msg
-      this->dataPtr->sendPoseMsg(this->Name(), msg);
+      this->dataPtr->updateScenePoses(this->Name(), msg);
     }
 
     this->dataPtr->publishModelPoses.clear();
