@@ -43,6 +43,7 @@ namespace gazebo
 
     /// \brief Information about a trajectory for an Actor.
     /// This doesn't contain the keyframes information, just duration.
+    /// Equivalent to ignition::common::TrajectoryInfo
     class GZ_PHYSICS_VISIBLE TrajectoryInfo
     {
       /// \brief Constructor.
@@ -95,7 +96,7 @@ namespace gazebo
       /// \param[in] _skel BVH skeleton
       /// \param[in] _skelMap joint mapping between DAE skin and BVH skeleton
       public: void AlignBvh(common::Skeleton *_skel,
-          std::map<std::string, std::string> _skelMap);
+          const std::map<std::string, std::string> &_skelMap);
 
       /// \brief Initialize the actor
       public: virtual void Init();
@@ -307,17 +308,6 @@ namespace gazebo
 
       /// \brief True if the animation should loop.
       protected: bool loop;
-
-      /// \brief True if the animation is loaded from BVH file
-      protected: bool bvhFile = false;
-
-      /// \brief Translations to align BVH skeleton to DAE skin
-      protected: std::map<std::string, ignition::math::Matrix4d>
-          translationAligner;
-
-      /// \brief Rotations to align BVH skeleton to DAE skin
-      protected: std::map<std::string, ignition::math::Matrix4d>
-          rotationAligner;
 
       /// \brief True if the actor is being updated.
       protected: bool active;
