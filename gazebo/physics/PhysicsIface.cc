@@ -106,8 +106,14 @@ void physics::load_worlds(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void physics::init_worlds()
 {
+  init_worlds(nullptr);
+}
+
+/////////////////////////////////////////////////
+void physics::init_worlds(UpdateScenePosesFunc _func)
+{
   for (auto &world : g_worlds)
-    world->Init();
+    world->Init(_func);
 }
 
 /////////////////////////////////////////////////
@@ -140,7 +146,13 @@ void physics::load_world(WorldPtr _world, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void physics::init_world(WorldPtr _world)
 {
-  _world->Init();
+  init_world(_world, nullptr);
+}
+
+/////////////////////////////////////////////////
+void physics::init_world(WorldPtr _world, UpdateScenePosesFunc _func)
+{
+  _world->Init(_func);
 }
 
 /////////////////////////////////////////////////

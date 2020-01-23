@@ -558,6 +558,11 @@ namespace gazebo
       /// \return The current simulation time in Scene
       public: common::Time SimTime() const;
 
+      /// \brief Update Poses of objects in the scene via direct API call
+      /// instead of transport.
+      /// \param[in] _msg The message data.
+      public: void UpdatePoses(const msgs::PosesStamped& _msg);
+
       /// \brief Get the number of visuals.
       /// \return The number of visuals in the Scene.
       public: uint32_t VisualCount() const;

@@ -69,8 +69,15 @@ namespace gazebo
 
     /// \brief Init world given a pointer to it.
     /// \param[in] _world World to initialize.
+    /// \deprecated See init_world(WorldPtr, UpdateScenePosesFunc)
     GZ_PHYSICS_VISIBLE
-    void init_world(WorldPtr _world);
+    void init_world(WorldPtr _world) GAZEBO_DEPRECATED(11.0);
+
+    /// \brief Init world given a pointer to it.
+    /// \param[in] _world World to initialize.
+    /// \param[in] _func function to be called when Poses are available.
+    GZ_PHYSICS_VISIBLE
+    void init_world(WorldPtr _world, UpdateScenePosesFunc _func);
 
     /// \brief Run world by calling World::Run() given a pointer to it.
     /// \param[in] _world World to run.
@@ -97,8 +104,15 @@ namespace gazebo
 
     /// \brief initialize multiple worlds stored in static variable
     /// gazebo::g_worlds
+    /// \deprecated See init_worlds(UpdateScenePosesFunc)
     GZ_PHYSICS_VISIBLE
-    void init_worlds();
+    void init_worlds() GAZEBO_DEPRECATED(11.0);
+
+    /// \brief initialize multiple worlds stored in static variable
+    /// gazebo::g_worlds
+    /// \param[in] _func function to be called when Poses are available.
+    GZ_PHYSICS_VISIBLE
+    void init_worlds(UpdateScenePosesFunc _func);
 
     /// \brief Run multiple worlds stored in static variable
     /// gazebo::g_worlds

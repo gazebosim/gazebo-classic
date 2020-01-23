@@ -9,8 +9,12 @@
     * [Pull request 3160](https://bitbucket.org/osrf/gazebo/pull-request/3160)
     * [Pull request 3161](https://bitbucket.org/osrf/gazebo/pull-request/3161)
 
-1. Add helper function PhysicsEngine::any_cast to handle std::any.
+1. Add helper function `PhysicsEngine::any_cast` to handle std::any.
     * [Pull request 3147](https://bitbucket.org/osrf/gazebo/pull-request/3147)
+
+1. Create Scene::UpdatePoses API to allow physics to directly update scene poses
+   for server-side rendering, though it is not yet enabled.
+    * [Pull request 3180](https://bitbucket.org/osrf/gazebo/pull-request/3180)
 
 1. Modify build system to install dll in `<prefix>/bin` by default on Windows.
     * [Pull request 3144](https://bitbucket.org/osrf/gazebo/pull-request/3144)

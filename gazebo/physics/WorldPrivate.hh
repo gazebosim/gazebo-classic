@@ -373,6 +373,9 @@ namespace gazebo
 
       /// \brief Node for ignition transport communication.
       public: ignition::transport::Node ignNode;
+
+      /// \brief Callback function intended to call the scene with updated Poses
+      public: UpdateScenePosesFunc updateScenePoses;
     };
   }
 }
