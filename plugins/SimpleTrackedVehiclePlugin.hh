@@ -100,6 +100,9 @@ namespace gazebo {
     /// \brief Compute and apply the forces that make the tracks move.
     protected: void DriveTracks(const common::UpdateInfo &/*_unused*/);
 
+    /// \brief Return the number of tracks on the given side. Should always be
+    /// at least 1 for the main track. If flippers are present, the number is
+    /// higher.
     public: size_t GetNumTracks(Tracks side) const;
 
     /// \brief Set collide categories and bits of all geometries to the
