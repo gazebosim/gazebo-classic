@@ -42,6 +42,8 @@ namespace gazebo
 {
 using namespace std;
 using namespace physics;
+/// \brief This is a temporary workaround to keep ABI compatibility in
+/// Gazebo 9. It should be deleted starting with Gazebo 10.
 unordered_map<LinkPtr, unordered_map<Tracks, Link_V> > globalTracks;
 }
 
