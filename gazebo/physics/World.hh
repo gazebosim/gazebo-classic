@@ -167,7 +167,7 @@ namespace gazebo
 
       /// \brief Return the magnetic field vector.
       /// \return The magnetic field vector.
-      public: virtual ignition::math::Vector3d MagneticField() const;
+      public: ignition::math::Vector3d MagneticField() const;
 
       /// \brief Set the magnetic field vector.
       /// \param[in] _mag New magnetic field vector.
