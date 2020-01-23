@@ -96,13 +96,15 @@ void Noise::SetCamera(rendering::CameraPtr /*_camera*/)
 }
 
 //////////////////////////////////////////////////
-double Noise::Apply(double _in)
+double Noise::Apply(double _in, double _dt)
 {
   if (this->type == NONE)
     return _in;
   else if (this->type == CUSTOM)
   {
-    if (this->customNoiseCallback)
+    if (this->customNoiseCallbackTime)
+      return this->customNoiseCallbackTime(_in, _dt);
+    else if (this->customNoiseCallback)
       return this->customNoiseCallback(_in);
     else
     {
@@ -113,11 +115,11 @@ double Noise::Apply(double _in)
     }
   }
   else
-    return this->ApplyImpl(_in);
+    return this->ApplyImpl(_in, _dt);
 }
 
 //////////////////////////////////////////////////
-double Noise::ApplyImpl(double _in)
+double Noise::ApplyImpl(double _in, double /*_dt*/)
 {
   return _in;
 }
@@ -133,6 +135,14 @@ void Noise::SetCustomNoiseCallback(boost::function<double (double)> _cb)
 {
   this->type = CUSTOM;
   this->customNoiseCallback = _cb;
+}
+
+//////////////////////////////////////////////////
+void Noise::SetCustomNoiseCallbackTime(
+    boost::function<double (double, double)> _cb)
+{
+  this->type = CUSTOM;
+  this->customNoiseCallbackTime = _cb;
 }
 
 //////////////////////////////////////////////////
