@@ -142,6 +142,14 @@ void JointVisual::Load(ConstJointPtr &_msg,
 
 /////////////////////////////////////////////////
 ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
+    const bool _useParentFrame, const msgs::Joint::Type &_type)
+{
+  std::string xyzExpressedIn = _useParentFrame ? "__model__" : "";
+  return this->CreateAxis(_axis, xyzExpressedIn, _type);
+}
+
+/////////////////////////////////////////////////
+ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
     const std::string &_xyzExpressedIn, const msgs::Joint::Type &_type)
 {
   ArrowVisualPtr axis;
@@ -156,6 +164,16 @@ ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
   this->UpdateAxis(axis, _axis, _xyzExpressedIn, _type);
 
   return axis;
+}
+
+/////////////////////////////////////////////////
+void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
+    const ignition::math::Vector3d &_axis,
+    const bool _useParentFrame,
+    const msgs::Joint::Type &_type)
+{
+  std::string xyzExpressedIn = _useParentFrame ? "__model__" : "";
+  this->UpdateAxis(_arrowVisual, _axis, xyzExpressedIn, _type);
 }
 
 /////////////////////////////////////////////////

@@ -48,6 +48,12 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
 
 ### Modifications
 
+1. **gazebo/rendering/JointVisual.hh**
+    + ***Deprecation:*** ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis, const bool _useParentFrame, const msgs::Joint::Type &_type);
+    + ***Replacement:*** ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis, const std::string &_xyzExpressedIn, const msgs::Joint::Type &_type);
+    + ***Deprecation:*** void UpdateAxis(ArrowVisualPtr _arrowVisual, const ignition::math::Vector3d &_axis, const bool _useParentFrame, const msgs::Joint::Type &_type);
+    + ***Replacement:*** void UpdateAxis(ArrowVisualPtr _arrowVisual, const ignition::math::Vector3d &_axis, const std::string &_xyzExpressedIn, const msgs::Joint::Type &_type);
+
 1. All instances of `ignition::math::Box` in the API are changed to `ignition::math::AxisAlignedBox`
    to match the changes in ignition-math6.
 
