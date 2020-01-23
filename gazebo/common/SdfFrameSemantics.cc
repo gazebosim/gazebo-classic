@@ -56,7 +56,7 @@ ignition::math::Pose3d resolveSdfPose(const sdf::SemanticPose &_semPose,
 }
 
 /////////////////////////////////////////////////
-void resolveSdfSemanticPoses(const sdf::ElementPtr &_modelElem)
+void convertPosesToSdf16(const sdf::ElementPtr &_modelElem)
 {
   ignition::math::SemanticVersion sdfOriginalVersion(
       _modelElem->OriginalVersion());

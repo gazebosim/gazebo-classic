@@ -44,7 +44,7 @@ namespace gazebo
     /// (i.e. relative to the poses default `relative_to` attribute).
     /// \param[in, out] _modelElem Model element that will have its poses
     /// resolved
-    GZ_COMMON_VISIBLE void resolveSdfSemanticPoses(
+    GZ_COMMON_VISIBLE void convertPosesToSdf16(
         const sdf::ElementPtr &_modelElem);
     /// \}
   }

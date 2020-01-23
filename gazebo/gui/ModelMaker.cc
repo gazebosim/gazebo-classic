@@ -118,7 +118,7 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
   }
   if (this->dataPtr->modelSDF->Root()->HasElement("model"))
   {
-    common::resolveSdfSemanticPoses(
+    common::convertPosesToSdf16(
         this->dataPtr->modelSDF->Root()->GetElement("model"));
   }
 

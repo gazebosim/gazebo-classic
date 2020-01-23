@@ -536,7 +536,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
       {
         if (model->GetAttribute("name")->GetAsString() == _modelName)
         {
-          common::resolveSdfSemanticPoses(model);
+          common::convertPosesToSdf16(model);
           // Create the root model
           this->CreateModelFromSDF(model);
 
@@ -1220,7 +1220,7 @@ LinkData *ModelCreator::AddShape(const EntityType _type,
 /////////////////////////////////////////////////
 NestedModelData *ModelCreator::AddModel(const sdf::ElementPtr &_sdf)
 {
-  common::resolveSdfSemanticPoses(_sdf);
+  common::convertPosesToSdf16(_sdf);
   // Create a top-level nested model
   return this->CreateModelFromSDF(_sdf, this->dataPtr->previewVisual, false);
 }
@@ -1310,7 +1310,7 @@ void ModelCreator::InsertNestedModelFromSDF(sdf::ElementPtr _sdf)
   if (!_sdf)
     return;
 
-  common::resolveSdfSemanticPoses(_sdf);
+  common::convertPosesToSdf16(_sdf);
 
   this->CreateModelFromSDF(_sdf, this->dataPtr->previewVisual);
 }
@@ -1377,7 +1377,7 @@ NestedModelData *ModelCreator::CloneNestedModel(
   sdf::ElementPtr cloneSDF = it->second->modelSDF->Clone();
   cloneSDF->GetAttribute("name")->Set(leafName);
 
-  common::resolveSdfSemanticPoses(cloneSDF);
+  common::convertPosesToSdf16(cloneSDF);
   NestedModelData *modelData = this->CreateModelFromSDF(cloneSDF,
     it->second->modelVisual->GetParent(), false);
 
