@@ -46,7 +46,7 @@ namespace gazebo
       public: void Load(sdf::ElementPtr _sdf) override;
 
       /// \brief Initialize the light.
-      public: void Init();
+      public: void Init() override;
 
       /// \brief Update this light's parameters from a message.
       /// \param[in] _msg Message to process.
@@ -61,10 +61,10 @@ namespace gazebo
       public: void SetState(const LightState &_state);
 
       // Documentation inherited
-      public: void OnPoseChange();
+      public: void OnPoseChange() override;
 
       /// \brief Publish the pose.
-      private: void PublishPose();
+      private: void PublishPose() override;
 
       /// \brief Indicate that the world pose should be recalculated.
       /// The recalculation will be done when Light::WorldPose is
@@ -72,7 +72,7 @@ namespace gazebo
       public: void SetWorldPoseDirty();
 
       // Documentation inherited.
-      public: virtual const ignition::math::Pose3d &WorldPose() const;
+      public: virtual const ignition::math::Pose3d &WorldPose() const override;
 
       // Documentation inherited.
       public: std::optional<sdf::SemanticPose> SDFSemanticPose() const override;

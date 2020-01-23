@@ -60,16 +60,16 @@ namespace gazebo
 
       /// \brief Load the body based on an SDF element.
       /// \param[in] _sdf SDF parameters.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) override;
 
       /// \brief Initialize the body.
-      public: virtual void Init();
+      public: virtual void Init() override;
 
       /// \brief Finalize the body.
-      public: void Fini();
+      public: void Fini() override;
 
       /// \brief Reset the link.
-      public: void Reset();
+      public: void Reset() override;
       using Entity::Reset;
 
       /// \brief Reset the velocity, acceleration, force and torque of link.
@@ -77,7 +77,7 @@ namespace gazebo
 
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to load from.
-      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf) override;
 
       /// \brief Update the collision.
       /// \param[in] _info Update information.
@@ -99,7 +99,7 @@ namespace gazebo
       /// \brief Set whether this entity has been selected by the user
       /// through the gui
       /// \param[in] _set True to set the link as selected.
-      public: virtual bool SetSelected(bool _set);
+      public: virtual bool SetSelected(bool _set) override;
 
       /// \brief Set whether gravity affects this body.
       /// \param[in] _mode True to enable gravity.
@@ -226,7 +226,7 @@ namespace gazebo
       /// \brief Get the linear velocity of the origin of the link frame,
       ///        expressed in the world frame.
       /// \return Linear velocity of the link frame.
-      public: virtual ignition::math::Vector3d WorldLinearVel() const;
+      public: virtual ignition::math::Vector3d WorldLinearVel() const override;
 
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in a body-fixed frame. If
@@ -257,23 +257,23 @@ namespace gazebo
 
       /// \brief Get the linear velocity of the body.
       /// \return Linear velocity of the body.
-      public: ignition::math::Vector3d RelativeLinearVel() const;
+      public: ignition::math::Vector3d RelativeLinearVel() const override;
 
       /// \brief Get the angular velocity of the body.
       /// \return Angular velocity of the body.
-      public: ignition::math::Vector3d RelativeAngularVel() const;
+      public: ignition::math::Vector3d RelativeAngularVel() const override;
 
       /// \brief Get the linear acceleration of the body.
       /// \return Linear acceleration of the body.
-      public: ignition::math::Vector3d RelativeLinearAccel() const;
+      public: ignition::math::Vector3d RelativeLinearAccel() const override;
 
       /// \brief Get the linear acceleration of the body in the world frame.
       /// \return Linear acceleration of the body in the world frame.
-      public: ignition::math::Vector3d WorldLinearAccel() const;
+      public: ignition::math::Vector3d WorldLinearAccel() const override;
 
       /// \brief Get the angular acceleration of the body.
       /// \return Angular acceleration of the body.
-      public: ignition::math::Vector3d RelativeAngularAccel() const;
+      public: ignition::math::Vector3d RelativeAngularAccel() const override;
 
       /// \brief Get the angular momentum of the body CoG in the world frame,
       /// which is computed as (I * w), where
@@ -289,7 +289,7 @@ namespace gazebo
       /// L: angular momentum of CoG in world frame
       /// w: angular velocity in world frame
       /// \return Angular acceleration of the body in the world frame.
-      public: ignition::math::Vector3d WorldAngularAccel() const;
+      public: ignition::math::Vector3d WorldAngularAccel() const override;
 
       /// \brief Get the force applied to the body.
       /// \return Force applied to the body.
@@ -357,7 +357,8 @@ namespace gazebo
       /// \brief Get the bounding box for the link and all the child
       /// elements.
       /// \return The link's bounding box.
-      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const
+          override;
 
       /// \brief Set the linear damping factor.
       /// \param[in] _damping Linear damping factor.
@@ -455,7 +456,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Called when the pose is changed. Do not call this directly.
-      public: virtual void OnPoseChange();
+      public: virtual void OnPoseChange() override;
 
       /// \brief Set the current link state.
       /// \param[in] _state The state to set the link to.
@@ -672,7 +673,7 @@ namespace gazebo
       private: void LoadBattery(const sdf::ElementPtr _sdf);
 
       /// \brief Register items in the introspection service.
-      protected: virtual void RegisterIntrospectionItems();
+      protected: virtual void RegisterIntrospectionItems() override;
 
       /// \brief Inertial properties.
       protected: InertialPtr inertial;

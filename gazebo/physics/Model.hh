@@ -67,27 +67,27 @@ namespace gazebo
 
       /// \brief Load the model.
       /// \param[in] _sdf SDF parameters to load from.
-      public: void Load(sdf::ElementPtr _sdf);
+      public: void Load(sdf::ElementPtr _sdf) override;
 
       /// \brief Load all the joints.
       public: void LoadJoints();
 
       /// \brief Initialize the model.
-      public: virtual void Init();
+      public: virtual void Init() override;
 
       /// \brief Update the model.
-      public: void Update();
+      public: void Update() override;
 
       /// \brief Finalize the model.
-      public: virtual void Fini();
+      public: virtual void Fini() override;
 
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to update from.
-      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf) override;
 
       /// \brief Get the SDF values for the model.
       /// \return The SDF value for this model.
-      public: virtual const sdf::ElementPtr GetSDF();
+      public: virtual const sdf::ElementPtr GetSDF() override;
 
       /// \brief Get the SDF DOM for the model.
       /// \return The SDF DOM for this model.
@@ -106,7 +106,7 @@ namespace gazebo
       using Base::RemoveChild;
 
       /// \brief Reset the model.
-      public: void Reset();
+      public: void Reset() override;
       using Entity::Reset;
 
       /// \brief Reset the velocity, acceleration, force and torque of
@@ -124,46 +124,55 @@ namespace gazebo
       /// \brief Get the linear velocity of the entity.
       /// \return ignition::math::Vector3d, set to 0, 0, 0
       /// if the model has no body.
-      public: virtual ignition::math::Vector3d RelativeLinearVel() const;
+      public: virtual ignition::math::Vector3d RelativeLinearVel() const
+          override;
 
       /// \brief Get the linear velocity of the entity in the world frame.
       /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has
       /// no body.
-      public: virtual ignition::math::Vector3d WorldLinearVel() const;
+      public: virtual ignition::math::Vector3d WorldLinearVel() const
+          override;
 
       /// \brief Get the angular velocity of the entity.
       /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model
       /// has no body.
-      public: virtual ignition::math::Vector3d RelativeAngularVel() const;
+      public: virtual ignition::math::Vector3d RelativeAngularVel() const
+          override;
 
       /// \brief Get the angular velocity of the entity in the world frame.
       /// \return ignition::math::Vector3, set to 0, 0, 0 if the model
       /// has no body.
-      public: virtual ignition::math::Vector3d WorldAngularVel() const;
+      public: virtual ignition::math::Vector3d WorldAngularVel() const
+          override;
 
       /// \brief Get the linear acceleration of the entity.
       /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model
       /// has no body.
-      public: virtual ignition::math::Vector3d RelativeLinearAccel() const;
+      public: virtual ignition::math::Vector3d RelativeLinearAccel() const
+          override;
 
       /// \brief Get the linear acceleration of the entity in the world frame.
       /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has
       /// no body.
-      public: virtual ignition::math::Vector3d WorldLinearAccel() const;
+      public: virtual ignition::math::Vector3d WorldLinearAccel() const
+          override;
 
       /// \brief Get the angular acceleration of the entity.
       /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model
       /// has no body.
-      public: virtual ignition::math::Vector3d RelativeAngularAccel() const;
+      public: virtual ignition::math::Vector3d RelativeAngularAccel() const
+          override;
 
       /// \brief Get the angular acceleration of the entity in the world frame.
       /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has
       /// no body.
-      public: virtual ignition::math::Vector3d WorldAngularAccel() const;
+      public: virtual ignition::math::Vector3d WorldAngularAccel() const
+          override;
 
       /// \brief Get the size of the bounding box.
       /// \return The bounding box.
-      public: virtual ignition::math::AxisAlignedBox BoundingBox() const;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const
+          override;
 
       /// \brief Get the number of joints.
       /// \return Get the number of joints.
@@ -262,7 +271,7 @@ namespace gazebo
                boost::function<void()> _onComplete = NULL);
 
       /// \brief Stop the current animations.
-      public: virtual void StopAnimation();
+      public: virtual void StopAnimation() override;
 
       /// \brief Attach a static model to this model
       ///
@@ -469,10 +478,10 @@ namespace gazebo
       public: std::optional<sdf::SemanticPose> SDFSemanticPose() const override;
 
       /// \brief Callback when the pose of the model has been changed.
-      protected: virtual void OnPoseChange();
+      protected: virtual void OnPoseChange() override;
 
       /// \brief Register items in the introspection service.
-      protected: virtual void RegisterIntrospectionItems();
+      protected: virtual void RegisterIntrospectionItems() override;
 
       /// \brief Load all the links.
       private: void LoadLinks();

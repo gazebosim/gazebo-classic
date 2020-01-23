@@ -103,23 +103,23 @@ namespace gazebo
 
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) override;
 
       /// \brief Initialize a joint.
-      public: virtual void Init();
+      public: virtual void Init() override;
 
       /// \brief Finialize the object
-      public: virtual void Fini();
+      public: virtual void Fini() override;
 
       /// \brief Update the joint.
-      public: void Update();
+      public: void Update() override;
 
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to update from.
-      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf) override;
 
       /// \brief Reset the joint.
-      public: virtual void Reset();
+      public: virtual void Reset() override;
       using Base::Reset;
 
       /// \brief Set the joint state.
@@ -622,7 +622,7 @@ namespace gazebo
           const unsigned int _index, const double _position);
 
       /// \brief Register items in the introspection service.
-      protected: virtual void RegisterIntrospectionItems();
+      protected: virtual void RegisterIntrospectionItems() override;
 
       /// \brief Register position items in the introspection service.
       /// \param[in] _index Axis index.
