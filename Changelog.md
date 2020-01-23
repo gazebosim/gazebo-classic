@@ -31,6 +31,10 @@
 1. MeshManager: PIMPL-ize class.
     * [Pull request 3171](https://bitbucket.org/osrf/gazebo/pull-request/3171)
 
+1. Add ABI-breaking change from pr 2768 `protected ODEJoint::angleOffset[]`
+    * [Pull request 3185](https://bitbucket.org/osrf/gazebo/pull-request/3185)
+    * [Pull request 2768](https://bitbucket.org/osrf/gazebo/pull-request/2768)
+
 ## Gazebo 10
 
 ## Gazebo 10.x.x (201x-xx-xx)

@@ -274,6 +274,9 @@ namespace gazebo
       /// \brief This is our ODE ID
       protected: dJointID jointId;
 
+      /// \brief Joint angle(s) when ODE joint has angle 0.
+      protected: double angleOffset[MAX_JOINT_AXIS];
+
       /// \brief Feedback data for this joint
       private: dJointFeedback *feedback;
 

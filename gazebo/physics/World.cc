@@ -149,6 +149,9 @@ World::World(const std::string &_name)
 
   this->dataPtr->prevStatTime = common::Time::GetWallTime();
   this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
+  this->dataPtr->logLastStatePlayedSimTime = common::Time(0);
+  this->dataPtr->logLastStatePlayedRealTime = common::Time(0);
+  this->dataPtr->logPlayRealTimeFactor = 0.0;
 
   this->dataPtr->connections.push_back(
      event::Events::ConnectStep(std::bind(&World::OnStep, this)));
@@ -575,6 +578,28 @@ void World::LogStep()
 
         this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
 
+        // If it's the first step, we're going back in time or
+        // rt factor is close to zero, don't sleep.
+        if ((this->dataPtr->logPlayRealTimeFactor > 1e-5) &&
+            (this->dataPtr->logLastStatePlayedRealTime != common::Time(0)) &&
+            (this->dataPtr->logLastStatePlayedSimTime != common::Time(0)) &&
+            (this->dataPtr->logLastStatePlayedSimTime <
+               this->dataPtr->logPlayState.GetSimTime()))
+        {
+          common::Time timeUntilNextStep =
+              common::Time((this->dataPtr->logPlayState.GetSimTime()
+                           - this->dataPtr->logLastStatePlayedSimTime).Double()
+                           / this->dataPtr->logPlayRealTimeFactor);
+          common::Time realTimeOfNextStep =
+              this->dataPtr->logLastStatePlayedRealTime + timeUntilNextStep;
+          common::Time realTimeSleep =
+              realTimeOfNextStep - common::Time::GetWallTime();
+          if (realTimeSleep > common::Time(0))
+          {
+            common::Time::Sleep(realTimeSleep);
+          }
+        }
+
         // If the log file does not contain iterations we have to manually
         // increase the iteration counter in logPlayState.
         if (!util::LogPlay::Instance()->HasIterations())
@@ -583,6 +608,9 @@ void World::LogStep()
             this->dataPtr->iterations + 1);
         }
 
+        this->dataPtr->logLastStatePlayedRealTime = common::Time::GetWallTime();
+        this->dataPtr->logLastStatePlayedSimTime =
+            this->dataPtr->logPlayState.GetSimTime();
         this->SetState(this->dataPtr->logPlayState);
         this->Update();
       }
@@ -1491,6 +1519,11 @@ void World::ProcessPlaybackControlMsgs()
       this->dataPtr->stepInc = -1;
       this->SetPaused(true);
       // ToDo: Update iterations if the log doesn't have it.
+    }
+
+    if (msg.has_rt_factor())
+    {
+      this->dataPtr->logPlayRealTimeFactor = msg.rt_factor();
     }
   }
 
