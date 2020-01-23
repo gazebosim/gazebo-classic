@@ -48,8 +48,7 @@ TEST_P(SdfFrameSemanticsTest, LinkRelativeTo)
         <pose relative_to="L1">0.5 0 1 0 0 0</pose>
       </link>
     </model>
-  </sdf>
-  )sdf";
+  </sdf>)sdf";
 
   this->SpawnSDF(modelSdf);
 
@@ -92,8 +91,7 @@ TEST_P(SdfFrameSemanticsTest, LinkRelativeToJoint)
         </axis>
       </joint>
     </model>
-  </sdf>
-  )sdf";
+  </sdf>)sdf";
 
   this->SpawnSDF(modelSdf);
 
@@ -146,8 +144,7 @@ TEST_P(SdfFrameSemanticsTest, JointRelativeTo)
         </axis>
       </joint>
     </model>
-  </sdf>
-  )sdf";
+  </sdf>)sdf";
 
   this->SpawnSDF(modelSdf);
 
@@ -197,8 +194,7 @@ TEST_P(SdfFrameSemanticsTest, VisualCollisionRelativeTo)
         </collision>
       </link>
     </model>
-  </sdf>
-  )sdf";
+  </sdf>)sdf";
 
   this->SpawnSDF(modelSdf);
 
@@ -253,8 +249,7 @@ TEST_P(SdfFrameSemanticsTest, ExplicitFramesWithLinks)
         <pose relative_to="F2"/>
       </link>
     </model>
-  </sdf>
-  )sdf";
+  </sdf>)sdf";
 
   this->SpawnSDF(modelSdf);
 
@@ -309,8 +304,7 @@ TEST_P(SdfFrameSemanticsTest, ExplicitFramesWithJoints)
         </axis>
       </joint>
     </model>
-  </sdf>
-  )sdf";
+  </sdf>)sdf";
 
   this->SpawnSDF(modelSdf);
 
@@ -351,8 +345,7 @@ TEST_P(SdfFrameSemanticsTest, ExplicitFramesWithVisualAndCollision)
         </collision>
       </link>
     </model>
-  </sdf>
-  )sdf";
+  </sdf>)sdf";
 
   this->SpawnSDF(modelSdf);
 
@@ -397,15 +390,14 @@ TEST_P(SdfFrameSemanticsTest, MultipleSDFVersionsCoexist)
     <model name="M1">
       <link name="L"/>
     </model>
-  </sdf>
-  )sdf";
+  </sdf>)sdf";
+
   // Valid in 1.6, but not in 1.7 because a canonical link is missing
   const std::string modelSDF16 = R"sdf(
   <sdf version="1.6">
     <model name="M2">
     </model>
-  </sdf>
-  )sdf";
+  </sdf>)sdf";
 
   auto tInit = std::chrono::high_resolution_clock::now();
   this->SpawnSDF(modelSDF17);
@@ -498,8 +490,7 @@ TEST_P(SdfFrameSemanticsTest, JointAxisXyzExpressedIn)
         </axis>
       </joint>
     </model>
-  </sdf>
-  )sdf";
+  </sdf>)sdf";
 
   this->SpawnSDF(modelSdf);
 

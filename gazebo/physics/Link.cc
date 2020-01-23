@@ -116,7 +116,7 @@ class gazebo::physics::LinkPrivate
 #endif
 
   /// \brief SDF Link DOM object
-  public: const sdf::Link *linkSDFDom{nullptr};
+  public: const sdf::Link *linkSDFDom = nullptr;
 };
 
 using namespace gazebo;

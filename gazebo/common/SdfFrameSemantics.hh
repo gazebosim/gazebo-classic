@@ -18,6 +18,7 @@
 #ifndef GAZEBO_COMMON_SDFFRAMESEMANTICS_HH_
 #define GAZEBO_COMMON_SDFFRAMESEMANTICS_HH_
 
+#include <string>
 #include <ignition/math/Pose3.hh>
 #include <sdf/SemanticPose.hh>
 

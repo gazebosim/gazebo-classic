@@ -31,8 +31,7 @@ class gazebo::physics::LightPrivate
   public: bool worldPoseDirty = false;
 
   /// \brief SDF Light DOM object
-  public: const sdf::Light *lightSDFDom{nullptr};
-
+  public: const sdf::Light *lightSDFDom = nullptr;
 };
 
 using namespace gazebo;

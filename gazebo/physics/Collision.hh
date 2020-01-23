@@ -227,7 +227,7 @@ namespace gazebo
       private: mutable bool worldPoseDirty;
 
       /// \brief SDF Collision DOM object
-      private: const sdf::Collision *collisionSDFDom{nullptr};
+      private: const sdf::Collision *collisionSDFDom = nullptr;
     };
     /// \}
   }

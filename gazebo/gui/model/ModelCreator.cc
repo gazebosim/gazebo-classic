@@ -997,7 +997,8 @@ void ModelCreator::OnPropertiesChanged(const bool _static,
 void ModelCreator::SaveModelFiles()
 {
   this->GenerateSDF();
-  sdf::ElementPtr modelElem = this->dataPtr->modelSDF->Root()->GetElement("model");
+  sdf::ElementPtr modelElem =
+      this->dataPtr->modelSDF->Root()->GetElement("model");
   // The generated SDF will have upconverted to 1.7. Make sure that the
   // resulting SDF is valid before saving it to file. We do this by checking for
   // errors when loading the model DOM object.

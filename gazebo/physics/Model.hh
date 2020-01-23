@@ -549,7 +549,7 @@ namespace gazebo
       private: std::unique_ptr<sdf::Model> modelSDFDomIsolated;
 
       /// \brief SDF Model DOM object
-      private: const sdf::Model *modelSDFDom{nullptr};
+      private: const sdf::Model *modelSDFDom = nullptr;
     };
     /// \}
   }

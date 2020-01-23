@@ -156,7 +156,8 @@ class JointTest : public ServerFixture,
   ///        checked.
   /// \param[in] _opt Options for spawned model and joint.
   public: physics::JointPtr SpawnJoint(const SpawnJointOptions &_opt,
-      const std::string &_sdfVersion = std::string(SDF_VERSION))          {
+      const std::string &_sdfVersion = std::string(SDF_VERSION))
+          {
             msgs::Factory msg;
             std::ostringstream modelStr;
             std::string modelName = this->GetUniqueString("joint_model");
