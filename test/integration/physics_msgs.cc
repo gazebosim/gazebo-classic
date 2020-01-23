@@ -839,7 +839,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   std::ostringstream sdfStream;
-  sdfStream << "<sdf version='" << SDF_VERSION << "'>"
+  sdfStream << "<sdf version='1.6'>"
     << "<model name ='joint_msg_test'>"
     << "<link name ='link1'>"
     << "  <pose>0 0 0 0 0 0</pose>"
@@ -1025,7 +1025,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     msgs::Axis axis1Msg = jointMsg.axis1();
     EXPECT_EQ(msgs::ConvertIgn(axis1Msg.xyz()),
         ignition::math::Vector3d(1, 0, 0));
-    EXPECT_EQ(axis1Msg.use_parent_model_frame(), false);
+    EXPECT_TRUE(axis1Msg.xyz_expressed_in().empty());
     EXPECT_DOUBLE_EQ(axis1Msg.limit_lower(), -1e6);
     EXPECT_DOUBLE_EQ(axis1Msg.limit_upper(), 1e6);
     EXPECT_DOUBLE_EQ(axis1Msg.limit_effort(), -0.9);
@@ -1036,7 +1036,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     msgs::Axis axis2Msg = jointMsg.axis2();
     EXPECT_EQ(msgs::ConvertIgn(axis2Msg.xyz()),
         ignition::math::Vector3d(0, 0, 1));
-    EXPECT_EQ(axis2Msg.use_parent_model_frame(), true);
+    EXPECT_EQ(axis2Msg.xyz_expressed_in(), "__model__");
     EXPECT_DOUBLE_EQ(axis2Msg.limit_lower(), -1e3);
     EXPECT_DOUBLE_EQ(axis2Msg.limit_upper(), 1e3);
     EXPECT_DOUBLE_EQ(axis2Msg.limit_effort(), -0.8);
