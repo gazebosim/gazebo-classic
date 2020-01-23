@@ -53,6 +53,8 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->useImplicitSpringDamper = false;
   this->stopERP = 0.0;
   this->stopCFM = 0.0;
+  this->angleOffset[0] = 0.0;
+  this->angleOffset[1] = 0.0;
 }
 
 //////////////////////////////////////////////////
