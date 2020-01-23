@@ -118,6 +118,7 @@ set (headers
   OBJLoader.hh
   PID.hh
   Plugin.hh
+  SdfFrameSemantics.hh
   SemanticVersion.hh
   SkeletonAnimation.hh
   Skeleton.hh
