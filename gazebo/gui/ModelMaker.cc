@@ -106,7 +106,8 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
   sdf::initFile("root.sdf", this->dataPtr->modelSDF);
 
   sdf::Errors errors;
-  if (!sdf::readFile(_filename, this->dataPtr->modelSDF, false, errors))
+  if (!sdf::readFileWithoutConversion(
+          _filename, this->dataPtr->modelSDF, errors))
   {
     gzerr << "Unable to load file[" << _filename << "]\n";
     for (const auto &e : errors)
