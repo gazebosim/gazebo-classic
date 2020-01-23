@@ -586,7 +586,7 @@ void World::LogStep()
       {
         this->dataPtr->stepInc = 1;
 
-        this->dataPtr->logPlayStateSDF->ClearElements();
+        this->dataPtr->logPlayStateSDF->Clear();
         sdf::readString(data, this->dataPtr->logPlayStateSDF);
 
         this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);

@@ -541,7 +541,7 @@ std::string StateFilter::Filter(const std::string &_stateString)
   gazebo::physics::WorldState state;
 
   // Read and parse the state information
-  g_stateSdf->ClearElements();
+  g_stateSdf->Clear();
   sdf::readString(_stateString, g_stateSdf);
   state.Load(g_stateSdf);
 
@@ -773,7 +773,7 @@ void LogCommand::Info(const std::string &_filename)
       std::string stateString;
       play->Chunk(play->ChunkCount()-1, stateString);
 
-      g_stateSdf->ClearElements();
+      g_stateSdf->Clear();
       sdf::readString(stateString, g_stateSdf);
 
       state.Load(g_stateSdf);
