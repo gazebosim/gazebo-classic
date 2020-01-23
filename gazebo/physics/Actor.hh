@@ -96,7 +96,7 @@ namespace gazebo
       /// \param[in] _skel BVH skeleton
       /// \param[in] _skelMap joint mapping between DAE skin and BVH skeleton
       public: void AlignBvh(common::Skeleton *_skel,
-          std::map<std::string, std::string> _skelMap);
+          const std::map<std::string, std::string> &_skelMap);
 
       /// \brief Initialize the actor
       public: virtual void Init();

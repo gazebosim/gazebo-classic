@@ -3,7 +3,7 @@
   Example using a BVH animation taken from CMu's motion capture database:
   https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion
 -->
-<sdf version="1.5">
+<sdf version="1.6">
   <world name="default">
     <include>
       <uri>model://ground_plane</uri>

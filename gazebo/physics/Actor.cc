@@ -513,7 +513,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 // Equivalent to ignition::common::Skeleton::AddBvhAnimation
 void Actor::AlignBvh(Skeleton *_skel,
-    std::map<std::string, std::string> _skelMap)
+    const std::map<std::string, std::string> &_skelMap)
 {
   // calculate translationAligner: aligner of initial bvh pose to initial dae
   // pose
@@ -543,8 +543,8 @@ void Actor::AlignBvh(Skeleton *_skel,
       continue;
     }
 
-    if (animNode->GetName() ==
-        _skelMap[this->skeleton->GetRootNode()->GetName()])
+    auto it = _skelMap.find(this->skeleton->GetRootNode()->GetName());
+    if (it != _skelMap.end() && animNode->GetName() == it->second)
     {
       // if this is root, then some setup is needed to match bvh and dae
       this->dataPtr->translationAligner[animNode->GetName()] =
@@ -610,8 +610,8 @@ void Actor::AlignBvh(Skeleton *_skel,
     SkeletonNode *animNode = _skel->GetNodeByHandle(i);
     SkeletonNode *skinNode = this->skeleton->GetNodeByHandle(i);
 
-    if (animNode->GetName() ==
-        _skelMap[this->skeleton->GetRootNode()->GetName()])
+    auto it = _skelMap.find(this->skeleton->GetRootNode()->GetName());
+    if (it != _skelMap.end() && animNode->GetName() == it->second)
     {
       // rotation should not be aligned with root
       this->dataPtr->rotationAligner[animNode->GetName()] =
@@ -805,7 +805,7 @@ void Actor::Update()
   // Zero root pos for BVH
   if (this->dataPtr->bvhFile)
   {
-    rootPos *= 0.0;
+    rootPos = ignition::math::Vector3d::Zero;
   }
 
   if (tinfo->translated)
