@@ -2,9 +2,16 @@
 
 ## Gazebo 9.XX.X (2019-XX-XX)
 
+1. Workaround for race condition when setting model scale.
+    * [Pull request 3159](https://bitbucket.org/osrf/gazebo/pull-request/3159)
+
 1. Fix compilation of plugins with tbb and qt 5.14.
     * [Pull request 3164](https://bitbucket.org/osrf/gazebo/pull-request/3164)
     * [Issue #2681](https://bitbucket.org/osrf/gazebo/issues/2681)
+
+1. Fix plugin loading in example by fixing uninitialized variable in World and calling `sensors::run_once()`.
+    * [Pull request 3059](https://bitbucket.org/osrf/gazebo/pull-request/3059)
+    * [Pull request 3173](https://bitbucket.org/osrf/gazebo/pull-request/3173)
 
 1. Windows: reduce WinSock header inclusion to limit name conflicts.
     * [Pull request 3158](https://bitbucket.org/osrf/gazebo/pull-request/3158)
@@ -28,6 +35,9 @@
 
 1. ODEBallJoint: reduce console output.
     * [Pull request 3132](https://bitbucket.org/osrf/gazebo/pull-request/3132)
+
+1. VariableGearboxPlugin: use splines to support arbitrary smooth input-output gearbox profiles.
+    * [Pull request 3073](https://bitbucket.org/osrf/gazebo/pull-request/3073)
 
 1. Fix moving model files in StaticMapPlugin
     * [Pull request 3123](https://bitbucket.org/osrf/gazebo/pull-request/3123)
@@ -1342,7 +1352,15 @@
 
 ## Gazebo 7
 
-## Gazebo 7.X.X (2018-XX-XX)
+## Gazebo 7.X.X (2019-XX-XX)
+
+## Gazebo 7.16.0 (2019-09-04)
+
+1. VariableGearboxPlugin: use splines to support arbitrary smooth input-output gearbox profiles
+    * [Pull request 3073](https://bitbucket.org/osrf/gazebo/pull-request/3073)
+
+1. Backport Camera PreRender and PostRender events
+    * [Pull request 3119](https://bitbucket.org/osrf/gazebo/pull-request/3119)
 
 ## Gazebo 7.15.0 (2018-03-26)
 

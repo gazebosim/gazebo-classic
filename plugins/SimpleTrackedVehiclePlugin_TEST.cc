@@ -736,9 +736,18 @@ TEST_P(SimpleTrackedVehiclePluginTestParametrized,
   // Test that the correct message was sent on ~/tracks_speed.
   {
     int waitCount = 0, maxWaitCount = 3000;
+#if GOOGLE_PROTOBUF_VERSION < 3001000
     while (plugin.lastTracksVelMsg.ByteSize() == 0
         && ++waitCount < maxWaitCount)
+#else
+  // ByteSizeLong appeared in version 3.1 of Protobuf, and ByteSize
+  // became deprecated.
+    while (plugin.lastTracksVelMsg.ByteSizeLong() == 0
+        && ++waitCount < maxWaitCount)
+#endif
+    {
       common::Time::MSleep(10);
+    }
     ASSERT_LT(waitCount, maxWaitCount);
   }
 
@@ -761,9 +770,18 @@ TEST_P(SimpleTrackedVehiclePluginTestParametrized,
   // Test that the correct message was sent on ~/tracks_speed.
   {
     int waitCount = 0, maxWaitCount = 3000;
+#if GOOGLE_PROTOBUF_VERSION < 3001000
     while (plugin.lastTracksVelMsg.ByteSize() == 0
         && ++waitCount < maxWaitCount)
+#else
+  // ByteSizeLong appeared in version 3.1 of Protobuf, and ByteSize
+  // became deprecated.
+    while (plugin.lastTracksVelMsg.ByteSizeLong() == 0
+        && ++waitCount < maxWaitCount)
+#endif
+    {
       common::Time::MSleep(10);
+    }
     ASSERT_LT(waitCount, maxWaitCount);
   }
 
