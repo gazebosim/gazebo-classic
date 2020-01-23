@@ -26,7 +26,7 @@
 #include "gazebo/rendering/RenderTypes.hh"
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
-// Since OGRE 1.11, the once public 
+// Since OGRE 1.11, the once public
 // Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelper
 // class and its descendant are now private classes of OGRE, see
 // * https://github.com/OGRECave/ogre/blob/master/Docs/1.11-Notes.md#other
