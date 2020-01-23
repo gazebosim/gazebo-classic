@@ -617,8 +617,8 @@ void RenderEngine::SetupResources()
     }
     catch(Ogre::Exception &/*_e*/)
     {
-      gzthrow("Unable to load Ogre Resources. Make sure the resources path "
-          "in the world file is set correctly.");
+      gzerr << "Unable to load Ogre Resources. Make sure the resources path "
+            << "in the world file is set correctly.";
     }
 #endif
     }
