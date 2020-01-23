@@ -60,7 +60,7 @@ set OGRE_LIB_SUFFIX=.lib
 :: Use legacy install location if unset
 @if "%WORKSPACE_INSTALL_DIR%"=="" set WORKSPACE_INSTALL_DIR="install\%build_type%"
 
-cmake -Wno-dev -G "NMake Makefiles"^
+cmake -Wno-dev -G "NMake Makefiles JOM"^
     -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION-MATH_PATH%;%IGNITION-MSGS_PATH%;%IGNITION-TRANSPORT_CMAKE_PREFIX_PATH%;%WORKSPACE_INSTALL_DIR%"^
     -DUSE_EXTERNAL_TINYXML:BOOL=False^
     -DUSE_EXTERNAL_TINYXML2:BOOL=False^
