@@ -877,6 +877,13 @@ void World::Fini()
   }
   this->dataPtr->models.clear();
 
+  for (auto &road : this->dataPtr->roads)
+  {
+    if (road)
+      road->Fini();
+  }
+  this->dataPtr->roads.clear();
+
   for (auto &light : this->dataPtr->lights)
   {
     if (light)
@@ -941,6 +948,13 @@ void World::ClearModels()
     this->RemoveModel(this->dataPtr->models[0]);
   }
   this->dataPtr->models.clear();
+
+  for (auto &road : this->dataPtr->roads)
+  {
+    if (road)
+      road->Fini();
+  }
+  this->dataPtr->roads.clear();
 
   this->SetPaused(pauseState);
 }
@@ -1152,6 +1166,7 @@ RoadPtr World::LoadRoad(sdf::ElementPtr _sdf , BasePtr _parent)
 {
   RoadPtr road(new Road(_parent));
   road->Load(_sdf);
+  this->dataPtr->roads.push_back(road);
   return road;
 }
 
@@ -1800,6 +1815,12 @@ void World::ProcessRequestMsgs()
       std::string *serializedData = response.mutable_serialized_data();
       this->dataPtr->sceneMsg.SerializeToString(serializedData);
       response.set_type(this->dataPtr->sceneMsg.GetTypeName());
+
+      for (auto road : this->dataPtr->roads)
+      {
+        // this causes the roads to publish road msgs.
+        road->Init();
+      }
     }
     else if (requestMsg.request() == "spherical_coordinates_info")
     {
