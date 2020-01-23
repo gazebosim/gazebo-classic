@@ -503,7 +503,7 @@ bool ModelCommand::RunImpl()
     }
 
     sdf::Errors errors;
-    if (!sdf::readString(sdfString, sdf, false, errors))
+    if (!sdf::readStringWithoutConversion(sdfString, sdf, errors))
     {
       std::cerr << "Error: SDF parsing the xml failed\n";
       return false;
