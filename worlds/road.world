@@ -59,7 +59,7 @@
       </visual>
       <sensor name="camera" type="camera">
         <camera>
-          <horizontal_fov>1.5047</horizontal_fov>
+          <horizontal_fov>1.5</horizontal_fov>
           <image>
             <width>320</width>
             <height>240</height>
@@ -71,8 +71,8 @@
                 <lens>
                     <intrinsics>
                       <!-- fx = fy = width / ( 2 * tan (hfov / 2 ) ) -->
-                      <fx>277.1</fx>
-                      <fy>277.1</fy>
+                      <fx>171.75</fx>
+                      <fy>171.75</fy>
                       <!-- cx = ( width + 1 ) / 2 -->
                       <cx>160.5</cx>
                       <!-- cy = ( height + 1 ) / 2 -->
