@@ -2,6 +2,9 @@
 
 ## Gazebo 9.XX.X (2019-XX-XX)
 
+1. Fix missing road segments in camera sensors
+    * [Pull request 3182](https://bitbucket.org/osrf/gazebo/pull-request/3182)
+
 1. Workaround for race condition when setting model scale.
     * [Pull request 3159](https://bitbucket.org/osrf/gazebo/pull-request/3159)
 
