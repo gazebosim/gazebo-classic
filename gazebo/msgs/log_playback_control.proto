@@ -27,4 +27,7 @@ message LogPlaybackControl
   ///        playback service will load the frame with the closest
   ///        simulation time bigger than the "seek" value.
   optional Time seek         = 5;
+
+  /// \brief Set the real time factor for log playing, 0.0 will disable it.
+  optional double rt_factor  = 6;
 }

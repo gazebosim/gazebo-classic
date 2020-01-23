@@ -80,13 +80,13 @@ namespace gazebo
       /// \brief Apply noise to input data value.
       /// \param[in] _in Input data value.
       /// \return Data with noise applied.
-      public: double Apply(double _in);
+      public: double Apply(double _in, double _dt = 0.0);
 
       /// \brief Apply noise to input data value. This gets overriden by
       /// derived classes, and called by Apply.
       /// \param[in] _in Input data value.
       /// \return Data with noise applied.
-      public: virtual double ApplyImpl(double _in);
+      public: virtual double ApplyImpl(double _in, double _dt = 0.0);
 
       /// \brief Finalize the noise model
       public: virtual void Fini();
@@ -96,11 +96,22 @@ namespace gazebo
       public: NoiseType GetNoiseType() const;
 
       /// \brief Register a custom noise callback.
+      /// If both a function that takes time and one that doesn't are set,
+      /// the one without time will be ignored.
       /// \param[in] _cb Callback function for applying a custom noise model.
       /// This is useful if users want to use their own noise model from a
       /// sensor plugin.
       public: virtual void SetCustomNoiseCallback(
           boost::function<double (double)> _cb);
+
+      /// \brief Register a custom noise callback, with time.
+      /// If both a function that takes time and one that doesn't are set,
+      /// the one without time will be ignored.
+      /// \param[in] _cb Callback function for applying a custom noise model.
+      /// This is useful if users want to use their own noise model from a
+      /// sensor plugin.
+      public: virtual void SetCustomNoiseCallbackTime(
+          boost::function<double (double, double)> _cb);
 
       /// \brief Set camera needed to create image noise. This is only needed
       /// for image sensors, i.e. camera/multicamera/depth sensors, which use
@@ -120,6 +131,9 @@ namespace gazebo
 
       /// \brief Callback function for applying custom noise to sensor data.
       private: std::function<double (double)> customNoiseCallback;
+
+      /// \brief Callback function for applying custom noise to sensor data.
+      private: std::function<double (double, double)> customNoiseCallbackTime;
     };
     /// \}
   }

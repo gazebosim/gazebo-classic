@@ -356,6 +356,15 @@ namespace gazebo
       /// \brief Simulation time of the last log state captured.
       public: gazebo::common::Time logLastStateTime;
 
+      /// \brief Simulation time of the last log state played.
+      public: gazebo::common::Time logLastStatePlayedSimTime;
+
+      /// \brief Wall clock time when the last state was played.
+      public: gazebo::common::Time logLastStatePlayedRealTime;
+
+      /// \brief Log play real time factor
+      public: double logPlayRealTimeFactor;
+
       /// \brief URI of this world.
       public: common::URI uri;
 
