@@ -1353,7 +1353,14 @@ void JointData::UpdateMsg()
         }
         msgs::Set(axisMsg->mutable_xyz(), this->axes[i]);
       }
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       axisMsg->set_use_parent_model_frame(false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
       axisMsg->set_limit_lower(-ignition::math::MAX_D);
       axisMsg->set_limit_upper(ignition::math::MAX_D);
       axisMsg->set_limit_effort(-1);

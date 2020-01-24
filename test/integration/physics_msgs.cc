@@ -968,7 +968,14 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     msgs::Axis axis1Msg = jointMsg.axis1();
     EXPECT_EQ(msgs::ConvertIgn(axis1Msg.xyz()),
         ignition::math::Vector3d(1, 0, 0));
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     EXPECT_EQ(axis1Msg.use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     EXPECT_DOUBLE_EQ(axis1Msg.limit_lower(), -1);
     EXPECT_DOUBLE_EQ(axis1Msg.limit_upper(), 1);
     EXPECT_DOUBLE_EQ(axis1Msg.limit_effort(), -1);
@@ -993,7 +1000,14 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     msgs::Axis axis1Msg = jointMsg.axis1();
     EXPECT_EQ(msgs::ConvertIgn(axis1Msg.xyz()),
         ignition::math::Vector3d(0, 1, 0));
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     EXPECT_EQ(axis1Msg.use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     EXPECT_DOUBLE_EQ(axis1Msg.limit_lower(), -2);
     EXPECT_DOUBLE_EQ(axis1Msg.limit_upper(), 2);
     EXPECT_DOUBLE_EQ(axis1Msg.limit_effort(), -0.7);

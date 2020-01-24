@@ -2031,8 +2031,15 @@ TEST_F(MsgsTest, AxisFromSDF)
   EXPECT_NEAR(msg.limit_effort(), 2.2, 1e-6);
   EXPECT_TRUE(msg.has_limit_velocity());
   EXPECT_NEAR(msg.limit_velocity(), 0.1, 1e-6);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   EXPECT_TRUE(msg.has_use_parent_model_frame());
   EXPECT_EQ(msg.use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   EXPECT_TRUE(msg.has_damping());
   EXPECT_NEAR(msg.damping(), 0.1, 1e-6);
   EXPECT_TRUE(msg.has_friction());
@@ -2125,8 +2132,15 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_NEAR(axisMsg.limit_effort(), 2.4, 1e-6);
   EXPECT_TRUE(axisMsg.has_limit_velocity());
   EXPECT_NEAR(axisMsg.limit_velocity(), 0.4, 1e-6);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   EXPECT_TRUE(axisMsg.has_use_parent_model_frame());
   EXPECT_EQ(axisMsg.use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   EXPECT_TRUE(axisMsg.has_xyz_expressed_in());
   EXPECT_EQ(axisMsg.xyz_expressed_in(), "__model__");
   EXPECT_TRUE(axisMsg.has_damping());
@@ -2232,8 +2246,15 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_NEAR(axisGearboxMsg.limit_effort(), 2.1, 1e-6);
   EXPECT_TRUE(axisGearboxMsg.has_limit_velocity());
   EXPECT_NEAR(axisGearboxMsg.limit_velocity(), 0.2, 1e-6);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   EXPECT_TRUE(axisGearboxMsg.has_use_parent_model_frame());
   EXPECT_EQ(axisGearboxMsg.use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   EXPECT_TRUE(axisGearboxMsg.has_xyz_expressed_in());
   EXPECT_EQ(axisGearboxMsg.xyz_expressed_in(), "__model__");
   EXPECT_TRUE(axisGearboxMsg.has_damping());
@@ -2254,8 +2275,15 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_NEAR(axisGearboxMsg2.limit_effort(), 2.3, 1e-6);
   EXPECT_TRUE(axisGearboxMsg2.has_limit_velocity());
   EXPECT_NEAR(axisGearboxMsg2.limit_velocity(), 0.1, 1e-6);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   EXPECT_TRUE(axisGearboxMsg2.has_use_parent_model_frame());
   EXPECT_EQ(axisGearboxMsg2.use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   EXPECT_TRUE(axisGearboxMsg2.has_xyz_expressed_in());
   EXPECT_EQ(axisGearboxMsg2.xyz_expressed_in(), "__model__");
   EXPECT_TRUE(axisGearboxMsg2.has_damping());
@@ -2352,8 +2380,15 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_NEAR(axisScrewMsg.limit_effort(), 1.21, 1e-6);
   EXPECT_TRUE(axisScrewMsg.has_limit_velocity());
   EXPECT_NEAR(axisScrewMsg.limit_velocity(), 0.12, 1e-6);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   EXPECT_TRUE(axisScrewMsg.has_use_parent_model_frame());
   EXPECT_EQ(axisScrewMsg.use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   EXPECT_EQ(axisScrewMsg.has_xyz_expressed_in(), true);
   EXPECT_EQ(axisScrewMsg.xyz_expressed_in(), "__model__");
   EXPECT_TRUE(axisScrewMsg.has_damping());
@@ -2999,7 +3034,14 @@ TEST_F(MsgsTest, JointToSDF)
       axis1->set_limit_velocity(limit_velocity1);
       axis1->set_damping(damping1);
       axis1->set_friction(friction1);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       axis1->set_use_parent_model_frame(useParentModelFrame1);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     }
     {
       auto axis2 = jointMsg.mutable_axis2();
@@ -3173,7 +3215,14 @@ TEST_F(MsgsTest, JointToSDF)
       axis1->set_limit_velocity(limit_velocity1);
       axis1->set_damping(damping1);
       axis1->set_friction(friction1);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       axis1->set_use_parent_model_frame(useParentModelFrame1);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     }
     {
       auto axis2 = jointMsg.mutable_axis2();
@@ -3346,7 +3395,14 @@ TEST_F(MsgsTest, JointToSDF)
       axis1->set_limit_velocity(limit_velocity1);
       axis1->set_damping(damping1);
       axis1->set_friction(friction1);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       axis1->set_use_parent_model_frame(useParentModelFrame1);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     }
 
     msgs::Joint::Screw *screwMsg = jointMsg.mutable_screw();

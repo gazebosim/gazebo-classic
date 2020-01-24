@@ -636,7 +636,14 @@ void Joint::FillMsg(msgs::Joint &_msg)
     axis->set_limit_velocity(this->GetVelocityLimit(i));
     axis->set_damping(this->GetDamping(i));
     axis->set_friction(this->GetParam("friction", i));
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     axis->set_use_parent_model_frame(false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     axis->set_xyz_expressed_in(this->axisExpressedIn[i]);
   }
 
