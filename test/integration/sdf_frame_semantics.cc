@@ -441,9 +441,9 @@ TEST_P(SdfFrameSemanticsTest, ImplicitModelFrames)
   ASSERT_NE(nullptr, link2);
 
   // Expect the world pose of L1 and L2 to be identical and at the origin
-  ignition::math::Pose3d expLinkWorldPose(0, 0, 0, 0, 0, IGN_PI);
-  EXPECT_EQ(expLinkWorldPose, link1->WorldPose());
-  EXPECT_EQ(expLinkWorldPose, link2->WorldPose());
+  ignition::math::Pose3d expM1WorldPose(0, 0, 0, 0, 0, IGN_PI);
+  EXPECT_EQ(expM1WorldPose, link1->WorldPose());
+  EXPECT_EQ(expM1WorldPose, link2->WorldPose());
 
   // Expect the relative pose (and the world pose) of M2 to be -0.5 meters in
   // the -y direction
@@ -453,8 +453,8 @@ TEST_P(SdfFrameSemanticsTest, ImplicitModelFrames)
   // Step once and check, the pose should still be close to its initial pose
   this->world->Step(1);
 
-  EXPECT_EQ(expLinkWorldPose, link1->WorldPose());
-  EXPECT_EQ(expLinkWorldPose, link2->WorldPose());
+  EXPECT_EQ(expM1WorldPose, link1->WorldPose());
+  EXPECT_EQ(expM1WorldPose, link2->WorldPose());
   EXPECT_EQ(expM2Pose, model2->RelativePose());
   EXPECT_EQ(expM2Pose, model2->WorldPose());
 }
@@ -533,9 +533,9 @@ TEST_P(SdfFrameSemanticsTest, ExplicitWorldFrames)
   ASSERT_NE(nullptr, link2);
 
   // Expect the world pose of L1 and L2 to be identical but translated 10m in z.
-  ignition::math::Pose3d expLinkWorldPose(0, 0, 10, 0, 0, IGN_PI);
-  EXPECT_EQ(expLinkWorldPose, link1->WorldPose());
-  EXPECT_EQ(expLinkWorldPose, link2->WorldPose());
+  ignition::math::Pose3d expM1WorldPose(0, 0, 10, 0, 0, IGN_PI);
+  EXPECT_EQ(expM1WorldPose, link1->WorldPose());
+  EXPECT_EQ(expM1WorldPose, link2->WorldPose());
 
   // Expect the relative pose (and the world pose) of M2 to be -0.5 meters in
   // the -y direction
@@ -545,8 +545,8 @@ TEST_P(SdfFrameSemanticsTest, ExplicitWorldFrames)
   // Step once and check, the pose should still be close to its initial pose
   this->world->Step(1);
 
-  EXPECT_EQ(expLinkWorldPose, link1->WorldPose());
-  EXPECT_EQ(expLinkWorldPose, link2->WorldPose());
+  EXPECT_EQ(expM1WorldPose, link1->WorldPose());
+  EXPECT_EQ(expM1WorldPose, link2->WorldPose());
   EXPECT_EQ(expM2Pose, model2->RelativePose());
   EXPECT_EQ(expM2Pose, model2->WorldPose());
 }
@@ -577,6 +577,34 @@ TEST_P(SdfFrameSemanticsTest, SensorPose)
 
   EXPECT_EQ(expImuSensorPose, imu->Pose());
   EXPECT_EQ(expFtSensorPose, ftSensor->Pose());
+}
+
+
+TEST_P(SdfFrameSemanticsTest, IncludedModel)
+{
+
+  this->LoadWorld("worlds/frame_semantics_included_model.world");
+
+  auto model1 = this->GetModel("M1");
+  ASSERT_NE(nullptr, model1);
+
+  auto model2 = this->GetModel("M2");
+  ASSERT_NE(nullptr, model2);
+
+  // Expect the world pose of the M1 to be the same as frame F_I
+  ignition::math::Pose3d expM1WorldPose(5, 0, 5, 0, 0, 0);
+  EXPECT_EQ(expM1WorldPose, model1->WorldPose());
+
+  // Expect the world pose of the M2 to be offset from M1 by 1m in the y
+  // direction
+  ignition::math::Pose3d expM2WorldPose(5, 1, 5, 0, 0, 0);
+  EXPECT_EQ(expM2WorldPose, model2->WorldPose());
+
+  // Step once and check, the poses should still be close to its initial pose
+  this->world->Step(1);
+
+  EXPECT_EQ(expM1WorldPose, model1->WorldPose());
+  EXPECT_EQ(expM2WorldPose, model2->WorldPose());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, SdfFrameSemanticsTest,
