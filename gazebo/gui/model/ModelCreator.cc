@@ -859,7 +859,9 @@ bool ModelCreator::OnSave()
   {
     case UNSAVED_CHANGES:
     {
-      this->SaveModelFiles();
+      if (!this->SaveModelFiles())
+        return false;
+
       gui::model::Events::saveModel(this->dataPtr->modelName);
       return true;
     }
@@ -886,7 +888,8 @@ bool ModelCreator::OnSaveAs()
     // Update name on palette
     gui::model::Events::saveModel(this->dataPtr->modelName);
     // Generate and save files
-    this->SaveModelFiles();
+    if (!this->SaveModelFiles())
+      return false;
     return true;
   }
   return false;
@@ -994,7 +997,7 @@ void ModelCreator::OnPropertiesChanged(const bool _static,
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::SaveModelFiles()
+bool ModelCreator::SaveModelFiles()
 {
   this->GenerateSDF();
   sdf::ElementPtr modelElem =
@@ -1027,13 +1030,14 @@ void ModelCreator::SaveModelFiles()
 
     msgBox.exec();
     if (msgBox.clickedButton() == cancelButton)
-      return;
+      return false;
   }
 
   this->dataPtr->saveDialog->GenerateConfig();
   this->dataPtr->saveDialog->SaveToConfig();
   this->dataPtr->saveDialog->SaveToSDF(this->dataPtr->modelSDF);
   this->dataPtr->currentSaveState = ALL_SAVED;
+  return true;
 }
 
 /////////////////////////////////////////////////
