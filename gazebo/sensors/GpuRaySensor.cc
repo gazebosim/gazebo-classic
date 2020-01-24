@@ -339,6 +339,24 @@ void GpuRaySensor::Fini()
 }
 
 //////////////////////////////////////////////////
+void GpuRaySensor::SetActive(bool _value)
+{
+  Sensor::SetActive(_value);
+}
+
+//////////////////////////////////////////////////
+bool GpuRaySensor::NeedsUpdate()
+{
+  return Sensor::NeedsUpdate();
+}
+
+//////////////////////////////////////////////////
+void GpuRaySensor::Update(bool _force)
+{
+  Sensor::Update(_force);
+}
+
+//////////////////////////////////////////////////
 event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
   std::function<void(const float *, unsigned int, unsigned int, unsigned int,
   const std::string &)> _subscriber)
@@ -664,4 +682,16 @@ bool GpuRaySensor::IsActive() const
 rendering::GpuLaserPtr GpuRaySensor::LaserCamera() const
 {
   return this->dataPtr->laserCam;
+}
+
+//////////////////////////////////////////////////
+double GpuRaySensor::NextRequiredTimestamp() const
+{
+  return Sensor::NextRequiredTimestamp();
+}
+
+//////////////////////////////////////////////////
+void GpuRaySensor::ResetLastUpdateTime()
+{
+  Sensor::ResetLastUpdateTime();
 }
