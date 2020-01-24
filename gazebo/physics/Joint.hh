@@ -552,7 +552,11 @@ namespace gazebo
       /// in parent link frame.
       public: ignition::math::Pose3d AnchorErrorPose() const;
 
-      //////////////////////////////////////////////////
+      /// \brief Resolve axis xyz value to the named frame, defaulting to
+      /// the joint frame if no frame name is supplied.
+      /// \param[in] _index joint axis index.
+      /// \param[in] _resolveTo name of frame in which to resolve axis xyz.
+      /// return Resolved axis vector.
       public: ignition::math::Vector3d ResolveAxisXyz(
           const unsigned int _index,
           const std::string &_resolveTo = "") const;
