@@ -70,7 +70,7 @@
       <frame name="F_L">
         <pose>-1.50 -1.50 0.2 0 0 0</pose>
       </frame>
-      <frame name="F_ray">
+      <frame name="F_lidar">
         <pose>-1.00 -1.00 0.2 0 0 0</pose>
       </frame>
       <frame name="F_LC">
@@ -79,7 +79,7 @@
       <frame name="F_LL">
         <pose>0 0 0.2 0 0 0</pose>
       </frame>
-      <frame name="F_gpu_ray">
+      <frame name="F_gpu_lidar">
         <pose>0.50 0.50 0.2 0 0 0</pose>
       </frame>
       <frame name="F_LV">
@@ -93,8 +93,8 @@
       </frame>
       <link name="L">
         <pose relative_to="F_L">0 3.5 0 0 0 0</pose>
-        <sensor name="ray" type="ray">
-          <pose relative_to="F_ray">0 3.0 0 0 0 0</pose>
+        <sensor name="lidar" type="lidar">
+          <pose relative_to="F_lidar">0 3.0 0 0 0 0</pose>
           <visualize>true</visualize>
           <update_rate>30</update_rate>
           <always_on>1</always_on>
@@ -125,18 +125,18 @@
         <light name="LL" type="point">
           <pose relative_to="F_LL">0 2.0 0 0 0 0</pose>
         </light>
-        <sensor name="gpu_ray" type="gpu_ray">
-          <pose relative_to="F_gpu_ray">0 1.5 0 0 0 0</pose>
+        <sensor name="gpu_lidar" type="gpu_lidar">
+          <pose relative_to="F_gpu_lidar">0 1.5 0 0 0 0</pose>
           <visualize>true</visualize>
           <update_rate>30</update_rate>
           <always_on>1</always_on>
           <ray>
             <scan>
               <horizontal>
-                <samples>51</samples>
+                <samples>640</samples>
                 <resolution>1</resolution>
-                <min_angle>-0.5</min_angle>
-                <max_angle>0.5</max_angle>
+                <min_angle>-1.396263</min_angle>
+                <max_angle>1.396263</max_angle>
               </horizontal>
             </scan>
             <range>
