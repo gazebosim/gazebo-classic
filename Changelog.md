@@ -9,6 +9,9 @@
     * [Pull request 3160](https://bitbucket.org/osrf/gazebo/pull-request/3160)
     * [Pull request 3161](https://bitbucket.org/osrf/gazebo/pull-request/3161)
 
+1. Support SDFormat 1.7 frame semantics with libsdformat9.
+    * [Pull request 3133](https://bitbucket.org/osrf/gazebo/pull-request/3133)
+
 1. Add helper function `PhysicsEngine::any_cast` to handle std::any.
     * [Pull request 3147](https://bitbucket.org/osrf/gazebo/pull-request/3147)
 
