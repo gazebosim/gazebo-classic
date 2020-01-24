@@ -371,6 +371,9 @@ namespace gazebo
       /// \brief All the introspection items regsitered for this.
       public: std::vector<common::URI> introspectionItems;
 
+      /// \brief A list of roads in the world
+      public: std::vector<RoadPtr> roads;
+
       /// \brief Node for ignition transport communication.
       public: ignition::transport::Node ignNode;
 
