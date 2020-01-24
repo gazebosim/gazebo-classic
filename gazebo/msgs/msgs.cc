@@ -3199,23 +3199,23 @@ namespace gazebo
       if (_msg.has_xyz())
         _sdf->GetElement("xyz")->Set(ConvertIgn(_msg.xyz()));
 
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       if (!_msg.xyz_expressed_in().empty())
       {
         _sdf->GetElement("xyz")
             ->GetAttribute("expressed_in")
             ->Set(_msg.xyz_expressed_in());
       }
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
       else if (_msg.use_parent_model_frame())
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
       {
         _sdf->GetElement("xyz")->GetAttribute("expressed_in")->Set("__model__");
       }
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
       {
         auto dynamicsElem = _sdf->GetElement("dynamics");
