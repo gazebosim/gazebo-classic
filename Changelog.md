@@ -246,6 +246,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Fix gazebo9 build and run on Windows, Ogre 1.10
+    * [Pull request 3174](https://bitbucket.org/osrf/gazebo/pull-request/3174)
+
 1. Added support for flippers in SimpleTrackedVehiclePlugin.
     * [Pull request 3159](https://bitbucket.org/osrf/gazebo/pull-request/3149)
 
