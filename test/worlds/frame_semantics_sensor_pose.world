@@ -8,6 +8,9 @@
       </frame>
       <link name="L1">
         <pose>0.5 0 0 0 0 0</pose>
+        <inertial>
+          <mass>12</mass>
+        </inertial>
         <visual name="V1">
           <pose relative_to="imu_frame"/>
           <geometry>
@@ -23,6 +26,9 @@
       </link>
       <link name="L2">
         <pose>0 1 0 0 0 0</pose>
+        <inertial>
+          <mass>12</mass>
+        </inertial>
         <visual name="V1">
           <geometry>
             <sphere>
@@ -34,7 +40,7 @@
       <frame name="force_torque_frame" attached_to="L2">
         <pose>1 0 0 0 1.5707963267948966 0</pose>
       </frame>
-      <joint name="J1" type="revolute">
+      <joint name="J1" type="fixed">
         <parent>L1</parent>
         <child>L2</child>
         <sensor name="force_torque_sensor" type="force_torque">
