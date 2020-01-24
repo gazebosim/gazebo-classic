@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <world name="default">
+    <gui>
+      <camera name="user">
+        <pose>1 -8 5.6 0 0.6 1.58</pose>
+      </camera>
+    </gui>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://camera</uri>
+      <pose>0 -1.8 0.25 0 0 1.57</pose>
+    </include>
+    <model name="sphere_sensor_target">
+      <pose>4 3 0.5 0 0 0</pose>
+      <link name="L">
+        <collision name="C">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="V">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name="M">
+      <pose>0 0 0.2 0 0 0</pose>
+      <link name="base">
+        <pose>0 0 -0.1 0 0 0</pose>
+        <inertial>
+          <mass>12</mass>
+          <inertia>
+            <ixx>16.04</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>16.04</iyy>
+            <iyz>0</iyz>
+            <izz>32</izz>
+          </inertia>
+        </inertial>
+        <collision name="C">
+          <geometry>
+            <box>
+              <size>4 4 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="V">
+          <geometry>
+            <box>
+              <size>4 4 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <frame name="F_L">
+        <pose>-1.50 -1.50 0.2 0 0 0</pose>
+      </frame>
+      <frame name="F_ray">
+        <pose>-1.00 -1.00 0.2 0 0 0</pose>
+      </frame>
+      <frame name="F_LC">
+        <pose>-0.50 -0.50 0.2 0 0 0</pose>
+      </frame>
+      <frame name="F_LL">
+        <pose>0 0 0.2 0 0 0</pose>
+      </frame>
+      <frame name="F_gpu_ray">
+        <pose>0.50 0.50 0.2 0 0 0</pose>
+      </frame>
+      <frame name="F_LV">
+        <pose>1.00 1.00 0.2 0 0 0</pose>
+      </frame>
+      <frame name="F_J">
+        <pose>1.50 1.50 0.2 0 0 0</pose>
+      </frame>
+      <frame name="F_JS">
+        <pose>1.75 1.75 0.2 0 0 0</pose>
+      </frame>
+      <link name="L">
+        <pose relative_to="F_L">0 3.5 0 0 0 0</pose>
+        <sensor name="ray" type="ray">
+          <pose relative_to="F_ray">0 3.0 0 0 0 0</pose>
+          <visualize>true</visualize>
+          <update_rate>30</update_rate>
+          <always_on>1</always_on>
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>51</samples>
+                <resolution>1</resolution>
+                <min_angle>-0.5</min_angle>
+                <max_angle>0.5</max_angle>
+              </horizontal>
+            </scan>
+            <range>
+              <min>0.001</min>
+              <max>10.0</max>
+              <resolution>0.001</resolution>
+            </range>
+          </ray>
+        </sensor>
+        <collision name="LC">
+          <pose relative_to="F_LC">0 2.5 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <light name="LL" type="point">
+          <pose relative_to="F_LL">0 2.0 0 0 0 0</pose>
+        </light>
+        <sensor name="gpu_ray" type="gpu_ray">
+          <pose relative_to="F_gpu_ray">0 1.5 0 0 0 0</pose>
+          <visualize>true</visualize>
+          <update_rate>30</update_rate>
+          <always_on>1</always_on>
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>51</samples>
+                <resolution>1</resolution>
+                <min_angle>-0.5</min_angle>
+                <max_angle>0.5</max_angle>
+              </horizontal>
+            </scan>
+            <range>
+              <min>0.001</min>
+              <max>10.0</max>
+              <resolution>0.001</resolution>
+            </range>
+          </ray>
+        </sensor>
+        <visual name="LV">
+          <pose relative_to="F_LV">0 1.0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="J" type="fixed">
+        <pose relative_to="F_J"> 0 0.5 0 0 0 0</pose>
+        <parent>base</parent>
+        <child>L</child>
+        <sensor name="JS" type="force_torque">
+          <pose relative_to="F_JS"> 0 0.25 0 0 0 0</pose>
+          <always_on>1</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>parent</frame>
+          </force_torque>
+        </sensor>
+      </joint>
+    </model>
+  </world>
+</sdf>
