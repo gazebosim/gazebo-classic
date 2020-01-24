@@ -246,6 +246,12 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Added support for flippers in SimpleTrackedVehiclePlugin.
+    * [Pull request 3159](https://bitbucket.org/osrf/gazebo/pull-request/3149)
+
+1. Fix missing road segments in camera sensors
+    * [Pull request 3182](https://bitbucket.org/osrf/gazebo/pull-request/3182)
+
 1. Workaround for race condition when setting model scale.
     * [Pull request 3159](https://bitbucket.org/osrf/gazebo/pull-request/3159)
 
