@@ -112,7 +112,7 @@ class TestSimpleTrackedVehiclePlugin : public SimpleTrackedVehiclePlugin
   }
 };
 
-void AddTrack(msgs::Model &_model, const std::string &_name,
+msgs::Link* AddTrack(msgs::Model &_model, const std::string &_name,
               const msgs::Link *_body, const double _x, const double _y)
 {
   msgs::AddBoxLink(_model, 1.0, ignition::math::Vector3d(0.1, 0.2, 0.5));
@@ -128,6 +128,8 @@ void AddTrack(msgs::Model &_model, const std::string &_name,
   joint->set_type(msgs::Joint_Type::Joint_Type_FIXED);
   joint->set_parent(_body->name());
   joint->set_child(link->name());
+
+  return link;
 }
 
 uint64_t GetCategoryBits(const std::string& _physicsEngine,
@@ -374,6 +376,174 @@ TEST_F(SimpleTrackedVehiclePluginTest, LoadBodyNotSpecified)
   ASSERT_THROW(plugin.Load(model, elem), std::runtime_error);
 }
 
+/// \brief Test that Load() doesn't fail when flippers are specified.
+TEST_F(SimpleTrackedVehiclePluginTest, LoadFlippers)
+{
+  // Create the model
+  msgs::Model modelMsg;
+  modelMsg.set_name("model");
+  modelMsg.set_is_static(false);
+
+  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(0.5, 0.25, 0.14));
+  auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
+  bodyLink->set_name("body");
+
+  auto leftTrack = AddTrack(modelMsg, "left_track", bodyLink, 0, 0.2);
+  auto rightTrack = AddTrack(modelMsg, "right_track", bodyLink, 0, -0.2);
+  AddTrack(modelMsg, "front_left_flipper", leftTrack, 0.2, 0.2);
+  AddTrack(modelMsg, "rear_left_flipper", leftTrack, -0.2, 0.2);
+  AddTrack(modelMsg, "front_right_flipper", rightTrack, 0.2, -0.2);
+  AddTrack(modelMsg, "rear_right_flipper", rightTrack, -0.2, -0.2);
+
+  this->SpawnModel(modelMsg);
+  this->WaitUntilEntitySpawn("model", 10, 100);
+  physics::ModelPtr model = this->world->ModelByName("model");
+
+  std::ostringstream pluginStr;
+  pluginStr << "<sdf version ='" << SDF_VERSION << "'>"
+            << "<model name='model'>"
+            << "  <plugin name='test' filename='notimportant'>"
+            << "    <body>body</body>"
+            << "    <left_track>left_track</left_track>"
+            << "    <right_track>right_track</right_track>"
+            << "    <left_flipper>front_left_flipper</left_flipper>"
+            << "    <left_flipper>rear_left_flipper</left_flipper>"
+            << "    <right_flipper>front_right_flipper</right_flipper>"
+            << "    <right_flipper>rear_right_flipper</right_flipper>"
+            << "  </plugin>"
+            << "</model>"
+            << "</sdf>";
+
+  sdf::SDFPtr pluginSDF(new sdf::SDF);
+  pluginSDF->SetFromString(pluginStr.str());
+
+  sdf::ElementPtr elem = pluginSDF->Root();
+  ASSERT_TRUE(elem != nullptr);
+  elem = elem->GetElement("model");
+  ASSERT_TRUE(elem != nullptr);
+  elem = elem->GetElement("plugin");
+  ASSERT_TRUE(elem != nullptr);
+
+  TestSimpleTrackedVehiclePlugin plugin;
+  ASSERT_NO_THROW(plugin.Load(model, elem));
+
+  ASSERT_EQ(plugin.GetNumTracks(Tracks::LEFT), 3u);
+  ASSERT_EQ(plugin.GetNumTracks(Tracks::RIGHT), 3u);
+}
+
+/// \brief Test that Load() doesn't fail when flippers are specified a different
+/// count on the left and right.
+TEST_F(SimpleTrackedVehiclePluginTest, LoadFlippersAssymetric)
+{
+  // Create the model
+  msgs::Model modelMsg;
+  modelMsg.set_name("model");
+  modelMsg.set_is_static(false);
+
+  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(0.5, 0.25, 0.14));
+  auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
+  bodyLink->set_name("body");
+
+  auto leftTrack = AddTrack(modelMsg, "left_track", bodyLink, 0, 0.2);
+  auto rightTrack = AddTrack(modelMsg, "right_track", bodyLink, 0, -0.2);
+  AddTrack(modelMsg, "front_left_flipper", leftTrack, 0.2, 0.2);
+  AddTrack(modelMsg, "rear_left_flipper", leftTrack, -0.2, 0.2);
+  AddTrack(modelMsg, "front_right_flipper", rightTrack, 0.2, -0.2);
+//  AddTrack(modelMsg, "rear_right_flipper", rightTrack, -0.2, -0.2);
+
+  this->SpawnModel(modelMsg);
+  this->WaitUntilEntitySpawn("model", 10, 100);
+  physics::ModelPtr model = this->world->ModelByName("model");
+
+  std::ostringstream pluginStr;
+  pluginStr << "<sdf version ='" << SDF_VERSION << "'>"
+            << "<model name='model'>"
+            << "  <plugin name='test' filename='notimportant'>"
+            << "    <body>body</body>"
+            << "    <left_track>left_track</left_track>"
+            << "    <right_track>right_track</right_track>"
+            << "    <left_flipper>front_left_flipper</left_flipper>"
+            << "    <left_flipper>rear_left_flipper</left_flipper>"
+            << "    <right_flipper>front_right_flipper</right_flipper>"
+//            << "    <right_flipper>rear_right_flipper</right_flipper>"
+            << "  </plugin>"
+            << "</model>"
+            << "</sdf>";
+
+  sdf::SDFPtr pluginSDF(new sdf::SDF);
+  pluginSDF->SetFromString(pluginStr.str());
+
+  sdf::ElementPtr elem = pluginSDF->Root();
+  ASSERT_TRUE(elem != nullptr);
+  elem = elem->GetElement("model");
+  ASSERT_TRUE(elem != nullptr);
+  elem = elem->GetElement("plugin");
+  ASSERT_TRUE(elem != nullptr);
+
+  TestSimpleTrackedVehiclePlugin plugin;
+  ASSERT_NO_THROW(plugin.Load(model, elem));
+
+  ASSERT_EQ(plugin.GetNumTracks(Tracks::LEFT), 3u);
+  ASSERT_EQ(plugin.GetNumTracks(Tracks::RIGHT), 2u);
+}
+
+/// \brief Test that Load() doesn't fail when flippers are specified but a
+/// referenced link does not exist. It should instead just ignore the
+/// non-existing flipper link.
+TEST_F(SimpleTrackedVehiclePluginTest, LoadFlippersMissingLink)
+{
+  // Create the model
+  msgs::Model modelMsg;
+  modelMsg.set_name("model");
+  modelMsg.set_is_static(false);
+
+  msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(0.5, 0.25, 0.14));
+  auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
+  bodyLink->set_name("body");
+
+  auto leftTrack = AddTrack(modelMsg, "left_track", bodyLink, 0, 0.2);
+  auto rightTrack = AddTrack(modelMsg, "right_track", bodyLink, 0, -0.2);
+  AddTrack(modelMsg, "front_left_flipper", leftTrack, 0.2, 0.2);
+  AddTrack(modelMsg, "rear_left_flipper", leftTrack, -0.2, 0.2);
+  AddTrack(modelMsg, "front_right_flipper", rightTrack, 0.2, -0.2);
+//  AddTrack(modelMsg, "rear_right_flipper", rightTrack, -0.2, -0.2);
+
+  this->SpawnModel(modelMsg);
+  this->WaitUntilEntitySpawn("model", 10, 100);
+  physics::ModelPtr model = this->world->ModelByName("model");
+
+  std::ostringstream pluginStr;
+  pluginStr << "<sdf version ='" << SDF_VERSION << "'>"
+            << "<model name='model'>"
+            << "  <plugin name='test' filename='notimportant'>"
+            << "    <body>body</body>"
+            << "    <left_track>left_track</left_track>"
+            << "    <right_track>right_track</right_track>"
+            << "    <left_flipper>front_left_flipper</left_flipper>"
+            << "    <left_flipper>rear_left_flipper</left_flipper>"
+            << "    <right_flipper>front_right_flipper</right_flipper>"
+            << "    <right_flipper>rear_right_flipper</right_flipper>"
+            << "  </plugin>"
+            << "</model>"
+            << "</sdf>";
+
+  sdf::SDFPtr pluginSDF(new sdf::SDF);
+  pluginSDF->SetFromString(pluginStr.str());
+
+  sdf::ElementPtr elem = pluginSDF->Root();
+  ASSERT_TRUE(elem != nullptr);
+  elem = elem->GetElement("model");
+  ASSERT_TRUE(elem != nullptr);
+  elem = elem->GetElement("plugin");
+  ASSERT_TRUE(elem != nullptr);
+
+  TestSimpleTrackedVehiclePlugin plugin;
+  ASSERT_NO_THROW(plugin.Load(model, elem));
+
+  ASSERT_EQ(plugin.GetNumTracks(Tracks::LEFT), 3u);
+  ASSERT_EQ(plugin.GetNumTracks(Tracks::RIGHT), 2u);
+}
+
 /// \brief Test that the plugin initializes the ~/tracks_speed publisher and
 ///        propagates track friction coefficients (mu, mu2) to links.
 TEST_P(SimpleTrackedVehiclePluginTestParametrized, Init)
@@ -395,8 +565,9 @@ TEST_P(SimpleTrackedVehiclePluginTestParametrized, Init)
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
 
-  AddTrack(modelMsg, "left_track", bodyLink, 0, 0.2);
+  auto leftFlipper = AddTrack(modelMsg, "left_track", bodyLink, 0, 0.2);
   AddTrack(modelMsg, "right_track", bodyLink, 0, -0.2);
+  AddTrack(modelMsg, "front_left_flipper", leftFlipper, 0.2, -0.2);
 
   this->SpawnModel(modelMsg);
   this->WaitUntilEntitySpawn("model", 10, 100);
@@ -410,6 +581,7 @@ TEST_P(SimpleTrackedVehiclePluginTestParametrized, Init)
             << "    <body>body</body>"
             << "    <left_track>left_track</left_track>"
             << "    <right_track>right_track</right_track>"
+            << "    <left_flipper>front_left_flipper</left_flipper>"
             << "    <track_mu>42.0</track_mu>"
             << "    <track_mu2>24.0</track_mu2>"
             << "    <collide_without_contact_bitmask>"
@@ -434,8 +606,15 @@ TEST_P(SimpleTrackedVehiclePluginTestParametrized, Init)
 
   auto const tracksVelTopic = "/gazebo/default/testNamespace/tracks_speed";
 
-  auto friction = model->GetLink("left_track")->
-    GetCollision("left_track_collision")->GetSurface()->FrictionPyramid();
+  auto surface = model->GetLink("left_track")->
+      GetCollisions()[0]->GetSurface();
+  ASSERT_NE(surface, nullptr);
+  auto friction = surface->FrictionPyramid();
+
+  auto flipperSurface = model->GetLink("front_left_flipper")->
+      GetCollisions()[0]->GetSurface();
+  ASSERT_NE(flipperSurface, nullptr);
+  auto flipperFriction = flipperSurface->FrictionPyramid();
 
   EXPECT_FALSE(nullptr != transport::TopicManager::Instance()->FindPublication(
     tracksVelTopic));
@@ -443,6 +622,8 @@ TEST_P(SimpleTrackedVehiclePluginTestParametrized, Init)
   EXPECT_FALSE(plugin.lastTrackMu2.is_initialized());
   EXPECT_DOUBLE_EQ(friction->MuPrimary(), 1.0);
   EXPECT_DOUBLE_EQ(friction->MuSecondary(), 1.0);
+  EXPECT_DOUBLE_EQ(flipperFriction->MuPrimary(), 1.0);
+  EXPECT_DOUBLE_EQ(flipperFriction->MuSecondary(), 1.0);
 
   ASSERT_NO_THROW(plugin.Init());
 
@@ -454,18 +635,26 @@ TEST_P(SimpleTrackedVehiclePluginTestParametrized, Init)
   EXPECT_DOUBLE_EQ(plugin.lastTrackMu2.get(), 24.0);
   EXPECT_DOUBLE_EQ(friction->MuPrimary(), 42.0);
   EXPECT_DOUBLE_EQ(friction->MuSecondary(), 24.0);
+  EXPECT_DOUBLE_EQ(flipperFriction->MuPrimary(), 42.0);
+  EXPECT_DOUBLE_EQ(flipperFriction->MuSecondary(), 24.0);
 
   EXPECT_NE(GetCategoryBits(physicsType, model, "body"),
             GetCategoryBits(physicsType, model, "left_track"));
 
+  EXPECT_NE(GetCategoryBits(physicsType, model, "body"),
+            GetCategoryBits(physicsType, model, "front_left_flipper"));
+
+  EXPECT_EQ(GetCategoryBits(physicsType, model, "left_track"),
+            GetCategoryBits(physicsType, model, "front_left_flipper"));
+
   EXPECT_NE(GetCategoryBits(physicsType, model, "right_track"),
             GetCategoryBits(physicsType, model, "left_track"));
 
-  if (model->GetLink("left_track")->GetCollisions()[0]->GetSurface() != nullptr)
-  {
-    EXPECT_EQ(model->GetLink("left_track")->GetCollisions()[0]->GetSurface()->
-      collideWithoutContactBitmask, 3u);
-  }
+  EXPECT_NE(GetCategoryBits(physicsType, model, "right_track"),
+            GetCategoryBits(physicsType, model, "front_left_flipper"));
+
+  EXPECT_EQ(surface->collideWithoutContactBitmask, 3u);
+  EXPECT_EQ(flipperSurface->collideWithoutContactBitmask, 3u);
 }
 
 /// \brief Test that speed is reset to 0 when calling Reset() and that all speed
