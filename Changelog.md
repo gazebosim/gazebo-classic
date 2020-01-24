@@ -2,6 +2,15 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Fix gazebo9 build and run on Windows, Ogre 1.10
+    * [Pull request 3174](https://bitbucket.org/osrf/gazebo/pull-request/3174)
+
+1. Added support for flippers in SimpleTrackedVehiclePlugin.
+    * [Pull request 3149](https://bitbucket.org/osrf/gazebo/pull-request/3149)
+
+1. Fix missing road segments in camera sensors
+    * [Pull request 3182](https://bitbucket.org/osrf/gazebo/pull-request/3182)
+
 1. Workaround for race condition when setting model scale.
     * [Pull request 3159](https://bitbucket.org/osrf/gazebo/pull-request/3159)
 
@@ -250,7 +259,7 @@
     * [Pull request 3174](https://bitbucket.org/osrf/gazebo/pull-request/3174)
 
 1. Added support for flippers in SimpleTrackedVehiclePlugin.
-    * [Pull request 3159](https://bitbucket.org/osrf/gazebo/pull-request/3149)
+    * [Pull request 3149](https://bitbucket.org/osrf/gazebo/pull-request/3149)
 
 1. Fix missing road segments in camera sensors
     * [Pull request 3182](https://bitbucket.org/osrf/gazebo/pull-request/3182)
