@@ -39,6 +39,13 @@
     * [Pull request 3185](https://bitbucket.org/osrf/gazebo/pull-request/3185)
     * [Pull request 2768](https://bitbucket.org/osrf/gazebo/pull-request/2768)
 
+1. Play logs as close to real time as possible.
+    * [Pull request 3179](https://bitbucket.org/osrf/gazebo/pull-request/3179)
+
+1. Actor: fix distortion when loaded with BVH animation.
+    * [Pull request 2957](https://bitbucket.org/osrf/gazebo/pull-request/2957)
+    * [Pull request 3183](https://bitbucket.org/osrf/gazebo/pull-request/3183)
+
 ## Gazebo 10
 
 ## Gazebo 10.x.x (201x-xx-xx)
