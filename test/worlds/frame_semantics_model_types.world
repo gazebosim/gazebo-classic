@@ -17,8 +17,13 @@
       <uri>model://camera</uri>
       <pose>0 -1.8 0.25 0 0 1.57</pose>
     </include>
-    <model name="sphere_sensor_target">
+
+    <frame name="F_sphere_sensor_target">
       <pose>4 3 0.5 0 0 0</pose>
+    </frame>
+
+    <model name="sphere_sensor_target">
+      <pose relative_to="F_sphere_sensor_target"/>
       <link name="L">
         <collision name="C">
           <geometry>
