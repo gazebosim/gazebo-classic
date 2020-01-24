@@ -23,6 +23,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+#include "gazebo/msgs/poses_stamped.pb.h"
 #include "gazebo/util/system.hh"
 
 /// \file
@@ -243,6 +244,12 @@ namespace gazebo
     /// \def JointState_M
     /// \brief Map of joint state
     typedef std::map<std::string, JointState> JointState_M;
+
+    /// \brief Function signature for API that updates scene poses.
+    /// \param[in] String name of scene update.
+    /// \param[in] Poses of objects in scene to update.
+    using UpdateScenePosesFunc =
+        std::function<void(const std::string &, const msgs::PosesStamped &)>;
 
     #ifndef GZ_COLLIDE_BITS
 

@@ -22,6 +22,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <condition_variable>
 
 #include <sdf/sdf.hh>
 
@@ -269,6 +270,9 @@ namespace gazebo
                  /// \param[in] _force True to force the sensors to update,
                  /// even if they are not active.
                  public: virtual void Update(bool _force = false);
+
+                 /// \brief used to wait for the end of prerendering
+                 private: std::condition_variable conditionPrerendered;
                };
       /// \endcond
 

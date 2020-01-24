@@ -403,6 +403,12 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
+  this->Init(nullptr);
+}
+
+//////////////////////////////////////////////////
+void World::Init(UpdateScenePosesFunc _func)
+{
   // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); ++i)
     this->dataPtr->rootElement->GetChild(i)->Init();
@@ -457,6 +463,8 @@ void World::Init()
       break;
     }
   }
+
+  this->dataPtr->updateScenePoses = _func;
 
   this->dataPtr->initialized = true;
 
@@ -2619,6 +2627,9 @@ void World::ProcessMessages()
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
 
     if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
+      // When ready to use the direct API for updating scene poses from server,
+      // uncomment the following line:
+      // this->dataPtr->updateScenePoses ||
         (this->dataPtr->poseLocalPub &&
          this->dataPtr->poseLocalPub->HasConnections()))
     {
@@ -2683,7 +2694,16 @@ void World::ProcessMessages()
         // rendering sensors to time stamp their data
         this->dataPtr->poseLocalPub->Publish(msg);
       }
+
+      // When ready to use the direct API for updating scene poses from server,
+      // uncomment the following lines:
+      // // Execute callback to export Pose msg
+      // if (this->dataPtr->updateScenePoses)
+      // {
+      //   this->dataPtr->updateScenePoses(this->Name(), msg);
+      // }
     }
+
     this->dataPtr->publishModelPoses.clear();
     this->dataPtr->publishLightPoses.clear();
   }

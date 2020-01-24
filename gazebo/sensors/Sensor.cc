@@ -219,7 +219,7 @@ void Sensor::Update(const bool _force)
     {
       std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
       this->lastUpdateTime = simTime;
-      this->dataPtr->updated();
+      this->updated();
     }
   }
 }
@@ -463,5 +463,12 @@ void Sensor::ResetLastUpdateTime()
 //////////////////////////////////////////////////
 event::ConnectionPtr Sensor::ConnectUpdated(std::function<void()> _subscriber)
 {
-  return this->dataPtr->updated.Connect(_subscriber);
+  return this->updated.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+double Sensor::NextRequiredTimestamp() const
+{
+  // implementation by default: next required timestamp is ignored
+  return std::numeric_limits<double>::quiet_NaN();
 }
