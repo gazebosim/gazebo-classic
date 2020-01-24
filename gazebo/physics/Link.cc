@@ -1941,11 +1941,13 @@ const Link::Visuals_M &Link::Visuals() const
   return this->visuals;
 }
 
+//////////////////////////////////////////////////
 const sdf::Link *Link::GetSDFDom() const
 {
   return this->dataPtr->linkSDFDom;
 }
 
+//////////////////////////////////////////////////
 std::optional<sdf::SemanticPose> Link::SDFSemanticPose() const
 {
   if (nullptr != this->dataPtr->linkSDFDom)

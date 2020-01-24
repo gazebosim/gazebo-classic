@@ -594,6 +594,10 @@ namespace gazebo
       public: virtual std::optional<sdf::SemanticPose> SDFSemanticPose()
                   const override;
 
+      /// \brief Get the SDF DOM object of this joint
+      /// \return Pointer to SDF DOM Object
+      public: const sdf::Joint *GetSDFDom() const;
+
       /// \brief Helper function to get the position of an axis.
       ///
       /// Subclasses must override this.

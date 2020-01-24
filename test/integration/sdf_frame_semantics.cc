@@ -551,6 +551,34 @@ TEST_P(SdfFrameSemanticsTest, ExplicitWorldFrames)
   EXPECT_EQ(expM2Pose, model2->WorldPose());
 }
 
+TEST_P(SdfFrameSemanticsTest, SensorPose)
+{
+  this->LoadWorld("worlds/frame_semantics_sensor_pose.world");
+
+  sensors::ImuSensorPtr imu =
+    std::static_pointer_cast<sensors::ImuSensor>(
+    sensors::SensorManager::Instance()->GetSensor("imu_sensor"));
+  ASSERT_TRUE(imu != NULL);
+  imu->Init();
+
+  sensors::ForceTorqueSensorPtr ftSensor =
+    std::static_pointer_cast<sensors::ForceTorqueSensor>(
+    sensors::SensorManager::Instance()->GetSensor("force_torque_sensor"));
+  ASSERT_TRUE(ftSensor != NULL);
+  ftSensor->Init();
+
+  ignition::math::Pose3d expImuSensorPose(0, 0.2, 0, IGN_PI/2, 0, 0);
+  EXPECT_EQ(expImuSensorPose, imu->Pose());
+
+  ignition::math::Pose3d expFtSensorPose(1, 0, 0, 0, IGN_PI/2, 0);
+  EXPECT_EQ(expFtSensorPose, ftSensor->Pose());
+
+  this->world->Step(1);
+
+  EXPECT_EQ(expImuSensorPose, imu->Pose());
+  EXPECT_EQ(expFtSensorPose, ftSensor->Pose());
+}
+
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, SdfFrameSemanticsTest,
                         PHYSICS_ENGINE_VALUES,); // NOLINT
 

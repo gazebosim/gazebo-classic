@@ -1441,6 +1441,12 @@ std::optional<sdf::SemanticPose> Joint::SDFSemanticPose() const
 }
 
 //////////////////////////////////////////////////
+const sdf::Joint *Joint::GetSDFDom() const
+{
+  return this->jointSDFDom;
+}
+
+//////////////////////////////////////////////////
 void Joint::CacheForceTorque()
 {
 }

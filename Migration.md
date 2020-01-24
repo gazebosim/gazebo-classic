@@ -26,6 +26,7 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
     + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
 
 1. **gazebo/physics/Joint.hh**
+    + public: const `sdf::Joint *` GetSDFDom() const
     + public: `ignition::math::Vector3d` ResolveAxisXyz(const unsigned int, const std::string &) const
     + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
 
@@ -33,10 +34,11 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
     + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
 
 1. **gazebo/physics/Link.hh**
+      public: const `sdf::Link` *GetSDFDom() const;
     + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
 
 1. **gazebo/physics/Model.hh**
-    + public: const `sdf::Model` GetSDFDom() const
+    + public: const `sdf::Model *` GetSDFDom() const
     + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
 
 1. **gazebo/physics/PhysicsEngine.hh**
