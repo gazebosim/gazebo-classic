@@ -49,6 +49,18 @@
     * [Pull request 2957](https://bitbucket.org/osrf/gazebo/pull-request/2957)
     * [Pull request 3183](https://bitbucket.org/osrf/gazebo/pull-request/3183)
 
+1. Fix many Ubuntu bionic compiler warnings and codecheck complaints
+    * [Pull request 3145](https://bitbucket.org/osrf/gazebo/pull-request/3145)
+
+1. Rename OpenAL types to `remove _struct`
+    * [Pull request 3154](https://bitbucket.org/osrf/gazebo/pull-request/3154)
+
+1. Update the gtest fork to fix c++17 bugs
+    * [Pull request 3168](https://bitbucket.org/osrf/gazebo/pull-request/3168)
+
+1. Cross port dynamic bias noise parameters from ign-sensors (random walk)
+    * [Pull request 3181](https://bitbucket.org/osrf/gazebo/pull-request/3181)
+
 ## Gazebo 10
 
 ## Gazebo 10.x.x (201x-xx-xx)
