@@ -112,8 +112,7 @@ void ODEHingeJoint::SetAxis(const unsigned int _index,
     this->parentLink->SetEnabled(true);
 
   // ODE needs global axis
-  auto axisFrame = this->AxisFrame(0);
-  auto globalAxis = axisFrame.RotateVector(_axis);
+  auto globalAxis = this->WorldPose().Rot() * _axis;
 
   if (this->jointId)
   {

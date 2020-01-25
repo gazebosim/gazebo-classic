@@ -381,13 +381,6 @@ ignition::math::Vector3d ODEJoint::LinkTorque(
 void ODEJoint::SetAxis(const unsigned int _index,
     const ignition::math::Vector3d &_axis)
 {
-  // record axis in sdf element
-  if (_index == 0)
-    this->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
-  else if (_index == 1)
-    this->sdf->GetElement("axis2")->GetElement("xyz")->Set(_axis);
-  else
-    gzerr << "SetAxis index [" << _index << "] out of bounds\n";
 }
 
 //////////////////////////////////////////////////

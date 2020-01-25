@@ -176,6 +176,25 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->loaded = false;
   this->dataPtr->sdf = _sdf;
 
+  // Create a DOM object to compute the resolved initial pose (with frame
+  // semantics)
+  ignition::math::SemanticVersion sdfOriginalVersion(_sdf->OriginalVersion());
+  if (sdfOriginalVersion >= ignition::math::SemanticVersion(1, 7))
+  {
+    this->dataPtr->worldSDFDom = std::make_unique<sdf::World>();
+    sdf::Errors errors = this->dataPtr->worldSDFDom->Load(_sdf);
+    if (!errors.empty())
+    {
+      this->dataPtr->worldSDFDom.reset();
+
+      for (const auto &error : errors)
+      {
+        gzerr << error << "\n";
+      }
+      return;
+    }
+  }
+
   if (this->dataPtr->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
            << this->dataPtr->name << "]) overwrites sdf world name\n!";
@@ -355,6 +374,11 @@ const sdf::ElementPtr World::SDF()
 {
   this->UpdateStateSDF();
   return this->dataPtr->sdf;
+}
+
+const sdf::World *World::GetSDFDom() const
+{
+  return this->dataPtr->worldSDFDom.get();
 }
 
 //////////////////////////////////////////////////
@@ -573,7 +597,7 @@ void World::LogStep()
       {
         this->dataPtr->stepInc = 1;
 
-        this->dataPtr->logPlayStateSDF->ClearElements();
+        this->dataPtr->logPlayStateSDF->Clear();
         sdf::readString(data, this->dataPtr->logPlayStateSDF);
 
         this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
@@ -2024,7 +2048,7 @@ void World::ProcessFactoryMsgs()
 
   for (auto const &factoryMsg : factoryMsgsCopy)
   {
-    this->dataPtr->factorySDF->Root()->ClearElements();
+    this->dataPtr->factorySDF->Clear();
 
     if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
     {
@@ -2264,7 +2288,7 @@ void World::SetState(const WorldState &_state)
   auto insertions = _state.Insertions();
   for (auto const &insertion : insertions)
   {
-    this->dataPtr->factorySDF->Root()->ClearElements();
+    this->dataPtr->factorySDF->Clear();
 
     std::stringstream sdfStr;
     sdfStr << "<sdf version='" << SDF_VERSION << "'>"

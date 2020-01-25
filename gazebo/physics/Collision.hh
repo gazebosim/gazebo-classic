@@ -45,18 +45,18 @@ namespace gazebo
       public: virtual ~Collision();
 
       /// \brief Finalize the collision.
-      public: virtual void Fini();
+      public: virtual void Fini() override;
 
       /// \brief Load the collision.
       /// \param[in] _sdf SDF to load from.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) override;
 
       /// \brief Initialize the collision.
-      public: virtual void Init();
+      public: virtual void Init() override;
 
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to update from.
-      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf) override;
 
       /// \brief Set the encapsulated collision object.
       /// Has a side effect of changing the collision bit masks
@@ -98,7 +98,8 @@ namespace gazebo
 
       /// \brief Get the bounding box for this collision.
       /// \return The bounding box.
-      public: virtual ignition::math::AxisAlignedBox BoundingBox() const = 0;
+      public: virtual ignition::math::AxisAlignedBox BoundingBox() const
+          override = 0;
 
       /// \brief Get the shape type.
       /// \return The shape type.
@@ -119,38 +120,46 @@ namespace gazebo
 
       /// \brief Get the linear velocity of the collision.
       /// \return The linear velocity relative to the parent model.
-      public: virtual ignition::math::Vector3d RelativeLinearVel() const;
+      public: virtual ignition::math::Vector3d RelativeLinearVel() const
+          override;
 
       /// \brief Get the linear velocity of the collision in the world
       /// frame.
       /// \return The linear velocity of the collision in the world frame.
-      public: virtual ignition::math::Vector3d WorldLinearVel() const;
+      public: virtual ignition::math::Vector3d WorldLinearVel() const
+          override;
 
       /// \brief Get the angular velocity of the collision.
       /// \return The angular velocity of the collision.
-      public: virtual ignition::math::Vector3d RelativeAngularVel() const;
+      public: virtual ignition::math::Vector3d RelativeAngularVel() const
+          override;
 
       /// \brief Get the angular velocity of the collision in the world frame.
       /// \return The angular velocity of the collision in the world frame.
-      public: virtual ignition::math::Vector3d WorldAngularVel() const;
+      public: virtual ignition::math::Vector3d WorldAngularVel() const
+          override;
 
       /// \brief Get the linear acceleration of the collision.
       /// \return The linear acceleration of the collision.
-      public: virtual ignition::math::Vector3d RelativeLinearAccel() const;
+      public: virtual ignition::math::Vector3d RelativeLinearAccel() const
+          override;
 
       /// \brief Get the linear acceleration of the collision in the world
       /// frame.
       /// \return The linear acceleration of the collision in the world frame.
-      public: virtual ignition::math::Vector3d WorldLinearAccel() const;
+      public: virtual ignition::math::Vector3d WorldLinearAccel() const
+          override;
 
       /// \brief Get the angular acceleration of the collision.
       /// \return The angular acceleration of the collision.
-      public: virtual ignition::math::Vector3d RelativeAngularAccel() const;
+      public: virtual ignition::math::Vector3d RelativeAngularAccel() const
+          override;
 
       /// \brief Get the angular acceleration of the collision in the
       /// world frame.
       /// \return The angular acceleration of the collision in the world frame.
-      public: virtual ignition::math::Vector3d WorldAngularAccel() const;
+      public: virtual ignition::math::Vector3d WorldAngularAccel() const
+          override;
 
       /// \brief Get the collision state.
       /// \return The collision state.
@@ -189,7 +198,12 @@ namespace gazebo
       public: void SetWorldPoseDirty();
 
       // Documentation inherited.
-      public: virtual const ignition::math::Pose3d &WorldPose() const;
+      public: virtual const ignition::math::Pose3d &WorldPose() const
+          override;
+
+      // Documentation inherited.
+      public: virtual std::optional<sdf::SemanticPose> SDFSemanticPose()
+                  const override;
 
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.
@@ -221,6 +235,9 @@ namespace gazebo
 
       /// \brief True if the world pose should be recalculated.
       private: mutable bool worldPoseDirty;
+
+      /// \brief SDF Collision DOM object
+      private: const sdf::Collision *collisionSDFDom = nullptr;
     };
     /// \}
   }

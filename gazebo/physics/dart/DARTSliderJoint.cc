@@ -108,8 +108,7 @@ void DARTSliderJoint::SetAxis(const unsigned int _index,
           this->dataPtr->dtJoint);
     GZ_ASSERT(dtPrismaticJoint, "PrismaticJoint is NULL");
 
-    Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(
-        this->AxisFrameOffset(0).RotateVector(_axis));
+    Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
     dtPrismaticJoint->setAxis(dartVec3);
   }
   else

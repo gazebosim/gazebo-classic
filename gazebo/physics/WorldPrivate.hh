@@ -379,6 +379,9 @@ namespace gazebo
 
       /// \brief Callback function intended to call the scene with updated Poses
       public: UpdateScenePosesFunc updateScenePoses;
+
+      /// \brief SDF World DOM object
+      public: std::unique_ptr<sdf::World> worldSDFDom;
     };
   }
 }

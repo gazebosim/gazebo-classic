@@ -1373,8 +1373,17 @@ namespace gazebo
       result.set_limit_effort(limitElem->Get<double>("effort"));
       result.set_limit_velocity(limitElem->Get<double>("velocity"));
 
-      result.set_use_parent_model_frame(
-          _sdf->Get<bool>("use_parent_model_frame"));
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+      // use_parent_model_frame is deprecated, so always set it to false.
+      result.set_use_parent_model_frame(false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
+      result.set_xyz_expressed_in(
+          _sdf->GetElement("xyz")->Get<std::string>("expressed_in"));
 
       sdf::ElementPtr dynamicsElem = _sdf->GetElement("dynamics");
       result.set_damping(dynamicsElem->Get<double>("damping"));
@@ -3189,11 +3198,24 @@ namespace gazebo
     {
       if (_msg.has_xyz())
         _sdf->GetElement("xyz")->Set(ConvertIgn(_msg.xyz()));
-      if (_msg.has_use_parent_model_frame())
+
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+      if (!_msg.xyz_expressed_in().empty())
       {
-        _sdf->GetElement("use_parent_model_frame")->Set(
-          _msg.use_parent_model_frame());
+        _sdf->GetElement("xyz")
+            ->GetAttribute("expressed_in")
+            ->Set(_msg.xyz_expressed_in());
       }
+      else if (_msg.use_parent_model_frame())
+      {
+        _sdf->GetElement("xyz")->GetAttribute("expressed_in")->Set("__model__");
+      }
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
       {
         auto dynamicsElem = _sdf->GetElement("dynamics");

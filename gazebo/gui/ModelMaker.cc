@@ -20,6 +20,7 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -104,10 +105,21 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
   this->dataPtr->modelSDF.reset(new sdf::SDF);
   sdf::initFile("root.sdf", this->dataPtr->modelSDF);
 
-  if (!sdf::readFile(_filename, this->dataPtr->modelSDF))
+  sdf::Errors errors;
+  if (!sdf::readFileWithoutConversion(
+          _filename, this->dataPtr->modelSDF, errors))
   {
     gzerr << "Unable to load file[" << _filename << "]\n";
+    for (const auto &e : errors)
+    {
+      gzerr << e.Message() << "\n";
+    }
     return false;
+  }
+  if (this->dataPtr->modelSDF->Root()->HasElement("model"))
+  {
+    common::convertPosesToSdf16(
+        this->dataPtr->modelSDF->Root()->GetElement("model"));
   }
 
   return this->Init();

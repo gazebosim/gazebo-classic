@@ -9,10 +9,37 @@ release will remove the deprecated code.
 
 ### Build system
 
-New versions in mandatory dependencies: `ign-transport8`, `ign-msgs5`, `ign-math6`, `sdformat8`.
+New versions in mandatory dependencies: `ign-transport8`, `ign-msgs5`, `ign-math6`, `sdformat9`.
 New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graphics`, `ign-common3-profiler`.
 
 ### Additions
+
+1. **gazebo/common/SdfFrameSemantics.hh**
+    + `ignition::math::Pose3d` resolveSdfPose(const sdf::SemanticPose &, const std::string &)
+    + `void` convertPosesToSdf16(const sdf::ElementPtr &)
+
+1. **gazebo/physics/Base.hh**
+    + public: `ignition::math::Pose3d` SDFPoseRelativeToParent() const
+    + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const
+
+1. **gazebo/physics/Collision.hh**
+    + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
+
+1. **gazebo/physics/Joint.hh**
+    + public: const `sdf::Joint *` GetSDFDom() const
+    + public: `ignition::math::Vector3d` ResolveAxisXyz(const unsigned int, const std::string &) const
+    + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
+
+1. **gazebo/physics/Light.hh**
+    + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
+
+1. **gazebo/physics/Link.hh**
+      public: const `sdf::Link` *GetSDFDom() const;
+    + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
+
+1. **gazebo/physics/Model.hh**
+    + public: const `sdf::Model *` GetSDFDom() const
+    + public: virtual `std::optional<sdf::SemanticPose>` SDFSemanticPose() const override
 
 1. **gazebo/physics/PhysicsEngine.hh**
     + public: template <typename T>
@@ -31,7 +58,16 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
     + API for directly updating the poses of objects in a scene
     + void UpdatePoses(const msgs::PosesStamped &)
 
+1. **gazebo/physics/World.hh**
+    + public: const `sdf::World` GetSDFDom() const
+
 ### Modifications
+
+1. **gazebo/rendering/JointVisual.hh**
+    + ***Deprecation:*** ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis, const bool _useParentFrame, const msgs::Joint::Type &_type);
+    + ***Replacement:*** ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis, const std::string &_xyzExpressedIn, const msgs::Joint::Type &_type);
+    + ***Deprecation:*** void UpdateAxis(ArrowVisualPtr _arrowVisual, const ignition::math::Vector3d &_axis, const bool _useParentFrame, const msgs::Joint::Type &_type);
+    + ***Replacement:*** void UpdateAxis(ArrowVisualPtr _arrowVisual, const ignition::math::Vector3d &_axis, const std::string &_xyzExpressedIn, const msgs::Joint::Type &_type);
 
 1. All instances of `ignition::math::Box` in the API are changed to `ignition::math::AxisAlignedBox`
    to match the changes in ignition-math6.
@@ -43,12 +79,12 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
 
 1. **gazebo/physics/PresetManager.hh**
    The PresetManager stores data internally with a map of `boost::any` values
-   and with the switch to sdformat8, the value may be stored as a `std::any`
+   and with the switch to sdformat9, the value may be stored as a `std::any`
    within a `boost::any`, making it more complex to cast to a specific type.
    This happens because the PresetManager stores the output of
    `sdf::Element::GetAny` as boost::any values in its parameterMap and
    calls `PhysicsEngine::SetParam` with these values.
-   Prior to libsdformat8, the GetAny function returned `boost::any`, but it now
+   Prior to libsdformat9, the GetAny function returned `boost::any`, but it now
    returns `std::any`. The `gazebo::physics::PhysicsEngine::any_cast` helper
    is provided to first check if a `boost::any` value contains a std::any,
    and if so, perform a `std::any_cast<T>`.
@@ -83,6 +119,12 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
     of `0` is indistinguishable from an unset `id`.
     As such, an `id` of `0` will now trigger a random `id` to be generated,
     and non-zero `id` values should be used instead.
+
+### Deletions
+
+1. **gazebo/physics/Joint.hh**
+    + ***Removed:*** protected: bool axisParentModelFrame[]
+    + ***Replacement:*** protected: std::string axisExpressedIn[]
 
 ## Gazebo 9.x to 10.x
 

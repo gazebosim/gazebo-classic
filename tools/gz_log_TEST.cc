@@ -180,6 +180,8 @@ TEST(gz_log, EchoFilter)
     EXPECT_EQ(shasum, "6ab471e6c410ebe90a939383bd168660ba9019e8");
   else if (std::string("1.6").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "8bec468cdc8f2cf3b5956ffffbd9c66cf3e8f474");
+  else if (std::string("1.7").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "b086cfdc4f76ce455bc79a1fef5710e0f3700666");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -194,6 +196,8 @@ TEST(gz_log, EchoFilter)
     EXPECT_EQ(shasum, "739e4454112440e2c1782fff51a1382edf6cfa57");
   else if (std::string("1.6").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "ad8a50c8b1743b7d7eafa788ff4aec1de051b86b");
+  else if (std::string("1.7").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "7949fc454abf05f938bbb8350d7cd64fac531af2");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -208,6 +212,8 @@ TEST(gz_log, EchoFilter)
     EXPECT_EQ(shasum, "592bbdf6511ea2e76b5225a1d5c13e8a1884c429");
   else if (std::string("1.6").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "b112fffb06668852ad11149639e105bfca8d686b");
+  else if (std::string("1.7").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "185fc6f18c3714f98151449a9a73b78e5e0ab5e6");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -222,6 +228,8 @@ TEST(gz_log, EchoFilter)
     EXPECT_EQ(shasum, "594de8f16f10ce881fcb5a17ff98ed9847891221");
   else if (std::string("1.6").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "2066e0d45ef941cce339e3219b19fe9c4a1b07c9");
+  else if (std::string("1.7").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "1493706e4b1a8ba309edeb6eb02260199d2b7c7b");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -237,6 +245,8 @@ TEST(gz_log, EchoFilter)
     EXPECT_EQ(shasum, "10beb40e2870ac4cf92e67bd95c19432177a7bce");
   else if (std::string("1.6").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "8e04dd497580841233c8d05e5b447d69e8bb186e");
+  else if (std::string("1.7").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "506ec1d1df8471fb392c8817e2f205907a73ebba");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -252,6 +262,8 @@ TEST(gz_log, EchoFilter)
     EXPECT_EQ(shasum, "25ec9631bd32a9ac5292823e553081375a255399");
   else if (std::string("1.6").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "29b572a28f6b83e0c24e8be028c660a58626515c");
+  else if (std::string("1.7").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "477f22487f7f0fa18e5cd478375a5f636798a726");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 }
@@ -341,6 +353,8 @@ TEST(gz_log, Step)
     EXPECT_EQ(shasum, "cc55bc387eec68fc2b2aef70bfb7372a2706a6dc");
   else if (std::string("1.6").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "35cf4c553b140a41412381f94bb400ef314298e8");
+  else if (std::string("1.7").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "ade6350b883b0e04ef813c1b332fe976f10c8d9a");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -353,6 +367,8 @@ TEST(gz_log, Step)
     EXPECT_EQ(shasum, "37934b37eb4e2e7d88ed764c296232124c8a38ab");
   else if (std::string("1.6").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "3d20657cad6c6ce457298ef81074ed6e62e05afa");
+  else if (std::string("1.7").compare(SDF_VERSION) == 0)
+    EXPECT_EQ(shasum, "2c5ae30eb3e0f5c9e131d4596215c060858015de");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 }

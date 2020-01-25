@@ -91,6 +91,10 @@ namespace gazebo
       /// \return The SDF
       public: const sdf::ElementPtr SDF();
 
+      /// \brief Get the SDF DOM for the world.
+      /// \return The SDF DOM for this world.
+      public: const sdf::World *GetSDFDom() const;
+
       /// \brief Save a world to a file.
       /// Save the current world and its state to a file.
       /// \param[in] _filename Name of the file to save into.
@@ -169,7 +173,7 @@ namespace gazebo
 
       /// \brief Return the magnetic field vector.
       /// \return The magnetic field vector.
-      public: virtual ignition::math::Vector3d MagneticField() const;
+      public: ignition::math::Vector3d MagneticField() const;
 
       /// \brief Set the magnetic field vector.
       /// \param[in] _mag New magnetic field vector.

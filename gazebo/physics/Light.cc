@@ -18,6 +18,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/LightState.hh"
 #include "gazebo/physics/Light.hh"
+#include "gazebo/physics/Link.hh"
 
 
 /// \brief Private data for the Light class
@@ -28,6 +29,9 @@ class gazebo::physics::LightPrivate
 
   /// \brief Flag to indicate if light world pose is dirty or not.
   public: bool worldPoseDirty = false;
+
+  /// \brief SDF Light DOM object
+  public: const sdf::Light *lightSDFDom = nullptr;
 };
 
 using namespace gazebo;
@@ -45,15 +49,48 @@ Light::~Light()
 {
 }
 
+//////////////////////////////////////////////////
+void Light::Load(sdf::ElementPtr _sdf)
+{
+  EntityPtr parentEnt = boost::dynamic_pointer_cast<Entity>(this->GetParent());
+
+  if (nullptr != parentEnt)
+  {
+    LinkPtr linkEnt = boost::dynamic_pointer_cast<Link>(parentEnt);
+    WorldPtr worldEnt = boost::dynamic_pointer_cast<World>(parentEnt);
+    if (nullptr != linkEnt)
+    {
+      auto *linkSDFDom = linkEnt->GetSDFDom();
+      if (nullptr != linkSDFDom)
+      {
+        this->dataPtr->lightSDFDom = linkSDFDom->LightByName(this->GetName());
+      }
+    }
+    else if (nullptr != worldEnt)
+    {
+      auto *worldSDFDom = worldEnt->GetSDFDom();
+      if (nullptr != worldSDFDom)
+      {
+        // sdf::World doesn't have LightByName so find the index and use that
+        for (uint64_t i = 0; i < worldSDFDom->LightCount(); ++i)
+        {
+          if (worldSDFDom->LightByIndex(i)->Name() == this->GetName())
+          {
+            this->dataPtr->lightSDFDom = worldSDFDom->LightByIndex(i);
+          }
+        }
+      }
+    }
+  }
+  Entity::Load(_sdf);
+}
 
 //////////////////////////////////////////////////
 void Light::Init()
 {
   // Record the light's initial pose (for resetting)
-  ignition::math::Pose3d initPose =
-      this->sdf->Get<ignition::math::Pose3d>("pose");
-  this->SetInitialRelativePose(initPose);
-  this->SetRelativePose(initPose);
+  this->SetInitialRelativePose(this->SDFPoseRelativeToParent());
+  this->SetRelativePose(this->SDFPoseRelativeToParent());
 }
 
 //////////////////////////////////////////////////
@@ -128,4 +165,14 @@ void Light::SetWorldPoseDirty()
   // Tell the light object that the next call to ::WorldPose should
   // compute a new worldPose value.
   this->dataPtr->worldPoseDirty = true;
+}
+
+std::optional<sdf::SemanticPose> Light::SDFSemanticPose() const
+{
+  if (nullptr != this->dataPtr->lightSDFDom)
+  {
+    return this->dataPtr->lightSDFDom->SemanticPose();
+  }
+
+  return std::nullopt;
 }

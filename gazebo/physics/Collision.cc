@@ -97,6 +97,13 @@ void Collision::Fini()
 //////////////////////////////////////////////////
 void Collision::Load(sdf::ElementPtr _sdf)
 {
+  auto *linkDom = this->GetLink()->GetSDFDom();
+  if (nullptr != linkDom)
+  {
+    this->collisionSDFDom =
+      linkDom->CollisionByName(_sdf->Get<std::string>("name"));
+  }
+
   Entity::Load(_sdf);
 
   this->maxContacts = _sdf->Get<unsigned int>("max_contacts");
@@ -105,8 +112,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("laser_retro"))
     this->SetLaserRetro(this->sdf->Get<double>("laser_retro"));
 
-  this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
-
+  this->SetRelativePose(this->SDFPoseRelativeToParent());
   this->surface->Load(this->sdf->GetElement("surface"));
 
   if (this->shape)
@@ -120,7 +126,7 @@ void Collision::Init()
 {
   this->shape->Init();
 
-  this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
+  this->SetRelativePose(this->SDFPoseRelativeToParent());
 }
 
 //////////////////////////////////////////////////
@@ -404,4 +410,13 @@ void Collision::SetWorldPoseDirty()
   // Tell the collision object that the next call to ::GetWorldPose should
   // compute a new worldPose value.
   this->worldPoseDirty = true;
+}
+
+std::optional<sdf::SemanticPose> Collision::SDFSemanticPose() const
+{
+  if (nullptr != this->collisionSDFDom)
+  {
+    return this->collisionSDFDom->SemanticPose();
+  }
+  return std::nullopt;
 }

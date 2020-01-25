@@ -42,6 +42,11 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("gpu_ray", GpuRaySensor)
 
+void RegisterGpuLidarSensor()
+{
+  SensorFactory::RegisterSensor("gpu_lidar", NewGpuRaySensor);
+}
+
 //////////////////////////////////////////////////
 GpuRaySensor::GpuRaySensor()
 : Sensor(sensors::IMAGE),

@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <model name="box_with_frame_semantics">
+    <pose>0 0 0.5 0 0 0</pose>
+    <frame name="offset">
+      <pose>5 0 0 0 0 0</pose>
+    </frame>
+    <link name="L1">
+      <pose>0 0 1 0 0 0</pose>
+      <collision name="C">
+        <pose relative_to="offset"/>
+        <geometry>
+          <box>
+            <size>1 1 1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="V">
+        <pose relative_to="offset"/>
+        <geometry>
+          <box>
+            <size>1 1 1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <link name="L2">
+      <pose relative_to="L1">0 5 0 0 0 0</pose>
+      <collision name="C">
+        <pose relative_to="offset"/>
+        <geometry>
+          <box>
+            <size>1 1 1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="V">
+        <pose relative_to="offset"/>
+        <geometry>
+          <box>
+            <size>1 1 1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -16,5 +16,6 @@ message Axis
   required double limit_velocity       = 5;
   required double damping              = 6;
   required double friction             = 7;
-  required bool use_parent_model_frame = 8;
+  required bool use_parent_model_frame = 8[deprecated = true];
+  required string xyz_expressed_in     = 9;
 }

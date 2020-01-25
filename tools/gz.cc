@@ -475,7 +475,8 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    if (!sdf::readFile(filename, sdf))
+    sdf::Errors errors;
+    if (!sdf::readFileWithoutConversion(filename, sdf, errors))
     {
       std::cerr << "Error: SDF parsing the xml failed\n";
       return false;
@@ -501,7 +502,8 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    if (!sdf::readString(sdfString, sdf))
+    sdf::Errors errors;
+    if (!sdf::readStringWithoutConversion(sdfString, sdf, errors))
     {
       std::cerr << "Error: SDF parsing the xml failed\n";
       return false;

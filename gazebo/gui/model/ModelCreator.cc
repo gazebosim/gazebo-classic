@@ -24,6 +24,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 #include "gazebo/common/SVGLoader.hh"
 
 #include "gazebo/rendering/LinkFrameVisual.hh"
@@ -535,6 +536,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
       {
         if (model->GetAttribute("name")->GetAsString() == _modelName)
         {
+          common::convertPosesToSdf16(model);
           // Create the root model
           this->CreateModelFromSDF(model);
 
@@ -721,8 +723,50 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     if (_modelElem->HasElement("joint"))
        jointElem = _modelElem->GetElement("joint");
 
+    auto resolveJointAxisXyz = [&](const sdf::ElementPtr &_axis)
+    {
+      sdf::ElementPtr xyzElem = _axis->GetElement("xyz");
+      if (xyzElem->Get<std::string>("expressed_in") == "__model__")
+      {
+        std::string parentLinkName =
+            modelVisual->Name() + "::" + jointElem->Get<std::string>("parent");
+        std::string childLinkName =
+            modelVisual->Name() + "::" + jointElem->Get<std::string>("child");
+        auto childLinkIt = modelData->links.find(childLinkName);
+        if (parentLinkName == "world")
+        {
+          // //joint/parent == world
+          // //joint/axis/use_parent_model_frame == true
+          // this will be migrated to
+          // //joint/axis/xyz/@expressed_in == __model__
+          // but gazebo10 interpreted this joint axis in the world frame
+          xyzElem->Set(modelVisual->WorldPose().Rot().Inverse() *
+                       xyzElem->Get<ignition::math::Vector3d>());
+          xyzElem->GetAttribute("expressed_in")->Reset();
+        }
+        else if (childLinkIt != modelData->links.end())
+        {
+          auto childLinkPose = childLinkIt->second.lock()->Pose();
+          auto jointPose = jointElem->Get<ignition::math::Pose3d>("pose");
+          xyzElem->Set(jointPose.Rot().Inverse() *
+                       childLinkPose.Rot().Inverse() *
+                       xyzElem->Get<ignition::math::Vector3d>());
+          xyzElem->GetAttribute("expressed_in")->Reset();
+        }
+      }
+    };
     while (jointElem)
     {
+      // Handle joint axis xyz
+      if (jointElem->HasElement("axis"))
+      {
+        resolveJointAxisXyz(jointElem->GetElement("axis"));
+      }
+      if (jointElem->HasElement("axis2"))
+      {
+        resolveJointAxisXyz(jointElem->GetElement("axis2"));
+      }
+
       this->dataPtr->jointMaker->CreateJointFromSDF(jointElem,
           modelNameStream.str());
       jointElem = jointElem->GetNextElement("joint");
@@ -815,7 +859,9 @@ bool ModelCreator::OnSave()
   {
     case UNSAVED_CHANGES:
     {
-      this->SaveModelFiles();
+      if (!this->SaveModelFiles())
+        return false;
+
       gui::model::Events::saveModel(this->dataPtr->modelName);
       return true;
     }
@@ -842,7 +888,8 @@ bool ModelCreator::OnSaveAs()
     // Update name on palette
     gui::model::Events::saveModel(this->dataPtr->modelName);
     // Generate and save files
-    this->SaveModelFiles();
+    if (!this->SaveModelFiles())
+      return false;
     return true;
   }
   return false;
@@ -950,13 +997,47 @@ void ModelCreator::OnPropertiesChanged(const bool _static,
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::SaveModelFiles()
+bool ModelCreator::SaveModelFiles()
 {
+  this->GenerateSDF();
+  sdf::ElementPtr modelElem =
+      this->dataPtr->modelSDF->Root()->GetElement("model");
+  // The generated SDF will have upconverted to 1.7. Make sure that the
+  // resulting SDF is valid before saving it to file. We do this by checking for
+  // errors when loading the model DOM object.
+  sdf::Root root;
+  sdf::Errors errors = root.LoadSdfString(this->dataPtr->modelSDF->ToString());
+  if (!errors.empty() && root.ModelCount() != 1)
+  {
+    QString msg("The edited model was automatically converted to SDFormat 1.7."
+        " The resulting model had the following errors.\n\n");
+
+    for (const auto err : errors)
+    {
+      msg.append("* " + QString::fromStdString(err.Message()) + "\n");
+      gzerr << err.Message() << "\n";
+    }
+    msg.append(
+        "\nIf you save the file, you may need to manually fix the errors. Do "
+        "you want to save the file?\n");
+    QMessageBox msgBox(QMessageBox::NoIcon, QString("Save"), msg);
+    QPushButton *cancelButton =
+        msgBox.addButton("Cancel", QMessageBox::RejectRole);
+    QPushButton *saveButton = msgBox.addButton("Save",
+        QMessageBox::AcceptRole);
+    msgBox.setEscapeButton(cancelButton);
+    msgBox.setDefaultButton(saveButton);
+
+    msgBox.exec();
+    if (msgBox.clickedButton() == cancelButton)
+      return false;
+  }
+
   this->dataPtr->saveDialog->GenerateConfig();
   this->dataPtr->saveDialog->SaveToConfig();
-  this->GenerateSDF();
   this->dataPtr->saveDialog->SaveToSDF(this->dataPtr->modelSDF);
   this->dataPtr->currentSaveState = ALL_SAVED;
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -1143,6 +1224,7 @@ LinkData *ModelCreator::AddShape(const EntityType _type,
 /////////////////////////////////////////////////
 NestedModelData *ModelCreator::AddModel(const sdf::ElementPtr &_sdf)
 {
+  common::convertPosesToSdf16(_sdf);
   // Create a top-level nested model
   return this->CreateModelFromSDF(_sdf, this->dataPtr->previewVisual, false);
 }
@@ -1232,6 +1314,8 @@ void ModelCreator::InsertNestedModelFromSDF(sdf::ElementPtr _sdf)
   if (!_sdf)
     return;
 
+  common::convertPosesToSdf16(_sdf);
+
   this->CreateModelFromSDF(_sdf, this->dataPtr->previewVisual);
 }
 
@@ -1297,6 +1381,7 @@ NestedModelData *ModelCreator::CloneNestedModel(
   sdf::ElementPtr cloneSDF = it->second->modelSDF->Clone();
   cloneSDF->GetAttribute("name")->Set(leafName);
 
+  common::convertPosesToSdf16(cloneSDF);
   NestedModelData *modelData = this->CreateModelFromSDF(cloneSDF,
     it->second->modelVisual->GetParent(), false);
 
@@ -3337,3 +3422,4 @@ void ModelCreator::ShowLinkFrames(const bool _show)
   for (auto link : this->dataPtr->allLinks)
     link.second->ShowLinkFrame(_show);
 }
+
