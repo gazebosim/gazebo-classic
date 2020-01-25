@@ -73,23 +73,22 @@ void Model::Load(sdf::ElementPtr _sdf)
 {
   // Create a DOM object to compute the resolved initial pose (with frame
   // semantics)
+  // Only <model> is supported right now, <actor> is not supported.
   if (_sdf->GetName() == "model")
   {
+    // If the model is initialized without a containing world, we create an
+    // isolated/standalone DOM object for the world. Otherwise, we'd obtain
+    // the model DOM from the world DOM.
+    const auto *worldDom = this->GetWorld()->GetSDFDom();
+    const std::string modelName = _sdf->Get<std::string>("name");
+    if (nullptr != worldDom && !modelName.empty())
+    {
+      this->modelSDFDom = worldDom->ModelByName(modelName);
+    }
+
     ignition::math::SemanticVersion sdfOriginalVersion(_sdf->OriginalVersion());
     if (sdfOriginalVersion >= ignition::math::SemanticVersion(1, 7))
     {
-      // If the model is initialized without a containing world, we create an
-      // isolated/standalone DOM object for the world. Otherwise, we'd obtain
-      // the model DOM from the world DOM.
-      //
-      // Only <model> is supported right now, <actor> is not supported.
-      const auto *worldDom = this->GetWorld()->GetSDFDom();
-      const std::string modelName = _sdf->Get<std::string>("name");
-      if (nullptr != worldDom && !modelName.empty())
-      {
-        this->modelSDFDom = worldDom->ModelByName(modelName);
-      }
-
       if (nullptr == this->modelSDFDom)
       {
         this->modelSDFDomIsolated = std::make_unique<sdf::Model>();
