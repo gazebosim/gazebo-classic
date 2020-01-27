@@ -261,10 +261,792 @@
                 <parent>base_link</parent>
             </joint>
 
+            <link name='front_left_flipper'>
+                <pose frame=''>0.25 0.272 0.0195 0 -0.5 0</pose>
+                <inertial>
+                    <pose frame=''>0.08 0 0 0 -0 0</pose>
+                    <mass>0.75</mass>
+                    <inertia>
+                        <ixx>0.0017491</ixx>
+                        <ixy>2.8512e-07</ixy>
+                        <ixz>0.0018277</ixz>
+                        <iyy>0.012277</iyy>
+                        <iyz>-3.6288e-07</iyz>
+                        <izz>0.010941</izz>
+                    </inertia>
+                </inertial>
+                <collision name='front_left_flipper_collision_large_wheel_collision'>
+                    <pose frame=''>0 -0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.089</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='front_left_flipper_collision_small_wheel_collision_1'>
+                    <pose frame=''>0.33 -0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.029</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='front_left_flipper_collision_top_bar_collision_2'>
+                    <pose frame=''>0.165 -0 0.0325 0 0.184162 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='front_left_flipper_collision_bottom_bar_collision_3'>
+                    <pose frame=''>0.165 -0 -0.0325 0 -0.184162 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='front_left_flipper_collision_middle_bar_collision_4'>
+                    <pose frame=''>0.166 -0 0.004 0 -0.02 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.04981 0.07</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <visual name='front_left_flipper_visual_large_wheel_visual'>
+                    <pose frame=''>0 -0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.089</radius>
+                        </cylinder>
+                    </geometry>
+                </visual>
+                <visual name='front_left_flipper_visual_small_wheel_visual_1'>
+                    <pose frame=''>0.33 -0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.029</radius>
+                        </cylinder>
+                    </geometry>
+                </visual>
+                <visual name='front_left_flipper_visual_top_bar_visual_2'>
+                    <pose frame=''>0.165 -0 0.0325 0 0.184162 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <visual name='front_left_flipper_visual_bottom_bar_visual_3'>
+                    <pose frame=''>0.165 -0 -0.0325 0 -0.184162 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <visual name='front_left_flipper_visual_middle_bar_visual_4'>
+                    <pose frame=''>0.166 -0 0.004 0 -0.02 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.04981 0.07</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <gravity>1</gravity>
+                <velocity_decay/>
+                <self_collide>1</self_collide>
+                <kinematic>0</kinematic>
+            </link>
+            <joint name='front_left_flipper_j' type='revolute'>
+                <child>front_left_flipper</child>
+                <parent>left_track</parent>
+                <axis>
+                    <xyz>0 1 0</xyz>
+                    <limit>
+                        <lower>0</lower>
+                        <upper>0</upper>
+                    </limit>
+                    <dynamics>
+                        <spring_reference>0</spring_reference>
+                        <spring_stiffness>0</spring_stiffness>
+                    </dynamics>
+                    <use_parent_model_frame>1</use_parent_model_frame>
+                </axis>
+                <physics>
+                    <ode>
+                        <implicit_spring_damper>1</implicit_spring_damper>
+                        <cfm_damping>1</cfm_damping>
+                        <limit>
+                            <cfm>0</cfm>
+                            <erp>0.2</erp>
+                        </limit>
+                    </ode>
+                </physics>
+            </joint>
+            <link name='rear_left_flipper'>
+                <pose frame=''>-0.25 0.272 0.0195 3.14159 -0.5 3.14159</pose>
+                <inertial>
+                    <pose frame=''>0.08 0 0 0 -0 0</pose>
+                    <mass>0.75</mass>
+                    <inertia>
+                        <ixx>0.0017491</ixx>
+                        <ixy>2.8512e-07</ixy>
+                        <ixz>0.0018277</ixz>
+                        <iyy>0.012277</iyy>
+                        <iyz>-3.6288e-07</iyz>
+                        <izz>0.010941</izz>
+                    </inertia>
+                </inertial>
+                <collision name='rear_left_flipper_collision_large_wheel_collision'>
+                    <pose frame=''>0 -0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.089</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='rear_left_flipper_collision_small_wheel_collision_1'>
+                    <pose frame=''>0.33 -0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.029</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='rear_left_flipper_collision_top_bar_collision_2'>
+                    <pose frame=''>0.165 -0 0.0325 0 0.184162 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='rear_left_flipper_collision_bottom_bar_collision_3'>
+                    <pose frame=''>0.165 -0 -0.0325 0 -0.184162 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='rear_left_flipper_collision_middle_bar_collision_4'>
+                    <pose frame=''>0.166 -0 0.004 0 -0.02 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.04981 0.07</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <visual name='rear_left_flipper_visual_large_wheel_visual'>
+                    <pose frame=''>0 -0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.089</radius>
+                        </cylinder>
+                    </geometry>
+                </visual>
+                <visual name='rear_left_flipper_visual_small_wheel_visual_1'>
+                    <pose frame=''>0.33 -0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.029</radius>
+                        </cylinder>
+                    </geometry>
+                </visual>
+                <visual name='rear_left_flipper_visual_top_bar_visual_2'>
+                    <pose frame=''>0.165 -0 0.0325 0 0.184162 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <visual name='rear_left_flipper_visual_bottom_bar_visual_3'>
+                    <pose frame=''>0.165 -0 -0.0325 0 -0.184162 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <visual name='rear_left_flipper_visual_middle_bar_visual_4'>
+                    <pose frame=''>0.166 -0 0.004 0 -0.02 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.04981 0.07</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <gravity>1</gravity>
+                <velocity_decay/>
+                <self_collide>1</self_collide>
+                <kinematic>0</kinematic>
+            </link>
+            <joint name='rear_left_flipper_j' type='revolute'>
+                <child>rear_left_flipper</child>
+                <parent>left_track</parent>
+                <axis>
+                    <xyz>0 1 0</xyz>
+                    <limit>
+                        <lower>0</lower>
+                        <upper>0</upper>
+                    </limit>
+                    <dynamics>
+                        <spring_reference>0</spring_reference>
+                        <spring_stiffness>0</spring_stiffness>
+                    </dynamics>
+                    <use_parent_model_frame>1</use_parent_model_frame>
+                </axis>
+                <physics>
+                    <ode>
+                        <implicit_spring_damper>1</implicit_spring_damper>
+                        <cfm_damping>1</cfm_damping>
+                        <limit>
+                            <cfm>0</cfm>
+                            <erp>0.2</erp>
+                        </limit>
+                    </ode>
+                </physics>
+            </joint>
+            <link name='front_right_flipper'>
+                <pose frame=''>0.25 -0.272 0.0195 3.14159 0.5 3.14159</pose>
+                <inertial>
+                    <pose frame=''>-0.08 0 0 0 -0 0</pose>
+                    <mass>0.75</mass>
+                    <inertia>
+                        <ixx>0.0017491</ixx>
+                        <ixy>2.8512e-07</ixy>
+                        <ixz>0.0018277</ixz>
+                        <iyy>0.012277</iyy>
+                        <iyz>-3.6288e-07</iyz>
+                        <izz>0.010941</izz>
+                    </inertia>
+                </inertial>
+                <collision name='front_right_flipper_collision_large_wheel_collision'>
+                    <pose frame=''>0 0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.089</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='front_right_flipper_collision_small_wheel_collision_1'>
+                    <pose frame=''>-0.33 0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.029</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='front_right_flipper_collision_top_bar_collision_2'>
+                    <pose frame=''>-0.165 0 0.0325 0 0.184162 -3.14159</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='front_right_flipper_collision_bottom_bar_collision_3'>
+                    <pose frame=''>-0.165 0 -0.0325 0 -0.184162 -3.14159</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='front_right_flipper_collision_middle_bar_collision_4'>
+                    <pose frame=''>-0.166 0 0.004 -0 -0.02 -3.14159</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.04981 0.07</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <visual name='front_right_flipper_visual_large_wheel_visual'>
+                    <pose frame=''>0 0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.089</radius>
+                        </cylinder>
+                    </geometry>
+                </visual>
+                <visual name='front_right_flipper_visual_small_wheel_visual_1'>
+                    <pose frame=''>-0.33 0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.029</radius>
+                        </cylinder>
+                    </geometry>
+                </visual>
+                <visual name='front_right_flipper_visual_top_bar_visual_2'>
+                    <pose frame=''>-0.165 0 0.0325 0 0.184162 -3.14159</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <visual name='front_right_flipper_visual_bottom_bar_visual_3'>
+                    <pose frame=''>-0.165 0 -0.0325 0 -0.184162 -3.14159</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <visual name='front_right_flipper_visual_middle_bar_visual_4'>
+                    <pose frame=''>-0.166 0 0.004 -0 -0.02 -3.14159</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.04981 0.07</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <gravity>1</gravity>
+                <velocity_decay/>
+                <self_collide>1</self_collide>
+                <kinematic>0</kinematic>
+            </link>
+            <joint name='front_right_flipper_j' type='revolute'>
+                <child>front_right_flipper</child>
+                <parent>right_track</parent>
+                <axis>
+                    <xyz>0 1 0</xyz>
+                    <limit>
+                        <lower>0</lower>
+                        <upper>0</upper>
+                    </limit>
+                    <dynamics>
+                        <spring_reference>0</spring_reference>
+                        <spring_stiffness>0</spring_stiffness>
+                    </dynamics>
+                    <use_parent_model_frame>1</use_parent_model_frame>
+                </axis>
+                <physics>
+                    <ode>
+                        <implicit_spring_damper>1</implicit_spring_damper>
+                        <cfm_damping>1</cfm_damping>
+                        <limit>
+                            <cfm>0</cfm>
+                            <erp>0.2</erp>
+                        </limit>
+                    </ode>
+                </physics>
+            </joint>
+            <link name='rear_right_flipper'>
+                <pose frame=''>-0.25 -0.272 0.0195 0 0.5 0</pose>
+                <inertial>
+                    <pose frame=''>-0.08 0 0 0 -0 0</pose>
+                    <mass>0.75</mass>
+                    <inertia>
+                        <ixx>0.0017491</ixx>
+                        <ixy>2.8512e-07</ixy>
+                        <ixz>0.0018277</ixz>
+                        <iyy>0.012277</iyy>
+                        <iyz>-3.6288e-07</iyz>
+                        <izz>0.010941</izz>
+                    </inertia>
+                </inertial>
+                <collision name='rear_right_flipper_collision_large_wheel_collision'>
+                    <pose frame=''>0 0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.089</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='rear_right_flipper_collision_small_wheel_collision_1'>
+                    <pose frame=''>-0.33 0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.029</radius>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='rear_right_flipper_collision_top_bar_collision_2'>
+                    <pose frame=''>-0.165 0 0.0325 0 0.184162 -3.14159</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='rear_right_flipper_collision_bottom_bar_collision_3'>
+                    <pose frame=''>-0.165 0 -0.0325 0 -0.184162 -3.14159</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+                <collision name='rear_right_flipper_collision_middle_bar_collision_4'>
+                    <pose frame=''>-0.166 0 0.004 -0 -0.02 -3.14159</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.04981 0.07</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>0.7</mu>
+                                <mu2>150</mu2>
+                                <fdir1>0 1 0</fdir1>
+                            </ode>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                    <max_contacts>20</max_contacts>
+                </collision>
+
+                <visual name='rear_right_flipper_visual_large_wheel_visual'>
+                    <pose frame=''>0 0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.089</radius>
+                        </cylinder>
+                    </geometry>
+                </visual>
+                <visual name='rear_right_flipper_visual_small_wheel_visual_1'>
+                    <pose frame=''>-0.33 0 0 1.5708 -0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <length>0.04981</length>
+                            <radius>0.029</radius>
+                        </cylinder>
+                    </geometry>
+                </visual>
+                <visual name='rear_right_flipper_visual_top_bar_visual_2'>
+                    <pose frame=''>-0.165 0 0.0325 0 0.184162 -3.14159</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <visual name='rear_right_flipper_visual_bottom_bar_visual_3'>
+                    <pose frame=''>-0.165 0 -0.0325 0 -0.184162 -3.14159</pose>
+                    <geometry>
+                        <box>
+                            <size>0.33 0.04981 0.055</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <visual name='rear_right_flipper_visual_middle_bar_visual_4'>
+                    <pose frame=''>-0.166 0 0.004 -0 -0.02 -3.14159</pose>
+                    <geometry>
+                        <box>
+                            <size>0.2 0.04981 0.07</size>
+                        </box>
+                    </geometry>
+                </visual>
+                <gravity>1</gravity>
+                <velocity_decay/>
+                <self_collide>1</self_collide>
+                <kinematic>0</kinematic>
+            </link>
+            <joint name='rear_right_flipper_j' type='revolute'>
+                <child>rear_right_flipper</child>
+                <parent>right_track</parent>
+                <axis>
+                    <xyz>0 1 0</xyz>
+                    <limit>
+                        <lower>0</lower>
+                        <upper>0</upper>
+                    </limit>
+                    <dynamics>
+                        <spring_reference>0</spring_reference>
+                        <spring_stiffness>0</spring_stiffness>
+                    </dynamics>
+                    <use_parent_model_frame>1</use_parent_model_frame>
+                </axis>
+                <physics>
+                    <ode>
+                        <implicit_spring_damper>1</implicit_spring_damper>
+                        <cfm_damping>1</cfm_damping>
+                        <limit>
+                            <cfm>0</cfm>
+                            <erp>0.2</erp>
+                        </limit>
+                    </ode>
+                </physics>
+            </joint>
+
             <plugin filename="libSimpleTrackedVehiclePlugin.so" name="simple_tracked_vehicle">
                 <body>base_link</body>
                 <left_track>left_track</left_track>
                 <right_track>right_track</right_track>
+                <left_flipper>front_left_flipper</left_flipper>
+                <left_flipper>rear_left_flipper</left_flipper>
+                <right_flipper>front_right_flipper</right_flipper>
+                <right_flipper>rear_right_flipper</right_flipper>
                 <track_mu>2</track_mu>
                 <track_mu2>0.5</track_mu2>
             </plugin>
@@ -830,6 +1612,36 @@
                             <radius>0.15</radius>
                             <length>0.8</length>
                         </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
+
+        <model name="box_obstacle">
+            <static>true</static>
+            <pose>2 -2 0.028 1.7821 0 0</pose>
+            <link name="box">
+                <collision name="box_collision">
+                    <pose frame="">0 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.85 0.15 0.50</size>
+                        </box>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>1</mu>
+                            </ode>
+                        </friction>
+                    </surface>
+                </collision>
+                <visual name="box_visual">
+                    <pose frame="">0 0 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.85 0.15 0.50</size>
+                        </box>
                     </geometry>
                 </visual>
             </link>

@@ -58,10 +58,12 @@ void Road::Load(sdf::ElementPtr _elem)
 /////////////////////////////////////////////////
 void Road::Init()
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-
-  this->roadPub = this->node->Advertise<msgs::Road>("~/roads", 10);
+  if (!this->node)
+  {
+    this->node = transport::NodePtr(new transport::Node());
+    this->node->Init();
+    this->roadPub = this->node->Advertise<msgs::Road>("~/roads", 10);
+  }
 
   msgs::Road msg;
 
