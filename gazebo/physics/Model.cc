@@ -93,15 +93,10 @@ void Model::Load(sdf::ElementPtr _sdf)
       {
         this->modelSDFDomIsolated = std::make_unique<sdf::Model>();
         sdf::Errors errors = this->modelSDFDomIsolated->Load(_sdf);
-        if (!errors.empty())
+        // Print errors and load the parts that worked.
+        for (const auto &error : errors)
         {
-          this->modelSDFDomIsolated.reset();
-
-          for (const auto &error : errors)
-          {
-            gzerr << error << "\n";
-          }
-          return;
+          gzerr << error << "\n";
         }
         this->modelSDFDom = this->modelSDFDomIsolated.get();
       }
