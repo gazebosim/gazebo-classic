@@ -183,15 +183,11 @@ void World::Load(sdf::ElementPtr _sdf)
   {
     this->dataPtr->worldSDFDom = std::make_unique<sdf::World>();
     sdf::Errors errors = this->dataPtr->worldSDFDom->Load(_sdf);
-    if (!errors.empty())
-    {
-      this->dataPtr->worldSDFDom.reset();
 
-      for (const auto &error : errors)
-      {
-        gzerr << error << "\n";
-      }
-      return;
+    // Print errors and load the parts that worked.
+    for (const auto &error : errors)
+    {
+      gzerr << error << "\n";
     }
   }
 
@@ -409,6 +405,12 @@ void World::Init()
 //////////////////////////////////////////////////
 void World::Init(UpdateScenePosesFunc _func)
 {
+  if (nullptr == this->dataPtr->rootElement)
+  {
+    gzerr << "Null root element. Not initializing." << std::endl;
+    return;
+  }
+
   // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); ++i)
     this->dataPtr->rootElement->GetChild(i)->Init();
