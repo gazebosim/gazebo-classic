@@ -1,6 +1,8 @@
 ## Gazebo 9
 
-## Gazebo 9.XX.X (2019-XX-XX)
+## Gazebo 9.XX.X (2020-XX-XX)
+
+## Gazebo 9.12.0 (2020-01-30)
 
 1. Fix gazebo9 build and run on Windows, Ogre 1.10
     * [Pull request 3174](https://bitbucket.org/osrf/gazebo/pull-request/3174)
@@ -31,6 +33,9 @@
 
 1. Don't pass GCC linker options to Visual Studio linker.
     * [Pull request 3153](https://bitbucket.org/osrf/gazebo/pull-request/3153)
+
+1. VariableGearboxPlugin: use splines to support arbitrary smooth input-output gearbox profiles
+    * [Pull request 3073](https://bitbucket.org/osrf/gazebo/pull-request/3073)
 
 1. Fix CMake 3.14 regression in `MSVC`/`PKG_CONFIG_FOUND` workaround.
     * [Pull request 3152](https://bitbucket.org/osrf/gazebo/pull-request/3152)
