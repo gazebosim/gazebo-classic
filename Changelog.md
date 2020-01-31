@@ -2,7 +2,7 @@
 
 ## Gazebo 11.x.x (202x-xx-xx)
 
-## Gazebo 11.0.0 (2020-01-xx)
+## Gazebo 11.0.0 (2020-01-30)
 
 1. Update to ignition citadel dependencies, c++17, cmake 3.10.
     * [Pull request 3139](https://bitbucket.org/osrf/gazebo/pull-request/3139)
