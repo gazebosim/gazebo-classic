@@ -2,9 +2,9 @@
 
 ## Gazebo 10.x.x (202x-xx-xx)
 
-## Gazebo 10.2.0 (2020-01-30)
+## Gazebo 10.2.0 (2020-01-31)
 
-1. Fix gazebo9 build and run on Windows, Ogre 1.10
+1. Fix gazebo build and run on Windows, Ogre 1.10
     * [Pull request 3174](https://bitbucket.org/osrf/gazebo/pull-request/3174)
 
 1. Fix missing road segments in camera sensors
@@ -155,12 +155,6 @@
 
 1. Backport camera intrinsics feature
     * [Pull request 3099](https://bitbucket.org/osrf/gazebo/pull-request/3099)
-
-1. Fix gazebo build and run on Windows, Ogre 1.10
-    * [Pull request 3174](https://bitbucket.org/osrf/gazebo/pull-request/3174)
-
-1. Workaround for race condition when setting model scale.
-    * [Pull request 3159](https://bitbucket.org/osrf/gazebo/pull-request/3159)
 
 1. Fix CMake 3.14 regression in `MSVC`/`PKG_CONFIG_FOUND` workaround.
     * [Pull request 3152](https://bitbucket.org/osrf/gazebo/pull-request/3152)
