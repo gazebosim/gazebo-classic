@@ -267,7 +267,9 @@
 
 ## Gazebo 9
 
-## Gazebo 9.X.X (20XX-XX-XX)
+## Gazebo 9.XX.X (2020-XX-XX)
+
+## Gazebo 9.12.0 (2020-01-31)
 
 1. Fix gazebo9 build and run on Windows, Ogre 1.10
     * [Pull request 3174](https://bitbucket.org/osrf/gazebo/pull-request/3174)
