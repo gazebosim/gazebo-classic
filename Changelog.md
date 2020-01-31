@@ -34,9 +34,6 @@
 1. Don't pass GCC linker options to Visual Studio linker.
     * [Pull request 3153](https://bitbucket.org/osrf/gazebo/pull-request/3153)
 
-1. VariableGearboxPlugin: use splines to support arbitrary smooth input-output gearbox profiles
-    * [Pull request 3073](https://bitbucket.org/osrf/gazebo/pull-request/3073)
-
 1. Fix CMake 3.14 regression in `MSVC`/`PKG_CONFIG_FOUND` workaround.
     * [Pull request 3152](https://bitbucket.org/osrf/gazebo/pull-request/3152)
 
