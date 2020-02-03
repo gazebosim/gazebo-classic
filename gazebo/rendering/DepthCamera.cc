@@ -46,6 +46,12 @@ DepthCamera::DepthCamera(const std::string &_namePrefix, ScenePtr _scene,
   this->dataPtr->pcdBuffer = NULL;
   this->dataPtr->pcdMaterial = NULL;
   this->dataPtr->outputPoints = false;
+
+  this->dataPtr->normalsBuffer = NULL;
+  this->dataPtr->normalsTarget = NULL;
+  this->dataPtr->normalsMaterial = NULL;
+  this->dataPtr->normalsTextures = NULL;
+  this->dataPtr->outputNormals = true;
 }
 
 //////////////////////////////////////////////////
@@ -53,6 +59,9 @@ DepthCamera::~DepthCamera()
 {
   if (this->dataPtr->depthBuffer)
     delete [] this->dataPtr->depthBuffer;
+
+  if (this->dataPtr->normalsBuffer)
+    delete [] this->dataPtr->normalsBuffer;
 
   if (this->dataPtr->pcdBuffer)
     delete [] this->dataPtr->pcdBuffer;
@@ -65,6 +74,9 @@ void DepthCamera::Load(sdf::ElementPtr _sdf)
   this->dataPtr->outputPoints =
     (_sdf->GetElement("depth_camera")->Get<std::string>("output")
     == "points");
+  // this->dataPtr->outputNormals =
+  //   (_sdf->GetElement("depth_camera")->Get<std::string>("normals")
+  //   == "1");
 }
 
 //////////////////////////////////////////////////
@@ -179,12 +191,54 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
 */
 }
 
+void DepthCamera::CreateNormalsTexture(const std::string &_textureName)
+{
+  if (this->dataPtr->outputNormals)
+  {
+    this->dataPtr->normalsTextures =
+      Ogre::TextureManager::getSingleton().createManual(
+      _textureName + "_normals",
+      "General",
+      Ogre::TEX_TYPE_2D,
+      this->ImageWidth(), this->ImageHeight(), 0,
+      Ogre::PF_FLOAT32_RGBA,
+      Ogre::TU_RENDERTARGET).getPointer();
+
+    this->dataPtr->normalsTarget =
+        this->dataPtr->normalsTextures->getBuffer()->getRenderTarget();
+    this->dataPtr->normalsTarget->setAutoUpdated(false);
+
+    this->dataPtr->normalsViewport =
+        this->dataPtr->normalsTarget->addViewport(this->camera);
+    this->dataPtr->normalsViewport->setClearEveryFrame(true);
+
+    auto const &ignBG = this->scene->BackgroundColor();
+    this->dataPtr->normalsViewport->setBackgroundColour(
+        Conversions::Convert(ignBG));
+    this->dataPtr->normalsViewport->setOverlaysEnabled(false);
+    this->dataPtr->normalsViewport->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
+
+    this->dataPtr->normalsMaterial = (Ogre::Material*)(
+    Ogre::MaterialManager::getSingleton().getByName("Gazebo/XYZNormals").get());
+
+    printf("CreateNormalsTexture this->renderTexture->getName() %s\n", this->renderTexture->getName().c_str());
+
+    this->dataPtr->normalsMaterial->getTechnique(0)->getPass(0)->
+        createTextureUnitState(_textureName + "_normals");
+
+    this->dataPtr->normalsMaterial->load();
+  }
+}
+
 //////////////////////////////////////////////////
 void DepthCamera::PostRender()
 {
   this->depthTarget->swapBuffers();
   if (this->dataPtr->outputPoints)
     this->dataPtr->pcdTarget->swapBuffers();
+  if (this->dataPtr->outputNormals)
+    this->dataPtr->normalsTarget->swapBuffers();
 
   if (this->newData && this->captureData)
   {
@@ -238,6 +292,30 @@ void DepthCamera::PostRender()
 
       this->dataPtr->newRGBPointCloud(
           this->dataPtr->pcdBuffer, width, height, 1, "RGBPOINTS");
+    }
+
+    if (this->dataPtr->outputNormals)
+    {
+      Ogre::HardwarePixelBufferSharedPtr normalsPixelBuffer;
+
+      normalsPixelBuffer = this->dataPtr->normalsTextures->getBuffer();
+
+      // Blit the depth buffer if needed
+      if (!this->dataPtr->normalsBuffer)
+        this->dataPtr->normalsBuffer = new float[width * height * 4];
+
+      memset(this->dataPtr->normalsBuffer, 0, width * height * 4);
+
+      Ogre::Box normals_src_box(0, 0, width, height);
+      Ogre::PixelBox normals_dst_box(width, height,
+          1, Ogre::PF_FLOAT32_RGBA, this->dataPtr->normalsBuffer);
+
+      normalsPixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
+      normalsPixelBuffer->blitToMemory(normals_src_box, normals_dst_box);
+      normalsPixelBuffer->unlock();
+
+      this->dataPtr->newNormalsPointCloud(
+          this->dataPtr->normalsBuffer, width, height, 1, "RGBPOINTS");
     }
   }
 
@@ -365,12 +443,30 @@ void DepthCamera::RenderImpl()
     sceneMgr->_suppressRenderStateChanges(false);
     sceneMgr->setShadowTechnique(shadowTech);
   }
+  if (this->dataPtr->outputNormals)
+  {
+    sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
+    sceneMgr->_suppressRenderStateChanges(true);
+
+    this->UpdateRenderTarget(this->dataPtr->normalsTarget,
+                  this->dataPtr->normalsMaterial, "Gazebo/XYZNormals");
+
+    this->dataPtr->normalsTarget->update(false);
+
+    sceneMgr->_suppressRenderStateChanges(false);
+    sceneMgr->setShadowTechnique(shadowTech);
+  }
 }
 
 //////////////////////////////////////////////////
 const float* DepthCamera::DepthData() const
 {
   return this->dataPtr->depthBuffer;
+}
+
+const float* DepthCamera::NormalsData() const
+{
+  return this->dataPtr->normalsBuffer;
 }
 
 //////////////////////////////////////////////////
@@ -413,4 +509,12 @@ event::ConnectionPtr DepthCamera::ConnectNewRGBPointCloud(
     const std::string &)>  _subscriber)
 {
   return this->dataPtr->newRGBPointCloud.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+event::ConnectionPtr DepthCamera::ConnectNewNormalsPointCloud(
+    std::function<void (const float *, unsigned int, unsigned int, unsigned int,
+    const std::string &)>  _subscriber)
+{
+  return this->dataPtr->newNormalsPointCloud.Connect(_subscriber);
 }

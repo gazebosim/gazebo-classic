@@ -34,6 +34,7 @@ DepthCameraPlugin::~DepthCameraPlugin()
   this->newDepthFrameConnection.reset();
   this->newRGBPointCloudConnection.reset();
   this->newImageFrameConnection.reset();
+  this->newNormalsFrameConnection.reset();
 
   this->parentSensor.reset();
   this->depthCamera.reset();
@@ -70,6 +71,11 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
 
   this->newImageFrameConnection = this->depthCamera->ConnectNewImageFrame(
       std::bind(&DepthCameraPlugin::OnNewImageFrame,
+        this, std::placeholders::_1, std::placeholders::_2,
+        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+
+  this->newNormalsFrameConnection = this->depthCamera->ConnectNewNormalsPointCloud(
+      std::bind(&DepthCameraPlugin::OnNewNormalsFrame,
         this, std::placeholders::_1, std::placeholders::_2,
         std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
 
@@ -120,4 +126,13 @@ void DepthCameraPlugin::OnNewImageFrame(const unsigned char * /*_image*/,
     this->height, this->depth, this->format,
     "/tmp/depthCamera/me.jpg");
     */
+}
+
+/////////////////////////////////////////////////
+void DepthCameraPlugin::OnNewNormalsFrame(const float * _normals,
+                              unsigned int _width,
+                              unsigned int _height,
+                              unsigned int _depth,
+                              const std::string &/*_format*/)
+{
 }
