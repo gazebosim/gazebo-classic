@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Open Source Robotics Foundation
+ * Copyright (C) 2020 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,11 +35,7 @@ void OnNewNormalsFrame(const float * _normals,
                        unsigned int _depth,
                        const std::string &/*_format*/)
 {
-  printf("OnNewNormalsFrame %u %u %u\n", _width, _height, _depth);
-
   int index =  ((_height * 0.5) * _width) + _width * 0.5;
-  printf("W[%u] H[%u] MidPoint[%d] Dist[%f]\n",
-      _width, _height, index, _normals[index]);
 
   for (unsigned int i = 0; i < _width; i++)
   {
@@ -50,8 +46,8 @@ void OnNewNormalsFrame(const float * _normals,
       float y = _normals[4 * index + 1];
       float z = _normals[4 * index + 2];
       float a = _normals[4 * index + 3];
-      if(x < farClip)
-        printf("W[%u] H[%u] %f\t%f\t%f\t%f\n", _width, _height, x, y, z, a);
+      // if(x < farClip)
+      //   printf("W[%u] H[%u] %f\t%f\t%f\t%f\n", _width, _height, x, y, z, a);
     }
   }
 }

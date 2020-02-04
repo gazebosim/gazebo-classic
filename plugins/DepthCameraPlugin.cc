@@ -129,10 +129,10 @@ void DepthCameraPlugin::OnNewImageFrame(const unsigned char * /*_image*/,
 }
 
 /////////////////////////////////////////////////
-void DepthCameraPlugin::OnNewNormalsFrame(const float * _normals,
-                              unsigned int _width,
-                              unsigned int _height,
-                              unsigned int _depth,
+void DepthCameraPlugin::OnNewNormalsFrame(const float * /*_normals*/,
+                              unsigned int  /*_width*/,
+                              unsigned int /*_height*/,
+                              unsigned int /*_depth*/,
                               const std::string &/*_format*/)
 {
 }

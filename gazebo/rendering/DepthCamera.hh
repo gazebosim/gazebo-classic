@@ -88,10 +88,6 @@ namespace gazebo
       /// \return The z-buffer as a float array
       public: virtual const float *DepthData() const;
 
-      /// \brief All things needed to get back normals data
-      /// \return The normals as a float array
-      public: virtual const float *NormalsData() const;
-
       /// \brief Set the render target, which renders the depth data
       /// \param[in] _target Pointer to the render target
       public: virtual void SetDepthTarget(Ogre::RenderTarget *_target);

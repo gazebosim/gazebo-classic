@@ -39,18 +39,7 @@ DepthCamera::DepthCamera(const std::string &_namePrefix, ScenePtr _scene,
   : Camera(_namePrefix, _scene, _autoRender),
     dataPtr(new DepthCameraPrivate)
 {
-  this->depthTarget = NULL;
-  this->dataPtr->depthBuffer = NULL;
-  this->dataPtr->depthMaterial = NULL;
-  this->dataPtr->pcdTarget = NULL;
-  this->dataPtr->pcdBuffer = NULL;
-  this->dataPtr->pcdMaterial = NULL;
   this->dataPtr->outputPoints = false;
-
-  this->dataPtr->normalsBuffer = NULL;
-  this->dataPtr->normalsTarget = NULL;
-  this->dataPtr->normalsMaterial = NULL;
-  this->dataPtr->normalsTextures = NULL;
   this->dataPtr->outputNormals = true;
 }
 
@@ -71,12 +60,13 @@ DepthCamera::~DepthCamera()
 void DepthCamera::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
-  this->dataPtr->outputPoints =
-    (_sdf->GetElement("depth_camera")->Get<std::string>("output")
-    == "points");
-  // this->dataPtr->outputNormals =
-  //   (_sdf->GetElement("depth_camera")->Get<std::string>("normals")
-  //   == "1");
+
+  std::string outputs = _sdf->GetElement("depth_camera")->Get<std::string>("output");
+
+  std::size_t found = outputs.find("points");
+  this->dataPtr->outputPoints =  found!=std::string::npos;
+  found = outputs.find("normals");
+  this->dataPtr->outputNormals =  found!=std::string::npos;
 }
 
 //////////////////////////////////////////////////
@@ -191,6 +181,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
 */
 }
 
+//////////////////////////////////////////////////
 void DepthCamera::CreateNormalsTexture(const std::string &_textureName)
 {
   if (this->dataPtr->outputNormals)
@@ -221,8 +212,6 @@ void DepthCamera::CreateNormalsTexture(const std::string &_textureName)
 
     this->dataPtr->normalsMaterial = (Ogre::Material*)(
     Ogre::MaterialManager::getSingleton().getByName("Gazebo/XYZNormals").get());
-
-    printf("CreateNormalsTexture this->renderTexture->getName() %s\n", this->renderTexture->getName().c_str());
 
     this->dataPtr->normalsMaterial->getTechnique(0)->getPass(0)->
         createTextureUnitState(_textureName + "_normals");
@@ -315,7 +304,7 @@ void DepthCamera::PostRender()
       normalsPixelBuffer->unlock();
 
       this->dataPtr->newNormalsPointCloud(
-          this->dataPtr->normalsBuffer, width, height, 1, "RGBPOINTS");
+          this->dataPtr->normalsBuffer, width, height, 1, "NORMALS");
     }
   }
 
@@ -330,7 +319,7 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
           Ogre::Material *_material, const std::string &_matName)
 {
   Ogre::RenderSystem *renderSys;
-  Ogre::Viewport *vp = NULL;
+  Ogre::Viewport *vp = nullptr;
   Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
   Ogre::Pass *pass;
 
@@ -462,11 +451,6 @@ void DepthCamera::RenderImpl()
 const float* DepthCamera::DepthData() const
 {
   return this->dataPtr->depthBuffer;
-}
-
-const float* DepthCamera::NormalsData() const
-{
-  return this->dataPtr->normalsBuffer;
 }
 
 //////////////////////////////////////////////////
