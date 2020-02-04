@@ -111,6 +111,87 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
     delete [] g_depthBuffer;
 }
 
+
+using namespace gazebo;
+class DepthCameraSensor_normals_TEST : public ServerFixture
+{
+};
+float farClip;
+
+/////////////////////////////////////////////////
+void OnNewNormalsFrame(const float * _normals,
+                       unsigned int _width,
+                       unsigned int _height,
+                       unsigned int /*_depth*/,
+                       const std::string &/*_format*/)
+{
+
+  bool show_one = false;
+
+  for (unsigned int i = 0; i < _width; i++)
+  {
+    for (unsigned int j = 0; j < _height; j++)
+    {
+      unsigned int index = (j * _width) + i;
+      float x = _normals[4 * index];
+      float y = _normals[4 * index + 1];
+      float z = _normals[4 * index + 2];
+      // float a = _normals[4 * index + 3];
+      if(x < farClip){
+        if(!show_one){
+          printf("W[%u] H[%u] Normals: X[%f] Y[%f] Z[%f]\n",
+            _width, _height, _normals[4 * index], _normals[4 * index + 1], _normals[4 * index + 2]);
+          show_one = true;
+        }
+        EXPECT_NEAR(x, 0.0, 0.01);
+        EXPECT_NEAR(y, 0.0, 0.01);
+        EXPECT_NEAR(z, -1.0, 0.01);
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+/// \brief Test Creation of a Depth Camera sensor
+TEST_F(DepthCameraSensor_normals_TEST, CreateDepthCamera)
+{
+  Load("worlds/depth_camera2.world");
+  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+
+  // Create the camera sensor
+  std::string sensorName = "default::camera_model::my_link::camera";
+
+  // Get a pointer to the depth camera sensor
+  sensors::DepthCameraSensorPtr sensor =
+     std::dynamic_pointer_cast<sensors::DepthCameraSensor>
+     (mgr->GetSensor(sensorName));
+
+  // Make sure the above dynamic cast worked.
+  EXPECT_TRUE(sensor != nullptr);
+
+  EXPECT_EQ(sensor->ImageWidth(), 640u);
+  EXPECT_EQ(sensor->ImageHeight(), 480u);
+  EXPECT_TRUE(sensor->IsActive());
+
+  rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
+  EXPECT_TRUE(depthCamera != nullptr);
+
+  farClip = depthCamera->FarClip();
+
+  event::ConnectionPtr c2 = depthCamera->ConnectNewNormalsPointCloud(
+      std::bind(&::OnNewNormalsFrame, std::placeholders::_1,
+      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+      std::placeholders::_5));
+
+  // wait for a few depth camera frames
+  int i = 0;
+  while ( i < 300)
+  {
+    common::Time::MSleep(10);
+    i++;
+  }
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {

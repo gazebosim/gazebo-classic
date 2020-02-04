@@ -85,7 +85,6 @@ gz_build_tests(${gtest_fixture_sources}
 set (gtest_sources_dri
   CameraSensor_TEST.cc
   DepthCameraSensor_TEST.cc
-  DepthCameraSensor_normals_TEST.cc
   GpuRaySensor_TEST.cc
   SensorManager_TEST.cc
 )

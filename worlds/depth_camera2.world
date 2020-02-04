@@ -113,8 +113,7 @@
               <far>20</far>
             </clip>
             <depth_camera>
-              <output>points</output>
-              <normals>true</normals>
+              <output>points;normals</output>
             </depth_camera>
           </camera>
           <plugin filename="libDepthCameraPlugin.so" name="depth_camera_plugin" />
