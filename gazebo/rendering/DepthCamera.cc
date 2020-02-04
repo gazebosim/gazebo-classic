@@ -40,7 +40,7 @@ DepthCamera::DepthCamera(const std::string &_namePrefix, ScenePtr _scene,
     dataPtr(new DepthCameraPrivate)
 {
   this->dataPtr->outputPoints = false;
-  this->dataPtr->outputNormals = true;
+  this->dataPtr->outputNormals = false;
 }
 
 //////////////////////////////////////////////////
