@@ -2636,7 +2636,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     std::string s = _msg->name();
     std::transform(s.begin(), s.end(), s.begin(),
                    [](unsigned char c){ return std::tolower(c); });
-    if (s.find("earth") != std::string::npos)
+    if (s.find("sun") != std::string::npos)
     {
       std::cerr << " ======== " <<  std::endl;
       std::cerr << _msg->DebugString() << std::endl;
