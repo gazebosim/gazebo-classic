@@ -55,8 +55,6 @@ void ReflectancePlugin::Load(rendering::VisualPtr _visual,
   // Unique name
   if (_sdf->HasElement("material")) {
     dataPtr->name = _sdf->Get<std::string>("material");
-    gzerr << "[ReflectancePlugin] material name " << dataPtr->name << std::endl;
-    gzerr << "[ReflectancePlugin] material name " << dataPtr->visual->GetMaterialName() << std::endl;
   } else {
     gzerr << "[ReflectancePlugin] Invalid material or SDF element." << std::endl;
     return;
@@ -64,8 +62,6 @@ void ReflectancePlugin::Load(rendering::VisualPtr _visual,
 
   dataPtr->visual->GetSceneNode()->getUserObjectBindings().setUserAny(std::string("reflectance_map"),
                                                              Ogre::Any(std::string(dataPtr->name)));
-
-  gzerr << "[ReflectancePlugin] material name " << dataPtr->visual->GetMaterialName() << std::endl;
 }
 
 }
