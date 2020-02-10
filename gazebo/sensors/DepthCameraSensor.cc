@@ -100,6 +100,9 @@ void DepthCameraSensor::Init()
         this->Name() + "_RttTex_Image");
     this->dataPtr->depthCamera->CreateDepthTexture(
         this->Name() + "_RttTex_Depth");
+    this->dataPtr->depthCamera->CreateReflectanceTexture(
+        this->Name() + "_RttTex_Reflectance");
+
     ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;

@@ -46,6 +46,7 @@ DepthCamera::DepthCamera(const std::string &_namePrefix, ScenePtr _scene,
   this->dataPtr->pcdBuffer = NULL;
   this->dataPtr->pcdMaterial = NULL;
   this->dataPtr->outputPoints = false;
+  this->dataPtr->outputReflectance = false;
 }
 
 //////////////////////////////////////////////////
@@ -53,6 +54,9 @@ DepthCamera::~DepthCamera()
 {
   if (this->dataPtr->depthBuffer)
     delete [] this->dataPtr->depthBuffer;
+
+  if (this->dataPtr->reflectanceBuffer)
+    delete [] this->dataPtr->reflectanceBuffer;
 
   if (this->dataPtr->pcdBuffer)
     delete [] this->dataPtr->pcdBuffer;
@@ -62,9 +66,11 @@ DepthCamera::~DepthCamera()
 void DepthCamera::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
-  this->dataPtr->outputPoints =
-    (_sdf->GetElement("depth_camera")->Get<std::string>("output")
-    == "points");
+  std::string outputs = _sdf->GetElement("depth_camera")->Get<std::string>("output");
+  std::size_t found = outputs.find("points");
+  this->dataPtr->outputPoints =  found!=std::string::npos;
+  found = outputs.find("reflectance");
+  this->dataPtr->outputReflectance =  found!=std::string::npos;
 }
 
 //////////////////////////////////////////////////
@@ -180,11 +186,50 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
 }
 
 //////////////////////////////////////////////////
+void DepthCamera::CreateReflectanceTexture(const std::string &_textureName)
+{
+  if (this->dataPtr->outputReflectance)
+  {
+    this->dataPtr->reflectanceTextures =
+      Ogre::TextureManager::getSingleton().createManual(
+      _textureName + "_reflectance",
+      "General",
+      Ogre::TEX_TYPE_2D,
+      this->ImageWidth(), this->ImageHeight(), 0,
+      Ogre::PF_FLOAT32_R,
+      Ogre::TU_RENDERTARGET).getPointer();
+
+    this->dataPtr->reflectanceTarget =
+        this->dataPtr->reflectanceTextures->getBuffer()->getRenderTarget();
+    this->dataPtr->reflectanceTarget->setAutoUpdated(false);
+
+    this->dataPtr->reflectanceViewport =
+        this->dataPtr->reflectanceTarget->addViewport(this->camera);
+    this->dataPtr->reflectanceViewport->setClearEveryFrame(true);
+
+    this->dataPtr->reflectanceViewport->setBackgroundColour(
+        Ogre::ColourValue(Ogre::ColourValue(0, 0, 0)));
+
+    this->dataPtr->reflectanceViewport->setOverlaysEnabled(false);
+    this->dataPtr->reflectanceViewport->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
+
+    this->dataPtr->reflectanceViewport->setMaterialScheme("reflectance_map");
+
+    this->reflectanceMaterialSwitcher.reset(
+        new ReflectanceMaterialSwitcher(this->scene, this->dataPtr->reflectanceViewport));
+    this->reflectanceMaterialSwitcher->SetMaterialScheme("reflectance_map");
+  }
+}
+
+//////////////////////////////////////////////////
 void DepthCamera::PostRender()
 {
   this->depthTarget->swapBuffers();
   if (this->dataPtr->outputPoints)
     this->dataPtr->pcdTarget->swapBuffers();
+  if (this->dataPtr->outputReflectance)
+    this->dataPtr->reflectanceTarget->swapBuffers();
 
   if (this->newData && this->captureData)
   {
@@ -239,6 +284,31 @@ void DepthCamera::PostRender()
       this->dataPtr->newRGBPointCloud(
           this->dataPtr->pcdBuffer, width, height, 1, "RGBPOINTS");
     }
+
+    if (this->dataPtr->outputReflectance)
+    {
+     Ogre::HardwarePixelBufferSharedPtr reflectancePixelBuffer;
+
+     reflectancePixelBuffer = this->dataPtr->reflectanceTextures->getBuffer();
+
+     // Blit the depth buffer if needed
+     if (!this->dataPtr->reflectanceBuffer)
+       this->dataPtr->reflectanceBuffer = new float[width * height * 1];
+
+     memset(this->dataPtr->reflectanceBuffer, 0, width * height * 1);
+
+     Ogre::Box reflectance_src_box(0, 0, width, height);
+     Ogre::PixelBox reflectance_dst_box(width, height,
+         1, Ogre::PF_FLOAT32_R, this->dataPtr->reflectanceBuffer);
+
+     reflectancePixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
+     reflectancePixelBuffer->blitToMemory(reflectance_src_box, reflectance_dst_box);
+     reflectancePixelBuffer->unlock();
+
+     this->dataPtr->newReflectanceFrame(
+         this->dataPtr->reflectanceBuffer, width, height, 1, "REFLECTANCE");
+    }
+
   }
 
   // also new image frame for camera texture
@@ -365,6 +435,12 @@ void DepthCamera::RenderImpl()
     sceneMgr->_suppressRenderStateChanges(false);
     sceneMgr->setShadowTechnique(shadowTech);
   }
+
+  if (this->dataPtr->outputReflectance)
+  {
+    this->dataPtr->reflectanceTarget->update(false);
+  }
+
 }
 
 //////////////////////////////////////////////////
@@ -413,4 +489,191 @@ event::ConnectionPtr DepthCamera::ConnectNewRGBPointCloud(
     const std::string &)>  _subscriber)
 {
   return this->dataPtr->newRGBPointCloud.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+event::ConnectionPtr DepthCamera::ConnectNewReflectanceFrame(
+    std::function<void (const float*, unsigned int, unsigned int, unsigned int,
+    const std::string &)>  _subscriber)
+{
+  return this->dataPtr->newReflectanceFrame.Connect(_subscriber);
+}
+
+/////////////////////////////////////////////////
+ReflectanceMaterialSwitcher::ReflectanceMaterialSwitcher(
+  ScenePtr _scene, Ogre::Viewport* _viewport)
+{
+  this->viewport = _viewport;
+  this->materialScheme = "";
+
+  if (!this->viewport)
+  {
+    gzerr << "Cannot create a material switcher for the reflectance material. "
+          << "viewport is NULL" << std::endl;
+    return;
+  }
+
+  this->materialListener.reset(new ReflectanceMaterialListener(_scene));
+  this->renderTargetListener.reset(new ReflectanceRenderTargetListener(
+      this->materialListener));
+}
+
+/////////////////////////////////////////////////
+void ReflectanceMaterialSwitcher::SetMaterialScheme(const std::string &_scheme)
+{
+  if (!this->viewport)
+    return;
+
+  this->materialScheme = _scheme;
+  if (_scheme.empty())
+  {
+    viewport->setMaterialScheme(
+        this->originalMaterialScheme);
+    viewport->getTarget()->removeListener(
+        this->renderTargetListener.get());
+  }
+  else
+  {
+    this->originalMaterialScheme =
+        viewport->getMaterialScheme();
+
+    viewport->setMaterialScheme(_scheme);
+    viewport->getTarget()->addListener(
+        this->renderTargetListener.get());
+  }
+}
+
+/////////////////////////////////////////////////
+std::string ReflectanceMaterialSwitcher::MaterialScheme() const
+{
+  return this->materialScheme;
+}
+
+//////////////////////////////////////////////////
+ReflectanceRenderTargetListener::ReflectanceRenderTargetListener(
+  const ReflectanceMaterialListenerPtr &_switcher)
+  :materialListener(_switcher)
+{
+}
+
+//////////////////////////////////////////////////
+void ReflectanceRenderTargetListener::preRenderTargetUpdate(
+  const Ogre::RenderTargetEvent &/*_evt*/)
+{
+  Ogre::MaterialManager::getSingleton().addListener(
+      this->materialListener.get());
+}
+
+//////////////////////////////////////////////////
+void ReflectanceRenderTargetListener::postRenderTargetUpdate(
+  const Ogre::RenderTargetEvent & /*_evt*/)
+{
+  Ogre::MaterialManager::getSingleton().removeListener(
+      this->materialListener.get());
+}
+
+/////////////////////////////////////////////////
+ReflectanceMaterialListener::ReflectanceMaterialListener(ScenePtr _scene)
+ :scene(_scene)
+{
+}
+
+/////////////////////////////////////////////////
+Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
+    uint16_t /*_schemeIndex*/, const Ogre::String & /*_schemeName*/,
+    Ogre::Material *_originalMaterial, uint16_t /*_lodIndex*/,
+    const Ogre::Renderable *_rend)
+{
+  // printf("_schemeName: %s\n", _schemeName.c_str());
+  if (_rend && typeid(*_rend) == typeid(Ogre::SubEntity))
+  {
+    std::string material = "";
+    std::string reflectanceMap = "";
+
+    const Ogre::SubEntity *subEntity =
+      static_cast<const Ogre::SubEntity *>(_rend);
+
+    if (!subEntity)
+    {
+      gzerr << "Unable to get an Ogre sub-entity when switching editor model "
+          << "material" << std::endl;
+      return NULL;
+    }
+
+    // use the original material for gui visuals
+    if (!(subEntity->getParent()->getVisibilityFlags() &
+        (GZ_VISIBILITY_ALL &  ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE))))
+    {
+      Ogre::Technique *originalTechnique = _originalMaterial->getTechnique(0);
+      if (originalTechnique)
+        return originalTechnique;
+    }
+    else
+    {
+      Ogre::Entity *entity = subEntity->getParent();
+      if (!entity)
+      {
+        gzerr << "Unable to get an Ogre entity when switching editor model "
+            << "material" << std::endl;
+        return NULL;
+      }
+
+      if (entity->getUserObjectBindings().getUserAny().isEmpty())
+        return NULL;
+
+      std::string userAny = "";
+      try
+      {
+        userAny = Ogre::any_cast<std::string>(
+            entity->getUserObjectBindings().getUserAny());
+      }
+      catch(Ogre::Exception &e)
+      {
+        gzerr << "Unable to cast Ogre user data when switching editor model "
+            <<  "material" << std::endl;
+        return NULL;
+      }
+
+      rendering::VisualPtr visual = scene->GetVisual(userAny);
+
+      if (!visual)
+        return NULL;
+
+      const Ogre::Any reflectanceMapAny = visual->GetSceneNode()->getUserObjectBindings().getUserAny("reflectance_map");
+      if(!reflectanceMapAny.isEmpty()){
+        material = "Gazebo/Reflectance";
+        reflectanceMap = Ogre::any_cast<std::string>(reflectanceMapAny);
+      }else{
+        material = "Gazebo/Black";
+      }
+
+      // set the material for the models
+      Ogre::ResourcePtr res =
+          Ogre::MaterialManager::getSingleton().getByName(material);
+      if (res.isNull())
+      {
+        Ogre::MaterialManager::getSingleton().load(material,
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+      }
+      Ogre::MaterialPtr mat;
+      // OGRE 1.9 changes the shared pointer definition
+      #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+      // Make sure we keep the same depth properties so that
+      // certain overlay objects can be picked by the mouse.
+      mat = static_cast<Ogre::MaterialPtr>(res);
+      #else
+      mat = res.staticCast<Ogre::Material>();
+      #endif
+
+      Ogre::Technique *technique = mat->getTechnique(0);
+      if (!reflectanceMap.empty())
+      {
+        Ogre::TextureUnitState *tus = technique->getPass(0)->getTextureUnitState(0);
+        tus->setTextureName(reflectanceMap);
+      }
+
+      return technique;
+    }
+  }
+  return NULL;
 }

@@ -49,20 +49,38 @@ namespace gazebo
       /// \brief True to generate point clouds
       public: bool outputPoints;
 
+      /// \brief True to generate reflectance
+      public: bool outputReflectance;
+
       /// \brief Point cloud data buffer
       public: float *pcdBuffer;
+
+      /// \brief reflectance data buffer
+      public: float *reflectanceBuffer = nullptr;
 
       /// \brief Point cloud view port
       public: Ogre::Viewport *pcdViewport;
 
+      /// \brief reflectance view port
+      public: Ogre::Viewport *reflectanceViewport = nullptr;
+
       /// \brief Point cloud material
       public: Ogre::Material *pcdMaterial;
+
+      /// \brief reflectance material
+      public: Ogre::Material *reflectanceMaterial = nullptr;
 
       /// \brief Point cloud texture
       public: Ogre::Texture *pcdTexture;
 
+      /// \brief reflectance texture
+      public: Ogre::Texture *reflectanceTextures = nullptr;
+
       /// \brief Point cloud texture
       public: Ogre::RenderTarget *pcdTarget;
+
+      /// \brief reflectance texture
+      public: Ogre::RenderTarget *reflectanceTarget = nullptr;
 
       /// \brief Event used to signal rgb point cloud data
       public: event::EventT<void(const float *, unsigned int, unsigned int,
@@ -71,6 +89,11 @@ namespace gazebo
       /// \brief Event used to signal depth data
       public: event::EventT<void(const float *, unsigned int, unsigned int,
                    unsigned int, const std::string &)> newDepthFrame;
+
+      /// \brief Event used to signal normals point cloud data
+      public: event::EventT<void(const float *, unsigned int, unsigned int,
+                  unsigned int, const std::string &)> newReflectanceFrame;
+
     };
   }
 }

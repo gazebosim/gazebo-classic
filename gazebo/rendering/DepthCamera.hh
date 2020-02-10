@@ -42,6 +42,17 @@ namespace gazebo
   {
     // Forward declare private data.
     class DepthCameraPrivate;
+    class ReflectanceRenderTargetListener;
+    class ReflectanceMaterialListener;
+    class ReflectanceMaterialSwitcher;
+
+    // typedefs that are used only in this class
+    using ReflectanceRenderTargetListenerPtr =
+        std::shared_ptr<ReflectanceRenderTargetListener>;
+    using ReflectanceMaterialListenerPtr =
+        std::shared_ptr<ReflectanceMaterialListener>;
+    using ReflectanceMaterialSwitcherPtr =
+        std::shared_ptr<ReflectanceMaterialSwitcher>;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \{
@@ -77,6 +88,10 @@ namespace gazebo
       /// \param[in] _textureName Name of the texture to create
       public: void CreateDepthTexture(const std::string &_textureName);
 
+      /// \brief Create a texture which will hold the reflectance data
+      /// \param[in] _textureName Name of the texture to create
+      public: void CreateReflectanceTexture(const std::string &_textureName);
+
       /// \brief Render the camera
       public: virtual void PostRender();
 
@@ -99,6 +114,13 @@ namespace gazebo
       /// \param[in] _subscriber Subscriber callback function
       /// \return Pointer to the new Connection. This must be kept in scope
       public: event::ConnectionPtr ConnectNewRGBPointCloud(
+          std::function<void (const float *, unsigned int, unsigned int,
+          unsigned int, const std::string &)>  _subscriber);
+
+      /// \brief Connect a to the new reflectance data
+      /// \param[in] _subscriber Subscriber callback function
+      /// \return Pointer to the new Connection. This must be kept in scope
+      public: event::ConnectionPtr ConnectNewReflectanceFrame(
           std::function<void (const float *, unsigned int, unsigned int,
           unsigned int, const std::string &)>  _subscriber);
 
@@ -125,7 +147,108 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<DepthCameraPrivate> dataPtr;
+
+      /// \brief Pointer to reflectance material switcher.
+      private: ReflectanceMaterialSwitcherPtr reflectanceMaterialSwitcher;
     };
+
+    class GZ_GUI_VISIBLE ReflectanceMaterialSwitcher
+    {
+      /// \brief Constructor
+      /// \param[in] _camera Pointer to the camera whose viewport will be
+      /// updated to see the effect of the material switch.
+      public: explicit ReflectanceMaterialSwitcher(
+                  ScenePtr _scene, Ogre::Viewport* _viewport);
+
+      /// \brief Destructor
+      public: ~ReflectanceMaterialSwitcher() = default;
+
+      /// \brief Set the material scheme that will be applied to the models
+      /// in the editor
+      /// \param[in] _scheme Name of material scheme
+      public: void SetMaterialScheme(const std::string &_scheme);
+
+      /// \brief Get the material scheme applied to the models in the editor
+      /// \return Name of material scheme
+      public: std::string MaterialScheme() const;
+
+      /// \brief Ogre render target listener that adds and removes the
+      /// material listener on every render event
+      private: ReflectanceRenderTargetListenerPtr renderTargetListener;
+
+      /// \brief Ogre material listener that will handle switching the
+      /// material scheme
+      private: ReflectanceMaterialListenerPtr materialListener;
+
+      private: Ogre::Viewport* viewport;
+
+      /// \brief Name of the original material scheme
+      private: std::string originalMaterialScheme;
+
+      /// \brief Name of the material scheme being used.
+      private: std::string materialScheme;
+    };
+
+
+    /// \class ReflectanceRenderTargetListener
+    /// \brief Ogre render target listener.
+    class ReflectanceRenderTargetListener : public Ogre::RenderTargetListener
+    {
+      /// \brief Constructor
+      /// \param[in] _switcher Material listener that will be added to or
+      /// removed from Ogre material manager's list of listeners.
+      public: explicit ReflectanceRenderTargetListener(
+                          const ReflectanceMaterialListenerPtr &_switcher);
+
+      /// \brief Destructor
+      public: ~ReflectanceRenderTargetListener() = default;
+
+      /// \brief Ogre's pre-render update callback
+      /// \param[in] _evt Ogre render target event containing information about
+      /// the source render target.
+      public: virtual void preRenderTargetUpdate(
+                  const Ogre::RenderTargetEvent &_evt);
+
+      /// \brief Ogre's post-render update callback
+      /// \param[in] _evt Ogre render target event containing information about
+      /// the source render target.
+      public: virtual void postRenderTargetUpdate(
+                  const Ogre::RenderTargetEvent &_evt);
+
+      private: ReflectanceMaterialListenerPtr materialListener;
+
+    };
+
+    /// \class EditorMaterialListener EditorMaterialSwitcher.hh
+    /// \brief Ogre material listener.
+    class ReflectanceMaterialListener : public Ogre::MaterialManager::Listener
+    {
+      /// \brief Constructor
+      /// \param[in] _camera Pointer to the camera whose viewport will be
+      /// updated to see the effect of the material switch.
+      public: explicit ReflectanceMaterialListener(ScenePtr _scene);
+
+      /// \brief Destructor
+      public: ~ReflectanceMaterialListener() = default;
+
+      /// \brief Ogre callback that is used to specify the material to use when
+      /// the requested scheme is not found
+      /// \param[in] _schemeIndex Index of scheme requested
+      /// \param[in] _schemeName Name of scheme requested
+      /// \param[in] _originalMaterial Orignal material that does not contain
+      /// the requested scheme
+      /// \param[in] _lodIndex The material level-of-detail
+      /// \param[in] _rend Pointer to the Ogre::Renderable object requesting
+      /// the use of the techinique
+      /// \return The Ogre material technique to use when scheme is not found.
+      public: virtual Ogre::Technique *handleSchemeNotFound(
+                  uint16_t _schemeIndex, const Ogre::String &_schemeName,
+                  Ogre::Material *_originalMaterial, uint16_t _lodIndex,
+                  const Ogre::Renderable *_rend);
+      private: ScenePtr scene;
+    };
+
+
     /// \}
   }
 }
