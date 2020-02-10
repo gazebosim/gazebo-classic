@@ -8,7 +8,7 @@
       <uri>model://sun</uri>
     </include>
     <model  name="box">
-      <pose>0 0 0.1 0 0 0</pose>
+      <pose>1 0 0.1 0 0 0</pose>
       <link name="box_link">
         <visual name="visual">
           <geometry>
@@ -19,11 +19,11 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>terrain.png</name>
+              <name>Gazebo/Red</name>
             </script>
           </material>
           <plugin filename="libReflectancePlugin.so" name="reflectance_plugin">
-            <material>Gazebo/Blue</material>
+            <material>flat_normal.png</material>
           </plugin>
         </visual>
         <collision name="visual">
@@ -63,11 +63,15 @@
             <image>
               <width>640</width>
               <height>480</height>
+              <format>R8G8B8</format>
             </image>
             <clip>
               <near>0.1</near>
-              <far>20</far>
+              <far>100</far>
             </clip>
+            <save enabled='0'>
+              <path>__default__</path>
+            </save>
             <depth_camera>
               <output>points;reflectance</output>
             </depth_camera>

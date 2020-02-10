@@ -111,6 +111,89 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
     delete [] g_depthBuffer;
 }
 
+class DepthCameraReflectanceSensor_TEST : public ServerFixture
+{
+};
+
+std::mutex g_reflectanceMutex;
+unsigned int g_reflectanceCounter = 0;
+float *g_reflectanceBuffer = nullptr;
+
+/////////////////////////////////////////////////
+void OnNewReflectanceFrame(const float * _image,
+    unsigned int _width, unsigned int _height,
+    unsigned int _depth, const std::string &/*_format*/)
+{
+
+  if (!_image)
+    return;
+  std::lock_guard<std::mutex> lock(g_reflectanceMutex);
+
+  int index =  ((_height * 0.45) * _width) + _width * 0.5;
+
+  printf("W[%u] H[%u] MidPoint[%d] ReflectaNce[%f]\n",
+      _width, _height, index, _image[index]);
+
+  if (!g_reflectanceBuffer)
+    g_reflectanceBuffer = new float[_width * _height];
+  memcpy(g_reflectanceBuffer,  _image, _width * _height * sizeof(_image[0]));
+  g_reflectanceCounter++;
+}
+
+/////////////////////////////////////////////////
+/// \brief Test Creation of a Depth Camera sensor
+TEST_F(DepthCameraReflectanceSensor_TEST, CreateDepthCamera)
+{
+  Load("worlds/reflectance.world");
+  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+
+  // Create the camera sensor
+  std::string sensorName = "default::camera_model::my_link::camera";
+
+  // Get a pointer to the depth camera sensor
+  sensors::DepthCameraSensorPtr sensor =
+     std::dynamic_pointer_cast<sensors::DepthCameraSensor>
+     (mgr->GetSensor(sensorName));
+
+  // Make sure the above dynamic cast worked.
+  EXPECT_TRUE(sensor != nullptr);
+
+  EXPECT_EQ(sensor->ImageWidth(), 640u);
+  EXPECT_EQ(sensor->ImageHeight(), 480u);
+  EXPECT_TRUE(sensor->IsActive());
+
+  rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
+  EXPECT_TRUE(depthCamera != nullptr);
+
+  event::ConnectionPtr c = depthCamera->ConnectNewReflectanceFrame(
+      std::bind(&::OnNewReflectanceFrame, std::placeholders::_1,
+      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+      std::placeholders::_5));
+
+  // wait for a few depth camera frames
+  int i = 0;
+  while (g_reflectanceCounter < 10 && i < 300)
+  {
+    common::Time::MSleep(10);
+    i++;
+  }
+  EXPECT_LT(i, 300);
+
+  std::lock_guard<std::mutex> lock(g_reflectanceMutex);
+
+  // Check the reflectance of the box
+  unsigned int index = ((sensor->ImageHeight() * 0.45) * sensor->ImageWidth())
+                       + sensor->ImageWidth() * 0.5;
+  for (unsigned int i = index - 25;
+      i < index + 25 ; ++i)
+  {
+    EXPECT_TRUE(g_reflectanceBuffer[i] > 0);
+  }
+
+  if (g_reflectanceBuffer)
+    delete [] g_reflectanceBuffer;
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
