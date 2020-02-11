@@ -176,6 +176,9 @@ TEST_F(DepthCameraSensor_normals_TEST, CreateDepthCamera)
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
       std::placeholders::_5));
 
+  g_depthCounter = 0u;
+  double updateRate = sensor->UpdateRate();
+  EXPECT_DOUBLE_EQ(10.0, updateRate);
   // wait for a few depth camera frames
   int i = 0;
   while ( i < 300)
@@ -183,6 +186,7 @@ TEST_F(DepthCameraSensor_normals_TEST, CreateDepthCamera)
     common::Time::MSleep(10);
     i++;
   }
+  EXPECT_GE(g_depthCounter, 3 * updateRate);
 }
 
 /////////////////////////////////////////////////
