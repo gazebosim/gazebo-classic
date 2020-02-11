@@ -122,16 +122,11 @@ float *g_reflectanceBuffer = nullptr;
 /////////////////////////////////////////////////
 void OnNewReflectanceFrame(const float * _image,
     unsigned int _width, unsigned int _height,
-    unsigned int _depth, const std::string &/*_format*/)
+    unsigned int /*_depth*/, const std::string &/*_format*/)
 {
   if (!_image)
     return;
   std::lock_guard<std::mutex> lock(g_reflectanceMutex);
-
-  int index =  ((_height * 0.45) * _width) + _width * 0.5;
-
-  printf("W[%u] H[%u] MidPoint[%d] ReflectaNce[%f]\n",
-      _width, _height, index, _image[index]);
 
   if (!g_reflectanceBuffer)
     g_reflectanceBuffer = new float[_width * _height];
@@ -170,13 +165,16 @@ TEST_F(DepthCameraReflectanceSensor_TEST, CreateDepthCamera)
       std::placeholders::_5));
 
   // wait for a few depth camera frames
+  g_reflectanceCounter = 0u;
+  double updateRate = sensor->UpdateRate();
+  EXPECT_DOUBLE_EQ(10.0, updateRate);
   int i = 0;
-  while (g_reflectanceCounter < 10 && i < 300)
+  while (i < 300)
   {
     common::Time::MSleep(10);
     i++;
   }
-  EXPECT_LT(i, 300);
+  EXPECT_GE(g_reflectanceCounter, 3 * updateRate);
 
   std::lock_guard<std::mutex> lock(g_reflectanceMutex);
 
