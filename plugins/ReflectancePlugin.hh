@@ -18,6 +18,7 @@
 #define GAZEBO_REFLECTANCEPLUGIN_HH_
 
 #include <memory>
+#include <string>
 #include <gazebo/common/Plugin.hh>
 
 namespace gazebo
@@ -45,7 +46,6 @@ namespace gazebo
         sdf::ElementPtr _sdf) override;
 
     private: std::unique_ptr<VisualUtilsPrivate> dataPtr;
-
   };
 }
 #endif

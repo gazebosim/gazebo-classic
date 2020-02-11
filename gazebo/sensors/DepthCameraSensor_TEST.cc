@@ -124,7 +124,6 @@ void OnNewReflectanceFrame(const float * _image,
     unsigned int _width, unsigned int _height,
     unsigned int _depth, const std::string &/*_format*/)
 {
-
   if (!_image)
     return;
   std::lock_guard<std::mutex> lock(g_reflectanceMutex);
@@ -187,7 +186,7 @@ TEST_F(DepthCameraReflectanceSensor_TEST, CreateDepthCamera)
   for (unsigned int i = index - 25;
       i < index + 25 ; ++i)
   {
-    EXPECT_TRUE(g_reflectanceBuffer[i] > 0);
+    EXPECT_GT(g_reflectanceBuffer[i], 0);
   }
 
   if (g_reflectanceBuffer)

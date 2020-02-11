@@ -216,7 +216,6 @@ namespace gazebo
                   const Ogre::RenderTargetEvent &_evt);
 
       private: ReflectanceMaterialListenerPtr materialListener;
-
     };
 
     /// \class EditorMaterialListener EditorMaterialSwitcher.hh

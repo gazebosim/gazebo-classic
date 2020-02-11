@@ -93,7 +93,6 @@ namespace gazebo
       /// \brief Event used to signal normals point cloud data
       public: event::EventT<void(const float *, unsigned int, unsigned int,
                   unsigned int, const std::string &)> newReflectanceFrame;
-
     };
   }
 }

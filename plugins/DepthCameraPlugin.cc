@@ -74,10 +74,12 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
         this, std::placeholders::_1, std::placeholders::_2,
         std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
 
-  this->newReflectanceFrameConnection = this->depthCamera->ConnectNewReflectanceFrame(
-      std::bind(&DepthCameraPlugin::OnNewReflectanceFrame,
-        this, std::placeholders::_1, std::placeholders::_2,
-        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+  this->newReflectanceFrameConnection =
+        this->depthCamera->ConnectNewReflectanceFrame(
+            std::bind(&DepthCameraPlugin::OnNewReflectanceFrame,
+            this, std::placeholders::_1, std::placeholders::_2,
+            std::placeholders::_3, std::placeholders::_4,
+            std::placeholders::_5));
 
   this->parentSensor->SetActive(true);
 }

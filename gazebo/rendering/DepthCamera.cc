@@ -66,11 +66,12 @@ DepthCamera::~DepthCamera()
 void DepthCamera::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
-  std::string outputs = _sdf->GetElement("depth_camera")->Get<std::string>("output");
+  std::string outputs = _sdf->GetElement("depth_camera")->
+                              Get<std::string>("output");
   std::size_t found = outputs.find("points");
-  this->dataPtr->outputPoints =  found!=std::string::npos;
+  this->dataPtr->outputPoints =  found != std::string::npos;
   found = outputs.find("reflectance");
-  this->dataPtr->outputReflectance =  found!=std::string::npos;
+  this->dataPtr->outputReflectance =  found != std::string::npos;
 }
 
 //////////////////////////////////////////////////
@@ -217,7 +218,8 @@ void DepthCamera::CreateReflectanceTexture(const std::string &_textureName)
     this->dataPtr->reflectanceViewport->setMaterialScheme("reflectance_map");
 
     this->reflectanceMaterialSwitcher.reset(
-        new ReflectanceMaterialSwitcher(this->scene, this->dataPtr->reflectanceViewport));
+        new ReflectanceMaterialSwitcher(this->scene,
+                                        this->dataPtr->reflectanceViewport));
     this->reflectanceMaterialSwitcher->SetMaterialScheme("reflectance_map");
   }
 }
@@ -302,15 +304,14 @@ void DepthCamera::PostRender()
          1, Ogre::PF_FLOAT32_R, this->dataPtr->reflectanceBuffer);
 
      reflectancePixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
-     reflectancePixelBuffer->blitToMemory(reflectance_src_box, reflectance_dst_box);
+     reflectancePixelBuffer->blitToMemory(reflectance_src_box,
+                                          reflectance_dst_box);
      reflectancePixelBuffer->unlock();
 
      this->dataPtr->newReflectanceFrame(
          this->dataPtr->reflectanceBuffer, width, height, 1, "REFLECTANCE");
     }
-
   }
-
   // also new image frame for camera texture
   Camera::PostRender();
 
@@ -440,7 +441,6 @@ void DepthCamera::RenderImpl()
   {
     this->dataPtr->reflectanceTarget->update(false);
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -574,7 +574,7 @@ void ReflectanceRenderTargetListener::postRenderTargetUpdate(
 
 /////////////////////////////////////////////////
 ReflectanceMaterialListener::ReflectanceMaterialListener(ScenePtr _scene)
- :scene(_scene)
+:scene(_scene)
 {
 }
 
@@ -639,11 +639,15 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       if (!visual)
         return NULL;
 
-      const Ogre::Any reflectanceMapAny = visual->GetSceneNode()->getUserObjectBindings().getUserAny("reflectance_map");
-      if(!reflectanceMapAny.isEmpty()){
+      const Ogre::Any reflectanceMapAny = visual->GetSceneNode()->
+                        getUserObjectBindings().getUserAny("reflectance_map");
+      if (!reflectanceMapAny.isEmpty())
+      {
         material = "Gazebo/Reflectance";
         reflectanceMap = Ogre::any_cast<std::string>(reflectanceMapAny);
-      }else{
+      }
+      else
+      {
         material = "Gazebo/Black";
       }
 
@@ -668,7 +672,8 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       Ogre::Technique *technique = mat->getTechnique(0);
       if (!reflectanceMap.empty())
       {
-        Ogre::TextureUnitState *tus = technique->getPass(0)->getTextureUnitState(0);
+        Ogre::TextureUnitState *tus = technique->getPass(0)->
+                                              getTextureUnitState(0);
         tus->setTextureName(reflectanceMap);
       }
 
