@@ -61,12 +61,13 @@ void DepthCamera::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
 
-  std::string outputs = _sdf->GetElement("depth_camera")->Get<std::string>("output");
+  std::string outputs = _sdf->GetElement("depth_camera")->
+                              Get<std::string>("output");
 
   std::size_t found = outputs.find("points");
-  this->dataPtr->outputPoints =  found!=std::string::npos;
+  this->dataPtr->outputPoints =  found != std::string::npos;
   found = outputs.find("normals");
-  this->dataPtr->outputNormals =  found!=std::string::npos;
+  this->dataPtr->outputNormals =  found != std::string::npos;
 }
 
 //////////////////////////////////////////////////

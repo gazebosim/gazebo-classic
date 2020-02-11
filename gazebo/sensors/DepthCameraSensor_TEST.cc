@@ -125,9 +125,6 @@ void OnNewNormalsFrame(const float * _normals,
                        unsigned int /*_depth*/,
                        const std::string &/*_format*/)
 {
-
-  bool show_one = false;
-
   for (unsigned int i = 0; i < _width; i++)
   {
     for (unsigned int j = 0; j < _height; j++)
@@ -137,12 +134,8 @@ void OnNewNormalsFrame(const float * _normals,
       float y = _normals[4 * index + 1];
       float z = _normals[4 * index + 2];
       // float a = _normals[4 * index + 3];
-      if(x < farClip){
-        if(!show_one){
-          printf("W[%u] H[%u] Normals: X[%f] Y[%f] Z[%f]\n",
-            _width, _height, _normals[4 * index], _normals[4 * index + 1], _normals[4 * index + 2]);
-          show_one = true;
-        }
+      if (x < farClip)
+      {
         EXPECT_NEAR(x, 0.0, 0.01);
         EXPECT_NEAR(y, 0.0, 0.01);
         EXPECT_NEAR(z, -1.0, 0.01);
