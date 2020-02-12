@@ -142,6 +142,9 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       rendering::Events::ConnectToggleLayer(
         std::bind(&Scene::ToggleLayer, this, std::placeholders::_1)));
 
+  this->dataPtr->sceneSub =
+      this->dataPtr->node->Subscribe("~/scene", &Scene::OnScene, this);
+
   this->dataPtr->sensorSub = this->dataPtr->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this, true);
   this->dataPtr->visSub =
@@ -188,8 +191,6 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 
   this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
       &Scene::OnResponse, this, true);
-  this->dataPtr->sceneSub =
-      this->dataPtr->node->Subscribe("~/scene", &Scene::OnScene, this);
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->dataPtr->sdf);
@@ -1826,6 +1827,13 @@ void Scene::PreRender()
   else
     first = false;
   */
+
+  {
+    // make sure we have a scene msg before processing anything else
+    std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+    if (!this->dataPtr->initialized && this->dataPtr->sceneMsgs.empty())
+      return;
+  }
 
   static RequestMsgs_L::iterator rIter;
   static SceneMsgs_L::iterator sIter;
