@@ -23,14 +23,8 @@
 
 namespace gazebo
 {
-  class VisualUtilsPrivate
-  {
-    /// Visual to which the plugin is attached
-    public: rendering::VisualPtr visual;
-
-    /// Unique name
-    public: std::string name;
-  };
+  
+  class VisualUtilsPrivate;
 
   /// \brief Plugin that creates
   class GAZEBO_VISIBLE ReflectancePlugin : public VisualPlugin

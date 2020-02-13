@@ -41,10 +41,10 @@ namespace gazebo
     class DepthCameraPrivate
     {
       /// \brief The depth buffer
-      public: float *depthBuffer;
+      public: float *depthBuffer = nullptr;
 
       /// \brief The depth material
-      public: Ogre::Material *depthMaterial;
+      public: Ogre::Material *depthMaterial = nullptr;
 
       /// \brief True to generate point clouds
       public: bool outputPoints;
@@ -53,7 +53,7 @@ namespace gazebo
       public: bool outputReflectance;
 
       /// \brief Point cloud data buffer
-      public: float *pcdBuffer;
+      public: float *pcdBuffer = nullptr;
 
       /// \brief reflectance data buffer
       public: float *reflectanceBuffer = nullptr;
@@ -65,7 +65,7 @@ namespace gazebo
       public: Ogre::Viewport *reflectanceViewport = nullptr;
 
       /// \brief Point cloud material
-      public: Ogre::Material *pcdMaterial;
+      public: Ogre::Material *pcdMaterial = nullptr;
 
       /// \brief reflectance material
       public: Ogre::Material *reflectanceMaterial = nullptr;
@@ -77,10 +77,13 @@ namespace gazebo
       public: Ogre::Texture *reflectanceTextures = nullptr;
 
       /// \brief Point cloud texture
-      public: Ogre::RenderTarget *pcdTarget;
+      public: Ogre::RenderTarget *pcdTarget = nullptr;
 
       /// \brief reflectance texture
       public: Ogre::RenderTarget *reflectanceTarget = nullptr;
+
+      /// \brief Pointer to reflectance material switcher.
+      public: ReflectanceMaterialSwitcherPtr reflectanceMaterialSwitcher;
 
       /// \brief Event used to signal rgb point cloud data
       public: event::EventT<void(const float *, unsigned int, unsigned int,

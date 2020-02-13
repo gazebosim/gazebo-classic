@@ -139,7 +139,7 @@ namespace gazebo
       protected: Ogre::Texture *depthTexture;
 
       /// \brief Pointer to the depth target
-      protected: Ogre::RenderTarget *depthTarget;
+      protected: Ogre::RenderTarget *depthTarget = nullptr;
 
       /// \brief Pointer to the depth viewport
       protected: Ogre::Viewport *depthViewport;
@@ -147,16 +147,16 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<DepthCameraPrivate> dataPtr;
-
-      /// \brief Pointer to reflectance material switcher.
-      private: ReflectanceMaterialSwitcherPtr reflectanceMaterialSwitcher;
     };
 
-    class GZ_GUI_VISIBLE ReflectanceMaterialSwitcher
+    /// \class ReflectanceMaterialSwitcher ReflectanceMaterialSwitcher.hh
+    /// \brief Material switcher for reflectance
+    class GZ_RENDERING_VISIBLE ReflectanceMaterialSwitcher
     {
       /// \brief Constructor
-      /// \param[in] _camera Pointer to the camera whose viewport will be
-      /// updated to see the effect of the material switch.
+      /// \param[in] _scene Pointer to get the visuals
+      /// \param[in] viewport will be updated to see the effect of
+      /// the material switch.
       public: explicit ReflectanceMaterialSwitcher(
                   ScenePtr _scene, Ogre::Viewport* _viewport);
 
@@ -180,6 +180,7 @@ namespace gazebo
       /// material scheme
       private: ReflectanceMaterialListenerPtr materialListener;
 
+      /// \brief viewport pointer to reflectance
       private: Ogre::Viewport* viewport;
 
       /// \brief Name of the original material scheme
@@ -215,16 +216,16 @@ namespace gazebo
       public: virtual void postRenderTargetUpdate(
                   const Ogre::RenderTargetEvent &_evt);
 
+      /// \brief Reflectance material listener pointer
       private: ReflectanceMaterialListenerPtr materialListener;
     };
 
-    /// \class EditorMaterialListener EditorMaterialSwitcher.hh
-    /// \brief Ogre material listener.
+    /// \class ReflectanceMaterialListener ReflectanceMaterialListener.hh
+    /// \brief reflectance material listener.
     class ReflectanceMaterialListener : public Ogre::MaterialManager::Listener
     {
       /// \brief Constructor
-      /// \param[in] _camera Pointer to the camera whose viewport will be
-      /// updated to see the effect of the material switch.
+      /// \param[in] _scene Pointer to get the visuals.
       public: explicit ReflectanceMaterialListener(ScenePtr _scene);
 
       /// \brief Destructor
@@ -244,10 +245,10 @@ namespace gazebo
                   uint16_t _schemeIndex, const Ogre::String &_schemeName,
                   Ogre::Material *_originalMaterial, uint16_t _lodIndex,
                   const Ogre::Renderable *_rend);
+
+      /// \brief Scene pointer
       private: ScenePtr scene;
     };
-
-
     /// \}
   }
 }

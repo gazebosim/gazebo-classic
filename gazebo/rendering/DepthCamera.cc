@@ -39,12 +39,6 @@ DepthCamera::DepthCamera(const std::string &_namePrefix, ScenePtr _scene,
   : Camera(_namePrefix, _scene, _autoRender),
     dataPtr(new DepthCameraPrivate)
 {
-  this->depthTarget = NULL;
-  this->dataPtr->depthBuffer = NULL;
-  this->dataPtr->depthMaterial = NULL;
-  this->dataPtr->pcdTarget = NULL;
-  this->dataPtr->pcdBuffer = NULL;
-  this->dataPtr->pcdMaterial = NULL;
   this->dataPtr->outputPoints = false;
   this->dataPtr->outputReflectance = false;
 }
@@ -217,10 +211,10 @@ void DepthCamera::CreateReflectanceTexture(const std::string &_textureName)
 
     this->dataPtr->reflectanceViewport->setMaterialScheme("reflectance_map");
 
-    this->reflectanceMaterialSwitcher.reset(
+    this->dataPtr->reflectanceMaterialSwitcher.reset(
         new ReflectanceMaterialSwitcher(this->scene,
                                         this->dataPtr->reflectanceViewport));
-    this->reflectanceMaterialSwitcher->SetMaterialScheme("reflectance_map");
+    this->dataPtr->reflectanceMaterialSwitcher->SetMaterialScheme("reflectance_map");
   }
 }
 
@@ -323,7 +317,7 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
           Ogre::Material *_material, const std::string &_matName)
 {
   Ogre::RenderSystem *renderSys;
-  Ogre::Viewport *vp = NULL;
+  Ogre::Viewport *vp = nullptr;
   Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
   Ogre::Pass *pass;
 
@@ -509,7 +503,7 @@ ReflectanceMaterialSwitcher::ReflectanceMaterialSwitcher(
   if (!this->viewport)
   {
     gzerr << "Cannot create a material switcher for the reflectance material. "
-          << "viewport is NULL" << std::endl;
+          << "viewport is nullptr" << std::endl;
     return;
   }
 
@@ -527,18 +521,18 @@ void ReflectanceMaterialSwitcher::SetMaterialScheme(const std::string &_scheme)
   this->materialScheme = _scheme;
   if (_scheme.empty())
   {
-    viewport->setMaterialScheme(
+    this->viewport->setMaterialScheme(
         this->originalMaterialScheme);
-    viewport->getTarget()->removeListener(
+    this->viewport->getTarget()->removeListener(
         this->renderTargetListener.get());
   }
   else
   {
     this->originalMaterialScheme =
-        viewport->getMaterialScheme();
+        this->viewport->getMaterialScheme();
 
-    viewport->setMaterialScheme(_scheme);
-    viewport->getTarget()->addListener(
+    this->viewport->setMaterialScheme(_scheme);
+    this->viewport->getTarget()->addListener(
         this->renderTargetListener.get());
   }
 }
@@ -595,9 +589,9 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
 
     if (!subEntity)
     {
-      gzerr << "Unable to get an Ogre sub-entity when switching editor model "
-          << "material" << std::endl;
-      return NULL;
+      gzerr << "Unable to get an Ogre sub-entity in reflectance material listener"
+          << std::endl;
+      return nullptr;
     }
 
     // use the original material for gui visuals
@@ -613,13 +607,13 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       Ogre::Entity *entity = subEntity->getParent();
       if (!entity)
       {
-        gzerr << "Unable to get an Ogre entity when switching editor model "
-            << "material" << std::endl;
-        return NULL;
+        gzerr << "Unable to get an Ogre entity in reflectance material listener"
+            << std::endl;
+        return nullptr;
       }
 
       if (entity->getUserObjectBindings().getUserAny().isEmpty())
-        return NULL;
+        return nullptr;
 
       std::string userAny = "";
       try
@@ -629,15 +623,15 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       }
       catch(Ogre::Exception &e)
       {
-        gzerr << "Unable to cast Ogre user data when switching editor model "
-            <<  "material" << std::endl;
-        return NULL;
+        gzerr << "Unable to cast Ogre user data in reflectance material listener"
+            << std::endl;
+        return nullptr;
       }
 
       rendering::VisualPtr visual = scene->GetVisual(userAny);
 
       if (!visual)
-        return NULL;
+        return nullptr;
 
       const Ogre::Any reflectanceMapAny = visual->GetSceneNode()->
                         getUserObjectBindings().getUserAny("reflectance_map");
@@ -680,5 +674,5 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       return technique;
     }
   }
-  return NULL;
+  return nullptr;
 }
