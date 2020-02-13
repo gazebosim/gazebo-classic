@@ -107,6 +107,7 @@
             <image>
               <width>640</width>
               <height>480</height>
+              <format>B8G8R8</format>
             </image>
             <clip>
               <near>0.1</near>

@@ -339,8 +339,11 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
   vp = _target->getViewport(0);
 
   // return farClip in case no renderable object is inside frustrum
-  vp->setBackgroundColour(Ogre::ColourValue(this->FarClip(),
-      this->FarClip(), this->FarClip()));
+  if (_target == this->dataPtr->normalsTarget)
+    vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0));
+  else
+    vp->setBackgroundColour(Ogre::ColourValue(this->FarClip(),
+        this->FarClip(), this->FarClip()));
 
   Ogre::CompositorManager::getSingleton().setCompositorEnabled(
                                                 vp, _matName, true);

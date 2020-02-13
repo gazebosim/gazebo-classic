@@ -77,12 +77,14 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
 
   // wait for a few depth camera frames
   int i = 0;
-  while (g_depthCounter < 10 && i < 300)
+  double updateRate = sensor->UpdateRate();
+  EXPECT_DOUBLE_EQ(10.0, updateRate);
+  while (i < 300)
   {
     common::Time::MSleep(10);
     i++;
   }
-  EXPECT_LT(i, 300);
+  EXPECT_GE(i, 3 * updateRate);
 
   unsigned int imageSize =
       sensor->ImageWidth() * sensor->ImageHeight();
@@ -116,7 +118,8 @@ using namespace gazebo;
 class DepthCameraSensor_normals_TEST : public ServerFixture
 {
 };
-float farClip;
+
+unsigned int g_normalsCounter = 0;
 
 /////////////////////////////////////////////////
 void OnNewNormalsFrame(const float * _normals,
@@ -134,7 +137,7 @@ void OnNewNormalsFrame(const float * _normals,
       float y = _normals[4 * index + 1];
       float z = _normals[4 * index + 2];
       // float a = _normals[4 * index + 3];
-      if (x < farClip)
+      if (x > 0.0 && y > 0.0 && z > 0.0)
       {
         EXPECT_NEAR(x, 0.0, 0.01);
         EXPECT_NEAR(y, 0.0, 0.01);
@@ -142,6 +145,7 @@ void OnNewNormalsFrame(const float * _normals,
       }
     }
   }
+  g_normalsCounter++;
 }
 
 /////////////////////////////////////////////////
@@ -169,24 +173,21 @@ TEST_F(DepthCameraSensor_normals_TEST, CreateDepthCamera)
   rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
   EXPECT_TRUE(depthCamera != nullptr);
 
-  farClip = depthCamera->FarClip();
-
   event::ConnectionPtr c2 = depthCamera->ConnectNewNormalsPointCloud(
       std::bind(&::OnNewNormalsFrame, std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
       std::placeholders::_5));
 
-  g_depthCounter = 0u;
   double updateRate = sensor->UpdateRate();
   EXPECT_DOUBLE_EQ(10.0, updateRate);
   // wait for a few depth camera frames
   int i = 0;
-  while ( i < 300)
+  while (i < 300)
   {
     common::Time::MSleep(10);
     i++;
   }
-  EXPECT_GE(g_depthCounter, 3 * updateRate);
+  EXPECT_GE(g_normalsCounter, 3 * updateRate);
 }
 
 /////////////////////////////////////////////////
