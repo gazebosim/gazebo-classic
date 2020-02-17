@@ -76,15 +76,14 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
       std::placeholders::_5));
 
   // wait for a few depth camera frames
+  unsigned int framesToWait = 10;
   int i = 0;
-  double updateRate = sensor->UpdateRate();
-  EXPECT_DOUBLE_EQ(10.0, updateRate);
-  while (i < 300)
+  while (i < 300 && g_depthCounter < 10)
   {
-    common::Time::MSleep(10);
+    common::Time::MSleep(20);
     i++;
   }
-  EXPECT_GE(i, 3 * updateRate);
+  EXPECT_GE(g_depthCounter, framesToWait);
 
   unsigned int imageSize =
       sensor->ImageWidth() * sensor->ImageHeight();
@@ -178,16 +177,15 @@ TEST_F(DepthCameraSensor_normals_TEST, CreateDepthCamera)
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
       std::placeholders::_5));
 
-  double updateRate = sensor->UpdateRate();
-  EXPECT_DOUBLE_EQ(10.0, updateRate);
-  // wait for a few depth camera frames
+  unsigned int framesToWait = 10;
+  // wait for a few normals callbacks
   int i = 0;
-  while (i < 300)
+  while (i < 300 && g_normalsCounter < 10)
   {
-    common::Time::MSleep(10);
+    common::Time::MSleep(20);
     i++;
   }
-  EXPECT_GE(g_normalsCounter, 3 * updateRate);
+  EXPECT_GE(g_normalsCounter, framesToWait);
 }
 
 /////////////////////////////////////////////////
