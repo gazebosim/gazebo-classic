@@ -29,6 +29,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/DepthCameraPrivate.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -83,6 +84,19 @@ void DepthCamera::Init()
 //////////////////////////////////////////////////
 void DepthCamera::Fini()
 {
+
+  if (this->dataPtr->reflectanceViewport && this->scene)
+    RTShaderSystem::DetachViewport(this->dataPtr->reflectanceViewport, this->scene);
+
+  if (this->dataPtr->reflectanceTarget)
+    this->dataPtr->reflectanceTarget->removeAllViewports();
+  this->dataPtr->reflectanceTarget = NULL;
+
+  if (this->dataPtr->reflectanceTextures)
+    Ogre::TextureManager::getSingleton().remove(this->dataPtr->reflectanceTextures->getName());
+  this->dataPtr->reflectanceTextures = NULL;
+
+  this->dataPtr->reflectanceMaterialSwitcher.reset();
   Camera::Fini();
 }
 

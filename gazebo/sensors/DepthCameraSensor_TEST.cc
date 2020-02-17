@@ -165,16 +165,14 @@ TEST_F(DepthCameraReflectanceSensor_TEST, CreateDepthCamera)
       std::placeholders::_5));
 
   // wait for a few depth camera frames
-  g_reflectanceCounter = 0u;
-  double updateRate = sensor->UpdateRate();
-  EXPECT_DOUBLE_EQ(10.0, updateRate);
+  unsigned int framesToWait = 10;
   int i = 0;
-  while (i < 300)
+  while (i < 300 && g_reflectanceCounter < 10)
   {
-    common::Time::MSleep(10);
+    common::Time::MSleep(20);
     i++;
   }
-  EXPECT_GE(g_reflectanceCounter, 3 * updateRate);
+  EXPECT_GE(g_reflectanceCounter, framesToWait);
 
   std::lock_guard<std::mutex> lock(g_reflectanceMutex);
 
@@ -186,6 +184,8 @@ TEST_F(DepthCameraReflectanceSensor_TEST, CreateDepthCamera)
   {
     EXPECT_GT(g_reflectanceBuffer[i], 0);
   }
+
+  depthCamera.reset();
 
   if (g_reflectanceBuffer)
     delete [] g_reflectanceBuffer;
