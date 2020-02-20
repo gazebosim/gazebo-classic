@@ -84,17 +84,18 @@ void DepthCamera::Init()
 //////////////////////////////////////////////////
 void DepthCamera::Fini()
 {
-
   if (this->dataPtr->reflectanceViewport && this->scene)
-    RTShaderSystem::DetachViewport(this->dataPtr->reflectanceViewport, this->scene);
+    RTShaderSystem::DetachViewport(this->dataPtr->reflectanceViewport,
+                                   this->scene);
 
   if (this->dataPtr->reflectanceTarget)
     this->dataPtr->reflectanceTarget->removeAllViewports();
-  this->dataPtr->reflectanceTarget = NULL;
+  this->dataPtr->reflectanceTarget = nullptr;
 
   if (this->dataPtr->reflectanceTextures)
-    Ogre::TextureManager::getSingleton().remove(this->dataPtr->reflectanceTextures->getName());
-  this->dataPtr->reflectanceTextures = NULL;
+    Ogre::TextureManager::getSingleton()
+          .remove(this->dataPtr->reflectanceTextures->getName());
+  this->dataPtr->reflectanceTextures = nullptr;
 
   this->dataPtr->reflectanceMaterialSwitcher.reset();
   Camera::Fini();
@@ -228,7 +229,8 @@ void DepthCamera::CreateReflectanceTexture(const std::string &_textureName)
     this->dataPtr->reflectanceMaterialSwitcher.reset(
         new ReflectanceMaterialSwitcher(this->scene,
                                         this->dataPtr->reflectanceViewport));
-    this->dataPtr->reflectanceMaterialSwitcher->SetMaterialScheme("reflectance_map");
+    this->dataPtr->reflectanceMaterialSwitcher->
+                   SetMaterialScheme("reflectance_map");
   }
 }
 
@@ -331,7 +333,7 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
           Ogre::Material *_material, const std::string &_matName)
 {
   Ogre::RenderSystem *renderSys;
-  Ogre::Viewport *vp = nullptr;
+  Ogre::Viewport *vp = nullptrptr;
   Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
   Ogre::Pass *pass;
 
@@ -517,7 +519,7 @@ ReflectanceMaterialSwitcher::ReflectanceMaterialSwitcher(
   if (!this->viewport)
   {
     gzerr << "Cannot create a material switcher for the reflectance material. "
-          << "viewport is nullptr" << std::endl;
+          << "viewport is nullptrptr" << std::endl;
     return;
   }
 
@@ -603,9 +605,9 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
 
     if (!subEntity)
     {
-      gzerr << "Unable to get an Ogre sub-entity in reflectance material listener"
-          << std::endl;
-      return nullptr;
+      gzerr << "Unable to get an Ogre sub-entity in reflectance "
+          << "material listener" << std::endl;
+      return nullptrptr;
     }
 
     // use the original material for gui visuals
@@ -623,11 +625,11 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       {
         gzerr << "Unable to get an Ogre entity in reflectance material listener"
             << std::endl;
-        return nullptr;
+        return nullptrptr;
       }
 
       if (entity->getUserObjectBindings().getUserAny().isEmpty())
-        return nullptr;
+        return nullptrptr;
 
       std::string userAny = "";
       try
@@ -637,15 +639,15 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       }
       catch(Ogre::Exception &e)
       {
-        gzerr << "Unable to cast Ogre user data in reflectance material listener"
-            << std::endl;
-        return nullptr;
+        gzerr << "Unable to cast Ogre user data in reflectance "
+            << "material listener" << std::endl;
+        return nullptrptr;
       }
 
       rendering::VisualPtr visual = scene->GetVisual(userAny);
 
       if (!visual)
-        return nullptr;
+        return nullptrptr;
 
       const Ogre::Any reflectanceMapAny = visual->GetSceneNode()->
                         getUserObjectBindings().getUserAny("reflectance_map");
@@ -662,7 +664,7 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       // set the material for the models
       Ogre::ResourcePtr res =
           Ogre::MaterialManager::getSingleton().getByName(material);
-      if (res.isNull())
+      if (res.isnullptr())
       {
         Ogre::MaterialManager::getSingleton().load(material,
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -688,5 +690,5 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       return technique;
     }
   }
-  return nullptr;
+  return nullptrptr;
 }

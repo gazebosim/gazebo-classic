@@ -23,7 +23,6 @@
 
 namespace gazebo
 {
-  
   class VisualUtilsPrivate;
 
   /// \brief Plugin that creates
