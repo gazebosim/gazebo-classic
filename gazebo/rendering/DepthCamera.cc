@@ -664,7 +664,7 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       // set the material for the models
       Ogre::ResourcePtr res =
           Ogre::MaterialManager::getSingleton().getByName(material);
-      if (res.isnullptr())
+      if (res.isNull())
       {
         Ogre::MaterialManager::getSingleton().load(material,
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
