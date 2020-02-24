@@ -2217,10 +2217,23 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 ignition::math::Box Visual::BoundingBox() const
 {
-  ignition::math::Box box(
-      ignition::math::Vector3d::Zero,
-      ignition::math::Vector3d::Zero);
+  ignition::math::Box emptyBox;
+  emptyBox.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
+      ignition::math::MAX_D);
+  emptyBox.Max().Set(-ignition::math::MAX_D, -ignition::math::MAX_D,
+     -ignition::math::MAX_D);
+
+  ignition::math::Box box = emptyBox;
   this->BoundsHelper(this->GetSceneNode(), box);
+
+  // return zero size box if bbox is empty to avoid breaking other features,
+  // e.g. CoM visualization of empty visual
+  if (box == emptyBox)
+  {
+     return ignition::math::Box(ignition::math::Vector3d::Zero,
+         ignition::math::Vector3d::Zero);
+  }
+
   return box;
 }
 
