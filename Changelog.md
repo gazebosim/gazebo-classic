@@ -2,6 +2,9 @@
 
 ## Gazebo 9.XX.X (2020-XX-XX)
 
+1. Fix bounding box calculation for visuals that have links with pose offset
+    * [Pull request 3196](https://bitbucket.org/osrf/gazebo/pull-request/3196)
+
 ## Gazebo 9.12.0 (2020-01-31)
 
 1. Fix gazebo9 build and run on Windows, Ogre 1.10
