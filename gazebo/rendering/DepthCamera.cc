@@ -333,7 +333,7 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
           Ogre::Material *_material, const std::string &_matName)
 {
   Ogre::RenderSystem *renderSys;
-  Ogre::Viewport *vp = nullptrptr;
+  Ogre::Viewport *vp = nullptr;
   Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
   Ogre::Pass *pass;
 
@@ -519,7 +519,7 @@ ReflectanceMaterialSwitcher::ReflectanceMaterialSwitcher(
   if (!this->viewport)
   {
     gzerr << "Cannot create a material switcher for the reflectance material. "
-          << "viewport is nullptrptr" << std::endl;
+          << "viewport is nullptr" << std::endl;
     return;
   }
 
@@ -607,7 +607,7 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
     {
       gzerr << "Unable to get an Ogre sub-entity in reflectance "
           << "material listener" << std::endl;
-      return nullptrptr;
+      return nullptr;
     }
 
     // use the original material for gui visuals
@@ -625,11 +625,11 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       {
         gzerr << "Unable to get an Ogre entity in reflectance material listener"
             << std::endl;
-        return nullptrptr;
+        return nullptr;
       }
 
       if (entity->getUserObjectBindings().getUserAny().isEmpty())
-        return nullptrptr;
+        return nullptr;
 
       std::string userAny = "";
       try
@@ -641,13 +641,13 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       {
         gzerr << "Unable to cast Ogre user data in reflectance "
             << "material listener" << std::endl;
-        return nullptrptr;
+        return nullptr;
       }
 
       rendering::VisualPtr visual = scene->GetVisual(userAny);
 
       if (!visual)
-        return nullptrptr;
+        return nullptr;
 
       const Ogre::Any reflectanceMapAny = visual->GetSceneNode()->
                         getUserObjectBindings().getUserAny("reflectance_map");
@@ -690,5 +690,5 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       return technique;
     }
   }
-  return nullptrptr;
+  return nullptr;
 }
