@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
 
 namespace gazebo
 {
@@ -31,7 +31,7 @@ namespace gazebo
     class BaseInspectorDialogPrivate
     {
       /// \brief Vector of color options.
-      public: std::vector<common::Color> colorList;
+      public: std::vector<ignition::math::Color> colorList;
 
       /// \brief Vector of texture options.
       public: std::vector<std::string> textureList;

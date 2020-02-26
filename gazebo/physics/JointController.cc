@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/algorithm/string.hpp>
 
 #include "gazebo/transport/Node.hh"
@@ -204,8 +198,8 @@ void JointController::Update()
 }
 
 /////////////////////////////////////////////////
-void JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
-    ignition::msgs::JointCmd &_rep, bool &_result)
+bool JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
+    ignition::msgs::JointCmd &_rep)
 {
   const std::string &jointName = _req.data();
   _rep.set_name(jointName);
@@ -250,7 +244,7 @@ void JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
         this->dataPtr->velPids[jointName].GetIGain());
   }
 
-  _result = true;
+  return true;
 }
 
 /////////////////////////////////////////////////

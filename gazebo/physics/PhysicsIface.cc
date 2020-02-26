@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/thread/mutex.hpp>
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -82,6 +76,24 @@ physics::WorldPtr physics::get_world(const std::string &_name)
   gzerr << "Unable to find world by name in physics::get_world["
     << _name.c_str() << "]\n";
   gzthrow("Unable to find world by name in physics::get_world(world_name)");
+}
+
+/////////////////////////////////////////////////
+bool physics::has_world(const std::string &_name)
+{
+  if (_name.empty())
+  {
+    return !g_worlds.empty();
+  }
+  else
+  {
+    for (auto const &world : g_worlds)
+    {
+      if (world->Name() == _name)
+        return true;
+    }
+  }
+  return false;
 }
 
 /////////////////////////////////////////////////

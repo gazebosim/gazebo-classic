@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include "gazebo/common/Exception.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/MultiRayShape.hh"
@@ -210,20 +204,6 @@ bool MultiRayShape::SetRay(const unsigned int _rayIndex,
 }
 
 //////////////////////////////////////////////////
-void MultiRayShape::AddRay(const math::Vector3 &_start,
-                           const math::Vector3 &_end)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->AddRay(_start.Ign(), _end.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void MultiRayShape::AddRay(const ignition::math::Vector3d &/*_start*/,
                            const ignition::math::Vector3d &/*_end*/)
 {
@@ -266,35 +246,9 @@ double MultiRayShape::GetScanResolution() const
 }
 
 //////////////////////////////////////////////////
-math::Angle MultiRayShape::GetMinAngle() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->MinAngle();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle MultiRayShape::MinAngle() const
 {
   return this->horzElem->Get<double>("min_angle");
-}
-
-//////////////////////////////////////////////////
-math::Angle MultiRayShape::GetMaxAngle() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->MaxAngle();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -322,38 +276,12 @@ double MultiRayShape::GetVerticalScanResolution() const
 }
 
 //////////////////////////////////////////////////
-math::Angle MultiRayShape::GetVerticalMinAngle() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->VerticalMinAngle();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle MultiRayShape::VerticalMinAngle() const
 {
   if (this->vertElem)
     return this->vertElem->Get<double>("min_angle");
   else
     return ignition::math::Angle::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Angle MultiRayShape::GetVerticalMaxAngle() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->VerticalMaxAngle();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

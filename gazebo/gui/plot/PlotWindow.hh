@@ -39,7 +39,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the parent widget.
-      public: PlotWindow(QWidget *_parent = nullptr);
+      public: explicit PlotWindow(QWidget *_parent = nullptr);
 
       /// \brief Destructor.
       public: virtual ~PlotWindow();

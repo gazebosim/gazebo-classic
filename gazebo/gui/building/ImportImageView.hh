@@ -46,7 +46,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Widget.
-      public: ImportImageView(ImportImageDialog *_parent = 0);
+      public: explicit ImportImageView(ImportImageDialog *_parent = 0);
 
       /// \brief Destructor
       public: ~ImportImageView();

@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/thread/recursive_mutex.hpp>
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
@@ -106,19 +100,6 @@ void MeshShape::Init()
 void MeshShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   this->sdf->GetElement("scale")->Set(_scale);
-}
-
-//////////////////////////////////////////////////
-math::Vector3 MeshShape::GetSize() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Size();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

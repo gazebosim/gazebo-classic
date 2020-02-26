@@ -50,7 +50,7 @@ void SpeedPR2Test::PR2World(const std::string &_physicsEngine)
   std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
             << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
-#ifdef BUILD_TYPE_RELEASE
+#ifdef GAZEBO_BUILD_TYPE_RELEASE
   EXPECT_GT(speedRatio, 0.5);
 #else
   EXPECT_GT(speedRatio, 0.3);

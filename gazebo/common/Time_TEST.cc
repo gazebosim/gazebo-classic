@@ -15,8 +15,11 @@
  *
 */
 
-#include <sys/time.h>
 #include <gtest/gtest.h>
+
+#ifdef _WIN32
+  #include <winsock.h>  // timeval
+#endif
 
 #include "gazebo/common/Time.hh"
 #include "test/util.hh"
@@ -29,7 +32,8 @@ class TimeTest : public gazebo::testing::AutoLogFixture { };
 TEST_F(TimeTest, Time)
 {
   struct timeval tv;
-  gettimeofday(&tv, nullptr);
+  tv.tv_sec = 10;
+  tv.tv_usec = 100;
   common::Time time(tv);
   EXPECT_EQ(time.sec, tv.tv_sec);
   EXPECT_EQ(time.nsec, tv.tv_usec * 1000);

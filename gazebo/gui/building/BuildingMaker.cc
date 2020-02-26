@@ -14,15 +14,9 @@
  * limitations under the License.
  *
  */
-
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/gazebo_config.h"
 
@@ -176,8 +170,8 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
       manip, SLOT(OnRotationChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(LevelChanged(int)),
       manip, SLOT(OnLevelChanged(int)));
-  QObject::connect(_item, SIGNAL(ColorChanged(common::Color)),
-      manip, SLOT(OnColorChanged(common::Color)));
+  QObject::connect(_item, SIGNAL(ColorChanged(ignition::math::Color)),
+      manip, SLOT(OnColorChanged(ignition::math::Color)));
   QObject::connect(_item, SIGNAL(TextureChanged(std::string)),
       manip, SLOT(OnTextureChanged(std::string)));
   QObject::connect(_item, SIGNAL(TransparencyChanged(float)),
@@ -200,8 +194,8 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
   QObject::connect(_item, SIGNAL(ItemDeleted()), manip, SLOT(OnDeleted()));
 
   // manip changes -> item changes
-  QObject::connect(manip, SIGNAL(ColorChanged(common::Color)),
-      _item, SLOT(OnColorChanged(common::Color)));
+  QObject::connect(manip, SIGNAL(ColorChanged(ignition::math::Color)),
+      _item, SLOT(OnColorChanged(ignition::math::Color)));
   QObject::connect(manip, SIGNAL(TextureChanged(std::string)),
       _item, SLOT(OnTextureChanged(std::string)));
 }
@@ -322,7 +316,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
-      ->Set(gazebo::common::Color(1, 1, 1));
+      ->Set(ignition::math::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
   auto scaledSize = BuildingMaker::ConvertSize(_size.x(), _size.y(), _size.z());
@@ -477,7 +471,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
-      ->Set(gazebo::common::Color(1, 1, 1));
+      ->Set(ignition::math::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
 
   // Relative size of each step within the parent visual
@@ -542,7 +536,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
-      ->Set(gazebo::common::Color(1, 1, 1));
+      ->Set(ignition::math::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
@@ -1774,9 +1768,10 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
       this->dataPtr->hoverVis = vis;
       if (this->dataPtr->selectedColor.isValid())
       {
-        common::Color newColor(this->dataPtr->selectedColor.red(),
+        ignition::math::Color newColor(this->dataPtr->selectedColor.red(),
                                this->dataPtr->selectedColor.green(),
-                               this->dataPtr->selectedColor.blue());
+                               this->dataPtr->selectedColor.blue(),
+                               1.0f);
         this->dataPtr->hoverVis->SetAmbient(newColor);
       }
       else if (this->dataPtr->selectedTexture != "")

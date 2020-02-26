@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <vector>
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -89,12 +83,6 @@ Road2d::~Road2d()
       reinterpret_cast<Road2dPrivate *>(this->dataPtr);
 
   dPtr->segments.clear();
-}
-
-/////////////////////////////////////////////////
-void Road2d::Load(VisualPtr /*_parent*/)
-{
-  // This function is deprecated. Remove in gazebo9
 }
 
 //////////////////////////////////////////////////

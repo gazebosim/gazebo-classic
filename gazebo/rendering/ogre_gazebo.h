@@ -37,6 +37,7 @@
 #include <OGRE/OgreSceneManager.h>
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreVector3.h>
+#include <OGRE/OgreMatrix4.h>
 #include <OGRE/OgreManualObject.h>
 #include <OGRE/OgreMaterialManager.h>
 #include <OGRE/OgreColourValue.h>
@@ -68,6 +69,8 @@
 #include <OGRE/RTShaderSystem/OgreShaderProgramSet.h>
 #include <OGRE/RTShaderSystem/OgreShaderGLSLProgramWriter.h>
 #include <OGRE/RTShaderSystem/OgreShaderProgramWriterManager.h>
+#include <OGRE/RTShaderSystem/OgreShaderFunction.h>
+#include <OGRE/RTShaderSystem/OgreShaderProgram.h>
 #endif
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9

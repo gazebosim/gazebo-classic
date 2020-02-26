@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
@@ -470,10 +464,4 @@ void Sensor::ResetLastUpdateTime()
 event::ConnectionPtr Sensor::ConnectUpdated(std::function<void()> _subscriber)
 {
   return this->dataPtr->updated.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
-{
-  this->dataPtr->updated.Disconnect(_c->Id());
 }

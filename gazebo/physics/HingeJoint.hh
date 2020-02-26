@@ -38,7 +38,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent link
-      public: HingeJoint(BasePtr _parent) : T(_parent)
+      public: explicit HingeJoint(BasePtr _parent) : T(_parent)
               { this->AddType(Base::HINGE_JOINT); }
       ///  \brief Destructor
       public: virtual ~HingeJoint()

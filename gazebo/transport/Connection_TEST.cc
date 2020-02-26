@@ -27,6 +27,20 @@ using namespace gazebo;
 class Connection : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
+#ifdef _WIN32
+static int setenv(const char *envname, const char *envval, int overwrite)
+{
+  char *original = getenv(envname);
+  if (!original || !!overwrite)
+  {
+    std::string envstring = std::string(envname) + "=" + envval;
+    return _putenv(envstring.c_str());
+  }
+  return 0;
+}
+#endif
+
+/////////////////////////////////////////////////
 TEST_F(Connection, IPWhiteList)
 {
   transport::Connection *connection = new transport::Connection();

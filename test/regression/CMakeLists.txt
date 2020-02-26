@@ -17,8 +17,8 @@ if(HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 if(HAVE_DART)
-  include_directories ( ${DARTCore_INCLUDE_DIRS} )
-  link_directories ( ${DARTCore_LIBRARY_DIRS} )
+  include_directories ( ${DART_INCLUDE_DIRS} )
+  link_directories ( ${DART_LIBRARY_DIRS} )
 endif()
 
 set(tests
@@ -42,6 +42,7 @@ set(tests
   2297_log_insertions_paused.cc
   2428_log_insertions.cc
   2430_revolute_joint_SetPosition.cc
+  2505_revolute_joint_SetAxis.cc
 )
 gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 

@@ -218,19 +218,6 @@ void BulletBallJoint::SetLowerLimit(const unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletBallJoint::GetAxis(unsigned int /*_index*/) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return ignition::math::Vector3d::Zero;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void BulletBallJoint::SetAxis(const unsigned int /*_index*/,
                         const ignition::math::Vector3d &/*_axis*/)
 {

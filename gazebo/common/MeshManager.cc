@@ -79,6 +79,7 @@ MeshManager::MeshManager()
   this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
 
   this->fileExtensions.push_back("stl");
+  this->fileExtensions.push_back("stlb");
   this->fileExtensions.push_back("dae");
   this->fileExtensions.push_back("obj");
 }
@@ -360,7 +361,7 @@ void MeshManager::CreatePlane(const std::string &_name,
 
   rot = rot3;
 
-  xlate.Translate(_normal * -_d);
+  xlate.SetTranslation(_normal * -_d);
   xform = xlate * rot;
   if (!xform.IsAffine())
   {

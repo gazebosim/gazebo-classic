@@ -18,12 +18,6 @@
 #ifndef GAZEBO_PLUGINS_EVENTSOURCE_HH_
 #define GAZEBO_PLUGINS_EVENTSOURCE_HH_
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-#include <Winsock2.h>
-#endif
-
 #include <memory>
 #include <string>
 
@@ -96,14 +90,6 @@ namespace gazebo
         static event::ConnectionPtr
             ConnectSpawnModel(T _subscriber)
       { return spawnModel.Connect(_subscriber); }
-
-    /// \brief Disconnect a callback to the spawn model event
-    /// \param[in] _subscriber the subscriber to this event
-    /// \deprecated Use event::~Connection to disconnect
-    public: static void DisconnectSpawnModel(
-        event::ConnectionPtr _subscriber)
-        GAZEBO_DEPRECATED(8.0)
-      { spawnModel.Disconnect(_subscriber->Id()); }
 
     /// \brief A model has been completed and uploaded onto the server.
     public: static event::EventT<void (std::string, bool)> spawnModel;

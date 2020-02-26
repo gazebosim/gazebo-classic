@@ -579,7 +579,8 @@ double BulletJoint::GetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-bool BulletJoint::SetPosition(unsigned int _index, const double _position)
+bool BulletJoint::SetPosition(const unsigned int _index, const double _position,
+                              const bool _preserveWorldVelocity)
 {
   // The code inside this ifdef is only relevant for versions of bullet greater
   // than 2.82. Any versions earlier than that will be broken no matter what.
@@ -613,7 +614,7 @@ bool BulletJoint::SetPosition(unsigned int _index, const double _position)
       // this joint angle. The end result should put this joint angle within
       // the range of [-pi, pi]. That should at least bring it back to a sane
       // state, even if it's not exactly what the user asked for.
-      Joint::SetPositionMaximal(_index, _position);
+      Joint::SetPositionMaximal(_index, _position, _preserveWorldVelocity);
 
       return false;
     }
@@ -634,7 +635,8 @@ bool BulletJoint::SetPosition(unsigned int _index, const double _position)
         currentAngle = _position;
       }
 
-      if (!Joint::SetPositionMaximal(_index, currentAngle))
+      if (!Joint::SetPositionMaximal(_index, currentAngle,
+                                     _preserveWorldVelocity))
       {
         return false;
       }
@@ -644,5 +646,5 @@ bool BulletJoint::SetPosition(unsigned int _index, const double _position)
   }
 #endif
 
-  return Joint::SetPositionMaximal(_index, _position);
+  return Joint::SetPositionMaximal(_index, _position, _preserveWorldVelocity);
 }

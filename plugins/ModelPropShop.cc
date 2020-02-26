@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <functional>
 
 #include <boost/program_options.hpp>
@@ -168,9 +162,9 @@ void ModelPropShop::Update()
     lightMsg.set_name("propshop_light");
     lightMsg.set_type(gazebo::msgs::Light::DIRECTIONAL);
     gazebo::msgs::Set(lightMsg.mutable_diffuse(),
-                      gazebo::common::Color(1, 1, 1, 1));
+                      ignition::math::Color(1, 1, 1, 1));
     gazebo::msgs::Set(lightMsg.mutable_specular(),
-                      gazebo::common::Color(.2, .2, .2, 1));
+                      ignition::math::Color(.2, .2, .2, 1));
     gazebo::msgs::Set(lightMsg.mutable_direction(),
                       ignition::math::Vector3d(-0.5, 0.1, -0.9));
     lightMsg.set_cast_shadows(false);

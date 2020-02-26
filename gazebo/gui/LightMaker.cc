@@ -14,15 +14,10 @@
  * limitations under the License.
  *
 */
-
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <iostream>
 #include <sstream>
+
+#include <boost/lexical_cast.hpp>
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/rendering/UserCamera.hh"
@@ -46,9 +41,9 @@ LightMaker::LightMaker() : dataPtr(new LightMakerPrivate)
       this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
 
   msgs::Set(this->msg.mutable_diffuse(),
-      common::Color(0.5, 0.5, 0.5, 1));
+      ignition::math::Color(0.5, 0.5, 0.5, 1));
   msgs::Set(this->msg.mutable_specular(),
-      common::Color(0.1, 0.1, 0.1, 1));
+      ignition::math::Color(0.1, 0.1, 0.1, 1));
 
   this->msg.set_attenuation_constant(0.5);
   this->msg.set_attenuation_linear(0.01);
@@ -77,7 +72,7 @@ bool LightMaker::InitFromLight(const std::string &_lightName)
     this->dataPtr->light.reset();
   }
 
-  rendering::LightPtr sceneLight = scene->GetLight(_lightName);
+  rendering::LightPtr sceneLight = scene->LightByName(_lightName);
   if (!sceneLight)
   {
     gzerr << "Light: '" << _lightName << "' does not exist." << std::endl;
@@ -97,7 +92,7 @@ bool LightMaker::InitFromLight(const std::string &_lightName)
 
   std::string newName = _lightName + "_clone";
   int i = 0;
-  while (scene->GetLight(newName))
+  while (scene->LightByName(newName))
   {
     newName = _lightName + "_clone_" +
       boost::lexical_cast<std::string>(i);
@@ -132,7 +127,7 @@ bool LightMaker::Init()
   {
     lightName = "user_" + this->lightTypename + "_light_" +
         std::to_string(counter++);
-  } while (scene->GetLight(lightName));
+  } while (scene->LightByName(lightName));
   this->msg.set_name(lightName);
 
   return true;

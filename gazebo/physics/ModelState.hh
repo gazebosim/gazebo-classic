@@ -24,7 +24,6 @@
 
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
-#include "gazebo/math/Pose.hh"
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/LinkState.hh"
@@ -94,11 +93,6 @@ namespace gazebo
       /// Load ModelState information from stored data in and SDF::Element
       /// \param[in] _elem Pointer to the SDF::Element containing state info.
       public: virtual void Load(const sdf::ElementPtr _elem);
-
-      /// \brief Get the stored model pose.
-      /// \return The gazebo::math::Pose of the Model.
-      /// \deprecated See function that returns ign-math.
-      public: const math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the stored model pose.
       /// \return The ignition::math::Pose3d of the Model.

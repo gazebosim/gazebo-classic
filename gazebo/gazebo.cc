@@ -14,13 +14,6 @@
  * limitations under the License.
  *
  */
-
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <vector>
 #include <boost/bind.hpp>
 #include <boost/thread/mutex.hpp>
@@ -33,7 +26,6 @@
 #include "gazebo/common/common.hh"
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/LogRecord.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gazebo_shared.hh"
 #include "gazebo/gazebo.hh"

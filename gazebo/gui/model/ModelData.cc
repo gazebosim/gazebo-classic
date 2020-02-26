@@ -14,13 +14,6 @@
  * limitations under the License.
  *
  */
-
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/thread/recursive_mutex.hpp>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/MassMatrix3.hh>
@@ -656,7 +649,7 @@ void LinkData::UpdateConfig()
     updateMsg->clear_scale();
     msgs::Material *matMsg = updateMsg->mutable_material();
     // clear empty colors so they are not used by visual updates
-    common::Color emptyColor;
+    ignition::math::Color emptyColor(0, 0, 0, 0);
     if (msgs::Convert(matMsg->ambient()) == emptyColor)
       matMsg->clear_ambient();
     if (msgs::Convert(matMsg->diffuse()) == emptyColor)
@@ -1181,18 +1174,18 @@ bool LinkData::Apply()
         msgs::Material *matMsg = updateMsg->mutable_material();
         msgs::Material::Script *scriptMsg = matMsg->mutable_script();
 
-        common::Color emptyColor;
-        common::Color matAmbient;
-        common::Color matDiffuse;
-        common::Color matSpecular;
-        common::Color matEmissive;
-        rendering::Material::GetMaterialAsColor(scriptMsg->name(), matAmbient,
+        ignition::math::Color matAmbient;
+        ignition::math::Color matDiffuse;
+        ignition::math::Color matSpecular;
+        ignition::math::Color matEmissive;
+        rendering::Material::MaterialAsColor(scriptMsg->name(), matAmbient,
             matDiffuse, matSpecular, matEmissive);
 
-        common::Color ambient = msgs::Convert(matMsg->ambient());
-        common::Color diffuse = msgs::Convert(matMsg->diffuse());
-        common::Color specular = msgs::Convert(matMsg->specular());
-        common::Color emissive = msgs::Convert(matMsg->emissive());
+        ignition::math::Color emptyColor(0, 0, 0, 0);
+        auto ambient = msgs::Convert(matMsg->ambient());
+        auto diffuse = msgs::Convert(matMsg->diffuse());
+        auto specular = msgs::Convert(matMsg->specular());
+        auto emissive = msgs::Convert(matMsg->emissive());
 
         if (ambient == emptyColor)
         {

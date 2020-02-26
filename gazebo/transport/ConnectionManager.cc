@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/bind.hpp>
 
 #include "gazebo/msgs/msgs.hh"
@@ -49,7 +43,7 @@ class TopicManagerConnectionTask : public tbb::task
 {
   /// \brief Constructor.
   /// \param[in] _pub Publish message
-  public: TopicManagerConnectionTask(msgs::Publish _pub) : pub(_pub) {}
+  public: explicit TopicManagerConnectionTask(msgs::Publish _pub) : pub(_pub) {}
 
   /// Implements the necessary execute function
   public: tbb::task *execute()

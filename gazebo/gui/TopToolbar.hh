@@ -29,13 +29,13 @@ namespace gazebo
     class TopToolbarPrivate;
 
     /// \brief Toolbar on the top of the main window.
-    class GAZEBO_VISIBLE TopToolbar : public QFrame
+    class GZ_GUI_VISIBLE TopToolbar : public QFrame
     {
       Q_OBJECT
 
       /// \brief Constructor.
       /// \param[in] _parent Parent widget.
-      public: TopToolbar(QWidget *_parent = 0);
+      public: explicit TopToolbar(QWidget *_parent = 0);
 
       /// \brief Destructor.
       public: virtual ~TopToolbar();

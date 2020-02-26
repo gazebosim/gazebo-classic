@@ -132,9 +132,9 @@ endmacro()
 
 #################################################
 macro (gz_setup_windows)
-    # Using static linking in Windows by default
-    set(BUILD_SHARED_LIBS FALSE)
-    add_definitions(-DBUILDING_STATIC_LIBS -DWIN32_LEAN_AND_MEAN)
+    # Using dynamic linking in Windows by default
+    set(BUILD_SHARED_LIBS TRUE)
+    add_definitions(-DWIN32_LEAN_AND_MEAN)
 
     # Need for M_PI constant
     add_definitions(-D_USE_MATH_DEFINES)
@@ -148,12 +148,8 @@ macro (gz_setup_windows)
     # Use dynamic linking for boost
     add_definitions(-DBOOST_ALL_DYN_LINK)
 
-    # And force linking to MSVC dynamic runtime
-    if ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "DEBUG")
-      add_definitions("/MDd")
-    else()
-      add_definitions("/MD")
-    endif()
+    # Use dynamic linking for protobuf
+    add_definitions(-DPROTOBUF_USE_DLLS)
 
     # And we want exceptions
     add_definitions("/EHsc")
@@ -163,6 +159,10 @@ macro (gz_setup_windows)
       # Enable as a second measure to workaround over bug
       # http://www.cmake.org/Bug/print_bug_page.php?bug_id=11240
       set(CMAKE_SHARED_LINKER_FLAGS "/machine:x64")
+    endif()
+
+    if (MSVC)
+      add_compile_options(/Zc:__cplusplus)
     endif()
 endmacro()
 

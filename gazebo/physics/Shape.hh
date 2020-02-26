@@ -17,12 +17,6 @@
 #ifndef GAZEBO_PHYSICS_SHAPE_HH_
 #define GAZEBO_PHYSICS_SHAPE_HH_
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <string>
 #include <ignition/math/Vector3.hh>
 
@@ -56,18 +50,7 @@ namespace gazebo
 
       /// \brief Set the scale of the shape.
       /// \param[in] _scale Scale to set the shape to.
-      //// \deprecated See version that accepts an ignition math object.
-      public: virtual void SetScale(const math::Vector3 &_scale)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the scale of the shape.
-      /// \param[in] _scale Scale to set the shape to.
       public: virtual void SetScale(const ignition::math::Vector3d &_scale) = 0;
-
-      /// \brief Get the scale of the shape.
-      /// \return Scale of the shape.
-      /// \deprecated See ignition::math::Vector3d Scale() const
-      public: virtual math::Vector3 GetScale() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the scale of the shape.
       /// \return Scale of the shape.

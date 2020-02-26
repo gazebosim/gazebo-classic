@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include "gazebo/common/Console.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -342,7 +336,7 @@ void MarkerVisual::FillMsg(ignition::msgs::Marker &_msg)
   ignition::msgs::Set(_msg.mutable_pose(), this->Pose());
 
   if (this->dPtr->text)
-    _msg.set_text(this->dPtr->text->GetText());
+    _msg.set_text(this->dPtr->text->Text());
 
   if (this->GetParent())
     _msg.set_parent(this->GetParent()->Name());

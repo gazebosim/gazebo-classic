@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/algorithm/string.hpp>
 
 #include "gazebo/physics/World.hh"
@@ -289,10 +283,4 @@ event::ConnectionPtr ForceTorqueSensor::ConnectUpdate(
     std::function<void (msgs::WrenchStamped)> _subscriber)
 {
   return this->dataPtr->update.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void ForceTorqueSensor::DisconnectUpdate(event::ConnectionPtr &_conn)
-{
-  this->dataPtr->update.Disconnect(_conn->Id());
 }

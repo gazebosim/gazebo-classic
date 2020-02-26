@@ -21,6 +21,8 @@
 #include <map>
 #include <vector>
 
+#include <ignition/math/Color.hh>
+
 #include "gazebo/physics/Model.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Animation.hh"
@@ -31,7 +33,6 @@ namespace gazebo
   namespace common
   {
     class Mesh;
-    class Color;
     class Skeleton;
   }
 
@@ -114,6 +115,10 @@ namespace gazebo
       /// \return Pointer to the SDF values.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Reset the actor.
+      public: void Reset();
+      using Model::Reset;
+
       /// \brief Set the current script time.
       /// \param[in] _time Time in seconds from the beginning of the current
       /// script loop.
@@ -138,6 +143,10 @@ namespace gazebo
       /// \param[in] _trajInfo Information about custom trajectory.
       /// \sa ResetCustomTrajectory, SetScriptTime
       public: void SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo);
+
+      /// \brief Returns the actor's mesh.
+      /// \return The actor's mesh.
+      public: const common::Mesh *Mesh() const;
 
       /// \brief Get the custom trajectory.
       /// \return The custom trajectory or Null if SetCustomTrajectory has
@@ -216,7 +225,8 @@ namespace gazebo
       private: void AddSphereVisual(const sdf::ElementPtr &_linkSdf,
                    const std::string &_name,
                    const ignition::math::Pose3d &_pose, const double _radius,
-                   const std::string &_material, const common::Color &_ambient);
+                   const std::string &_material,
+                   const ignition::math::Color &_ambient);
 
       /// \brief Add a box visual object.
       /// \param[in] _linkSdf Link to add the visual to.
@@ -230,7 +240,7 @@ namespace gazebo
                    const ignition::math::Pose3d &_pose,
                    const ignition::math::Vector3d &_size,
                    const std::string &_material,
-                   const common::Color &_ambient);
+                   const ignition::math::Color &_ambient);
 
       /// \brief Add a visual to the given link which holds the actor's skin.
       /// \param[in] _linkSdf Link to add the visual to.

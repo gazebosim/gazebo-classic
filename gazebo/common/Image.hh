@@ -22,21 +22,13 @@
 #ifndef _IMAGE_HH_
 #define _IMAGE_HH_
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
-#ifdef BOOL
-#undef BOOL
-#endif
-#include <FreeImage.h>
 #include <string>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/common/Color.hh"
 #include "gazebo/util/system.hh"
 
+struct FIBITMAP;
 namespace gazebo
 {
   namespace common
@@ -172,15 +164,34 @@ namespace gazebo
       /// \param[in] _x Column location in the image
       /// \param[in] _y Row location in the image
       /// \return The color of the given pixel
-      public: Color GetPixel(unsigned int _x, unsigned int _y) const;
+      /// \deprecated See function that returns ignition::math::Color.
+      public: Color GetPixel(unsigned int _x, unsigned int _y) const
+          GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Get a pixel color value
+      /// \param[in] _x Column location in the image
+      /// \param[in] _y Row location in the image
+      /// \return The color of the given pixel
+      public: ignition::math::Color Pixel(const unsigned int _x,
+                                          const unsigned int _y) const;
 
       /// \brief Get the average color
       /// \return The average color
-      public: Color GetAvgColor();
+      /// \deprecated See function that returns ignition::math::Color.
+      public: Color GetAvgColor() GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Get the average color
+      /// \return The average color
+      public: ignition::math::Color AvgColor();
 
       /// \brief Get the max color
       /// \return The max color
-      public: Color GetMaxColor() const;
+      /// \deprecated See function that returns ignition::math::Color.
+      public: Color GetMaxColor() const GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Get the max color
+      /// \return The max color
+      public: ignition::math::Color MaxColor() const;
 
       /// \brief Rescale the image
       /// \param[in] _width New image width

@@ -15,8 +15,6 @@
  *
 */
 
-#include "gazebo/math/Vector3.hh"
-
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/OriginVisualPrivate.hh"
 #include "gazebo/rendering/OriginVisual.hh"

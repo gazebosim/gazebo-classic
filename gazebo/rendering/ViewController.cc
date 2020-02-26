@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/ViewController.hh"
 
@@ -37,20 +31,6 @@ ViewController::ViewController(UserCameraPtr _cam)
 //////////////////////////////////////////////////
 ViewController::~ViewController()
 {
-}
-
-//////////////////////////////////////////////////
-void ViewController::Init(const math::Vector3 &_focalPoint,
-    double _yaw, double _pitch)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->Init(_focalPoint.Ign(), _yaw, _pitch);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/algorithm/string.hpp>
 
 #include <ignition/math/Vector3.hh>
@@ -356,11 +350,5 @@ event::ConnectionPtr SonarSensor::ConnectUpdate(
     std::function<void (msgs::SonarStamped)> _subscriber)
 {
   return this->dataPtr->update.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void SonarSensor::DisconnectUpdate(event::ConnectionPtr &_conn)
-{
-  this->dataPtr->update.Disconnect(_conn->Id());
 }
 

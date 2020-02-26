@@ -28,6 +28,8 @@
 #include <deque>
 #include <sdf/sdf.hh>
 #include <ignition/math/Angle.hh>
+#include <ignition/math/Color.hh>
+#include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector2.hh>
@@ -42,9 +44,11 @@
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"
 
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/util/system.hh"
 
 // Forward Declarations
@@ -60,11 +64,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace math
-  {
-    class Pose;
-  }
-
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
   namespace rendering
@@ -95,12 +94,87 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Camera();
 
-      /// \brief Load the camera with a set of parmeters
+      /// \brief Load the camera with a set of parameters
       /// \param[in] _sdf The SDF camera info
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Load the camera with default parmeters
+      /// \brief Load the camera with default parameters
       public: virtual void Load();
+
+      /// \brief Updates the camera intrinsics
+      /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
+      /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
+      /// \param[in] _intrinsicsCx X coordinate of principal point in pixels
+      /// \param[in] _intrinsicsCy Y coordinate of principal point in pixels
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between
+      ///            the x and y pixel axes
+      public: void UpdateCameraIntrinsics(
+          const double _cameraIntrinsicsFx, const double _cameraIntrinsicsFy,
+          const double _cameraIntrinsicsCx, const double _cameraIntrinsicsCy,
+          const double _cameraIntrinsicsS);
+
+      /// \brief Computes the OpenGL NDC matrix
+      /// \param[in] _left Left vertical clipping plane
+      /// \param[in] _right Right vertical clipping plane
+      /// \param[in] _bottom Bottom horizontal clipping plane
+      /// \param[in] _top Top horizontal clipping plane
+      /// \param[in] _near Distance to the nearer depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \param[in] _far Distance to the farther depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \return OpenGL NDC (Normalized Device Coordinates) matrix
+      public: static ignition::math::Matrix4d BuildNDCMatrix(
+              const double _left, const double _right,
+              const double _bottom, const double _top,
+              const double _near, const double _far);
+
+      /// \brief Computes the OpenGL perspective matrix
+      /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
+      /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
+      /// \param[in] _intrinsicsCx X coordinate of principal point in pixels
+      /// \param[in] _intrinsicsCy Y coordinate of principal point in pixels
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between
+      ///            the x and y pixel axes
+      /// \param[in] _clipNear Distance to the nearer depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \param[in] _clipFar Distance to the farther depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \return OpenGL perspective matrix
+      public: static ignition::math::Matrix4d BuildPerspectiveMatrix(
+              const double _intrinsicsFx, const double _intrinsicsFy,
+              const double _intrinsicsCx, const double _intrinsicsCy,
+              const double _intrinsicsS,
+              const double _clipNear, const double _clipFar);
+
+      /// \brief Computes the OpenGL projection matrix by multiplying
+      ///        the OpenGL Normalized Device Coordinates matrix (NDC) with
+      ///        the OpenGL perspective matrix
+      ///        openglProjectionMatrix = ndcMatrix * perspectiveMatrix
+      /// \param[in] _imageWidth Image width (in pixels)
+      /// \param[in] _imageHeight Image height (in pixels)
+      /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
+      /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
+      /// \param[in] _intrinsicsCx X coordinate of principal point in pixels
+      /// \param[in] _intrinsicsCy Y coordinate of principal point in pixels
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between
+      ///             the x and y pixel axes
+      /// \param[in] _clipNear Distance to the nearer depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \param[in] _clipFar Distance to the farther depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \return OpenGL projection matrix
+      public: static ignition::math::Matrix4d BuildProjectionMatrix(
+              const double _imageWidth, const double _imageHeight,
+              const double _intrinsicsFx, const double _intrinsicsFy,
+              const double _intrinsicsCx, const double _intrinsicsCy,
+              const double _intrinsicsS,
+              const double _clipNear, const double _clipFar);
 
       /// \brief Initialize the camera
       public: virtual void Init();
@@ -163,12 +237,6 @@ namespace gazebo
       public: ignition::math::Quaterniond WorldRotation() const;
 
       /// \brief Set the global pose of the camera
-      /// \param[in] _pose The new math::Pose of the camera
-      /// \deprecated See function that accepts an ignition::math parameter.
-      public: virtual void SetWorldPose(const math::Pose &_pose)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the global pose of the camera
       /// \param[in] _pose The new ignition::math::Pose3d of the camera
       public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);
 
@@ -224,8 +292,6 @@ namespace gazebo
 
       /// \brief Get the camera FOV (vertical)
       /// \return The vertical field of view
-      /// \deprecated See function that returns an ignition::math object.
-      /// \sa VFOV
       public: ignition::math::Angle VFOV() const;
 
       /// \brief Set the image size
@@ -511,12 +577,6 @@ namespace gazebo
           std::function<void (const unsigned char *, unsigned int, unsigned int,
           unsigned int, const std::string &)> _subscriber);
 
-      /// \brief Disconnect from an image frame
-      /// \param[in] _c The connection to disconnect
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewImageFrame(event::ConnectionPtr &_c)
-              GAZEBO_DEPRECATED(8.0);
-
       /// \brief Save a frame using an image buffer
       /// \param[in] _image The raw image buffer
       /// \param[in] _width Width of the image
@@ -591,7 +651,15 @@ namespace gazebo
       /// \brief Set background color for viewport (if viewport is not null)
       /// \param[in] _color Background color.
       /// \return True if successful. False if viewport is null
-      public: virtual bool SetBackgroundColor(const common::Color &_color);
+      /// \deprecated Use function which accepts ignition::math::Color.
+      public: virtual bool SetBackgroundColor(const common::Color &_color)
+          GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set background color for viewport (if viewport is not null)
+      /// \param[in] _color Background color.
+      /// \return True if successful. False if viewport is null
+      public: virtual bool SetBackgroundColor(
+          const ignition::math::Color &_color);
 
       /// \brief Return the projection matrix of this camera.
       /// \return the projection matrix
@@ -746,6 +814,12 @@ namespace gazebo
       /// \brief Set the clip distance based on stored SDF values
       protected: virtual void SetClipDist();
 
+      /// \brief Limit field of view taking care of using a valid value for
+      /// an OGRE camera.
+      /// \param[in] _fov expected field of view
+      /// \return valid field of view
+      protected: static double LimitFOV(const double _fov);
+
       /// \brief Tell the camera whether to yaw around its own local Y axis or a
       /// fixed axis of choice.
       /// \param[in] _useFixed If true, the axis passed in the second parameter
@@ -755,6 +829,9 @@ namespace gazebo
       protected: virtual void SetFixedYawAxis(const bool _useFixed,
           const ignition::math::Vector3d &_fixedAxis =
             ignition::math::Vector3d::UnitY);
+
+      /// \brief Load the camera intrinsics parameters from the sdf
+      private: void LoadCameraIntrinsics();
 
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats

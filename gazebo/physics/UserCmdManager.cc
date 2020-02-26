@@ -14,12 +14,6 @@
  * limitations under the License.
  *
  */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
@@ -110,7 +104,7 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->world = _world;
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->Init(_world->Name());
 
   this->dataPtr->userCmdSub = this->dataPtr->node->Subscribe("~/user_cmd",
       &UserCmdManager::OnUserCmdMsg, this, true);

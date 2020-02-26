@@ -241,7 +241,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _materialName Name of material
-      public: TerrainMaterial(const std::string &_materialName);
+      public: explicit TerrainMaterial(const std::string &_materialName);
 
       /// \brief Set terrain material
       /// \param[in] _materialName Name of material
@@ -452,6 +452,9 @@ namespace gazebo
 
       /// \brief Skirt length on LOD tiles
       public: double skirtLength = 1.0;
+
+      /// \brief Terrain casts shadows
+      public: bool castShadows = false;
 
       /// \brief True if the terrain need to be split into subterrains
       public: bool splitTerrain = false;

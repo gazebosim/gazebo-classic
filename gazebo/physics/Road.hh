@@ -24,7 +24,6 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/transport/Node.hh>
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/Base.hh"
 #include "gazebo/util/system.hh"
@@ -56,12 +55,6 @@ namespace gazebo
 
       /// \brief Finalize the road.
       public: virtual void Fini();
-
-      /// \brief Get the point that define the road.
-      /// \return The vector of points that define the road.
-      /// \deprecated See Points()
-      public: const std::vector<math::Vector3> GetPoints() const
-          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the points that define the road.
       /// \return The vector of points that define the road.

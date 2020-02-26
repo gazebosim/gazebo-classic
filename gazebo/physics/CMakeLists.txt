@@ -21,8 +21,8 @@ endif()
 if (HAVE_DART)
   add_subdirectory(dart)
 
-  include_directories(${DARTCore_INCLUDE_DIRS})
-  link_directories(${DARTCore_LIBRARY_DIRS})
+  include_directories(${DART_INCLUDE_DIRS})
+  link_directories(${DART_LIBRARY_DIRS})
 endif()
 
 # Add Simbody support if present
@@ -38,7 +38,6 @@ include_directories(${TBB_INCLUDEDIR})
 
 # Be sure to locate this definition *after* add_subdirectories
 # in order to get the proper visibility when building libs
-add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
 if (WIN32)
   include_directories(${libdl_include_dir})
 endif()
@@ -146,15 +145,18 @@ set (headers
   World.hh
   WorldState.hh)
 
-set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
+set (physics_headers "")
 foreach (hdr ${headers})
-  APPEND_TO_CACHED_STRING(physics_headers
-    "Physics Headers" "#include \"gazebo/physics/${hdr}\"\n")
+  set (physics_headers "${physics_headers}#include \"gazebo/physics/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
 gz_add_library(gazebo_physics ${sources})
+
+target_compile_definitions(gazebo_physics
+  PRIVATE BUILDING_DLL_GZ_PHYSICS
+)
 
 target_link_libraries(gazebo_physics
   gazebo_common
@@ -172,7 +174,7 @@ endif()
 
 # Link in DART support if present
 if (HAVE_DART)
-  target_link_libraries(gazebo_physics ${DARTCore_LIBRARIES})
+  target_link_libraries(gazebo_physics ${DART_LIBRARIES})
 endif()
 
 # Link in Simbody support if present
@@ -198,6 +200,7 @@ set (gtest_sources
   CylinderShape_TEST.cc
   Inertial_TEST.cc
   JointController_TEST.cc
+  JointState_TEST.cc
   ModelState_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc

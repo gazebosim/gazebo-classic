@@ -6,6 +6,7 @@
       <ambient>1.0 1.0 1.0 1.0</ambient>
       <grid>0</grid>
       <origin_visual>0</origin_visual>
+      <sky></sky>
     </scene>
 
     <model name="ground_plane">

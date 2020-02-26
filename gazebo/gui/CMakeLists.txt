@@ -195,7 +195,9 @@ gz_add_executable(gzclient main.cc ${resources_RCC})
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_gui)
 
-add_definitions(-DBUILDING_DLL_GZ_GUI)
+target_compile_definitions(gazebo_gui
+  PRIVATE BUILDING_DLL_GZ_GUI
+)
 
 target_link_libraries(gazebo_gui
   libgazebo_client
@@ -243,10 +245,9 @@ set (gtest_sources
 
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_gui)
 
-set (gui_headers "" CACHE INTERNAL "gui headers" FORCE)
+set (gui_headers "")
 foreach (hdr ${headers} ${qt_headers})
-  APPEND_TO_CACHED_STRING(gui_headers
-    "GUI Headers" "#include \"gazebo/gui/${hdr}\"\n")
+  set (gui_headers "${gui_headers}#include \"gazebo/gui/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR}/gui.hh )
 

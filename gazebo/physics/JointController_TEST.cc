@@ -23,8 +23,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include "gazebo/common/PID.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Angle.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/JointController.hh"
@@ -36,7 +34,7 @@ class JointControllerTest : public gazebo::testing::AutoLogFixture { };
 
 class FakeJoint : public physics::Joint
 {
-  public: FakeJoint(physics::ModelPtr _model) : physics::Joint(_model)
+  public: explicit FakeJoint(physics::ModelPtr _model) : physics::Joint(_model)
           {}
 
   public: virtual physics::LinkPtr GetJointLink(unsigned int) const

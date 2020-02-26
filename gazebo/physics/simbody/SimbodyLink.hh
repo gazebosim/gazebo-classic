@@ -38,7 +38,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyLink : public Link
     {
       /// \brief Constructor
-      public: SimbodyLink(EntityPtr _parent);
+      public: explicit SimbodyLink(EntityPtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyLink();
@@ -161,8 +161,6 @@ namespace gazebo
 
       public: SimTK::MassProperties GetEffectiveMassProps(
         int _numFragments) const;
-
-      public: void SetDirtyPose(const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the dirty pose
       /// \param[in] New dirty pose

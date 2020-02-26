@@ -30,8 +30,11 @@ endif()
 
 add_definitions(-DBUILDING_DLL)
 
+if (WIN32)
+  add_definitions(-DNOUSER)
+endif()
+
 add_subdirectory(msgs)
-add_subdirectory(math)
 add_subdirectory(transport)
 add_subdirectory(common)
 add_subdirectory(rendering)
@@ -105,7 +108,6 @@ target_link_libraries(libgazebo
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
-  gazebo_math
 )
 if (UNIX)
   target_link_libraries(libgazebo pthread)

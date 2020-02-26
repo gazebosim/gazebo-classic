@@ -29,6 +29,9 @@
 #include "gazebo/util/UtilTypes.hh"
 #include "gazebo/util/system.hh"
 
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_UTIL_VISIBLE, gazebo, util, DiagnosticManager)
+
 namespace gazebo
 {
   namespace util
@@ -157,7 +160,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _name Name of the timer
-      public: DiagnosticTimer(const std::string &_name);
+      public: explicit DiagnosticTimer(const std::string &_name);
 
       /// \brief Destructor
       public: virtual ~DiagnosticTimer();

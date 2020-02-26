@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-#include <Winsock2.h>
-#endif
-
 #include <boost/algorithm/string.hpp>
 #include <stdio.h>
 #include <string>
@@ -353,18 +347,6 @@ void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
   {
     this->poses[_msg->pose(i).name()] = msgs::ConvertIgn(_msg->pose(i));
   }
-}
-/////////////////////////////////////////////////
-math::Pose ServerFixture::GetEntityPose(const std::string &_name)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->EntityPose(_name);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -1452,6 +1434,35 @@ void ServerFixture::SpawnLight(const std::string &_name,
     double _spotOuterAngle,
     double _spotFallOff,
     bool _castShadows)
+{
+  this->SpawnLight(_name, _type, _pos, _rpy,
+      _diffuse.Ign(), _specular.Ign(), _direction,
+      _attenuationRange,
+      _attenuationConstant,
+      _attenuationLinear,
+      _attenuationQuadratic,
+      _spotInnerAngle,
+      _spotOuterAngle,
+      _spotFallOff,
+      _castShadows);
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::SpawnLight(const std::string &_name,
+    const std::string &_type,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
+    const ignition::math::Color &_diffuse,
+    const ignition::math::Color &_specular,
+    const ignition::math::Vector3d &_direction,
+    const double _attenuationRange,
+    const double _attenuationConstant,
+    const double _attenuationLinear,
+    const double _attenuationQuadratic,
+    const double _spotInnerAngle,
+    const double _spotOuterAngle,
+    const double _spotFallOff,
+    const bool _castShadows)
 {
   msgs::Factory msg;
   std::ostringstream newLightStr;

@@ -308,8 +308,8 @@ std::string RestApi::Request(const std::string &_reqUrl,
   // will be grown as needed by the realloc above
   chunk.memory = static_cast<char*>(malloc(1));
   chunk.size = 0;            // no data at this point
-  bool secure = false;
-  if (!secure)
+  // bool secure = false;
+  // if (!secure)
   {
     // skip peer verification
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);

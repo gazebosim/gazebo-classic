@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <algorithm>
 #include <string>
 #include <vector>
@@ -64,10 +58,12 @@ void Road::Load(sdf::ElementPtr _elem)
 /////////////////////////////////////////////////
 void Road::Init()
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-
-  this->roadPub = this->node->Advertise<msgs::Road>("~/roads", 10);
+  if (!this->node)
+  {
+    this->node = transport::NodePtr(new transport::Node());
+    this->node->Init();
+    this->roadPub = this->node->Advertise<msgs::Road>("~/roads", 10);
+  }
 
   msgs::Road msg;
 
@@ -114,22 +110,6 @@ void Road::Init()
   }
 
   this->roadPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
-const std::vector<math::Vector3> Road::GetPoints() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  std::vector<math::Vector3> result;
-  for (const auto pt : this->points)
-    result.push_back(pt);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-  return result;
 }
 
 /////////////////////////////////////////////////

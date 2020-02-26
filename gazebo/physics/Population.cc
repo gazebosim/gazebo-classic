@@ -15,14 +15,9 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <string>
 #include <vector>
+#include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 #include <ignition/math/Kmeans.hh>
 #include <ignition/math/Rand.hh>
@@ -108,7 +103,8 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
 
   // Create an sdf containing the model description.
   sdf::SDF sdf;
-  sdf.SetFromString("<sdf version ='1.5'>" + params.modelSdf + "</sdf>");
+  sdf.SetFromString("<sdf version ='" + std::string(SDF_PROTOCOL_VERSION) +
+    "'>" + params.modelSdf + "</sdf>");
 
   for (size_t i = 0; i < objects.size(); ++i)
   {

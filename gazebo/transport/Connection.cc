@@ -24,7 +24,10 @@
   #include <iphlpapi.h>
   // Type used for raw data on this platform.
   typedef char raw_type;
-  #define snprintf _snprintf
+  // snprintf is available since VS 2015
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+    #define snprintf _snprintf
+  #endif
 #else
   // For data types
   #include <sys/types.h>
@@ -86,7 +89,6 @@ Connection::Connection()
 {
   this->isOpen = false;
   this->dropMsgLogged = false;
-  this->headerBuffer = new char[HEADER_LENGTH+1];
 
   if (iomanager == NULL)
     iomanager = new IOManager();
@@ -122,9 +124,6 @@ Connection::Connection()
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
-  delete [] this->headerBuffer;
-  this->headerBuffer = NULL;
-
   this->Shutdown();
 
   if (iomanager)
@@ -303,8 +302,8 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     return;
   }
 
-  char headerBufferLocal[HEADER_LENGTH + 1];
-  snprintf(headerBufferLocal, HEADER_LENGTH + 1, "%08x",
+  char headerBuffer[HEADER_LENGTH + 1];
+  snprintf(headerBuffer, HEADER_LENGTH + 1, "%08x",
       static_cast<unsigned int>(_buffer.size()));
 
   {
@@ -312,11 +311,17 @@ void Connection::EnqueueMsg(const std::string &_buffer,
 
     if (this->writeQueue.empty() ||
         (this->writeCount > 0 && this->writeQueue.size() == 1) ||
-        (this->writeQueue.back().size()+_buffer.size() > 4096))
-      this->writeQueue.push_back(std::string(headerBufferLocal) + _buffer);
+        (this->writeQueue.back().size() + HEADER_LENGTH + _buffer.size() >
+         4096))
+    {
+      this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
+      this->callbacks.push_back({std::make_pair(_cb, _id)});
+    }
     else
-      this->writeQueue.back() += std::string(headerBufferLocal) + _buffer;
-    this->callbacks.push_back(std::make_pair(_cb, _id));
+    {
+      this->writeQueue.back() += std::string(headerBuffer) + _buffer;
+      this->callbacks.back().push_back(std::make_pair(_cb, _id));
+    }
   }
 
   if (_force)
@@ -354,7 +359,6 @@ void Connection::ProcessWriteQueue(bool _blocking)
   // a single write operation
   if (!_blocking)
   {
-    this->callbackIndex = this->callbacks.size();
     boost::asio::async_write(*this->socket,
         boost::asio::buffer(this->writeQueue.front().c_str(),
           this->writeQueue.front().size()),
@@ -374,12 +378,7 @@ void Connection::ProcessWriteQueue(bool _blocking)
       this->Shutdown();
     }
 
-    // Call the callback, in not NULL
-    if (!this->callbacks.front().first.empty())
-      this->callbacks.front().first(this->callbacks.front().second);
-
-    this->writeQueue.pop_front();
-    this->writeCount--;
+    this->PostWrite();
   }
 }
 
@@ -396,24 +395,29 @@ std::string Connection::GetRemoteURI() const
 }
 
 //////////////////////////////////////////////////
+void Connection::PostWrite()
+{
+  // Call the callbacks, if not NULL
+  if (!this->callbacks.empty())
+  {
+    for (auto const &callback : this->callbacks.front())
+      if (!callback.first.empty())
+        callback.first(callback.second);
+    this->callbacks.pop_front();
+  }
+
+  if (!this->writeQueue.empty())
+    this->writeQueue.pop_front();
+  this->writeCount--;
+}
+
+//////////////////////////////////////////////////
 void Connection::OnWrite(const boost::system::error_code &_e)
 {
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
-    for (unsigned int i = 0; i < this->callbackIndex; ++i)
-    {
-      if (!this->callbacks.empty())
-      {
-        if (!this->callbacks.front().first.empty())
-          this->callbacks.front().first(this->callbacks.front().second);
-        this->callbacks.pop_front();
-      }
-    }
-
-    if (!this->writeQueue.empty())
-      this->writeQueue.pop_front();
-    this->writeCount--;
+    this->PostWrite();
   }
 
   if (_e)
@@ -744,6 +748,9 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     // Iterate over all the interface addresses
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
     {
+      // Only consider UP interfaces
+      if (!(ifa->ifa_flags & IFF_UP))
+        continue;
       if (ifa->ifa_addr == NULL)
         continue;
 
@@ -814,6 +821,10 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     // last non-loopback one that we find.
     for (PIP_ADAPTER_ADDRESSES curr = addrs; curr; curr = curr->Next)
     {
+      // The interface is not running.
+      if (curr->OperStatus != IfOperStatusUp)
+        continue;
+
       // Iterate over all unicast addresses for this adapter
       for (PIP_ADAPTER_UNICAST_ADDRESS unicast = curr->FirstUnicastAddress;
            unicast; unicast = unicast->Next)

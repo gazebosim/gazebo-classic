@@ -14,13 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/BoxShape.hh"
 
 using namespace gazebo;
@@ -44,35 +37,9 @@ void BoxShape::Init()
 }
 
 //////////////////////////////////////////////////
-void BoxShape::SetSize(const math::Vector3 &_size)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetSize(_size.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void BoxShape::SetSize(const ignition::math::Vector3d &_size)
 {
   this->sdf->GetElement("size")->Set(_size);
-}
-
-//////////////////////////////////////////////////
-math::Vector3 BoxShape::GetSize() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Size();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

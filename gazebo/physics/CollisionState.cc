@@ -15,12 +15,6 @@
  *
  */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/CollisionState.hh"
@@ -67,19 +61,6 @@ void CollisionState::Load(const sdf::ElementPtr _elem)
     this->pose = _elem->Get<ignition::math::Pose3d>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
-}
-
-/////////////////////////////////////////////////
-const math::Pose CollisionState::GetPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->pose;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////

@@ -49,19 +49,8 @@ namespace gazebo
       public: virtual ~Event();
 
       /// \brief Disconnect
-      /// \param[in] _c A pointer to a connection
-      /// \deprecated Use event::~Connection to disconnect
-      public: virtual void Disconnect(ConnectionPtr _c)
-              GAZEBO_DEPRECATED(8.0) = 0;
-
-      /// \brief Disconnect
       /// \param[in] _id Integer ID of a connection
       public: virtual void Disconnect(int _id) = 0;
-
-      /// \brief Get whether this event has been signaled.
-      /// \return True if the event has been signaled.
-      /// \deprecated See bool Signaled() const;
-      public: bool GetSignaled() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get whether this event has been signaled.
       /// \return True if the event has been signaled.
@@ -85,11 +74,6 @@ namespace gazebo
 
       /// \brief Destructor.
       public: ~Connection();
-
-      /// \brief Get the id of this connection.
-      /// \return The id of this connection.
-      /// \deprecated See const Id() const;
-      public: int GetId() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the id of this connection.
       /// \return The id of this connection.
@@ -123,12 +107,6 @@ namespace gazebo
       /// \return A Connection object, which will automatically call
       /// Disconnect when it goes out of scope.
       public: ConnectionPtr Connect(const std::function<T> &_subscriber);
-
-      /// \brief Disconnect a callback to this event.
-      /// \param[in] _c The connection to disconnect.
-      /// \deprecated Use event::~Connection to disconnect
-      public: virtual void Disconnect(ConnectionPtr _c)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Disconnect a callback to this event.
       /// \param[in] _id The id of the connection to disconnect.
@@ -587,19 +565,6 @@ namespace gazebo
       }
       this->connections[index].reset(new EventConnection(true, _subscriber));
       return ConnectionPtr(new Connection(this, index));
-    }
-
-    /// \brief Removes a connection.
-    /// \param[in] _c the connection.
-    template<typename T>
-    void EventT<T>::Disconnect(ConnectionPtr _c)
-    {
-      if (!_c)
-        return;
-
-      this->Disconnect(_c->Id());
-      _c->event = nullptr;
-      _c->id = -1;
     }
 
     /// \brief Get the number of connections.

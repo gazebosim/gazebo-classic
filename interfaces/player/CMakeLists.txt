@@ -16,16 +16,16 @@ set (sources GazeboDriver.cc
              #IRInterface.cc
              #ImuInterface.cc
 
-include_directories( 
-  ${SDFormat_INCLUDE_DIRS} 
-  ${PLAYER_INCLUDE_DIRS} 
+include_directories(
+  ${SDFormat_INCLUDE_DIRS}
+  ${PLAYER_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
 )
 
-link_directories( 
-  ${SDFormat_LIBRARY_DIRS} 
+link_directories(
+  ${SDFormat_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)
@@ -33,7 +33,7 @@ if (HAVE_BULLET)
 endif()
 
 if (HAVE_DART)
-  link_directories(${DARTCore_LIBRARY_DIRS})
+  link_directories(${DART_LIBRARY_DIRS})
 endif()
 
 link_directories(${PLAYER_LINK_DIRS} ${Boost_LIBRARY_DIRS})
@@ -43,7 +43,6 @@ target_link_libraries(gazebo_player ${PLAYER_LINK_LIBS}
 libgazebo_client
 gazebo_common
 gazebo_msgs
-gazebo_math
 gazebo_physics
 gazebo_sensors
 gazebo_transport

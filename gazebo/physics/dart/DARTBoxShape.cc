@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ DARTBoxShape::DARTBoxShape(DARTCollisionPtr _parent)
   : BoxShape(_parent),
     dataPtr(new DARTBoxShapePrivate())
 {
-  _parent->SetDARTCollisionShape(this->dataPtr->dtBoxShape);
 }
 
 //////////////////////////////////////////////////
@@ -40,6 +39,28 @@ DARTBoxShape::~DARTBoxShape()
   delete this->dataPtr;
   this->dataPtr = nullptr;
 }
+
+//////////////////////////////////////////////////
+void DARTBoxShape::Init()
+{
+  BasePtr _parent = GetParent();
+  GZ_ASSERT(boost::dynamic_pointer_cast<DARTCollision>(_parent),
+            "Parent must be a DARTCollisionPtr");
+  DARTCollisionPtr _collisionParent =
+    boost::static_pointer_cast<DARTCollision>(_parent);
+
+  dart::dynamics::BodyNodePtr bodyNode = _collisionParent->DARTBodyNode();
+
+  if (!bodyNode) gzerr << "BodyNode is NULL in Init!\n";
+  GZ_ASSERT(bodyNode, "BodyNode is NULL Init!");
+
+  this->dataPtr->CreateShape(bodyNode);
+  _collisionParent->SetDARTCollisionShapeNode(
+                      this->dataPtr->ShapeNode(), false);
+
+  BoxShape::Init();
+}
+
 
 //////////////////////////////////////////////////
 void DARTBoxShape::SetSize(const ignition::math::Vector3d &_size)
@@ -76,5 +97,7 @@ void DARTBoxShape::SetSize(const ignition::math::Vector3d &_size)
 
   BoxShape::SetSize(size);
 
-  this->dataPtr->dtBoxShape->setSize(DARTTypes::ConvVec3(size));
+  GZ_ASSERT(this->dataPtr->Shape(),
+            "Box shape node or shape itself is NULL");
+  this->dataPtr->Shape()->setSize(DARTTypes::ConvVec3(size));
 }

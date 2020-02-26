@@ -15,12 +15,6 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
@@ -39,7 +33,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Timer.hh"
 

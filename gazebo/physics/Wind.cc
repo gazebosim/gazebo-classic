@@ -15,13 +15,8 @@
  *
 */
 
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
 #include <functional>
+#include <boost/lexical_cast.hpp>
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Vector3.hh>
@@ -44,7 +39,7 @@ namespace gazebo
     {
       /// \brief Class constructor.
       /// \param[in] _world A reference to the world.
-      public: WindPrivate(physics::World &_world)
+      public: explicit WindPrivate(physics::World &_world)
         : world(_world)
       {
       }
