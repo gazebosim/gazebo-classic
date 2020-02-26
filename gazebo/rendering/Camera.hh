@@ -113,6 +113,9 @@ namespace gazebo
           const double _cameraIntrinsicsCx, const double _cameraIntrinsicsCy,
           const double _cameraIntrinsicsS);
 
+      /// \brief Load the camera intrinsics parameters from the sdf
+      private: virtual void LoadCameraIntrinsics();
+
       /// \brief Computes the OpenGL NDC matrix
       /// \param[in] _left Left vertical clipping plane
       /// \param[in] _right Right vertical clipping plane
@@ -170,6 +173,33 @@ namespace gazebo
       ///            the camera
       /// \return OpenGL projection matrix
       public: static ignition::math::Matrix4d BuildProjectionMatrix(
+              const double _imageWidth, const double _imageHeight,
+              const double _intrinsicsFx, const double _intrinsicsFy,
+              const double _intrinsicsCx, const double _intrinsicsCy,
+              const double _intrinsicsS,
+              const double _clipNear, const double _clipFar);
+
+      /// \brief Computes the OpenGL projective matrix by multiplying
+      ///        the OpenGL Normalized Device Coordinates matrix (NDC) with
+      ///        the OpenGL perspective matrix
+      ///        openglProjectiveMatrix = ndcMatrix * perspectiveMatrix
+      /// \param[in] _imageWidth Image width (in pixels)
+      /// \param[in] _imageHeight Image height (in pixels)
+      /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
+      /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
+      /// \param[in] _intrinsicsCx X coordinate of principal point in pixels
+      /// \param[in] _intrinsicsCy Y coordinate of principal point in pixels
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between
+      ///             the x and y pixel axes
+      /// \param[in] _clipNear Distance to the nearer depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \param[in] _clipFar Distance to the farther depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \return OpenGL projective matrix
+      /// \deprecated See BuildProjectionMatrix().
+      public: static ignition::math::Matrix4d BuildProjectiveMatrix(
               const double _imageWidth, const double _imageHeight,
               const double _intrinsicsFx, const double _intrinsicsFy,
               const double _intrinsicsCx, const double _intrinsicsCy,
@@ -651,13 +681,6 @@ namespace gazebo
       /// \brief Set background color for viewport (if viewport is not null)
       /// \param[in] _color Background color.
       /// \return True if successful. False if viewport is null
-      /// \deprecated Use function which accepts ignition::math::Color.
-      public: virtual bool SetBackgroundColor(const common::Color &_color)
-          GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set background color for viewport (if viewport is not null)
-      /// \param[in] _color Background color.
-      /// \return True if successful. False if viewport is null
       public: virtual bool SetBackgroundColor(
           const ignition::math::Color &_color);
 
@@ -830,9 +853,6 @@ namespace gazebo
           const ignition::math::Vector3d &_fixedAxis =
             ignition::math::Vector3d::UnitY);
 
-      /// \brief Load the camera intrinsics parameters from the sdf
-      private: void LoadCameraIntrinsics();
-
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats
       /// \param[out] _dst Destination buffer for the image data
@@ -880,8 +900,17 @@ namespace gazebo
       /// \brief The OGRE camera
       protected: Ogre::Camera *camera;
 
+      /// \brief Camera projective matrix
+      protected: ignition::math::Matrix4d cameraProjectiveMatrix;
+
+      /// \brief Flag for signaling the usage of camera intrinsics within OGRE
+      protected: bool cameraUsingIntrinsics;
+
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
+
+      /// \brief Scene node that the camera is attached to.
+      protected: Ogre::SceneNode *cameraNode = nullptr;
 
       /// \brief Scene node that controls camera position and orientation.
       protected: Ogre::SceneNode *sceneNode;

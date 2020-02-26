@@ -14,8 +14,6 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
-
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -46,11 +44,9 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   dPtr->sonarSub = dPtr->node->Subscribe(_topicName,
       &SonarVisual::OnMsg, this, true);
 
-  dPtr->sonarRay = NULL;
-
   dPtr->connections.push_back(
       event::Events::ConnectPreRender(
-        boost::bind(&SonarVisual::Update, this)));
+        std::bind(&SonarVisual::Update, this)));
 }
 
 /////////////////////////////////////////////////
@@ -67,17 +63,10 @@ void SonarVisual::Load()
       reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
 
   dPtr->sonarRay = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->sonarRay->setMaterial("Gazebo/RedGlow");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->sonarRay, "Gazebo/RedGlow");
   dPtr->sonarRay->AddPoint(0, 0, 0);
   dPtr->sonarRay->AddPoint(0, 0, 0);
-
-  dPtr->coneVis.reset(
-      new Visual(this->Name() + "_SONAR_CONE_", shared_from_this(), false));
-  dPtr->coneVis->Load();
-  dPtr->coneVis->InsertMesh("unit_cone");
-  dPtr->coneVis->AttachMesh("unit_cone");
-  dPtr->coneVis->SetMaterial("Gazebo/BlueLaser");
-  dPtr->coneVis->SetCastShadows(false);
+  dPtr->sonarRay->SetPoint(0, ignition::math::Vector3d::Zero);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
@@ -112,22 +101,57 @@ void SonarVisual::Update()
     return;
   }
 
+  if (!dPtr->shapeVis)
+  {
+    std::string geom = dPtr->sonarMsg->sonar().geometry();
+    if (geom != "sphere" && geom != "cone")
+    {
+      gzwarn << "Unknown sonar geometry [" << geom << "], defaulting to [cone]"
+             << std::endl;
+      geom = "cone";
+    }
+    auto upperGeom = geom;
+    std::transform(upperGeom.begin(), upperGeom.end(), upperGeom.begin(),
+        ::toupper);
+    dPtr->shapeVis = std::make_shared<Visual>(
+        this->Name() + "_SONAR_" + upperGeom, shared_from_this(), false);
+    dPtr->shapeVis->Load();
+    dPtr->shapeVis->InsertMesh("unit_" + geom);
+    dPtr->shapeVis->AttachMesh("unit_" + geom);
+    dPtr->shapeVis->SetMaterial("Gazebo/BlueLaser");
+    dPtr->shapeVis->SetCastShadows(false);
+  }
+
   double rangeDelta = dPtr->sonarMsg->sonar().range_max()
       - dPtr->sonarMsg->sonar().range_min();
-  double radiusScale = dPtr->sonarMsg->sonar().radius()*2.0;
 
-  if (!ignition::math::equal(dPtr->coneVis->Scale().Z(), rangeDelta) ||
-      !ignition::math::equal(dPtr->coneVis->Scale().X(), radiusScale))
+  if (dPtr->sonarMsg->sonar().geometry() == "sphere")
   {
-    dPtr->coneVis->SetScale(
-        ignition::math::Vector3d(radiusScale, radiusScale, rangeDelta));
-    dPtr->sonarRay->SetPoint(0,
-        ignition::math::Vector3d(0, 0, rangeDelta * 0.5));
+    double rangeMax = dPtr->sonarMsg->sonar().range_max();
+    if (!ignition::math::equal(dPtr->shapeVis->Scale().Z(), rangeMax) ||
+        !ignition::math::equal(dPtr->shapeVis->Scale().X(), rangeMax))
+    {
+      dPtr->shapeVis->SetScale(
+          ignition::math::Vector3d(rangeMax*2, rangeMax*2, rangeMax*2));
+    }
+  }
+  else
+  {
+    dPtr->shapeVis->SetPosition(
+        ignition::math::Vector3d(0, 0, -rangeDelta * 0.5));
+
+    double radiusScale = dPtr->sonarMsg->sonar().radius() * 2.0;
+    if (!ignition::math::equal(dPtr->shapeVis->Scale().Z(), rangeDelta) ||
+        !ignition::math::equal(dPtr->shapeVis->Scale().X(), radiusScale))
+    {
+      dPtr->shapeVis->SetScale(
+          ignition::math::Vector3d(radiusScale, radiusScale, rangeDelta));
+    }
   }
 
   ignition::math::Pose3d pose =
-    msgs::ConvertIgn(dPtr->sonarMsg->sonar().world_pose());
-  this->SetPose(pose);
+      msgs::ConvertIgn(dPtr->sonarMsg->sonar().world_pose());
+  this->SetWorldPose(pose);
 
   if (dPtr->sonarMsg->sonar().has_contact())
   {

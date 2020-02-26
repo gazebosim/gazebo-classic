@@ -218,7 +218,17 @@ void Distortion::SetCamera(CameraPtr _camera)
   // fill the distortion map, while interpolating to fill dead pixels
   pixelBuffer->lock(Ogre::HardwareBuffer::HBL_NORMAL);
   const Ogre::PixelBox &pixelBox = pixelBuffer->getCurrentLock();
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 11
+  // Ogre 1.11 changed Ogre::PixelBox::data from void* to uchar*, hence
+  // reinterpret_cast is required here. static_cast is not allowed between
+  // pointers of unrelated types (see, for instance, Standard § 3.9.1
+  // Fundamental types)
+  float *pDest = reinterpret_cast<float *>(pixelBox.data);
+#else
   float *pDest = static_cast<float *>(pixelBox.data);
+#endif
+
   for (unsigned int i = 0; i < this->dataPtr->distortionTexHeight; ++i)
   {
     for (unsigned int j = 0; j < this->dataPtr->distortionTexWidth; ++j)

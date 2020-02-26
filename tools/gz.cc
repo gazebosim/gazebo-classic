@@ -584,7 +584,6 @@ JointCommand::JointCommand()
     ("world-name,w", po::value<std::string>(), "World name.")
     ("model-name,m", po::value<std::string>(), "Model name.")
     ("joint-name,j", po::value<std::string>(), "Joint name.")
-    ("delete,d", "Delete a model.")
     ("force,f", po::value<double>(), "Force to apply to a joint (N).")
     ("pos-t", po::value<double>(),
      "Target angle(rad) for rotation joints or position (m) for linear joints.")
@@ -623,10 +622,7 @@ void JointCommand::HelpDetailed()
 /////////////////////////////////////////////////
 bool JointCommand::RunImpl()
 {
-  std::string modelName, worldName, jointName;
-
-  if (this->vm.count("world-name"))
-    worldName = this->vm["world-name"].as<std::string>();
+  std::string modelName, jointName;
 
   if (this->vm.count("model-name"))
     modelName = this->vm["model-name"].as<std::string>();
@@ -648,7 +644,7 @@ bool JointCommand::RunImpl()
     return false;
   }
 
-  msgs::JointCmd msg;
+  ignition::msgs::JointCmd msg;
   msg.set_name(modelName + "::" + jointName);
 
   if (this->vm.count("force"))
@@ -682,16 +678,27 @@ bool JointCommand::RunImpl()
       msg.mutable_velocity()->set_d_gain(this->vm["vel-d"].as<double>());
   }
 
-  transport::NodePtr node(new transport::Node());
-  node->Init(worldName);
+  std::string topic = std::string("/") + modelName + "/joint_cmd";
 
-  transport::PublisherPtr pub =
-    node->Advertise<msgs::JointCmd>(
-        std::string("~/") + modelName + "/joint_cmd");
+  ignition::transport::Node ignNode;
+  auto pub = ignNode.Advertise<ignition::msgs::JointCmd>(topic);
 
-  pub->WaitForConnection();
+  unsigned int maxSleep = 30;
+  unsigned int sleep = 0;
+  unsigned int mSleep = 100;
+  for (; sleep < maxSleep && !pub.HasConnections(); ++sleep)
+  {
+    common::Time::MSleep(mSleep);
+  }
 
-  pub->Publish(msg, true);
+  if (sleep == maxSleep)
+  {
+    gzerr << "No subscribers to topic [" << topic <<"], timed out after " <<
+        maxSleep * mSleep << "ms." << std::endl;
+    return false;
+  }
+
+  pub.Publish(msg);
 
   return true;
 }

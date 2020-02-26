@@ -82,7 +82,7 @@ namespace gazebo
   };
 
   /// \brief Plugin for simulating a torque-speed curve for actuators.
-  class GAZEBO_VISIBLE ActuatorPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE ActuatorPlugin : public ModelPlugin
   {
     /// Documentation inherited
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);

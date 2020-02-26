@@ -424,6 +424,12 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/Plugin_BSPSceneManager");
     plugins.push_back(path+"/Plugin_OctreeSceneManager");
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    // OGRE 1.11 moved FreeImage codec support to a plugin
+    // See: https://github.com/OGRECave/ogre/blob/master/Docs/1.11-Notes.md
+    plugins.push_back(path + "/Codec_FreeImage");
+#endif
+
 #ifdef HAVE_OCULUS
     plugins.push_back(path+"/Plugin_CgProgramManager");
 #endif
@@ -812,7 +818,13 @@ void RenderEngine::CheckSystemCapabilities()
   // int multiRenderTargetCount = capabilities->getNumMultiRenderTargets();
 
   bool hasFBO =
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    // All APIs targeted by OGRE supported this capability,
+    // see https://ogrecave.github.io/ogre/api/1.10/group___render_system.html#gga3d2965b7f378ebdcfe8a4a6cf74c3de7a8a0ececdc95122ac3063fc4f27d6402c
+    true;
+#else
     capabilities->hasCapability(Ogre::RSC_FBO);
+#endif
 
   bool hasGLSL =
     std::find(profiles.begin(), profiles.end(), "glsl") != profiles.end();

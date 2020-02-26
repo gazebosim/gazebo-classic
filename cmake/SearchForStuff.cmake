@@ -161,13 +161,16 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  set(DART_MIN_REQUIRED_VERSION 6)
-  find_package(DART ${DART_MIN_REQUIRED_VERSION} CONFIG OPTIONAL_COMPONENTS utils-urdf)
+  set(DART_MIN_REQUIRED_VERSION 6.6)
+  find_package(DART ${DART_MIN_REQUIRED_VERSION} CONFIG OPTIONAL_COMPONENTS collision-bullet collision-ode utils-urdf)
   if (DART_FOUND)
     message (STATUS "Looking for DART - found")
     set (HAVE_DART TRUE)
     if (DART_utils-urdf_FOUND)
       set (HAVE_DART_URDF TRUE)
+    endif()
+    if (DART_collision-bullet_FOUND)
+      set (HAVE_DART_BULLET TRUE)
     endif()
   else()
     message (STATUS "Looking for DART - not found")
@@ -309,13 +312,23 @@ if (PKG_CONFIG_FOUND)
     message(STATUS "TBB not found, attempting to detect manually")
     set (TBB_PKG_CONFIG "")
 
-    find_library(tbb_library tbb ENV LD_LIBRARY_PATH)
-    if (tbb_library)
-      set(TBB_FOUND true)
-      set(TBB_LIBRARIES ${tbb_library})
-    else (tbb_library)
-      BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
-    endif(tbb_library)
+    # Workaround for CMake bug https://gitlab.kitware.com/cmake/cmake/issues/17135
+    unset(TBB_FOUND CACHE)
+
+    find_package(TBB CONFIG)
+    if (TBB_FOUND)
+      set(TBB_LIBRARIES TBB::tbb)
+    endif()
+
+    if (NOT TBB_FOUND)
+      find_library(tbb_library tbb ENV LD_LIBRARY_PATH)
+      if (tbb_library)
+        set(TBB_FOUND true)
+        set(TBB_LIBRARIES ${tbb_library})
+      else (tbb_library)
+        BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
+      endif(tbb_library)
+    endif (NOT TBB_FOUND)
   endif (NOT TBB_FOUND)
 
   #################################################
@@ -354,6 +367,10 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
 
   if (NOT OGRE_FOUND)
+    # Workaround for CMake bug https://gitlab.kitware.com/cmake/cmake/issues/17135,
+    # that prevents to successfully run a find_package(<package>) call if before there
+    # was a failed call to pkg_check_modules(<package> <package>)
+    unset(OGRE_FOUND CACHE)
     # If OGRE was not found, try with the standard find_package(OGRE)
     find_package(OGRE COMPONENTS RTShaderSystem Terrain Overlay Paging)
     # Add each component include directories to OGRE_INCLUDE_DIRS because
@@ -367,6 +384,7 @@ if (PKG_CONFIG_FOUND)
     list(APPEND OGRE_LIBRARIES ${OGRE_Terrain_LIBRARIES})
     list(APPEND OGRE_LIBRARIES ${OGRE_Overlay_LIBRARIES})
     list(APPEND OGRE_LIBRARIES ${OGRE_Paging_LIBRARIES})
+    set(OGRE_PLUGINDIR ${OGRE_PLUGIN_DIR})
   endif ()
 
   if (NOT OGRE_FOUND)

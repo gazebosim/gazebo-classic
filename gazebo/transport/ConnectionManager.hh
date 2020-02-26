@@ -171,7 +171,7 @@ namespace gazebo
       private: boost::mutex updateMutex;
 
       private: ConnectionPtr masterConn;
-      private: Connection *serverConn;
+      private: ConnectionPtr serverConn;
 
       private: std::list<ConnectionPtr> connections;
       protected: std::vector<event::ConnectionPtr> eventConnections;

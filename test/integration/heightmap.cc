@@ -18,6 +18,9 @@
 #include <string.h>
 #include <ignition/math/Vector3.hh>
 
+// required for HAVE_DART_BULLET define
+#include <gazebo/gazebo_config.h>
+
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -25,6 +28,13 @@
 #include "gazebo/test/helper_physics_generator.hh"
 #include "images_cmp.h"
 #include "gazebo/test/ServerFixture.hh"
+
+#ifdef HAVE_DART
+#ifdef __MACTYPES__
+#undef nil
+#endif
+#include "gazebo/physics/dart/DARTPhysics.hh"
+#endif
 
 using namespace gazebo;
 
@@ -53,6 +63,12 @@ class HeightmapTest : public ServerFixture,
   public: void LoadDEM(const std::string &_physicsEngine);
   public: void Material(const std::string &_worldName,
       const std::string &_physicsEngine);
+  // \brief Test dropping a spheres on terrain
+  // \param[in] _physicsEngine the physics engine to test
+  // \param[in] _dartCollision only if \e _physicsEngine is "dart", this
+  //  is the collision detector to use in DART. Can be fcl, dart, bullet or ode.
+  public: void TerrainCollision(const std::string &_physicsEngine,
+                                const std::string &_dartCollision = "");
 
   /// \brief Test loading a heightmap that has no visuals
   public: void NoVisual();
@@ -71,13 +87,33 @@ class HeightmapTest : public ServerFixture,
 /////////////////////////////////////////////////
 void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
 {
+  Load("worlds/heightmap_test.world", true, _physicsEngine);
+
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+#ifdef HAVE_DART
+    physics::WorldPtr w = physics::get_world();
+    ASSERT_NE(w, nullptr);
+    physics::PhysicsEnginePtr engine = w->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet")
+    {
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
     return;
+#endif
   }
-
-  Load("worlds/heightmap_test.world", true, _physicsEngine);
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -133,13 +169,35 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
 {
+  Load("worlds/white_alpha_heightmap.world", true, _physicsEngine);
+
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+#ifdef HAVE_DART
+    physics::WorldPtr w = physics::get_world();
+    ASSERT_NE(w, nullptr);
+    physics::PhysicsEnginePtr engine = w->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet")
+    {
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
     return;
+#endif
   }
 
-  Load("worlds/white_alpha_heightmap.world", true, _physicsEngine);
   physics::ModelPtr model = GetModel("heightmap");
   EXPECT_TRUE(model != NULL);
 
@@ -165,13 +223,34 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
 {
+  Load("worlds/white_no_alpha_heightmap.world", true, _physicsEngine);
+
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+#ifdef HAVE_DART
+    physics::WorldPtr w = physics::get_world();
+    ASSERT_NE(w, nullptr);
+    physics::PhysicsEnginePtr engine = w->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet")
+    {
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
     return;
+#endif
   }
 
-  Load("worlds/white_no_alpha_heightmap.world", true, _physicsEngine);
   physics::ModelPtr model = GetModel("heightmap");
   EXPECT_TRUE(model != NULL);
 
@@ -236,15 +315,34 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
           << std::endl;
     return;
   }
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for "
-          << _physicsEngine
-          << ", see issue #909" << std::endl;
-    return;
-  }
 
   Load("worlds/heightmap_test.world", true, _physicsEngine);
+
+  if (_physicsEngine == "dart")
+  {
+#ifdef HAVE_DART
+    physics::WorldPtr w = physics::get_world();
+    ASSERT_NE(w, nullptr);
+    physics::PhysicsEnginePtr engine = w->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet")
+    {
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
+  }
 
   physics::ModelPtr model = GetModel("heightmap");
   EXPECT_TRUE(model != NULL);
@@ -263,12 +361,6 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
 void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
 {
 #ifdef HAVE_GDAL
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
-    return;
-  }
-
   if (_physicsEngine == "bullet" || _physicsEngine == "simbody")
   {
     gzerr << "Aborting test for " << _physicsEngine <<
@@ -277,6 +369,32 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
   }
 
   Load("worlds/dem_neg.world", true, _physicsEngine);
+
+  if (_physicsEngine == "dart")
+  {
+#ifdef HAVE_DART
+    physics::WorldPtr w = physics::get_world();
+    ASSERT_NE(w, nullptr);
+    physics::PhysicsEnginePtr engine = w->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet")
+    {
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
+  }
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_NE(world, nullptr);
@@ -308,8 +426,9 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
   EXPECT_GE(boxInitPose.Pos().Z(), minHeight);
 
   // step the world
-  // let the box fall onto the heightmap and wait for it to rest
-  world->Step(1000);
+  // let the box fall onto the heightmap and wait for it to rest.
+  // ODE and Bullet seem to be fine with 1000 iterations, but DART needs more.
+  world->Step(1200);
 
   ignition::math::Pose3d boxRestPose = boxModel->WorldPose();
   EXPECT_NE(boxRestPose, boxInitPose);
@@ -455,14 +574,42 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
 void HeightmapTest::Material(const std::string &_worldName,
     const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
+  // load a heightmap with red material
+  Load(_worldName, false, _physicsEngine);
+
+  if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+    // SimbodyHeightmapShape unimplemented.
+    gzerr << "Aborting test for simbody" << std::endl;
     return;
   }
 
-  // load a heightmap with red material
-  Load(_worldName, false, _physicsEngine);
+  if (_physicsEngine == "dart")
+  {
+#ifdef HAVE_DART
+    physics::WorldPtr w = physics::get_world();
+    ASSERT_NE(w, nullptr);
+    physics::PhysicsEnginePtr engine = w->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet")
+    {
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
+  }
+
   physics::ModelPtr heightmap = GetModel("heightmap");
   ASSERT_NE(heightmap, nullptr);
 
@@ -632,6 +779,112 @@ void HeightmapTest::HeightmapCache()
 }
 
 /////////////////////////////////////////////////
+void HeightmapTest::TerrainCollision(const std::string &_physicsEngine,
+                                     const std::string &_dartCollision)
+{
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Skipping test for bullet. See issue #2506" << std::endl;
+    return;
+  }
+
+  if (_physicsEngine == "simbody")
+  {
+    // SimbodyHeightmapShape unimplemented.
+    gzerr << "Aborting test for " << _physicsEngine << std::endl;
+    return;
+  }
+
+  // world file to use
+  std::string useWorld = "worlds/heightmap_test_with_sphere.world";
+  if (_physicsEngine == "dart")
+  {
+    if (_dartCollision.empty() || _dartCollision == "bullet")
+    {
+      // test DART with the bullet collision detector by default or when
+      // specified collision detector. Use a world file where
+      // <collision_detector> is set accordingly.
+      useWorld = "worlds/heightmap_test_with_sphere_dart_bullet.world";
+    }
+    else if (_dartCollision == "ode")
+    {
+      useWorld = "worlds/heightmap_test_with_sphere_dart_ode.world";
+    }
+    else
+    {
+      gzerr << "Cannot test DART with collision detector " << _dartCollision
+            << ", which is not supported yet. Aborting test." << std::endl;
+      return;
+    }
+  }
+  Load(useWorld, true, _physicsEngine);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  if (_physicsEngine == "dart")
+  {
+#ifdef HAVE_DART
+    physics::PhysicsEnginePtr engine = world->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet")
+    {
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
+  }
+
+  // step the world and verify the sphere has rolled into the valley
+  world->Step(5000);
+
+  // get shapes and min height
+  physics::ModelPtr heightmap = GetModel("heightmap");
+  ASSERT_NE(heightmap, nullptr);
+
+  physics::CollisionPtr hmCollision =
+    heightmap->GetLink("link")->GetCollision("collision");
+
+  physics::HeightmapShapePtr heightmapShape =
+    boost::dynamic_pointer_cast<
+      physics::HeightmapShape>(hmCollision->GetShape());
+  ASSERT_NE(heightmapShape, nullptr);
+  double minHeight = heightmapShape->GetMinHeight();
+
+  physics::ModelPtr sphere = GetModel("test_sphere");
+  ASSERT_NE(sphere, nullptr);
+
+  physics::CollisionPtr sphereCollision =
+    sphere->GetLink("link")->GetCollision("collision");
+  ASSERT_NE(sphereCollision, nullptr);
+
+  physics::SphereShapePtr sphereShape =
+    boost::dynamic_pointer_cast<
+      physics::SphereShape>(sphereCollision->GetShape());
+  ASSERT_NE(sphereShape, nullptr);
+  double radius = sphereShape->GetRadius();
+
+  // verify that the sphere has rolled to valley as expected
+  ignition::math::Pose3d spherePose = sphere->WorldPose();
+
+  // ensure it in fact has rolled all the way down, with some tolerance
+  EXPECT_LE(spherePose.Pos().Z(), (minHeight + radius*1.01));
+  // ensure it has not dropped below terrain, with some tolerance
+  EXPECT_GE(spherePose.Pos().Z(), (minHeight + radius*0.99));
+}
+
+/////////////////////////////////////////////////
 TEST_F(HeightmapTest, NotSquareImage)
 {
   NotSquareImage();
@@ -671,6 +924,135 @@ TEST_P(HeightmapTest, Volume)
 TEST_P(HeightmapTest, LoadDEM)
 {
   LoadDEM(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, DartCollisionDetectorSelectionBullet)
+{
+#ifndef HAVE_DART
+  gzdbg << "Not testing DART because it is not installed." << std::endl;
+  return;
+#endif
+
+#ifndef HAVE_DART_BULLET
+  gzerr << "Aborting test for DART with bullet, because the "
+        << "required DART extension is not installed. Please install "
+        << "libdart<version>-collision-bullet-dev." << std::endl;
+  return;
+#endif
+
+  // first, test if the collision_detector tag in general can be read
+  // from a simple SDF, or if the SDF format does not support it.
+  sdf::SDFPtr sdf(new sdf::SDF());
+  // initalize the SDF descriptoins for the supported version
+  sdf::init(sdf);
+  // make sure we have all elements at least until <physics><dart>...
+  ASSERT_NE(sdf->Root(), nullptr) << "Could not initialize SDF.";
+  sdf::ElementPtr elemWorld = sdf->Root()->GetElementDescription("world");
+  ASSERT_NE(elemWorld, nullptr) << "World element is expected in SDF";
+  sdf::ElementPtr elemPhysics = elemWorld->GetElementDescription("physics");
+  ASSERT_NE(elemPhysics, nullptr) << "Physics element is expected in SDF";
+  sdf::ElementPtr elemDart = elemPhysics->GetElementDescription("dart");
+  ASSERT_NE(elemDart, nullptr) << "Dart element is expected in SDF";
+  // if the collision_detector element is not there, we can't run this test.
+  if (!elemDart->HasElementDescription("collision_detector"))
+  {
+    gzerr << "SDF format version does not support <collision_detector> tag. "
+          << "Skipping test." << std::endl;
+    return;
+  }
+
+  // test using a world file with the <dart><collision_detector>
+  // tag: verify the right collision detector has been selected.
+  // Use bullet as an example (the test could also be done for ode etc.,
+  // but we presume that if it works for bullet, the functionality is there
+  // and it will also work for ode).
+  std::string loadWorld = "worlds/heightmap_test_with_sphere_dart_bullet.world";
+  Load(loadWorld, true, "dart");
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  physics::PhysicsEnginePtr engine = world->Physics();
+  ASSERT_NE(engine, nullptr);
+#ifdef HAVE_DART
+  physics::DARTPhysicsPtr dartEngine
+    = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+  ASSERT_NE(dartEngine, nullptr);
+  std::string cd = dartEngine->CollisionDetectorInUse();
+  EXPECT_FALSE(cd.empty());
+  EXPECT_EQ(cd, "bullet");
+#endif
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, DartCollisionDetectorSelectionOde)
+{
+#ifndef HAVE_DART
+  gzdbg << "Not testing DART because it is not installed." << std::endl;
+  return;
+#endif
+
+  // test using a world file with the <dart><collision_detector>
+  // tag: verify the right collision detector has been selected.
+  std::string loadWorld = "worlds/heightmap_test_with_sphere_dart_ode.world";
+  Load(loadWorld, true, "dart");
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  physics::PhysicsEnginePtr engine = world->Physics();
+  ASSERT_NE(engine, nullptr);
+
+#ifdef HAVE_DART
+  physics::DARTPhysicsPtr dartEngine
+    = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+  ASSERT_NE(dartEngine, nullptr);
+  std::string cd = dartEngine->CollisionDetectorInUse();
+  EXPECT_FALSE(cd.empty());
+
+  // ODE collision detector should be disabled, as it causes conflicts.
+  // Instad, the default collision detector should have been selected.
+  EXPECT_NE(cd, "ode");
+#endif
+}
+
+
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, TerrainCollision)
+{
+  std::string param = GetParam();
+  // do this test for all engines but DART, because for DART it needs to be run
+  // several times for different collision detectors to use.
+  // Different tests exist for this below.
+  if (param == "dart")
+    return;
+
+  TerrainCollision(param);
+}
+
+/////////////////////////////////////////////////
+// TerrainCollision() call for Dart using Bullet.
+// We could do the same for ODE but this is disabled
+// due to conflicts with the internally compiled ODE library.
+// Collision engines in Dart other than Bullet don't support
+// heighmaps yet, but once they do, we can do this test for
+// them as well.
+TEST_F(HeightmapTest, TerrainCollisionDartBullet)
+{
+#ifndef HAVE_DART
+  gzdbg << "Not testing DART because it is not installed." << std::endl;
+  return;
+#endif
+
+#ifndef HAVE_DART_BULLET
+  gzerr << "Aborting test for DART with bullet, because the "
+        << "required DART extension is not installed. Please install "
+        << "libdart<version>-collision-bullet-dev." << std::endl;
+  return;
+#endif
+
+  TerrainCollision("dart", "bullet");
 }
 
 /////////////////////////////////////////////////

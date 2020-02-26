@@ -24,7 +24,6 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo/common/Color.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -40,13 +39,6 @@ namespace gazebo
     /// data types
     class GZ_RENDERING_VISIBLE Conversions
     {
-      /// \brief Return the equivalent ogre color
-      /// \param[in] _clr Gazebo color to convert
-      /// \return Ogre color value
-      /// \deprecated use ignition::math::Color
-      public: static Ogre::ColourValue Convert(const common::Color &_clr)
-              GAZEBO_DEPRECATED(9.0);
-
       /// \brief Return the equivalent ogre color
       /// \param[in] _clr color to convert
       /// \return Ogre color value

@@ -121,6 +121,13 @@ set(tests
   worlds_installed.cc
   )
 
+if (NOT WIN32)
+  set(tests
+    ${tests}
+    transport_msg_count.cc
+  )
+endif()
+
 if (HAVE_GTS)
   set(tests
     ${tests}

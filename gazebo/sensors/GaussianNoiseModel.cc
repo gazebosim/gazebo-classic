@@ -31,7 +31,8 @@ namespace gazebo
     : public Ogre::CompositorInstance::Listener
   {
     /// \brief Constructor, setting mean and standard deviation.
-    public: GaussianNoiseCompositorListener(double _mean, double _stddev):
+    public: GaussianNoiseCompositorListener(const double &_mean,
+                                            const double &_stddev):
         mean(_mean), stddev(_stddev) {}
 
     /// \brief Callback that OGRE will invoke for us on each render call
@@ -68,10 +69,10 @@ namespace gazebo
     }
 
     /// \brief Mean that we'll pass down to the GLSL fragment shader.
-    private: double mean;
+    private: const double &mean;
     /// \brief Standard deviation that we'll pass down to the GLSL fragment
     /// shader.
-    private: double stddev;
+    private: const double &stddev;
   };
 }  // namespace gazebo
 
@@ -85,7 +86,9 @@ GaussianNoiseModel::GaussianNoiseModel()
     stdDev(0.0),
     bias(0.0),
     precision(0.0),
-    quantized(false)
+    quantized(false),
+    biasMean(0),
+    biasStdDev(0)
 {
 }
 
@@ -101,19 +104,11 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
 
   this->mean = _sdf->Get<double>("mean");
   this->stdDev = _sdf->Get<double>("stddev");
-  // Sample the bias
-  double biasMean = 0;
-  double biasStdDev = 0;
   if (_sdf->HasElement("bias_mean"))
-    biasMean = _sdf->Get<double>("bias_mean");
+    this->biasMean = _sdf->Get<double>("bias_mean");
   if (_sdf->HasElement("bias_stddev"))
-    biasStdDev = _sdf->Get<double>("bias_stddev");
-  this->bias = ignition::math::Rand::DblNormal(biasMean, biasStdDev);
-  // With equal probability, we pick a negative bias (by convention,
-  // rateBiasMean should be positive, though it would work fine if
-  // negative).
-  if (ignition::math::Rand::DblUniform() < 0.5)
-    this->bias = -this->bias;
+    this->biasStdDev = _sdf->Get<double>("bias_stddev");
+  this->SampleBias();
 
   /// \todo Remove this, and use Noise::Print. See ImuSensor for an example
   gzlog << "applying Gaussian noise model with mean " << this->mean
@@ -170,9 +165,35 @@ double GaussianNoiseModel::GetStdDev() const
 }
 
 //////////////////////////////////////////////////
+void GaussianNoiseModel::SetMean(const double _mean)
+{
+  this->mean = _mean;
+  this->SampleBias();
+}
+
+//////////////////////////////////////////////////
+void GaussianNoiseModel::SetStdDev(const double _stddev)
+{
+  this->stdDev = _stddev;
+  this->SampleBias();
+}
+
+//////////////////////////////////////////////////
 double GaussianNoiseModel::GetBias() const
 {
   return this->bias;
+}
+
+//////////////////////////////////////////////////
+void GaussianNoiseModel::SampleBias()
+{
+  this->bias =
+      ignition::math::Rand::DblNormal(this->biasMean, this->biasStdDev);
+  // With equal probability, we pick a negative bias (by convention,
+  // rateBiasMean should be positive, though it would work fine if
+  // negative).
+  if (ignition::math::Rand::DblUniform() < 0.5)
+    this->bias = -this->bias;
 }
 
 //////////////////////////////////////////////////

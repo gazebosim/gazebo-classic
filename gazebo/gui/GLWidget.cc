@@ -858,7 +858,15 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
     request.set_id(0);
     request.set_request("get_topics");
     connection->EnqueueMsg(msgs::Package("request", request), true);
-    connection->Read(topicData);
+    try
+    {
+      connection->Read(topicData);
+    }
+    catch(std::exception &_e)
+    {
+      gzerr << "Error during connection read : " << _e.what() << std::endl;
+      return;
+    }
 
     packet.ParseFromString(topicData);
     topics.ParseFromString(packet.serialized_data());

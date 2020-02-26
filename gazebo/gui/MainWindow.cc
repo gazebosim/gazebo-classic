@@ -77,7 +77,6 @@ using namespace gui;
 #define MINIMUM_TAB_WIDTH 250
 
 extern bool g_fullscreen;
-
 /////////////////////////////////////////////////
 MainWindow::MainWindow()
   : dataPtr(new MainWindowPrivate)
@@ -504,7 +503,7 @@ void MainWindow::SaveAs()
 
     std::string filename = selected[0].toStdString();
 
-    g_saveAct->setEnabled(true);
+    this->dataPtr->isSavedOnce = true;
     this->dataPtr->saveFilename = filename;
     this->Save();
   }
@@ -513,71 +512,79 @@ void MainWindow::SaveAs()
 /////////////////////////////////////////////////
 void MainWindow::Save()
 {
-  // Get the latest world in SDF.
-  boost::shared_ptr<msgs::Response> response =
-    transport::request(get_world(), "world_sdf_save");
-
-  msgs::GzString msg;
-  std::string msgData;
-
-  // Make sure the response is correct
-  if (response->response() != "error" && response->type() == msg.GetTypeName())
+  if (this->dataPtr->isSavedOnce)
   {
-    // Parse the response message
-    msg.ParseFromString(response->serialized_data());
+    // Get the latest world in SDF.
+    boost::shared_ptr<msgs::Response> response =
+      transport::request(get_world(), "world_sdf_save");
 
-    // Parse the string into sdf, so that we can insert user camera settings.
-    sdf::SDF sdf_parsed;
-    sdf_parsed.SetFromString(msg.data());
-    // Check that sdf contains world
-    if (sdf_parsed.Root()->HasElement("world"))
+    msgs::GzString msg;
+    std::string msgData;
+
+    // Make sure the response is correct
+    if (response->response() != "error" &&
+        response->type() == msg.GetTypeName())
     {
-      sdf::ElementPtr world = sdf_parsed.Root()->GetElement("world");
-      sdf::ElementPtr guiElem = world->GetElement("gui");
+      // Parse the response message
+      msg.ParseFromString(response->serialized_data());
 
-      if (guiElem->HasAttribute("fullscreen"))
-        guiElem->GetAttribute("fullscreen")->Set(g_fullscreen);
+      // Parse the string into sdf, so that we can insert user camera settings.
+      sdf::SDF sdf_parsed;
+      sdf_parsed.SetFromString(msg.data());
+      // Check that sdf contains world
+      if (sdf_parsed.Root()->HasElement("world"))
+      {
+        sdf::ElementPtr world = sdf_parsed.Root()->GetElement("world");
+        sdf::ElementPtr guiElem = world->GetElement("gui");
 
-      sdf::ElementPtr cameraElem = guiElem->GetElement("camera");
-      rendering::UserCameraPtr cam = gui::get_active_camera();
+        if (guiElem->HasAttribute("fullscreen"))
+          guiElem->GetAttribute("fullscreen")->Set(g_fullscreen);
 
-      cameraElem->GetElement("pose")->Set(cam->WorldPose());
-      cameraElem->GetElement("view_controller")->Set(
-          cam->GetViewControllerTypeString());
+        sdf::ElementPtr cameraElem = guiElem->GetElement("camera");
+        rendering::UserCameraPtr cam = gui::get_active_camera();
 
-      cameraElem->GetElement("projection_type")->Set(cam->ProjectionType());
+        cameraElem->GetElement("pose")->Set(cam->WorldPose());
+        cameraElem->GetElement("view_controller")->Set(
+            cam->GetViewControllerTypeString());
 
-      // TODO: export track_visual properties as well.
-      msgData = sdf_parsed.Root()->ToString("");
+        cameraElem->GetElement("projection_type")->Set(cam->ProjectionType());
+
+        // TODO: export track_visual properties as well.
+        msgData = sdf_parsed.Root()->ToString("");
+      }
+      else
+      {
+        msgData = msg.data();
+        gzerr << "Unable to parse world file to add user camera settings.\n";
+      }
+
+      // Open the file
+      std::ofstream out(this->dataPtr->saveFilename.c_str(), std::ios::out);
+
+      if (!out)
+      {
+        QMessageBox msgBox;
+        std::string str = "Unable to open file: " + this->dataPtr->saveFilename;
+        str += ".\nCheck file permissions.";
+        msgBox.setText(str.c_str());
+        msgBox.exec();
+      }
+      else
+        out << msgData;
+
+      out.close();
     }
     else
-    {
-      msgData = msg.data();
-      gzerr << "Unable to parse world file to add user camera settings.\n";
-    }
-
-    // Open the file
-    std::ofstream out(this->dataPtr->saveFilename.c_str(), std::ios::out);
-
-    if (!out)
     {
       QMessageBox msgBox;
-      std::string str = "Unable to open file: " + this->dataPtr->saveFilename;
-      str += ".\nCheck file permissions.";
-      msgBox.setText(str.c_str());
+      msgBox.setText("Unable to save world.\n"
+                     "Unable to retrieve SDF world description from server.");
       msgBox.exec();
     }
-    else
-      out << msgData;
-
-    out.close();
   }
   else
   {
-    QMessageBox msgBox;
-    msgBox.setText("Unable to save world.\n"
-                   "Unable to retrieve SDF world description from server.");
-    msgBox.exec();
+    this->SaveAs();
   }
 }
 
@@ -1110,7 +1117,6 @@ void MainWindow::CreateActions()
   g_saveAct = new QAction(tr("&Save World"), this);
   g_saveAct->setShortcut(tr("Ctrl+S"));
   g_saveAct->setStatusTip(tr("Save world"));
-  g_saveAct->setEnabled(false);
   this->connect(g_saveAct, SIGNAL(triggered()), this, SLOT(Save()));
 
   g_saveAsAct = new QAction(tr("Save World &As"), this);

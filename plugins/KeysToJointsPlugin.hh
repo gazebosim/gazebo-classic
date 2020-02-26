@@ -104,7 +104,7 @@ namespace gazebo
   ///
   /// 4. Check the example world "simple_arm_teleop.world" for a demo.
   ///
-  class GAZEBO_VISIBLE KeysToJointsPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE KeysToJointsPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: KeysToJointsPlugin();

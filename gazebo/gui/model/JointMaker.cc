@@ -506,7 +506,8 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
   jointData->parent = _parent;
   jointData->line = jointLine;
   jointData->type = this->dataPtr->jointType;
-  jointData->line->setMaterial(this->jointMaterials[jointData->type]);
+  GZ_OGRE_SET_MATERIAL_BY_NAME(jointData->line,
+                               this->jointMaterials[jointData->type]);
 
   return jointData;
 }
@@ -1221,7 +1222,7 @@ void JointData::Update()
   // Line
   if (this->line)
   {
-    this->line->setMaterial(material);
+    GZ_OGRE_SET_MATERIAL_BY_NAME(this->line, material);
 
     // Parent - child
     if (this->child && this->jointVisual)

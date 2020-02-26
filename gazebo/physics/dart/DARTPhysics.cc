@@ -15,6 +15,16 @@
  *
 */
 
+// required for HAVE_DART_BULLET define
+#include <gazebo/gazebo_config.h>
+
+#ifdef HAVE_DART_BULLET
+#include <dart/collision/bullet/bullet.hpp>
+#endif
+
+#include <dart/collision/dart/dart.hpp>
+#include <dart/collision/fcl/fcl.hpp>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -88,6 +98,15 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+std::string DARTPhysics::CollisionDetectorInUse() const
+{
+  dart::collision::CollisionDetectorPtr cd =
+    this->dataPtr->dtWorld->getConstraintSolver()->getCollisionDetector();
+  if (!cd) return "";
+  return cd->getType();
+}
+
+//////////////////////////////////////////////////
 void DARTPhysics::Init()
 {
 }
@@ -101,20 +120,6 @@ void DARTPhysics::Fini()
 //////////////////////////////////////////////////
 void DARTPhysics::Reset()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
-
-  // Restore state all the models
-  unsigned int modelCount = this->world->ModelCount();
-  DARTModelPtr dartModelIt;
-
-  for (unsigned int i = 0; i < modelCount; ++i)
-  {
-    dartModelIt =
-      boost::dynamic_pointer_cast<DARTModel>(this->world->ModelByIndex(i));
-    GZ_ASSERT(dartModelIt, "dartModelIt pointer is null");
-
-    dartModelIt->RestoreState();
-  }
 }
 
 //////////////////////////////////////////////////
@@ -714,6 +719,54 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
     {
       this->dataPtr->resetAllForcesAfterSimulationStep =
           boost::any_cast<bool>(_value);
+    }
+    else if (_key == "collision_detector")
+    {
+      // set collision detector
+      std::string useCollisionDetector = boost::any_cast<std::string>(_value);
+      std::shared_ptr<dart::collision::CollisionDetector> cd;
+      if (useCollisionDetector == "bullet")
+      {
+        gzdbg << "Using BULLET collision detector" << std::endl;
+#ifdef HAVE_DART_BULLET
+        cd = dart::collision::BulletCollisionDetector::create();
+#else
+        gzerr << "Required DART bullet collision package not in use. Please "
+            << "install libdart<version>-collision-bullet-dev." << std::endl;
+#endif
+      }
+      else if (useCollisionDetector == "fcl")
+      {
+        gzdbg << "Using FCL collision detector" << std::endl;
+        cd = dart::collision::FCLCollisionDetector::create();
+      }
+      else if (useCollisionDetector == "ode")
+      {
+        // ODE collision detectors have to be disabled because it causes
+        // conflicts with the version of the internally compiled ODE library.
+        // See also discussion in the PR:
+        // https://bitbucket.org/osrf/gazebo/pull-requests/2956/
+        //   dart-heightmap-with-bullet-and-ode/diff#comment-81389484
+        gzerr << "The use of the ODE collision detector with DART is disabled "
+            << "because it causes conflicts with the version of ODE used in "
+            << "Gazebo." << std::endl;
+      }
+      else if (useCollisionDetector == "dart")
+      {
+        gzdbg << "Using DART collision detector" << std::endl;
+        cd = dart::collision::DARTCollisionDetector::create();
+      }
+
+      if (cd)
+      {
+        this->dataPtr->dtWorld->getConstraintSolver()->setCollisionDetector(cd);
+      }
+      else
+      {
+        gzwarn << "collision_detector element set in SDF, but no valid "
+               << "collision detector specified (" << useCollisionDetector
+               << " not supported. Using default." << std::endl;
+      }
     }
     else
     {

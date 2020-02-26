@@ -156,20 +156,6 @@ namespace gazebo
       public: virtual void SetAngularVel(
                   const ignition::math::Vector3d &_vel) = 0;
 
-      /// \brief Set the linear acceleration of the body.
-      /// \param[in] _accel Linear acceleration.
-      /// \deprecated acceleration should be achieved by setting
-      ///     force, see SetForce()
-      public: void SetLinearAccel(const ignition::math::Vector3d &_accel)
-              GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the angular acceleration of the body.
-      /// \param[in] _accel Angular acceleration.
-      /// \deprecated acceleration should be achieved by setting
-      ///     force, see SetForce()
-      public: void SetAngularAccel(const ignition::math::Vector3d &_accel)
-              GAZEBO_DEPRECATED(9.0);
-
       /// \brief Set the force applied to the body.
       /// \param[in] _force Force value.
       public: virtual void SetForce(
@@ -686,14 +672,6 @@ namespace gazebo
 
       /// \brief Link visual elements.
       protected: Visuals_M visuals;
-
-      /// \brief Linear acceleration.
-      /// deprecated
-      protected: ignition::math::Vector3d linearAccel;
-
-      /// \brief Angular acceleration.
-      /// deprecated
-      protected: ignition::math::Vector3d angularAccel;
 
       /// \brief Offsets for the attached models.
       protected: std::vector<ignition::math::Pose3d> attachedModelsOffset;

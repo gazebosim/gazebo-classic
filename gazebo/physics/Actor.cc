@@ -35,13 +35,18 @@
 
 #include "gazebo/transport/Node.hh"
 
+/// \brief Private data for Actor class
+class gazebo::physics::ActorPrivate
+{
+};
+
 using namespace gazebo;
 using namespace physics;
 using namespace common;
 
 //////////////////////////////////////////////////
 Actor::Actor(BasePtr _parent)
-  : Model(_parent)
+  : Model(_parent), dataPtr(new ActorPrivate)
 {
   this->AddType(ACTOR);
   this->pathLength = 0.0;
@@ -278,6 +283,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
     while (trajSdf)
     {
       auto trajType = trajSdf->Get<std::string>("type");
+      double tension = trajSdf->Get<double>("tension", 0.0).first;
 
       TrajectoryInfo tinfo;
       tinfo.id = trajSdf->Get<int>("id");
@@ -314,7 +320,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
         std::stringstream animName;
         animName << tinfo.type << "_" << tinfo.id;
         common::PoseAnimation *anim = new common::PoseAnimation(animName.str(),
-                                                          last->first, false);
+            last->first, false, tension);
 
         // Create a keyframe for each point
         for (auto pIter = points.begin(); pIter != points.end(); ++pIter)

@@ -69,7 +69,7 @@ void TransmitterVisual::Load()
   TransmitterVisualPrivate *dPtr =
       reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);
   dPtr->points = this->CreateDynamicLine(rendering::RENDERING_POINT_LIST);
-  dPtr->points->setMaterial("Gazebo/PointCloud");
+  GZ_OGRE_SET_MATERIAL_BY_NAME(dPtr->points, "Gazebo/PointCloud");
 }
 
 /////////////////////////////////////////////////

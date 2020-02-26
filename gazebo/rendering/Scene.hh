@@ -25,6 +25,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <OGRE/OgrePrerequisites.h>
+
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Color.hh>
@@ -32,7 +34,6 @@
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Color.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -43,16 +44,6 @@
 namespace SkyX
 {
   class SkyX;
-}
-
-namespace Ogre
-{
-  class SceneManager;
-  class Node;
-  class Entity;
-  class Mesh;
-  class Vector3;
-  class Quaternion;
 }
 
 namespace gazebo
@@ -146,12 +137,6 @@ namespace gazebo
 
       /// \brief Set the ambient color.
       /// \param[in] _color The ambient color to use.
-      /// \deprecated Use function which accepts ignition::math::Color.
-      public: void SetAmbientColor(const common::Color &_color)
-          GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the ambient color.
-      /// \param[in] _color The ambient color to use.
       public: void SetAmbientColor(const ignition::math::Color &_color);
 
       /// \brief Get the ambient color.
@@ -160,27 +145,11 @@ namespace gazebo
 
       /// \brief Set the background color.
       /// \param[in] _color The background color.
-      /// \deprecated Use function which accepts ignition::math::Color.
-      public: void SetBackgroundColor(const common::Color &_color)
-          GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the background color.
-      /// \param[in] _color The background color.
       public: void SetBackgroundColor(const ignition::math::Color &_color);
 
       /// \brief Get the background color.
       /// \return The background color.
       public: ignition::math::Color BackgroundColor() const;
-
-      /// \brief Create a square grid of cells.
-      /// \param[in] _cellCount Number of grid cells in one direction.
-      /// \param[in] _cellLength Length of one grid cell.
-      /// \param[in] _lineWidth Width of the grid lines.
-      /// \param[in] _color Color of the grid lines.
-      /// \deprecated Use function which accepts ignition::math::Color.
-      public: void CreateGrid(const uint32_t _cellCount,
-          const float _cellLength, const float _lineWidth,
-          const common::Color &_color) GAZEBO_DEPRECATED(9.0);
 
       /// \brief Create a square grid of cells.
       /// \param[in] _cellCount Number of grid cells in one direction.
@@ -405,19 +374,6 @@ namespace gazebo
       public: void DrawLine(const ignition::math::Vector3d &_start,
                             const ignition::math::Vector3d &_end,
                             const std::string &_name);
-
-      /// \brief Set the fog parameters.
-      /// \param[in] _type Type of fog: "linear", "exp", or "exp2".
-      /// \param[in] _color Color of the fog.
-      /// \param[in] _density Fog density.
-      /// \param[in] _start Distance from camera to start the fog.
-      /// \param[in] _end Distance from camera at which the fog is at max
-      /// density.
-      /// \deprecated Use function which accepts ignition::math::Color.
-      public: void SetFog(const std::string &_type,
-                          const common::Color &_color,
-                          const double _density, const double _start,
-                          const double _end) GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the fog parameters.
       /// \param[in] _type Type of fog: "linear", "exp", or "exp2".

@@ -498,12 +498,6 @@ std::string Scene::Name() const
 }
 
 //////////////////////////////////////////////////
-void Scene::SetAmbientColor(const common::Color &_color)
-{
-  this->SetAmbientColor(_color.Ign());
-}
-
-//////////////////////////////////////////////////
 void Scene::SetAmbientColor(const ignition::math::Color &_color)
 {
   this->dataPtr->sdf->GetElement("ambient")->Set(_color);
@@ -520,12 +514,6 @@ void Scene::SetAmbientColor(const ignition::math::Color &_color)
 ignition::math::Color Scene::AmbientColor() const
 {
   return this->dataPtr->sdf->Get<ignition::math::Color>("ambient");
-}
-
-//////////////////////////////////////////////////
-void Scene::SetBackgroundColor(const common::Color &_color)
-{
-  this->SetBackgroundColor(_color.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -552,13 +540,6 @@ void Scene::SetBackgroundColor(const ignition::math::Color &_color)
 ignition::math::Color Scene::BackgroundColor() const
 {
   return this->dataPtr->sdf->Get<ignition::math::Color>("background");
-}
-
-//////////////////////////////////////////////////
-void Scene::CreateGrid(const uint32_t _cellCount, const float _cellLength,
-                       const float /*_lineWidth*/, const common::Color &_color)
-{
-  this->CreateGrid(_cellCount, _cellLength, _color.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1365,14 +1346,6 @@ void Scene::DrawLine(const ignition::math::Vector3d &_start,
 
   if (!attached)
     sceneNode->attachObject(obj);
-}
-
-//////////////////////////////////////////////////
-void Scene::SetFog(const std::string &_type, const common::Color &_color,
-                   const double _density, const double _start,
-                   const double _end)
-{
-  this->SetFog(_type, _color.Ign(), _density, _start, _end);
 }
 
 //////////////////////////////////////////////////
@@ -3177,8 +3150,14 @@ void Scene::SetShadowsEnabled(bool _value)
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
     this->dataPtr->manager->setShadowTechnique(
         Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+    this->dataPtr->manager->setShadowTextureCasterMaterial(
+        Ogre::MaterialManager::getSingleton().getByName(
+            "DeferredRendering/Shadows/RSMCaster_Spot"));
+#else
     this->dataPtr->manager->setShadowTextureCasterMaterial(
         "DeferredRendering/Shadows/RSMCaster_Spot");
+#endif
     this->dataPtr->manager->setShadowTextureCount(1);
     this->dataPtr->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and

@@ -35,11 +35,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Color;
-  }
-
   namespace rendering
   {
     class Scene;
@@ -57,18 +52,6 @@ namespace gazebo
     /// identity orientation is drawn along the XY plane.
     class GZ_RENDERING_VISIBLE Grid
     {
-      /// \brief Constructor
-      ///
-      /// \param[in] _scene The scene this object is part of
-      /// \param[in] _cellCount The number of cells to draw
-      /// \param[in] _cellLength The size of each cell
-      /// \param[in] _lineWidth The width of the lines to use
-      /// \param[in] _color The color of the grid
-      /// \deprecated Use constructor which accepts ignition::math::Color.
-      public: Grid(Scene *_scene, const uint32_t _cellCount,
-          const float _cellLength, const float _lineWidth,
-          const common::Color &_color) GAZEBO_DEPRECATED(9.0);
-
       /// \brief Constructor
       ///
       /// \param[in] _scene The scene this object is part of
@@ -100,11 +83,6 @@ namespace gazebo
 
       /// \brief Sets the color of the grid
       /// \param[in] _color The grid color
-      /// \deprecated Use function which accepts ignition::math::Color.
-      public: void SetColor(const common::Color &_color) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Sets the color of the grid
-      /// \param[in] _color The grid color
       public: void SetColor(const ignition::math::Color &_color);
 
       /// \brief Return the grid color
@@ -126,16 +104,6 @@ namespace gazebo
       /// \brief Get the cell length
       /// \return The cell length
       public: float CellLength() const;
-
-      /// \brief Set the line width
-      /// \param[in] _width The width of the grid
-      /// \deprecated Grid lines are always 1px wide.
-      public: void SetLineWidth(const float _width) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Get the width of the grid line
-      /// \return The line width
-      /// \deprecated Grid lines are always 1px wide.
-      public: float LineWidth() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the height of the grid
       /// \param[in] _count Grid height

@@ -118,7 +118,7 @@ void UserCamera::Init()
 
   // Don't yaw along variable axis, causes leaning
   this->SetFixedYawAxis(true, ignition::math::Vector3d::UnitZ);
-  this->camera->setDirection(1, 0, 0);
+  this->sceneNode->setDirection(1, 0, 0);
   this->camera->setAutoAspectRatio(false);
 
   // Right camera
@@ -500,7 +500,7 @@ void UserCamera::UpdateFOV()
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->dataPtr->rightCamera->setAspectRatio(ratio);
-    this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
+    this->dataPtr->rightCamera->setFOVy(Ogre::Radian(this->LimitFOV(vfov)));
   }
 }
 

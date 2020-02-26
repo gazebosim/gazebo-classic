@@ -219,7 +219,7 @@ void Light::CreateVisual()
     this->dataPtr->line =
         this->dataPtr->visual->CreateDynamicLine(RENDERING_LINE_LIST);
 
-    this->dataPtr->line->setMaterial("Gazebo/LightOn");
+    GZ_OGRE_SET_MATERIAL_BY_NAME(this->dataPtr->line, "Gazebo/LightOn");
 
     this->dataPtr->line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
@@ -400,9 +400,9 @@ bool Light::SetSelected(const bool _s)
   if (this->dataPtr->light->getType() != Ogre::Light::LT_DIRECTIONAL)
   {
     if (_s)
-      this->dataPtr->line->setMaterial("Gazebo/PurpleGlow");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(this->dataPtr->line, "Gazebo/PurpleGlow");
     else
-      this->dataPtr->line->setMaterial("Gazebo/LightOn");
+      GZ_OGRE_SET_MATERIAL_BY_NAME(this->dataPtr->line, "Gazebo/LightOn");
   }
 
   return true;
@@ -474,12 +474,6 @@ std::string Light::LightType() const
 }
 
 //////////////////////////////////////////////////
-void Light::SetDiffuseColor(const common::Color &_color)
-{
-  this->SetDiffuseColor(_color.Ign());
-}
-
-//////////////////////////////////////////////////
 void Light::SetDiffuseColor(const ignition::math::Color &_color)
 {
   sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("diffuse");
@@ -502,12 +496,6 @@ ignition::math::Color Light::SpecularColor() const
 {
   return
       this->dataPtr->sdf->GetElement("specular")->Get<ignition::math::Color>();
-}
-
-//////////////////////////////////////////////////
-void Light::SetSpecularColor(const common::Color &_color)
-{
-  this->SetSpecularColor(_color.Ign());
 }
 
 //////////////////////////////////////////////////

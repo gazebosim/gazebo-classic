@@ -1092,7 +1092,8 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
         Ogre::SimpleRenderable *simpleRenderable =
             dynamic_cast<Ogre::SimpleRenderable *>(obj);
         if (simpleRenderable)
-          simpleRenderable->setMaterial(this->dataPtr->myMaterialName);
+          GZ_OGRE_SET_MATERIAL_BY_NAME(simpleRenderable,
+              this->dataPtr->myMaterialName);
       }
     }
   }
@@ -1238,12 +1239,6 @@ void Visual::SetMaterialShaderParam(const std::string &_paramName,
 }
 
 /////////////////////////////////////////////////
-void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
-{
-  this->SetAmbient(_color.Ign(), _cascade);
-}
-
-/////////////////////////////////////////////////
 void Visual::SetAmbient(const ignition::math::Color &_color,
     const bool _cascade)
 {
@@ -1306,12 +1301,6 @@ void Visual::SetAmbient(const ignition::math::Color &_color,
 
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("ambient")->Set(_color);
-}
-
-/////////////////////////////////////////////////
-void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
-{
-  this->SetDiffuse(_color.Ign(), _cascade);
 }
 
 /////////////////////////////////////////////////
@@ -1384,12 +1373,6 @@ void Visual::SetDiffuse(const ignition::math::Color &_color,
       ->GetElement("diffuse")->Set(_color);
 }
 
-/////////////////////////////////////////////////
-void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
-{
-  this->SetSpecular(_color.Ign(), _cascade);
-}
-
 //////////////////////////////////////////////////
 void Visual::SetSpecular(const ignition::math::Color &_color,
     const bool _cascade)
@@ -1456,12 +1439,6 @@ void Visual::SetSpecular(const ignition::math::Color &_color,
 }
 
 //////////////////////////////////////////////////
-void Visual::SetEmissive(const common::Color &_color, const bool _cascade)
-{
-  this->SetEmissive(_color.Ign(), _cascade);
-}
-
-//////////////////////////////////////////////////
 void Visual::SetEmissive(const ignition::math::Color &_color,
     const bool _cascade)
 {
@@ -1517,35 +1494,9 @@ void Visual::SetEmissive(const ignition::math::Color &_color,
 }
 
 /////////////////////////////////////////////////
-common::Color Visual::GetAmbient() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->dataPtr->ambient;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 ignition::math::Color Visual::Ambient() const
 {
   return this->dataPtr->ambient;
-}
-
-/////////////////////////////////////////////////
-common::Color Visual::GetDiffuse() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->dataPtr->diffuse;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -1555,35 +1506,9 @@ ignition::math::Color Visual::Diffuse() const
 }
 
 /////////////////////////////////////////////////
-common::Color Visual::GetSpecular() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->dataPtr->specular;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 ignition::math::Color Visual::Specular() const
 {
   return this->dataPtr->specular;
-}
-
-/////////////////////////////////////////////////
-common::Color Visual::GetEmissive() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->dataPtr->emissive;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -2166,14 +2091,6 @@ void Visual::SetRibbonTrail(bool _value,
 }
 
 //////////////////////////////////////////////////
-void Visual::SetRibbonTrail(bool _value,
-                  const common::Color &_initialColor,
-                  const common::Color &_changeColor)
-{
-  this->SetRibbonTrail(_value, _initialColor.Ign(), _changeColor.Ign());
-}
-
-//////////////////////////////////////////////////
 DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 {
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
@@ -2273,7 +2190,11 @@ void Visual::BoundsHelper(Ogre::SceneNode *_node,
         transform[3][0] = transform[3][1] = transform[3][2] = 0;
         transform[3][3] = 1;
         // get oriented bounding box in object's local space
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+        bb.transform(transform);
+#else
         bb.transformAffine(transform);
+#endif
 
         min = Conversions::ConvertIgn(bb.getMinimum());
         max = Conversions::ConvertIgn(bb.getMaximum());

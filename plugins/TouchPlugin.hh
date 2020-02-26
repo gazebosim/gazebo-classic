@@ -57,7 +57,7 @@ namespace gazebo
   /// <enabled> Set this to true so the plugin works from the start and doesn't
   ///           need to be enabled.
   ///
-  class GAZEBO_VISIBLE TouchPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE TouchPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: TouchPlugin();

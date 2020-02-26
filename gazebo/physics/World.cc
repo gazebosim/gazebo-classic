@@ -476,12 +476,16 @@ void World::Stop()
 {
   this->dataPtr->stop = true;
 
-  if (this->dataPtr->thread)
+  // Make sure that the thread does not try to join with itself
+  if (this->dataPtr->thread &&
+     this->dataPtr->thread->get_id() != std::this_thread::get_id())
   {
     this->dataPtr->thread->join();
     delete this->dataPtr->thread;
     this->dataPtr->thread = nullptr;
   }
+
+  event::Events::stop();
 }
 
 //////////////////////////////////////////////////

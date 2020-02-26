@@ -117,20 +117,6 @@ namespace gazebo
       /// \param[in] _vel The new angular velocity.
       public: void SetAngularVel(const ignition::math::Vector3d &_vel);
 
-      /// \brief Set the linear acceleration of the model, and all its
-      /// links.
-      /// \param[in] _vel The new linear acceleration.
-      /// \deprecated acceleration should be achieved by applying a force.
-      public: void SetLinearAccel(const ignition::math::Vector3d &_vel)
-              GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the angular acceleration of the model, and all its
-      /// links.
-      /// \param[in] _vel The new angular acceleration
-      /// \deprecated acceleration should be achieved by applying a force.
-      public: void SetAngularAccel(const ignition::math::Vector3d &_vel)
-              GAZEBO_DEPRECATED(9.0);
-
       /// \brief Get the linear velocity of the entity.
       /// \return ignition::math::Vector3d, set to 0, 0, 0
       /// if the model has no body.
@@ -416,7 +402,7 @@ namespace gazebo
       ///         returns NULL JointPtr() if joint by name _name
       ///         already exists.
       /// \throws common::Exception When _type is not recognized
-      public: gazebo::physics::JointPtr CreateJoint(
+      public: virtual gazebo::physics::JointPtr CreateJoint(
         const std::string &_name, const std::string &_type,
         physics::LinkPtr _parent, physics::LinkPtr _child);
 
@@ -429,12 +415,13 @@ namespace gazebo
       ///         returns NULL JointPtr() if joint by name _name
       ///         already exists.
       /// \throws common::Exception When _type is not recognized
-      public: gazebo::physics::JointPtr CreateJoint(sdf::ElementPtr _sdf);
+      public: virtual gazebo::physics::JointPtr CreateJoint(
+        sdf::ElementPtr _sdf);
 
       /// \brief Remove a joint for this model
       /// \param[in] _name name of joint
       /// \return true if successful, false if not.
-      public: bool RemoveJoint(const std::string &_name);
+      public: virtual bool RemoveJoint(const std::string &_name);
 
       /// \brief Set whether wind affects this body.
       /// \param[in] _mode True to enable wind.

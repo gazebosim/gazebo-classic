@@ -19,6 +19,7 @@
 
 #include <string>
 #include <map>
+#include <memory>
 #include <vector>
 
 #include <ignition/math/Color.hh>
@@ -38,6 +39,8 @@ namespace gazebo
 
   namespace physics
   {
+    class ActorPrivate;
+
     /// \brief Information about a trajectory for an Actor.
     /// This doesn't contain the keyframes information, just duration.
     class GZ_PHYSICS_VISIBLE TrajectoryInfo
@@ -375,6 +378,9 @@ namespace gazebo
       /// \brief Custom trajectory.
       /// Used to control an actor with a plugin.
       private: TrajectoryInfoPtr customTrajectoryInfo;
+
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ActorPrivate> dataPtr;
     };
     /// \}
   }

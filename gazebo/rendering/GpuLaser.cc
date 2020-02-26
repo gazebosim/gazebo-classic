@@ -461,12 +461,6 @@ void GpuLaser::RenderImpl()
 }
 
 //////////////////////////////////////////////////
-const float* GpuLaser::LaserData() const
-{
-  return this->dataPtr->laserBuffer;
-}
-
-//////////////////////////////////////////////////
 GpuLaser::DataIter GpuLaser::LaserDataBegin() const
 {
   const unsigned int index = 0;
@@ -570,7 +564,7 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
   if (_index == 0)
   {
     this->camera->setAspectRatio(this->RayCountRatio());
-    this->camera->setFOVy(Ogre::Radian(this->CosVertFOV()));
+    this->camera->setFOVy(Ogre::Radian(this->LimitFOV(this->CosVertFOV())));
   }
 }
 

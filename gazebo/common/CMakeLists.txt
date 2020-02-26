@@ -37,7 +37,6 @@ set (sources
   BVHLoader.cc
   ColladaExporter.cc
   ColladaLoader.cc
-  Color.cc
   CommonIface.cc
   Console.cc
   Dem.cc
@@ -94,7 +93,6 @@ set (headers
   ColladaLoader.hh
   CommonIface.hh
   CommonTypes.hh
-  Color.hh
   Console.hh
   Dem.hh
   EnumIface.hh
@@ -131,6 +129,7 @@ set (headers
   URI.hh
   Video.hh
   VideoEncoder.hh
+  WeakBind.hh
   ffmpeg_inc.h
  )
 
@@ -139,7 +138,6 @@ set (gtest_sources
   Battery_TEST.cc
   ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
-  Color_TEST.cc
   CommonIface_TEST.cc
   Console_TEST.cc
   Dem_TEST.cc
@@ -164,6 +162,7 @@ set (gtest_sources
   Time_TEST.cc
   URI_TEST.cc
   VideoEncoder_TEST.cc
+  WeakBind_TEST.cc
 )
 
 # Timer test fails on OSX
@@ -262,6 +261,7 @@ target_link_libraries(gazebo_common
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
   ${IGNITION-FUEL_TOOLS_LIBRARIES}
+  ${IGNITION-COMMON_LIBRARIES}
 )
 
 if (UNIX)

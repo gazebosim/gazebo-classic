@@ -374,13 +374,6 @@ bool ConfigWidget::SetVector3dWidgetValue(const std::string &_name,
 
 /////////////////////////////////////////////////
 bool ConfigWidget::SetColorWidgetValue(const std::string &_name,
-    const common::Color &_value)
-{
-  return this->SetColorWidgetValue(_name, _value.Ign());
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::SetColorWidgetValue(const std::string &_name,
     const ignition::math::Color &_value)
 {
   auto iter = this->dataPtr->configWidgets.find(_name);

@@ -104,7 +104,6 @@ set (qt_headers
 
 set (headers
   qt.h
-  qt_test.h
   Conversions.hh
   EntityMaker.hh
   GuiIface.hh

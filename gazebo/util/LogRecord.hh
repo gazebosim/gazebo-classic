@@ -50,6 +50,10 @@ namespace gazebo
 
       /// \brief Log filter string
       public: std::string filter;
+
+      /// \brief Recording resources. True will record state logs
+      /// together with model meshes and materials.
+      public: bool recordResources = false;
     };
 
     // Forward declare private data class

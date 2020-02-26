@@ -61,9 +61,8 @@ Joint::Joint(BasePtr _parent)
   this->stopStiffness[1] = 1e8;
   this->stopDissipation[1] = 1.0;
   // these flags are related to issue #494
-  // set default to true for backward compatibility
-  this->axisParentModelFrame[0] = true;
-  this->axisParentModelFrame[1] = true;
+  this->axisParentModelFrame[0] = false;
+  this->axisParentModelFrame[1] = false;
 
   if (!this->sdfJoint)
   {
@@ -144,9 +143,6 @@ void Joint::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr axisElem = _sdf->GetElement(axisName);
     {
       std::string param = "use_parent_model_frame";
-      // Check if "use_parent_model_frame" element exists.
-      // It has `required=1`, so if it does not exist, then SDF is old,
-      // and we should assume support for backwards compatibility
       if (axisElem->HasElement(param))
       {
         this->axisParentModelFrame[index] = axisElem->Get<bool>(param);

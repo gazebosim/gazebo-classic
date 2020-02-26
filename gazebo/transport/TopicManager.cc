@@ -52,6 +52,10 @@ class NodeProcess_TBB
 //////////////////////////////////////////////////
 TopicManager::TopicManager()
 {
+  // The following enforce the relative construction/destruction order of the
+  // ConnectionManager and TopicManager.
+  if (!ConnectionManager::Instance())
+    gzwarn << "TopicManager requires the ConnectionManager" << std::endl;
   this->pauseIncoming = false;
   this->advertisedTopicsEnd = this->advertisedTopics.end();
 }

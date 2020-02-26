@@ -27,8 +27,8 @@
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/common/Color.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace google
 {
@@ -293,14 +293,6 @@ namespace gazebo
       /// \return True if the value is set successfully.
       public: bool SetVector3dWidgetValue(const std::string &_name,
           const ignition::math::Vector3d &_value);
-
-      /// \brief Set a color value to a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \param[in] _value Value to set to.
-      /// \return True if the value is set successfully.
-      /// \deprecated Use function which accepts ignition::math::Color
-      public: bool SetColorWidgetValue(const std::string &_name,
-          const common::Color &_value) GAZEBO_DEPRECATED(9);
 
       /// \brief Set a color value to a child widget.
       /// \param[in] _name Name of the child widget.
