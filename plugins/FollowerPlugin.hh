@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_FOLLOWER_PLUGIN_HH_
-#define _GAZEBO_FOLLOWER_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_FOLLOWERPLUGIN_HH_
+#define GAZEBO_PLUGINS_FOLLOWERPLUGIN_HH_
 
 #include <memory>
 #include <string>

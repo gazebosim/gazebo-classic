@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_ANGLE_HH_
-#define _GAZEBO_ANGLE_HH_
+#ifndef GAZEBO_MATH_ANGLE_HH_
+#define GAZEBO_MATH_ANGLE_HH_
 
 #include <math.h>
 #include <ignition/math/Angle.hh>
@@ -26,17 +25,17 @@
 /// \brief Macro that converts radians to degrees
 /// \param[in] radians
 /// \return degrees
-#define GZ_RTOD(r) ((r) * 180 / M_PI)
+#define GZ_RTOD(r) gazebo::math::Angle::RadiansToDegrees(r)
 
 /// \brief Converts degrees to radians
 /// \param[in] degrees
 /// \return radians
-#define GZ_DTOR(d) ((d) * M_PI / 180)
+#define GZ_DTOR(d) gazebo::math::Angle::DegreesToRadians(d)
 
 /// \brief Macro tha normalizes an angle in the range -Pi to Pi
 /// \param[in] angle
 /// \return the angle, in range
-#define GZ_NORMALIZE(a) (atan2(sin(a), cos(a)))
+#define GZ_NORMALIZE(a) gazebo::math::Angle::Normalize(a)
 
 namespace gazebo
 {
@@ -50,6 +49,7 @@ namespace gazebo
 
   /// \class Angle Angle.hh math/gzmath.hh
   /// \brief An angle and related functions.
+  // cppcheck-suppress noConstructor
   class GZ_MATH_VISIBLE Angle
   {
     /// \brief math::Angle(0)
@@ -65,19 +65,19 @@ namespace gazebo
     public: static const Angle TwoPi;
 
     /// \brief Constructor
-    public: Angle();
+    public: Angle() GAZEBO_DEPRECATED(8.0);
 
     /// \brief Copy Constructor
     /// \param[in] _radian Radians
-    public: Angle(double _radian);
+    public: Angle(double _radian) GAZEBO_DEPRECATED(8.0);
 
     /// \brief Copy constructor
     /// \param[in] _angle Angle to copy
-    public: Angle(const Angle &_angle);
+    public: Angle(const Angle &_angle) GAZEBO_DEPRECATED(8.0);
 
     /// \brief Ignition copy constructor
     /// \param[in] _angle Ignition angle to copy
-    public: Angle(const ignition::math::Angle &_angle);
+    public: Angle(const ignition::math::Angle &_angle) GAZEBO_DEPRECATED(8.0);
 
     /// \brief Destructor
     public: virtual ~Angle();
@@ -197,6 +197,33 @@ namespace gazebo
     {
       _out << _a.Radian();
       return _out;
+    }
+
+    /// \brief Converts degrees to radians
+    /// \param[in] degrees
+    /// \return radians
+    public: static double DegreesToRadians(const double _d)
+        GAZEBO_DEPRECATED(8.0)
+    {
+      return _d * M_PI / 180;
+    }
+
+    /// \brief Converts radians to degrees
+    /// \param[in] radians
+    /// \return degrees
+    public: static double RadiansToDegrees(const double _r)
+        GAZEBO_DEPRECATED(8.0)
+    {
+      return _r * 180 / M_PI;
+    }
+
+    /// \brief Macro that normalizes an angle in the range -Pi to Pi
+    /// \param[in] angle
+    /// \return the angle, in range
+    public: static double Normalize(const double _a)
+        GAZEBO_DEPRECATED(8.0)
+    {
+      return atan2(sin(_a), cos(_a));
     }
 
     /// \brief Stream extraction operator. Assumes input is in degrees

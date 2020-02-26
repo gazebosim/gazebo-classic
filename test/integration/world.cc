@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,13 +69,13 @@ void beforePhysicsUpdate(const common::UpdateInfo &_updateInfo)
   physics::WorldPtr world = physics::get_world(_updateInfo.worldName);
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  physics::ModelPtr sphereModel = world->ModelByName("sphere");
   ASSERT_TRUE(sphereModel != NULL);
 
   physics::LinkPtr link = sphereModel->GetLink("link");
   ASSERT_TRUE(link != NULL);
 
-  g_poseBeforeUpdate = link->GetWorldPose().Ign();
+  g_poseBeforeUpdate = link->WorldPose();
 }
 
 /// \brief Callback for WorldUpdateEnd event, just records it's been called.
@@ -93,11 +93,11 @@ void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
 
   // Verify physics engine type
   gzdbg << "Engine: " << _physicsEngine << std::endl;
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  EXPECT_EQ(world->GetModelCount(), 0u);
+  EXPECT_EQ(world->ModelCount(), 0u);
 
   world->Clear();
 
@@ -105,11 +105,12 @@ void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
   for (unsigned int i = 0; i < 20; ++i)
     common::Time::MSleep(500);
 
-  EXPECT_EQ(world->GetModelCount(), 0u);
+  EXPECT_EQ(world->ModelCount(), 0u);
 
   // Now spawn something, and the model count should increase
-  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
-  EXPECT_EQ(world->GetModelCount(), 1u);
+  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1),
+      ignition::math::Vector3d::Zero);
+  EXPECT_EQ(world->ModelCount(), 1u);
 }
 
 /////////////////////////////////////////////////
@@ -125,17 +126,18 @@ TEST_F(WorldTest, Clear)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  EXPECT_EQ(world->GetModelCount(), 2u);
+  EXPECT_EQ(world->ModelCount(), 2u);
 
   world->Clear();
-  while (world->GetModelCount() > 0u)
+  while (world->ModelCount() > 0u)
     common::Time::MSleep(1000);
 
-  EXPECT_EQ(world->GetModelCount(), 0u);
+  EXPECT_EQ(world->ModelCount(), 0u);
 
-  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
+  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1),
+      ignition::math::Vector3d::Zero);
 
-  EXPECT_EQ(world->GetModelCount(), 1u);
+  EXPECT_EQ(world->ModelCount(), 1u);
 }
 
 /////////////////////////////////////////////////
@@ -145,7 +147,7 @@ void WorldTest::Gravity(const std::string &_physicsEngine)
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  auto physics = world->GetPhysicsEngine();
+  auto physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   double dt = physics->GetMaxStepSize();
 
@@ -158,20 +160,20 @@ void WorldTest::Gravity(const std::string &_physicsEngine)
   EXPECT_EQ(gravity, world->Gravity());
 
   // get initial pose and velocity of a box
-  auto model = world->GetModel("box_01_model");
+  auto model = world->ModelByName("box_01_model");
   ASSERT_TRUE(model != NULL);
-  auto initialPose = model->GetWorldPose().Ign();
-  auto initialVelocity = model->GetWorldLinearVel().Ign();
+  auto initialPose = model->WorldPose();
+  auto initialVelocity = model->WorldLinearVel();
   EXPECT_EQ(ignition::math::Vector3d::Zero, initialVelocity);
 
   // step simulation and verify that box moves upwards
   const int steps = 100;
   world->Step(steps);
   auto expectedVelocity = dt * steps * gravity;
-  auto velocity = model->GetWorldLinearVel().Ign();
+  auto velocity = model->WorldLinearVel();
   auto expectedPosition = initialPose.Pos() + 0.5*(dt*steps) * expectedVelocity;
   EXPECT_GT(velocity.Z(), 0.95*expectedVelocity.Z());
-  EXPECT_GT(model->GetWorldPose().Ign().Pos().Z(), 0.95*expectedPosition.Z());
+  EXPECT_GT(model->WorldPose().Pos().Z(), 0.95*expectedPosition.Z());
 
   // set gravity back to zero
   world->SetGravity(ignition::math::Vector3d::Zero);
@@ -179,7 +181,7 @@ void WorldTest::Gravity(const std::string &_physicsEngine)
 
   // step simulation and verify that velocity stays constant
   world->Step(steps);
-  EXPECT_EQ(velocity, model->GetWorldLinearVel().Ign());
+  EXPECT_EQ(velocity, model->WorldLinearVel());
 }
 
 /////////////////////////////////////////////////
@@ -229,7 +231,7 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
   }
@@ -263,7 +265,7 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(lightMsg.diffuse().b(), 0);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
     EXPECT_EQ(sceneMsg.light(0).diffuse().r(), 0);
@@ -299,7 +301,7 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(lightMsg.type(), msgs::Light::POINT);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_light");
     EXPECT_EQ(sceneMsg.light(1).diffuse().r(), 1);
@@ -322,7 +324,7 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
   }
@@ -352,7 +354,7 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(lightMsg.type(), msgs::Light::SPOT);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_spot_light");
     EXPECT_EQ(sceneMsg.light(1).diffuse().r(), 1);
@@ -398,7 +400,7 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(lightMsg.type(), msgs::Light::SPOT);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_spot_light");
     EXPECT_EQ(sceneMsg.light(1).diffuse().r(), 1);
@@ -441,7 +443,7 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(lightMsg.type(), msgs::Light::DIRECTIONAL);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 3);
     EXPECT_STREQ(sceneMsg.light(2).name().c_str(), "test_light");
     EXPECT_EQ(sceneMsg.light(2).diffuse().r(), 0);
@@ -458,8 +460,8 @@ TEST_F(WorldTest, RemoveModelPaused)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr sphereModel = world->GetModel("sphere");
-  physics::ModelPtr boxModel = world->GetModel("box");
+  physics::ModelPtr sphereModel = world->ModelByName("sphere");
+  physics::ModelPtr boxModel = world->ModelByName("box");
 
   EXPECT_TRUE(sphereModel != NULL);
   EXPECT_TRUE(boxModel != NULL);
@@ -467,8 +469,8 @@ TEST_F(WorldTest, RemoveModelPaused)
   world->RemoveModel(sphereModel);
   world->RemoveModel("box");
 
-  sphereModel = world->GetModel("sphere");
-  boxModel = world->GetModel("box");
+  sphereModel = world->ModelByName("sphere");
+  boxModel = world->ModelByName("box");
 
   EXPECT_FALSE(sphereModel != NULL);
   EXPECT_FALSE(boxModel != NULL);
@@ -481,8 +483,8 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr sphereModel = world->GetModel("sphere");
-  physics::ModelPtr boxModel = world->GetModel("box");
+  physics::ModelPtr sphereModel = world->ModelByName("sphere");
+  physics::ModelPtr boxModel = world->ModelByName("box");
 
   EXPECT_TRUE(sphereModel != NULL);
   EXPECT_TRUE(boxModel != NULL);
@@ -491,8 +493,8 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   world->RemoveModel(sphereModel);
   world->RemoveModel("box");
 
-  sphereModel = world->GetModel("sphere");
-  boxModel = world->GetModel("box");
+  sphereModel = world->ModelByName("sphere");
+  boxModel = world->ModelByName("box");
 
   EXPECT_FALSE(sphereModel != NULL);
   EXPECT_FALSE(boxModel != NULL);
@@ -508,7 +510,7 @@ TEST_F(WorldTest, CheckWorldEventsWork)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  physics::ModelPtr sphereModel = world->ModelByName("sphere");
   ASSERT_TRUE(sphereModel != NULL);
 
   physics::LinkPtr link = sphereModel->GetLink("link");
@@ -518,7 +520,7 @@ TEST_F(WorldTest, CheckWorldEventsWork)
   world->Step(10);
 
   // initial pose of the link
-  ignition::math::Pose3d initialPose = link->GetWorldPose().Ign();
+  ignition::math::Pose3d initialPose = link->WorldPose();
 
   // connect to the world events
   event::ConnectionPtr worldUpdateBeginEventConnection =
@@ -544,7 +546,7 @@ TEST_F(WorldTest, CheckWorldEventsWork)
     world->Step(1);
 
     // pose after the physics update
-    ignition::math::Pose3d poseAfterUpdate = link->GetWorldPose().Ign();
+    ignition::math::Pose3d poseAfterUpdate = link->WorldPose();
 
     // initial pose and pose before physics update should be the same
     EXPECT_EQ(initialPose.Pos(), g_poseBeforeUpdate.Pos());
@@ -580,12 +582,12 @@ TEST_F(WorldTest, URI)
   EXPECT_EQ(world->URI().Str(), "data://world/default");
 
   // Check a light.
-  auto light = world->Light("sun");
+  auto light = world->LightByName("sun");
   ASSERT_TRUE(light != NULL);
   EXPECT_EQ(light->URI().Str(), "data://world/default/light/sun");
 
   // Check a model.
-  auto model = world->GetModel("ground_plane");
+  auto model = world->ModelByName("ground_plane");
   ASSERT_TRUE(model != NULL);
   EXPECT_EQ(model->URI().Str(), "data://world/default/model/ground_plane");
 
@@ -595,7 +597,7 @@ TEST_F(WorldTest, URI)
       "data://world/default/model/ground_plane/link/link");
 
   // Check a nested model.
-  model = world->GetModel("model_00");
+  model = world->ModelByName("model_00");
   ASSERT_TRUE(model != NULL);
   EXPECT_EQ(model->URI().Str(), "data://world/default/model/model_00");
 

@@ -52,30 +52,7 @@ namespace gazebo
 
     // Specialization of conversion from SDF to ignition message for plugins.
     template<>
-    ignition::msgs::Plugin Convert(const sdf::ElementPtr _sdf)
-    {
-      ignition::msgs::Plugin result;
-
-      if (_sdf->GetName() != "plugin")
-      {
-        gzerr << "Tried to convert SDF [" << _sdf->GetName() <<
-            "] into [plugin]" << std::endl;
-        return result;
-      }
-
-      result.set_name(_sdf->Get<std::string>("name"));
-      result.set_filename(_sdf->Get<std::string>("filename"));
-
-      std::stringstream ss;
-      for (sdf::ElementPtr innerElem = _sdf->GetFirstElement();
-          innerElem; innerElem = innerElem->GetNextElement(""))
-      {
-        ss << innerElem->ToString("");
-      }
-      result.set_innerxml(ss.str());
-
-      return result;
-    }
+    ignition::msgs::Plugin Convert(const sdf::ElementPtr _sdf);
   }
 }
 #endif

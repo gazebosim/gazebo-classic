@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,9 @@ using namespace gazebo;
 class ContactSensor : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
+  /// \brief Test removing a model that has a contact sensor
+  public: void ModelRemoval(const std::string &_physicsEngine);
+
   /// \brief Test moving a model while in contact.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void MoveTool(const std::string &_physicsEngine);
@@ -51,6 +54,130 @@ void ContactSensor::Callback(const ConstContactsPtr &/*_msg*/)
   g_messageCount++;
 }
 
+
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
+{
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // check initial topics count
+  auto topics = transport::getAdvertisedTopics();
+  int topicsCount = 0;
+  for (auto iter : topics)
+  {
+    for (auto str : iter.second)
+    {
+      topicsCount++;
+    }
+  }
+  EXPECT_GT(topicsCount, 0);
+
+  // spanw the model
+  std::string modelName = "contactModel";
+  std::string contactSensorName = "contactSensor";
+  ignition::math::Pose3d modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
+
+  SpawnUnitContactSensor(modelName, contactSensorName,
+      "cylinder", modelPose.Pos(), modelPose.Rot().Euler());
+
+  sensors::SensorPtr sensor = sensors::get_sensor(contactSensorName);
+  sensors::ContactSensorPtr contactSensor =
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
+
+  ASSERT_TRUE(contactSensor != nullptr);
+
+  sensors::SensorManager::Instance()->Init();
+  sensors::SensorManager::Instance()->RunThreads();
+
+  EXPECT_FALSE(contactSensor->IsActive());
+
+  unsigned int expectedColCount = 1;
+  EXPECT_EQ(contactSensor->GetCollisionCount(), expectedColCount);
+
+  contactSensor->SetActive(true);
+
+  EXPECT_TRUE(contactSensor->IsActive());
+
+  physics::ModelPtr contactModel = world->ModelByName(modelName);
+  ASSERT_TRUE(contactModel != nullptr);
+
+  // check new topic are published
+  // there should be more than 1 new topic:
+  //   1 new factory topic and 2 new contact sensor topics
+  int wait = 0;
+  int maxWait = 20;
+  int topicsCountModel = 0;
+  int topicsCountModelName = 0;
+  while (topicsCountModel <= topicsCount+2 && wait < maxWait)
+  {
+    common::Time::MSleep(100);
+    topicsCountModel = 0;
+    auto modelTopics = transport::getAdvertisedTopics();
+    for (auto iter : modelTopics)
+    {
+      for (auto str : iter.second)
+      {
+        topicsCountModel++;
+        if (str.find(modelName) != std::string::npos)
+          topicsCountModelName++;
+      }
+    }
+    wait++;
+  }
+  EXPECT_GT(topicsCountModel, topicsCount+1);
+  EXPECT_GT(topicsCountModelName, 0);
+
+  // remove the model
+  world->RemoveModel(contactModel);
+
+  contactModel = world->ModelByName(modelName);
+  EXPECT_TRUE(contactModel == nullptr);
+
+  int sleep = 0;
+  int maxSleep  = 20;
+  while (sensors::get_sensor(contactSensorName) && sleep < maxSleep)
+  {
+    common::Time::MSleep(30);
+    sleep++;
+  }
+  EXPECT_TRUE(sensors::get_sensor(contactSensorName) == nullptr);
+
+  // wait for topics cleanup
+  // verify there are no more contact sensor topics and the number of topics
+  // are back to the initial condition + 1 new factory topic.
+  auto topicsAfter = transport::getAdvertisedTopics();
+  int j = 0;
+  for (j = 0; j < 5 && topicsAfter.size() > (topics.size() + 1); ++j)
+  {
+    common::Time::MSleep(1000);
+    topicsAfter = transport::getAdvertisedTopics();
+  }
+  EXPECT_LT(j, 5);
+  int topicsCountAfter = 0;
+  for (auto iter : topicsAfter)
+  {
+    for (auto str : iter.second)
+    {
+      topicsCountAfter++;
+      EXPECT_TRUE(str.find(modelName) == std::string::npos);
+    }
+  }
+  EXPECT_EQ(topicsCountAfter, topicsCount+1);
+}
+
+TEST_P(ContactSensor, ModelRemoval)
+{
+  ModelRemoval(GetParam());
+}
+
 ////////////////////////////////////////////////////////////////////////
 // Test moving a model while in contact
 // addresses a failure in pull request #1610 for simbody
@@ -62,8 +189,8 @@ void ContactSensor::MoveTool(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   const std::string modelName("sphere");
-  const math::Vector3 pos(0, 0, 1.8);
-  const math::Vector3 v30;
+  const ignition::math::Vector3d pos(0, 0, 1.8);
+  const ignition::math::Vector3d v30;
   const double radius = 0.5;
   SpawnSphere(modelName, pos, v30, v30, radius);
 
@@ -76,20 +203,20 @@ void ContactSensor::MoveTool(const std::string &_physicsEngine)
   world->Step(200);
 
   // Try moving the model
-  auto model = world->GetModel(modelName);
+  auto model = world->ModelByName(modelName);
   ASSERT_TRUE(model != NULL);
 
-  auto pose = model->GetWorldPose();
-  pose.pos.x += 0.2;
-  pose.pos.y += 0.2;
+  auto pose = model->WorldPose();
+  pose.Pos().X() += 0.2;
+  pose.Pos().Y() += 0.2;
 
   msgs::Model msg;
   msg.set_name(modelName);
   msg.set_id(model->GetId());
-  msgs::Set(msg.mutable_pose(), pose.Ign());
+  msgs::Set(msg.mutable_pose(), pose);
   modelPub->Publish(msg);
 
-  while (pose != model->GetWorldPose())
+  while (pose != model->WorldPose())
   {
     world->Step(1);
     common::Time::MSleep(1);
@@ -193,33 +320,33 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   std::string modelName01 = "contactModel01";
   std::string contactSensorName01 = "contactSensor01";
-  math::Pose modelPose01(0, 0, 0.5, 0, 0, 0);
+  ignition::math::Pose3d modelPose01(0, 0, 0.5, 0, 0, 0);
 
   std::string modelName02 = "contactModel02";
   std::string contactSensorName02 = "contactSensor02";
-  math::Pose modelPose02(0, 2, 0.5, 0, M_PI/2.0, 0);
+  ignition::math::Pose3d modelPose02(0, 2, 0.5, 0, M_PI/2.0, 0);
 
   std::string sphereName01 = "sphere01";
-  math::Pose spherePose01(0, 0, 1.5, 0, 0, 0);
+  ignition::math::Pose3d spherePose01(0, 0, 1.5, 0, 0, 0);
 
   std::string sphereName02 = "sphere02";
-  math::Pose spherePose02(0, 2, 1.5, 0, 0, 0);
+  ignition::math::Pose3d spherePose02(0, 2, 1.5, 0, 0, 0);
 
   // spawn two contact sensors
   SpawnUnitContactSensor(modelName01, contactSensorName01,
-      "box", modelPose01.pos, modelPose01.rot.GetAsEuler());
+      "box", modelPose01.Pos(), modelPose01.Rot().Euler());
   SpawnUnitContactSensor(modelName02, contactSensorName02,
-      "box", modelPose02.pos, modelPose02.rot.GetAsEuler());
+      "box", modelPose02.Pos(), modelPose02.Rot().Euler());
 
   // spawn two spheres, each sphere rests on top of one contact sensor
-  SpawnSphere(sphereName01, spherePose01.pos, spherePose01.rot.GetAsEuler());
-  SpawnSphere(sphereName02, spherePose02.pos, spherePose02.rot.GetAsEuler());
+  SpawnSphere(sphereName01, spherePose01.Pos(), spherePose01.Rot().Euler());
+  SpawnSphere(sphereName02, spherePose02.Pos(), spherePose02.Rot().Euler());
 
   sensors::SensorPtr sensor01 = sensors::get_sensor(contactSensorName01);
   sensors::ContactSensorPtr contactSensor01 =
@@ -250,8 +377,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   EXPECT_TRUE(contactSensor01->IsActive());
   EXPECT_TRUE(contactSensor02->IsActive());
 
-  physics::ModelPtr contactModel01 = world->GetModel(modelName01);
-  physics::ModelPtr contactModel02 = world->GetModel(modelName02);
+  physics::ModelPtr contactModel01 = world->ModelByName(modelName01);
+  physics::ModelPtr contactModel02 = world->ModelByName(modelName02);
   ASSERT_TRUE(contactModel01 != NULL);
   ASSERT_TRUE(contactModel02 != NULL);
 
@@ -260,7 +387,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   models.push_back(contactModel02);
 
   double gravityZ = -9.8;
-  physics->SetGravity(math::Vector3(0, 0, gravityZ));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, gravityZ));
 
   msgs::Contacts contacts01;
   msgs::Contacts contacts02;
@@ -286,8 +413,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   contacts.push_back(contacts01);
   contacts.push_back(contacts02);
 
-  math::Vector3 expectedForce;
-  math::Vector3 expectedTorque;
+  ignition::math::Vector3d expectedForce;
+  ignition::math::Vector3d expectedTorque;
 
   // double tolPercentage = 0.1;
   // double tol = 1e-2;
@@ -296,10 +423,10 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   // Run the test once for each contact sensor
   for (unsigned int k = 0; k < contacts.size(); ++k)
   {
-    double mass = models[k]->GetLink()->GetInertial()->GetMass();
-    expectedForce = models[k]->GetLink()->GetWorldCoGPose().rot.GetInverse()
-        * math::Vector3(0, 0, (gravityZ * mass));
-    expectedTorque = math::Vector3(0, 0, 0);
+    double mass = models[k]->GetLink()->GetInertial()->Mass();
+    expectedForce = models[k]->GetLink()->WorldCoGPose().Rot().Inverse()
+        * ignition::math::Vector3d(0, 0, (gravityZ * mass));
+    expectedTorque = ignition::math::Vector3d::Zero;
 
     unsigned int ColInd = 0;
     physics::CollisionPtr col = models[k]->GetLink()->GetCollision(ColInd);
@@ -308,9 +435,9 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
     // calculate tolerance based on magnitude of force
     // Uncomment lines below once we are able to accurately determine the
     // expected force output, see issue #565
-    // tolX = std::max(tolPercentage*expectedForce.x, tol);
-    // tolY = std::max(tolPercentage*expectedForce.y, tol);
-    // tolZ = std::max(tolPercentage*expectedForce.z, tol);
+    // tolX = std::max(tolPercentage*expectedForce.X(), tol);
+    // tolY = std::max(tolPercentage*expectedForce.Y(), tol);
+    // tolZ = std::max(tolPercentage*expectedForce.Z(), tol);
 
     // loop through contact collision pairs
     for (int i = 0; i < contacts[k].contact_size(); ++i)
@@ -325,21 +452,21 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
         FAIL();
       }
 
-      math::Vector3 actualForce;
-      math::Vector3 actualTorque;
+      ignition::math::Vector3d actualForce;
+      ignition::math::Vector3d actualTorque;
 
       // loop through all contact points between the two collisions
       for (int j = 0; j < contacts[k].contact(i).position_size(); ++j)
       {
         // Contact between the sphere and the contact sensor occurs at z=1.0
         // Skip other contact points with the ground plane
-        if (!math::equal(contacts[k].contact(i).position(j).z(), 1.0))
+        if (!ignition::math::equal(contacts[k].contact(i).position(j).z(), 1.0))
           continue;
 
         EXPECT_NEAR(contacts[k].contact(i).position(j).x(),
-            models[k]->GetLink()->GetWorldCoGPose().pos.x, TOL);
+            models[k]->GetLink()->WorldCoGPose().Pos().X(), TOL);
         EXPECT_NEAR(contacts[k].contact(i).position(j).y(),
-            models[k]->GetLink()->GetWorldCoGPose().pos.y, TOL);
+            models[k]->GetLink()->WorldCoGPose().Pos().Y(), TOL);
 
         EXPECT_NEAR(contacts[k].contact(i).normal(j).x(), 0, TOL);
         EXPECT_NEAR(contacts[k].contact(i).normal(j).y(), 0, TOL);
@@ -347,51 +474,51 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
         if (body1)
         {
-          actualForce.x =
+          actualForce.X() =
             contacts[k].contact(i).wrench(j).body_1_wrench().force().x();
-          actualForce.y =
+          actualForce.Y() =
             contacts[k].contact(i).wrench(j).body_1_wrench().force().y();
-          actualForce.z =
+          actualForce.Z() =
             contacts[k].contact(i).wrench(j).body_1_wrench().force().z();
 
-          actualTorque.x =
+          actualTorque.X() =
             contacts[k].contact(i).wrench(j).body_1_wrench().torque().x();
-          actualTorque.y =
+          actualTorque.Y() =
             contacts[k].contact(i).wrench(j).body_1_wrench().torque().y();
-          actualTorque.z =
+          actualTorque.Z() =
             contacts[k].contact(i).wrench(j).body_1_wrench().torque().z();
         }
         else
         {
-          actualForce.x =
+          actualForce.X() =
             contacts[k].contact(i).wrench(j).body_2_wrench().force().x();
-          actualForce.y =
+          actualForce.Y() =
             contacts[k].contact(i).wrench(j).body_2_wrench().force().y();
-          actualForce.z =
+          actualForce.Z() =
             contacts[k].contact(i).wrench(j).body_2_wrench().force().z();
 
-          actualTorque.x =
+          actualTorque.X() =
             contacts[k].contact(i).wrench(j).body_2_wrench().torque().x();
-          actualTorque.y =
+          actualTorque.Y() =
             contacts[k].contact(i).wrench(j).body_2_wrench().torque().y();
-          actualTorque.z =
+          actualTorque.Z() =
             contacts[k].contact(i).wrench(j).body_2_wrench().torque().z();
         }
 
         // Find the dominant force vector component and verify the value has
         // the correct sign.
         // Force and torque are given in the link frame, see issue #545
-        int vi = (fabs(expectedForce.x) > fabs(expectedForce.y))
+        int vi = (fabs(expectedForce.X()) > fabs(expectedForce.Y()))
             ? 0 : 1;
-        vi = (fabs(expectedForce[vi]) > fabs(expectedForce.z))
+        vi = (fabs(expectedForce[vi]) > fabs(expectedForce.Z()))
             ? vi : 2;
         EXPECT_EQ((expectedForce[vi] < 0), (actualForce[vi] < 0));
 
         // Verify torque with a large tolerance
         double odeTorqueTol = 2;
-        EXPECT_LT(fabs(actualTorque.x), odeTorqueTol);
-        EXPECT_LT(fabs(actualTorque.y), odeTorqueTol);
-        EXPECT_LT(fabs(actualTorque.z), odeTorqueTol);
+        EXPECT_LT(fabs(actualTorque.X()), odeTorqueTol);
+        EXPECT_LT(fabs(actualTorque.Y()), odeTorqueTol);
+        EXPECT_LT(fabs(actualTorque.Z()), odeTorqueTol);
 
         // TODO: ODE and bullet produce slightly different results
         // In ODE the force and torque on an object seem to be affected by other
@@ -399,12 +526,12 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
         // exerts non-zero x and y forces on the contact sensor when only
         // negative z forces are expected.
         // The tests below pass in bullet but fail in ode, see issue #565
-        // EXPECT_NEAR(expectedForce.x, actualForce.x, tolX);
-        // EXPECT_NEAR(expectedForce.y, actualForce.y, tolY);
-        // EXPECT_NEAR(expectedForce.z, actualForce.z, tolZ);
-        // EXPECT_NEAR(expectedTorque.x, actualTorque.x, tolX);
-        // EXPECT_NEAR(expectedTorque.y, actualTorque.y, tolY);
-        // EXPECT_NEAR(expectedTorque.z, actualTorque.z, tolZ);
+        // EXPECT_NEAR(expectedForce.X(), actualForce.X(), tolX);
+        // EXPECT_NEAR(expectedForce.Y(), actualForce.Y(), tolY);
+        // EXPECT_NEAR(expectedForce.Z(), actualForce.Z(), tolZ);
+        // EXPECT_NEAR(expectedTorque.X(), actualTorque.X(), tolX);
+        // EXPECT_NEAR(expectedTorque.Y(), actualTorque.Y(), tolY);
+        // EXPECT_NEAR(expectedTorque.Z(), actualTorque.Z(), tolZ);
       }
     }
   }
@@ -429,21 +556,21 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   std::string modelName = "contactModel";
   std::string contactSensorName = "contactSensor";
-  math::Pose modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
+  ignition::math::Pose3d modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
 
   std::string cylinderName = "cylinder";
-  math::Pose cylinderPose(0, 0, 0.5, 0, M_PI/2.0, 0);
+  ignition::math::Pose3d cylinderPose(0, 0, 0.5, 0, M_PI/2.0, 0);
 
   SpawnUnitContactSensor(modelName, contactSensorName,
-      "cylinder", modelPose.pos, modelPose.rot.GetAsEuler());
+      "cylinder", modelPose.Pos(), modelPose.Rot().Euler());
 
-  SpawnCylinder(cylinderName, cylinderPose.pos, cylinderPose.rot.GetAsEuler());
+  SpawnCylinder(cylinderName, cylinderPose.Pos(), cylinderPose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(contactSensorName);
   sensors::ContactSensorPtr contactSensor =
@@ -463,11 +590,11 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   EXPECT_TRUE(contactSensor->IsActive());
 
-  physics::ModelPtr contactModel = world->GetModel(modelName);
+  physics::ModelPtr contactModel = world->ModelByName(modelName);
   ASSERT_TRUE(contactModel != NULL);
 
   double gravityZ = -9.8;
-  physics->SetGravity(math::Vector3(0, 0, gravityZ));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, gravityZ));
 
   msgs::Contacts contacts;
 
@@ -509,7 +636,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
     {
       FAIL();
     }
-    math::Vector3 actualTorque;
+    ignition::math::Vector3d actualTorque;
 
     // loop through all contact points between the two collisions
     for (int j = 0; j < contacts.contact(i).position_size(); ++j)
@@ -519,20 +646,20 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
       if (body1)
       {
-        actualTorque.x =
+        actualTorque.X() =
           contacts.contact(i).wrench(j).body_1_wrench().torque().x();
-        actualTorque.y =
+        actualTorque.Y() =
           contacts.contact(i).wrench(j).body_1_wrench().torque().y();
-        actualTorque.z =
+        actualTorque.Z() =
           contacts.contact(i).wrench(j).body_1_wrench().torque().z();
       }
       else
       {
-        actualTorque.x =
+        actualTorque.X() =
           contacts.contact(i).wrench(j).body_2_wrench().torque().x();
-        actualTorque.y =
+        actualTorque.Y() =
           contacts.contact(i).wrench(j).body_2_wrench().torque().y();
-        actualTorque.z =
+        actualTorque.Z() =
           contacts.contact(i).wrench(j).body_2_wrench().torque().z();
       }
 
@@ -541,11 +668,11 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
       {
         // contact sensor should have positive x torque and relatively large
         // compared to y and z
-        EXPECT_GT(actualTorque.x, 0);
-        EXPECT_GT(actualTorque.x, fabs(actualTorque.y));
-        EXPECT_GT(actualTorque.x, fabs(actualTorque.z));
-        // EXPECT_LT(fabs(actualTorque.y), tol);
-        // EXPECT_LT(fabs(actualTorque.z), tol);
+        EXPECT_GT(actualTorque.X(), 0);
+        EXPECT_GT(actualTorque.X(), fabs(actualTorque.Y()));
+        EXPECT_GT(actualTorque.X(), fabs(actualTorque.Z()));
+        // EXPECT_LT(fabs(actualTorque.Y()), tol);
+        // EXPECT_LT(fabs(actualTorque.Z()), tol);
       }
     }
   }

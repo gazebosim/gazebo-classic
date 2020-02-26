@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -705,7 +705,7 @@ TEST_F(TransportTest, Errors)
   EXPECT_STREQ("/gazebo/default/world_stats", statsSub->GetTopic().c_str());
 
   // This generates a warning message
-  // EXPECT_THROW(testNode->Advertise<math::Vector3>("~/scene"),
+  // EXPECT_THROW(testNode->Advertise<ignition::math::Vector3d>("~/scene"),
   //             common::Exception);
 
   scenePub = testNode->Advertise<msgs::Scene>("~/scene");
@@ -760,6 +760,28 @@ TEST_F(TransportTest, Errors)
   scenePub.reset();
   statsSub.reset();
   testNode.reset();
+}
+
+/////////////////////////////////////////////////
+TEST_F(TransportTest, TryInit)
+{
+  // If the ConnectionManager has not been initialized, then TryInit() is
+  // certain to fail.
+  transport::NodePtr node = transport::NodePtr(new transport::Node);
+  EXPECT_FALSE(node->IsInitialized());
+  EXPECT_FALSE(node->TryInit(common::Time(0.01)));
+  EXPECT_FALSE(node->IsInitialized());
+
+  // Loading the server will initialize the ConnectionManager
+  this->Load("worlds/empty.world");
+
+  // The server will initialize some Nodes, so a namespace will be available now
+  EXPECT_FALSE(node->IsInitialized());
+  EXPECT_TRUE(node->TryInit(common::Time(0.01)));
+  EXPECT_TRUE(node->IsInitialized());
+
+  // The namespace of the Node should match the name of the world that we loaded
+  EXPECT_EQ(physics::get_world()->Name(), node->GetTopicNamespace());
 }
 
 /////////////////////////////////////////////////

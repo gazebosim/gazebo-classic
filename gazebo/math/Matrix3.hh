@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,19 @@
  * limitations under the License.
  *
 */
-#ifndef _MATRIX3_HH_
-#define _MATRIX3_HH_
+#ifndef GAZEBO_MATH_MATRIX3_HH_
+#define GAZEBO_MATH_MATRIX3_HH_
 
 #include <assert.h>
+#include <ignition/math/Matrix3.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
+
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 namespace gazebo
 {
@@ -34,11 +40,11 @@ namespace gazebo
     class GZ_MATH_VISIBLE Matrix3
     {
       /// \brief Constructor
-      public: Matrix3();
+      public: Matrix3() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy constructor
       /// \param _m Matrix to copy
-      public: Matrix3(const Matrix3 &_m);
+      public: Matrix3(const Matrix3 &_m) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Constructor
       /// \param[in] _v00 Row 0, Col 0 value
@@ -52,10 +58,20 @@ namespace gazebo
       /// \param[in] _v22 Row 2, Col 2 value
       public: Matrix3(double _v00, double _v01, double _v02,
                       double _v10, double _v11, double _v12,
-                      double _v20, double _v21, double _v22);
+                      double _v20, double _v21, double _v22)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Copy constructor for ignition math
+      /// \param _m Matrix to copy
+      public: Matrix3(const ignition::math::Matrix3d &_m)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Desctructor
       public: virtual ~Matrix3();
+
+      /// \brief Convert this matrix to an ignition::math::Matrix3d.
+      /// \return This matrix as an ignition::math::Matrix3d.
+      public: ignition::math::Matrix3d Ign() const;
 
       /// \brief Set the matrix from three axis (1 per column)
       /// \param[in] _xAxis The x axis
@@ -206,6 +222,9 @@ namespace gazebo
     /// \}
   }
 }
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 #endif
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ BulletMotionState::~BulletMotionState()
 void BulletMotionState::getWorldTransform(btTransform &_cogWorldTrans) const
 {
   _cogWorldTrans =
-    BulletTypes::ConvertPose(this->link->GetWorldInertialPose());
+    BulletTypes::ConvertPose(this->link->WorldInertialPose());
 }
 
 //////////////////////////////////////////////////
@@ -57,15 +57,15 @@ void BulletMotionState::setWorldTransform(const btTransform &/*_cogWorldTrans*/)
   physics::BulletLinkPtr bulletLink =
     boost::static_pointer_cast<BulletLink>(this->link);
   GZ_ASSERT(bulletLink, "parent link must be valid");
-  math::Pose pose;
+  ignition::math::Pose3d pose;
   if (bulletLink->GetBulletLink())
   {
-    pose = BulletTypes::ConvertPose(
+    pose = BulletTypes::ConvertPoseIgn(
       bulletLink->GetBulletLink()->getCenterOfMassTransform());
   }
   else
   {
-    pose = bulletLink->GetWorldCoGPose();
+    pose = bulletLink->WorldInertialPose();
   }
 
   // transform pose from cg location to link location
@@ -73,7 +73,7 @@ void BulletMotionState::setWorldTransform(const btTransform &/*_cogWorldTrans*/)
   //     link defined in cg frame.
   // pose: transform from world origin to cg in inertial frame.
   // -cg + pose:  transform from world origin to link frame in inertial frame.
-  math::Pose cg = this->link->GetInertial()->GetPose();
+  ignition::math::Pose3d cg = this->link->GetInertial()->Pose();
   pose = -cg + pose;
 
   // The second argument is set to false to prevent Entity.cc from propagating

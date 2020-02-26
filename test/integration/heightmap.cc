@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,21 @@
 
 using namespace gazebo;
 
+std::mutex mutex;
+unsigned char* img = NULL;
+
+/////////////////////////////////////////////////
+void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
+                  const unsigned char *_image,
+                  unsigned int _width, unsigned int _height,
+                  unsigned int _depth,
+                  const std::string &/*_format*/)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  memcpy(_imageDest, _image, _width * _height * _depth);
+  *_imageCounter += 1;
+}
+
 class HeightmapTest : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
@@ -35,6 +50,19 @@ class HeightmapTest : public ServerFixture,
   public: void WhiteAlpha(const std::string &_physicsEngine);
   public: void WhiteNoAlpha(const std::string &_physicsEngine);
   public: void Volume(const std::string &_physicsEngine);
+  public: void LoadDEM(const std::string &_physicsEngine);
+  public: void Material(const std::string &_worldName,
+      const std::string &_physicsEngine);
+
+  /// \brief Test loading a heightmap that has no visuals
+  public: void NoVisual();
+
+  /// \brief Test loading a heightmap with an LOD visual plugin
+  public: void LODVisualPlugin();
+
+/// \brief Test loading a heightmap and verify cache files are created
+  public: void HeightmapCache();
+
   public: void NotSquareImage();
   public: void InvalidSizeImage();
   // public: void Heights(const std::string &_physicsEngine);
@@ -72,8 +100,8 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3d(129, 129, 10));
+  EXPECT_TRUE(shape->Pos() == ignition::math::Vector3d::Zero);
+  EXPECT_TRUE(shape->Size() == ignition::math::Vector3d(129, 129, 10));
 
   common::Image trueImage("media/materials/textures/heightmap_bowl.png");
   common::Image testImage = shape->GetImage();
@@ -125,9 +153,9 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
-  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  for (y = 0; y < shape->VertexCount().Y(); ++y)
   {
-    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    for (x = 0; x < shape->VertexCount().X(); ++x)
     {
       EXPECT_NEAR(shape->GetHeight(x, y), 10.0, 1e-4);
     }
@@ -157,9 +185,9 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
-  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  for (y = 0; y < shape->VertexCount().Y(); ++y)
   {
-    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    for (x = 0; x < shape->VertexCount().X(); ++x)
     {
       EXPECT_EQ(shape->GetHeight(x, y), 10.0);
     }
@@ -231,6 +259,73 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
   EXPECT_DOUBLE_EQ(shape->ComputeVolume(), 0);
 }
 
+/////////////////////////////////////////////////
+void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
+{
+#ifdef HAVE_GDAL
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+    return;
+  }
+
+  if (_physicsEngine == "bullet" || _physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for " << _physicsEngine <<
+        ", negative elevations are not working yet." << std::endl;
+    return;
+  }
+
+  Load("worlds/dem_neg.world", true, _physicsEngine);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  physics::ModelPtr boxModel = GetModel("box");
+  ASSERT_NE(boxModel, nullptr);
+
+  ignition::math::Pose3d boxInitPose(0, 0, -207, 0, 0, 0);
+  EXPECT_EQ(boxModel->WorldPose(), boxInitPose);
+
+  physics::ModelPtr model = GetModel("heightmap");
+  ASSERT_NE(model, nullptr);
+
+  physics::CollisionPtr collision =
+    model->GetLink("link")->GetCollision("collision");
+
+  physics::HeightmapShapePtr shape =
+    boost::dynamic_pointer_cast<physics::HeightmapShape>(
+        collision->GetShape());
+
+  ASSERT_NE(shape, nullptr);
+  EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
+
+  EXPECT_TRUE(shape->Pos() == ignition::math::Vector3d::Zero);
+
+  double maxHeight = shape->GetMaxHeight();
+  double minHeight = shape->GetMinHeight();
+  EXPECT_GE(maxHeight, minHeight);
+  EXPECT_GE(boxInitPose.Pos().Z(), minHeight);
+
+  // step the world
+  // let the box fall onto the heightmap and wait for it to rest
+  world->Step(1000);
+
+  ignition::math::Pose3d boxRestPose = boxModel->WorldPose();
+  EXPECT_NE(boxRestPose, boxInitPose);
+  EXPECT_GE(boxInitPose.Pos().Z(), minHeight);
+
+  // step the world and verify the box is at rest
+  world->Step(100);
+
+  ignition::math::Pose3d boxNewRestPose = boxModel->WorldPose();
+  EXPECT_EQ(boxNewRestPose, boxRestPose);
+#else
+  // prevent unused variable warning
+  (void)(_physicsEngine);
+#endif
+}
+
 /*
 void HeightmapTest::Heights(const std::string &_physicsEngine)
 {
@@ -275,7 +370,7 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
   EXPECT_TRUE(shape);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d::Zero);
   EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3d(129, 129, 10));
 
   std::vector<float> physicsTest;
@@ -357,6 +452,186 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
 */
 
 /////////////////////////////////////////////////
+void HeightmapTest::Material(const std::string &_worldName,
+    const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+    return;
+  }
+
+  // load a heightmap with red material
+  Load(_worldName, false, _physicsEngine);
+  physics::ModelPtr heightmap = GetModel("heightmap");
+  ASSERT_NE(heightmap, nullptr);
+
+  // spawn camera sensor to capture an image of heightmap
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  ignition::math::Pose3d testPose(
+      ignition::math::Vector3d(0, 0, 100),
+      ignition::math::Quaterniond(0, 1.57, 0));
+  SpawnCamera(modelName, cameraName, testPose.Pos(),
+      testPose.Rot().Euler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  int imageCount = 0;
+  img = new unsigned char[width*height*3];
+  event::ConnectionPtr c =
+      camSensor->Camera()->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount, img,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+
+  // grab some images
+  int sleep = 0;
+  int maxSleep = 500;
+  int total_images = 10;
+  while (imageCount < total_images && sleep++ < maxSleep )
+    common::Time::MSleep(10);
+  EXPECT_GE(imageCount, total_images);
+
+  c.reset();
+
+  unsigned int rSum = 0;
+  unsigned int gSum = 0;
+  unsigned int bSum = 0;
+  for (unsigned int i = 0; i < height*width*3; i+=3)
+  {
+    unsigned int r = img[i];
+    unsigned int g = img[i+1];
+    unsigned int b = img[i+2];
+    rSum += r;
+    gSum += g;
+    bSum += b;
+  }
+
+  // verify that red is the dominant color in the image
+  EXPECT_GT(rSum, gSum);
+  EXPECT_GT(rSum, bSum);
+
+  delete [] img;
+}
+
+/////////////////////////////////////////////////
+void HeightmapTest::NoVisual()
+{
+  // load a heightmap with no visual
+  Load("worlds/heightmap_no_visual.world", false);
+  physics::ModelPtr heightmap = GetModel("heightmap");
+  ASSERT_NE(heightmap, nullptr);
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+  ASSERT_NE(scene, nullptr);
+
+  // make sure scene is initialized and running
+  int sleep = 0;
+  int maxSleep = 30;
+  while (scene->SimTime().Double() < 2.0 && sleep++ < maxSleep)
+    common::Time::MSleep(100);
+
+  // no heightmaps should exist in the scene
+  EXPECT_EQ(scene->GetHeightmap(), nullptr);
+}
+
+/////////////////////////////////////////////////
+void HeightmapTest::LODVisualPlugin()
+{
+  // load a heightmap with no visual
+  Load("worlds/heightmap_lod_plugin.world", false);
+  physics::ModelPtr heightmap = GetModel("heightmap");
+  ASSERT_NE(heightmap, nullptr);
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+  ASSERT_NE(scene, nullptr);
+
+  // make sure scene is initialized and running
+  int sleep = 0;
+  int maxSleep = 30;
+  while (scene->SimTime().Double() < 2.0 && sleep++ < maxSleep)
+    common::Time::MSleep(100);
+
+  // check the heightmap lod via scene
+  EXPECT_EQ(scene->HeightmapLOD(), 5u);
+  // check skirt length param via scene
+  EXPECT_EQ(scene->HeightmapSkirtLength(), 0.5);
+
+  // get heightmap object and check lod params
+  rendering::Heightmap *h = scene->GetHeightmap();
+  EXPECT_NE(h, nullptr);
+  EXPECT_EQ(h->LOD(), 5u);
+  EXPECT_EQ(h->SkirtLength(), 0.5);
+}
+
+/////////////////////////////////////////////////
+void HeightmapTest::HeightmapCache()
+{
+  // path to heightmap cache files
+  std::string heightmapName = "heightmap_bowl";
+  std::string heightmapDir(common::SystemPaths::Instance()->GetLogPath()
+      + "/paging");
+  std::string shaPath = heightmapDir + "/" + heightmapName + "/gzterrain.SHA1";
+  std::string cachePath = heightmapDir +
+      "/" + heightmapName + "/gazebo_terrain_00000000.dat";
+
+  // temporary backup files for testing if cache files exist.
+  std::string shaPathBk = shaPath + ".bk";
+  std::string cachePathBk = cachePath + ".bk";
+  if (common::exists(shaPath))
+    common::moveFile(shaPath, shaPathBk);
+  if (common::exists(cachePath))
+    common::moveFile(cachePath, cachePathBk);
+
+  // there should be no cache files
+  EXPECT_FALSE(common::exists(shaPath));
+  EXPECT_FALSE(common::exists(cachePath));
+
+  // load a heightmap
+  Load("worlds/heightmap_test.world", false);
+  physics::ModelPtr heightmap = this->GetModel("heightmap");
+  ASSERT_NE(heightmap, nullptr);
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+  ASSERT_NE(scene, nullptr);
+
+  // make sure scene is initialized and running
+  int sleep = 0;
+  int maxSleep = 30;
+  while (scene->SimTime().Double() < 2.0 && sleep++ < maxSleep)
+    common::Time::MSleep(100);
+
+  // make sure we have the heightmap object
+  rendering::Heightmap *h = scene->GetHeightmap();
+  EXPECT_NE(h, nullptr);
+
+  // verify new sha-1 file exists
+  EXPECT_TRUE(common::exists(shaPath));
+  EXPECT_TRUE(common::isFile(shaPath));
+
+  // wait for the terrain tile cache to be saved
+  sleep = 0;
+  while (!common::exists(cachePath) && sleep++ < maxSleep)
+    common::Time::MSleep(100);
+
+  // verify that terrain tile cache exists
+  EXPECT_TRUE(common::exists(cachePath));
+  EXPECT_TRUE(common::isFile(cachePath));
+
+  // clean up by moving old files back
+  if (common::exists(shaPathBk))
+    common::moveFile(shaPathBk, shaPath);
+  if (common::exists(cachePathBk))
+    common::moveFile(cachePathBk, cachePath);
+  EXPECT_FALSE(common::exists(shaPathBk));
+  EXPECT_FALSE(common::exists(cachePathBk));
+}
+
+/////////////////////////////////////////////////
 TEST_F(HeightmapTest, NotSquareImage)
 {
   NotSquareImage();
@@ -393,6 +668,12 @@ TEST_P(HeightmapTest, Volume)
 }
 
 /////////////////////////////////////////////////
+TEST_P(HeightmapTest, LoadDEM)
+{
+  LoadDEM(GetParam());
+}
+
+/////////////////////////////////////////////////
 //
 // Disabled: segfaults ocassionally
 // See https://bitbucket.org/osrf/gazebo/issue/521 for details
@@ -403,6 +684,40 @@ TEST_P(HeightmapTest, Heights)
   Heights(GetParam());
 }
 */
+
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, Material)
+{
+  Material("worlds/heightmap_material.world", GetParam());
+}
+
+// This test fails on OSX
+// It uses glsl 130 which is not supported yet
+#ifndef __APPLE__
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, MaterialShader)
+{
+  Material("worlds/heightmap_material_shader.world", GetParam());
+}
+#endif
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, NoVisual)
+{
+  NoVisual();
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, LODVisualPlugin)
+{
+  LODVisualPlugin();
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, HeightmapCache)
+{
+  HeightmapCache();
+}
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, HeightmapTest, PHYSICS_ENGINE_VALUES);
 

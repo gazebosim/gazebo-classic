@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,14 @@
  *
 */
 
-#ifndef _JOINT_TEST_HH_
-#define _JOINT_TEST_HH_
+#ifndef GAZEBO_TEST_INTEGRATION_JOINT_TEST_HH_
+#define GAZEBO_TEST_INTEGRATION_JOINT_TEST_HH_
 
 #include <string>
 #include <sstream>
+#include <ignition/math/Inertial.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/test/ServerFixture.hh"
 
@@ -71,10 +74,7 @@ class JointTest : public ServerFixture,
   public: class SpawnJointOptions
   {
     /// \brief Constructor.
-    public: SpawnJointOptions() : worldChild(false), worldParent(false),
-              wait(common::Time(99, 0)),
-              noLinkPose(false), axis(math::Vector3(1, 0, 0)),
-              useParentModelFrame(false)
+    public: SpawnJointOptions()
             {
             }
 
@@ -87,35 +87,41 @@ class JointTest : public ServerFixture,
     public: std::string type;
 
     /// \brief Flag to set child link to the world.
-    public: bool worldChild;
+    public: bool worldChild = false;
 
     /// \brief Flag to set parent link to the world.
-    public: bool worldParent;
+    public: bool worldParent = false;
 
     /// \brief Length of time to wait for model to spawn in order to return
     ///        Joint pointer.
-    public: common::Time wait;
+    public: common::Time wait = common::Time(99, 0);
 
     /// \brief Model pose for spawned model.
-    public: math::Pose modelPose;
+    public: ignition::math::Pose3d modelPose;
 
     /// \brief Child link pose for spawned model.
-    public: math::Pose childLinkPose;
+    public: ignition::math::Pose3d childLinkPose;
 
     /// \brief Parent link pose for spawned model.
-    public: math::Pose parentLinkPose;
+    public: ignition::math::Pose3d parentLinkPose;
 
     /// \brief Flag to disable including link pose per issue #978.
-    public: bool noLinkPose;
+    public: bool noLinkPose = false;
 
     /// \brief Joint pose for spawned joint.
-    public: math::Pose jointPose;
+    public: ignition::math::Pose3d jointPose;
 
     /// \brief Axis value for spawned joint.
-    public: math::Vector3 axis;
+    public: ignition::math::Vector3d axis = ignition::math::Vector3d::UnitX;
 
     /// \brief Use parent model frame (#494)
-    public: bool useParentModelFrame;
+    public: bool useParentModelFrame = false;
+
+    /// \brief Use child link inertia.
+    public: bool useChildLinkInertia = false;
+
+    /// \brief Child link inertia.
+    public: ignition::math::Inertiald childLinkInertia;
   };
 
   /// \brief Spawn a model with a joint connecting to the world. The function
@@ -152,7 +158,7 @@ class JointTest : public ServerFixture,
             msgs::Model msg;
             std::string modelName = this->GetUniqueString("joint_model");
             msg.set_name(modelName);
-            msgs::Set(msg.mutable_pose(), _opt.modelPose.Ign());
+            msgs::Set(msg.mutable_pose(), _opt.modelPose);
 
             if (!_opt.worldParent)
             {
@@ -163,7 +169,7 @@ class JointTest : public ServerFixture,
               link->set_name("parent");
               if (!_opt.noLinkPose)
               {
-                msgs::Set(link->mutable_pose(), _opt.parentLinkPose.Ign());
+                msgs::Set(link->mutable_pose(), _opt.parentLinkPose);
               }
             }
             if (!_opt.worldChild)
@@ -175,14 +181,18 @@ class JointTest : public ServerFixture,
               link->set_name("child");
               if (!_opt.noLinkPose)
               {
-                msgs::Set(link->mutable_pose(), _opt.childLinkPose.Ign());
+                msgs::Set(link->mutable_pose(), _opt.childLinkPose);
+              }
+              if (_opt.useChildLinkInertia)
+              {
+                msgs::Set(link->mutable_inertial(), _opt.childLinkInertia);
               }
             }
             msg.add_joint();
             auto jointMsg = msg.mutable_joint(0);
             jointMsg->set_name("joint");
             jointMsg->set_type(msgs::ConvertJointType(_opt.type));
-            msgs::Set(jointMsg->mutable_pose(), _opt.jointPose.Ign());
+            msgs::Set(jointMsg->mutable_pose(), _opt.jointPose);
             if (_opt.worldParent)
             {
               jointMsg->set_parent("world");
@@ -202,11 +212,11 @@ class JointTest : public ServerFixture,
 
             {
               auto axis = jointMsg->mutable_axis1();
-              msgs::Set(axis->mutable_xyz(), _opt.axis.Ign());
+              msgs::Set(axis->mutable_xyz(), _opt.axis);
               axis->set_use_parent_model_frame(_opt.useParentModelFrame);
             }
             // Hack: hardcode a second axis for universal joints
-            if (_opt.type == "universal")
+            if (_opt.type == "universal" || _opt.type == "revolute2")
             {
               auto axis2 = jointMsg->mutable_axis2();
               msgs::Set(axis2->mutable_xyz(),

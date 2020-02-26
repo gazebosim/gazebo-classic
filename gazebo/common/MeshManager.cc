@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,6 @@
 #include <string>
 #include <map>
 
-#include "gazebo/math/Plane.hh"
-#include "gazebo/math/Matrix3.hh"
-#include "gazebo/math/Matrix4.hh"
-#include "gazebo/math/Vector2i.hh"
-
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -31,6 +26,7 @@
 #include "gazebo/common/ColladaLoader.hh"
 #include "gazebo/common/ColladaExporter.hh"
 #include "gazebo/common/STLLoader.hh"
+#include "gazebo/common/OBJLoader.hh"
 #include "gazebo/gazebo_config.h"
 
 #ifdef HAVE_GTS
@@ -42,6 +38,10 @@
 
 using namespace gazebo;
 using namespace common;
+
+// added here for ABI compatibility
+// TODO move to header / private class when merging forward.
+static OBJLoader objLoader;
 
 //////////////////////////////////////////////////
 MeshManager::MeshManager()
@@ -63,6 +63,12 @@ MeshManager::MeshManager()
       ignition::math::Vector2d(0.014, 0.014));
   this->CreateBox("unit_box", ignition::math::Vector3d(1, 1, 1),
       ignition::math::Vector2d(1, 1));
+  // Note: axis_box is added and currently only used by SelectionObj in
+  // replacement of unit_box to avoid a weird ogre 1.9 problem in
+  // UNIT_Projection_TEST on OSX
+  this->CreateBox("axis_box", ignition::math::Vector3d::One,
+      ignition::math::Vector2d::One);
+
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
@@ -74,6 +80,7 @@ MeshManager::MeshManager()
 
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
+  this->fileExtensions.push_back("obj");
 }
 
 //////////////////////////////////////////////////
@@ -130,8 +137,13 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       loader = this->stlLoader;
     else if (extension == "dae")
       loader = this->colladaLoader;
+    else if (extension == "obj")
+      loader = &objLoader;
     else
+    {
       gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
+      return nullptr;
+    }
 
     try
     {
@@ -350,6 +362,11 @@ void MeshManager::CreatePlane(const std::string &_name,
 
   xlate.Translate(_normal * -_d);
   xform = xlate * rot;
+  if (!xform.IsAffine())
+  {
+    gzerr << "Matrix is not affine, plane creation failed\n";
+    return;
+  }
 
   ignition::math::Vector3d vec;
   ignition::math::Vector3d norm(0, 0, 1);
@@ -374,11 +391,11 @@ void MeshManager::CreatePlane(const std::string &_name,
         vec.X() = (x * xSpace) - halfWidth;
         vec.Y() = (y * ySpace) - halfHeight;
         vec.Z() = -z;
-        vec = xform.TransformAffine(vec);
+        xform.TransformAffine(vec, vec);
         subMesh->AddVertex(vec);
 
         // Compute the normal
-        vec = xform.TransformAffine(norm);
+        xform.TransformAffine(norm, vec);
         subMesh->AddNormal(vec);
 
         // Compute the texture coordinate
@@ -588,7 +605,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
         {
           int index = (ev0 + k + 1) % triangle.size();
           ignition::math::Vector3d triV = triangle[index];
-          if (math::Vector2d(triV.X(), triV.Y()) == edgeV1)
+          if (ignition::math::Vector2d(triV.X(), triV.Y()) == edgeV1)
           {
             // found another vertex in triangle that matches the vertex of the
             // other edge.

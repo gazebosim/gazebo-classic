@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <string>
 #include <map>
+#include <ignition/transport.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/PID.hh"
@@ -56,10 +57,14 @@ namespace gazebo
       public: std::map<std::string, double> velocities;
 
       /// \brief Node for communication.
-      public: transport::NodePtr node;
+      /// \deprecated See JointControllerPrivate::node.
+      public: transport::NodePtr gznode;
 
       /// \brief Subscribe to joint command.
       public: transport::SubscriberPtr jointCmdSub;
+
+      /// \brief Node for communication.
+      public: ignition::transport::Node node;
 
       /// \brief Last time the controller was updated.
       public: common::Time prevUpdateTime;

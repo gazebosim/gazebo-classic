@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef _WORLDSTATE_HH_
-#define _WORLDSTATE_HH_
+#ifndef GAZEBO_PHYSICS_WORLDSTATE_HH_
+#define GAZEBO_PHYSICS_WORLDSTATE_HH_
 
 #include <string>
 #include <vector>
@@ -69,6 +69,14 @@ namespace gazebo
       /// Generate a WorldState from an instance of a World.
       /// \param[in] _world Pointer to a world
       public: void Load(const WorldPtr _world);
+
+      /// \brief Load from a World pointer.
+      ///
+      /// Generate a WorldState from an instance of a World.
+      /// \param[in] _world Pointer to a world
+      /// \param[in] _filter String for filtering models states
+      public: void LoadWithFilter(const WorldPtr _world,
+          const std::string &_filter);
 
       /// \brief Load state from SDF element.
       ///
@@ -132,13 +140,15 @@ namespace gazebo
 
       /// \brief Get the vector of SDF insertions.
       /// \return A vector of SDF blocks. Each block contains the SDF of the
-      /// model to be spawned in the simulation.
+      /// model to be spawned in the simulation, without the <sdf> tag wrapping
+      /// it.
       public: const std::vector<std::string> &Insertions() const;
 
       /// \brief Set a new vector of SDF insertions.
       /// \param[in] _insertions Vector containing SDF blocks. Each block should
-      /// contain the SDF of the new models spawned in the current simulation
-      /// frame.
+      /// contain the SDF of the new model, light or actor spawned in the
+      /// current simulation frame. The block could either come wrapped in an
+      /// <sdf> tag or not.
       public: void SetInsertions(const std::vector<std::string> &_insertions);
 
       /// \brief Get the vector of SDF deletions.

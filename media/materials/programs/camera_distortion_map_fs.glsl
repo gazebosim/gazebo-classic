@@ -10,7 +10,7 @@ uniform vec3 scale;
 void main()
 {
   vec2 scaleCenter = vec2(0.5, 0.5);
-  vec2 inputUV = (gl_TexCoord[0].xy - scaleCenter) * scale.xy + scaleCenter;
+  vec2 inputUV = (gl_TexCoord[0].xy - scaleCenter) / scale.xy + scaleCenter;
   vec4 mapUV = texture2D(distortionMap, inputUV);
 
   if (mapUV.x < 0.0 || mapUV.y < 0.0)

@@ -33,6 +33,6 @@ set (qt_tests_local
 gz_build_qt_tests(${qt_tests_local})
 gz_install_includes("gui/viewers" ${headers_install})
 
-if (VALID_DISPLAY AND ENABLE_TESTS_COMPILATION)
+if (VALID_DISPLAY)
   set_tests_properties(${TEST_TYPE}_ImagesView_TEST PROPERTIES TIMEOUT 500)
 endif()

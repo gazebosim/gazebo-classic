@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -414,9 +414,6 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       gzerr << "Unable to download model[" << _uri << "]\n";
       return std::string();
     }
-
-    // DEBUG output
-    // std::cout << "Getting uri[" << _uri << "] path[" << path << "]\n";
 
     // Get the model name from the uri
     size_t startIndex = _uri.find_first_of("://");

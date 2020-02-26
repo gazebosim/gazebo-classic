@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -30,6 +32,11 @@
 using namespace gazebo;
 using namespace gui;
 
+const QString activeStyle =
+"QDoubleSpinBox{background: #404040; color: #ffffff;}";
+const QString inactiveStyle =
+"QDoubleSpinBox{background: #737373; color: #353535;}";
+
 /////////////////////////////////////////////////
 JointForceControl::JointForceControl(const std::string &_name,
     QGridLayout *_layout, QWidget *_parent, int _index)
@@ -38,7 +45,8 @@ JointForceControl::JointForceControl(const std::string &_name,
 {
   this->dataPtr->name = _name;
   this->dataPtr->forceSpin = new QDoubleSpinBox;
-  this->dataPtr->forceSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->forceSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->forceSpin->setSingleStep(0.001);
   this->dataPtr->forceSpin->setDecimals(3);
   this->dataPtr->forceSpin->setValue(0.000);
@@ -58,12 +66,30 @@ JointForceControl::~JointForceControl()
 /////////////////////////////////////////////////
 void JointForceControl::Reset()
 {
+  this->SetShowActive(false);
+  bool blockSignalsPrev = this->dataPtr->forceSpin->blockSignals(true);
   this->dataPtr->forceSpin->setValue(0.0);
+  this->dataPtr->forceSpin->blockSignals(blockSignalsPrev);
+}
+
+/////////////////////////////////////////////////
+void JointForceControl::SetForce(const double _force)
+{
+  this->SetShowActive(true);
+  this->dataPtr->forceSpin->setValue(_force);
+}
+
+/////////////////////////////////////////////////
+void JointForceControl::SetShowActive(const bool _active)
+{
+  this->dataPtr->forceSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
 }
 
 /////////////////////////////////////////////////
 void JointForceControl::OnChanged(double _value)
 {
+  this->SetShowActive(true);
   emit changed(_value, this->dataPtr->name);
 }
 
@@ -75,25 +101,29 @@ JointPIDPosControl::JointPIDPosControl(const std::string &_name,
 {
   this->dataPtr->name = _name;
   this->dataPtr->posSpin = new QDoubleSpinBox;
-  this->dataPtr->posSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->posSpin->setRange(-ignition::math::MAX_D,
+                                    ignition::math::MAX_D);
   this->dataPtr->posSpin->setSingleStep(0.001);
   this->dataPtr->posSpin->setDecimals(3);
   this->dataPtr->posSpin->setValue(0.000);
 
   this->dataPtr->pGainSpin = new QDoubleSpinBox;
-  this->dataPtr->pGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->pGainSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->pGainSpin->setSingleStep(0.01);
   this->dataPtr->pGainSpin->setDecimals(3);
   this->dataPtr->pGainSpin->setValue(1.000);
 
   this->dataPtr->iGainSpin = new QDoubleSpinBox;
-  this->dataPtr->iGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->iGainSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->iGainSpin->setSingleStep(0.01);
   this->dataPtr->iGainSpin->setDecimals(3);
   this->dataPtr->iGainSpin->setValue(0.100);
 
   this->dataPtr->dGainSpin = new QDoubleSpinBox;
-  this->dataPtr->dGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->dGainSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->dGainSpin->setSingleStep(0.01);
   this->dataPtr->dGainSpin->setDecimals(3);
   this->dataPtr->dGainSpin->setValue(0.010);
@@ -102,6 +132,7 @@ JointPIDPosControl::JointPIDPosControl(const std::string &_name,
   _layout->addWidget(this->dataPtr->pGainSpin, _index, 3);
   _layout->addWidget(this->dataPtr->iGainSpin, _index, 4);
   _layout->addWidget(this->dataPtr->dGainSpin, _index, 5);
+  this->SetShowActive(false);
 
   connect(this->dataPtr->posSpin, SIGNAL(valueChanged(double)),
         this, SLOT(OnChanged(double)));
@@ -123,10 +154,48 @@ JointPIDPosControl::~JointPIDPosControl()
 /////////////////////////////////////////////////
 void JointPIDPosControl::Reset()
 {
+  this->SetShowActive(false);
+  bool blockSignalsPrev = this->dataPtr->posSpin->blockSignals(true);
   this->dataPtr->posSpin->setValue(0.0);
-  this->dataPtr->pGainSpin->setValue(1.000);
-  this->dataPtr->iGainSpin->setValue(0.100);
-  this->dataPtr->dGainSpin->setValue(0.010);
+  this->dataPtr->posSpin->blockSignals(blockSignalsPrev);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::SetPositionTarget(const double _target)
+{
+  this->SetShowActive(true);
+  this->dataPtr->posSpin->setValue(_target);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::SetPGain(const double _pGain)
+{
+  this->dataPtr->pGainSpin->setValue(_pGain);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::SetIGain(const double _iGain)
+{
+  this->dataPtr->iGainSpin->setValue(_iGain);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::SetDGain(const double _dGain)
+{
+  this->dataPtr->dGainSpin->setValue(_dGain);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::SetShowActive(const bool _active)
+{
+  this->dataPtr->posSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->pGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->iGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->dGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
 }
 
 /////////////////////////////////////////////////
@@ -135,7 +204,7 @@ void JointPIDPosControl::SetToDegrees()
   if (this->dataPtr->radians)
   {
     this->dataPtr->radians = false;
-    this->dataPtr->posSpin->setValue(GZ_RTOD(this->dataPtr->posSpin->value()));
+    this->dataPtr->posSpin->setValue(IGN_RTOD(this->dataPtr->posSpin->value()));
   }
 }
 
@@ -145,17 +214,18 @@ void JointPIDPosControl::SetToRadians()
   if (!this->dataPtr->radians)
   {
     this->dataPtr->radians = true;
-    this->dataPtr->posSpin->setValue(GZ_DTOR(this->dataPtr->posSpin->value()));
+    this->dataPtr->posSpin->setValue(IGN_DTOR(this->dataPtr->posSpin->value()));
   }
 }
 
 /////////////////////////////////////////////////
 void JointPIDPosControl::OnChanged(double _value)
 {
+  this->SetShowActive(true);
   if (this->dataPtr->radians)
     emit changed(_value, this->dataPtr->name);
   else
-    emit changed(GZ_DTOR(_value), this->dataPtr->name);
+    emit changed(IGN_DTOR(_value), this->dataPtr->name);
 }
 
 /////////////////////////////////////////////////
@@ -184,25 +254,29 @@ JointPIDVelControl::JointPIDVelControl(const std::string &_name,
 {
   this->dataPtr->name = _name;
   this->dataPtr->posSpin = new QDoubleSpinBox;
-  this->dataPtr->posSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->posSpin->setRange(-ignition::math::MAX_D,
+                                    ignition::math::MAX_D);
   this->dataPtr->posSpin->setSingleStep(0.001);
   this->dataPtr->posSpin->setDecimals(3);
   this->dataPtr->posSpin->setValue(0.000);
 
   this->dataPtr->pGainSpin = new QDoubleSpinBox;
-  this->dataPtr->pGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->pGainSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->pGainSpin->setSingleStep(0.01);
   this->dataPtr->pGainSpin->setDecimals(3);
   this->dataPtr->pGainSpin->setValue(1.000);
 
   this->dataPtr->iGainSpin = new QDoubleSpinBox;
-  this->dataPtr->iGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->iGainSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->iGainSpin->setSingleStep(0.01);
   this->dataPtr->iGainSpin->setDecimals(3);
   this->dataPtr->iGainSpin->setValue(0.100);
 
   this->dataPtr->dGainSpin = new QDoubleSpinBox;
-  this->dataPtr->dGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->dGainSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->dGainSpin->setSingleStep(0.01);
   this->dataPtr->dGainSpin->setDecimals(3);
   this->dataPtr->dGainSpin->setValue(0.010);
@@ -211,6 +285,7 @@ JointPIDVelControl::JointPIDVelControl(const std::string &_name,
   _layout->addWidget(this->dataPtr->pGainSpin, _index, 3);
   _layout->addWidget(this->dataPtr->iGainSpin, _index, 4);
   _layout->addWidget(this->dataPtr->dGainSpin, _index, 5);
+  this->SetShowActive(false);
 
   connect(this->dataPtr->posSpin, SIGNAL(valueChanged(double)),
         this, SLOT(OnChanged(double)));
@@ -230,15 +305,54 @@ JointPIDVelControl::~JointPIDVelControl()
 /////////////////////////////////////////////////
 void JointPIDVelControl::Reset()
 {
+  this->SetShowActive(false);
+  bool blockSignalsPrev = this->dataPtr->posSpin->blockSignals(true);
   this->dataPtr->posSpin->setValue(0.0);
-  this->dataPtr->pGainSpin->setValue(1.000);
-  this->dataPtr->iGainSpin->setValue(0.100);
-  this->dataPtr->dGainSpin->setValue(0.010);
+  this->dataPtr->posSpin->blockSignals(blockSignalsPrev);
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::SetVelocityTarget(const double _target)
+{
+  this->SetShowActive(true);
+  this->dataPtr->posSpin->setValue(_target);
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::SetPGain(const double _pGain)
+{
+  this->dataPtr->pGainSpin->setValue(_pGain);
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::SetIGain(const double _iGain)
+{
+  this->dataPtr->iGainSpin->setValue(_iGain);
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::SetDGain(const double _dGain)
+{
+  this->dataPtr->dGainSpin->setValue(_dGain);
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::SetShowActive(const bool _active)
+{
+  this->dataPtr->posSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->pGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->iGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->dGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
 }
 
 /////////////////////////////////////////////////
 void JointPIDVelControl::OnChanged(double _value)
 {
+  this->SetShowActive(true);
   emit changed(_value, this->dataPtr->name);
 }
 
@@ -263,8 +377,11 @@ void JointPIDVelControl::OnDChanged(double _value)
 /////////////////////////////////////////////////
 void JointControlWidget::SetModelName(const std::string &_modelName)
 {
-  if (this->dataPtr->jointPub)
-    this->dataPtr->jointPub.reset();
+  // The selected model has not changed.
+  if (_modelName == this->dataPtr->modelName)
+  {
+    return;
+  }
 
   msgs::Model modelMsg;
 
@@ -274,8 +391,14 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   // Only request info if the model has a name.
   if (!_modelName.empty())
   {
-    this->dataPtr->jointPub = this->dataPtr->node->Advertise<msgs::JointCmd>(
-        std::string("~/") + _modelName + "/joint_cmd");
+    std::string topic = "/" + _modelName + "/joint_cmd";
+    boost::replace_all(topic, "::", "/");
+    this->dataPtr->jointPub =
+        this->dataPtr->node.Advertise<ignition::msgs::JointCmd>(topic);
+    if (!this->dataPtr->jointPub)
+    {
+      gzerr << "Error advertising topic [" << topic << "]\n";
+    }
 
     boost::shared_ptr<msgs::Response> response = transport::request(
         gui::get_world(), "entity_info", _modelName);
@@ -295,6 +418,28 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   this->LayoutPositionTab(modelMsg);
 
   this->LayoutVelocityTab(modelMsg);
+
+  if (!_modelName.empty())
+  {
+    // Get joint controller parameters and use them to populate the sliders.
+    ignition::msgs::StringMsg req;
+    std::string service = "/" + _modelName + "/joint_cmd_req";
+    boost::replace_all(service, "::", "/");
+
+    std::function<void(const ignition::msgs::JointCmd &, const bool)> callback =
+        std::bind(&JointControlWidget::ResponseCallback, this, _modelName,
+        std::placeholders::_1, std::placeholders::_2);
+
+    // Force, PID vel, and PID pos controls should all have the same joints, so
+    // we can request info for all joints by looping over the force controls.
+    for (auto &slider : this->dataPtr->sliders)
+    {
+      req.set_data(slider.first);
+      this->dataPtr->node.Request(service, req, callback);
+    }
+  }
+
+  this->dataPtr->modelName = _modelName;
 }
 
 /////////////////////////////////////////////////
@@ -305,8 +450,6 @@ JointControlWidget::JointControlWidget(QWidget *_parent)
   this->setObjectName("jointControl");
 
   this->setWindowTitle("Joint Control");
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
 
   this->dataPtr->tabWidget = new QTabWidget;
   this->dataPtr->tabWidget->setObjectName("embeddedTab");
@@ -346,11 +489,86 @@ JointControlWidget::JointControlWidget(QWidget *_parent)
   mainLayout->setContentsMargins(4, 4, 4, 4);
 
   this->setLayout(mainLayout);
+
+  connect(this, SIGNAL(repReceived(const std::string &,
+      const ignition::msgs::JointCmd &)),
+      this, SLOT(OnResponse(const std::string &,
+      const ignition::msgs::JointCmd &)),
+      Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////
 JointControlWidget::~JointControlWidget()
 {
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::ResponseCallback(const std::string &_modelName,
+    const ignition::msgs::JointCmd &_rep, const bool _result)
+{
+  if (_result)
+  {
+    // Signal itself to make the update. This lets Qt schedule the update
+    // in its own thread, which prevents some synchronization issues.
+    emit repReceived(_modelName, _rep);
+  }
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::OnResponse(const std::string &_modelName,
+    const ignition::msgs::JointCmd &_rep)
+{
+  if (_modelName == this->dataPtr->modelName)
+  {
+    if (_rep.has_force())
+    {
+      auto slider = this->dataPtr->sliders[_rep.name()];
+      GZ_ASSERT(slider, "Joint force controller is null");
+      slider->SetForce(_rep.force());
+    }
+    if (_rep.has_position())
+    {
+      auto slider = this->dataPtr->pidPosSliders[_rep.name()];
+      GZ_ASSERT(slider, "Joint PID position controller is null");
+      if (_rep.position().has_target())
+      {
+        slider->SetPositionTarget(_rep.position().target());
+      }
+      if (_rep.position().has_p_gain())
+      {
+        slider->SetPGain(_rep.position().p_gain());
+      }
+      if (_rep.position().has_i_gain())
+      {
+        slider->SetIGain(_rep.position().i_gain());
+      }
+      if (_rep.position().has_d_gain())
+      {
+        slider->SetDGain(_rep.position().d_gain());
+      }
+    }
+    if (_rep.has_velocity())
+    {
+      auto slider = this->dataPtr->pidVelSliders[_rep.name()];
+      GZ_ASSERT(slider, "Joint PID velocity controller is null");
+      if (_rep.velocity().has_target())
+      {
+        slider->SetVelocityTarget(_rep.velocity().target());
+      }
+      if (_rep.velocity().has_p_gain())
+      {
+        slider->SetPGain(_rep.velocity().p_gain());
+      }
+      if (_rep.velocity().has_i_gain())
+      {
+        slider->SetIGain(_rep.velocity().i_gain());
+      }
+      if (_rep.velocity().has_d_gain())
+      {
+        slider->SetDGain(_rep.velocity().d_gain());
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -360,10 +578,11 @@ void JointControlWidget::OnReset()
        this->dataPtr->sliders.begin();
        iter != this->dataPtr->sliders.end(); ++iter)
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(iter->first);
     msg.set_reset(true);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
+
     iter->second->Reset();
   }
 
@@ -389,10 +608,10 @@ void JointControlWidget::OnForceChanged(double _value, const std::string &_name)
   iter = this->dataPtr->sliders.find(_name);
   if (iter != this->dataPtr->sliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.set_force(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -404,10 +623,10 @@ void JointControlWidget::OnPIDPosChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_target(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -419,10 +638,10 @@ void JointControlWidget::OnPPosGainChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_p_gain(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -434,10 +653,10 @@ void JointControlWidget::OnDPosGainChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_d_gain(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -449,10 +668,10 @@ void JointControlWidget::OnIPosGainChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_i_gain(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -478,10 +697,10 @@ void JointControlWidget::OnPIDVelChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_target(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -493,10 +712,10 @@ void JointControlWidget::OnPVelGainChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_p_gain(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -508,10 +727,10 @@ void JointControlWidget::OnDVelGainChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_d_gain(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -523,10 +742,10 @@ void JointControlWidget::OnIVelGainChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_i_gain(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 

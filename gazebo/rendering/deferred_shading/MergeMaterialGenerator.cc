@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,6 @@ Ogre::GpuProgramPtr MergeMaterialGeneratorImpl::GenerateVertexShader(
 
   Ogre::String programSource = ss.str();
 
-  std::cout << programSource << "\n";
   Ogre::String programName = this->baseName + "VP_" +
     Ogre::StringConverter::toString(_permutation);
 
@@ -294,7 +293,6 @@ Ogre::GpuProgramPtr MergeMaterialGeneratorImpl::GenerateFragmentShader(
   Ogre::String programName = this->baseName + "FP_" +
     Ogre::StringConverter::toString(_permutation);
 
-  std::cout << programSource << "\n";
 #if OGRE_DEBUG_MODE
   Ogre::LogManager::getSingleton().getDefaultLog()->logMessage(programSource);
 #endif

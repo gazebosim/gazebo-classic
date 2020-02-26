@@ -1,3 +1,4 @@
+syntax = "proto2";
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
@@ -7,7 +8,7 @@ package gazebo.msgs;
 
 message Vector3d
 {
-  required double x = 2;
-  required double y = 3;
-  required double z = 4;
+  required double x = 1;
+  required double y = 2;
+  required double z = 3;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -231,6 +231,7 @@ boost::shared_ptr<msgs::Response> transport::request(
     }
   }
 
+  node->Fini();
   requestPub.reset();
   responseSub.reset();
   node.reset();
@@ -409,6 +410,14 @@ transport::ConnectionPtr transport::connectToMaster()
 /////////////////////////////////////////////////
 bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
 {
+  // If the ConnectionManager has not been initialized, then there is no point
+  // in waiting for namespaces.
+  if (!ConnectionManager::Instance()->IsInitialized())
+  {
+    gzerr << "ConnectionManager has not been initialized!\n";
+    return false;
+  }
+
   std::list<std::string> namespaces;
   gazebo::common::Time startTime = gazebo::common::Time::GetWallTime();
 
@@ -426,7 +435,5 @@ bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
     gazebo::common::Time::Sleep(waitTime);
   }
 
-  if (gazebo::common::Time::GetWallTime() - startTime <= _maxWait)
-    return true;
-  return false;
+  return !namespaces.empty();
 }

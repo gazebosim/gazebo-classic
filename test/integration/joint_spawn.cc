@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,31 +74,64 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   {
     gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, false, false);
-    ASSERT_TRUE(joint != NULL);
+    ASSERT_TRUE(joint != nullptr);
     // Check child and parent links
     physics::LinkPtr child = joint->GetChild();
     physics::LinkPtr parent = joint->GetParent();
-    ASSERT_TRUE(child != NULL);
+    ASSERT_TRUE(child != nullptr);
     EXPECT_EQ(child->GetParentJoints().size(), 1u);
     EXPECT_EQ(child->GetChildJoints().size(), 0u);
-    ASSERT_TRUE(parent != NULL);
+    ASSERT_TRUE(parent != nullptr);
     EXPECT_EQ(parent->GetChildJoints().size(), 1u);
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
     EXPECT_EQ(_jointType, msgs::ConvertJointType(joint->GetMsgType()));
-    for (unsigned int i = 0; i < joint->GetAngleCount(); ++i)
+    for (unsigned int i = 0; i < joint->DOF(); ++i)
+    {
+      CheckJointProperties(i, joint);
+    }
+  }
+
+  // child link with off-diagonal inertias
+  // skip universal joints because the off-diagonal inertias
+  // add coupling between the axes, which messes up CheckJointProperties
+  if (_jointType != "universal")
+  {
+    gzdbg << "SpawnJoint " << _jointType
+          << " child with off-diagonal inertia, parent"
+          << std::endl;
+    SpawnJointOptions opt;
+    opt.type = _jointType;
+    opt.useChildLinkInertia = true;
+    EXPECT_TRUE(opt.childLinkInertia.SetMassMatrix(
+      ignition::math::MassMatrix3d(12.0,
+        ignition::math::Vector3d(2.0, 3.0, 4.0),
+        ignition::math::Vector3d(0, 0, 0.4))));
+    physics::JointPtr joint = SpawnJoint(opt);
+    ASSERT_TRUE(joint != nullptr);
+    // Check child and parent links
+    physics::LinkPtr child = joint->GetChild();
+    physics::LinkPtr parent = joint->GetParent();
+    ASSERT_TRUE(child != nullptr);
+    EXPECT_EQ(child->GetParentJoints().size(), 1u);
+    EXPECT_EQ(child->GetChildJoints().size(), 0u);
+    ASSERT_TRUE(parent != nullptr);
+    EXPECT_EQ(parent->GetChildJoints().size(), 1u);
+    EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+    EXPECT_EQ(_jointType, msgs::ConvertJointType(joint->GetMsgType()));
+    for (unsigned int i = 0; i < joint->DOF(); ++i)
     {
       CheckJointProperties(i, joint);
     }
@@ -115,15 +148,15 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   {
     gzdbg << "SpawnJoint " << _jointType << " child world" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, false, true);
-    ASSERT_TRUE(joint != NULL);
+    ASSERT_TRUE(joint != nullptr);
     // Check child link
     physics::LinkPtr child = joint->GetChild();
     physics::LinkPtr parent = joint->GetParent();
-    ASSERT_TRUE(child != NULL);
+    ASSERT_TRUE(child != nullptr);
     EXPECT_EQ(child->GetParentJoints().size(), 1u);
     EXPECT_EQ(child->GetChildJoints().size(), 0u);
-    EXPECT_TRUE(parent == NULL);
-    for (unsigned int i = 0; i < joint->GetAngleCount(); ++i)
+    EXPECT_TRUE(parent == nullptr);
+    for (unsigned int i = 0; i < joint->DOF(); ++i)
     {
       CheckJointProperties(i, joint);
     }
@@ -144,15 +177,15 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   {
     gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, true, false);
-    ASSERT_TRUE(joint != NULL);
+    ASSERT_TRUE(joint != nullptr);
     // Check parent link
     physics::LinkPtr child = joint->GetChild();
     physics::LinkPtr parent = joint->GetParent();
-    EXPECT_TRUE(child == NULL);
-    ASSERT_TRUE(parent != NULL);
+    EXPECT_TRUE(child == nullptr);
+    ASSERT_TRUE(parent != nullptr);
     EXPECT_EQ(parent->GetChildJoints().size(), 1u);
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
-    for (unsigned int i = 0; i < joint->GetAngleCount(); ++i)
+    for (unsigned int i = 0; i < joint->DOF(); ++i)
     {
       CheckJointProperties(i, joint);
     }
@@ -168,40 +201,41 @@ void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   gzdbg << "SpawnJoint " << _jointType << std::endl;
   physics::JointPtr joint = SpawnJoint(_jointType);
-  ASSERT_TRUE(joint != NULL);
+  ASSERT_TRUE(joint != nullptr);
 
   physics::LinkPtr parent, child;
   child = joint->GetChild();
   parent = joint->GetParent();
-  ASSERT_TRUE(child != NULL);
-  ASSERT_TRUE(parent != NULL);
+  ASSERT_TRUE(child != nullptr);
+  ASSERT_TRUE(parent != nullptr);
 
-  math::Vector3 pos(10, 10, 10);
-  math::Vector3 vel(10, 10, 10);
-  parent->SetWorldPose(math::Pose(pos, math::Quaternion()));
+  ignition::math::Vector3d pos(10, 10, 10);
+  ignition::math::Vector3d vel(10, 10, 10);
+  parent->SetWorldPose(ignition::math::Pose3d(pos,
+        ignition::math::Quaterniond::Identity));
   for (unsigned int i = 0; i < 10; ++i)
   {
     parent->SetLinearVel(vel);
     world->Step(10);
   }
   world->Step(50);
-  math::Pose childPose = child->GetWorldPose();
-  math::Pose parentPose = parent->GetWorldPose();
-  EXPECT_TRUE(parentPose.pos != pos);
-  EXPECT_TRUE(parentPose.pos != math::Vector3::Zero);
-  EXPECT_TRUE(childPose.pos != math::Vector3::Zero);
-  EXPECT_TRUE(childPose.pos == parentPose.pos);
-  EXPECT_EQ(joint->GetWorldPose().pos, joint->GetParentWorldPose().pos);
-  EXPECT_EQ(joint->GetAnchorErrorPose().pos, math::Vector3::Zero);
+  ignition::math::Pose3d childPose = child->WorldPose();
+  ignition::math::Pose3d parentPose = parent->WorldPose();
+  EXPECT_TRUE(parentPose.Pos() != pos);
+  EXPECT_TRUE(parentPose.Pos() != ignition::math::Vector3d::Zero);
+  EXPECT_TRUE(childPose.Pos() != ignition::math::Vector3d::Zero);
+  EXPECT_TRUE(childPose.Pos() == parentPose.Pos());
+  EXPECT_EQ(joint->WorldPose().Pos(), joint->ParentWorldPose().Pos());
+  EXPECT_EQ(joint->AnchorErrorPose().Pos(), ignition::math::Vector3d::Zero);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -214,11 +248,11 @@ void JointSpawningTest::SpawnJointRotationalWorld(
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   physics::JointPtr joint;
@@ -247,21 +281,21 @@ void JointSpawningTest::SpawnJointRotationalWorld(
     }
 
     joint = SpawnJoint(_jointType, worldChild, worldParent);
-    ASSERT_TRUE(joint != NULL);
+    ASSERT_TRUE(joint != nullptr);
 
     physics::LinkPtr link;
     if (!worldChild)
       link = joint->GetChild();
     else if (!worldParent)
       link = joint->GetParent();
-    ASSERT_TRUE(link != NULL);
+    ASSERT_TRUE(link != nullptr);
 
-    math::Pose initialPose = link->GetWorldPose();
+    auto initialPose = link->WorldPose();
     world->Step(100);
-    math::Pose afterPose = link->GetWorldPose();
-    EXPECT_TRUE(initialPose.pos == afterPose.pos);
-    EXPECT_EQ(joint->GetWorldPose().pos, joint->GetParentWorldPose().pos);
-    EXPECT_EQ(joint->GetAnchorErrorPose().pos, math::Vector3::Zero);
+    auto afterPose = link->WorldPose();
+    EXPECT_TRUE(initialPose.Pos() == afterPose.Pos());
+    EXPECT_EQ(joint->WorldPose().Pos(), joint->ParentWorldPose().Pos());
+    EXPECT_EQ(joint->AnchorErrorPose().Pos(), ignition::math::Vector3d::Zero);
   }
 }
 
@@ -270,9 +304,9 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
                                         physics::JointPtr _joint)
 {
   physics::WorldPtr world = physics::get_world();
-  ASSERT_TRUE(world != NULL);
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(world != nullptr);
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
   bool isBullet = physics->GetType().compare("bullet") == 0;
   bool isDart = physics->GetType().compare("dart") == 0;
   bool isSimbody = physics->GetType().compare("simbody") == 0;
@@ -318,32 +352,32 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
-    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->Position(_index), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 
     // set positive force
-    double angleStart = _joint->GetAngle(_index).Radian();
+    double angleStart = _joint->Position(_index);
     _joint->SetForce(_index, 5);
     world->Step(1);
     EXPECT_GT(_joint->GetVelocity(_index), 0.0);
     world->Step(1);
-    EXPECT_GT(_joint->GetAngle(_index).Radian(), angleStart);
+    EXPECT_GT(_joint->Position(_index), angleStart);
   }
 
   // Test SetForce with negative value
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
-    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->Position(_index), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 
     // set negative force
-    double angleStart = _joint->GetAngle(_index).Radian();
+    double angleStart = _joint->Position(_index);
     _joint->SetForce(_index, -5);
     world->Step(1);
     EXPECT_LT(_joint->GetVelocity(_index), 0.0);
     world->Step(1);
-    EXPECT_LT(_joint->GetAngle(_index).Radian(), angleStart);
+    EXPECT_LT(_joint->Position(_index), angleStart);
   }
 
   // Test Coloumb friction
@@ -366,7 +400,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
-    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->Position(_index), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 
     // set friction to 1.0
@@ -383,7 +417,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 
     // Expect no motion
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
-    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->Position(_index), 0.0, g_tolerance);
 
     for (unsigned int i = 0; i < 500; ++i)
     {
@@ -394,7 +428,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 
     // Expect motion
     EXPECT_GT(_joint->GetVelocity(_index), 0.2 * friction);
-    EXPECT_GT(_joint->GetAngle(_index).Radian(), 0.05 * friction);
+    EXPECT_GT(_joint->Position(_index), 0.05 * friction);
 
     // DART has problem with joint friction and joint limits
     // https://github.com/dartsim/dart/issues/317
@@ -407,45 +441,45 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     }
   }
 
-  // SetHighStop
+  // SetUpperLimit
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
-    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->Position(_index), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 
     unsigned int steps = 100;
     double vel = 1.0;
-    math::Angle limit = math::Angle(steps * dt * vel * 0.5);
-    _joint->SetHighStop(_index, limit);
+    double limit = steps * dt * vel * 0.5;
+    _joint->SetUpperLimit(_index, limit);
     _joint->SetVelocity(_index, vel);
     world->Step(steps);
-    EXPECT_LT(_joint->GetAngle(_index).Radian(), limit.Radian() + g_tolerance);
-    EXPECT_EQ(_joint->GetHighStop(_index), limit);
+    EXPECT_LT(_joint->Position(_index), limit + g_tolerance);
+    EXPECT_NEAR(_joint->UpperLimit(_index), limit, g_tolerance);
     {
       boost::any value = _joint->GetParam("hi_stop", _index);
-      EXPECT_NEAR(boost::any_cast<double>(value), limit.Radian(), g_tolerance);
+      EXPECT_NEAR(boost::any_cast<double>(value), limit, g_tolerance);
     }
   }
 
-  // SetLowStop
+  // SetLowerLimit
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
-    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->Position(_index), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 
     unsigned int steps = 100;
     double vel = -1.0;
-    math::Angle limit = math::Angle(steps * dt * vel * 0.5);
-    _joint->SetLowStop(_index, limit);
+    double limit = steps * dt * vel * 0.5;
+    _joint->SetLowerLimit(_index, limit);
     _joint->SetVelocity(_index, vel);
     world->Step(steps);
-    EXPECT_GT(_joint->GetAngle(_index).Radian(), limit.Radian() - g_tolerance);
-    EXPECT_EQ(_joint->GetLowStop(_index), limit);
+    EXPECT_GT(_joint->Position(_index), limit - g_tolerance);
+    EXPECT_NEAR(_joint->LowerLimit(_index), limit, g_tolerance);
     {
       boost::any value = _joint->GetParam("lo_stop", _index);
-      EXPECT_NEAR(boost::any_cast<double>(value), limit.Radian(), g_tolerance);
+      EXPECT_NEAR(boost::any_cast<double>(value), limit, g_tolerance);
     }
   }
 }

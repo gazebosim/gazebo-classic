@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -530,7 +530,7 @@ namespace gazebo
       private: class EventConnection
       {
         /// \brief Constructor
-        public: EventConnection(const bool _on, std::function<T> _cb)
+        public: EventConnection(const bool _on, const std::function<T> &_cb)
                 : callback(_cb)
         {
           // Windows Visual Studio 2012 does not have atomic_bool constructor,

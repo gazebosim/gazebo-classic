@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 
 #include <algorithm>
 #include <string>
+
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
@@ -55,8 +57,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
@@ -79,6 +79,7 @@ struct CollisionFilter : public btOverlapFilterCallback
       GZ_ASSERT(_proxy0 != nullptr && _proxy1 != nullptr,
           "Bullet broadphase overlapping pair proxies are null");
 
+      // BulletRayShape uses these, TODO remove in favor of collideBits
       bool collide = (_proxy0->m_collisionFilterGroup
           & _proxy1->m_collisionFilterMask) != 0;
       collide = collide && (_proxy1->m_collisionFilterGroup
@@ -101,6 +102,21 @@ struct CollisionFilter : public btOverlapFilterCallback
       BulletLink *link1 = static_cast<BulletLink *>(
           rb1->getUserPointer());
       GZ_ASSERT(link1 != nullptr, "Link1 in collision pair is null");
+
+      const Collision_V &cols0 = link0->GetCollisions();
+      const Collision_V &cols1 = link1->GetCollisions();
+
+      if (cols0.size() == 0 || cols1.size() == 0)
+      {
+        // no collision on the link? It can't collide
+        return false;
+      }
+
+      // use first collision, BulletLink expects all to have same bits
+      SurfaceParamsPtr surf0 = cols0[0]->GetSurface();
+      SurfaceParamsPtr surf1 = cols1[0]->GetSurface();
+
+      collide = surf0->collideBitmask & surf1->collideBitmask;
 
       if (!link0->GetSelfCollide() || !link1->GetSelfCollide())
       {
@@ -142,7 +158,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     if (!collisionPtr1 || !collisionPtr2)
       continue;
 
-    PhysicsEnginePtr engine = collisionPtr1->GetWorld()->GetPhysicsEngine();
+    PhysicsEnginePtr engine = collisionPtr1->GetWorld()->Physics();
     BulletPhysicsPtr bulletPhysics =
           boost::static_pointer_cast<BulletPhysics>(engine);
 
@@ -150,19 +166,17 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     // listening for contact information.
     Contact *contactFeedback = bulletPhysics->GetContactManager()->NewContact(
         collisionPtr1.get(), collisionPtr2.get(),
-        collisionPtr1->GetWorld()->GetSimTime());
+        collisionPtr1->GetWorld()->SimTime());
 
     if (!contactFeedback)
       continue;
 
-    math::Pose body1Pose = link1->GetWorldPose();
-    math::Pose body2Pose = link2->GetWorldPose();
-    math::Vector3 cg1Pos = link1->GetInertial()->GetPose().pos;
-    math::Vector3 cg2Pos = link2->GetInertial()->GetPose().pos;
-    math::Vector3 localForce1;
-    math::Vector3 localForce2;
-    math::Vector3 localTorque1;
-    math::Vector3 localTorque2;
+    auto body1Pose = link1->WorldPose();
+    auto body2Pose = link2->WorldPose();
+    ignition::math::Vector3d localForce1;
+    ignition::math::Vector3d localForce2;
+    ignition::math::Vector3d localTorque1;
+    ignition::math::Vector3d localTorque2;
 
     int numContacts = contactManifold->getNumContacts();
     for (int j = 0; j < numContacts; ++j)
@@ -182,17 +196,17 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         btVector3 torqueB = (ptB-rbB->getCenterOfMassPosition()).cross(-force);
 
         // Convert from world to link frame
-        localForce1 = body1Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(force));
-        localForce2 = body2Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(-force));
-        localTorque1 = body1Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(torqueA));
-        localTorque2 = body2Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(torqueB));
+        localForce1 = body1Pose.Rot().RotateVectorReverse(
+            BulletTypes::ConvertVector3Ign(force));
+        localForce2 = body2Pose.Rot().RotateVectorReverse(
+            BulletTypes::ConvertVector3Ign(-force));
+        localTorque1 = body1Pose.Rot().RotateVectorReverse(
+            BulletTypes::ConvertVector3Ign(torqueA));
+        localTorque2 = body2Pose.Rot().RotateVectorReverse(
+            BulletTypes::ConvertVector3Ign(torqueB));
 
-        contactFeedback->positions[j] = BulletTypes::ConvertVector3(ptB);
-        contactFeedback->normals[j] = BulletTypes::ConvertVector3(normalOnB);
+        contactFeedback->positions[j] = BulletTypes::ConvertVector3Ign(ptB);
+        contactFeedback->normals[j] = BulletTypes::ConvertVector3Ign(normalOnB);
         contactFeedback->depths[j] = -pt.getDistance();
         if (!link1->IsStatic())
         {
@@ -279,7 +293,7 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
-  this->SetSeed(math::Rand::GetSeed());
+  this->SetSeed(ignition::math::Rand::Seed());
 
   btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
 }
@@ -378,7 +392,7 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
       boost::any_cast<double>(this->GetParam("min_step_size")));
     physicsMsg.set_iters(
       boost::any_cast<int>(this->GetParam("iters")));
-    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
+    physicsMsg.set_enable_physics(this->world->PhysicsEnabled());
     physicsMsg.set_sor(
       boost::any_cast<double>(this->GetParam("sor")));
     physicsMsg.set_cfm(
@@ -430,7 +444,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetParam("erp", _msg->erp());
 
   if (_msg->has_enable_physics())
-    this->world->EnablePhysicsEngine(_msg->enable_physics());
+    this->world->SetPhysicsEnabled(_msg->enable_physics());
 
   if (_msg->has_contact_surface_layer())
     this->SetParam("contact_surface_layer", _msg->contact_surface_layer());
@@ -714,7 +728,7 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
     if (_collision)
       shape.reset(new BulletRayShape(_collision));
     else
-      shape.reset(new BulletRayShape(this->world->GetPhysicsEngine()));
+      shape.reset(new BulletRayShape(this->world->Physics()));
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 
@@ -782,9 +796,9 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void BulletPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
-  this->world->SetGravitySDF(_gravity.Ign());
+  this->world->SetGravitySDF(_gravity);
   this->dynamicsWorld->setGravity(
     BulletTypes::ConvertVector3(_gravity));
 }

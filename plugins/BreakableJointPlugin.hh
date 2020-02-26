@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Open Source Robotics Foundation
+ * Copyright (C) 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PLUGINS_BREAKABLE_JOINT_PLUGIN_HH_
-#define _GAZEBO_PLUGINS_BREAKABLE_JOINT_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_BREAKABLEJOINTPLUGIN_HH_
+#define GAZEBO_PLUGINS_BREAKABLEJOINTPLUGIN_HH_
 
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"

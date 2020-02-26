@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,15 +75,11 @@ void ImagesView::UpdateImpl()
     auto oldLayout = this->frame->layout();
     if (oldLayout)
     {
-      // Let Qt delete the widgets. Give ownership of all widgets to an object
-      // which will be out of scope.
-      QWidget().setLayout(oldLayout);
-    }
+      while (QLayoutItem* item = oldLayout->takeAt(0))
+        item->widget()->deleteLater();
 
-    // Create new layout
-    std::unique_ptr<QGridLayout> newLayout(new QGridLayout);
-    newLayout->setSizeConstraint(QLayout::SetMinimumSize);
-    this->frame->setLayout(newLayout.release());
+      oldLayout->invalidate();
+    }
 
     // Make sure to adjust the size of the widget
     this->frame->adjustSize();

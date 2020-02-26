@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
-#define _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_SCENE_PRIVATE_HH_
+#define GAZEBO_RENDERING_SCENE_PRIVATE_HH_
 
 #include <list>
 #include <map>
@@ -30,6 +30,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/rendering/MarkerManager.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -66,9 +67,13 @@ namespace gazebo
     /// \brief List of light messages.
     typedef std::list<boost::shared_ptr<msgs::Light const> > LightMsgs_L;
 
-    /// \def PoseMsgs_L.
+    /// \typedef PoseMsgs_M.
     /// \brief List of messages.
     typedef std::map<uint32_t, msgs::Pose> PoseMsgs_M;
+
+    /// \typedef LightPoseMsgs_M.
+    /// \brief List of messages.
+    typedef std::map<std::string, msgs::Pose> LightPoseMsgs_M;
 
     /// \def SceneMsgs_L
     /// \brief List of scene messages.
@@ -140,10 +145,10 @@ namespace gazebo
 #endif
 
       /// \brief The ogre scene manager.
-      public: Ogre::SceneManager *manager;
+      public: Ogre::SceneManager *manager = nullptr;
 
       /// \brief A ray query used to locate distances to visuals.
-      public: Ogre::RaySceneQuery *raySceneQuery;
+      public: Ogre::RaySceneQuery *raySceneQuery = nullptr;
 
       /// \brief All the grids in the scene.
       public: std::vector<Grid *> grids;
@@ -178,6 +183,9 @@ namespace gazebo
       /// \brief List of pose message to process.
       public: PoseMsgs_M poseMsgs;
 
+      /// \brief List of pose message to process.
+      public: LightPoseMsgs_M lightPoseMsgs;
+
       /// \brief List of scene message to process.
       public: SceneMsgs_L sceneMsgs;
 
@@ -209,7 +217,7 @@ namespace gazebo
       public: RoadMsgs_L roadMsgs;
 
       /// \brief Mutex to lock the various message buffers.
-      public: std::mutex *receiveMutex;
+      public: std::mutex *receiveMutex = nullptr;
 
       /// \brief Mutex to lock the pose message buffers.
       public: std::recursive_mutex poseMsgMutex;
@@ -282,22 +290,31 @@ namespace gazebo
       public: std::string selectionMode;
 
       /// \brief Keep around our request message.
-      public: msgs::Request *requestMsg;
+      public: msgs::Request *requestMsg = nullptr;
 
       /// \brief True if visualizations should be rendered.
       public: bool enableVisualizations;
 
+      /// \brief True if this scene is running on the server.
+      public: bool isServer;
+
       /// \brief The heightmap, if any.
-      public: Heightmap *terrain;
+      public: Heightmap *terrain = nullptr;
+
+      /// \brief The heightmap level of detail
+      public: unsigned int heightmapLOD = 0u;
+
+      /// \brief The heightmap skirt length
+      public: double heightmapSkirtLength = 1.0;
 
       /// \brief All the projectors.
       public: std::map<std::string, Projector *> projectors;
 
       /// \brief Pointer to the sky.
-      public: SkyX::SkyX *skyx;
+      public: SkyX::SkyX *skyx = nullptr;
 
       /// \brief Controls the sky.
-      public: SkyX::BasicController *skyxController;
+      public: SkyX::BasicController *skyxController = nullptr;
 
       /// \brief True when all COMs should be visualized.
       public: bool showCOMs;
@@ -339,6 +356,16 @@ namespace gazebo
 
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
+
+      /// \brief Size of shadow texture
+      public: unsigned int shadowTextureSize = 1024u;
+
+      /// \brief Manager of marker visuals
+      public: MarkerManager markerManager;
+
+      /// \brief State of each layer where key is the layer id, and value is
+      /// the layer's visibility.
+      public: std::map<int32_t, bool> layerState;
     };
   }
 }

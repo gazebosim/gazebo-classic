@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,11 +35,11 @@
 #include "gazebo/rendering/WideAngleCameraPrivate.hh"
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/WideAngleCamera.hh"
-
 
 using namespace gazebo;
 using namespace rendering;
@@ -612,13 +612,43 @@ void WideAngleCamera::SetClipDist()
 }
 
 //////////////////////////////////////////////////
+bool WideAngleCamera::SetBackgroundColor(const common::Color &_color)
+{
+  bool retVal = true;
+  Ogre::ColourValue clr = Conversions::Convert(_color);
+  if (this->OgreViewport())
+  {
+    this->OgreViewport()->setBackgroundColour(clr);
+    for (int i = 0; i < 6; ++i)
+    {
+      if (this->dataPtr->envViewports[i])
+      {
+        this->dataPtr->envViewports[i]->setBackgroundColour(clr);
+      }
+      else
+      {
+        retVal = false;
+      }
+    }
+  }
+  else
+  {
+    retVal = false;
+  }
+  return retVal;
+}
+
+//////////////////////////////////////////////////
 void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 {
-  int fsaa = 4;
-
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
-  fsaa = 0;
-#endif
+  unsigned int fsaa = 0;
+  std::vector<unsigned int> fsaaLevels =
+      RenderEngine::Instance()->FSAALevels();
+  // check if target fsaa is supported
+  unsigned int targetFSAA = 4;
+  auto const it = std::find(fsaaLevels.begin(), fsaaLevels.end(), targetFSAA);
+  if (it != fsaaLevels.end())
+    fsaa = targetFSAA;
 
   this->dataPtr->envCubeMapTexture =
       Ogre::TextureManager::getSingleton().createManual(
@@ -628,7 +658,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
           this->dataPtr->envTextureSize,
           this->dataPtr->envTextureSize,
           0,
-          Ogre::PF_A8R8G8B8,
+          static_cast<Ogre::PixelFormat>(this->imageFormat),
           Ogre::TU_RENDERTARGET,
           0,
           false,
@@ -638,6 +668,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
   {
     Ogre::RenderTarget *rtt;
     rtt = this->dataPtr->envCubeMapTexture->getBuffer(i)->getRenderTarget();
+    rtt->setAutoUpdated(false);
 
     Ogre::Viewport *vp = rtt->addViewport(this->dataPtr->envCameras[i]);
     vp->setClearEveryFrame(true);
@@ -704,4 +735,112 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
   // suppose that this function was invoked in a thread that has OpenGL context
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif
+}
+
+//////////////////////////////////////////////////
+void WideAngleCamera::UpdateFOV()
+{
+  // override to prevent parent class from updating fov as
+  // it'll be handled here in this class.
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d WideAngleCamera::Project3d(
+    const ignition::math::Vector3d &_pt) const
+{
+  // project onto cubemap face then onto
+  ignition::math::Vector3d screenPos;
+  // loop through all env cameras can find the one that sees the 3d world point
+  for (int i = 0; i < 6; ++i)
+  {
+    // project world point to camera clip space.
+    auto viewProj = this->dataPtr->envCameras[i]->getProjectionMatrix() *
+        this->dataPtr->envCameras[i]->getViewMatrix();
+    auto pos = viewProj * Ogre::Vector4(Conversions::Convert(_pt));
+    pos.x /= pos.w;
+    pos.y /= pos.w;
+    // check if point is visible
+    if (std::fabs(pos.x) <= 1 && std::fabs(pos.y) <= 1 && pos.z > 0)
+    {
+      // determine dir vector to projected point from env camera
+      // work in y up, z forward, x right clip space
+      ignition::math::Vector3d dir(pos.x, pos.y, 1);
+      ignition::math::Quaterniond rot = ignition::math::Quaterniond::Identity;
+
+      // rotate dir vector into wide angle camera frame based on the
+      // face of the cube. Note: operate in clip space so
+      // left handed coordinate system rotation
+      if (i == 0)
+        rot = ignition::math::Quaterniond(0.0, M_PI*0.5, 0.0);
+      else if (i == 1)
+        rot = ignition::math::Quaterniond(0.0, -M_PI*0.5, 0.0);
+      else if (i == 2)
+        rot = ignition::math::Quaterniond(-M_PI*0.5, 0.0, 0.0);
+      else if (i == 3)
+        rot = ignition::math::Quaterniond(M_PI*0.5, 0.0, 0.0);
+      else if (i == 5)
+        rot = ignition::math::Quaterniond(0.0, M_PI, 0.0);
+      dir = rot * dir;
+      dir.Normalize();
+
+      // compute theta and phi from the dir vector
+      // theta is angle to dir vector from z (forward)
+      // phi is angle from x in x-y plane
+      // direction vector (x, y, z)
+      // x = sin(theta)cos(phi)
+      // y = sin(theta)sin(phi)
+      // z = cos(theta)
+      double theta =  std::atan2(
+          std::sqrt(dir.X() * dir.X() + dir.Y() * dir.Y()), dir.Z());
+      double phi = std::atan2(dir.Y(), dir.X());
+      // this also works:
+      // double theta = std::acos(dir.Z());
+      // double phi = std::asin(dir.Y() / std::sin(theta));
+
+      double f = this->Lens()->F();
+      double hfov = this->HFOV().Radian();
+      // recompute f if scale to HFOV is true
+      if (this->Lens()->ScaleToHFOV())
+      {
+        double param = (hfov/2.0) / this->Lens()->C2() + this->Lens()->C3();
+        double funRes =
+            CameraLensPrivate::MapFunctionEnum(this->Lens()->Fun()).Apply(
+            static_cast<float>(param));
+        f = 1.0/(this->Lens()->C1()*funRes);
+      }
+
+      // Apply fisheye lens mapping function
+      // r is distance of point from image center
+      double r = this->Lens()->C1() * f *
+          CameraLensPrivate::MapFunctionEnum(this->Lens()->Fun()).Apply(
+          theta/this->Lens()->C2() + this->Lens()->C3());
+
+      // compute projected x and y in clip space
+      double x = cos(phi) * r;
+      double y = sin(phi) * r;
+
+      // env cam cube map texture is square and likely to be different size from
+      // viewport. We need to adjust projected pos based on aspect ratio
+      double aspect = static_cast<double>(this->ViewportWidth()) /
+        static_cast<double>(this->ViewportHeight());
+      y *= aspect;
+
+      // convert to screen space
+      screenPos.X() = ((x / 2.0) + 0.5) * this->ViewportWidth();
+      screenPos.Y() = (1 - ((y / 2.0) + 0.5)) * this->ViewportHeight();
+
+      // r will be > 1.0 if point is not visible (outside of image)
+      screenPos.Z() = r;
+      return screenPos;
+    }
+  }
+
+  return screenPos;
+}
+
+//////////////////////////////////////////////////
+std::vector<Ogre::Camera *> WideAngleCamera::OgreEnvCameras() const
+{
+  return std::vector<Ogre::Camera *>(
+    std::begin(this->dataPtr->envCameras), std::end(this->dataPtr->envCameras));
 }

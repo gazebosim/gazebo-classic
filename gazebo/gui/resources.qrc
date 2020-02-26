@@ -74,6 +74,10 @@
   <file>images/view_angle_left.png</file>
   <file>images/view_angle_right.png</file>
   <file>images/view_angle_home.png</file>
+  <file>images/eye.png</file>
+  <file>images/eye_collision.svg</file>
+  <file>images/eye_frame.svg</file>
+  <file>images/eye_visual.svg</file>
 
   <file alias='wood.jpg'>../../media/materials/textures/wood.jpg</file>
   <file alias='tiles.jpg'>../../media/materials/textures/ceiling_tiled.jpg</file>
@@ -94,6 +98,11 @@
   <file>images/clear.svg</file>
   <file>images/check_box_black.svg</file>
   <file>images/check_box_outline_black.svg</file>
+  <file>images/mp4.svg</file>
+  <file>images/ogv.svg</file>
+  <file>images/avi.svg</file>
+  <file>images/v4l.svg</file>
+  <file>images/video_camera.svg</file>
 
   <file>fonts/Roboto-Black.ttf</file>
   <file>fonts/Roboto-BlackItalic.ttf</file>

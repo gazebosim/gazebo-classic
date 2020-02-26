@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ namespace gazebo
                                            CollisionPtr _collision);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
@@ -145,7 +145,13 @@ namespace gazebo
 
       /// \brief Get pointer to DART World associated with this DART Physics.
       /// \return The pointer to DART World.
-      public: dart::simulation::World *GetDARTWorld();
+      /// \deprecated See dart::simulation::WorldPtr DARTWorld()
+      public: dart::simulation::World *GetDARTWorld() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get pointer to DART World associated with this DART Physics.
+      /// \return The pointer to DART World.
+      public: dart::simulation::WorldPtr DARTWorld() const;
 
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
@@ -161,7 +167,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: DARTPhysicsPrivate *dataPtr;
+      private: DARTPhysicsPrivate *dataPtr = nullptr;
     };
 
   /// \}

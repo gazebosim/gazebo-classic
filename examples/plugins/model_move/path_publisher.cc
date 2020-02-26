@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,15 @@
  * limitations under the License.
  *
  */
+
 #include <iostream>
-#include <math.h>
 #include <ignition/math/Pose3.hh>
 
-#include "gazebo/gazebo.hh"
 #include "gazebo/common/common.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/transport/transport.hh"
-#include "gazebo/physics/physics.hh"
+#include "gazebo/gazebo.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 
 using namespace gazebo;
 

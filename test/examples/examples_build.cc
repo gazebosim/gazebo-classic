@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,8 @@ TEST_P(ExamplesBuild_Plugins, Plugins)
 
 ///////////////////////////////////////////////////////////////////
 INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
-  "animate_joints"
+  "actor_collisions"
+  , "animate_joints"
   , "animate_pose"
   , "factory"
   , "gui_overlay_plugin_spawn"
@@ -104,6 +105,7 @@ INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
   , "parameters"
   , "projector"
   , "system_gui_plugin"
+  , "trigger_light"
   , "world_edit"
 ));
 
@@ -121,6 +123,7 @@ auto standaloneValues = ::testing::Values(
   , "clone_simulation"
   , "custom_main"
   , "custom_main_pkgconfig"
+  , "diagnostics"
   , "harness"
   , "introspection_client"
   , "listener"

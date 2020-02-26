@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ using namespace gui;
 LightMaker::LightMaker() : dataPtr(new LightMakerPrivate)
 {
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   this->dataPtr->lightPub =
       this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
@@ -59,6 +59,7 @@ LightMaker::LightMaker() : dataPtr(new LightMakerPrivate)
 //////////////////////////////////////////////////
 LightMaker::~LightMaker()
 {
+  this->dataPtr->lightPub.reset();
   this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
 }

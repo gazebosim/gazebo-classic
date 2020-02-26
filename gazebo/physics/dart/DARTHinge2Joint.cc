@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
@@ -29,19 +31,21 @@ using namespace physics;
 DARTHinge2Joint::DARTHinge2Joint(BasePtr _parent)
   : Hinge2Joint<DARTJoint>(_parent)
 {
-  this->dataPtr->dtJoint = new dart::dynamics::UniversalJoint();
 }
 
 //////////////////////////////////////////////////
 DARTHinge2Joint::~DARTHinge2Joint()
 {
-  // We don't need to delete dtJoint because the world will delete it
 }
 
 //////////////////////////////////////////////////
 void DARTHinge2Joint::Load(sdf::ElementPtr _sdf)
 {
   Hinge2Joint<DARTJoint>::Load(_sdf);
+
+  this->dataPtr->dtProperties.reset(
+        new dart::dynamics::UniversalJoint::Properties(
+          *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -51,18 +55,34 @@ void DARTHinge2Joint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHinge2Joint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d DARTHinge2Joint::Anchor(
+    const unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
+          "Anchor" + std::to_string(_index));
+  }
+
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin);
+  return DARTTypes::ConvVec3Ign(worldOrigin);
 }
 
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void DARTHinge2Joint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "Axis" + std::to_string(_index),
+          boost::bind(&DARTHinge2Joint::SetAxis, this, _index, _axis));
+    return;
+  }
+
   Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
 
   if (_index == 0)
@@ -100,8 +120,15 @@ void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTHinge2Joint::GlobalAxis(
+    const unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
+          "Axis" + std::to_string(_index));
+  }
+
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
   if (_index == 0)
@@ -137,23 +164,26 @@ math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/
   // joint-axis-reference-frame-doesnt-match
-  return DARTTypes::ConvVec3(globalAxis);
+  return DARTTypes::ConvVec3Ign(globalAxis);
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTHinge2Joint::GetAngleImpl(unsigned int _index) const
+double DARTHinge2Joint::PositionImpl(const unsigned int _index) const
 {
-  math::Angle result;
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>("Angle" + std::to_string(_index));
+  }
+
+  double result = ignition::math::NAN_D;
 
   if (_index == 0)
   {
-    double radianAngle = this->dataPtr->dtJoint->getPosition(0);
-    result.SetFromRadian(radianAngle);
+    result = this->dataPtr->dtJoint->getPosition(0);
   }
   else if (_index == 1)
   {
-    double radianAngle = this->dataPtr->dtJoint->getPosition(1);
-    result.SetFromRadian(radianAngle);
+    result = this->dataPtr->dtJoint->getPosition(1);
   }
   else
   {
@@ -166,6 +196,12 @@ math::Angle DARTHinge2Joint::GetAngleImpl(unsigned int _index) const
 //////////////////////////////////////////////////
 double DARTHinge2Joint::GetVelocity(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>(
+          "Velocity" + std::to_string(_index));
+  }
+
   double result = 0.0;
 
   if (_index == 0)
@@ -181,6 +217,15 @@ double DARTHinge2Joint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void DARTHinge2Joint::SetVelocity(unsigned int _index, double _vel)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "Velocity" + std::to_string(_index),
+          boost::bind(&DARTHinge2Joint::SetVelocity, this, _index, _vel),
+          _vel);
+    return;
+  }
+
   if (_index == 0)
     this->dataPtr->dtJoint->setVelocity(0, _vel);
   else if (_index == 1)
@@ -192,6 +237,14 @@ void DARTHinge2Joint::SetVelocity(unsigned int _index, double _vel)
 //////////////////////////////////////////////////
 void DARTHinge2Joint::SetForceImpl(unsigned int _index, double _effort)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+        "Force" + std::to_string(_index),
+        boost::bind(&DARTHinge2Joint::SetForceImpl, this, _index, _effort));
+    return;
+  }
+
   if (_index == 0)
     this->dataPtr->dtJoint->setForce(0, _effort);
   else if (_index == 1)

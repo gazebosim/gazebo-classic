@@ -833,7 +833,7 @@ void ModelEditorUndoTest::LinkTranslation()
   std::string linkVisName = "ModelPreview_1::link";
   auto linkVis = scene->GetVisual(linkVisName);
   QVERIFY(linkVis != nullptr);
-  auto initialPose = linkVis->GetWorldPose().Ign();
+  auto initialPose = linkVis->WorldPose();
 
   // Move camera closer to model so we can easily click on it
   cam->SetWorldPose(ignition::math::Pose3d(1.37, 0, 0.73, 0, 0.26, 3.1));
@@ -872,10 +872,10 @@ void ModelEditorUndoTest::LinkTranslation()
     QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
 
     // Check link pose has changed
-    QVERIFY(linkVis->GetWorldPose().Ign() != initialPose);
+    QVERIFY(linkVis->WorldPose() != initialPose);
 
     // Undo
-    gzmsg << "Undo moving [" << linkVis->GetName() << "]" << std::endl;
+    gzmsg << "Undo moving [" << linkVis->Name() << "]" << std::endl;
     gazebo::gui::g_undoAct->trigger();
 
     // Check redo is enabled
@@ -885,10 +885,10 @@ void ModelEditorUndoTest::LinkTranslation()
     QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled());
 
     // Check it's back to initial pose
-    QVERIFY(initialPose == linkVis->GetWorldPose().Ign());
+    QVERIFY(initialPose == linkVis->WorldPose());
 
     // Redo
-    gzmsg << "Redo moving [" << linkVis->GetName() << "]" << std::endl;
+    gzmsg << "Redo moving [" << linkVis->Name() << "]" << std::endl;
     gazebo::gui::g_redoAct->trigger();
   }
 
@@ -943,8 +943,8 @@ void ModelEditorUndoTest::LinkScaling()
   auto linkCol = scene->GetVisual(linkName + "::collision");
   QVERIFY(linkCol != nullptr);
 
-  auto initialVisScale = linkVis->GetScale().Ign();
-  auto initialColScale = linkCol->GetScale().Ign();
+  auto initialVisScale = linkVis->Scale();
+  auto initialColScale = linkCol->Scale();
 
   // Move camera closer to model so we can easily click on it
   cam->SetWorldPose(ignition::math::Pose3d(1.37, 0, 0.73, 0, 0.26, 3.1));
@@ -991,8 +991,8 @@ void ModelEditorUndoTest::LinkScaling()
     QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
 
     // Check visual and collision scales have changed
-    QVERIFY(linkVis->GetScale().Ign() != initialVisScale);
-    QVERIFY(linkCol->GetScale().Ign() != initialColScale);
+    QVERIFY(linkVis->Scale() != initialVisScale);
+    QVERIFY(linkCol->Scale() != initialColScale);
 
     // Undo
     gzmsg << "Undo scaling [" << linkName << "]" << std::endl;
@@ -1005,8 +1005,8 @@ void ModelEditorUndoTest::LinkScaling()
     QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled());
 
     // Check they're back to initial scale
-    QVERIFY(initialVisScale == linkVis->GetScale().Ign());
-    QVERIFY(initialColScale == linkCol->GetScale().Ign());
+    QVERIFY(initialVisScale == linkVis->Scale());
+    QVERIFY(initialColScale == linkCol->Scale());
 
     // Redo
     gzmsg << "Redo scaling [" << linkName << "]" << std::endl;
@@ -1070,7 +1070,7 @@ void ModelEditorUndoTest::NestedModelAlign()
   QVERIFY(nestedVis != nullptr);
   visuals.push_back(nestedVis);
 
-  auto initialPose = nestedVis->GetWorldPose().Ign();
+  auto initialPose = nestedVis->WorldPose();
 
   // Align
   gazebo::gui::ModelAlign::Instance()->Init();
@@ -1089,10 +1089,10 @@ void ModelEditorUndoTest::NestedModelAlign()
     QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
 
     // Check nested pose has changed
-    QVERIFY(nestedVis->GetWorldPose().Ign() != initialPose);
+    QVERIFY(nestedVis->WorldPose() != initialPose);
 
     // Undo
-    gzmsg << "Undo moving [" << nestedVis->GetName() << "]" << std::endl;
+    gzmsg << "Undo moving [" << nestedVis->Name() << "]" << std::endl;
     gazebo::gui::g_undoAct->trigger();
 
     // Check redo is enabled
@@ -1102,10 +1102,10 @@ void ModelEditorUndoTest::NestedModelAlign()
     QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled());
 
     // Check it's back to initial pose
-    QVERIFY(initialPose == nestedVis->GetWorldPose().Ign());
+    QVERIFY(initialPose == nestedVis->WorldPose());
 
     // Redo
-    gzmsg << "Redo moving [" << nestedVis->GetName() << "]" << std::endl;
+    gzmsg << "Redo moving [" << nestedVis->Name() << "]" << std::endl;
     gazebo::gui::g_redoAct->trigger();
   }
 

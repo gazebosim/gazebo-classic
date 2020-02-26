@@ -52,7 +52,7 @@
       <region>
         <name>start</name>
         <volume>
-          <!-- min and max are sdf::Vector3 -->
+          <!-- min and max are ignition::math::Vector3d -->
           <!-- around the origin -->
           <min>-3 -3 -3</min>
           <max>3 3 3</max>

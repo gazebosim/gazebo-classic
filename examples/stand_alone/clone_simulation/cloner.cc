@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <boost/scoped_ptr.hpp>
-#include <boost/thread.hpp>
+#include <memory>
+#include <thread>
 #include <gazebo/gazebo.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
@@ -38,7 +38,7 @@ void OnWorldModify(ConstWorldModifyPtr &_msg)
 void RunServer()
 {
   // Initialize gazebo server.
-  boost::scoped_ptr<gazebo::Server> server(new gazebo::Server());
+  std::unique_ptr<gazebo::Server> server(new gazebo::Server());
   try
   {
     if (!server->ParseArgs(0, NULL))
@@ -61,7 +61,7 @@ void RunServer()
 int main(int _argc, char **_argv)
 {
   // Launch a server in a different thread.
-  boost::thread serverThread(RunServer);
+  std::thread serverThread(RunServer);
 
   // Create a node for communication.
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
@@ -98,4 +98,5 @@ int main(int _argc, char **_argv)
     std::cerr << "kill gzserver returned a non zero value:" << ret << std::endl;
 
   gazebo::shutdown();
+  serverThread.join();
 }

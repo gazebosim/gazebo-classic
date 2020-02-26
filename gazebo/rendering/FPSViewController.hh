@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _FPSVIEWCONTROLLER_HH_
-#define _FPSVIEWCONTROLLER_HH_
+#ifndef GAZEBO_RENDERING_FPSVIEWCONTROLLER_HH_
+#define GAZEBO_RENDERING_FPSVIEWCONTROLLER_HH_
 
 #include <string>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/ViewController.hh"
 #include "gazebo/util/system.hh"
 
@@ -36,7 +36,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] Camera to controll
-      public: FPSViewController(UserCameraPtr _camera);
+      public: explicit FPSViewController(UserCameraPtr _camera);
 
       /// \brief Destructor
       public: virtual ~FPSViewController();
@@ -61,9 +61,6 @@ namespace gazebo
       // Documentation inherited from parent
       public: void HandleKeyPressEvent(const std::string &_key);
 
-      /// \brief The current velocity of the camera.
-      private: math::Pose velocity;
-
       /// \brief Translation velocity factor along the x-axis
       private: float xVelocityFactor;
 
@@ -71,10 +68,10 @@ namespace gazebo
       private: float yVelocityFactor;
 
       /// \brief Translation velocity along the x-axis
-      private: math::Vector3 xVelocity;
+      private: ignition::math::Vector3d xVelocity;
 
       /// \brief Translation velocity along the y-axis
-      private: math::Vector3 yVelocity;
+      private: ignition::math::Vector3d yVelocity;
     };
     /// \}
   }

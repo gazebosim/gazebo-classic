@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,10 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
 #include <boost/algorithm/string.hpp>
+#include <ignition/math/Vector3.hh>
 #include <gazebo/physics/Base.hh>
 #include "PressurePlugin.hh"
 
@@ -71,7 +74,7 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
     std::string collisionName =
       collisionScopedName.substr(collisionScopedName.rfind("::") + 2);
     // Get physics pointers
-    physics::EntityPtr entity = world->GetEntity(linkName);
+    physics::EntityPtr entity = world->EntityByName(linkName);
     if (entity && entity->HasType(physics::Base::LINK))
     {
       physics::LinkPtr link =
@@ -88,11 +91,11 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
               boost::dynamic_pointer_cast<physics::BoxShape>(shape);
             if (box)
             {
-              math::Vector3 size = box->GetSize();
+              ignition::math::Vector3d size = box->Size();
               std::vector<double> sizeVector;
-              sizeVector.push_back(size.x);
-              sizeVector.push_back(size.y);
-              sizeVector.push_back(size.z);
+              sizeVector.push_back(size.X());
+              sizeVector.push_back(size.Y());
+              sizeVector.push_back(size.Z());
               std::sort(sizeVector.begin(), sizeVector.end());
               double area = sizeVector[1] * sizeVector[2];
               if (area > 0.0)
@@ -126,7 +129,7 @@ void PressurePlugin::OnUpdate()
   msgs::Tactile tactileMsg;
 
   // For each collision attached to this sensor
-  boost::unordered_map<std::string, double>::iterator iter;
+  std::map<std::string, double>::iterator iter;
   for (iter = this->collisionNamesToArea.begin();
        iter != this->collisionNamesToArea.end(); ++iter)
   {
@@ -140,12 +143,12 @@ void PressurePlugin::OnUpdate()
       for (int i = 0; i < iter2->second.count; ++i)
       {
         // TODO: determine whether body1Force or body2Force should be used.
-        normalForce = iter2->second.normals[i].x *
-                      iter2->second.wrench[i].body1Force.x +
-                      iter2->second.normals[i].y *
-                      iter2->second.wrench[i].body1Force.y +
-                      iter2->second.normals[i].z *
-                      iter2->second.wrench[i].body1Force.z;
+        normalForce = iter2->second.normals[i].X() *
+                      iter2->second.wrench[i].body1Force.X() +
+                      iter2->second.normals[i].Y() *
+                      iter2->second.wrench[i].body1Force.Y() +
+                      iter2->second.normals[i].Z() *
+                      iter2->second.wrench[i].body1Force.Z();
         normalForceSum += normalForce;
       }
     }

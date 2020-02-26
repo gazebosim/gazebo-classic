@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,15 @@
 #define TOL_TORQUES 2.0
 
 using namespace gazebo;
-using namespace gazebo::math;
 
 class Issue940Test : public ServerFixture,
                      public testing::WithParamInterface<const char*>
 {
   public: void ForceTorqueSensorFrameTest(const std::string &_physicsEngine);
   public: void ExpectForceTorqueMeasure(const std::string &_sensorName,
-                                        const Vector3 &_expForce,
-                                        const Vector3 &_expTorque,
-                                        sensors::SensorManager *_mgr);
+                                    const ignition::math::Vector3d &_expForce,
+                                    const ignition::math::Vector3d &_expTorque,
+                                    sensors::SensorManager *_mgr);
 };
 
 /////////////////////////////////////////////////////////////////////
@@ -62,7 +61,7 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -87,40 +86,49 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
 
   // For details on the expected answers, check force_torque_frame_test.world
   ExpectForceTorqueMeasure("force_torque_01_parent_and_parent_to_child",
-    Vector3(0, 0, -g*mAll), Vector3(-g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
+    ignition::math::Vector3d(0, 0, -g*mAll),
+    ignition::math::Vector3d(-g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_01_parent_and_child_to_parent",
-    Vector3(0, 0, g*mAll), Vector3(g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
+    ignition::math::Vector3d(0, 0, g*mAll),
+    ignition::math::Vector3d(g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_01_child_and_parent_to_child",
-    Vector3(0, 0, -g*mAll), Vector3(-g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
+    ignition::math::Vector3d(0, 0, -g*mAll),
+    ignition::math::Vector3d(-g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_01_child_and_child_to_parent",
-    Vector3(0, 0, g*mAll), Vector3(g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
+    ignition::math::Vector3d(0, 0, g*mAll),
+    ignition::math::Vector3d(g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_01_sensor_and_parent_to_child",
-    Vector3(0, 0, -g*mAll), Vector3(-g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
+    ignition::math::Vector3d(0, 0, -g*mAll),
+    ignition::math::Vector3d(-g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_01_sensor_and_child_to_parent",
-    Vector3(0, 0, g*mAll), Vector3(g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
+    ignition::math::Vector3d(0, 0, g*mAll),
+    ignition::math::Vector3d(g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_12_parent_and_parent_to_child",
-    Vector3(0, 0, -g*m1),
-    Vector3(-g*m1*cog_y_1, -g*m1*delta_x_joint_12, 0), mgr);
+    ignition::math::Vector3d(0, 0, -g*m1),
+    ignition::math::Vector3d(-g*m1*cog_y_1, -g*m1*delta_x_joint_12, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_12_parent_and_child_to_parent",
-    Vector3(0, 0, g*m1), Vector3(g*m1*cog_y_1, g*m1*delta_x_joint_12, 0), mgr);
+    ignition::math::Vector3d(0, 0, g*m1),
+    ignition::math::Vector3d(g*m1*cog_y_1, g*m1*delta_x_joint_12, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_12_child_and_parent_to_child",
-    Vector3(0, -g*m1, 0),
-    Vector3(-g*m1*cog_y_1, 0, g*m1*delta_x_joint_12), mgr);
+    ignition::math::Vector3d(0, -g*m1, 0),
+    ignition::math::Vector3d(-g*m1*cog_y_1, 0, g*m1*delta_x_joint_12), mgr);
   ExpectForceTorqueMeasure("force_torque_12_child_and_child_to_parent",
-    Vector3(0, g*m1, 0), Vector3(g*m1*cog_y_1, 0, -g*m1*delta_x_joint_12), mgr);
+    ignition::math::Vector3d(0, g*m1, 0),
+    ignition::math::Vector3d(g*m1*cog_y_1, 0, -g*m1*delta_x_joint_12), mgr);
   ExpectForceTorqueMeasure("force_torque_12_sensor_and_parent_to_child",
-    Vector3(0, -g*m1, 0), Vector3(g*m1*delta_x_joint_12, 0, g*m1*cog_y_1), mgr);
+    ignition::math::Vector3d(0, -g*m1, 0),
+    ignition::math::Vector3d(g*m1*delta_x_joint_12, 0, g*m1*cog_y_1), mgr);
   ExpectForceTorqueMeasure("force_torque_12_sensor_and_child_to_parent",
-    Vector3(0, g*m1, 0),
-    Vector3(-g*m1*delta_x_joint_12, 0, -g*m1*cog_y_1), mgr);
+    ignition::math::Vector3d(0, g*m1, 0),
+    ignition::math::Vector3d(-g*m1*delta_x_joint_12, 0, -g*m1*cog_y_1), mgr);
 }
 
 ////////////////////////////////////////////////////////////////////
 // \brief Expect force and torque measures for a force torque sensor
 void Issue940Test::ExpectForceTorqueMeasure(const std::string &_sensorName,
-                                            const Vector3 &_expForce,
-                                            const Vector3 &_expTorque,
-                                            sensors::SensorManager *_mgr)
+                                    const ignition::math::Vector3d &_expForce,
+                                    const ignition::math::Vector3d &_expTorque,
+                                    sensors::SensorManager *_mgr)
 {
   sensors::ForceTorqueSensorPtr sensor =
     std::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
@@ -138,13 +146,13 @@ void Issue940Test::ExpectForceTorqueMeasure(const std::string &_sensorName,
   gzdbg << "mesTorque : " << mesTorque << std::endl;
   gzdbg << "expTorque : " << _expTorque << std::endl;
 
-  EXPECT_NEAR(_expForce.x, mesForce.X(), TOL_FORCES);
-  EXPECT_NEAR(_expForce.y, mesForce.Y(), TOL_FORCES);
-  EXPECT_NEAR(_expForce.z, mesForce.Z(), TOL_FORCES);
+  EXPECT_NEAR(_expForce.X(), mesForce.X(), TOL_FORCES);
+  EXPECT_NEAR(_expForce.Y(), mesForce.Y(), TOL_FORCES);
+  EXPECT_NEAR(_expForce.Z(), mesForce.Z(), TOL_FORCES);
 
-  EXPECT_NEAR(_expTorque.x, mesTorque.X(), TOL_TORQUES);
-  EXPECT_NEAR(_expTorque.y, mesTorque.Y(), TOL_TORQUES);
-  EXPECT_NEAR(_expTorque.z, mesTorque.Z(), TOL_TORQUES);
+  EXPECT_NEAR(_expTorque.X(), mesTorque.X(), TOL_TORQUES);
+  EXPECT_NEAR(_expTorque.Y(), mesTorque.Y(), TOL_TORQUES);
+  EXPECT_NEAR(_expTorque.Z(), mesTorque.Z(), TOL_TORQUES);
 
   EXPECT_TRUE(sensor->IsActive());
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Open Source Robotics Foundation
+ * Copyright (C) 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,7 +268,7 @@ void SaveEntityDialog::OnBrowse()
   QFileDialog fileDialog(this, tr("Open Directory"), QDir::homePath());
   fileDialog.setFileMode(QFileDialog::Directory);
   fileDialog.setOptions(QFileDialog::ShowDirsOnly
-      | QFileDialog::DontResolveSymlinks);
+      | QFileDialog::DontResolveSymlinks | QFileDialog::DontUseNativeDialog);
   fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 

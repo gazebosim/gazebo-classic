@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _RENDERTYPES_HH_
-#define _RENDERTYPES_HH_
+#ifndef GAZEBO_RENDERING_RENDERTYPES_HH_
+#define GAZEBO_RENDERING_RENDERTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
 #include "gazebo/gazebo_config.h"
@@ -71,6 +71,7 @@ namespace gazebo
     class SelectionObj;
     class RayQuery;
     class Distortion;
+    class LensFlare;
     class Road2d;
 
 #ifdef HAVE_OCULUS
@@ -200,6 +201,10 @@ namespace gazebo
     /// \def DistortionPtr
     /// \brief Shared pointer to Distortion
     typedef boost::shared_ptr<Distortion> DistortionPtr;
+
+    /// \def LensFlarePtr
+    /// \brief Shared pointer to LensFlare
+    typedef std::shared_ptr<LensFlare> LensFlarePtr;
 
     /// \def Road2dPtr
     /// \brief Shared pointer to Road2d

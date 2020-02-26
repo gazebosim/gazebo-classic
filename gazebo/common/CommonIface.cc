@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/ffmpeg_inc.h>
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
@@ -59,6 +60,49 @@ using namespace gazebo;
 # define GZ_PATH_MAX _POSIX_PATH_MAX
 #endif
 
+/////////////////////////////////////////////////
+// avcodec log callback. We use this to redirect message to gazebo's console
+// messages.
+#ifdef HAVE_FFMPEG
+void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
+{
+  static char message[8192];
+
+  std::string msg = "ffmpeg ";
+
+  // Get the ffmpeg module.
+  if (_ptr)
+  {
+    AVClass *avc = *reinterpret_cast<AVClass**>(_ptr);
+    const char *module = avc->item_name(_ptr);
+    if (module)
+      msg += std::string("[") + module + "] ";
+  }
+
+  // Create the actual message
+  vsnprintf(message, sizeof(message), _fmt, _args);
+  msg += message;
+
+  // Output to the appropriate stream.
+  switch (_level)
+  {
+    case AV_LOG_DEBUG:
+      // There are a lot of debug messages. So we'll skip those.
+      break;
+    case AV_LOG_PANIC:
+    case AV_LOG_FATAL:
+    case AV_LOG_ERROR:
+      gzerr << msg << std::endl;
+      break;
+    case AV_LOG_WARNING:
+      gzwarn << msg << std::endl;
+      break;
+    default:
+      gzmsg << msg << std::endl;
+      break;
+  }
+}
+#endif
 
 /////////////////////////////////////////////////
 void common::load()
@@ -68,8 +112,17 @@ void common::load()
   if (first)
   {
     first = false;
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 9, 100)
     avcodec_register_all();
     av_register_all();
+#endif
+
+#if defined(__linux__) && defined(HAVE_AVDEVICE)
+    avdevice_register_all();
+#endif
+
+    // Set the log callback function.
+    av_log_set_callback(logCallback);
   }
 #endif
 }
@@ -320,4 +373,65 @@ bool common::copyFile(const std::string &_existingFilename,
 
   return offset == statBuf.st_size;
 #endif
+}
+
+/////////////////////////////////////////////////
+bool common::copyDir(const boost::filesystem::path &_source,
+                     const boost::filesystem::path &_destination)
+{
+  namespace fs = boost::filesystem;
+  try
+  {
+    // Check whether source directory exists
+    if (!fs::exists(_source) || !fs::is_directory(_source))
+    {
+      gzwarn << "Source directory " << _source.string()
+        << " does not exist or is not a directory." << std::endl;
+      return false;
+    }
+
+    if (fs::exists(_destination))
+    {
+      fs::remove_all(_destination);
+    }
+    // Create the destination directory
+    if (!fs::create_directory(_destination))
+    {
+      gzwarn << "Unable to create the destination directory "
+        << _destination.string() << ", please check the permission.\n";
+        return false;
+    }
+  }
+  catch(fs::filesystem_error const &e)
+  {
+    gzwarn << e.what() << std::endl;
+    return false;
+  }
+
+  // Start copy from source to destination directory
+  for (fs::directory_iterator file(_source);
+       file != fs::directory_iterator(); ++file)
+  {
+    try
+    {
+      fs::path current(file->path());
+      if (fs::is_directory(current))
+      {
+        if (!copyDir(current, _destination / current.filename()))
+        {
+          return false;
+        }
+      }
+      else
+      {
+        fs::copy_file(current, _destination / current.filename());
+      }
+    }
+    catch(fs::filesystem_error const &e)
+    {
+      gzwarn << e.what() << std::endl;
+      return false;
+    }
+  }
+  return true;
 }

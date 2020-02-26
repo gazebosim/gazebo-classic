@@ -32,9 +32,9 @@ namespace SkyX
       , mCreated(false)
       , mSubMesh(0)
       , mEntity(0)
-      , mVertexBuffer(0)
+      , mVertexBuffer()
       , mVertices(0)
-      , mIndexBuffer(0)
+      , mIndexBuffer()
       , mSceneNode(0)
       , mSteps(70)
       , mCircles(95)
@@ -102,15 +102,15 @@ namespace SkyX
         mMesh->load();
         mMesh->touch();
 
-        mEntity = mSkyX->getSceneManager()->createEntity("SkyXMeshEnt",
-            "SkyXMesh");
-        mEntity->setMaterialName(mMaterialName);
-    mEntity->setCastShadows(false);
-    mEntity->setRenderQueueGroup(mSkyX->getRenderQueueGroups().skydome);
-
     mSceneNode = mSkyX->getSceneManager()->getRootSceneNode()->
       createChildSceneNode();
     mSceneNode->showBoundingBox(false);
+
+    mEntity = mSkyX->getSceneManager()->createEntity(
+        "SkyXMeshEnt_" + mSceneNode->getName(), "SkyXMesh");
+    mEntity->setCastShadows(false);
+    mEntity->setRenderQueueGroup(mSkyX->getRenderQueueGroups().skydome);
+
     mSceneNode->attachObject(mEntity);
 
     mCreated = true;

@@ -28,6 +28,7 @@
 // #include "gazebo/gui/Futures.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/plot/Palette.hh"
 
 #include "gazebo/transport/TransportIface.hh"
@@ -324,11 +325,15 @@ bool SearchModel::filterAcceptsRow(const int _srcRow,
   }
 
   // Collapsed by default
+  this->sourceModel()->blockSignals(true);
   this->sourceModel()->setData(id, false, PlotItemDelegate::TO_EXPAND);
+  this->sourceModel()->blockSignals(false);
 
   // Empty search matches everything
   if (this->search.isEmpty())
+  {
     return true;
+  }
 
   // Each word must match at least once, either self, parent or child
   auto words = this->search.split(" ");
@@ -342,7 +347,9 @@ bool SearchModel::filterAcceptsRow(const int _srcRow,
     // all words
     if (this->hasChildAcceptsItself(id, word))
     {
+      this->sourceModel()->blockSignals(true);
       this->sourceModel()->setData(id, true, PlotItemDelegate::TO_EXPAND);
+      this->sourceModel()->blockSignals(false);
     }
 
     // At least one of the children fits rule 1
@@ -522,7 +529,6 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->modelsModel = new PlotItemModel;
   this->dataPtr->modelsModel->setObjectName("plotModelsModel");
   this->dataPtr->modelsModel->setParent(this);
-
   this->FillModels();
 
   // A proxy model to filter models model
@@ -727,11 +733,14 @@ void Palette::FillTopics()
     }
   }
 
+  std::string worldName = gui::get_world();
+  std::string prefix = "/gazebo/" + worldName;
+
+  std::lock_guard<std::mutex> lock(this->dataPtr->modelsMutex);
   // Populate widget
   for (auto topic : topics)
   {
     // Shorten topic name
-    std::string prefix = "/gazebo/default";
     auto shortName = topic;
     auto idX = shortName.find(prefix);
     if (idX != std::string::npos)
@@ -751,7 +760,7 @@ void Palette::FillTopics()
     }
 
     auto msg = msgs::MsgFactory::NewMsg(msgType);
-    this->FillFromMsg(msg.get(), topicItem, topic+"?p=");
+    this->FillFromMsg(msg.get(), topicItem, topic + "?p=");
   }
 }
 
@@ -864,7 +873,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
 
     QStandardItem *previousItem = nullptr;
     unsigned int i = 0;
-    while (i < pathParts.size())
+    while (i < pathParts.size() - 1)
     {
       // Create model item based on part
       auto part = pathParts[i];
@@ -1103,10 +1112,15 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
 void Palette::FillSim()
 {
   // Hard-coded values for the sim tab
+
+  std::string worldName = gui::get_world();
+  std::string prefix = "/gazebo/" + worldName;
+  std::string worldStatsTopicStr = prefix + "/world_stats";
+
   std::multimap<std::string, std::string> simFields = {
-      {"~/world_stats", "sim_time"},
-      {"~/world_stats", "real_time"},
-      {"~/world_stats", "iterations"}};
+      {worldStatsTopicStr, "sim_time"},
+      {worldStatsTopicStr, "real_time"},
+      {worldStatsTopicStr, "iterations"}};
 
   for (auto field : simFields)
   {
@@ -1161,6 +1175,9 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
       return;
 
     auto name = field->name();
+
+    if (field->is_repeated())
+      continue;
 
     switch (field->type())
     {
@@ -1219,9 +1236,6 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
       // Message within a message
       case google::protobuf::FieldDescriptor::TYPE_MESSAGE:
       {
-        if (field->is_repeated())
-          continue;
-
         // Treat time as double
         if (field->message_type()->name() == "Time")
         {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <boost/algorithm/string.hpp>
 #include <math.h>
 #include <iostream>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/transport/transport.hh"
@@ -180,7 +181,7 @@ void LaserInterface::OnScan(ConstLaserScanStampedPtr &_msg)
     this->data.scan.intensity_count = _msg->scan().ranges_size();
   this->data.scan.id = this->scanId++;
 
-  if (!gazebo::math::equal(oldCount,
+  if (!ignition::math::equal(oldCount,
         static_cast<double>(this->data.scan.ranges_count)))
   {
     delete [] this->data.scan.ranges;

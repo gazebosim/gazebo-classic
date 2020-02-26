@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -47,7 +49,8 @@ void SimbodyHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHinge2Joint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::Anchor(
+    const unsigned int /*index*/) const
 {
   return this->anchorPos;
 }
@@ -56,7 +59,14 @@ math::Vector3 SimbodyHinge2Joint::GetAnchor(unsigned int /*index*/) const
 math::Vector3 SimbodyHinge2Joint::GetAxis(unsigned int /*index*/) const
 {
   gzerr << "Not implemented";
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return math::Vector3();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -74,8 +84,8 @@ void SimbodyHinge2Joint::SetVelocity(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+void SimbodyHinge2Joint::SetAxis(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
@@ -89,15 +99,16 @@ void SimbodyHinge2Joint::SetForceImpl(
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
-  gzerr << "SimbodyHinge2Joint::GetGlobalAxis not implemented\n";
-  return math::Vector3();
+  gzerr << "SimbodyHinge2Joint::GlobalAxis not implemented\n";
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetAngleImpl(unsigned int /*_index*/) const
+double SimbodyHinge2Joint::PositionImpl(const unsigned int /*_index*/) const
 {
-  gzerr << "SimbodyHinge2Joint::GetAngleImpl not implemented\n";
-  return math::Angle();
+  gzerr << "SimbodyHinge2Joint::PositionImpl not implemented\n";
+  return ignition::math::NAN_D;
 }

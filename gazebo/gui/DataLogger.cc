@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -233,7 +233,7 @@ DataLogger::DataLogger(QWidget *_parent)
 
   // Create a node from communication.
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   // Advertise on the log control topic. The server listens to log control
   // messages.
@@ -273,6 +273,11 @@ DataLogger::DataLogger(QWidget *_parent)
 /////////////////////////////////////////////////
 DataLogger::~DataLogger()
 {
+  this->dataPtr->sub.reset();
+  this->dataPtr->pub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
 }
 
 /////////////////////////////////////////////////

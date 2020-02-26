@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ TopicCommand::TopicCommand()
     ("hz,z", po::value<std::string>(), "Get publish frequency.")
     ("bw,b", po::value<std::string>(), "Get topic bandwidth.")
     ("unformatted,u", "Output data from echo without formatting.")
-    ("duration,d", po::value<double>(), "Duration (seconds) to run. "
+    ("duration,d", po::value<uint64_t>(), "Duration (seconds) to run. "
      "Applicable with echo, hz, and bw");
 }
 
@@ -206,7 +206,7 @@ void TopicCommand::Echo(const std::string &_topic)
   boost::mutex::scoped_lock lock(this->sigMutex);
   if (this->vm.count("duration"))
     this->sigCondition.timed_wait(lock,
-        boost::posix_time::seconds(this->vm["duration"].as<double>()));
+        boost::posix_time::seconds(this->vm["duration"].as<uint64_t>()));
   else
     this->sigCondition.wait(lock);
 }
@@ -231,7 +231,7 @@ void TopicCommand::Hz(const std::string &_topic)
   boost::mutex::scoped_lock lock(this->sigMutex);
   if (this->vm.count("duration"))
     this->sigCondition.timed_wait(lock,
-        boost::posix_time::seconds(this->vm["duration"].as<double>()));
+        boost::posix_time::seconds(this->vm["duration"].as<uint64_t>()));
   else
     this->sigCondition.wait(lock);
 }
@@ -323,7 +323,7 @@ void TopicCommand::Bw(const std::string &_topic)
   boost::mutex::scoped_lock lock(this->sigMutex);
   if (this->vm.count("duration"))
     this->sigCondition.timed_wait(lock,
-        boost::posix_time::seconds(this->vm["duration"].as<double>()));
+        boost::posix_time::seconds(this->vm["duration"].as<uint64_t>()));
   else
     this->sigCondition.wait(lock);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,19 @@
  *
 */
 
-#include "gazebo/common/MeshManager.hh"
-#include "gazebo/rendering/Visual.hh"
+#include <ignition/math/Triangle.hh>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/rendering/Conversions.hh"
-#include "gazebo/rendering/Scene.hh"
+#include "gazebo/common/MeshManager.hh"
+
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/RayQueryPrivate.hh"
 #include "gazebo/rendering/RayQuery.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 using namespace gazebo;
 using namespace rendering;
@@ -37,109 +42,53 @@ RayQuery::RayQuery(CameraPtr _camera)
 /////////////////////////////////////////////////
 RayQuery::~RayQuery()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
     math::Vector3 &_intersect, std::vector<math::Vector3> &_vertices)
 {
-  // create the ray to test
-  Ogre::Ray ray =
-      this->dataPtr->camera->OgreCamera()->getCameraToViewportRay(
-      static_cast<float>(_x) / this->dataPtr->camera->ViewportWidth(),
-      static_cast<float>(_y) / this->dataPtr->camera->ViewportHeight());
+  ignition::math::Vector3d intersect;
+  ignition::math::Triangle3d triangle;
 
-  std::vector<rendering::VisualPtr> visuals;
-  this->GetMeshVisuals(_visual, visuals);
+  auto result = this->SelectMeshTriangle(_x, _y, _visual, intersect, triangle);
 
-  Ogre::Real closestDistance = -1.0f;
-  Ogre::Vector3 closestResult;
-  bool newClosestFound = false;
-  std::vector<Ogre::Vector3> vertices;
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  _intersect = intersect;
+  _vertices.clear();
+  _vertices.push_back(triangle[0]);
+  _vertices.push_back(triangle[1]);
+  _vertices.push_back(triangle[2]);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 
-  for (unsigned int i = 0; i < visuals.size(); ++i)
-  {
-    const common::Mesh *mesh =
-        common::MeshManager::Instance()->GetMesh(visuals[i]->GetMeshName());
-
-    if (!mesh)
-      continue;
-
-    Ogre::Matrix4 transform = visuals[i]->GetSceneNode()->_getFullTransform();
-    // test for hitting individual triangles on the mesh
-    for (unsigned int j = 0; j < mesh->GetSubMeshCount(); ++j)
-    {
-      const common::SubMesh *submesh = mesh->GetSubMesh(j);
-      for (unsigned int k = 0; k < submesh->GetIndexCount(); k += 3)
-      {
-        ignition::math::Vector3d vertexA =
-          submesh->Vertex(submesh->GetIndex(k));
-        ignition::math::Vector3d vertexB =
-          submesh->Vertex(submesh->GetIndex(k+1));
-        ignition::math::Vector3d vertexC =
-          submesh->Vertex(submesh->GetIndex(k+2));
-
-        Ogre::Vector3 worldVertexA = transform * Conversions::Convert(vertexA);
-        Ogre::Vector3 worldVertexB = transform * Conversions::Convert(vertexB);
-        Ogre::Vector3 worldVertexC = transform * Conversions::Convert(vertexC);
-
-        // check for a hit against this triangle
-        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(ray,
-            worldVertexA, worldVertexB, worldVertexC,
-           (worldVertexB - worldVertexA).crossProduct(
-           worldVertexC - worldVertexA));
-
-        // if it was a hit check if its the closest
-        if (hit.first &&
-            (closestDistance < 0.0f || hit.second < closestDistance))
-        {
-          // this is the closest so far, save it off
-          closestDistance = hit.second;
-          vertices.clear();
-          vertices.push_back(worldVertexA);
-          vertices.push_back(worldVertexB);
-          vertices.push_back(worldVertexC);
-          newClosestFound = true;
-        }
-      }
-    }
-  }
-
-  // if we found a new closest raycast for this object, update the
-  // closestResult before moving on to the next object.
-  if (newClosestFound)
-    closestResult = ray.getPoint(closestDistance);
-
-  // return the result
-  if (closestDistance >= 0.0f && vertices.size() == 3u)
-  {
-    // raycast success
-    _intersect = Conversions::Convert(closestResult);
-    _vertices.clear();
-    _vertices.push_back(Conversions::Convert(vertices[0]));
-    _vertices.push_back(Conversions::Convert(vertices[1]));
-    _vertices.push_back(Conversions::Convert(vertices[2]));
-    return true;
-  }
-  // raycast failed
-  return false;
+  return result;
 }
 
 /////////////////////////////////////////////////
-bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
-    ignition::math::Vector3d &_intersect,
-    ignition::math::Triangle3d &_triangle)
+bool RayQuery::SelectMeshTriangle(const int _x, const int _y,
+    const VisualPtr &_visual, ignition::math::Vector3d &_intersect,
+    ignition::math::Triangle3d &_triangle) const
 {
+  auto cam = boost::dynamic_pointer_cast<UserCamera>(this->dataPtr->camera);
+  double ratio = 1;
+  if (cam)
+    ratio = cam->DevicePixelRatio();
+
+  double x = _x * ratio;
+  double y = _y * ratio;
   // create the ray to test
   Ogre::Ray ray =
       this->dataPtr->camera->OgreCamera()->getCameraToViewportRay(
-      static_cast<float>(_x) / this->dataPtr->camera->ViewportWidth(),
-      static_cast<float>(_y) / this->dataPtr->camera->ViewportHeight());
+      static_cast<float>(x) / this->dataPtr->camera->ViewportWidth(),
+      static_cast<float>(y) / this->dataPtr->camera->ViewportHeight());
 
   std::vector<rendering::VisualPtr> visuals;
-  this->GetMeshVisuals(_visual, visuals);
+  this->MeshVisuals(_visual, visuals);
 
   Ogre::Real closestDistance = -1.0f;
   Ogre::Vector3 closestResult;
@@ -159,8 +108,14 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
     for (unsigned int j = 0; j < mesh->GetSubMeshCount(); ++j)
     {
       const common::SubMesh *submesh = mesh->GetSubMesh(j);
-      for (unsigned int k = 0; k < submesh->GetIndexCount(); k += 3)
+      if (submesh->GetVertexCount() < 3u)
+        continue;
+      unsigned int indexCount = submesh->GetIndexCount();
+      for (unsigned int k = 0; k < indexCount; k += 3)
       {
+        if (indexCount <= k+2)
+          continue;
+
         ignition::math::Vector3d vertexA =
           submesh->Vertex(submesh->GetIndex(k));
         ignition::math::Vector3d vertexB =
@@ -204,9 +159,10 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
   {
     // raycast success
     _intersect = Conversions::ConvertIgn(closestResult);
-    _triangle.Set(Conversions::ConvertIgn(vertices[0]),
-                  Conversions::ConvertIgn(vertices[1]),
-                  Conversions::ConvertIgn(vertices[2]));
+    _triangle.Set(
+        Conversions::ConvertIgn(vertices[0]),
+        Conversions::ConvertIgn(vertices[1]),
+        Conversions::ConvertIgn(vertices[2]));
     return true;
   }
   // raycast failed
@@ -214,13 +170,13 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
 }
 
 /////////////////////////////////////////////////
-void RayQuery::GetMeshVisuals(rendering::VisualPtr _visual,
-    std::vector<rendering::VisualPtr> &_visuals)
+void RayQuery::MeshVisuals(const rendering::VisualPtr _visual,
+    std::vector<rendering::VisualPtr> &_visuals) const
 {
   if (!_visual->GetMeshName().empty() &&
       (_visual->GetVisibilityFlags() & GZ_VISIBILITY_SELECTABLE))
     _visuals.push_back(_visual);
 
   for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
-    this->GetMeshVisuals(_visual->GetChild(i), _visuals);
+    this->MeshVisuals(_visual->GetChild(i), _visuals);
 }

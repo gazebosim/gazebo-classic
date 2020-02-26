@@ -77,7 +77,6 @@ sudo apt-get install cmake \
      pkg-config \
      libqt4-dev \
      libboost-thread-dev \
-     libboost-signals-dev \
      libboost-system-dev \
      libboost-filesystem-dev \
      libboost-program-options-dev \
@@ -111,7 +110,7 @@ echo "We're going to compare your working copy in $srcdir with the system-instal
 # unexpected interactions with the developer's own build space.  An
 # optimization would be to allow reuse of an existing build space.
 cd $TMPDIR/build
-cmake -DENABLE_TESTS_COMPILATION:BOOL=False -DCMAKE_INSTALL_PREFIX=$TMPDIR/install $GAZEBO_SOURCE_DIR
+cmake -DCMAKE_INSTALL_PREFIX=$TMPDIR/install $GAZEBO_SOURCE_DIR
 # Assume that we can use all cores
 MAKE_JOBS=$(grep -c ^processor /proc/cpuinfo)
 make -j${MAKE_JOBS}

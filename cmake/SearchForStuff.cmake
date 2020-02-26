@@ -80,8 +80,7 @@ else ()
 endif ()
 
 ########################################
-include (FindHDF5)
-find_package(HDF5)
+find_package(HDF5 COMPONENTS C CXX)
 
 if (NOT HDF5_FOUND)
   BUILD_WARNING("HDF5 not found")
@@ -148,13 +147,13 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore 4.3.3 QUIET)
+  find_package(DARTCore 5.1.1 QUIET)
   if (DARTCore_FOUND)
-    message (STATUS "Looking for DARTCore - found")
+    message (STATUS "Looking for DARTCore - ${DARTCore_VERSION} found")
     set (HAVE_DART TRUE)
   else()
     message (STATUS "Looking for DARTCore - not found")
-    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core4-dev.")
+    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core5-dev.")
     set (HAVE_DART FALSE)
   endif()
 
@@ -244,6 +243,9 @@ if (PKG_CONFIG_FOUND)
     if (tinyxml2_FAIL)
       message (STATUS "Looking for tinyxml2.h - not found")
       BUILD_ERROR("Missing: tinyxml2")
+    else()
+      include_directories(${tinyxml2_INCLUDE_DIRS})
+      link_directories(${tinyxml2_LIBRARY_DIRS})
     endif()
   else()
     # Needed in WIN32 since in UNIX the flag is added in the code installed
@@ -415,6 +417,24 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   ########################################
+  # Find AV device. Only check for this on linux.
+  if (UNIX)
+    pkg_check_modules(libavdevice libavdevice>=56.4.100)
+    if (NOT libavdevice_FOUND)
+      BUILD_WARNING ("libavdevice not found. Recording to a video device will be disabled.")
+    else()
+      include_directories(${libavdevice_INCLUDE_DIRS})
+      link_directories(${libavdevice_LIBRARY_DIRS})
+    endif ()
+  endif ()
+
+  if (NOT libavdevice_FOUND)
+    set (HAVE_AVDEVICE False)
+  else()
+    set (HAVE_AVDEVICE True)
+  endif()
+
+  ########################################
   # Find AV format
   pkg_check_modules(libavformat libavformat)
   if (NOT libavformat_FOUND)
@@ -441,8 +461,8 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavutil not found. Audio-video capabilities will be disabled.")
   endif ()
 
-
-  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
+  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND
+      libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
   else ()
     set (HAVE_FFMPEG FALSE)
@@ -531,7 +551,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 4.1.0)
+set (SDFormat_MIN_VERSION 5.0.0)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)
@@ -543,19 +563,16 @@ endif()
 
 ########################################
 # Find QT
-find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtXmlPatterns REQUIRED)
-if (NOT QT4_FOUND)
-  BUILD_ERROR("Missing: Qt4")
-endif()
+find_package(Qt5 COMPONENTS Core Widgets OpenGL Test REQUIRED)
 
 ########################################
 # Find Boost, if not specified manually
 include(FindBoost)
-find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex iostreams date_time)
+find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread system filesystem program_options regex iostreams date_time)
 
 if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-  BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
+  BUILD_ERROR ("Boost not found. Please install thread system filesystem program_options regex iostreams date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
 
 ########################################
@@ -664,24 +681,28 @@ if (NOT ignition-msgs0_FOUND)
   BUILD_ERROR ("Missing: Ignition msgs0 library.")
 else()
   message(STATUS "Looking for ignition-msgs0-config.cmake - found")
+  include_directories(${IGNITION-MSGS_INCLUDE_DIRS})
+  link_directories(${IGNITION-MSGS_LIBRARY_DIRS})
 endif()
 
 ########################################
 # Find ignition math library
-find_package(ignition-math2 2.4 QUIET)
-if (NOT ignition-math2_FOUND)
-  message(STATUS "Looking for ignition-math2-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition math2 library.")
+find_package(ignition-math3 QUIET)
+if (NOT ignition-math3_FOUND)
+  message(STATUS "Looking for ignition-math3-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition math (libignition-math3-dev)")
 else()
-  message(STATUS "Looking for ignition-math2-config.cmake - found")
+  message(STATUS "Looking for ignition-math3-config.cmake - found")
 endif()
 
 ########################################
 # Find the Ignition_Transport library
-find_package(ignition-transport1 QUIET)
-if (NOT ignition-transport1_FOUND)
-  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")
+find_package(ignition-transport3 QUIET)
+if (NOT ignition-transport3_FOUND)
+  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport3-dev)")
 else()
+  message(STATUS "Looking for ignition-transport3-config.cmake - found")
+
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
   include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
   link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
@@ -716,20 +737,17 @@ find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
   /usr/include
   /usr/local/include
   /usr/local/lib/qwt.framework/Headers
-  PATH_SUFFIXES qwt-qt4 qwt qwt5
-  )
+  ${QWT_WIN_INCLUDE_DIR}
 
-find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
+  PATH_SUFFIXES qwt qwt5
+)
+
+find_library(QWT_LIBRARY NAMES qwt-qt5 qwt PATHS
   /usr/lib
   /usr/local/lib
   /usr/local/lib/qwt.framework
-  )
-
-if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
-  set(HAVE_QWT TRUE)
-else()
-  set(HAVE_QWT FALSE)
-endif ()
+  ${QWT_WIN_LIBRARY_DIR}
+)
 
 # version
 set ( _VERSION_FILE ${QWT_INCLUDE_DIR}/qwt_global.h )
@@ -747,9 +765,14 @@ if ( _VERSION_LINE )
     ${QWT_MAJOR_VERSION}.${QWT_MINOR_VERSION}.${QWT_PATCH_VERSION})
 endif ()
 
-if (HAVE_QWT)
+# in Windows, the path need to point to the parent to get correct qwt/foo headers
+if (WIN32)
+  SET(QWT_INCLUDE_DIR "${QWT_INCLUDE_DIR}\\..")
+endif()
+
+if (QWT_INCLUDE_DIR AND QWT_LIBRARY AND (NOT ${QWT_VERSION} VERSION_LESS 6.1.0))
   message (STATUS "Looking for qwt - found: version ${QWT_VERSION}")
 else()
-  message (STATUS "Looking for qwt - not found")
+  message (STATUS "Looking for qwt >= 6.1.0 - not found")
   BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
 endif ()

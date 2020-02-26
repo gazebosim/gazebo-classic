@@ -56,8 +56,8 @@ KeyboardGUIPlugin::KeyboardGUIPlugin()
   mainWindow->installEventFilter(this);
 
   // Make this invisible
-  this->move(0, 0);
-  this->resize(0, 0);
+  this->move(-1, -1);
+  this->resize(1, 1);
 
   // Initialize transport.
   this->dataPtr->gzNode = transport::NodePtr(new transport::Node());

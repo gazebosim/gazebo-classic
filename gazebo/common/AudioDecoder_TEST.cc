@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -164,7 +164,9 @@ TEST_F(AudioDecoder, CheerFile)
     // later versions of ffmpeg produces a different buffer size probably due to
     // underlying changes in the decoder. The size of the first decoded frame
     // is much smaller than all other frames.
-    EXPECT_TRUE(dataBufferSize == 4995072u || dataBufferSize == 4987612u);
+    EXPECT_TRUE(dataBufferSize == 4995072u ||
+                dataBufferSize == 4987612u ||
+                dataBufferSize == 4987612u * 2);
   }
 }
 

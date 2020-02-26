@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,13 +50,13 @@ void SpeedTest::BallTest(const std::string &_physicsEngine)
 
   // Load 500 spheres into the world
   std::string name = "sphere";
-  math::Vector3 pos(0, 0, 5);
+  ignition::math::Vector3d pos(0, 0, 5);
 
   for (int i = 0; i < 500; ++i)
   {
-    pos.z += i;
+    pos.Z() += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, math::Vector3(0, 0, 0), i == 499);
+        pos, ignition::math::Vector3d::Zero, i == 499);
   }
 
   common::Time::MSleep(2000);
@@ -91,12 +91,12 @@ void SpeedTest::ShapesWorld(const std::string &_physicsEngine)
 
   // Load 500 spheres into the world
   std::string name = "sphere";
-  math::Vector3 pos(0, 0, 5);
+  ignition::math::Vector3d pos(0, 0, 5);
   for (int i = 0; i < 500; ++i)
   {
-    pos.z += i;
+    pos.Z() += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, math::Vector3(0, 0, 0), i == 499);
+        pos, ignition::math::Vector3d::Zero, i == 499);
   }
   common::Time::MSleep(2000);
 
@@ -126,7 +126,7 @@ void SpeedTest::UnthrottledStep(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Unthrottle physics updates
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   physics->SetRealTimeUpdateRate(0.0);
   double dt = physics->GetMaxStepSize();

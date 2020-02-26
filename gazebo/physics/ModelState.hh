@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
  *
 */
 
-#ifndef _GAZEBO_MODELSTATE_HH_
-#define _GAZEBO_MODELSTATE_HH_
+#ifndef GAZEBO_PHYSICS_MODELSTATE_HH_
+#define GAZEBO_PHYSICS_MODELSTATE_HH_
 
 #include <vector>
 #include <string>
 #include <boost/regex.hpp>
 
+#include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 #include "gazebo/math/Pose.hh"
 
@@ -95,8 +96,13 @@ namespace gazebo
       public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Get the stored model pose.
-      /// \return The math::Pose of the Model.
-      public: const math::Pose &GetPose() const;
+      /// \return The gazebo::math::Pose of the Model.
+      /// \deprecated See function that returns ign-math.
+      public: const math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the stored model pose.
+      /// \return The ignition::math::Pose3d of the Model.
+      public: const ignition::math::Pose3d &Pose() const;
 
       /// \brief Get the stored model scale.
       /// \return The scale of the Model.
@@ -243,20 +249,22 @@ namespace gazebo
       public: inline friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::physics::ModelState &_state)
       {
-        math::Vector3 q(_state.pose.rot.GetAsEuler());
-        _out << std::fixed <<std::setprecision(3)
+        ignition::math::Vector3d euler(_state.pose.Rot().Euler());
+        _out.unsetf(std::ios_base::floatfield);
+        _out << std::setprecision(3)
           << "<model name='" << _state.GetName() << "'>"
           << "<pose>"
-          << _state.pose.pos.x << " "
-          << _state.pose.pos.y << " "
-          << _state.pose.pos.z << " "
-          << q.x << " "
-          << q.y << " "
-          << q.z << " "
-          << "</pose>"
-          << "<scale>"
-          << _state.scale
-          << "</scale>";
+          << ignition::math::precision(_state.pose.Pos().X(), 4) << " "
+          << ignition::math::precision(_state.pose.Pos().Y(), 4) << " "
+          << ignition::math::precision(_state.pose.Pos().Z(), 4) << " "
+          << ignition::math::precision(euler.X(), 4) << " "
+          << ignition::math::precision(euler.Y(), 4) << " "
+          << ignition::math::precision(euler.Z(), 4) << " "
+          << "</pose>";
+
+        // Only record scale if it is not the default value of [1, 1, 1].
+        if (_state.scale != ignition::math::Vector3d::One)
+          _out << "<scale>" << _state.scale << "</scale>";
 
         for (LinkState_M::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();
@@ -284,7 +292,7 @@ namespace gazebo
       }
 
       /// \brief Pose of the model.
-      private: math::Pose pose;
+      private: ignition::math::Pose3d pose;
 
       /// \brief Scale of the model.
       private: ignition::math::Vector3d scale;

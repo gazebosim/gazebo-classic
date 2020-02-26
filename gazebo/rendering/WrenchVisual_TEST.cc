@@ -49,9 +49,9 @@ TEST_F(WrenchVisual_TEST, WrenchVisualTest)
       "wrench_vis", scene->WorldVisual(), ""));
   wrenchVis->Load();
 
-  EXPECT_EQ(wrenchVis->GetName(), "wrench_vis");
+  EXPECT_EQ(wrenchVis->Name(), "wrench_vis");
   EXPECT_GT(scene->WorldVisual()->GetChildCount(), count);
-  EXPECT_TRUE(scene->GetVisual(wrenchVis->GetName()) != nullptr);
+  EXPECT_TRUE(scene->GetVisual(wrenchVis->Name()) != nullptr);
 
   // test destroying the visual
   wrenchVis->Fini();

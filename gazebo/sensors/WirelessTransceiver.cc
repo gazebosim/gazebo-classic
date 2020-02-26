@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,12 +62,11 @@ void WirelessTransceiver::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
-    this->world->GetEntity(this->ParentName()));
+    this->world->EntityByName(this->ParentName()));
 
   GZ_ASSERT(this->parentEntity.lock() != nullptr, "parentEntity is null");
 
-  this->referencePose = this->pose +
-    this->parentEntity.lock()->GetWorldPose().Ign();
+  this->referencePose = this->pose + this->parentEntity.lock()->WorldPose();
 
   if (!this->sdf->HasElement("transceiver"))
   {

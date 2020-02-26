@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
-#ifndef _COLLISION_HH_
-#define _COLLISION_HH_
+#ifndef GAZEBO_PHYSICS_COLLISION_HH_
+#define GAZEBO_PHYSICS_COLLISION_HH_
 
 #include <string>
 #include <vector>
@@ -63,9 +58,14 @@ namespace gazebo
       /// \param[in] _sdf SDF values to update from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
-      /// \brief Set the encapsulated collsion object.
+      /// \brief Set the encapsulated collision object.
+      /// Has a side effect of changing the collision bit masks
       /// \param[in] _placeable True to make the object movable.
       public: void SetCollision(bool _placeable);
+
+      /// \brief Set if this object is moveable
+      /// \param[in] _placeable True to make the object movable.
+      public: void SetPlaceable(const bool _placeable);
 
       /// \brief Return whether this collision is movable.
       /// Example on an immovable object is a ray.
@@ -98,7 +98,7 @@ namespace gazebo
 
       /// \brief Get the bounding box for this collision.
       /// \return The bounding box.
-      public: virtual math::Box GetBoundingBox() const = 0;
+      public: virtual ignition::math::Box BoundingBox() const = 0;
 
       /// \brief Get the shape type.
       /// \return The shape type.
@@ -115,42 +115,98 @@ namespace gazebo
 
       /// \brief Set the scale of the collision.
       /// \param[in] _scale Scale to set the collision to.
-      public: void SetScale(const math::Vector3 &_scale);
+      /// \deprecated See version that accepts an ignition math object.
+      public: void SetScale(const math::Vector3 &_scale) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the scale of the collision.
+      /// \param[in] _scale Scale to set the collision to.
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get the linear velocity of the collision.
       /// \return The linear velocity relative to the parent model.
-      public: virtual math::Vector3 GetRelativeLinearVel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeLinearVel() const
+      public: virtual math::Vector3 GetRelativeLinearVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear velocity of the collision.
+      /// \return The linear velocity relative to the parent model.
+      public: virtual ignition::math::Vector3d RelativeLinearVel() const;
 
       /// \brief Get the linear velocity of the collision in the world
       /// frame.
       /// \return The linear velocity of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      /// \deprecated See ignition::math::Vector3d WorldLinearVel() const
+      public: virtual math::Vector3 GetWorldLinearVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear velocity of the collision in the world
+      /// frame.
+      /// \return The linear velocity of the collision in the world frame.
+      public: virtual ignition::math::Vector3d WorldLinearVel() const;
 
       /// \brief Get the angular velocity of the collision.
       /// \return The angular velocity of the collision.
-      public: virtual math::Vector3 GetRelativeAngularVel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeAngularVel() const
+      public: virtual math::Vector3 GetRelativeAngularVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular velocity of the collision.
+      /// \return The angular velocity of the collision.
+      public: virtual ignition::math::Vector3d RelativeAngularVel() const;
 
       /// \brief Get the angular velocity of the collision in the world frame.
       /// \return The angular velocity of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldAngularVel() const;
+      /// \deprecated See ignition::math::Vector3d WorldAngularVel() const
+      public: virtual math::Vector3 GetWorldAngularVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular velocity of the collision in the world frame.
+      /// \return The angular velocity of the collision in the world frame.
+      public: virtual ignition::math::Vector3d WorldAngularVel() const;
 
       /// \brief Get the linear acceleration of the collision.
       /// \return The linear acceleration of the collision.
-      public: virtual math::Vector3 GetRelativeLinearAccel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeLinearAccel() const
+      public: virtual math::Vector3 GetRelativeLinearAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear acceleration of the collision.
+      /// \return The linear acceleration of the collision.
+      public: virtual ignition::math::Vector3d RelativeLinearAccel() const;
 
       /// \brief Get the linear acceleration of the collision in the world
       /// frame.
       /// \return The linear acceleration of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldLinearAccel() const;
+      /// \deprecated See ignition::math::Vector3d WorldLinearAccel() const
+      public: virtual math::Vector3 GetWorldLinearAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear acceleration of the collision in the world
+      /// frame.
+      /// \return The linear acceleration of the collision in the world frame.
+      public: virtual ignition::math::Vector3d WorldLinearAccel() const;
 
       /// \brief Get the angular acceleration of the collision.
       /// \return The angular acceleration of the collision.
-      public: virtual math::Vector3 GetRelativeAngularAccel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeAngularAccel() const
+      public: virtual math::Vector3 GetRelativeAngularAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular acceleration of the collision.
+      /// \return The angular acceleration of the collision.
+      public: virtual ignition::math::Vector3d RelativeAngularAccel() const;
 
       /// \brief Get the angular acceleration of the collision in the
       /// world frame.
       /// \return The angular acceleration of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldAngularAccel() const;
+      /// \deprecated See ignition::math::Vector3d WorldAngularAccel() const
+      public: virtual math::Vector3 GetWorldAngularAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular acceleration of the collision in the
+      /// world frame.
+      /// \return The angular acceleration of the collision in the world frame.
+      public: virtual ignition::math::Vector3d WorldAngularAccel() const;
 
       /// \brief Get the collision state.
       /// \return The collision state.
@@ -189,7 +245,12 @@ namespace gazebo
       public: void SetWorldPoseDirty();
 
       // Documentation inherited.
-      public: virtual const math::Pose &GetWorldPose() const;
+      /// \deprecated See const ignition::math::Pose3d &WorldPose() const
+      public: virtual const math::Pose GetWorldPose() const
+              GAZEBO_DEPRECATED(8.0);
+
+      // Documentation inherited.
+      public: virtual const ignition::math::Pose3d &WorldPose() const;
 
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.
@@ -208,7 +269,7 @@ namespace gazebo
       protected: SurfaceParamsPtr surface;
 
       /// \brief The laser retro value.
-      private: float laserRetro;
+      private: float laserRetro = 0.0;
 
       /// \brief Stores collision state information.
       private: CollisionState state;

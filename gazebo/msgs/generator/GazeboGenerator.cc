@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <google/protobuf/descriptor.pb.h>
 #include <boost/algorithm/string/replace.hpp>
 
+#include <memory>
 #include <vector>
 #include <utility>
 #include <iostream>
@@ -48,7 +49,7 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
 
   // Add boost shared point include
   {
-    scoped_ptr<io::ZeroCopyOutputStream> output(
+    std::unique_ptr<io::ZeroCopyOutputStream> output(
         _generator_context->OpenForInsert(headerFilename, "includes"));
     io::Printer printer(output.get(), '$');
 
@@ -57,7 +58,7 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
 
   // Add boost shared point include
   {
-    scoped_ptr<io::ZeroCopyOutputStream> output(
+    std::unique_ptr<io::ZeroCopyOutputStream> output(
         _generator_context->OpenForInsert(sourceFilename, "includes"));
     io::Printer printer(output.get(), '$');
 
@@ -67,7 +68,7 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
 
 
   {
-    scoped_ptr<io::ZeroCopyOutputStream> output(
+    std::unique_ptr<io::ZeroCopyOutputStream> output(
         _generator_context->OpenForInsert(headerFilename, "includes"));
     io::Printer printer(output.get(), '$');
 
@@ -79,7 +80,7 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
 
   // Add boost shared typedef
   {
-    scoped_ptr<io::ZeroCopyOutputStream> output(
+    std::unique_ptr<io::ZeroCopyOutputStream> output(
         _generator_context->OpenForInsert(headerFilename, "namespace_scope"));
     io::Printer printer(output.get(), '$');
 
@@ -95,7 +96,7 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
 
   // Add const boost shared typedef
   {
-    scoped_ptr<io::ZeroCopyOutputStream> output(
+    std::unique_ptr<io::ZeroCopyOutputStream> output(
         _generator_context->OpenForInsert(headerFilename, "global_scope"));
     io::Printer printer(output.get(), '$');
 
@@ -111,7 +112,7 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
 
   // Add Message Factory register
   {
-    scoped_ptr<io::ZeroCopyOutputStream> output(
+    std::unique_ptr<io::ZeroCopyOutputStream> output(
         _generator_context->OpenForInsert(sourceFilename, "global_scope"));
     io::Printer printer(output.get(), '$');
 

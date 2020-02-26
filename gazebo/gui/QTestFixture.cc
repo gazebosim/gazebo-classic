@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,6 +91,10 @@ void QTestFixture::init()
 void QTestFixture::Load(const std::string &_worldFilename, bool _paused,
     bool _serverScene, bool _clientScene)
 {
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0)) && defined(__APPLE__)
+  this->resMaxPercentChange *= 2.0;
+#endif
+
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
       boost::bind(&QTestFixture::RunServer, this,
@@ -115,7 +119,7 @@ void QTestFixture::Load(const std::string &_worldFilename, bool _paused,
   if (_clientScene)
   {
     gazebo::rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false);
+        gazebo::physics::get_world()->Name(), true);
   }
 }
 
@@ -130,8 +134,10 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
   this->SetPause(_paused);
 
   if (_createScene)
+  {
     gazebo::rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false);
+        gazebo::physics::get_world()->Name(), false);
+  }
 
   this->server->Run();
 
@@ -173,6 +179,8 @@ void QTestFixture::cleanup()
 
   delete this->serverThread;
   this->serverThread = NULL;
+
+  gazebo::rendering::fini();
 
   double residentEnd, shareEnd;
   this->GetMemInfo(residentEnd, shareEnd);

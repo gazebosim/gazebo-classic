@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,12 @@ namespace gazebo
     /// \brief Logical camera sensor private data.
     class LogicalCameraSensorPrivate
     {
+      /// \brief Add models that are visible to the camera to a vector of models
+      /// \param[in] _myPose pose of the logical camera
+      /// \param[in] _models list of models to test against frustum
+      public: void AddVisibleModels(ignition::math::Pose3d &_myPose,
+        const physics::Model_V &_models);
+
       /// \brief Publisher of msgs::LogicalCameraImage messages.
       public: transport::PublisherPtr pub;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
-#define _GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
-
+#ifndef GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
+#define GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
 
 #include <string>
 #include <utility>
+#include <vector>
+
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -28,16 +28,12 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
-
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
 #include "gazebo/rendering/Camera.hh"
-
 
 namespace gazebo
 {
@@ -150,6 +146,8 @@ namespace gazebo
       public: void SetCutOffAngle(const double _angle);
 
       /// \brief Sets whether the image should be scaled to fit horizontal FOV
+      /// If True, the projection will compute a new focal length for achieving
+      /// the desired FOV
       /// \param[in] _scale true if it should,
       ///   note: c1 and f parameters are ignored in this case
       public: void SetScaleToHFOV(const bool _scale);
@@ -222,12 +220,30 @@ namespace gazebo
       public: void SetClipDist() override;
       using Camera::SetClipDist;
 
+      // Documentation inherited
+      public: bool SetBackgroundColor(const common::Color &_color) override;
+
+      /// \brief Project 3D world coordinates to screen coordinates
+      /// \param[in] _pt 3D world coodinates
+      /// \return Screen coordinates. Z is the distance of point from camera
+      /// optical center.
+      public: ignition::math::Vector3d Project3d(
+          const ignition::math::Vector3d &_pt) const;
+
+      /// \brief Get the list of ogre cameras used to create the cube map for
+      /// generating the wide angle camera image
+      /// \return A list of OGRE cameras
+      public: std::vector<Ogre::Camera *> OgreEnvCameras() const;
+
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture
       protected: void CreateEnvRenderTexture(const std::string &_textureName);
 
       // Documentation inherited
       protected: void RenderImpl() override;
+
+      // Documentation inherited
+      protected: void UpdateFOV() override;
 
       /// \bried Callback that is used to set mapping material uniform values,
       ///   implements Ogre::CompositorInstance::Listener interface
@@ -243,6 +259,4 @@ namespace gazebo
     /// \}
   }
 }
-
-
 #endif

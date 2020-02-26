@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh geometry
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
-
-#ifndef _MESHSHAPE_HH_
-#define _MESHSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_MESHSHAPE_HH_
+#define GAZEBO_PHYSICS_MESHSHAPE_HH_
 
 #include <string>
 
@@ -55,7 +50,12 @@ namespace gazebo
 
       /// \brief Get the size of the triangle mesh.
       /// \return The size of the triangle mesh.
-      public: virtual math::Vector3 GetSize() const;
+      /// \deprecated See ignition::math::Vector3d Size() const
+      public: virtual math::Vector3 GetSize() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the size of the triangle mesh.
+      /// \return The size of the triangle mesh.
+      public: virtual ignition::math::Vector3d Size() const;
 
       /// \brief Get the URI of the mesh data.
       /// \return The URI of the mesh data.
@@ -70,10 +70,9 @@ namespace gazebo
                            const std::string &_submesh = "",
                            bool _center = false);
 
-
       /// \brief Set the scaling factor.
       /// \param[in] _scale Scaling factor.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Populate a msgs::Geometry message with data from this
       /// shape.

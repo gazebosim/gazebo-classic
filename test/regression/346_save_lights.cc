@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,12 +34,12 @@ TEST_F(Issue346Test, SaveLights)
   ASSERT_TRUE(world != NULL);
 
   std::string spotLightName = "spot_light";
-  math::Vector3 spotLightPos(1, 2, 5);
-  math::Vector3 spotLightRot(0, 0, 0.5);
+  ignition::math::Vector3d spotLightPos(1, 2, 5);
+  ignition::math::Vector3d spotLightRot(0, 0, 0.5);
 
   std::string pointLightName = "point_light";
-  math::Vector3 pointLightPos(4, 3, 8);
-  math::Vector3 pointLightRot(0, 0.8, 0.1);
+  ignition::math::Vector3d pointLightPos(4, 3, 8);
+  ignition::math::Vector3d pointLightRot(0, 0.8, 0.1);
 
   // Spawn two lights: one spot light and one point light
   SpawnLight(spotLightName, "spot", spotLightPos, spotLightRot);
@@ -69,18 +69,19 @@ TEST_F(Issue346Test, SaveLights)
   while (lightElem)
   {
     std::string name = lightElem->Get<std::string>("name");
-    math::Pose pose = lightElem->Get<math::Pose>("pose");
+    ignition::math::Pose3d pose =
+      lightElem->Get<ignition::math::Pose3d>("pose");
     if (name == spotLightName)
     {
       hasSpotLight++;
-      EXPECT_TRUE(pose.pos == spotLightPos);
-      EXPECT_TRUE(pose.rot == spotLightRot);
+      EXPECT_TRUE(pose.Pos() == spotLightPos);
+      EXPECT_TRUE(pose.Rot() == ignition::math::Quaterniond(spotLightRot));
     }
     else if (name == pointLightName)
     {
       hasPointLight++;
-      EXPECT_TRUE(pose.pos == pointLightPos);
-      EXPECT_TRUE(pose.rot == pointLightRot);
+      EXPECT_TRUE(pose.Pos() == pointLightPos);
+      EXPECT_TRUE(pose.Rot() == ignition::math::Quaterniond(pointLightRot));
     }
     lightElem = lightElem->GetNextElement("light");
   }

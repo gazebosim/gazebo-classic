@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ void NonDefaultWorld::Load(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("not_the_default_world_name");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("ground_plane");
+  physics::ModelPtr model = world->ModelByName("ground_plane");
   ASSERT_TRUE(model != NULL);
 }
 

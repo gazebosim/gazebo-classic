@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/PID.hh"
@@ -79,11 +80,11 @@ namespace gazebo
     private: void OnUpdate(const common::UpdateInfo &_info);
 
     /// \brief Velocity control callback.
-    /// \param[in] _msg Message data, interpretted as a float
+    /// \param[in] _msg Message data, interpreted as a float
     private: void OnVelocity(ConstGzStringPtr &_msg);
 
     /// \brief Detach control callback.
-    /// \param[in] _msg Message data, interpretted as a bool
+    /// \param[in] _msg Message data, interpreted as a bool
     private: void OnDetach(ConstGzStringPtr &_msg);
 
     /// \brief Get the index of a joint with the given name.
@@ -129,6 +130,12 @@ namespace gazebo
 
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition Communication node
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

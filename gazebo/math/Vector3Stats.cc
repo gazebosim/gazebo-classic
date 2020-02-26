@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,12 @@ using namespace math;
 //////////////////////////////////////////////////
 Vector3Stats::Vector3Stats()
   : dataPtr(new Vector3StatsPrivate)
+{
+}
+
+//////////////////////////////////////////////////
+Vector3Stats::Vector3Stats(const ignition::math::Vector3Stats &_v)
+  : dataPtr(new Vector3StatsPrivate(_v))
 {
 }
 
@@ -123,3 +129,23 @@ SignalStats &Vector3Stats::Mag()
   return this->dataPtr->mag;
 }
 
+//////////////////////////////////////////////////
+ignition::math::Vector3Stats Vector3Stats::Ign() const
+{
+  ignition::math::Vector3Stats result;
+  result.X() = this->X().Ign();
+  result.Y() = this->Y().Ign();
+  result.Z() = this->Z().Ign();
+  result.Mag() = this->Mag().Ign();
+  return result;
+}
+
+//////////////////////////////////////////////////
+Vector3Stats &Vector3Stats::operator=(const ignition::math::Vector3Stats &_v)
+{
+  this->dataPtr->x = _v.X();
+  this->dataPtr->y = _v.Y();
+  this->dataPtr->z = _v.Z();
+  this->dataPtr->mag = _v.Mag();
+  return *this;
+}

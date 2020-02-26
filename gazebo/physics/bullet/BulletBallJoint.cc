@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
  * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
+
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -63,8 +65,8 @@ void BulletBallJoint::Init()
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.
-  math::Vector3 pivotParent, pivotChild;
-  math::Pose pose;
+  ignition::math::Vector3d pivotParent, pivotChild;
+  ignition::math::Pose3d pose;
 
   // Initialize pivots to anchorPos, which is expressed in the
   // world coordinate frame.
@@ -74,22 +76,22 @@ void BulletBallJoint::Init()
   // Check if parentLink exists. If not, the parent will be the world.
   if (this->parentLink)
   {
-    // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of parent.
+    pose = this->parentLink->WorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotParent -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed frame of parent.
-    pivotParent = pose.rot.RotateVectorReverse(pivotParent);
+    pivotParent -= pose.Pos();
+    // Rotate pivot offset and axis into body-fixed inertial frame of parent.
+    pivotParent = pose.Rot().RotateVectorReverse(pivotParent);
   }
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
   {
-    // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of child.
+    pose = this->childLink->WorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotChild -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed frame of child.
-    pivotChild = pose.rot.RotateVectorReverse(pivotChild);
+    pivotChild -= pose.Pos();
+    // Rotate pivot offset and axis into body-fixed inertial frame of child.
+    pivotChild = pose.Rot().RotateVectorReverse(pivotChild);
   }
 
   // If both links exist, then create a joint between the two links.
@@ -137,7 +139,8 @@ void BulletBallJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletBallJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletBallJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
@@ -156,22 +159,23 @@ double BulletBallJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 /////////////////////////////////////////////////
-math::Vector3 BulletBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletBallJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 /////////////////////////////////////////////////
-math::Angle BulletBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+double BulletBallJoint::PositionImpl(const unsigned int /*_index*/) const
 {
-  gzerr << "Not implemented\n";
-  return math::Angle();
+  gzerr << "BulletBallJoint::PositionImpl not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-bool BulletBallJoint::SetHighStop(unsigned int /*_index*/,
-                                   const math::Angle &/*_angle*/)
+void BulletBallJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                    const double /*_angle*/)
 {
   if (this->bulletBall)
   {
@@ -181,12 +185,10 @@ bool BulletBallJoint::SetHighStop(unsigned int /*_index*/,
     // this->bulletBall->setLimit(this->btBall->getLowerLimit(),
     //                         _angle.Radian());
     gzerr << "BulletBallJoint limits not implemented" << std::endl;
-    return false;
   }
   else
   {
     gzerr << "bulletBall does not yet exist" << std::endl;
-    return false;
   }
 }
 
@@ -197,8 +199,8 @@ void BulletBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 }
 
 //////////////////////////////////////////////////
-bool BulletBallJoint::SetLowStop(unsigned int /*_index*/,
-                                  const math::Angle &/*_angle*/)
+void BulletBallJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                    const double /*_angle*/)
 {
   if (this->bulletBall)
   {
@@ -208,38 +210,43 @@ bool BulletBallJoint::SetLowStop(unsigned int /*_index*/,
     // this->bulletBall->setLimit(-_angle.Radian(),
     //                         this->bulletBall->getUpperLimit());
     gzerr << "BulletBallJoint limits not implemented" << std::endl;
-    return false;
   }
   else
   {
     gzerr << "bulletBall does not yet exist" << std::endl;
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
 math::Vector3 BulletBallJoint::GetAxis(unsigned int /*_index*/) const
 {
-  return math::Vector3();
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return ignition::math::Vector3d::Zero;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetAxis(unsigned int /*_index*/,
-                        const math::Vector3 &/*_axis*/)
+void BulletBallJoint::SetAxis(const unsigned int /*_index*/,
+                        const ignition::math::Vector3d &/*_axis*/)
 {
   gzerr << "BulletBallJoint::SetAxis not implemented" << std::endl;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletBallJoint::GetHighStop(unsigned int /*_index*/)
+double BulletBallJoint::UpperLimit(const unsigned int /*_index*/) const
 {
-  gzerr << "BulletBallJoint::GetHighStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "BulletBallJoint::UpperLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletBallJoint::GetLowStop(unsigned int /*_index*/)
+double BulletBallJoint::LowerLimit(const unsigned int /*_index*/) const
 {
-  gzerr << "BulletBallJoint::GetLowStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "BulletBallJoint::LowerLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }

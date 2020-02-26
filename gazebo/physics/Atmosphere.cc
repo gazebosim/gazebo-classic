@@ -94,7 +94,7 @@ Atmosphere::Atmosphere(physics::World &_world)
   sdf::initFile("atmosphere.sdf", this->dataPtr->sdf);
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(this->dataPtr->world.GetName());
+  this->dataPtr->node->Init(this->dataPtr->world.Name());
   this->dataPtr->atmosphereSub = this->dataPtr->node->Subscribe("~/atmosphere",
       &Atmosphere::OnAtmosphereMsg, this);
 
@@ -108,6 +108,9 @@ Atmosphere::Atmosphere(physics::World &_world)
 //////////////////////////////////////////////////
 Atmosphere::~Atmosphere()
 {
+  this->dataPtr->atmosphereSub.reset();
+  this->dataPtr->requestSub.reset();
+  this->dataPtr->responsePub.reset();
   // Must call fini on node to remove it from topic manager.
   this->dataPtr->node->Fini();
 }

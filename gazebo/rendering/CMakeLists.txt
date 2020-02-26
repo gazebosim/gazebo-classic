@@ -7,13 +7,12 @@ include_directories(SYSTEM
   skyx/include
 )
 
-
 if (WIN32)
   include_directories(${libdl_include_dir})
 endif()
 
 include_directories(${tinyxml_INCLUDE_DIRS})
-link_directories(${tinyxml_LIBRARY_DIRS})
+link_directories(${tinyxml_LIBRARY_DIRS} ${IGNITION-MSGS_LIBRARY_DIRS})
 
 set (sources
   ApplyWrenchVisual.cc
@@ -24,6 +23,7 @@ set (sources
   COMVisual.cc
   ContactVisual.cc
   Conversions.cc
+  CustomPSSMShadowCameraSetup.cc
   DepthCamera.cc
   Distortion.cc
   DynamicLines.cc
@@ -35,7 +35,10 @@ set (sources
   InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
+  LensFlare.cc
   LinkFrameVisual.cc
+  MarkerManager.cc
+  MarkerVisual.cc
   SonarVisual.cc
   Light.cc
   LogicalCameraVisual.cc
@@ -85,6 +88,7 @@ set (headers
   COMVisual.hh
   ContactVisual.hh
   Conversions.hh
+  CustomPSSMShadowCameraSetup.hh
   DepthCamera.hh
   Distortion.hh
   DynamicLines.hh
@@ -96,6 +100,7 @@ set (headers
   InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
+  LensFlare.hh
   LinkFrameVisual.hh
   LogicalCameraVisual.hh
   SonarVisual.hh
@@ -130,6 +135,12 @@ set (headers
   ogre_gazebo.h
 )
 
+# This captures headers that should not be installed.
+set (internal_headers
+  MarkerManager.hh
+  MarkerVisual.hh
+)
+
 if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
   add_subdirectory(deferred_shading)
 endif()
@@ -153,16 +164,28 @@ set (gtest_sources
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_rendering)
 
 set (gtest_sources_dri
+  ApplyWrenchVisual_TEST.cc
+  ArrowVisual_TEST.cc
+  AxisVisual_TEST.cc
+  Camera_TEST.cc
+  CameraVisual_TEST.cc
   COMVisual_TEST.cc
   ContactVisual_TEST.cc
+  Distortion_TEST.cc
   GpuLaser_TEST.cc
   Grid_TEST.cc
   Heightmap_TEST.cc
   InertiaVisual_TEST.cc
   JointVisual_TEST.cc
+  LaserVisual_TEST.cc
+  LogicalCameraVisual_TEST.cc
   LinkFrameVisual_TEST.cc
+  RenderingMaterial_TEST.cc
   OriginVisual_TEST.cc
+  RenderEngine_TEST.cc
   RenderingLight_TEST.cc
+  RFIDVisual_TEST.cc
+  RTShaderSystem_TEST.cc
   Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc
@@ -200,6 +223,8 @@ target_link_libraries(gazebo_rendering
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
   ${tinyxml_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 if (HAVE_OCULUS)
@@ -211,7 +236,7 @@ if (NOT APPLE AND NOT WIN32)
 endif()
 
 if (USE_PCH)
-  add_pch(gazebo_rendering rendering_pch.hh)
+  add_pch(gazebo_rendering rendering_pch.hh ${Boost_PKGCONFIG_CFLAGS})
 endif()
 
 gz_install_library(gazebo_rendering)

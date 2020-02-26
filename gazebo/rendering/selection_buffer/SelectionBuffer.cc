@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,6 +168,7 @@ void SelectionBuffer::CreateRTTBuffer()
   this->dataPtr->renderTexture->setPriority(0);
   this->dataPtr->renderTexture->addViewport(this->dataPtr->selectionCamera);
   this->dataPtr->renderTexture->getViewport(0)->setOverlaysEnabled(false);
+  this->dataPtr->renderTexture->getViewport(0)->setShadowsEnabled(false);
   this->dataPtr->renderTexture->getViewport(0)->setClearEveryFrame(true);
   this->dataPtr->renderTexture->addListener(
       this->dataPtr->selectionTargetListener.get());

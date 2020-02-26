@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   WorldPtr world = get_world("default");
   ASSERT_TRUE(world != nullptr);
 
-  PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), physicsEngineStr);
 
@@ -301,6 +301,45 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     EXPECT_EQ(param, frictionModel);
   }
 
+  // Test island_threads
+  {
+    // island_threads should be 0 by default
+    int islandThreads = 1;
+    EXPECT_NO_THROW(islandThreads =
+      boost::any_cast<int>(odePhysics->GetParam("island_threads")));
+    EXPECT_FALSE(islandThreads);
+
+    // try enabling threads, then disabling
+    std::vector<int> threads = {1, 2, 3, 0};
+    for (auto const islandThreadsSet : threads)
+    {
+      odePhysics->SetParam("island_threads", islandThreadsSet);
+      EXPECT_NO_THROW(islandThreads =
+        boost::any_cast<int>(odePhysics->GetParam("island_threads")));
+      EXPECT_EQ(islandThreads, islandThreadsSet);
+    }
+  }
+
+  // Test ode_quiet
+  // convenient for disabling LCP internal error messages from world solver
+  {
+    // ode_quiet should be off by default
+    bool odeQuiet = true;
+    EXPECT_NO_THROW(
+      odeQuiet = boost::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
+    EXPECT_FALSE(odeQuiet);
+
+    // try turning it on, then off again
+    std::vector<bool> bools = {true, false};
+    for (const bool odeQuietSet : bools)
+    {
+      odePhysics->SetParam("ode_quiet", odeQuietSet);
+      EXPECT_NO_THROW(
+        odeQuiet = boost::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
+      EXPECT_EQ(odeQuiet, odeQuietSet);
+    }
+  }
+
   // Test world step solvers
   {
     // Default value "ODE_DANTZIG"
@@ -353,7 +392,7 @@ void ODEPhysics_TEST::PhysicsMsgParam()
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
 
-  physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr engine = world->Physics();
   ASSERT_TRUE(engine != nullptr);
 
   transport::NodePtr phyNode;

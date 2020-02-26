@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ void ModelMaker_TEST::SimpleShape()
   // Check that the box appeared in the center of the screen
   ignition::math::Vector3d startPos = modelMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
-  QVERIFY(vis->GetWorldPose().pos == startPos);
+  QVERIFY(vis->WorldPose().Pos() == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -84,7 +84,7 @@ void ModelMaker_TEST::SimpleShape()
   // Check that entity moved
   ignition::math::Vector3d pos = modelMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(vis->GetWorldPose().pos == pos);
+  QVERIFY(vis->WorldPose().Pos() == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
@@ -107,6 +107,8 @@ void ModelMaker_TEST::SimpleShape()
   // Check the box is in the left panel
   hasBox = mainWindow->HasEntityName("unit_box");
   QVERIFY(hasBox);
+
+  delete modelMaker;
 
   // Terminate
   mainWindow->close();
@@ -165,7 +167,7 @@ void ModelMaker_TEST::FromFile()
   // Check that the box appeared in the center of the screen
   ignition::math::Vector3d startPos = modelMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
-  QVERIFY(vis->GetWorldPose().pos == startPos);
+  QVERIFY(vis->WorldPose().Pos() == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -175,7 +177,7 @@ void ModelMaker_TEST::FromFile()
   // Check that entity moved
   ignition::math::Vector3d pos = modelMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(vis->GetWorldPose().pos == pos);
+  QVERIFY(vis->WorldPose().Pos() == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
@@ -198,6 +200,8 @@ void ModelMaker_TEST::FromFile()
   // Check the box is in the left panel
   hasBox = mainWindow->HasEntityName("box");
   QVERIFY(hasBox);
+
+  delete modelMaker;
 
   // Terminate
   mainWindow->close();
@@ -266,7 +270,7 @@ void ModelMaker_TEST::FromNestedModelFile()
   ignition::math::Vector3d startPos = modelMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
   vis = scene->GetVisual("model_00");
-  QVERIFY(vis->GetWorldPose().pos == startPos);
+  QVERIFY(vis->WorldPose().Pos() == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -276,7 +280,7 @@ void ModelMaker_TEST::FromNestedModelFile()
   // Check that entity moved
   ignition::math::Vector3d pos = modelMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(vis->GetWorldPose().pos == pos);
+  QVERIFY(vis->WorldPose().Pos() == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
@@ -311,6 +315,8 @@ void ModelMaker_TEST::FromNestedModelFile()
   // Check the model is in the left panel
   hasModel = mainWindow->HasEntityName("model_00");
   QVERIFY(hasModel);
+
+  delete modelMaker;
 
   // Terminate
   mainWindow->close();
@@ -375,7 +381,7 @@ void ModelMaker_TEST::FromModel()
   // Check that the clone appeared in the center of the screen
   ignition::math::Vector3d startPos = modelMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
-  QVERIFY(vis->GetWorldPose().pos == startPos);
+  QVERIFY(vis->WorldPose().Pos() == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -385,7 +391,7 @@ void ModelMaker_TEST::FromModel()
   // Check that entity moved
   ignition::math::Vector3d pos = modelMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(vis->GetWorldPose().pos == pos);
+  QVERIFY(vis->WorldPose().Pos() == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
@@ -408,6 +414,8 @@ void ModelMaker_TEST::FromModel()
   // Check the clone is in the left panel
   hasModel = mainWindow->HasEntityName("box_clone");
   QVERIFY(hasModel);
+
+  delete modelMaker;
 
   // Terminate
   mainWindow->close();
@@ -488,7 +496,7 @@ void ModelMaker_TEST::FromNestedModel()
   ignition::math::Vector3d startPos = modelMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
   vis = scene->GetVisual("model_00_clone_tmp");
-  QVERIFY(vis->GetWorldPose().pos == startPos);
+  QVERIFY(vis->WorldPose().Pos() == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -498,7 +506,7 @@ void ModelMaker_TEST::FromNestedModel()
   // Check that entity moved
   ignition::math::Vector3d pos = modelMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(vis->GetWorldPose().pos == pos);
+  QVERIFY(vis->WorldPose().Pos() == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
@@ -533,6 +541,8 @@ void ModelMaker_TEST::FromNestedModel()
   // Check the clone is in the left panel
   hasModel = mainWindow->HasEntityName("model_00_clone");
   QVERIFY(hasModel);
+
+  delete modelMaker;
 
   // Terminate
   mainWindow->close();

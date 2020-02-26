@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ void GpsSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   physics::EntityPtr parentEntity =
-    this->world->GetEntity(this->ParentName());
+    this->world->EntityByName(this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
@@ -123,8 +123,7 @@ void GpsSensor::Init()
 {
   Sensor::Init();
 
-  this->dataPtr->sphericalCoordinates =
-    this->world->GetSphericalCoordinates();
+  this->dataPtr->sphericalCoordinates = this->world->SphericalCoords();
 }
 
 //////////////////////////////////////////////////
@@ -137,7 +136,7 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
     {
       // Get postion in Cartesian gazebo frame
       ignition::math::Pose3d gpsPose = this->pose +
-        this->dataPtr->parentLink->GetWorldPose().Ign();
+        this->dataPtr->parentLink->WorldPose();
 
       // Apply position noise before converting to global frame
       gpsPose.Pos().X(
@@ -161,8 +160,7 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
     // Measure velocity and apply noise
     {
       ignition::math::Vector3d gpsVelocity =
-        this->dataPtr->parentLink->GetWorldLinearVel(
-            this->pose.Pos()).Ign();
+        this->dataPtr->parentLink->WorldLinearVel(this->pose.Pos());
 
       // Convert to global frame
       gpsVelocity =
@@ -184,7 +182,7 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
       this->dataPtr->lastGpsMsg.set_velocity_up(gpsVelocity.Z());
     }
   }
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->SimTime();
   msgs::Set(this->dataPtr->lastGpsMsg.mutable_time(),
       this->lastMeasurementTime);
 
@@ -214,4 +212,32 @@ ignition::math::Angle GpsSensor::Latitude() const
 double GpsSensor::Altitude() const
 {
   return this->dataPtr->lastGpsMsg.altitude();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d GpsSensor::VelocityENU() const
+{
+  ignition::math::Vector3d velocity;
+  velocity.X(this->dataPtr->lastGpsMsg.velocity_east());
+  velocity.Y(this->dataPtr->lastGpsMsg.velocity_north());
+  velocity.Z(this->dataPtr->lastGpsMsg.velocity_up());
+  return velocity;
+}
+
+//////////////////////////////////////////////////
+double GpsSensor::VelocityEast() const
+{
+  return this->dataPtr->lastGpsMsg.velocity_east();
+}
+
+//////////////////////////////////////////////////
+double GpsSensor::VelocityNorth() const
+{
+  return this->dataPtr->lastGpsMsg.velocity_north();
+}
+
+//////////////////////////////////////////////////
+double GpsSensor::VelocityUp() const
+{
+  return this->dataPtr->lastGpsMsg.velocity_up();
 }

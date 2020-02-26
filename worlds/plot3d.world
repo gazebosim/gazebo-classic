@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <model name="plot_pendulum">
+      <include>
+        <uri>model://double_pendulum_with_base</uri>
+      </include>
+
+      <plugin name='3dplot' filename='libLinkPlot3DPlugin.so'>
+
+        <!-- Update at 10 Hz -->
+        <frequency>10</frequency>
+
+        <!-- Upper link plot -->
+        <plot>
+          <link>double_pendulum_with_base::upper_link</link>
+
+          <!-- Point 1m in +Z axis in link frame -->
+          <pose>0 0 1 0 0 0</pose>
+
+          <material>Gazebo/Red</material>
+        </plot>
+
+        <!-- Upper link plot -->
+        <plot>
+          <link>double_pendulum_with_base::lower_link</link>
+
+          <!-- Point 1m in +Z axis in link frame -->
+          <pose>0 0 1 0 0 0</pose>
+
+          <material>Gazebo/Blue</material>
+        </plot>
+
+      </plugin>
+    </model>
+  </world>
+</sdf>

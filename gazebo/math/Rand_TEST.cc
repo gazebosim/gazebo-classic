@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,14 @@
 */
 
 #include <gtest/gtest.h>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Rand.hh"
+
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 using namespace gazebo;
 
@@ -40,8 +45,8 @@ TEST_F(RandTest, Rand)
   EXPECT_GE(i, 1);
 
   i = math::Rand::GetIntNormal(2, 3);
-  EXPECT_LE(i, GZ_INT32_MAX);
-  EXPECT_GE(i, -GZ_INT32_MAX);
+  EXPECT_LE(i, ignition::math::MAX_I32);
+  EXPECT_GE(i, -ignition::math::MAX_I32);
 
   // Test setting the random number seed
   {

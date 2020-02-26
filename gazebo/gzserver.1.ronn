@@ -29,6 +29,12 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
  Compression encoding format for log data (zlib|bz2|txt).
 * --record_path arg :
  Absolute path in which to store state data
+* --record_period arg (=-1) :
+ Recording period (seconds).
+* --record_filter arg :
+ Recording filter (supports wildcard and regular expression).
+* --record_resources :
+ Recording with model meshes and materials.
 * --seed arg :
  Start with a given random number seed.
 * --iters arg :
@@ -44,8 +50,8 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
 ## AUTHOR
   Open Source Robotics Foundation
 
-## COPYRIGHT 
-  Copyright (C) 2012-2016 Open Source Robotics Foundation
-       
+## COPYRIGHT
+  Copyright (C) 2012 Open Source Robotics Foundation
+
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.

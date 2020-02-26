@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,7 +143,7 @@ ModelRightMenu::ModelRightMenu()
 bool ModelRightMenu::Init()
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  this->node->TryInit(common::Time::Maximum());
   this->requestSub = this->node->Subscribe("~/request",
       &ModelRightMenu::OnRequest, this);
 
@@ -166,7 +166,9 @@ bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
 /////////////////////////////////////////////////
 ModelRightMenu::~ModelRightMenu()
 {
+  this->requestSub.reset();
   this->node->Fini();
+  this->node.reset();
 }
 
 /////////////////////////////////////////////////
@@ -174,11 +176,11 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     EntityTypes _type)
 {
   // Find out the entity type
-  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
+  if (_type == EntityTypes::MODEL)
   {
     this->entityName = _entityName.substr(0, _entityName.find("::"));
   }
-  else if (_type == EntityTypes::LINK)
+  else if (_type == EntityTypes::LINK || _type == EntityTypes::LIGHT)
   {
     this->entityName = _entityName;
   }
@@ -291,11 +293,11 @@ void ModelRightMenu::OnApplyWrench()
   {
     modelName = this->entityName;
     // If model selected just take the first link
-    linkName = vis->GetChild(0)->GetName();
+    linkName = vis->GetChild(0)->Name();
   }
   else
   {
-    modelName = vis->GetRootVisual()->GetName();
+    modelName = vis->GetRootVisual()->Name();
     linkName = this->entityName;
   }
 

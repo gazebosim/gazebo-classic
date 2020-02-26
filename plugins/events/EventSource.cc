@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,11 +69,11 @@ void EventSource::Emit(const std::string &_data) const
     // add world stats to give context to the event (mostly time & sim state)
     gazebo::msgs::WorldStatistics *worldStatsMsg;
     worldStatsMsg = msg.mutable_world_statistics();
-    worldStatsMsg->set_iterations(this->world->GetIterations());
+    worldStatsMsg->set_iterations(this->world->Iterations());
     worldStatsMsg->set_paused(this->world->IsPaused());
-    msgs::Set(worldStatsMsg->mutable_sim_time(), this->world->GetSimTime());
-    msgs::Set(worldStatsMsg->mutable_real_time(), this->world->GetRealTime());
-    msgs::Set(worldStatsMsg->mutable_pause_time(), this->world->GetPauseTime());
+    msgs::Set(worldStatsMsg->mutable_sim_time(), this->world->SimTime());
+    msgs::Set(worldStatsMsg->mutable_real_time(), this->world->RealTime());
+    msgs::Set(worldStatsMsg->mutable_pause_time(), this->world->PauseTime());
     // send it on the publisher we got in the ctor
     this->pub->Publish(msg);
   }

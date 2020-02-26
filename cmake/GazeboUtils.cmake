@@ -201,27 +201,7 @@ endmacro()
 # directories. It's present on cmake 2.8.8 while precise version is 2.8.7
 link_directories(${PROJECT_BINARY_DIR}/test)
 include_directories("${PROJECT_SOURCE_DIR}/test/gtest/include")
-
-#################################################
-# Enable tests compilation by default
-if (NOT DEFINED ENABLE_TESTS_COMPILATION)
-  set (ENABLE_TESTS_COMPILATION True)
-endif()
-
-# Define testing macros as empty and redefine them if support is found and
-# ENABLE_TESTS_COMPILATION is set to true
-macro (gz_build_tests)
-endmacro()
-macro (gz_build_qt_tests)
-endmacro()
-macro (gz_build_display_tests)
-endmacro()
-macro (gz_build_dri_tests)
-endmacro()
-
-if (ENABLE_TESTS_COMPILATION)
-  include (${gazebo_cmake_dir}/GazeboTestUtils.cmake)
-endif()
+include (${gazebo_cmake_dir}/GazeboTestUtils.cmake)
 
 #################################################
 # Macro to setup supported compiler flags
@@ -249,12 +229,11 @@ macro(add_pch target_name filename)
 
   set(pch_out ${CMAKE_CURRENT_BINARY_DIR}/${filename}.out.gch)
   set(pch_in ${CMAKE_CURRENT_SOURCE_DIR}/${filename})
-  set(FLAGS -g -O2 -fPIC -x c++-header)
+  set(FLAGS -fPIC -x c++-header)
 
-  separate_arguments(ARGS UNIX_COMMAND "${CMAKE_C_FLAGS_ALL} ${CMAKE_CXX_FLAGS} ${ARGN}")
-
+  separate_arguments(ARGS UNIX_COMMAND "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
   add_custom_command(OUTPUT ${pch_out}
-    COMMAND ${CMAKE_CXX_COMPILER} ${ARGS} ${FLAGS} ${pch_in} -o ${pch_out}
+    COMMAND ${CMAKE_CXX_COMPILER} ${ARGS} ${ARGN} ${FLAGS} ${pch_in} -o ${pch_out}
     DEPENDS ${pch_in}
     COMMENT "Generating precompiled header: ${pch_out}"
     VERBATIM)

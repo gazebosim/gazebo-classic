@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ TEST_F(LightStateTest, LightConstructor)
   EXPECT_TRUE(lightPtr != NULL);
 
   lightPtr->ProcessMsg(lightMsg);
-  EXPECT_EQ(lightPtr->GetWorldPose(), pose);
+  EXPECT_EQ(lightPtr->WorldPose(), pose);
 
   // Create the light state
   physics::LightState lightState(lightPtr, common::Time(1), common::Time(1), 1);

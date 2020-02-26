@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A joint state
- * Author: Nate Koenig
- */
-
-#ifndef _JOINTSTATE_HH_
-#define _JOINTSTATE_HH_
+#ifndef GAZEBO_PHYSICS_JOINTSTATE_HH_
+#define GAZEBO_PHYSICS_JOINTSTATE_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -29,9 +25,10 @@
 
 #include <vector>
 #include <string>
+#include <ignition/math/Angle.hh>
 
 #include "gazebo/physics/State.hh"
-#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Angle.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -88,11 +85,36 @@ namespace gazebo
       /// \param[in] _axis The axis index.
       /// \return Angle of the axis.
       /// \throw common::Exception When _axis is invalid.
-      public: math::Angle GetAngle(unsigned int _axis) const;
+      /// \deprecated See Position()
+      public: math::Angle GetAngle(unsigned int _axis) const
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the joint position.
+      ///
+      /// For rotational axes, the value is in radians. For prismatic axes,
+      /// it is in meters.
+      ///
+      /// It returns ignition::math::NAN_D in case the position can't be
+      /// obtained. For instance, if the index is invalid.
+      ///
+      /// \param[in] _index Index of the axis, defaults to 0.
+      /// \return Position of the axis.
+      /// \throw common::Exception When _axis is invalid.
+      public: double Position(const unsigned int _axis = 0) const;
 
       /// \brief Get the angles.
       /// \return Vector of angles.
-      public: const std::vector<math::Angle> &GetAngles() const;
+      /// \deprecated See Positions()
+      public: const std::vector<math::Angle> GetAngles() const
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the joint positions.
+      ///
+      /// For rotational axes, the value is in radians. For prismatic axes,
+      /// it is in meters.
+      ///
+      /// \return Vector of joint positions.
+      public: const std::vector<double> &Positions() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -127,8 +149,8 @@ namespace gazebo
         _out << "<joint name='" << _state.GetName() << "'>";
 
         int i = 0;
-        for (std::vector<math::Angle>::const_iterator iter =
-            _state.angles.begin(); iter != _state.angles.end(); ++iter)
+        for (std::vector<double>::const_iterator iter =
+            _state.positions.begin(); iter != _state.positions.end(); ++iter)
         {
           _out << "<angle axis='" << i << "'>" << (*iter) << "</angle>";
         }
@@ -138,7 +160,7 @@ namespace gazebo
         return _out;
       }
 
-      private: std::vector<math::Angle> angles;
+      private: std::vector<double> positions;
     };
     /// \}
   }

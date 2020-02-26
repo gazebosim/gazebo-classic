@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ TEST_F(ColladaLoader, LoadZeroCount)
 }
 
 /////////////////////////////////////////////////
-TEST_F(ColladaLoader, Specular)
+TEST_F(ColladaLoader, Material)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
@@ -130,7 +130,20 @@ TEST_F(ColladaLoader, Specular)
   ASSERT_TRUE(mat);
 
   // Make sure we read the specular value
+  EXPECT_EQ(mat->GetAmbient(), common::Color(0.0, 0.0, 0.0, 1.0));
+  EXPECT_EQ(mat->GetDiffuse(), common::Color(0.64, 0.64, 0.64, 1.0));
   EXPECT_EQ(mat->GetSpecular(), common::Color(0.5, 0.5, 0.5, 1.0));
+  EXPECT_EQ(mat->GetEmissive(), common::Color(0.0, 0.0, 0.0, 1.0));
+  EXPECT_DOUBLE_EQ(mat->GetShininess(), 50.0);
+  // transparent: opaque="A_ONE", color=[1 1 1 1]
+  // transparency: 1.0
+  // resulting transparency value = (1 - color.a * transparency)
+  EXPECT_DOUBLE_EQ(mat->GetTransparency(), 0.0);
+  double srcFactor = -1;
+  double dstFactor = -1;
+  mat->GetBlendFactors(srcFactor, dstFactor);
+  EXPECT_DOUBLE_EQ(srcFactor, 1.0);
+  EXPECT_DOUBLE_EQ(dstFactor, 0.0);
 }
 
 /////////////////////////////////////////////////

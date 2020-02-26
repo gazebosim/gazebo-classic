@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -303,7 +303,8 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     return;
   }
 
-  snprintf(this->headerBuffer, HEADER_LENGTH + 1, "%08x",
+  char headerBufferLocal[HEADER_LENGTH + 1];
+  snprintf(headerBufferLocal, HEADER_LENGTH + 1, "%08x",
       static_cast<unsigned int>(_buffer.size()));
 
   {
@@ -312,9 +313,9 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     if (this->writeQueue.empty() ||
         (this->writeCount > 0 && this->writeQueue.size() == 1) ||
         (this->writeQueue.back().size()+_buffer.size() > 4096))
-      this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
+      this->writeQueue.push_back(std::string(headerBufferLocal) + _buffer);
     else
-      this->writeQueue.back() += std::string(headerBuffer) + _buffer;
+      this->writeQueue.back() += std::string(headerBufferLocal) + _buffer;
     this->callbacks.push_back(std::make_pair(_cb, _id));
   }
 
@@ -943,7 +944,7 @@ void Connection::OnConnect(const boost::system::error_code &_error,
   // unsuccessfully) established.
 
   boost::mutex::scoped_lock lock(this->connectMutex);
-  if (_error == 0)
+  if (_error == boost::system::errc::success)
   {
     this->remoteURI = std::string("http://") + this->GetRemoteHostname()
       + ":" + boost::lexical_cast<std::string>(this->GetRemotePort());

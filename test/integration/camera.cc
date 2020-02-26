@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,9 @@ TEST_F(CameraTest, Follow)
   ASSERT_TRUE(world != NULL);
 
   // Spawn a box to follow.
-  SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
-      math::Vector3(0, 0, 0));
+  SpawnBox("box", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(10, 10, 1),
+      ignition::math::Vector3d::Zero);
 
   ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
 
@@ -90,8 +91,9 @@ TEST_F(CameraTest, Visible)
   ASSERT_TRUE(world != NULL);
 
   // Spawn a box.
-  SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(1, 0, 0.5),
-      math::Vector3(0, 0, 0));
+  SpawnBox("box", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(1, 0, 0.5),
+      ignition::math::Vector3d::Zero);
 
   ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
 
@@ -130,80 +132,80 @@ TEST_F(CameraTest, Visible)
   // box should be visible to the camera.
   EXPECT_TRUE(camera->IsVisible(visual));
 
-  physics::ModelPtr box = world->GetModel("box");
+  physics::ModelPtr box = world->ModelByName("box");
   ASSERT_TRUE(box != NULL);
 
   // move the box behind the camera and it should not be visible to the camera
-  math::Pose pose = math::Pose(-1, 0, 0.5, 0, 0, 0);
+  ignition::math::Pose3d pose(-1, 0, 0.5, 0, 0, 0);
   box->SetWorldPose(pose);
   world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (visual->GetWorldPose() != pose && sleep < maxSleep)
+  while (visual->WorldPose() != pose && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->GetWorldPose() == pose);
+  EXPECT_TRUE(visual->WorldPose() == pose);
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
-  EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
+  EXPECT_TRUE(!camera->IsVisible(visual->Name()));
 
   // move the box to the left of the camera and it should not be visible
-  pose = math::Pose(0, -1, 0.5, 0, 0, 0);
+  pose = ignition::math::Pose3d(0, -1, 0.5, 0, 0, 0);
   box->SetWorldPose(pose);
   world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (visual->GetWorldPose() != pose && sleep < maxSleep)
+  while (visual->WorldPose() != pose && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->GetWorldPose() == pose);
+  EXPECT_TRUE(visual->WorldPose() == pose);
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
-  EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
+  EXPECT_TRUE(!camera->IsVisible(visual->Name()));
 
   // move the box to the right of the camera with some rotations,
   // it should still not be visible.
-  pose = math::Pose(0, 1, 0.5, 0, 0, 1.57);
+  pose = ignition::math::Pose3d(0, 1, 0.5, 0, 0, 1.57);
   box->SetWorldPose(pose);
   world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (visual->GetWorldPose() != pose && sleep < maxSleep)
+  while (visual->WorldPose() != pose && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->GetWorldPose() == pose);
+  EXPECT_TRUE(visual->WorldPose() == pose);
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
-  EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
+  EXPECT_TRUE(!camera->IsVisible(visual->Name()));
 
   // rotate the camera counter-clockwise to see the box
   camera->Yaw(ignition::math::Angle(1.57));
   EXPECT_TRUE(camera->IsVisible(visual));
-  EXPECT_TRUE(camera->IsVisible(visual->GetName()));
+  EXPECT_TRUE(camera->IsVisible(visual->Name()));
 
   // move the box up and let it drop. The camera should not see the box
   // initially but the box should eventually move into the camera view
   // as it falls
-  pose = math::Pose(0, 1, 5.5, 0, 0, 1.57);
+  pose = ignition::math::Pose3d(0, 1, 5.5, 0, 0, 1.57);
   box->SetWorldPose(pose);
   world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (visual->GetWorldPose() != pose && sleep < maxSleep)
+  while (visual->WorldPose() != pose && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->GetWorldPose() == pose);
+  EXPECT_TRUE(visual->WorldPose() == pose);
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
-  EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
+  EXPECT_TRUE(!camera->IsVisible(visual->Name()));
 
   sleep = 0;
   maxSleep = 100;
@@ -213,7 +215,100 @@ TEST_F(CameraTest, Visible)
     sleep++;
   }
   EXPECT_TRUE(camera->IsVisible(visual));
-  EXPECT_TRUE(camera->IsVisible(visual->GetName()));
+  EXPECT_TRUE(camera->IsVisible(visual->Name()));
+}
+
+/////////////////////////////////////////////////
+// Spawn a mesh in front of camera and test ray triangle intersection
+TEST_F(CameraTest, RayTriangleIntersection)
+{
+  Load("worlds/empty.world");
+
+  // Get a pointer to the world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  ignition::math::Pose3d cameraStartPose(-1, 0, 0.02, 0, 0, 0);
+
+  // Spawn a camera for ray intersection test
+  SpawnCamera("test_camera_model", "test_camera",
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
+
+  // Spawn a cordless drill
+  SpawnModel("model://cordless_drill");
+  WaitUntilEntitySpawn("drill", 100, 50);
+
+  // verify ray triangle intersection in rendering thread
+  bool verified = false;
+  auto testRayIntersection = [&]()
+  {
+    // get scene
+    rendering::ScenePtr scene = rendering::get_scene();
+    ASSERT_TRUE(scene != nullptr);
+
+    // wait until the camera is created in scene
+    rendering::CameraPtr camera = scene->GetCamera(
+        "test_camera_model::body::test_camera");
+    if (!camera)
+      return;
+
+    // wait until the drill is created in scene
+    rendering::VisualPtr drillVis = scene->GetVisual("drill");
+    if (!drillVis)
+      return;
+
+    // wait until the camera is in place
+    if (camera->WorldPose() != cameraStartPose)
+      return;
+
+    // sanity check
+    if (!camera->IsVisible(drillVis))
+      return;
+
+    // test ray intersection with a mesh
+    ignition::math::Vector2i drillImgPos =
+        camera->Project(drillVis->WorldPose().Pos() +
+                        ignition::math::Vector3d(0, 0, 0.05));
+
+    ignition::math::Vector3d intersectPos;
+    bool intersect = scene->FirstContact(camera, drillImgPos, intersectPos);
+
+    // camera ray should intersect with a triangle on mesh
+    EXPECT_TRUE(intersect);
+    EXPECT_GT(intersectPos.X(), -1);
+    EXPECT_LT(intersectPos.X(), 0);
+    EXPECT_TRUE(ignition::math::equal(intersectPos.Y(), 0.0, 1e-4));
+    EXPECT_GT(intersectPos.Z(), 0);
+    EXPECT_LT(intersectPos.Z(), 0.05);
+
+    // cast a ray so that it's within the bounding box of the mesh but doesn't
+    // intersect with any triangles
+    ignition::math::Vector2i emptyImgPos =
+        camera->Project(drillVis->WorldPose().Pos() +
+                        ignition::math::Vector3d(0, 0, 0.1));
+
+    // ray should not intersect with any triangles on mesh
+    intersect = scene->FirstContact(camera, emptyImgPos, intersectPos);
+    EXPECT_FALSE(intersect);
+    EXPECT_EQ(ignition::math::Vector3d::Zero, intersectPos);
+
+    verified = true;
+  };
+  auto connection =
+      event::Events::ConnectPreRender(std::bind(testRayIntersection));
+
+  // wait until the verification has been done in the rendering thread
+  int sleep = 0;
+  int maxSleep = 50;
+  while (sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+    if (verified)
+      break;
+  }
+  EXPECT_TRUE(verified);
+
+  connection.reset();
 }
 
 /////////////////////////////////////////////////

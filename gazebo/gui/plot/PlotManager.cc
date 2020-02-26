@@ -25,6 +25,7 @@
 #include "gazebo/common/URI.hh"
 
 #include "gazebo/gui/plot/IntrospectionCurveHandler.hh"
+#include "gazebo/gui/plot/TopicCurveHandler.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
@@ -52,6 +53,9 @@ namespace gazebo
       /// \brief Handler for updating introspection curves
       public: IntrospectionCurveHandler introspectionCurve;
 
+      /// \brief Handler for updating topic curves
+      public: TopicCurveHandler topicCurve;
+
       /// \brief A list of plot windows.
       public: std::vector<PlotWindow *> windows;
     };
@@ -63,7 +67,7 @@ PlotManager::PlotManager()
   : dataPtr(new PlotManagerPrivate())
 {
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   // check for reset events and restart plots when time is reset
   this->dataPtr->worldControlSub =
@@ -103,6 +107,19 @@ void PlotManager::AddIntrospectionCurve(const std::string &_uri,
 void PlotManager::RemoveIntrospectionCurve(PlotCurveWeakPtr _curve)
 {
   this->dataPtr->introspectionCurve.RemoveCurve(_curve);
+}
+
+/////////////////////////////////////////////////
+void PlotManager::AddTopicCurve(const std::string &_topic,
+    PlotCurveWeakPtr _curve)
+{
+  this->dataPtr->topicCurve.AddCurve(_topic, _curve);
+}
+
+/////////////////////////////////////////////////
+void PlotManager::RemoveTopicCurve(PlotCurveWeakPtr _curve)
+{
+  this->dataPtr->topicCurve.RemoveCurve(_curve);
 }
 
 /////////////////////////////////////////////////

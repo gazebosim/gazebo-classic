@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ LightState::LightState(const LightPtr _light, const common::Time &_realTime,
     const common::Time &_simTime, const uint64_t _iterations)
 : State(_light->GetName(), _realTime, _simTime, _iterations)
 {
-  this->pose = _light->GetWorldPose().Ign();
+  this->pose = _light->WorldPose();
 }
 
 /////////////////////////////////////////////////
@@ -58,7 +58,7 @@ void LightState::Load(const LightPtr _light, const common::Time &_realTime,
   this->realTime = _realTime;
   this->simTime = _simTime;
   this->iterations = _iterations;
-  this->pose = _light->GetWorldPose().Ign();
+  this->pose = _light->WorldPose();
 }
 
 /////////////////////////////////////////////////

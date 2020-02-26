@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,10 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
+#include <functional>
+#include <mutex>
+#include <ignition/math/Triangle.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/transport/transport.hh"
 
@@ -59,9 +62,7 @@ ModelSnap::ModelSnap()
 /////////////////////////////////////////////////
 ModelSnap::~ModelSnap()
 {
-  this->Clear();
-  delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -78,8 +79,10 @@ void ModelSnap::Clear()
   this->dataPtr->selectedVis.reset();
   this->dataPtr->hoverVis.reset();
 
-  this->dataPtr->node.reset();
   this->dataPtr->userCmdPub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
 
   this->dataPtr->renderConnection.reset();
 
@@ -98,9 +101,6 @@ void ModelSnap::Clear()
     this->dataPtr->highlightVisual->Fini();
     this->dataPtr->highlightVisual.reset();
   }
-
-  delete this->dataPtr->updateMutex;
-  this->dataPtr->updateMutex = NULL;
 
   this->dataPtr->scene.reset();
   this->dataPtr->userCamera.reset();
@@ -125,10 +125,8 @@ void ModelSnap::Init()
   this->dataPtr->userCamera = cam;
   this->dataPtr->scene =  cam->GetScene();
 
-  this->dataPtr->updateMutex = new boost::recursive_mutex();
-
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
@@ -141,7 +139,7 @@ void ModelSnap::Init()
 /////////////////////////////////////////////////
 void ModelSnap::Reset()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   this->dataPtr->selectedVis.reset();
 
   this->dataPtr->hoverVis.reset();
@@ -176,8 +174,9 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
 
-  rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+  rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
       this->dataPtr->mouseEvent.Pos());
+
   if (vis && !vis->IsPlane())
   {
     // get the triangle being hovered so that it can be highlighted
@@ -188,7 +187,7 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
 
     if (hoverTriangle.Valid())
     {
-      boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+      std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
       this->dataPtr->hoverVis = vis;
       this->dataPtr->hoverTriangle = hoverTriangle;
       this->dataPtr->hoverTriangleDirty = true;
@@ -196,13 +195,13 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
       if (!this->dataPtr->renderConnection)
       {
         this->dataPtr->renderConnection = event::Events::ConnectRender(
-            boost::bind(&ModelSnap::Update, this));
+            std::bind(&ModelSnap::Update, this));
       }
     }
   }
   else
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     this->dataPtr->hoverVis.reset();
     this->dataPtr->hoverTriangleDirty = true;
   }
@@ -216,7 +215,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
 
-  rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+  rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
       this->dataPtr->mouseEvent.Pos());
 
   if (vis && !vis->IsPlane() &&
@@ -227,7 +226,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     rendering::VisualPtr previousParent;
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
 
-    if (gui::get_entity_id(currentParent->GetName()))
+    if (gui::get_entity_id(currentParent->Name()))
     {
       if (this->dataPtr->selectedVis)
         previousParent = this->dataPtr->selectedVis->GetRootVisual();
@@ -258,7 +257,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
       if (!this->dataPtr->renderConnection)
       {
         this->dataPtr->renderConnection = event::Events::ConnectRender(
-            boost::bind(&ModelSnap::Update, this));
+            std::bind(&ModelSnap::Update, this));
       }
     }
     else
@@ -287,20 +286,24 @@ void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
     const std::vector<math::Vector3> &_triangleDest,
     rendering::VisualPtr _visualSrc)
 {
-  math::Vector3 translation;
-  math::Quaternion rotation;
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  ignition::math::Triangle3d triangleSrc(
+      _triangleSrc[0].Ign(),
+      _triangleSrc[1].Ign(),
+      _triangleSrc[2].Ign());
 
-  this->GetSnapTransform(_triangleSrc, _triangleDest,
-      _visualSrc->GetWorldPose(), translation, rotation);
+  ignition::math::Triangle3d triangleDest(
+      _triangleDest[0].Ign(),
+      _triangleDest[1].Ign(),
+      _triangleDest[2].Ign());
 
-  _visualSrc->SetWorldPose(
-      math::Pose(_visualSrc->GetWorldPose().pos + translation,
-      rotation * _visualSrc->GetWorldPose().rot));
-
-  Events::moveEntity(_visualSrc->GetName(), _visualSrc->GetWorldPose().Ign(),
-      true);
-
-  this->PublishVisualPose(_visualSrc);
+  this->Snap(triangleSrc, triangleDest, _visualSrc);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -312,11 +315,14 @@ void ModelSnap::Snap(const ignition::math::Triangle3d &_triangleSrc,
   ignition::math::Quaterniond rotation;
 
   this->SnapTransform(_triangleSrc, _triangleDest,
-      _visualSrc->GetWorldPose().Ign(), translation, rotation);
+      _visualSrc->WorldPose(), translation, rotation);
 
   _visualSrc->SetWorldPose(
-      ignition::math::Pose3d(_visualSrc->GetWorldPose().Ign().Pos() +
-      translation, rotation * _visualSrc->GetWorldPose().Ign().Rot()));
+      ignition::math::Pose3d(_visualSrc->WorldPose().Pos() +
+      translation, rotation * _visualSrc->WorldPose().Rot()));
+
+  Events::moveEntity(_visualSrc->Name(), _visualSrc->WorldPose(),
+      true);
 
   this->PublishVisualPose(_visualSrc);
 }
@@ -327,32 +333,34 @@ void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
     const math::Pose &_poseSrc, math::Vector3 &_trans,
     math::Quaternion &_rot)
 {
-  // snap the centroid of one triangle to another
-  math::Vector3 centroidSrc = (_triangleSrc[0] + _triangleSrc[1] +
-      _triangleSrc[2]) / 3.0;
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  ignition::math::Triangle3d triangleSrc(
+      _triangleSrc[0].Ign(),
+      _triangleSrc[1].Ign(),
+      _triangleSrc[2].Ign());
 
-  math::Vector3 centroidDest =
-      (_triangleDest[0] + _triangleDest[1] + _triangleDest[2]) / 3.0;
+  ignition::math::Triangle3d triangleDest(
+      _triangleDest[0].Ign(),
+      _triangleDest[1].Ign(),
+      _triangleDest[2].Ign());
 
-  math::Vector3 normalSrc = math::Vector3::GetNormal(
-      _triangleSrc[0], _triangleSrc[1], _triangleSrc[2]);
+  ignition::math::Vector3d trans;
+  ignition::math::Quaterniond rot;
 
-  math::Vector3 normalDest = math::Vector3::GetNormal(
-      _triangleDest[0], _triangleDest[1], _triangleDest[2]);
+  this->SnapTransform(triangleSrc, triangleDest, _poseSrc.Ign(), trans, rot);
 
-  math::Vector3 u = normalDest.Normalize() * -1;
-  math::Vector3 v = normalSrc.Normalize();
-  double cosTheta = v.Dot(u);
-  double angle = acos(cosTheta);
-  // check the parallel case
-  if (math::equal(angle, M_PI))
-    _rot.SetFromAxis(u.GetPerpendicular(), angle);
-  else
-    _rot.SetFromAxis((v.Cross(u)).Normalize(), angle);
-
-  // Get translation needed for alignment
-  // taking into account the rotated position of the mesh
-  _trans = centroidDest - (_rot * (centroidSrc - _poseSrc.pos) + _poseSrc.pos);
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  _trans = trans;
+  _rot = rot;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -363,17 +371,15 @@ void ModelSnap::SnapTransform(
     ignition::math::Quaterniond &_rot)
 {
   // snap the centroid of one triangle to another
-  auto centroidSrc = (_triangleSrc[0] + _triangleSrc[1] +
-      _triangleSrc[2]) / 3.0;
+  auto centroidSrc =
+      (_triangleSrc[0] + _triangleSrc[1] + _triangleSrc[2]) / 3.0;
 
   auto centroidDest =
       (_triangleDest[0] + _triangleDest[1] + _triangleDest[2]) / 3.0;
 
-  auto normalSrc = ignition::math::Vector3d::Normal(
-      _triangleSrc[0], _triangleSrc[1], _triangleSrc[2]);
+  auto normalSrc = _triangleSrc.Normal();
 
-  auto normalDest = ignition::math::Vector3d::Normal(
-      _triangleDest[0], _triangleDest[1], _triangleDest[2]);
+  auto normalDest = _triangleDest.Normal();
 
   auto u = normalDest.Normalize() * -1;
   auto v = normalSrc.Normalize();
@@ -402,17 +408,17 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
   {
     // Register user command on server
     msgs::UserCmd userCmdMsg;
-    userCmdMsg.set_description("Snap [" + _vis->GetName() + "]");
+    userCmdMsg.set_description("Snap [" + _vis->Name() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
     msgs::Model msg;
 
-    auto id = gui::get_entity_id(_vis->GetName());
+    auto id = gui::get_entity_id(_vis->Name());
     if (id)
       msg.set_id(id);
 
-    msg.set_name(_vis->GetName());
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
+    msg.set_name(_vis->Name());
+    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
 
     auto modelMsg = userCmdMsg.add_model();
     modelMsg->CopyFrom(msg);
@@ -424,7 +430,7 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void ModelSnap::Update()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   if (this->dataPtr->hoverTriangleDirty)
   {
     if (this->dataPtr->hoverTriangle.Valid())
@@ -434,9 +440,9 @@ void ModelSnap::Update()
       for (unsigned int i = 0; i < 3; ++i)
       {
         hoverTriangle.Set(i,
-            this->dataPtr->hoverVis->GetWorldPose().Ign().Rot().Inverse() *
+            this->dataPtr->hoverVis->WorldPose().Rot().Inverse() *
             (this->dataPtr->hoverTriangle[i] -
-            this->dataPtr->hoverVis->GetWorldPose().Ign().Pos()));
+            this->dataPtr->hoverVis->WorldPose().Pos()));
       }
 
       if (!this->dataPtr->highlightVisual)
@@ -496,9 +502,9 @@ void ModelSnap::Update()
     for (unsigned int i = 0; i < 3; ++i)
     {
       triangle.Set(i,
-          this->dataPtr->selectedVis->GetWorldPose().Ign().Rot().Inverse() *
+          this->dataPtr->selectedVis->WorldPose().Rot().Inverse() *
           (this->dataPtr->selectedTriangle[i] -
-          this->dataPtr->selectedVis->GetWorldPose().Ign().Pos()));
+          this->dataPtr->selectedVis->WorldPose().Pos()));
     }
 
     if (!this->dataPtr->snapVisual)

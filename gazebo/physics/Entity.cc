@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: External interfaces for Gazebo
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -44,6 +39,7 @@
 #include "gazebo/physics/RayShape.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -65,7 +61,7 @@ Entity::Entity(BasePtr _parent)
   this->visualMsg->set_id(this->id);
 
   if (this->world)
-    this->visualMsg->set_parent_name(this->world->GetName());
+    this->visualMsg->set_parent_name(this->world->Name());
   else
   {
     gzerr << "No world set when constructing an Entity.\n";
@@ -94,7 +90,7 @@ Entity::~Entity()
 void Entity::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
-  this->node->Init(this->GetWorld()->GetName());
+  this->node->Init(this->GetWorld()->Name());
 
   this->poseSub = this->node->Subscribe("~/pose/modify",
       &Entity::OnPoseMsg, this);
@@ -105,12 +101,16 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   {
     if (this->parent && this->parentEntity)
-      this->worldPose = this->sdf->Get<math::Pose>("pose") +
+    {
+      this->worldPose = this->sdf->Get<ignition::math::Pose3d>("pose") +
                         this->parentEntity->worldPose;
+    }
     else
-      this->worldPose = this->sdf->Get<math::Pose>("pose");
+    {
+      this->worldPose = this->sdf->Get<ignition::math::Pose3d>("pose");
+    }
 
-    this->initialRelativePose = this->sdf->Get<math::Pose>("pose");
+    this->initialRelativePose = this->sdf->Get<ignition::math::Pose3d>("pose");
   }
 
   if (this->parent)
@@ -120,10 +120,10 @@ void Entity::Load(sdf::ElementPtr _sdf)
   }
   else
   {
-    this->visualMsg->set_parent_name(this->world->GetName());
+    this->visualMsg->set_parent_name(this->world->Name());
     this->visualMsg->set_parent_id(0);
   }
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose().Ign());
+  msgs::Set(this->visualMsg->mutable_pose(), this->RelativePose());
 
   if (this->HasType(Base::MODEL))
     this->visualMsg->set_type(msgs::Visual::MODEL);
@@ -174,11 +174,37 @@ bool Entity::IsStatic() const
 //////////////////////////////////////////////////
 void Entity::SetInitialRelativePose(const math::Pose &_p)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetInitialRelativePose(_p.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void Entity::SetInitialRelativePose(const ignition::math::Pose3d &_p)
+{
   this->initialRelativePose = _p;
 }
 
 //////////////////////////////////////////////////
 math::Pose Entity::GetInitialRelativePose() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->InitialRelativePose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Entity::InitialRelativePose() const
 {
   return this->initialRelativePose;
 }
@@ -186,7 +212,21 @@ math::Pose Entity::GetInitialRelativePose() const
 //////////////////////////////////////////////////
 math::Box Entity::GetBoundingBox() const
 {
-  return math::Box(math::Vector3(0, 0, 0), math::Vector3(1, 1, 1));
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->BoundingBox();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Box Entity::BoundingBox() const
+{
+  return ignition::math::Box(
+      ignition::math::Vector3d::Zero, ignition::math::Vector3d::One);
 }
 
 //////////////////////////////////////////////////
@@ -200,7 +240,7 @@ void Entity::SetAnimation(common::PoseAnimationPtr _anim)
 {
   this->animationStartPose = this->worldPose;
 
-  this->prevAnimationTime = this->world->GetSimTime();
+  this->prevAnimationTime = this->world->SimTime();
   this->animation = _anim;
   this->onAnimationComplete.clear();
   this->animationConnection = event::Events::ConnectWorldUpdateBegin(
@@ -213,7 +253,7 @@ void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
 {
   this->animationStartPose = this->worldPose;
 
-  this->prevAnimationTime = this->world->GetSimTime();
+  this->prevAnimationTime = this->world->SimTime();
   this->animation = _anim;
   this->onAnimationComplete = _onComplete;
   this->animationConnection = event::Events::ConnectWorldUpdateBegin(
@@ -240,6 +280,19 @@ void Entity::PublishPose()
 //////////////////////////////////////////////////
 math::Pose Entity::GetRelativePose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->RelativePose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Entity::RelativePose() const
+{
   // We return the initialRelativePose for COLLISION objects because they
   // cannot move relative to their parent link.
   // \todo Look into storing relative poses for all objects instead of world
@@ -250,11 +303,11 @@ math::Pose Entity::GetRelativePose() const
   }
   else if (this->parent && this->parentEntity)
   {
-    return this->worldPose - this->parentEntity->GetWorldPose();
+    return this->WorldPose() - this->parentEntity->WorldPose();
   }
   else
   {
-    return this->worldPose;
+    return this->WorldPose();
   }
 }
 
@@ -262,8 +315,22 @@ math::Pose Entity::GetRelativePose() const
 void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
         bool _publish)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetRelativePose(_pose.Ign(), _notify, _publish);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void Entity::SetRelativePose(const ignition::math::Pose3d &_pose,
+    const bool _notify, const bool _publish)
+{
   if (this->parent && this->parentEntity)
-    this->SetWorldPose(_pose + this->parentEntity->GetWorldPose(), _notify,
+    this->SetWorldPose(_pose + this->parentEntity->WorldPose(), _notify,
                               _publish);
   else
     this->SetWorldPose(_pose, _notify, _publish);
@@ -272,6 +339,20 @@ void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
 //////////////////////////////////////////////////
 void Entity::SetWorldTwist(const math::Vector3 &_linear,
     const math::Vector3 &_angular, bool _updateChildren)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->SetWorldTwist(_linear.Ign(), _angular.Ign(), _updateChildren);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void Entity::SetWorldTwist(const ignition::math::Vector3d &_linear,
+    const ignition::math::Vector3d &_angular, const bool _updateChildren)
 {
   if (this->HasType(LINK) || this->HasType(MODEL))
   {
@@ -298,10 +379,11 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
-        bool _publish)
+void Entity::SetWorldPoseModel(
+    const ignition::math::Pose3d &_pose,
+    const bool _notify, const bool _publish)
 {
-  math::Pose oldModelWorldPose = this->worldPose;
+  ignition::math::Pose3d oldModelWorldPose = this->worldPose;
 
   // initialization: (no children?) set own worldPose
   this->worldPose = _pose;
@@ -332,6 +414,11 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
         else
         {
           entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
+
+          // Publish only for non-canonical links,
+          // since local pose of the canonical link does not change,
+          // so there is no need to keep telling everyone about it.
+          // The canonical link will automatically move as the model moves
           if (_publish)
             entity->PublishPose();
         }
@@ -349,6 +436,12 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
           {
             CollisionPtr entityC =
                 boost::static_pointer_cast<Collision>(*iterC);
+            entityC->SetWorldPoseDirty();
+          }
+          else if ((*iterC)->HasType(LIGHT))
+          {
+            LightPtr entityC =
+                boost::static_pointer_cast<Light>(*iterC);
             entityC->SetWorldPoseDirty();
           }
         }
@@ -369,14 +462,11 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
-        bool _publish)
+void Entity::SetWorldPoseCanonicalLink(
+    const ignition::math::Pose3d &_pose,
+    const bool _notify, const bool _publish)
 {
-  this->worldPose = _pose;
-  this->worldPose.Correct();
-
-  if (_notify)
-    this->UpdatePhysicsPose(true);
+  this->SetWorldPoseDefault(_pose, _notify, _publish);
 
   if (!this->parentEntity->HasType(MODEL))
   {
@@ -387,15 +477,15 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
   }
 
   EntityPtr parentEnt = this->parentEntity;
-  ignition::math::Pose3d relativePose = this->initialRelativePose.Ign();
-  math::Pose updatePose = _pose;
+  ignition::math::Pose3d relativePose = this->initialRelativePose;
+  ignition::math::Pose3d updatePose = _pose;
 
   // recursively update parent model pose based on new canonical link pose
   while (parentEnt && parentEnt->HasType(MODEL))
   {
     // setting parent Model world pose from canonical link world pose
     // where _pose is the canonical link's world pose
-    parentEnt->worldPose = math::Pose(-relativePose) + updatePose;
+    parentEnt->worldPose = ignition::math::Pose3d(-relativePose) + updatePose;
 
     parentEnt->worldPose.Correct();
 
@@ -406,34 +496,41 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
       this->parentEntity->PublishPose();
 
     updatePose = parentEnt->worldPose;
-    relativePose = parentEnt->GetInitialRelativePose().Ign();
+    relativePose = parentEnt->InitialRelativePose();
 
     parentEnt = boost::dynamic_pointer_cast<Entity>(parentEnt->GetParent());
-  }
-
-  // Tell collisions that their current world pose is dirty (needs
-  // updating). We set a dirty flag instead of directly updating the
-  // value to improve performance.
-  for (Base_V::iterator iterC = this->children.begin();
-      iterC != this->children.end(); ++iterC)
-  {
-    if ((*iterC)->HasType(COLLISION))
-    {
-      CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
-      entityC->SetWorldPoseDirty();
-    }
   }
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
-        bool /*_publish*/)
+void Entity::SetWorldPoseDefault(const ignition::math::Pose3d &_pose,
+    const bool _notify, const bool /*_publish*/)
 {
   this->worldPose = _pose;
   this->worldPose.Correct();
 
   if (_notify)
     this->UpdatePhysicsPose(true);
+
+  if (this->HasType(LINK))
+  {
+    // Tell collisions that their current world pose is dirty (needs
+    // updating). We set a dirty flag instead of directly updating the
+    // value to improve performance.
+    for (auto &childPtr : this->children)
+    {
+      if (childPtr->HasType(COLLISION))
+      {
+        CollisionPtr entityC = boost::static_pointer_cast<Collision>(childPtr);
+        entityC->SetWorldPoseDirty();
+      }
+      else if (childPtr->HasType(LIGHT))
+      {
+        LightPtr entityC = boost::static_pointer_cast<Light>(childPtr);
+        entityC->SetWorldPoseDirty();
+      }
+    }
+  }
 }
 
 
@@ -467,14 +564,28 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 //    MWP  - Model World Pose
 //    CBRP - Canonical Body Relative (to Model) Pose
 //
-void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
+void Entity::SetWorldPose(const ignition::math::Pose3d &_pose,
+    const bool _notify, const bool _publish)
 {
   {
-    boost::mutex::scoped_lock lock(*this->GetWorld()->GetSetWorldPoseMutex());
+    std::lock_guard<std::mutex> lock(this->GetWorld()->WorldPoseMutex());
     (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
   }
   if (_publish)
     this->PublishPose();
+}
+
+//////////////////////////////////////////////////
+void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetWorldPose(_pose.Ign(), _notify, _publish);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -509,10 +620,10 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
       {
         // update collision pose
         //   to model's world pose + it's intial relative pose
-        coll->worldPose.pos = this->worldPose.pos +
-          this->worldPose.rot.RotateVector(coll->initialRelativePose.pos);
-        coll->worldPose.rot = this->worldPose.rot *
-          coll->initialRelativePose.rot;
+        coll->worldPose.Pos() = this->worldPose.Pos() +
+          this->worldPose.Rot().RotateVector(coll->initialRelativePose.Pos());
+        coll->worldPose.Rot() = this->worldPose.Rot() *
+          coll->initialRelativePose.Rot();
         coll->OnPoseChange();
       }
       else
@@ -573,7 +684,7 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 void Entity::Fini()
 {
   // TODO: put this back in
-  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
+  // this->GetWorld()-Physics()->RemoveEntity(this);
 
   if (this->requestPub)
   {
@@ -618,12 +729,12 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Base::UpdateParameters(_sdf);
 
-  math::Pose parentPose;
+  ignition::math::Pose3d parentPose;
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
-  math::Pose newPose = _sdf->Get<math::Pose>("pose");
-  if (newPose != this->GetRelativePose())
+  ignition::math::Pose3d newPose = _sdf->Get<ignition::math::Pose3d>("pose");
+  if (newPose != this->RelativePose())
   {
     this->SetRelativePose(newPose);
   }
@@ -637,9 +748,9 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
   this->animation->AddTime((_info.simTime - this->prevAnimationTime).Double());
   this->animation->GetInterpolatedKeyFrame(kf);
 
-  math::Pose offset;
-  offset.pos = kf.Translation();
-  offset.rot = kf.Rotation();
+  ignition::math::Pose3d offset;
+  offset.Pos() = kf.Translation();
+  offset.Rot() = kf.Rotation();
 
   this->SetWorldPose(offset);
   this->prevAnimationTime = _info.simTime;
@@ -655,7 +766,20 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
 }
 
 //////////////////////////////////////////////////
-const math::Pose &Entity::GetDirtyPose() const
+const math::Pose Entity::GetDirtyPose() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->DirtyPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+const ignition::math::Pose3d &Entity::DirtyPose() const
 {
   return this->dirtyPose;
 }
@@ -663,21 +787,34 @@ const math::Pose &Entity::GetDirtyPose() const
 //////////////////////////////////////////////////
 math::Box Entity::GetCollisionBoundingBox() const
 {
-  BasePtr base = boost::const_pointer_cast<Base>(shared_from_this()); return
-  this->GetCollisionBoundingBoxHelper(base);
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->CollisionBoundingBox();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
-math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
+ignition::math::Box Entity::CollisionBoundingBox() const
+{
+  BasePtr base = boost::const_pointer_cast<Base>(shared_from_this());
+  return this->CollisionBoundingBoxHelper(base);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Box Entity::CollisionBoundingBoxHelper(BasePtr _base) const
 {
   if (_base->HasType(COLLISION))
-    return boost::dynamic_pointer_cast<Collision>(_base)->GetBoundingBox();
+    return boost::dynamic_pointer_cast<Collision>(_base)->BoundingBox();
 
-  math::Box box;
+  ignition::math::Box box;
 
   for (unsigned int i = 0; i < _base->GetChildCount(); i++)
   {
-    box += this->GetCollisionBoundingBoxHelper(_base->GetChild(i));
+    box += this->CollisionBoundingBoxHelper(_base->GetChild(i));
   }
 
   return box;
@@ -686,12 +823,12 @@ math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
 //////////////////////////////////////////////////
 void Entity::PlaceOnEntity(const std::string &_entityName)
 {
-  EntityPtr onEntity = this->GetWorld()->GetEntity(_entityName);
-  math::Box box = this->GetCollisionBoundingBox();
-  math::Box onBox = onEntity->GetCollisionBoundingBox();
+  EntityPtr onEntity = this->GetWorld()->EntityByName(_entityName);
+  ignition::math::Box box = this->CollisionBoundingBox();
+  ignition::math::Box onBox = onEntity->CollisionBoundingBox();
 
-  math::Pose p = onEntity->GetWorldPose();
-  p.pos.z = onBox.max.z + box.GetZLength()*0.5;
+  ignition::math::Pose3d p = onEntity->WorldPose();
+  p.Pos().Z() = onBox.Max().Z() + box.ZLength()*0.5;
   this->SetWorldPose(p);
 }
 
@@ -699,15 +836,15 @@ void Entity::PlaceOnEntity(const std::string &_entityName)
 void Entity::GetNearestEntityBelow(double &_distBelow,
                                    std::string &_entityName)
 {
-  this->GetWorld()->GetPhysicsEngine()->InitForThread();
+  this->GetWorld()->Physics()->InitForThread();
   RayShapePtr rayShape = boost::dynamic_pointer_cast<RayShape>(
-    this->GetWorld()->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+    this->GetWorld()->Physics()->CreateShape("ray", CollisionPtr()));
 
-  math::Box box = this->GetCollisionBoundingBox();
-  math::Vector3 start = this->GetWorldPose().pos;
-  math::Vector3 end = start;
-  start.z = box.min.z - 0.00001;
-  end.z -= 1000;
+  ignition::math::Box box = this->CollisionBoundingBox();
+  ignition::math::Vector3d start = this->WorldPose().Pos();
+  ignition::math::Vector3d end = start;
+  start.Z() = box.Min().Z() - 0.00001;
+  end.Z() -= 1000;
   rayShape->SetPoints(start, end);
   rayShape->GetIntersection(_distBelow, _entityName);
   _distBelow += 0.00001;
@@ -721,8 +858,160 @@ void Entity::PlaceOnNearestEntityBelow()
   this->GetNearestEntityBelow(dist, entityName);
   if (dist > 0.0)
   {
-    math::Pose p = this->GetWorldPose();
-    p.pos.z -= dist;
+    ignition::math::Pose3d p = this->WorldPose();
+    p.Pos().Z() -= dist;
     this->SetWorldPose(p);
   }
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetRelativeLinearVel() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->RelativeLinearVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::RelativeLinearVel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetWorldLinearVel() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldLinearVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::WorldLinearVel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetRelativeAngularVel() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->RelativeAngularVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::RelativeAngularVel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetWorldAngularVel() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldAngularVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::WorldAngularVel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetRelativeLinearAccel() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->RelativeLinearAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::RelativeLinearAccel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetWorldLinearAccel() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldLinearAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::WorldLinearAccel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetRelativeAngularAccel() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->RelativeAngularAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::RelativeAngularAccel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetWorldAngularAccel() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldAngularAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::WorldAngularAccel() const
+{
+  return ignition::math::Vector3d::Zero;
 }

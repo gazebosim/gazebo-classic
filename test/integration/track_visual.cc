@@ -63,19 +63,19 @@ void TrackVisualTest::TrackVisual()
   // Get box model visual
   auto boxModelVis = scene->GetVisual("box");
   QVERIFY(boxModelVis != NULL);
-  auto boxModelVisPose = boxModelVis->GetPose().Ign();
+  auto boxModelVisPose = boxModelVis->Pose();
 
   // Get tracked model visual
   auto trackedModelVis = cam->TrackedVisual();
   QVERIFY(trackedModelVis == boxModelVis);
 
   // Get box model
-  auto boxModel = world->GetModel("box");
+  auto boxModel = world->ModelByName("box");
   QVERIFY(boxModel != NULL);
-  QVERIFY(boxModel->GetWorldPose().Ign() == boxModelVisPose);
+  QVERIFY(boxModel->WorldPose() == boxModelVisPose);
 
   // Get box model pose
-  auto boxModelPose = boxModel->GetWorldPose();
+  auto boxModelPose = boxModel->WorldPose();
   QVERIFY(boxModelPose == ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
 
   // Check that camera's position is static when tracking a model
@@ -117,7 +117,7 @@ void TrackVisualTest::TrackVisual()
   QVERIFY(false == cam->TrackUseModelFrame());
   cam->SetTrackInheritYaw(false);
   QVERIFY(false == cam->TrackInheritYaw());
-  auto camPosition = ignition::math::Vector3d(0, 0, 0);
+  auto camPosition = ignition::math::Vector3d::Zero;
   cam->SetTrackPosition(camPosition);
   QVERIFY(camPosition == cam->TrackPosition());
   double minDistance = 1;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Update();
 
-      /// \brief ODE collsion mesh helper class.
+      /// \brief ODE collision mesh helper class.
       private: ODEMesh *odeMesh;
     };
     /// \}

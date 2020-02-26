@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,11 +57,17 @@ void help()
   << "                                (zlib|bz2|txt).\n"
   << "  --record_path arg             Absolute path in which to store "
   << "state data.\n"
+  << "  --record_period arg (=-1)     Recording period (seconds).\n"
+  << "  --record_filter arg           Recording filter (supports wildcard and "
+  << "regular expression).\n"
+  << "  --record_resources           Recording with model meshes and "
+  << "materials.\n"
   << "  --seed arg                    Start with a given random number seed.\n"
   << "  --iters arg                   Number of iterations to simulate.\n"
   << "  --minimal_comms               Reduce the TCP/IP traffic output by "
   <<                                  "gazebo.\n"
-  << "  -g [ --gui-plugin ] arg       Load a GUI plugin.\n"
+  << "  -g [ --gui-plugin ] arg       Load a System plugin (deprecated)\n"
+  << "  --gui-client-plugin arg       Load a GUI plugin.\n"
   << "  -s [ --server-plugin ] arg    Load a server plugin.\n"
   << "  -o [ --profile ] arg          Physics preset profile name from the "
   << "options in\n"

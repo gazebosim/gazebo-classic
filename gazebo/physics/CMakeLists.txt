@@ -162,6 +162,7 @@ target_link_libraries(gazebo_physics
   gazebo_ode
   gazebo_opcode
   ${Boost_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
 )
 
 # Link in Bullet support if present
@@ -185,7 +186,7 @@ if (HAVE_GDAL)
 endif()
 
 if (USE_PCH)
-  add_pch(gazebo_physics physics_pch.hh)
+  add_pch(gazebo_physics physics_pch.hh ${Boost_PKGCONFIG_CFLAGS} "-I${TBB_INCLUDEDIR}")
 endif()
 
 gz_install_library(gazebo_physics)

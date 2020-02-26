@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2012-2016 Open Source Robotics Foundation
+* Copyright (C) 2012 Open Source Robotics Foundation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -255,8 +255,13 @@ bool AudioDecoder::SetFile(const std::string &_filename)
     return false;
   }
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(56, 60, 100)
+  if (this->codec->capabilities & AV_CODEC_CAP_TRUNCATED)
+    this->codecCtx->flags |= AV_CODEC_FLAG_TRUNCATED;
+#else
   if (this->codec->capabilities & CODEC_CAP_TRUNCATED)
     this->codecCtx->flags |= CODEC_FLAG_TRUNCATED;
+#endif
 
   // Open codec
   if (avcodec_open2(this->codecCtx, this->codec, nullptr) < 0)

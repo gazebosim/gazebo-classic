@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Dynamic line generator
- * Author: Nate Koenig
- * Date: 28 June 2007
- */
-
-#ifndef DYNAMICLINES_HH
-#define DYNAMICLINES_HH
+#ifndef GAZEBO_RENDERING_DYNAMICLINES_HH
+#define GAZEBO_RENDERING_DYNAMICLINES_HH
 
 #include <vector>
 #include <string>
@@ -43,7 +38,8 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _opType The type of Line
-      public: DynamicLines(RenderOpType _opType = RENDERING_LINE_STRIP);
+      public: explicit DynamicLines(
+                  RenderOpType _opType = RENDERING_LINE_STRIP);
 
       /// \brief Destructor
       public: virtual ~DynamicLines();
@@ -84,9 +80,9 @@ namespace gazebo
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return
       /// \return ignition::math::Vector3d value of the point. A vector of
-      /// [IGN_DBL_INF, IGN_DBL_INF, IGN_DBL_INF] is returned when then the
-      /// _index is out of bounds.
-      /// IGN_DBL_INF==std::numeric_limits<double>::infinity()
+      /// [ignition::math::INF_D, ignition::math::INF_D, ignition::math::INF_D]
+      /// is returned when then the _index is out of bounds.
+      /// ignition::math::INF_D==std::numeric_limits<double>::infinity()
       public: ignition::math::Vector3d Point(const unsigned int _index) const;
 
       /// \brief Return the total number of points in the point list

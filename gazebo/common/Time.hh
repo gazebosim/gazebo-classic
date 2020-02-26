@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,6 +94,12 @@ namespace gazebo
 
       /// \brief Destructor
       public: virtual ~Time();
+
+      /// \brief Get a Time object that represents the maximum amount of time
+      /// that this class can represent.
+      /// \return The largest duration of time that can be represented by this
+      /// data structure. This is approximately 68 years.
+      public: static Time Maximum();
 
       /// \brief Get the wall time
       /// \return the current time

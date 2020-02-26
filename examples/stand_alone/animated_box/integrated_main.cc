@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,27 +60,37 @@ int main(int _argc, char **_argv)
     str = _argv[1];
   }
 
-  // load gazebo server
-  gazebo::setupServer(_argc, _argv);
-
-  // Load a world
-  gazebo::physics::WorldPtr world = gazebo::loadWorld(str);
-
-  // Create our node for communication
-  gazebo::transport::NodePtr node(new gazebo::transport::Node());
-  node->Init();
-
-  // Listen to Gazebo pose information topic
-  gazebo::transport::SubscriberPtr sub =
-  node->Subscribe("~/pose/info", posesStampedCallback);
-
-  // Busy wait loop...replace with your own code as needed.
-  while (true)
+  try
   {
-    // Run simulation for 100 steps.
-    gazebo::runWorld(world, 100);
+    // load gazebo server
+    gazebo::setupServer(_argc, _argv);
+
+    // Load a world
+    gazebo::physics::WorldPtr world = gazebo::loadWorld(str);
+
+    // Create our node for communication
+    gazebo::transport::NodePtr node(new gazebo::transport::Node());
+    node->Init();
+
+    // Listen to Gazebo pose information topic
+    gazebo::transport::SubscriberPtr sub =
+    node->Subscribe("~/pose/info", posesStampedCallback);
+
+    // Busy wait loop...replace with your own code as needed.
+    while (true)
+    {
+      // Run simulation for 100 steps.
+      gazebo::runWorld(world, 100);
+    }
+
+    // Make sure to shut everything down.
+    gazebo::shutdown();
+  }
+  catch(gazebo::common::Exception &e)
+  {
+    std::cerr << "ERROR: " << e << std::endl;
+    return 1;
   }
 
-  // Make sure to shut everything down.
-  gazebo::shutdown();
+  return 0;
 }

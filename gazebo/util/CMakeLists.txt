@@ -8,7 +8,8 @@ endif()
 
 include_directories(${TBB_INCLUDEDIR}
                     ${tinyxml_INCLUDE_DIRS}
-                    ${tinyxml2_INCLUDE_DIRS})
+                    ${tinyxml2_INCLUDE_DIRS}
+                    ${IGNITION-TRANSPORT_INCLUDE_DIRS})
 
 link_directories(${tinyxml2_LIBRARY_DIRS} ${IGNITION-MSGS_LIBRARY_DIRS})
 
@@ -67,6 +68,11 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/util.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/util.hh )
 
+
+if (WIN32)
+  add_definitions(-DBUILDING_DLL)
+endif()
+
 gz_add_library(gazebo_util ${sources})
 
 add_dependencies(gazebo_util
@@ -82,6 +88,20 @@ target_link_libraries(gazebo_util
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES}
 )
+
+# define if tinxml2 major version >= 6
+# https://bitbucket.org/ignitionrobotics/ign-common/issues/28
+if (NOT tinyxml2_VERSION VERSION_LESS "6.0.0")
+  message(STATUS "tinyxml2_VERSION ${tinyxml2_VERSION} >= 6.0.0")
+  target_compile_definitions(gazebo_util
+    PRIVATE "TINYXML2_MAJOR_VERSION_GE_6")
+endif()
+
+if (WIN32)
+  include_directories(IGNITION-MSGS_INCLUDE_DIR)
+  set_target_properties(gazebo_util PROPERTIES COMPILE_FLAGS "/FIignition/msgs/System.hh")
+endif()
+
 
 gz_install_library(gazebo_util)
 gz_install_includes("util" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/util.hh)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
+#include <ignition/math/Helpers.hh>
 #include <sdf/sdf.hh>
 
 #ifndef _WIN32
@@ -39,6 +41,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/VideoEncoder.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -98,7 +101,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   // Connect to the render signal
   this->connections.push_back(
-      event::Events::ConnectPostRender(std::bind(&Camera::Update, this)));
+      event::Events::ConnectPreRender(std::bind(&Camera::Update, this)));
 
   if (_autoRender)
   {
@@ -215,6 +218,8 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  this->dataPtr->videoEncoder.Reset();
+
   if (this->saveFrameBuffer)
     delete [] this->saveFrameBuffer;
   this->saveFrameBuffer = NULL;
@@ -309,7 +314,7 @@ void Camera::Update()
       msg.ParseFromString((*iter).data());
       bool result = false;
 
-      if (msg.id() < GZ_UINT32_MAX)
+      if (msg.id() < ignition::math::MAX_UI32)
         result = this->AttachToVisualImpl(msg.id(),
             msg.inherit_orientation(), msg.min_dist(), msg.max_dist());
       else
@@ -362,43 +367,16 @@ void Camera::Update()
   }
   else if (this->dataPtr->trackedVisual)
   {
+    double scaling = 0;
     ignition::math::Vector3d direction =
-      this->dataPtr->trackedVisual->GetWorldPose().pos.Ign() -
-                              this->WorldPose().Pos();
+      this->dataPtr->trackedVisual->WorldPose().Pos() - this->WorldPose().Pos();
 
-    double yaw = atan2(direction.Y(), direction.X());
-    double pitch = atan2(-direction.Z(),
-                         sqrt(pow(direction.X(), 2) + pow(direction.Y(), 2)));
-
-    Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
-    ignition::math::Quaterniond localRot = ignition::math::Quaterniond(
-      localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
-    double currPitch = localRot.Euler().Y();
-    double currYaw = localRot.Euler().Z();
-
-    double pitchError = currPitch - pitch;
-
-    double yawError = currYaw - yaw;
-    if (yawError > M_PI)
-      yawError -= M_PI*2;
-    if (yawError < -M_PI)
-      yawError += M_PI*2;
-
-    double pitchAdj = this->dataPtr->trackVisualPitchPID.Update(
-        pitchError, 0.01);
-    double yawAdj = this->dataPtr->trackVisualYawPID.Update(
-        yawError, 0.01);
-
-    this->SetWorldRotation(ignition::math::Quaterniond(0, currPitch + pitchAdj,
-          currYaw + yawAdj));
-
-    double error = 0.0;
     if (!this->dataPtr->trackIsStatic)
     {
       if (direction.Length() < this->dataPtr->trackMinDistance)
-        error = this->dataPtr->trackMinDistance - direction.Length();
+        scaling = direction.Length() - this->dataPtr->trackMinDistance;
       else if (direction.Length() > this->dataPtr->trackMaxDistance)
-        error = this->dataPtr->trackMaxDistance - direction.Length();
+        scaling = direction.Length() - this->dataPtr->trackMaxDistance;
     }
     else
     {
@@ -406,8 +384,8 @@ void Camera::Update()
       {
         if (this->dataPtr->trackInheritYaw)
         {
-          yaw =
-              this->dataPtr->trackedVisual->GetWorldPose().Ign().Rot().Yaw();
+          double yaw =
+              this->dataPtr->trackedVisual->WorldPose().Rot().Yaw();
           ignition::math::Quaterniond rot =
               ignition::math::Quaterniond(0.0, 0.0, yaw);
           direction += rot.RotateVector(this->dataPtr->trackPos);
@@ -421,10 +399,9 @@ void Camera::Update()
       {
         direction = this->dataPtr->trackPos - this->WorldPose().Pos();
       }
-      error = -direction.Length();
-    }
 
-    double scaling = this->dataPtr->trackVisualPID.Update(error, 0.3);
+      scaling = direction.Length();
+    }
 
     ignition::math::Vector3d displacement = direction;
     displacement.Normalize();
@@ -462,7 +439,8 @@ void Camera::RenderImpl()
 //////////////////////////////////////////////////
 void Camera::ReadPixelBuffer()
 {
-  if (this->newData && (this->captureData || this->captureDataOnce))
+  if (this->newData && (this->captureData || this->captureDataOnce ||
+      this->dataPtr->videoEncoder.IsEncoding()))
   {
     size_t size;
     unsigned int width = this->ImageWidth();
@@ -544,12 +522,21 @@ void Camera::PostRender()
   if (this->newData)
     this->lastRenderWallTime = common::Time::GetWallTime();
 
-  if (this->newData && (this->captureData || this->captureDataOnce))
+  if (this->newData && (this->captureData || this->captureDataOnce ||
+      this->dataPtr->videoEncoder.IsEncoding()))
   {
+    unsigned int width = this->ImageWidth();
+    unsigned int height = this->ImageHeight();
+    const unsigned char *buffer = this->saveFrameBuffer;
+
     if (this->captureDataOnce)
     {
       this->SaveFrame(this->FrameFilename());
       this->captureDataOnce = false;
+    }
+    else if (this->dataPtr->videoEncoder.IsEncoding())
+    {
+      this->dataPtr->videoEncoder.AddFrame(buffer, width, height);
     }
 
     if (this->sdf->HasElement("save") &&
@@ -557,10 +544,6 @@ void Camera::PostRender()
     {
       this->SaveFrame(this->FrameFilename());
     }
-
-    unsigned int width = this->ImageWidth();
-    unsigned int height = this->ImageHeight();
-    const unsigned char *buffer = this->saveFrameBuffer;
 
     // do last minute conversion if Bayer pattern is requested, go from R8G8B8
     if ((this->ImageFormat() == "BAYER_RGGB8") ||
@@ -601,8 +584,14 @@ ignition::math::Quaterniond Camera::WorldRotation() const
 //////////////////////////////////////////////////
 void Camera::SetWorldPose(const math::Pose &_pose)
 {
-  this->SetWorldPosition(_pose.pos.Ign());
-  this->SetWorldRotation(_pose.rot.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetWorldPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -704,6 +693,15 @@ void Camera::SetClipDist(const float _near, const float _far)
 }
 
 //////////////////////////////////////////////////
+void Camera::SetFixedYawAxis(const bool _useFixed,
+    const ignition::math::Vector3d &_fixedAxis)
+{
+  this->camera->setFixedYawAxis(_useFixed, Conversions::Convert(_fixedAxis));
+  this->dataPtr->yawFixed = _useFixed;
+  this->dataPtr->yawFixedAxis = _fixedAxis;
+}
+
+//////////////////////////////////////////////////
 void Camera::SetHFOV(const ignition::math::Angle &_angle)
 {
   this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
@@ -783,10 +781,15 @@ unsigned int Camera::ImageDepth() const
 
   if (imgFmt == "L8" || imgFmt == "L_INT8")
     return 1;
+  else if (imgFmt == "L16" || imgFmt == "L_INT16" || imgFmt == "L_UINT16")
+    return 2;
   else if (imgFmt == "R8G8B8" || imgFmt == "RGB_INT8")
     return 3;
   else if (imgFmt == "B8G8R8" || imgFmt == "BGR_INT8")
     return 3;
+  else if (imgFmt == "R16G16B16" || imgFmt == "RGB_INT16"
+      || imgFmt == "RGB_UINT16")
+    return 6;
   else if ((imgFmt == "BAYER_RGGB8") || (imgFmt == "BAYER_BGGR8") ||
             (imgFmt == "BAYER_GBRG8") || (imgFmt == "BAYER_GRBG8"))
     return 1;
@@ -796,6 +799,14 @@ unsigned int Camera::ImageDepth() const
           << imgFmt << "), using default Ogre::PF_R8G8B8\n";
     return 3;
   }
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::ImageMemorySize() const
+{
+  return  Ogre::PixelUtil::getMemorySize(this->ImageWidth(),
+      this->ImageHeight(), 1, static_cast<Ogre::PixelFormat>(
+      this->imageFormat));
 }
 
 //////////////////////////////////////////////////
@@ -843,6 +854,8 @@ int Camera::OgrePixelFormat(const std::string &_format)
 
   if (_format == "L8" || _format == "L_INT8")
     result = static_cast<int>(Ogre::PF_L8);
+  else if (_format == "L16" || _format == "L_INT16" || _format == "L_UINT16")
+    result = static_cast<int>(Ogre::PF_L16);
   else if (_format == "R8G8B8" || _format == "RGB_INT8")
     result = static_cast<int>(Ogre::PF_BYTE_RGB);
   else if (_format == "B8G8R8" || _format == "BGR_INT8")
@@ -851,6 +864,9 @@ int Camera::OgrePixelFormat(const std::string &_format)
     result = static_cast<int>(Ogre::PF_FLOAT32_R);
   else if (_format == "FLOAT16")
     result = static_cast<int>(Ogre::PF_FLOAT16_R);
+  else if (_format == "R16G16B16" || _format == "RGB_INT16"
+      || _format == "RGB_UINT16")
+    result = static_cast<int>(Ogre::PF_SHORT_RGB);
   else if ((_format == "BAYER_RGGB8") ||
             (_format == "BAYER_BGGR8") ||
             (_format == "BAYER_GBRG8") ||
@@ -1282,9 +1298,47 @@ void Camera::SetCaptureDataOnce()
 }
 
 //////////////////////////////////////////////////
+bool Camera::StartVideo(const std::string &_format,
+                        const std::string &_filename)
+{
+  return this->dataPtr->videoEncoder.Start(_format, _filename,
+      this->ImageWidth(), this->ImageHeight());
+}
+
+//////////////////////////////////////////////////
+bool Camera::StopVideo()
+{
+  return this->dataPtr->videoEncoder.Stop();
+}
+
+//////////////////////////////////////////////////
+bool Camera::SaveVideo(const std::string &_filename)
+{
+  // This will stop video encoding, save the video file, and reset
+  // video encoding.
+  return this->dataPtr->videoEncoder.SaveToFile(_filename);
+}
+
+//////////////////////////////////////////////////
+bool Camera::ResetVideo()
+{
+  this->dataPtr->videoEncoder.Reset();
+  return true;
+}
+
+//////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &_textureName)
 {
-  int fsaa = 4;
+  unsigned int fsaa = 0;
+
+  std::vector<unsigned int> fsaaLevels =
+      RenderEngine::Instance()->FSAALevels();
+
+  // check if target fsaa is supported
+  unsigned int targetFSAA = 4;
+  auto const it = std::find(fsaaLevels.begin(), fsaaLevels.end(), targetFSAA);
+  if (it != fsaaLevels.end())
+    fsaa = targetFSAA;
 
   // Full-screen anti-aliasing only works correctly in 1.8 and above
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
@@ -1299,7 +1353,7 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       this->ImageWidth(),
       this->ImageHeight(),
       0,
-      (Ogre::PixelFormat)this->imageFormat,
+      static_cast<Ogre::PixelFormat>(this->imageFormat),
       Ogre::TU_RENDERTARGET,
       0,
       false,
@@ -1325,7 +1379,7 @@ void Camera::CreateCamera()
   if (this->sdf->HasElement("projection_type"))
     this->SetProjectionType(this->sdf->Get<std::string>("projection_type"));
 
-  this->camera->setFixedYawAxis(false);
+  this->SetFixedYawAxis(false);
   this->camera->yaw(Ogre::Degree(-90.0));
   this->camera->roll(Ogre::Degree(-90.0));
 }
@@ -1374,14 +1428,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
-    double ratio = static_cast<double>(this->viewport->getActualWidth()) /
-                   static_cast<double>(this->viewport->getActualHeight());
-
-    double hfov = this->HFOV().Radian();
-    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-
-    this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
+    this->UpdateFOV();
 
     // Setup Deferred rendering for the camera
     if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
@@ -1465,7 +1512,7 @@ void Camera::AttachToVisual(const std::string &_visualName,
   else
   {
     gzerr << "Unable to attach to visual with name[" << _visualName << "]\n";
-    track.set_id(GZ_UINT32_MAX);
+    track.set_id(ignition::math::MAX_UI32);
   }
 
   track.set_name(_visualName);
@@ -1534,9 +1581,16 @@ bool Camera::TrackVisualImpl(const std::string &_name)
 {
   VisualPtr visual = this->scene->GetVisual(_name);
   if (visual)
+  {
     return this->TrackVisualImpl(visual);
+  }
   else
+  {
+    this->camera->setAutoTracking(false);
     this->dataPtr->trackedVisual.reset();
+    this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
+        Conversions::Convert(this->dataPtr->yawFixedAxis));
+  }
 
   if (_name.empty())
     return true;
@@ -1547,22 +1601,21 @@ bool Camera::TrackVisualImpl(const std::string &_name)
 //////////////////////////////////////////////////
 bool Camera::TrackVisualImpl(VisualPtr _visual)
 {
-  // if (this->sceneNode->getParent())
-  //  this->sceneNode->getParent()->removeChild(this->sceneNode);
-
   bool result = false;
   if (_visual)
   {
-    this->dataPtr->trackVisualPID.Init(0.25, 0, 0, 0, 0, 1.0, 0.0);
-    this->dataPtr->trackVisualPitchPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
-    this->dataPtr->trackVisualYawPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
-
     this->dataPtr->trackedVisual = _visual;
+    this->camera->setAutoTracking(true, _visual->GetSceneNode());
+    this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+
     result = true;
   }
   else
   {
+    this->camera->setAutoTracking(false);
     this->dataPtr->trackedVisual.reset();
+    this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
+        Conversions::Convert(this->dataPtr->yawFixedAxis));
   }
 
   return result;
@@ -1585,7 +1638,7 @@ bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)
   {
-    ignition::math::Box bbox = _visual->GetBoundingBox().Ign();
+    ignition::math::Box bbox = _visual->BoundingBox();
     Ogre::AxisAlignedBox box;
     box.setMinimum(bbox.Min().X(), bbox.Min().Y(), bbox.Min().Z());
     box.setMaximum(bbox.Max().X(), bbox.Max().Y(), bbox.Max().Z());
@@ -1794,14 +1847,11 @@ void Camera::UpdateFOV()
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
       static_cast<double>(this->viewport->getActualHeight());
 
-    double hfov = this->sdf->Get<double>("horizontal_fov");
+    double hfov = this->HFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
-
-    delete [] this->saveFrameBuffer;
-    this->saveFrameBuffer = NULL;
   }
 }
 
@@ -1859,6 +1909,17 @@ std::string Camera::ProjectionType() const
   {
     return "perspective";
   }
+}
+
+//////////////////////////////////////////////////
+bool Camera::SetBackgroundColor(const common::Color &_color)
+{
+  if (this->OgreViewport())
+  {
+    this->OgreViewport()->setBackgroundColour(Conversions::Convert(_color));
+    return true;
+  }
+  return false;
 }
 
 //////////////////////////////////////////////////

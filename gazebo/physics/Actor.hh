@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,6 +139,12 @@ namespace gazebo
       /// \sa ResetCustomTrajectory, SetScriptTime
       public: void SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo);
 
+      /// \brief Get the custom trajectory.
+      /// \return The custom trajectory or Null if SetCustomTrajectory has
+      /// never been called.
+      /// \sa ResetCustomTrajectory, SetCustomTrajectory
+      public: TrajectoryInfoPtr CustomTrajectory() const;
+
       /// \brief Reset custom trajectory of the actor.
       /// \sa SetCustomTrajectory
       public: void ResetCustomTrajectory();
@@ -167,7 +173,7 @@ namespace gazebo
       /// \param [in] _enabled Whether this is affected by wind, will be
       /// false for actors regardless of the input.
       /// \sa GetWindMode()
-      public: virtual void SetWindMode(bool _enabled);
+      public: virtual void SetWindMode(const bool _enabled);
 
       /// \brief Add inertia for a sphere.
       /// \param[in] _linkSdf The link to add the inertia to.
@@ -183,10 +189,22 @@ namespace gazebo
       /// \param[in] _name Name of the collision object.
       /// \param[in] _pose Pose of the collision object.
       /// \param[in] _radius Radius of the collision object.
+      /// \deprecated This function is no longer used, consider removing it
       private: void AddSphereCollision(const sdf::ElementPtr &_linkSdf,
                    const std::string &_name,
                    const ignition::math::Pose3d &_pose,
                    const double _radius);
+
+      /// \brief Add a box collision object.
+      /// \param[in] _linkSdf Link to add the collision to.
+      /// \param[in] _name Name of the collision object.
+      /// \param[in] _pose Pose of the collision object.
+      /// \param[in] _size Dimensions of the collison object.
+      /// \deprecated This function is no longer used, consider removing it
+      private: void AddBoxCollision(const sdf::ElementPtr &_linkSdf,
+                   const std::string &_name,
+                   const ignition::math::Pose3d &_pose,
+                   const ignition::math::Vector3d &_size);
 
       /// \brief Add a spherical visual object.
       /// \param[in] _linkSdf Link to add the visual to.

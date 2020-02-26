@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,8 +83,8 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
       if (linkElem->HasElement("center_of_volume"))
       {
-        math::Vector3 cov =
-            linkElem->GetElement("center_of_volume")->Get<math::Vector3>();
+        ignition::math::Vector3d cov = linkElem->GetElement("center_of_volume")
+            ->Get<ignition::math::Vector3d>();
         this->volPropsMap[id].cov = cov;
       }
       else
@@ -125,7 +125,7 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     if (this->volPropsMap.find(id) == this->volPropsMap.end())
     {
       double volumeSum = 0;
-      math::Vector3 weightedPosSum = math::Vector3::Zero;
+      ignition::math::Vector3d weightedPosSum = ignition::math::Vector3d::Zero;
 
       // The center of volume of the link is a weighted average over the pose
       // of each collision shape, where the weight is the volume of the shape
@@ -133,11 +133,11 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       {
         double volume = collision->GetShape()->ComputeVolume();
         volumeSum += volume;
-        weightedPosSum += volume*collision->GetWorldPose().pos;
+        weightedPosSum += volume*collision->WorldPose().Pos();
       }
       // Subtract the center of volume into the link frame.
       this->volPropsMap[id].cov =
-          weightedPosSum/volumeSum - link->GetWorldPose().pos;
+          weightedPosSum/volumeSum - link->WorldPose().Pos();
       this->volPropsMap[id].volume = volumeSum;
     }
   }
@@ -163,13 +163,13 @@ void BuoyancyPlugin::OnUpdate()
     // buoyancy = -(mass*gravity)*fluid_density/object_density
     // object_density = mass/volume, so the mass term cancels.
     // Therefore,
-    math::Vector3 buoyancy =
+    ignition::math::Vector3d buoyancy =
         -this->fluidDensity * volume * this->model->GetWorld()->Gravity();
 
-    math::Pose linkFrame = link->GetWorldPose();
+    ignition::math::Pose3d linkFrame = link->WorldPose();
     // rotate buoyancy into the link frame before applying the force.
-    math::Vector3 buoyancyLinkFrame =
-        linkFrame.rot.GetInverse().RotateVector(buoyancy);
+    ignition::math::Vector3d buoyancyLinkFrame =
+        linkFrame.Rot().Inverse().RotateVector(buoyancy);
 
     link->AddLinkForce(buoyancyLinkFrame, volumeProperties.cov);
   }

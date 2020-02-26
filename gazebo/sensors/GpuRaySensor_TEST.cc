@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #include <functional>
 #include <gtest/gtest.h>
 #include <ignition/math/Angle.hh>
+#include <ignition/math/Helpers.hh>
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -99,7 +100,7 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   // Check that all the range values
   for (unsigned int i = 0; i < ranges.size(); ++i)
   {
-    EXPECT_DOUBLE_EQ(ranges[i], GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(ranges[i], ignition::math::INF_D);
     EXPECT_DOUBLE_EQ(sensor->Range(i), ranges[i]);
     EXPECT_NEAR(sensor->Retro(i), 0, 1e-6);
     EXPECT_EQ(sensor->Fiducial(i), -1);

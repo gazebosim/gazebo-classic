@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ MainWindow::MainWindow()
   }
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
   gui::set_world(this->dataPtr->node->GetTopicNamespace());
 
   QWidget *mainWidget = new QWidget;
@@ -125,6 +125,8 @@ MainWindow::MainWindow()
   this->dataPtr->toolsWidget = new ToolsWidget();
 
   this->dataPtr->renderWidget = new gui::RenderWidget(mainWidget);
+  // don't call RenderWidget::Init() yet, as some GUI plugins loaded from
+  // there may need the main window to be finalised already.
 
   this->CreateEditors();
 
@@ -287,6 +289,8 @@ void MainWindow::Load()
 /////////////////////////////////////////////////
 void MainWindow::Init()
 {
+  this->RenderWidget()->Init();
+
   // Get the size properties from the INI file.
   int winWidth = getINIProperty<int>("geometry.width", -1);
   int winHeight = getINIProperty<int>("geometry.height", -1);
@@ -378,6 +382,24 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->dataPtr->tabWidget->hide();
   this->dataPtr->toolsWidget->hide();
 
+  this->dataPtr->responseSub.reset();
+  this->dataPtr->guiSub.reset();
+  this->dataPtr->newEntitySub.reset();
+  this->dataPtr->worldModSub.reset();
+  this->dataPtr->lightModifySub.reset();
+  this->dataPtr->lightFactorySub.reset();
+  this->dataPtr->worldControlPub.reset();
+  this->dataPtr->serverControlPub.reset();
+  this->dataPtr->requestPub.reset();
+  this->dataPtr->scenePub.reset();
+  this->dataPtr->userCmdPub.reset();
+
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->pluginMsgs.clear();
+
+  this->dataPtr->node.reset();
+
   this->dataPtr->connections.clear();
 
 #ifdef HAVE_OCULUS
@@ -394,8 +416,6 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->dataPtr->spacenav = nullptr;
 
   emit Close();
-
-  gazebo::client::shutdown();
 }
 
 /////////////////////////////////////////////////
@@ -1406,7 +1426,7 @@ void MainWindow::CreateActions()
       tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
-  g_dataLoggerAct->setToolTip(tr("Log Data (Ctrl+D)"));
+  g_dataLoggerAct->setToolTip(tr("Log data (Ctrl+D)"));
   g_dataLoggerAct->setCheckable(true);
   g_dataLoggerAct->setChecked(false);
   this->connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
@@ -1636,6 +1656,15 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 
   this->dataPtr->menuLayout->addStretch(5);
   this->dataPtr->menuLayout->setContentsMargins(0, 0, 0, 0);
+
+  // OSX:
+  // There is a problem on osx with the qt5 menubar being out of focus when
+  // the application is launched from a terminal, so prevent using a native
+  // menubar for now.
+  //
+  // Ubuntu Xenial + Unity:
+  // The native menubar is not registering shortcuts (issue #2134)
+  this->dataPtr->menuBar->setNativeMenuBar(false);
 }
 
 /////////////////////////////////////////////////
@@ -1890,7 +1919,6 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_overlayAct);
   windowMenu->addAction(g_showToolbarsAct);
   windowMenu->addAction(g_fullScreenAct);
-
   windowMenu->addAction(g_plotAct);
 
   bar->addSeparator();
@@ -1979,7 +2007,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
       ignition::math::Pose3d cam_pose(cam_pose_pos, cam_pose_rot);
 
-      cam->SetDefaultPose(cam_pose);
+      cam->SetInitialPose(cam_pose);
       cam->SetUseSDFPose(true);
     }
 

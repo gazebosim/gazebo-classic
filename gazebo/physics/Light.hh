@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,17 @@ namespace gazebo
 
       /// \brief Light message container.
       private: msgs::Light msg;
+
+      /// \brief Indicate that the world pose should be recalculated.
+      /// The recalculation will be done when Light::GetWorldPose is
+      /// called.
+      public: void SetWorldPoseDirty();
+
+      // Documentation inherited.
+      public: virtual const math::Pose GetWorldPose() const;
+
+      // Documentation inherited.
+      public: virtual const ignition::math::Pose3d &WorldPose() const;
     };
     /// \}
   }

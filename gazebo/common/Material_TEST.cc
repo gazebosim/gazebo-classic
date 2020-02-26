@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,8 +34,7 @@ TEST_F(MaterialTest, Material)
   EXPECT_STREQ("texture_image", mat.GetTextureImage().c_str());
 
   mat.SetTextureImage("texture_image", "/path");
-  EXPECT_STREQ("/path/../materials/textures/texture_image",
-               mat.GetTextureImage().c_str());
+  EXPECT_TRUE(mat.GetTextureImage().empty());
 
   mat.SetAmbient(common::Color(0.1, 0.2, 0.3, 0.4));
   EXPECT_TRUE(mat.GetAmbient() == common::Color(0.1, 0.2, 0.3, 0.4));

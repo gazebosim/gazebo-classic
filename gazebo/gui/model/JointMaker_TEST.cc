@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ using namespace gazebo;
 /////////////////////////////////////////////////
 void JointMaker_TEST::JointState()
 {
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
   QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_NONE);
@@ -104,7 +104,7 @@ void JointMaker_TEST::CreateRemoveJoint()
   QCOMPARE(jointMaker->JointCount(), 3u);
 
   // Remove the screw joint
-  jointMaker->RemoveJoint(screwJointData->hotspot->GetName());
+  jointMaker->RemoveJoint(screwJointData->hotspot->Name());
   QCOMPARE(jointMaker->JointCount(), 2u);
 
   // Add a ball joint
@@ -115,11 +115,11 @@ void JointMaker_TEST::CreateRemoveJoint()
   QCOMPARE(jointMaker->JointCount(), 3u);
 
   // Remove the two joints connected to the sphere
-  jointMaker->RemoveJointsByLink(sphereLink->GetName());
+  jointMaker->RemoveJointsByLink(sphereLink->Name());
   QCOMPARE(jointMaker->JointCount(), 1u);
 
   // Remove the last joint
-  jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
+  jointMaker->RemoveJoint(ballJointData->hotspot->Name());
   QCOMPARE(jointMaker->JointCount(), 0u);
 
   delete jointMaker;
@@ -171,19 +171,19 @@ void JointMaker_TEST::CreateRemoveNestedJoint()
   unsigned int jointCount = jointMaker->JointCount();
 
   // Remove joints connected to the each link
-  jointMaker->RemoveJointsByLink(link00Vis->GetName());
+  jointMaker->RemoveJointsByLink(link00Vis->Name());
   QVERIFY(jointMaker->JointCount() <= jointCount);
   jointCount = jointMaker->JointCount();
 
-  jointMaker->RemoveJointsByLink(link01Vis->GetName());
+  jointMaker->RemoveJointsByLink(link01Vis->Name());
   QVERIFY(jointMaker->JointCount() <= jointCount);
   jointCount = jointMaker->JointCount();
 
-  jointMaker->RemoveJointsByLink(link02Vis->GetName());
+  jointMaker->RemoveJointsByLink(link02Vis->Name());
   QVERIFY(jointMaker->JointCount() <= jointCount);
   jointCount = jointMaker->JointCount();
 
-  jointMaker->RemoveJointsByLink(link03Vis->GetName());
+  jointMaker->RemoveJointsByLink(link03Vis->Name());
   QVERIFY(jointMaker->JointCount() <= jointCount);
 
   // no more joints left
@@ -211,7 +211,7 @@ void JointMaker_TEST::CreateRemoveNestedJoint()
   QCOMPARE(jointMaker->JointCount(), 3u);
 
   // Remove the screw joint
-  jointMaker->RemoveJoint(screwJointData->hotspot->GetName());
+  jointMaker->RemoveJoint(screwJointData->hotspot->Name());
   QCOMPARE(jointMaker->JointCount(), 2u);
 
   // Add a ball joint
@@ -222,11 +222,11 @@ void JointMaker_TEST::CreateRemoveNestedJoint()
   QCOMPARE(jointMaker->JointCount(), 3u);
 
   // Remove the two joints connected to link01
-  jointMaker->RemoveJointsByLink(link01Vis->GetName());
+  jointMaker->RemoveJointsByLink(link01Vis->Name());
   QCOMPARE(jointMaker->JointCount(), 1u);
 
   // Remove the last joint
-  jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
+  jointMaker->RemoveJoint(ballJointData->hotspot->Name());
   QCOMPARE(jointMaker->JointCount(), 0u);
 
   delete jointMaker;
@@ -298,8 +298,10 @@ void JointMaker_TEST::JointDefaultProperties()
   msgs::Axis rev2Axis1Msg = rev2joint->jointMsg->axis1();
   QCOMPARE(msgs::ConvertIgn(rev2Axis1Msg.xyz()),
       ignition::math::Vector3d(1, 0, 0));
-  QVERIFY(ignition::math::equal(rev2Axis1Msg.limit_lower(), -IGN_DBL_MAX));
-  QVERIFY(ignition::math::equal(rev2Axis1Msg.limit_upper(), IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(rev2Axis1Msg.limit_lower(),
+      -ignition::math::MAX_D));
+  QVERIFY(ignition::math::equal(rev2Axis1Msg.limit_upper(),
+      ignition::math::MAX_D));
   QVERIFY(ignition::math::equal(rev2Axis1Msg.limit_effort(), -1.0));
   QVERIFY(ignition::math::equal(rev2Axis1Msg.limit_velocity(), -1.0));
   QVERIFY(ignition::math::equal(rev2Axis1Msg.damping(), 0.0));
@@ -309,8 +311,10 @@ void JointMaker_TEST::JointDefaultProperties()
   msgs::Axis rev2Axis2Msg = rev2joint->jointMsg->axis2();
   QCOMPARE(msgs::ConvertIgn(rev2Axis2Msg.xyz()),
       ignition::math::Vector3d(0, 1, 0));
-  QVERIFY(ignition::math::equal(rev2Axis2Msg.limit_lower(), -IGN_DBL_MAX));
-  QVERIFY(ignition::math::equal(rev2Axis2Msg.limit_upper(), IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(rev2Axis2Msg.limit_lower(),
+      -ignition::math::MAX_D));
+  QVERIFY(ignition::math::equal(rev2Axis2Msg.limit_upper(),
+      ignition::math::MAX_D));
   QVERIFY(ignition::math::equal(rev2Axis2Msg.limit_effort(), -1.0));
   QVERIFY(ignition::math::equal(rev2Axis2Msg.limit_velocity(), -1.0));
   QVERIFY(ignition::math::equal(rev2Axis2Msg.damping(), 0.0));
@@ -352,8 +356,10 @@ void JointMaker_TEST::JointDefaultProperties()
   msgs::Axis prisAxis1Msg = prisJoint->jointMsg->axis1();
   QCOMPARE(msgs::ConvertIgn(prisAxis1Msg.xyz()),
       ignition::math::Vector3d(1, 0, 0));
-  QVERIFY(ignition::math::equal(prisAxis1Msg.limit_lower(), -IGN_DBL_MAX));
-  QVERIFY(ignition::math::equal(prisAxis1Msg.limit_upper(), IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(prisAxis1Msg.limit_lower(),
+      -ignition::math::MAX_D));
+  QVERIFY(ignition::math::equal(prisAxis1Msg.limit_upper(),
+      ignition::math::MAX_D));
   QVERIFY(ignition::math::equal(prisAxis1Msg.limit_effort(), -1.0));
   QVERIFY(ignition::math::equal(prisAxis1Msg.limit_velocity(), -1.0));
   QVERIFY(ignition::math::equal(prisAxis1Msg.damping(), 0.0));
@@ -395,8 +401,10 @@ void JointMaker_TEST::JointDefaultProperties()
   msgs::Axis gearboxAxis1Msg = gearboxJoint->jointMsg->axis1();
   QCOMPARE(msgs::ConvertIgn(gearboxAxis1Msg.xyz()),
       ignition::math::Vector3d(0, 0, 1));
-  QVERIFY(ignition::math::equal(gearboxAxis1Msg.limit_lower(), -IGN_DBL_MAX));
-  QVERIFY(ignition::math::equal(gearboxAxis1Msg.limit_upper(), IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(gearboxAxis1Msg.limit_lower(),
+      -ignition::math::MAX_D));
+  QVERIFY(ignition::math::equal(gearboxAxis1Msg.limit_upper(),
+      ignition::math::MAX_D));
   QVERIFY(ignition::math::equal(gearboxAxis1Msg.limit_effort(), -1.0));
   QVERIFY(ignition::math::equal(gearboxAxis1Msg.limit_velocity(), -1.0));
   QVERIFY(ignition::math::equal(gearboxAxis1Msg.damping(), 0.0));
@@ -406,8 +414,10 @@ void JointMaker_TEST::JointDefaultProperties()
   msgs::Axis gearboxAxis2Msg = gearboxJoint->jointMsg->axis2();
   QCOMPARE(msgs::ConvertIgn(gearboxAxis2Msg.xyz()),
       ignition::math::Vector3d(0, 0, 1));
-  QVERIFY(ignition::math::equal(gearboxAxis2Msg.limit_lower(), -IGN_DBL_MAX));
-  QVERIFY(ignition::math::equal(gearboxAxis2Msg.limit_upper(), IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(gearboxAxis2Msg.limit_lower(),
+      -ignition::math::MAX_D));
+  QVERIFY(ignition::math::equal(gearboxAxis2Msg.limit_upper(),
+      ignition::math::MAX_D));
   QVERIFY(ignition::math::equal(gearboxAxis2Msg.limit_effort(), -1.0));
   QVERIFY(ignition::math::equal(gearboxAxis2Msg.limit_velocity(), -1.0));
   QVERIFY(ignition::math::equal(gearboxAxis2Msg.damping(), 0.0));

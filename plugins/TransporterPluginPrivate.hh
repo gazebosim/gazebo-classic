@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,17 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_TRANSPORTER_PLUGIN_PRIVATE_HH_
-#define _GAZEBO_TRANSPORTER_PLUGIN_PRIVATE_HH_
+#ifndef GAZEBO_PLUGINS_TRANSPORTERPLUGINPRIVATE_HH_
+#define GAZEBO_PLUGINS_TRANSPORTERPLUGINPRIVATE_HH_
 
 #include <map>
 #include <string>
 #include <mutex>
 #include <memory>
+#include <ignition/transport/Node.hh>
+
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Box.hh>
 
 #include <gazebo/transport/Node.hh>
 #include <gazebo/transport/Subscriber.hh>
@@ -40,10 +44,10 @@ namespace gazebo
 
       /// \brief Pose of the incoming pad. This is where incoming models
       /// appear.
-      public: math::Pose incomingPose;
+      public: ignition::math::Pose3d incomingPose;
 
       /// \brief Box that defines the activation region of the transporter.
-      public: math::Box outgoingBox;
+      public: ignition::math::Box outgoingBox;
 
       /// \brief True if the pad should automatically teleport.
       /// False will cause the pad to wait for an activation
@@ -73,6 +77,12 @@ namespace gazebo
 
     /// \brief Mutex to protect pad data.
     public: std::mutex padMutex;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for communication.
+    public: ignition::transport::Node nodeIgn;
   };
 }
 #endif

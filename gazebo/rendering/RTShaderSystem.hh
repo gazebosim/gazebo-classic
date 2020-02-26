@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,6 +123,46 @@ namespace gazebo
       /// \brief Update the RT shaders. This should not be called frequently.
       public: void Update();
 
+      /// \brief Set the shadow texture size.
+      /// \param[in] _size Size of shadow texture to set to. This must be a
+      /// power of 2. The default size is 1024.
+      /// \return True if size is set successfully, false otherwise.
+      public: bool SetShadowTextureSize(const unsigned int _size);
+
+      /// \brief Get the shadow texture size.
+      /// \return Size of the shadow texture. The default size is 1024.
+      public: unsigned int ShadowTextureSize() const;
+
+      /// \brief Set the shadow clip distances.
+      /// \param[in] _near Near clip distance.
+      /// \param[in] _far Far clip distance.
+      public: void SetShadowClipDist(const double _near, const double _far);
+
+      /// \brief Get the shadow near clip distance.
+      /// \return Near clip distance.
+      public: double ShadowNearClip() const;
+
+      /// \brief Get the shadow far clip distance.
+      /// \return Far clip distance.
+      public: double ShadowFarClip() const;
+
+      /// \brief Set the PSSM lambda value for determining how linear or
+      /// logarithmic choice of split points will be.
+      /// \param[in] _lambda PSSM split point lambda.
+      public: void SetShadowSplitLambda(const double _lambda);
+
+      /// \brief Get the PSSM split point lambda value.
+      /// \return PSSM split point lambda.
+      public: double ShadowSplitLambda() const;
+
+      /// \brief Set the overlap between PSSM shadow maps.
+      /// \param[in] _padding PSSM split point overlap.
+      public: void SetShadowSplitPadding(const double _padding);
+
+      /// \brief Get the PSSM split point overlap.
+      /// \return PSSM split point overlap.
+      public: double ShadowSplitPadding() const;
+
       /// \brief Get paths for the shader system
       /// \param[out] _coreLibsPath Path to the core libraries.
       /// \param[out] _cachePath Path to where the generated shaders are
@@ -133,6 +173,9 @@ namespace gazebo
       /// \brief Update the shaders for a visual.
       /// \param[in] _vis Pointer to the visual to update.
       private: void UpdateShaders(VisualPtr _vis);
+
+      /// \brief Re-apply shadows. Call this if a shadow paramenter is changed.
+      private: void ReapplyShadows();
 
       /// \brief Make the RTShader system a singleton.
       private: friend class SingletonT<RTShaderSystem>;

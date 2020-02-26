@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -225,6 +225,27 @@ TEST_F(TimeTest, String)
   // Large time
   time = common::Time(1234567890, 123456789);
   EXPECT_EQ(time.FormattedString(), "14288 23:31:30.123");
+}
+
+/////////////////////////////////////////////////
+TEST_F(TimeTest, Maximum)
+{
+  const common::Time maximum = common::Time::Maximum();
+
+  const common::Time zeroTime = common::Time(0, 0);
+  EXPECT_LT(zeroTime, maximum);
+  EXPECT_GT(maximum, zeroTime);
+  EXPECT_NE(zeroTime, maximum);
+
+  // This time is very large, but it is still not technically the maximum that
+  // we are able to represent.
+  const common::Time veryLargeTime =
+      common::Time(std::numeric_limits<int32_t>::max(), 0);
+  EXPECT_LT(veryLargeTime, maximum);
+  EXPECT_GT(maximum, veryLargeTime);
+  EXPECT_NE(veryLargeTime, maximum);
+
+  EXPECT_EQ(common::Time::Maximum(), maximum);
 }
 
 /////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -59,8 +62,8 @@ void BulletSliderJoint::Init()
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   // Get axis unit vector (expressed in world frame).
-  math::Vector3 axis = this->initialWorldAxis;
-  if (axis == math::Vector3::Zero)
+  ignition::math::Vector3d axis = this->initialWorldAxis;
+  if (axis == ignition::math::Vector3d::Zero)
   {
     gzerr << "axis must have non-zero length, resetting to 0 0 1\n";
     axis.Set(0, 0, 1);
@@ -68,8 +71,8 @@ void BulletSliderJoint::Init()
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.
-  math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
-  math::Pose pose;
+  ignition::math::Vector3d pivotParent, pivotChild, axisParent, axisChild;
+  ignition::math::Pose3d pose;
   btTransform frameParent, frameChild;
   btVector3 axis2, axis3;
 
@@ -81,45 +84,56 @@ void BulletSliderJoint::Init()
   // Check if parentLink exists. If not, the parent will be the world.
   if (this->parentLink)
   {
-    // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of parent.
+    pose = this->parentLink->WorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotParent -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed frame of parent.
-    pivotParent = pose.rot.RotateVectorReverse(pivotParent);
+    pivotParent -= pose.Pos();
+    // Rotate pivot offset and axis into body-fixed inertial frame of parent.
+    pivotParent = pose.Rot().RotateVectorReverse(pivotParent);
     frameParent.setOrigin(BulletTypes::ConvertVector3(pivotParent));
-    axisParent = pose.rot.RotateVectorReverse(axis);
+    axisParent = pose.Rot().RotateVectorReverse(axis);
     axisParent = axisParent.Normalize();
     // The following math is based on btHingeConstraint.cpp:95-115
     btPlaneSpace1(BulletTypes::ConvertVector3(axisParent), axis2, axis3);
     frameParent.getBasis().setValue(
-      axisParent.x, axis2.x(), axis3.x(),
-      axisParent.y, axis2.y(), axis3.y(),
-      axisParent.z, axis2.z(), axis3.z());
+      axisParent.X(), axis2.x(), axis3.x(),
+      axisParent.Y(), axis2.y(), axis3.y(),
+      axisParent.Z(), axis2.z(), axis3.z());
   }
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
   {
-    // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of child.
+    pose = this->childLink->WorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotChild -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed frame of child.
-    pivotChild = pose.rot.RotateVectorReverse(pivotChild);
+    pivotChild -= pose.Pos();
+    // Rotate pivot offset and axis into body-fixed inertial frame of child.
+    pivotChild = pose.Rot().RotateVectorReverse(pivotChild);
     frameChild.setOrigin(BulletTypes::ConvertVector3(pivotChild));
-    axisChild = pose.rot.RotateVectorReverse(axis);
+    axisChild = pose.Rot().RotateVectorReverse(axis);
     axisChild = axisChild.Normalize();
     // The following math is based on btHingeConstraint.cpp:95-115
     btPlaneSpace1(BulletTypes::ConvertVector3(axisChild), axis2, axis3);
     frameChild.getBasis().setValue(
-      axisChild.x, axis2.x(), axis3.x(),
-      axisChild.y, axis2.y(), axis3.y(),
-      axisChild.z, axis2.z(), axis3.z());
+      axisChild.X(), axis2.x(), axis3.x(),
+      axisChild.Y(), axis2.y(), axis3.y(),
+      axisChild.Z(), axis2.z(), axis3.z());
   }
 
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
+    // Parent and child constraint frames generated with btPlaneSpace1 may
+    // differ by 90 degrees because they are underdetermined (only one axis
+    // given). Here we set the child constraint frame by taking the parent
+    // constraint frame (in the frame of the parent Bullet link) and rotating
+    // it into the frame of the child Bullet link. This ensures that the
+    // constraint frames are initially aligned.
+    pose = ignition::math::Pose3d(pivotChild,
+        this->childLink->WorldInertialPose().Rot().Inverse() *
+        this->parentLink->WorldInertialPose().Rot() *
+        BulletTypes::ConvertPoseIgn(frameParent).Rot());
+    frameChild = BulletTypes::ConvertPose(pose);
     this->bulletSlider = new btSliderConstraint(
         *bulletParentLink->GetBulletLink(),
         *bulletChildLink->GetBulletLink(),
@@ -191,11 +205,11 @@ void BulletSliderJoint::Init()
 double BulletSliderJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
-  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  ignition::math::Vector3d globalAxis = this->GlobalAxis(0);
   if (this->childLink)
-    result += globalAxis.Dot(this->childLink->GetWorldLinearVel());
+    result += globalAxis.Dot(this->childLink->WorldLinearVel());
   if (this->parentLink)
-    result -= globalAxis.Dot(this->parentLink->GetWorldLinearVel());
+    result -= globalAxis.Dot(this->parentLink->WorldLinearVel());
   return result;
 }
 
@@ -206,15 +220,15 @@ void BulletSliderJoint::SetVelocity(unsigned int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &_axis)
+void BulletSliderJoint::SetAxis(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
   if (!this->bulletSlider)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-    math::Quaternion axisFrame = this->GetAxisFrame(0);
+    auto axisFrame = this->AxisFrame(0);
     this->initialWorldAxis = axisFrame.RotateVector(_axis);
   }
   else
@@ -260,65 +274,62 @@ void BulletSliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-bool BulletSliderJoint::SetHighStop(unsigned int /*_index*/,
-                                    const math::Angle &_angle)
+void BulletSliderJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                      const double _limit)
 {
-  Joint::SetHighStop(0, _angle);
+  Joint::SetUpperLimit(0, _limit);
   if (this->bulletSlider)
   {
-    this->bulletSlider->setUpperLinLimit(_angle.Radian());
-    return true;
+    this->bulletSlider->setUpperLinLimit(_limit);
   }
   else
   {
     gzlog << "bulletSlider not yet created.\n";
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
-bool BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
-                                   const math::Angle &_angle)
+void BulletSliderJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                      const double _limit)
 {
-  Joint::SetLowStop(0, _angle);
+  Joint::SetLowerLimit(0, _limit);
   if (this->bulletSlider)
   {
-    this->bulletSlider->setLowerLinLimit(_angle.Radian());
-    return true;
+    this->bulletSlider->setLowerLinLimit(_limit);
   }
   else
   {
     gzlog << "bulletSlider not yet created.\n";
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetHighStop(unsigned int /*_index*/)
+double BulletSliderJoint::UpperLimit(const unsigned int /*_index*/) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->bulletSlider)
     result = this->bulletSlider->getUpperLinLimit();
   else
-    gzlog << "Joint must be created before getting high stop\n";
+    gzerr << "Joint must be created before getting upper limit\n";
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetLowStop(unsigned int /*_index*/)
+double BulletSliderJoint::LowerLimit(const unsigned int /*_index*/) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->bulletSlider)
     result = this->bulletSlider->getLowerLinLimit();
   else
-    gzlog << "Joint must be created before getting low stop\n";
+    gzerr << "Joint must be created before getting lower limit\n";
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletSliderJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
-  math::Vector3 result = this->initialWorldAxis;
+  ignition::math::Vector3d result = this->initialWorldAxis;
 
   if (this->bulletSlider)
   {
@@ -326,19 +337,19 @@ math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
     btVector3 vec =
       this->bulletSlider->getRigidBodyA().getCenterOfMassTransform().getBasis()
       * this->bulletSlider->getFrameOffsetA().getBasis().getColumn(0);
-    result = BulletTypes::ConvertVector3(vec);
+    result = BulletTypes::ConvertVector3Ign(vec);
   }
 
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
+double BulletSliderJoint::PositionImpl(const unsigned int _index) const
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid axis index [" << _index << "]" << std::endl;
-    return math::Angle();
+    return ignition::math::NAN_D;
   }
 
   // The getLinearPos function seems to be off by one time-step
@@ -349,11 +360,10 @@ math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
   //   gzlog << "bulletSlider does not exist, returning default position\n";
 
   // Compute slider angle from gazebo's cached poses instead
-  math::Vector3 offset = this->GetWorldPose().pos
-                 - this->GetParentWorldPose().pos;
-  math::Vector3 axis = this->GetGlobalAxis(_index);
-  math::Pose poseParent = this->GetWorldPose();
-  return math::Angle(axis.Dot(offset));
+  auto offset = this->WorldPose().Pos()
+              - this->ParentWorldPose().Pos();
+  auto axis = this->GlobalAxis(_index);
+  return axis.Dot(offset);
 }
 
 //////////////////////////////////////////////////
@@ -361,7 +371,7 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
     unsigned int _index,
     const boost::any &_value)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index [" << _index << "]" << std::endl;
     return false;
@@ -384,7 +394,7 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
         // https://github.com/bulletphysics/bullet3/pull/328
         // As a workaround, multiply the desired friction
         // parameter by dt^2 when setting
-        double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+        double dt = this->world->Physics()->GetMaxStepSize();
         value *= dt*dt;
 #endif
         this->bulletSlider->setMaxLinMotorForce(value);
@@ -413,7 +423,7 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
 //////////////////////////////////////////////////
 double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index [" << _index << "]" << std::endl;
     return 0;
@@ -432,7 +442,7 @@ double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
       // https://github.com/bulletphysics/bullet3/pull/328
       // As a workaround, divide the desired friction
       // parameter by dt^2 when getting
-      double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+      double dt = this->world->Physics()->GetMaxStepSize();
       value /= dt*dt;
 #endif
       return value;

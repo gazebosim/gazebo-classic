@@ -53,9 +53,9 @@ TEST_F(InertiaVisual_TEST, InertiaVisualTest)
       "inertia_vis", scene->WorldVisual()));
   inertiaVis->Load();
 
-  EXPECT_EQ(inertiaVis->GetName(), "inertia_vis");
+  EXPECT_EQ(inertiaVis->Name(), "inertia_vis");
   EXPECT_GT(scene->WorldVisual()->GetChildCount(), count);
-  EXPECT_NE(scene->GetVisual(inertiaVis->GetName()), nullptr);
+  EXPECT_NE(scene->GetVisual(inertiaVis->Name()), nullptr);
 
   // test destroying the visual
   inertiaVis->Fini();
@@ -84,6 +84,9 @@ TEST_F(InertiaVisual_TEST, InertiaRotation)
     "box010409_z45::link_INERTIA_VISUAL__"
   };
 
+  // Generate inertia visuals
+  scene->ShowInertias(true);
+
   // Wait until all models are inserted
   int sleep = 0;
   const int maxSleep = 50;
@@ -110,6 +113,7 @@ TEST_F(InertiaVisual_TEST, InertiaRotation)
     common::Time::MSleep(200);
     sleep++;
   }
+  EXPECT_LT(sleep, maxSleep);
 
   // expect bounding box of size 0.1 x 0.4 x 0.9
   const ignition::math::Box box(-0.05, -0.2, -0.45,
@@ -124,7 +128,7 @@ TEST_F(InertiaVisual_TEST, InertiaRotation)
     // need to set these flags in order to GetBoundingBox
     visual->SetVisible(true);
     visual->SetVisibilityFlags(GZ_VISIBILITY_ALL);
-    EXPECT_EQ(visual->GetBoundingBox().Ign(), box);
+    EXPECT_EQ(visual->BoundingBox(), box);
   }
 }
 

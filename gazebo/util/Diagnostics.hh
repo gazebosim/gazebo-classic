@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,10 @@ namespace gazebo
       /// \brief Initialize to report diagnostics about a world.
       /// \param[in] _worldName Name of the world.
       public: void Init(const std::string &_worldName);
+
+      /// \brief Finish reporting diagnostics for a world.
+      /// Write all remaining log data to disk.
+      public: void Fini();
 
       /// \brief Start a new timer instance
       /// \param[in] _name Name of the timer.
@@ -171,6 +175,10 @@ namespace gazebo
       /// \brief Get the name of the timer
       /// \return The name of timer
       public: const std::string Name() const;
+
+      /// \brief Insert data for statistics computation.
+      public: void InsertData(const std::string &_name,
+                              const common::Time &_time);
 
       /// \internal
       /// \brief Private data pointer

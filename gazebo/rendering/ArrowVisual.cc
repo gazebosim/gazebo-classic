@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,18 +55,18 @@ void ArrowVisual::Load()
   this->InsertMesh("axis_head");
 
   dPtr->shaftVis.reset(
-      new Visual(this->GetName()+"__SHAFT__", shared_from_this(), false));
+      new Visual(this->Name()+"__SHAFT__", shared_from_this(), false));
   dPtr->shaftVis->Load();
   dPtr->shaftVis->AttachMesh("axis_shaft");
-  dPtr->shaftVis->SetPosition(math::Vector3(0, 0, 0.1));
+  dPtr->shaftVis->SetPosition(ignition::math::Vector3d(0, 0, 0.1));
   dPtr->shaftVis->SetCastShadows(false);
   dPtr->shaftVis->SetType(VT_GUI);
 
   dPtr->headVis.reset(
-      new Visual(this->GetName()+"__HEAD__", shared_from_this(), false));
+      new Visual(this->Name()+"__HEAD__", shared_from_this(), false));
   dPtr->headVis->Load();
   dPtr->headVis->AttachMesh("axis_head");
-  dPtr->headVis->SetPosition(math::Vector3(0, 0, 0.24));
+  dPtr->headVis->SetPosition(ignition::math::Vector3d(0, 0, 0.24));
   dPtr->headVis->SetCastShadows(false);
   dPtr->headVis->SetType(VT_GUI);
 
@@ -75,10 +75,10 @@ void ArrowVisual::Load()
   this->InsertMesh("rotation_tube");
 
   dPtr->rotationVis.reset(
-      new Visual(this->GetName()+"__ROTATION__", shared_from_this(), false));
+      new Visual(this->Name()+"__ROTATION__", shared_from_this(), false));
   dPtr->rotationVis->Load();
   dPtr->rotationVis->AttachMesh("rotation_tube");
-  dPtr->rotationVis->SetPosition(math::Vector3(0, 0, 0.24));
+  dPtr->rotationVis->SetPosition(ignition::math::Vector3d(0, 0, 0.24));
   dPtr->rotationVis->SetCastShadows(false);
   dPtr->rotationVis->SetType(VT_GUI);
 

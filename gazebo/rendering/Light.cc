@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,8 +82,6 @@ void Light::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Light::Load()
 {
-  math::Vector3 vec;
-
   try
   {
     this->dataPtr->light =
@@ -98,7 +96,7 @@ void Light::Load()
   this->Update();
 
   this->dataPtr->visual.reset(new Visual(this->Name(),
-                     this->dataPtr->scene->WorldVisual()));
+                     this->dataPtr->scene->WorldVisual(), false));
   this->dataPtr->visual->Load();
   this->dataPtr->visual->AttachObject(this->dataPtr->light);
 
@@ -108,9 +106,10 @@ void Light::Load()
 //////////////////////////////////////////////////
 void Light::Update()
 {
+  // shadow support is also affected by light type so set type first.
+  this->SetLightType(this->dataPtr->sdf->Get<std::string>("type"));
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
 
-  this->SetLightType(this->dataPtr->sdf->Get<std::string>("type"));
   this->SetDiffuseColor(
       this->dataPtr->sdf->GetElement("diffuse")->Get<common::Color>());
   this->SetSpecularColor(
@@ -363,7 +362,7 @@ void Light::SetPosition(const ignition::math::Vector3d &_p)
 //////////////////////////////////////////////////
 ignition::math::Vector3d Light::Position() const
 {
-  return this->dataPtr->visual->GetPosition().Ign();
+  return this->dataPtr->visual->Position();
 }
 
 //////////////////////////////////////////////////
@@ -375,7 +374,7 @@ void Light::SetRotation(const ignition::math::Quaterniond &_q)
 //////////////////////////////////////////////////
 ignition::math::Quaterniond Light::Rotation() const
 {
-  return this->dataPtr->visual->GetRotation().Ign();
+  return this->dataPtr->visual->Rotation();
 }
 
 //////////////////////////////////////////////////
@@ -432,6 +431,15 @@ void Light::SetLightType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
+std::string Light::LightType() const
+{
+  if (this->dataPtr->sdf)
+    return this->dataPtr->sdf->Get<std::string>("type");
+
+  return std::string();
+}
+
+//////////////////////////////////////////////////
 void Light::SetDiffuseColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("diffuse");
@@ -469,13 +477,13 @@ void Light::SetSpecularColor(const common::Color &_color)
 void Light::SetDirection(const ignition::math::Vector3d &_dir)
 {
   // Set the direction which the light points
-  math::Vector3 vec = _dir;
+  ignition::math::Vector3d vec = _dir;
   vec.Normalize();
 
-  if (vec != this->dataPtr->sdf->Get<math::Vector3>("direction"))
+  if (vec != this->dataPtr->sdf->Get<ignition::math::Vector3d>("direction"))
     this->dataPtr->sdf->GetElement("direction")->Set(vec);
 
-  this->dataPtr->light->setDirection(vec.x, vec.y, vec.z);
+  this->dataPtr->light->setDirection(vec.X(), vec.Y(), vec.Z());
 }
 
 //////////////////////////////////////////////////
@@ -524,18 +532,25 @@ void Light::SetRange(const double _range)
 }
 
 //////////////////////////////////////////////////
-void Light::SetCastShadows(const bool /*_cast*/)
+void Light::SetCastShadows(const bool _cast)
 {
-    this->dataPtr->light->setCastShadows(true);
-  /*if (this->dataPtr->light->getType() == Ogre::Light::LT_SPOTLIGHT ||
-      this->dataPtr->light->getType() == Ogre::Light::LT_DIRECTIONAL)
+  if (this->dataPtr->light->getType() == Ogre::Light::LT_DIRECTIONAL)
   {
     this->dataPtr->light->setCastShadows(_cast);
   }
   else
   {
     this->dataPtr->light->setCastShadows(false);
-  }*/
+  }
+}
+
+//////////////////////////////////////////////////
+bool Light::CastShadows() const
+{
+  if (this->dataPtr->light)
+    return this->dataPtr->light->getCastShadows();
+
+  return false;
 }
 
 //////////////////////////////////////////////////

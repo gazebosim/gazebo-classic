@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Open Source Robotics Foundation
+ * Copyright 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <functional>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -107,7 +110,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       forceElementLabel->setText(tr("Z:"));
     QLabel *forceUnitLabel = new QLabel(tr("N"));
 
-    forceSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+    forceSpins[i]->setRange(-ignition::math::MAX_D, ignition::math::MAX_D);
     forceSpins[i]->setSingleStep(100);
     forceSpins[i]->setDecimals(3);
     forceSpins[i]->setValue(0);
@@ -126,7 +129,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   QLabel *forceMagUnitLabel = new QLabel(tr("N"));
 
   this->dataPtr->forceMagSpin = new QDoubleSpinBox();
-  this->dataPtr->forceMagSpin->setRange(0, GZ_DBL_MAX);
+  this->dataPtr->forceMagSpin->setRange(0, ignition::math::MAX_D);
   this->dataPtr->forceMagSpin->setSingleStep(100);
   this->dataPtr->forceMagSpin->setDecimals(3);
   this->dataPtr->forceMagSpin->setValue(0);
@@ -205,7 +208,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       forcePosElementLabel->setText(tr("Z:"));
     QLabel *forcePosUnitLabel = new QLabel(tr("m"));
 
-    forcePosSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+    forcePosSpins[i]->setRange(-ignition::math::MAX_D, ignition::math::MAX_D);
     forcePosSpins[i]->setSingleStep(0.1);
     forcePosSpins[i]->setDecimals(3);
     forcePosSpins[i]->setValue(0);
@@ -289,7 +292,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       torqueElementLabel->setText(tr("Z:"));
     QLabel *torqueUnitLabel = new QLabel(tr("Nm"));
 
-    torqueSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+    torqueSpins[i]->setRange(-ignition::math::MAX_D, ignition::math::MAX_D);
     torqueSpins[i]->setSingleStep(100);
     torqueSpins[i]->setDecimals(3);
     torqueSpins[i]->setValue(0);
@@ -308,7 +311,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   QLabel *torqueMagUnitLabel = new QLabel(tr("Nm"));
 
   this->dataPtr->torqueMagSpin = new QDoubleSpinBox();
-  this->dataPtr->torqueMagSpin->setRange(0, GZ_DBL_MAX);
+  this->dataPtr->torqueMagSpin->setRange(0, ignition::math::MAX_D);
   this->dataPtr->torqueMagSpin->setSingleStep(100);
   this->dataPtr->torqueMagSpin->setDecimals(3);
   this->dataPtr->torqueMagSpin->setValue(0);
@@ -384,7 +387,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   // Transport
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
@@ -445,11 +448,11 @@ void ApplyWrenchDialog::Fini()
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->RemoveReleaseFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
     MouseEventHandler::Instance()->RemovePressFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
     MouseEventHandler::Instance()->RemoveMoveFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
 
     this->dataPtr->applyWrenchVisual->Fini();
   }
@@ -478,7 +481,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
   // Check if model/link hasn't been deleted on PreRender
   this->dataPtr->connections.push_back(
       event::Events::ConnectPreRender(
-      boost::bind(&ApplyWrenchDialog::OnPreRender, this)));
+      std::bind(&ApplyWrenchDialog::OnPreRender, this)));
 
   this->dataPtr->modelLabel->setText(("<b>Model:</b> " + _modelName).c_str());
 
@@ -489,7 +492,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
   for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = vis->GetChild(i);
-    std::string linkName = childVis->GetName();
+    std::string linkName = childVis->Name();
 
     // Issue #1553: This is failing to get real links sometimes:
     // uint32_t flags = childVis->GetVisibilityFlags();
@@ -509,8 +512,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
 
         if (comVis)
         {
-          this->dataPtr->linkToCOMMap[linkName] =
-              comVis->GetInertiaPose().Ign().Pos();
+          this->dataPtr->linkToCOMMap[linkName] = comVis->InertiaPose().Pos();
           break;
         }
       }
@@ -584,8 +586,9 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->AddReleaseFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
-        boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name(),
+        std::bind(&ApplyWrenchDialog::OnMouseRelease, this,
+        std::placeholders::_1));
   }
 
   return true;
@@ -598,7 +601,7 @@ void ApplyWrenchDialog::SetLink(const QString _linkName)
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->RemoveReleaseFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
   }
 
   if (!this->SetLink(this->dataPtr->modelName + "::" + _linkName.toStdString()))
@@ -966,7 +969,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent &_event)
 
   this->dataPtr->draggingTool = false;
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos(),
+  rendering::VisualPtr vis = userCamera->Visual(_event.Pos(),
       this->dataPtr->manipState);
 
   if (vis)
@@ -984,7 +987,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent &_event)
 
     // Register rotTool pose at drag start
     this->dataPtr->dragStartPose =
-        this->dataPtr->applyWrenchVisual->GetRotTool()->GetWorldPose().Ign();
+        this->dataPtr->applyWrenchVisual->GetRotTool()->WorldPose();
   }
   return false;
 }
@@ -996,7 +999,7 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent &_event)
   if (!userCamera || !this->dataPtr->applyWrenchVisual)
     return false;
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos(),
+  rendering::VisualPtr vis = userCamera->Visual(_event.Pos(),
       this->dataPtr->manipState);
 
   if (!vis || _event.Dragging())
@@ -1107,8 +1110,8 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
     vec.Z(-sin(rotEuler.Y()));
 
     // To local frame
-    vec = this->dataPtr->linkVisual->
-        GetWorldPose().Ign().Rot().RotateVectorReverse(vec);
+    vec = this->dataPtr->linkVisual->WorldPose().Rot().RotateVectorReverse(
+        vec);
 
     if (this->GetMode() == Mode::FORCE)
     {
@@ -1123,7 +1126,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
   // Highlight hovered tools
   else
   {
-    userCamera->GetVisual(_event.Pos(), this->dataPtr->manipState);
+    userCamera->Visual(_event.Pos(), this->dataPtr->manipState);
 
     if (this->dataPtr->manipState == "rot_z" ||
         this->dataPtr->manipState == "rot_y")
@@ -1203,12 +1206,14 @@ void ApplyWrenchDialog::SetActive(bool _active)
       g_arrowAct->trigger();
 
     MouseEventHandler::Instance()->AddPressFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
-        boost::bind(&ApplyWrenchDialog::OnMousePress, this, _1));
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name(),
+        std::bind(&ApplyWrenchDialog::OnMousePress, this,
+        std::placeholders::_1));
 
     MouseEventHandler::Instance()->AddMoveFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
-        boost::bind(&ApplyWrenchDialog::OnMouseMove, this, _1));
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name(),
+        std::bind(&ApplyWrenchDialog::OnMouseMove, this,
+        std::placeholders::_1));
   }
   else
   {
@@ -1216,9 +1221,9 @@ void ApplyWrenchDialog::SetActive(bool _active)
         rendering::ApplyWrenchVisual::Mode::NONE);
 
     MouseEventHandler::Instance()->RemovePressFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
     MouseEventHandler::Instance()->RemoveMoveFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
   }
 }
 
@@ -1303,8 +1308,8 @@ void ApplyWrenchDialog::changeEvent(QEvent *_event)
     // During tests it seems not to find main window, so this is true by default
     bool mainWindowActive = true;
 
-    if (!this->dataPtr->mainWindow || (this->dataPtr->mainWindow &&
-        !this->dataPtr->mainWindow->isActiveWindow()))
+    if (!this->dataPtr->mainWindow ||
+        !this->dataPtr->mainWindow->isActiveWindow())
     {
       mainWindowActive = false;
     }

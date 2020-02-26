@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,40 +76,78 @@ void Node::Fini()
   }
 }
 
+//////////////////////////////////////////////////
+bool Node::TryInit(const common::Time &_maxWait)
+{
+  return this->PrivateInit("", _maxWait, false);
+}
+
 /////////////////////////////////////////////////
 void Node::Init(const std::string &_space)
 {
-  // Don't initialize twice.
+  this->PrivateInit(_space, common::Time(1, 0), true);
+}
+
+/////////////////////////////////////////////////
+bool Node::PrivateInit(const std::string &_space,
+                       const common::Time &_maxWait,
+                       const bool _fallbackToDefault)
+{
   if (this->initialized)
   {
-    gzerr << "Node is already initialized, skipping Init."
-          << "This shouldn't happen...so fix it.\n";
-    return;
+    gzerr << "Node is already initialized, skipping initialization. "
+          << "This shouldn't happen... so fix it.\n";
+
+    // If the Node is already initialized, return true in order to match the
+    // function description.
+    return true;
   }
 
-  this->topicNamespace = _space;
+  // Clearing the topicNamespace field shouldn't affect anything, but let's make
+  // sure that the assumption made later in this function is valid.
+  this->topicNamespace.clear();
 
   if (_space.empty())
   {
-    this->topicNamespace = "default";
-
-    // wait at most 1 second for namespaces to appear.
-    if (transport::waitForNamespaces(common::Time(1, 0)))
+    if (transport::waitForNamespaces(_maxWait))
     {
+      // If waitForNamespaces succeeded, then we are guaranteed to have at least
+      // one namespace in the list.
       std::list<std::string> namespaces;
       TopicManager::Instance()->GetTopicNamespaces(namespaces);
-      this->topicNamespace = namespaces.empty() ? this->topicNamespace :
-        namespaces.front();
+
+      GZ_ASSERT(!namespaces.empty(),
+                "It should not be possible for namespaces to be empty here");
+      this->topicNamespace = namespaces.front();
     }
     else
-      gzerr << "No namespace found\n";
+    {
+      gzerr << "No namespaces found\n";
+
+      // If we're coming here from TryInit(), then quit right away.
+      if (!_fallbackToDefault)
+        return false;
+    }
   }
-  else
-    TopicManager::Instance()->RegisterTopicNamespace(_space);
+
+  // If the topic namespace field is empty, then either a global namespace was
+  // not found, or we want a specific namespace for this Node.
+  if (this->topicNamespace.empty())
+  {
+    this->topicNamespace = _space.empty() ? "default" : _space;
+    TopicManager::Instance()->RegisterTopicNamespace(this->topicNamespace);
+  }
 
   TopicManager::Instance()->AddNode(shared_from_this());
-
   this->initialized = true;
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool Node::IsInitialized() const
+{
+  return this->initialized;
 }
 
 //////////////////////////////////////////////////

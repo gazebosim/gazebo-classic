@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Author: Nate Koenig mod by John Hsu
  */
 
-#ifndef _GAZEBO_RAY_PLUGIN_HH_
-#define _GAZEBO_RAY_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_RAYPLUGIN_HH_
+#define GAZEBO_PLUGINS_RAYPLUGIN_HH_
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/sensors/SensorTypes.hh"

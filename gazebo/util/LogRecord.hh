@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _GAZEBO_UTIL_LOGRECORD_HH_
 
 #include <fstream>
+#include <set>
 #include <string>
 
 #include "gazebo/msgs/msgs.hh"
@@ -30,6 +31,24 @@ namespace gazebo
 {
   namespace util
   {
+    /// \brief Log recording parameters.
+    /// \sa LogRecord::Start
+    class LogRecordParams
+    {
+      /// \brief The type of encoding (txt, zlib, or bz2).
+      public: std::string encoding = "zlib";
+
+      /// \brief Path in which to store log files.
+      public: std::string path;
+
+      /// \brief Recording period. A value < 0 indicates that every
+      /// iteration should be recorded.
+      public: double period = -1;
+
+      /// \brief Log filter string
+      public: std::string filter;
+    };
+
     // Forward declare private data class
     class LogRecordPrivate;
 
@@ -111,6 +130,31 @@ namespace gazebo
       /// \sa LogRecord::SetPaused
       public: bool Paused() const;
 
+      /// \brief Get the log recording period.
+      /// \return Log recording period in seconds.
+      public: double Period() const;
+
+      /// \brief Set the log recording period.
+      /// \param[in] _period New log recording period in seconds.
+      public: void SetPeriod(const double _period);
+
+      /// \brief Get the log recording filter string.
+      /// \return Log recording filter string.
+      public: std::string Filter() const;
+
+      /// \brief Set the log recording filter string.
+      /// \param[in] _filter New log record filter regex string
+      public: void SetFilter(const std::string &_filter);
+
+      /// \brief Get whether the model meshes and materials are saved when
+      /// recording.
+      /// \return True if model meshes and materials are saved when recording.
+      public: bool RecordResources() const;
+
+      /// \brief Set whether to save model meshes and materials when recording.
+      /// \param[in] _record True to save model resources when recording.
+      public: void SetRecordResources(const bool _record);
+
       /// \brief Get whether the logger is ready to start, which implies
       /// that any previous runs have finished.
       // \return True if logger is ready to start.
@@ -119,6 +163,10 @@ namespace gazebo
       /// \brief Get whether logging is running.
       /// \return True if logging has been started.
       public: bool Running() const;
+
+      /// \brief Start the logger.
+      /// \params[in] _params Log recording parameters.
+      public: bool Start(const LogRecordParams &_params);
 
       /// \brief Start the logger.
       /// \param[in] _encoding The type of encoding (txt, zlib, or bz2).
@@ -159,6 +207,15 @@ namespace gazebo
       /// \brief Return true if an Update has not yet been completed.
       /// \return True if an Update has not yet been completed.
       public: bool FirstUpdate() const;
+
+      /// \brief Return true if all the models are saved successfully.
+      /// \return True if all the models are saved successfully.
+      public: bool SaveModels(const std::set<std::string> &models);
+
+      /// \brief Return true if all the files are saved successfully.
+      /// \return True if all the files are saved successfully, and false if
+      /// there are errors saving the files.
+      public: bool SaveFiles(const std::set<std::string> &resources);
 
       /// \brief Write all logs.
       /// \param[in] _force True to skip waiting on dataAvailableCondition.

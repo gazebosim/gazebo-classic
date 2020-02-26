@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RANDOMVELOCITY_PLUGIN_HH_
-#define _GAZEBO_RANDOMVELOCITY_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_RANDOMVELOCITYPLUGIN_HH_
+#define GAZEBO_PLUGINS_RANDOMVELOCITYPLUGIN_HH_
+
+#include <memory>
 
 #include <sdf/sdf.hh>
 #include <gazebo/common/UpdateInfo.hh>
@@ -25,7 +27,7 @@
 namespace gazebo
 {
   // Forward declare private data class.
-  class RandomVelocityPrivate;
+  class RandomVelocityPluginPrivate;
 
   /// \brief Plugin that applies a random velocity to a linke periodically.
   ///
@@ -82,7 +84,7 @@ namespace gazebo
 
     /// \internal
     /// \brief Private data pointer
-    private: RandomVelocityPluginPrivate *dataPtr;
+    private: std::unique_ptr<RandomVelocityPluginPrivate> dataPtr;
   };
 }
 #endif

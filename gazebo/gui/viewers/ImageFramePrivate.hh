@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_VIEWERS_IMAGEFRAME_PRIVATE_HH_
-#define _GAZEBO_GUI_VIEWERS_IMAGEFRAME_PRIVATE_HH_
+#ifndef GAZEBO_GUI_VIEWERS_IMAGEFRAMEPRIVATE_HH_
+#define GAZEBO_GUI_VIEWERS_IMAGEFRAMEPRIVATE_HH_
 
 #include <mutex>
 #include "gazebo/gui/qt.h"
@@ -33,7 +33,10 @@ namespace gazebo
       public: std::mutex mutex;
 
       /// \brief Depth camera image data buffer.
-      public: float *depthBuffer = NULL;
+      public: float *depthBuffer = nullptr;
+
+      /// \brief Camera image data buffer.
+      public: unsigned char *imageBuffer = nullptr;
     };
   }
 }

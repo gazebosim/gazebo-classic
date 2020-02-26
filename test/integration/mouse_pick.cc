@@ -18,6 +18,9 @@
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/MeshManager.hh"
+
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -25,6 +28,8 @@
 
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
+
+#include "gazebo/rendering/RayQuery.hh"
 
 #include "mouse_pick.hh"
 
@@ -109,7 +114,7 @@ void MousePickingTest::Shapes()
   // move camera to look at the shapes from +x
   cam->SetWorldPose(ignition::math::Pose3d(
       ignition::math::Vector3d(-5, 0.0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Quaterniond::Identity));
 
   auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != NULL);
@@ -120,7 +125,7 @@ void MousePickingTest::Shapes()
   this->ProcessEventsAndDraw(mainWindow);
 
   // pick the first model - sphere
-  auto pickPt = cam->Project(model01Vis->GetWorldPose().pos.Ign());
+  auto pickPt = cam->Project(model01Vis->WorldPose().Pos());
   auto pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -132,7 +137,7 @@ void MousePickingTest::Shapes()
   QVERIFY(!model03Vis->GetHighlighted());
 
   // pick the second model - box
-  pickPt = cam->Project(model02Vis->GetWorldPose().pos.Ign());
+  pickPt = cam->Project(model02Vis->WorldPose().Pos());
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -143,8 +148,8 @@ void MousePickingTest::Shapes()
   QVERIFY(model02Vis->GetHighlighted());
   QVERIFY(!model03Vis->GetHighlighted());
 
-  // pick the third model - box
-  pickPt = cam->Project(model03Vis->GetWorldPose().pos.Ign());
+  // pick the third model - cylinder
+  pickPt = cam->Project(model03Vis->WorldPose().Pos());
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -156,7 +161,7 @@ void MousePickingTest::Shapes()
   QVERIFY(model03Vis->GetHighlighted());
 
   // pick near the edge of box
-  pickPt = cam->Project(model02Vis->GetWorldPose().pos.Ign() +
+  pickPt = cam->Project(model02Vis->WorldPose().Pos() +
       ignition::math::Vector3d(-0.5, 0.49, 0));
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
@@ -169,7 +174,7 @@ void MousePickingTest::Shapes()
   QVERIFY(!model03Vis->GetHighlighted());
 
   // pick just outside the edge of box and verify nothing is selected
-  pickPt = cam->Project(model02Vis->GetWorldPose().pos.Ign() +
+  pickPt = cam->Project(model02Vis->WorldPose().Pos() +
       ignition::math::Vector3d(-0.5, 0.51, 0));
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
@@ -237,7 +242,7 @@ void MousePickingTest::ModelEditorSelection()
   // move camera to look at cylinder
   cam->SetWorldPose(ignition::math::Pose3d(
       ignition::math::Vector3d(-5, 0.0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Quaterniond::Identity));
 
   // Process some events and draw the screen
   this->ProcessEventsAndDraw(mainWindow);
@@ -404,6 +409,144 @@ void MousePickingTest::Transparency()
   QVERIFY(model01Vis->GetHighlighted() || model01LinkVis->GetHighlighted());
   QVERIFY(!model02Vis->GetHighlighted() && !model02LinkVis->GetHighlighted());
   QVERIFY(!model03Vis->GetHighlighted() && !model03LinkVis->GetHighlighted());
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MousePickingTest::InvalidMesh()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  std::string modelName = "box";
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelName);
+  QVERIFY(modelVis != nullptr);
+
+  // get the box mesh
+  gazebo::common::Mesh *mesh = const_cast<gazebo::common::Mesh *>(
+      gazebo::common::MeshManager::Instance()->GetMesh("unit_box"));
+
+  // create invalid submesh and add to unit_box mesh
+  // submesh must have no. of indices that is a multiple of 3 (triangle)
+  gazebo::common::SubMesh *subMesh = new gazebo::common::SubMesh();
+  subMesh->SetName("invalid");
+  subMesh->SetPrimitiveType(gazebo::common::SubMesh::TRIANGLES);
+  subMesh->AddIndex(0);
+  subMesh->AddIndex(1);
+  subMesh->AddIndex(2);
+  subMesh->AddIndex(3);
+  subMesh->AddVertex(ignition::math::Vector3d::Zero);
+  subMesh->AddVertex(ignition::math::Vector3d::Zero);
+  subMesh->AddVertex(ignition::math::Vector3d::Zero);
+  subMesh->AddVertex(ignition::math::Vector3d::Zero);
+  subMesh->AddNormal(ignition::math::Vector3d::UnitX);
+  subMesh->AddNormal(ignition::math::Vector3d::UnitX);
+  subMesh->AddNormal(ignition::math::Vector3d::UnitX);
+  subMesh->AddNormal(ignition::math::Vector3d::UnitX);
+  mesh->AddSubMesh(subMesh);
+
+  // move camera to look at the shapes from +x
+  cam->SetWorldPose(ignition::math::Pose3d(
+      ignition::math::Vector3d(-5, 0.0, 0.5),
+      ignition::math::Quaterniond(0, 0, 0)));
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // pick the box
+  auto pickPt = cam->Project(modelVis->WorldPose().Pos());
+
+  gazebo::rendering::RayQuery rayQuery(cam);
+  ignition::math::Vector3d intersect;
+  ignition::math::Triangle3d triangle;
+  QVERIFY(rayQuery.SelectMeshTriangle(pickPt.X(), pickPt.Y(), modelVis,
+      intersect, triangle));
+  QVERIFY(triangle.Valid());
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MousePickingTest::DistantMovement()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // move camera to a distance far away from origin
+  ignition::math::Pose3d camPose(
+      ignition::math::Vector3d(-160000, 0.0, 0.0),
+      ignition::math::Quaterniond(0, 0, 0));
+  cam->SetWorldPose(camPose);
+
+  QCOMPARE(cam->WorldPose(), camPose);
+
+  // set a large clip distance
+  double nearClip = 0.125;
+  double farClip = 200000.0;
+  cam->SetClipDist(nearClip, farClip);
+
+  QVERIFY(qFuzzyCompare(cam->NearClip(), nearClip));
+  QVERIFY(qFuzzyCompare(cam->FarClip(), farClip));
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != nullptr);
+
+  // test orbiting
+  MouseDrag(glWidget, Qt::MiddleButton,
+      ignition::math::Vector2d(0.75, 0.5),
+      ignition::math::Vector2d(0.25, 0.5));
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // test panning
+  MouseDrag(glWidget, Qt::LeftButton,
+      ignition::math::Vector2d(0.5, 0.75),
+      ignition::math::Vector2d(0.5, 0.25));
+
+  QVERIFY(cam->WorldPose() != camPose);
+
+  this->ProcessEventsAndDraw(mainWindow);
 
   cam->Fini();
   mainWindow->close();

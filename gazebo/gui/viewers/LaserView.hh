@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _LASERVIEW_HH_
-#define _LASERVIEW_HH_
+#ifndef GAZEBO_GUI_VIEWERS_LASERVIEW_HH_
+#define GAZEBO_GUI_VIEWERS_LASERVIEW_HH_
 
 #include <string>
 #include <vector>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -110,6 +110,9 @@ namespace gazebo
                              double _angleStep, double _rangeMax,
                              double _rangeMin);
 
+                 /// \brief Update Qt geometry and bounding box
+                 public: void UpdateGeometry();
+
                  /// \brief A QT pure virtual function that must be defined.
                  /// This calls GetBoundingRect.
                  private: virtual QRectF boundingRect() const;
@@ -177,7 +180,10 @@ namespace gazebo
                  public: bool radians;
 
                  /// \brief Mutex to protect the laser data.
-                 private: mutable boost::mutex mutex;
+                 private: mutable std::mutex mutex;
+
+                 /// \brief Flag to indicate there are new range values.
+                 private: bool dirty = false;
                };
 
       /// \brief This class exists so that we can properly capture the

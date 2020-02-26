@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
-#define _GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
+#ifndef GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
+#define GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
 
 #include <string>
 
@@ -36,7 +36,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent widget.
-      public: ImagesView(QWidget *_parent = NULL);
+      public: ImagesView(QWidget *_parent = nullptr);
 
       /// \brief Destructor
       public: virtual ~ImagesView();

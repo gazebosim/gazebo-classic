@@ -88,7 +88,7 @@ Wind::Wind(World &_world, sdf::ElementPtr _sdf)
   this->Load(_sdf);
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(this->dataPtr->world.GetName());
+  this->dataPtr->node->Init(this->dataPtr->world.Name());
   this->dataPtr->windSub = this->dataPtr->node->Subscribe("~/wind",
       &Wind::OnWindMsg, this);
 
@@ -105,6 +105,9 @@ Wind::Wind(World &_world, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 Wind::~Wind()
 {
+  this->dataPtr->windSub.reset();
+  this->dataPtr->requestSub.reset();
+  this->dataPtr->responsePub.reset();
   // Must call fini on node to remove it from topic manager.
   this->dataPtr->node->Fini();
 }
@@ -125,7 +128,7 @@ ignition::math::Vector3d Wind::WorldLinearVel(const Entity *_entity) const
 //////////////////////////////////////////////////
 ignition::math::Vector3d Wind::RelativeLinearVel(const Entity *_entity) const
 {
-  return _entity->GetWorldPose().Ign().Rot().Inverse().RotateVector(
+  return _entity->WorldPose().Rot().Inverse().RotateVector(
       this->WorldLinearVel(_entity));
 }
 

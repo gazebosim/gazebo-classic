@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -206,6 +206,12 @@ bool ConnectionManager::Init(const std::string &_masterHost,
         << this->masterConn->GetLocalHostname() << std::endl;
 
   return true;
+}
+
+//////////////////////////////////////////////////
+bool ConnectionManager::IsInitialized() const
+{
+  return this->initialized;
 }
 
 //////////////////////////////////////////////////
