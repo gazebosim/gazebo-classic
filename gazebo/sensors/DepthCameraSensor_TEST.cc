@@ -36,10 +36,9 @@ void OnNewDepthFrame(const float * _image,
     unsigned int _width, unsigned int _height,
     unsigned int /*_depth*/, const std::string &/*_format*/)
 {
-  if (!_image)
-    return;
+  ASSERT_NE(nullptr, _image);
   std::lock_guard<std::mutex> lock(g_depthMutex);
-  if (!g_depthBuffer)
+  if(!g_depthBuffer)
     g_depthBuffer = new float[_width * _height];
   memcpy(g_depthBuffer,  _image, _width * _height * sizeof(_image[0]));
   g_depthCounter++;
@@ -61,14 +60,14 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
      (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != nullptr);
+  ASSERT_NE(nullptr, sensor);
 
   EXPECT_EQ(sensor->ImageWidth(), 640u);
   EXPECT_EQ(sensor->ImageHeight(), 480u);
   EXPECT_TRUE(sensor->IsActive());
 
   rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
-  EXPECT_TRUE(depthCamera != nullptr);
+  ASSERT_NE(nullptr, depthCamera);
 
   event::ConnectionPtr c = depthCamera->ConnectNewDepthFrame(
       std::bind(&::OnNewDepthFrame, std::placeholders::_1,
@@ -124,11 +123,9 @@ void OnNewReflectanceFrame(const float * _image,
     unsigned int _width, unsigned int _height,
     unsigned int /*_depth*/, const std::string &/*_format*/)
 {
-  if (!_image)
-    return;
+  ASSERT_NE(nullptr, _image);
   std::lock_guard<std::mutex> lock(g_reflectanceMutex);
-
-  if (!g_reflectanceBuffer)
+  if(!g_reflectanceBuffer)
     g_reflectanceBuffer = new float[_width * _height];
   memcpy(g_reflectanceBuffer,  _image, _width * _height * sizeof(_image[0]));
   g_reflectanceCounter++;
@@ -150,14 +147,14 @@ TEST_F(DepthCameraReflectanceSensor_TEST, CreateDepthCamera)
      (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != nullptr);
+  ASSERT_NE(nullptr, sensor);
 
   EXPECT_EQ(sensor->ImageWidth(), 640u);
   EXPECT_EQ(sensor->ImageHeight(), 480u);
   EXPECT_TRUE(sensor->IsActive());
 
   rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
-  EXPECT_TRUE(depthCamera != nullptr);
+  ASSERT_NE(nullptr, depthCamera);
 
   event::ConnectionPtr c = depthCamera->ConnectNewReflectanceFrame(
       std::bind(&::OnNewReflectanceFrame, std::placeholders::_1,

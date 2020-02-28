@@ -36,6 +36,20 @@ namespace gazebo
 {
   namespace rendering
   {
+    // Forward declare private data.
+    class DepthCameraPrivate;
+    class ReflectanceRenderTargetListener;
+    class ReflectanceMaterialListener;
+    class ReflectanceMaterialSwitcher;
+
+    // typedefs that are used only in this class
+    using ReflectanceRenderTargetListenerPtr =
+        std::shared_ptr<ReflectanceRenderTargetListener>;
+    using ReflectanceMaterialListenerPtr =
+        std::shared_ptr<ReflectanceMaterialListener>;
+    using ReflectanceMaterialSwitcherPtr =
+        std::shared_ptr<ReflectanceMaterialSwitcher>;
+
     /// \internal
     /// \brief Private data for the DepthCameraPrivate class
     class DepthCameraPrivate

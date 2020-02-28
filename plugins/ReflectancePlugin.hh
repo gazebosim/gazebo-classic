@@ -25,7 +25,9 @@ namespace gazebo
 {
   class VisualUtilsPrivate;
 
-  /// \brief Plugin that creates
+  /// \brief This plugin stored the reflectance map in the parent visual Then we
+  /// will be able to access this reflectance map from the ogre node to apply
+  /// this reflectanceto the objec using this plugin
   class GAZEBO_VISIBLE ReflectancePlugin : public VisualPlugin
   {
     /// \brief Constructor.
@@ -37,8 +39,6 @@ namespace gazebo
     // Documentation inherited
     public: virtual void Load(rendering::VisualPtr _visual,
         sdf::ElementPtr _sdf) override;
-
-    private: std::unique_ptr<VisualUtilsPrivate> dataPtr;
   };
 }
 #endif

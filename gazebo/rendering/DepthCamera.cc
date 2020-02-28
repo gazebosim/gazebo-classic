@@ -34,6 +34,113 @@
 using namespace gazebo;
 using namespace rendering;
 
+namespace gazebo
+{
+  namespace rendering
+  {
+    /// \class ReflectanceMaterialSwitcher ReflectanceMaterialSwitcher.hh
+    /// \brief Material switcher for reflectance
+    class GZ_RENDERING_VISIBLE ReflectanceMaterialSwitcher
+    {
+      /// \brief Constructor
+      /// \param[in] _scene Pointer to get the visuals
+      /// \param[in] viewport will be updated to see the effect of
+      /// the material switch.
+      public: explicit ReflectanceMaterialSwitcher(
+                  ScenePtr _scene, Ogre::Viewport* _viewport);
+
+      /// \brief Destructor
+      public: ~ReflectanceMaterialSwitcher() = default;
+
+      /// \brief Set the material scheme that will be applied to the models
+      /// in the editor
+      /// \param[in] _scheme Name of material scheme
+      public: void SetMaterialScheme(const std::string &_scheme);
+
+      /// \brief Get the material scheme applied to the models in the editor
+      /// \return Name of material scheme
+      public: std::string MaterialScheme() const;
+
+      /// \brief Ogre render target listener that adds and removes the
+      /// material listener on every render event
+      private: ReflectanceRenderTargetListenerPtr renderTargetListener;
+
+      /// \brief Ogre material listener that will handle switching the
+      /// material scheme
+      private: ReflectanceMaterialListenerPtr materialListener;
+
+      /// \brief viewport pointer to reflectance
+      private: Ogre::Viewport* viewport;
+
+      /// \brief Name of the original material scheme
+      private: std::string originalMaterialScheme;
+
+      /// \brief Name of the material scheme being used.
+      private: std::string materialScheme;
+    };
+
+
+    /// \class ReflectanceRenderTargetListener
+    /// \brief Ogre render target listener.
+    class ReflectanceRenderTargetListener : public Ogre::RenderTargetListener
+    {
+      /// \brief Constructor
+      /// \param[in] _switcher Material listener that will be added to or
+      /// removed from Ogre material manager's list of listeners.
+      public: explicit ReflectanceRenderTargetListener(
+                          const ReflectanceMaterialListenerPtr &_switcher);
+
+      /// \brief Destructor
+      public: ~ReflectanceRenderTargetListener() = default;
+
+      /// \brief Ogre's pre-render update callback
+      /// \param[in] _evt Ogre render target event containing information about
+      /// the source render target.
+      public: virtual void preRenderTargetUpdate(
+                  const Ogre::RenderTargetEvent &_evt);
+
+      /// \brief Ogre's post-render update callback
+      /// \param[in] _evt Ogre render target event containing information about
+      /// the source render target.
+      public: virtual void postRenderTargetUpdate(
+                  const Ogre::RenderTargetEvent &_evt);
+
+      /// \brief Reflectance material listener pointer
+      private: ReflectanceMaterialListenerPtr materialListener;
+    };
+
+    /// \class ReflectanceMaterialListener ReflectanceMaterialListener.hh
+    /// \brief reflectance material listener.
+    class ReflectanceMaterialListener : public Ogre::MaterialManager::Listener
+    {
+      /// \brief Constructor
+      /// \param[in] _scene Pointer to get the visuals.
+      public: explicit ReflectanceMaterialListener(ScenePtr _scene);
+
+      /// \brief Destructor
+      public: ~ReflectanceMaterialListener() = default;
+
+      /// \brief Ogre callback that is used to specify the material to use when
+      /// the requested scheme is not found
+      /// \param[in] _schemeIndex Index of scheme requested
+      /// \param[in] _schemeName Name of scheme requested
+      /// \param[in] _originalMaterial Orignal material that does not contain
+      /// the requested scheme
+      /// \param[in] _lodIndex The material level-of-detail
+      /// \param[in] _rend Pointer to the Ogre::Renderable object requesting
+      /// the use of the techinique
+      /// \return The Ogre material technique to use when scheme is not found.
+      public: virtual Ogre::Technique *handleSchemeNotFound(
+                  uint16_t _schemeIndex, const Ogre::String &_schemeName,
+                  Ogre::Material *_originalMaterial, uint16_t _lodIndex,
+                  const Ogre::Renderable *_rend);
+
+      /// \brief Scene pointer
+      private: ScenePtr scene;
+    };
+  }
+}
+
 //////////////////////////////////////////////////
 DepthCamera::DepthCamera(const std::string &_namePrefix, ScenePtr _scene,
                          bool _autoRender)
@@ -594,7 +701,6 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
     Ogre::Material *_originalMaterial, uint16_t /*_lodIndex*/,
     const Ogre::Renderable *_rend)
 {
-  // printf("_schemeName: %s\n", _schemeName.c_str());
   if (_rend && typeid(*_rend) == typeid(Ogre::SubEntity))
   {
     std::string material = "";
@@ -672,8 +778,6 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       Ogre::MaterialPtr mat;
       // OGRE 1.9 changes the shared pointer definition
       #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
-      // Make sure we keep the same depth properties so that
-      // certain overlay objects can be picked by the mouse.
       mat = static_cast<Ogre::MaterialPtr>(res);
       #else
       mat = res.staticCast<Ogre::Material>();

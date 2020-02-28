@@ -28,19 +28,10 @@ namespace gazebo
 {
 using namespace gazebo;
 
-class VisualUtilsPrivate
-{
-  /// Visual to which the plugin is attached
-  public: rendering::VisualPtr visual;
-
-  /// Unique name
-  public: std::string name;
-};
-
 GZ_REGISTER_VISUAL_PLUGIN(ReflectancePlugin)
 
 /////////////////////////////////////////////////
-ReflectancePlugin::ReflectancePlugin() : dataPtr(new VisualUtilsPrivate)
+ReflectancePlugin::ReflectancePlugin()
 {
 }
 
@@ -59,21 +50,17 @@ void ReflectancePlugin::Load(rendering::VisualPtr _visual,
     gzerr << "[ReflectancePlugin] Invalid visual or SDF element." << std::endl;
     return;
   }
-  this->dataPtr->visual = _visual;
 
   // Unique name
-  if (_sdf->HasElement("reflectance_map"))
+  if (!_sdf->HasElement("reflectance_map"))
   {
-    this->dataPtr->name = _sdf->Get<std::string>("reflectance_map");
-  }
-  else
-  {
-    gzerr << "[ReflectancePlugin] Invalid material." << std::endl;
+    gzerr << "<reflectance_map> is required" << std::endl;
     return;
   }
 
-  this->dataPtr->visual->GetSceneNode()->getUserObjectBindings()
+  std::string name = _sdf->Get<std::string>("reflectance_map");
+  _visual->GetSceneNode()->getUserObjectBindings()
                 .setUserAny(std::string("reflectance_map"),
-                            Ogre::Any(std::string(dataPtr->name)));
+                            Ogre::Any(std::string(name)));
 }
 }
