@@ -36,8 +36,7 @@ void OnNewDepthFrame(const float * _image,
     unsigned int _width, unsigned int _height,
     unsigned int /*_depth*/, const std::string &/*_format*/)
 {
-  if (!_image)
-    return;
+  ASSERT_NE(nullptr, _image);
   std::lock_guard<std::mutex> lock(g_depthMutex);
   if (!g_depthBuffer)
     g_depthBuffer = new float[_width * _height];
@@ -61,14 +60,14 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
      (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != nullptr);
+  ASSERT_NE(nullptr, sensor);
 
   EXPECT_EQ(sensor->ImageWidth(), 640u);
   EXPECT_EQ(sensor->ImageHeight(), 480u);
   EXPECT_TRUE(sensor->IsActive());
 
   rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
-  EXPECT_TRUE(depthCamera != nullptr);
+  ASSERT_NE(nullptr, depthCamera);
 
   event::ConnectionPtr c = depthCamera->ConnectNewDepthFrame(
       std::bind(&::OnNewDepthFrame, std::placeholders::_1,
@@ -135,7 +134,8 @@ void OnNewNormalsFrame(const float * _normals,
       float x = _normals[4 * index];
       float y = _normals[4 * index + 1];
       float z = _normals[4 * index + 2];
-      // float a = _normals[4 * index + 3];
+      // checking only normals in object
+      // background is set to 0 ( it means no object)
       if (x > 0.0 && y > 0.0 && z > 0.0)
       {
         EXPECT_NEAR(x, 0.0, 0.01);
@@ -163,14 +163,14 @@ TEST_F(DepthCameraSensor_normals_TEST, CreateDepthCamera)
      (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != nullptr);
+  ASSERT_NE(nullptr, sensor);
 
   EXPECT_EQ(sensor->ImageWidth(), 640u);
   EXPECT_EQ(sensor->ImageHeight(), 480u);
   EXPECT_TRUE(sensor->IsActive());
 
   rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
-  EXPECT_TRUE(depthCamera != nullptr);
+  ASSERT_NE(nullptr, depthCamera);
 
   event::ConnectionPtr c2 = depthCamera->ConnectNewNormalsPointCloud(
       std::bind(&::OnNewNormalsFrame, std::placeholders::_1,

@@ -106,7 +106,10 @@ namespace gazebo
           std::function<void (const float *, unsigned int, unsigned int,
           unsigned int, const std::string &)>  _subscriber);
 
-      /// \brief Connect a to the new normal data
+      /// \brief Connect to the new normal data
+      /// Normals are stored in a vector4f, XYZ contains the normal for this
+      /// specific point cloud, the 4th channel should be skipped
+      /// The pixels in the image return the point towards the camera.
       /// \param[in] _subscriber Subscriber callback function
       /// \return Pointer to the new Connection. This must be kept in scope
       public: event::ConnectionPtr ConnectNewNormalsPointCloud(
