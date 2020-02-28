@@ -38,7 +38,7 @@ void OnNewDepthFrame(const float * _image,
 {
   ASSERT_NE(nullptr, _image);
   std::lock_guard<std::mutex> lock(g_depthMutex);
-  if(!g_depthBuffer)
+  if (!g_depthBuffer)
     g_depthBuffer = new float[_width * _height];
   memcpy(g_depthBuffer,  _image, _width * _height * sizeof(_image[0]));
   g_depthCounter++;
@@ -125,7 +125,7 @@ void OnNewReflectanceFrame(const float * _image,
 {
   ASSERT_NE(nullptr, _image);
   std::lock_guard<std::mutex> lock(g_reflectanceMutex);
-  if(!g_reflectanceBuffer)
+  if (!g_reflectanceBuffer)
     g_reflectanceBuffer = new float[_width * _height];
   memcpy(g_reflectanceBuffer,  _image, _width * _height * sizeof(_image[0]));
   g_reflectanceCounter++;
