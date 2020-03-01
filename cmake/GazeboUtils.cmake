@@ -98,12 +98,20 @@ macro (gz_add_library _name)
   # Not defining STATIC or SHARED will use BUILD_SHARED_LIBS variable
   add_library(${_name} ${ARGN})
   target_link_libraries (${_name} ${general_libraries})
+  # Visual Studio enables c++11 support by default
+  if (NOT MSVC)
+    target_compile_options(${_name} PUBLIC -std=c++11)
+  endif()
 endmacro ()
 
 #################################################
 macro (gz_add_executable _name)
   add_executable(${_name} ${ARGN})
   target_link_libraries (${_name} ${general_libraries})
+  # Visual Studio enables c++11 support by default
+  if (NOT MSVC)
+    target_compile_options(${_name} PRIVATE -std=c++11)
+  endif()
 endmacro ()
 
 
