@@ -34,8 +34,10 @@ float *g_depthBuffer = nullptr;
 /////////////////////////////////////////////////
 void OnNewDepthFrame(const float * _image,
     unsigned int _width, unsigned int _height,
-    unsigned int /*_depth*/, const std::string &/*_format*/)
+    unsigned int _depth, const std::string & _format)
 {
+  EXPECT_EQ(_depth, 1u);
+  EXPECT_EQ(_format, std::string("FLOAT32"));
   ASSERT_NE(nullptr, _image);
   std::lock_guard<std::mutex> lock(g_depthMutex);
   if (!g_depthBuffer)
@@ -75,13 +77,14 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
       std::placeholders::_5));
 
   // wait for a few depth camera frames
+  unsigned int framesToWait = 10;
   int i = 0;
-  while (g_depthCounter < 10 && i < 300)
+  while (i < 300 && g_depthCounter < framesToWait)
   {
-    common::Time::MSleep(10);
+    common::Time::MSleep(20);
     i++;
   }
-  EXPECT_LT(i, 300);
+  EXPECT_GE(g_depthCounter, framesToWait);
 
   unsigned int imageSize =
       sensor->ImageWidth() * sensor->ImageHeight();
@@ -121,8 +124,10 @@ float *g_reflectanceBuffer = nullptr;
 /////////////////////////////////////////////////
 void OnNewReflectanceFrame(const float * _image,
     unsigned int _width, unsigned int _height,
-    unsigned int /*_depth*/, const std::string &/*_format*/)
+    unsigned int _depth, const std::string & _format)
 {
+  EXPECT_EQ(_depth, 1u);
+  EXPECT_EQ(_format, std::string("REFLECTANCE"));
   ASSERT_NE(nullptr, _image);
   std::lock_guard<std::mutex> lock(g_reflectanceMutex);
   if (!g_reflectanceBuffer)
@@ -164,7 +169,7 @@ TEST_F(DepthCameraReflectanceSensor_TEST, CreateDepthCamera)
   // wait for a few depth camera frames
   unsigned int framesToWait = 10;
   int i = 0;
-  while (i < 300 && g_reflectanceCounter < 10)
+  while (i < 300 && g_reflectanceCounter < framesToWait)
   {
     common::Time::MSleep(20);
     i++;
