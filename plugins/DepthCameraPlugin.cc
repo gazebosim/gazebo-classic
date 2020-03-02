@@ -22,6 +22,7 @@
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(DepthCameraPlugin)
 
+// Added this map to avoid breaking the ABI
 static std::map<DepthCameraPlugin*, event::ConnectionPtr>
                                                 connection_normals_map;
 
