@@ -34,8 +34,10 @@ float *g_depthBuffer = nullptr;
 /////////////////////////////////////////////////
 void OnNewDepthFrame(const float * _image,
     unsigned int _width, unsigned int _height,
-    unsigned int /*_depth*/, const std::string &/*_format*/)
+    unsigned int _depth, const std::string & _format)
 {
+  EXPECT_EQ(_depth, 1u);
+  EXPECT_EQ(_format, std::string("FLOAT32"));
   ASSERT_NE(nullptr, _image);
   std::lock_guard<std::mutex> lock(g_depthMutex);
   if (!g_depthBuffer)
@@ -77,7 +79,7 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
   // wait for a few depth camera frames
   unsigned int framesToWait = 10;
   int i = 0;
-  while (i < 300 && g_depthCounter < 10)
+  while (i < 300 && g_depthCounter < framesToWait)
   {
     common::Time::MSleep(20);
     i++;
@@ -123,9 +125,11 @@ unsigned int g_normalsCounter = 0;
 void OnNewNormalsFrame(const float * _normals,
                        unsigned int _width,
                        unsigned int _height,
-                       unsigned int /*_depth*/,
-                       const std::string &/*_format*/)
+                       unsigned int _depth,
+                       const std::string & _format)
 {
+  EXPECT_EQ(_depth, 1u);
+  EXPECT_EQ(_format, std::string("NORMALS"));
   for (unsigned int i = 0; i < _width; i++)
   {
     for (unsigned int j = 0; j < _height; j++)
@@ -134,14 +138,14 @@ void OnNewNormalsFrame(const float * _normals,
       float x = _normals[4 * index];
       float y = _normals[4 * index + 1];
       float z = _normals[4 * index + 2];
-      // checking only normals in object
-      // background is set to 0 ( it means no object)
-      if (x > 0.0 && y > 0.0 && z > 0.0)
-      {
-        EXPECT_NEAR(x, 0.0, 0.01);
-        EXPECT_NEAR(y, 0.0, 0.01);
+      EXPECT_NEAR(x, 0.0, 0.01);
+      EXPECT_NEAR(y, 0.0, 0.01);
+      // box
+      if (z < -0.5)
         EXPECT_NEAR(z, -1.0, 0.01);
-      }
+      // background
+      else
+        EXPECT_NEAR(z, 0.0, 0.01);
     }
   }
   g_normalsCounter++;
@@ -180,7 +184,7 @@ TEST_F(DepthCameraSensor_normals_TEST, CreateDepthCamera)
   unsigned int framesToWait = 10;
   // wait for a few normals callbacks
   int i = 0;
-  while (i < 300 && g_normalsCounter < 10)
+  while (i < 300 && g_normalsCounter < framesToWait)
   {
     common::Time::MSleep(20);
     i++;

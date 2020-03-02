@@ -64,7 +64,6 @@ namespace gazebo
     private: event::ConnectionPtr newDepthFrameConnection;
     private: event::ConnectionPtr newRGBPointCloudConnection;
     private: event::ConnectionPtr newImageFrameConnection;
-    private: event::ConnectionPtr newNormalsFrameConnection;
   };
 }
 #endif

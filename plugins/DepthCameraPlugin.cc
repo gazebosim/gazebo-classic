@@ -22,6 +22,9 @@
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(DepthCameraPlugin)
 
+static std::map<DepthCameraPlugin*, event::ConnectionPtr>
+                                                connection_normals_map;
+
 /////////////////////////////////////////////////
 DepthCameraPlugin::DepthCameraPlugin()
 : SensorPlugin(), width(0), height(0), depth(0)
@@ -34,7 +37,11 @@ DepthCameraPlugin::~DepthCameraPlugin()
   this->newDepthFrameConnection.reset();
   this->newRGBPointCloudConnection.reset();
   this->newImageFrameConnection.reset();
-  this->newNormalsFrameConnection.reset();
+
+  std::map<DepthCameraPlugin*, event::ConnectionPtr>::iterator it;
+  it = connection_normals_map.find(this);
+  it->second.reset();
+  connection_normals_map.erase(it);
 
   this->parentSensor.reset();
   this->depthCamera.reset();
@@ -74,12 +81,16 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
         this, std::placeholders::_1, std::placeholders::_2,
         std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
 
-  this->newNormalsFrameConnection =
-        this->depthCamera->ConnectNewNormalsPointCloud(
+  event::ConnectionPtr newNormalsFrameConnection =
+    this->depthCamera->ConnectNewNormalsPointCloud(
             std::bind(&DepthCameraPlugin::OnNewNormalsFrame,
             this, std::placeholders::_1, std::placeholders::_2,
             std::placeholders::_3, std::placeholders::_4,
             std::placeholders::_5));
+
+  connection_normals_map.
+        insert(std::pair<DepthCameraPlugin*, event::ConnectionPtr>
+               (this, newNormalsFrameConnection));
 
   this->parentSensor->SetActive(true);
 }
