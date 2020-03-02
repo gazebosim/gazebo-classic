@@ -1,0 +1,128 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="model_2">
+        <pose>3.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <link name="link_1">
+            <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+            <inertial>
+                <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>1.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                    <iyy>1.0</iyy>
+                    <iyz>0.0</iyz>
+                    <izz>1.0</izz>
+                </inertia>
+                <mass>10.0</mass>
+            </inertial>
+            <visual name="visual_box">
+                <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+                <geometry>
+                    <box>
+                        <size>1 2 2</size>
+                    </box>
+                </geometry>
+                <material>
+                    <ambient>0.00 0.9 0.1 1.0</ambient>
+                    <script>Gazebo/Green</script>
+                </material>
+                <cast_shadows>true</cast_shadows>
+                <laser_retro>100.0</laser_retro>
+            </visual>
+            <collision name="collision_box">
+                <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+                <max_contacts>250</max_contacts>
+                <geometry>
+                    <box>
+                        <size>1 2 2</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>0.5</mu>
+                            <mu2>0.2</mu2>
+                            <fdir1>1.0 0 0</fdir1>
+                            <slip1>0</slip1>
+                            <slip2>0</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0</restitution_coefficient>
+                        <threshold>1000000.0</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0</soft_cfm>
+                            <soft_erp>0.2</soft_erp>
+                            <kp>1e15</kp>
+                            <kd>1e13</kd>
+                            <max_vel>100.0</max_vel>
+                            <min_depth>0.0001</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>100.0</laser_retro>
+            </collision>
+            <gravity>false</gravity>
+            <self_collide>true</self_collide>
+            <kinematic>false</kinematic>
+        </link>
+        <static>false</static>
+    </model>
+
+    <model name="camera_model">
+      <pose>0 0 0 0 0 0</pose>
+      <link name="my_link">
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <sensor name="camera" type="depth">
+          <camera>
+            <horizontal_fov>1.04719755</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>B8G8R8</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>20</far>
+            </clip>
+            <depth_camera>
+              <output>points;normals</output>
+            </depth_camera>
+          </camera>
+          <plugin filename="libDepthCameraPlugin.so" name="depth_camera_plugin" />
+          <always_on>true</always_on>
+          <update_rate>10.0</update_rate>
+        </sensor>
+      </link>
+      <static>true</static>
+    </model>
+  </world>
+</sdf>
