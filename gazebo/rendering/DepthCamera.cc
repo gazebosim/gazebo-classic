@@ -149,6 +149,7 @@ DepthCamera::DepthCamera(const std::string &_namePrefix, ScenePtr _scene,
 {
   this->dataPtr->outputPoints = false;
   this->dataPtr->outputReflectance = false;
+  this->dataPtr->outputNormals = false;
 }
 
 //////////////////////////////////////////////////
@@ -159,6 +160,9 @@ DepthCamera::~DepthCamera()
 
   if (this->dataPtr->reflectanceBuffer)
     delete [] this->dataPtr->reflectanceBuffer;
+
+  if (this->dataPtr->normalsBuffer)
+    delete [] this->dataPtr->normalsBuffer;
 
   if (this->dataPtr->pcdBuffer)
     delete [] this->dataPtr->pcdBuffer;
@@ -174,6 +178,8 @@ void DepthCamera::Load(sdf::ElementPtr _sdf)
   this->dataPtr->outputPoints =  found != std::string::npos;
   found = outputs.find("reflectance");
   this->dataPtr->outputReflectance =  found != std::string::npos;
+  found = outputs.find("normals");
+  this->dataPtr->outputNormals =  found != std::string::npos;
 }
 
 //////////////////////////////////////////////////
@@ -342,6 +348,45 @@ void DepthCamera::CreateReflectanceTexture(const std::string &_textureName)
 }
 
 //////////////////////////////////////////////////
+void DepthCamera::CreateNormalsTexture(const std::string &_textureName)
+{
+  if (this->dataPtr->outputNormals)
+  {
+    this->dataPtr->normalsTextures =
+      Ogre::TextureManager::getSingleton().createManual(
+      _textureName + "_normals",
+      "General",
+      Ogre::TEX_TYPE_2D,
+      this->ImageWidth(), this->ImageHeight(), 0,
+      Ogre::PF_FLOAT32_RGBA,
+      Ogre::TU_RENDERTARGET).getPointer();
+
+    this->dataPtr->normalsTarget =
+        this->dataPtr->normalsTextures->getBuffer()->getRenderTarget();
+    this->dataPtr->normalsTarget->setAutoUpdated(false);
+
+    this->dataPtr->normalsViewport =
+        this->dataPtr->normalsTarget->addViewport(this->camera);
+    this->dataPtr->normalsViewport->setClearEveryFrame(true);
+
+    auto const &ignBG = this->scene->BackgroundColor();
+    this->dataPtr->normalsViewport->setBackgroundColour(
+        Conversions::Convert(ignBG));
+    this->dataPtr->normalsViewport->setOverlaysEnabled(false);
+    this->dataPtr->normalsViewport->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
+
+    this->dataPtr->normalsMaterial = (Ogre::Material*)(
+    Ogre::MaterialManager::getSingleton().getByName("Gazebo/XYZNormals").get());
+
+    this->dataPtr->normalsMaterial->getTechnique(0)->getPass(0)->
+        createTextureUnitState(_textureName + "_normals");
+
+    this->dataPtr->normalsMaterial->load();
+  }
+}
+
+//////////////////////////////////////////////////
 void DepthCamera::PostRender()
 {
   this->depthTarget->swapBuffers();
@@ -349,6 +394,8 @@ void DepthCamera::PostRender()
     this->dataPtr->pcdTarget->swapBuffers();
   if (this->dataPtr->outputReflectance)
     this->dataPtr->reflectanceTarget->swapBuffers();
+  if (this->dataPtr->outputNormals)
+    this->dataPtr->normalsTarget->swapBuffers();
 
   if (this->newData && this->captureData)
   {
@@ -428,6 +475,30 @@ void DepthCamera::PostRender()
      this->dataPtr->newReflectanceFrame(
          this->dataPtr->reflectanceBuffer, width, height, 1, "REFLECTANCE");
     }
+
+    if (this->dataPtr->outputNormals)
+    {
+      Ogre::HardwarePixelBufferSharedPtr normalsPixelBuffer;
+
+      normalsPixelBuffer = this->dataPtr->normalsTextures->getBuffer();
+
+      // Blit the depth buffer if needed
+      if (!this->dataPtr->normalsBuffer)
+        this->dataPtr->normalsBuffer = new float[width * height * 4];
+
+      memset(this->dataPtr->normalsBuffer, 0, width * height * 4);
+
+      Ogre::Box normals_src_box(0, 0, width, height);
+      Ogre::PixelBox normals_dst_box(width, height,
+          1, Ogre::PF_FLOAT32_RGBA, this->dataPtr->normalsBuffer);
+
+      normalsPixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
+      normalsPixelBuffer->blitToMemory(normals_src_box, normals_dst_box);
+      normalsPixelBuffer->unlock();
+
+      this->dataPtr->newNormalsPointCloud(
+          this->dataPtr->normalsBuffer, width, height, 1, "NORMALS");
+    }
   }
   // also new image frame for camera texture
   Camera::PostRender();
@@ -459,8 +530,11 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
   vp = _target->getViewport(0);
 
   // return farClip in case no renderable object is inside frustrum
-  vp->setBackgroundColour(Ogre::ColourValue(this->FarClip(),
-      this->FarClip(), this->FarClip()));
+  if (_target == this->dataPtr->normalsTarget)
+    vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0));
+  else
+    vp->setBackgroundColour(Ogre::ColourValue(this->FarClip(),
+        this->FarClip(), this->FarClip()));
 
   Ogre::CompositorManager::getSingleton().setCompositorEnabled(
                                                 vp, _matName, true);
@@ -558,6 +632,20 @@ void DepthCamera::RenderImpl()
   {
     this->dataPtr->reflectanceTarget->update(false);
   }
+
+  if (this->dataPtr->outputNormals)
+  {
+    sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
+    sceneMgr->_suppressRenderStateChanges(true);
+
+    this->UpdateRenderTarget(this->dataPtr->normalsTarget,
+                  this->dataPtr->normalsMaterial, "Gazebo/XYZNormals");
+
+    this->dataPtr->normalsTarget->update(false);
+
+    sceneMgr->_suppressRenderStateChanges(false);
+    sceneMgr->setShadowTechnique(shadowTech);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -614,6 +702,14 @@ event::ConnectionPtr DepthCamera::ConnectNewReflectanceFrame(
     const std::string &)>  _subscriber)
 {
   return this->dataPtr->newReflectanceFrame.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+event::ConnectionPtr DepthCamera::ConnectNewNormalsPointCloud(
+    std::function<void (const float *, unsigned int, unsigned int, unsigned int,
+    const std::string &)>  _subscriber)
+{
+  return this->dataPtr->newNormalsPointCloud.Connect(_subscriber);
 }
 
 /////////////////////////////////////////////////
