@@ -27,7 +27,11 @@ namespace gazebo
 
   /// \brief This plugin stored the reflectance map in the parent visual Then we
   /// will be able to access this reflectance map from the ogre node to apply
-  /// this reflectanceto the objec using this plugin
+  /// this reflectance to the object using this plugin.
+  /// This plugin should be used inside a visual tag. It has one parameter
+  /// called <reflectance_map> where you need to place the name of your image
+  /// The image could be RGB or black and white. It's recommended to use .png
+  /// files. Resources are found in the texture folder
   class GAZEBO_VISIBLE ReflectancePlugin : public VisualPlugin
   {
     /// \brief Constructor.

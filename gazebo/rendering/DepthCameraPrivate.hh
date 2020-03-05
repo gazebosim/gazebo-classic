@@ -125,14 +125,13 @@ namespace gazebo
       public: event::EventT<void(const float *, unsigned int, unsigned int,
                    unsigned int, const std::string &)> newDepthFrame;
 
-      /// \brief Event used to signal reflectance point cloud data
+      /// \brief Event used to signal reflectance data
       public: event::EventT<void(const float *, unsigned int, unsigned int,
                   unsigned int, const std::string &)> newReflectanceFrame;
 
       /// \brief Event used to signal normals point cloud data
       public: event::EventT<void(const float *, unsigned int, unsigned int,
                   unsigned int, const std::string &)> newNormalsPointCloud;
-
     };
   }
 }
