@@ -77,6 +77,10 @@ namespace gazebo
       /// \param[in] _textureName Name of the texture to create
       public: void CreateDepthTexture(const std::string &_textureName);
 
+      /// \brief Create a texture which will hold the normal data
+      /// \param[in] _textureName Name of the texture to create
+      public: void CreateNormalsTexture(const std::string &_textureName);
+
       /// \brief Render the camera
       public: virtual void PostRender();
 
@@ -99,6 +103,16 @@ namespace gazebo
       /// \param[in] _subscriber Subscriber callback function
       /// \return Pointer to the new Connection. This must be kept in scope
       public: event::ConnectionPtr ConnectNewRGBPointCloud(
+          std::function<void (const float *, unsigned int, unsigned int,
+          unsigned int, const std::string &)>  _subscriber);
+
+      /// \brief Connect to the new normal data
+      /// Normals are stored in a vector4f, XYZ contains the normal for this
+      /// specific point cloud, the 4th channel should be skipped
+      /// The pixels in the image return the point towards the camera.
+      /// \param[in] _subscriber Subscriber callback function
+      /// \return Pointer to the new Connection. This must be kept in scope
+      public: event::ConnectionPtr ConnectNewNormalsPointCloud(
           std::function<void (const float *, unsigned int, unsigned int,
           unsigned int, const std::string &)>  _subscriber);
 
