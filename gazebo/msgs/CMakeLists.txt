@@ -148,7 +148,11 @@ if (UNIX)
 endif()
 # Visual Studio enables c++11 support by default
 if (NOT MSVC)
-  target_compile_options(gazebomsgs_out PUBLIC -std=c++11)
+  if(CMAKE_VERSION VERSION_LESS 3.8.2)
+    target_compile_options(${BINARY_NAME} PRIVATE -std=c++11)
+  else()
+    target_compile_features(dart PUBLIC cxx_std_11)
+  endif()
 endif()
 
 set (sources msgs.cc MsgFactory.cc)
