@@ -146,6 +146,9 @@ target_link_libraries(gazebomsgs_out ${GZ_PROTOBUF_LIBRARY} ${GZ_PROTOBUF_PROTOC
 if (UNIX)
   target_link_libraries(gazebomsgs_out pthread)
 endif()
+if (NOT MSVC)
+  target_compile_options(gazebomsgs_out PUBLIC -std=c++11)
+endif()
 
 set (sources msgs.cc MsgFactory.cc)
 set (headers msgs.hh MsgFactory.hh)
