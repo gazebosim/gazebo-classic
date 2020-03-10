@@ -51,6 +51,10 @@ namespace gazebo
                               unsigned int _width, unsigned int _height,
                               unsigned int _depth, const std::string &_format);
 
+    public: virtual void OnNewNormalsFrame(const float *_normals,
+                              unsigned int _width, unsigned int _height,
+                              unsigned int _depth, const std::string &_format);
+
     protected: unsigned int width, height, depth;
     protected: std::string format;
 

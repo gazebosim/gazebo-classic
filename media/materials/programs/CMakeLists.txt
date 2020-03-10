@@ -14,6 +14,8 @@ deform_fp.glsl
 deform_vp.glsl
 depth_map.frag
 depth_map.vert
+depth_normals_map.frag
+depth_normals_map.vert
 depth_points_map.frag
 depth_points_map.vert
 directional_shadow_receiver_fp.glsl
@@ -50,4 +52,3 @@ wide_lens_map_vs.glsl
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/materials/programs/)
-

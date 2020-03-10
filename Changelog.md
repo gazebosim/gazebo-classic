@@ -5,6 +5,12 @@
 1. Fix bounding box calculation for visuals that have links with pose offset
     * [Pull request 3196](https://bitbucket.org/osrf/gazebo/pull-request/3196)
 
+1. Added normals to depth camera sensor
+    * [Pull request 3193](https://bitbucket.org/osrf/gazebo/pull-requests/3193/)
+
+1. Prevent crash when subscribing to depth camera image topic
+    * [Pull request 3197](https://bitbucket.org/osrf/gazebo/pull-request/3197)
+
 ## Gazebo 9.12.0 (2020-01-31)
 
 1. Fix gazebo9 build and run on Windows, Ogre 1.10
