@@ -15,6 +15,8 @@
  *
 */
 
+#include <boost/filesystem.hpp>
+
 #include <gazebo/rendering/Camera.hh>
 #include <gazebo/rendering/RenderTypes.hh>
 #include <gazebo/rendering/Scene.hh>
@@ -59,6 +61,20 @@ void ReflectancePlugin::Load(rendering::VisualPtr _visual,
   }
 
   std::string name = _sdf->Get<std::string>("reflectance_map");
+
+  boost::filesystem::path file_reflectance(name.c_str());
+  if (file_reflectance.is_absolute())
+  {
+    if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
+          file_reflectance.parent_path().c_str(), "General"))
+    {
+      Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+        file_reflectance.parent_path().c_str(), "FileSystem", "General", true);
+      Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
+          "General");
+    }
+  }
+
   _visual->GetSceneNode()->getUserObjectBindings()
                 .setUserAny(std::string("reflectance_map"),
                             Ogre::Any(std::string(name)));

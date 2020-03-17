@@ -31,7 +31,8 @@ namespace gazebo
   /// This plugin should be used inside a visual tag. It has one parameter
   /// called <reflectance_map> where you need to place the name of your image
   /// The image could be RGB or black and white. It's recommended to use .png
-  /// files. Resources are found in the texture folder
+  /// files. Resources are found in the Gazebo texture folder or you can also
+  /// use absolute paths
   class GAZEBO_VISIBLE ReflectancePlugin : public VisualPlugin
   {
     /// \brief Constructor.
