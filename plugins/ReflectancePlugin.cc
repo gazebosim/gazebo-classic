@@ -62,9 +62,9 @@ void ReflectancePlugin::Load(rendering::VisualPtr _visual,
     return;
   }
 
-  sdf::ElementPtr reflectance_map_elem = _sdf->GetElement("reflectance_map");
-  std::string name = reflectance_map_elem->Get<std::string>("name");
-  std::string uri = reflectance_map_elem->Get<std::string>("uri");
+  sdf::ElementPtr reflectanceMapElem = _sdf->GetElement("reflectance_map");
+  std::string name = reflectanceMapElem->Get<std::string>("name");
+  std::string uri = reflectanceMapElem->Get<std::string>("uri");
 
   if (!uri.empty())
   {
