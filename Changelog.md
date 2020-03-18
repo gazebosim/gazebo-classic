@@ -64,13 +64,12 @@
 
 ## Gazebo 10
 
-## Gazebo 10.x.x (201x-xx-xx)
+## Gazebo 10.x.x (202x-xx-xx)
 
-1. Fix gazebo9 build and run on Windows, Ogre 1.10
+## Gazebo 10.2.0 (2020-01-31)
+
+1. Fix gazebo build and run on Windows, Ogre 1.10
     * [Pull request 3174](https://bitbucket.org/osrf/gazebo/pull-request/3174)
-
-1. Added support for flippers in SimpleTrackedVehiclePlugin.
-    * [Pull request 3149](https://bitbucket.org/osrf/gazebo/pull-request/3149)
 
 1. Fix missing road segments in camera sensors
     * [Pull request 3182](https://bitbucket.org/osrf/gazebo/pull-request/3182)
@@ -89,6 +88,12 @@
 1. Windows: reduce WinSock header inclusion to limit name conflicts.
     * [Pull request 3158](https://bitbucket.org/osrf/gazebo/pull-request/3158)
 
+1. Windows patches to build default
+    * [Pull request 3065](https://bitbucket.org/osrf/gazebo/pull-request/3065)
+
+1. Don't pass GCC linker options to Visual Studio linker.
+    * [Pull request 3153](https://bitbucket.org/osrf/gazebo/pull-request/3153)
+
 1. Fix deadlock between `World::OnRequest` and `TopicManager::AddNode`.
     * [Pull request 3155](https://bitbucket.org/osrf/gazebo/pull-request/3155)
     * [Issue #2679](https://bitbucket.org/osrf/gazebo/issues/2679)
@@ -98,13 +103,6 @@
 
 1. Fix CMake 3.14 regression in `MSVC`/`PKG_CONFIG_FOUND` workaround.
     * [Pull request 3125](https://bitbucket.org/osrf/gazebo/pull-request/3125)
-
-1. Add Twist message and use in `cmd_vel_twist` of TrackedVehiclePlugin.
-    * [Pull request 3116](https://bitbucket.org/osrf/gazebo/pull-request/3116)
-
-1. Allow multiple instances of SimpleTrackedVehiclePlugin.
-    * [Pull request 3140](https://bitbucket.org/osrf/gazebo/pull-request/3140)
-    * [Pull request 3148](https://bitbucket.org/osrf/gazebo/pull-request/3148)
 
 1. ODEBallJoint: reduce console output.
     * [Pull request 3132](https://bitbucket.org/osrf/gazebo/pull-request/3132)
@@ -175,6 +173,10 @@
 
 1. Added support for tracked vehicles
     * [Pull request 2652](https://bitbucket.org/osrf/gazebo/pull-request/2652)
+    * [Pull request 3116](https://bitbucket.org/osrf/gazebo/pull-request/3116)
+    * [Pull request 3140](https://bitbucket.org/osrf/gazebo/pull-request/3140)
+    * [Pull request 3148](https://bitbucket.org/osrf/gazebo/pull-request/3148)
+    * [Pull request 3149](https://bitbucket.org/osrf/gazebo/pull-request/3149)
     * [Issue #863](https://bitbucket.org/osrf/gazebo/issues/863)
 
 1. Fix windows plugin visibility.
@@ -214,6 +216,12 @@
     * [Pull request 3038](https://bitbucket.org/osrf/gazebo/pull-request/3038)
     * [Pull request 3169](https://bitbucket.org/osrf/gazebo/pull-request/3169)
     * [Pull request 3172](https://bitbucket.org/osrf/gazebo/pull-request/3172)
+
+1. Backport camera intrinsics feature
+    * [Pull request 3099](https://bitbucket.org/osrf/gazebo/pull-request/3099)
+
+1. Fix CMake 3.14 regression in `MSVC`/`PKG_CONFIG_FOUND` workaround.
+    * [Pull request 3152](https://bitbucket.org/osrf/gazebo/pull-request/3152)
 
 ## Gazebo 10.1.0 (2019-03-28)
 
@@ -317,7 +325,9 @@
 
 ## Gazebo 9
 
-## Gazebo 9.X.X (20XX-XX-XX)
+## Gazebo 9.XX.X (2020-XX-XX)
+
+## Gazebo 9.12.0 (2020-01-31)
 
 1. Fix gazebo9 build and run on Windows, Ogre 1.10
     * [Pull request 3174](https://bitbucket.org/osrf/gazebo/pull-request/3174)
