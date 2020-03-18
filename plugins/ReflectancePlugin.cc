@@ -15,9 +15,11 @@
  *
 */
 
-#include <boost/filesystem.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
+#include <gazebo/common/ModelDatabase.hh>
 #include <gazebo/rendering/Camera.hh>
+#include <gazebo/rendering/RenderEngine.hh>
 #include <gazebo/rendering/RenderTypes.hh>
 #include <gazebo/rendering/Scene.hh>
 #include <gazebo/rendering/UserCamera.hh>
@@ -60,18 +62,23 @@ void ReflectancePlugin::Load(rendering::VisualPtr _visual,
     return;
   }
 
-  std::string name = _sdf->Get<std::string>("reflectance_map");
+  sdf::ElementPtr reflectance_map_elem = _sdf->GetElement("reflectance_map");
+  std::string name = reflectance_map_elem->Get<std::string>("name");
+  std::string uri = reflectance_map_elem->Get<std::string>("uri");
 
-  boost::filesystem::path file_reflectance(name.c_str());
-  if (file_reflectance.is_absolute())
+  if (!uri.empty())
   {
-    if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
-          file_reflectance.parent_path().c_str(), "General"))
+    rendering::RenderEngine::Instance()->AddResourcePath(uri);
+  }
+  else
+  {
+    if (!name.empty())
     {
-      Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-        file_reflectance.parent_path().c_str(), "FileSystem", "General", true);
-      Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
-          "General");
+      rendering::RenderEngine::Instance()->AddResourcePath(name);
+    }
+    else
+    {
+      gzerr << "<name> inside <reflectance_map> tag is required" << std::endl;
     }
   }
 
