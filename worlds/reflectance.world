@@ -23,7 +23,10 @@
             </script>
           </material>
           <plugin filename="libReflectancePlugin.so" name="reflectance_plugin">
-            <reflectance_map>flat_normal.png</reflectance_map>
+            <reflectance_map>
+              <uri>file://media/materials/textures</uri>
+              <name>terrain.png</name>
+            </reflectance_map>
           </plugin>
         </visual>
         <collision name="visual">
