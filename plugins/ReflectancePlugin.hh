@@ -35,7 +35,8 @@ namespace gazebo
   ///   - absolute directory
   ///   - model://
   ///
-  /// The image could be RGB or black and white. It's recommended to use .png files.
+  /// The image could be RGB or black and white. It's recommended to use
+  /// .png files.
   class GAZEBO_VISIBLE ReflectancePlugin : public VisualPlugin
   {
     /// \brief Constructor.

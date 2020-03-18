@@ -79,6 +79,7 @@ void ReflectancePlugin::Load(rendering::VisualPtr _visual,
     else
     {
       gzerr << "<name> inside <reflectance_map> tag is required" << std::endl;
+      return;
     }
   }
 
