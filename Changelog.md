@@ -2,6 +2,15 @@
 
 ## Gazebo 10.x.x (202x-xx-xx)
 
+1. Fix problem with automoc in CMake 3.17
+    * [Pull request 3206](https://bitbucket.org/osrf/gazebo/pull-requests/3206/)
+
+1. Added normals to depth camera sensor
+    * [Pull request 3193](https://bitbucket.org/osrf/gazebo/pull-requests/3193/)
+
+1. Prevent crash when subscribing to depth camera image topic
+    * [Pull request 3197](https://bitbucket.org/osrf/gazebo/pull-request/3197)
+
 ## Gazebo 10.2.0 (2020-01-31)
 
 1. Fix gazebo build and run on Windows, Ogre 1.10
@@ -262,6 +271,15 @@
 ## Gazebo 9
 
 ## Gazebo 9.XX.X (2020-XX-XX)
+
+1. Fix problem with automoc in CMake 3.17
+    * [Pull request 3206](https://bitbucket.org/osrf/gazebo/pull-requests/3206/)
+
+1. Added normals to depth camera sensor
+    * [Pull request 3193](https://bitbucket.org/osrf/gazebo/pull-requests/3193/)
+
+1. Prevent crash when subscribing to depth camera image topic
+    * [Pull request 3197](https://bitbucket.org/osrf/gazebo/pull-request/3197)
 
 ## Gazebo 9.12.0 (2020-01-31)
 

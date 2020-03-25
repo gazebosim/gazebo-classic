@@ -41,28 +41,46 @@ namespace gazebo
     class DepthCameraPrivate
     {
       /// \brief The depth buffer
-      public: float *depthBuffer;
+      public: float *depthBuffer = nullptr;
 
       /// \brief The depth material
-      public: Ogre::Material *depthMaterial;
+      public: Ogre::Material *depthMaterial = nullptr;
 
       /// \brief True to generate point clouds
       public: bool outputPoints;
 
+      /// \brief True to generate normals
+      public: bool outputNormals;
+
       /// \brief Point cloud data buffer
-      public: float *pcdBuffer;
+      public: float *pcdBuffer = nullptr;
+
+      /// \brief Point cloud data buffer
+      public: float *normalsBuffer = nullptr;
 
       /// \brief Point cloud view port
-      public: Ogre::Viewport *pcdViewport;
+      public: Ogre::Viewport *pcdViewport = nullptr;
+
+      /// \brief Point cloud view port
+      public: Ogre::Viewport *normalsViewport = nullptr;
 
       /// \brief Point cloud material
-      public: Ogre::Material *pcdMaterial;
+      public: Ogre::Material *pcdMaterial = nullptr;
+
+      /// \brief Point cloud material
+      public: Ogre::Material *normalsMaterial = nullptr;
 
       /// \brief Point cloud texture
-      public: Ogre::Texture *pcdTexture;
+      public: Ogre::Texture *pcdTexture = nullptr;
 
       /// \brief Point cloud texture
-      public: Ogre::RenderTarget *pcdTarget;
+      public: Ogre::Texture *normalsTextures = nullptr;
+
+      /// \brief Point cloud texture
+      public: Ogre::RenderTarget *pcdTarget = nullptr;
+
+      /// \brief Point cloud texture
+      public: Ogre::RenderTarget *normalsTarget = nullptr;
 
       /// \brief Event used to signal rgb point cloud data
       public: event::EventT<void(const float *, unsigned int, unsigned int,
@@ -71,6 +89,10 @@ namespace gazebo
       /// \brief Event used to signal depth data
       public: event::EventT<void(const float *, unsigned int, unsigned int,
                    unsigned int, const std::string &)> newDepthFrame;
+
+      /// \brief Event used to signal normals point cloud data
+      public: event::EventT<void(const float *, unsigned int, unsigned int,
+                  unsigned int, const std::string &)> newNormalsPointCloud;
     };
   }
 }
