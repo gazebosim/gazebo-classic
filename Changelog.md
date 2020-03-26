@@ -2,6 +2,9 @@
 
 ## Gazebo 9.XX.X (2020-XX-XX)
 
+1. Added reflectance to depth camera sensor
+    * [Pull request 3194](https://bitbucket.org/osrf/gazebo/pull-requests/3194/)
+
 1. Fix problem with automoc in CMake 3.17
     * [Pull request 3206](https://bitbucket.org/osrf/gazebo/pull-requests/3206/)
 

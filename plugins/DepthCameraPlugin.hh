@@ -51,6 +51,12 @@ namespace gazebo
                               unsigned int _width, unsigned int _height,
                               unsigned int _depth, const std::string &_format);
 
+    /// \brief Update the reflectance frame
+    public: virtual void OnNewReflectanceFrame(const float *_reflectance,
+                              unsigned int _width, unsigned int _height,
+                              unsigned int _depth, const std::string &_format);
+
+    /// \brief Update the normals frame
     public: virtual void OnNewNormalsFrame(const float *_normals,
                               unsigned int _width, unsigned int _height,
                               unsigned int _depth, const std::string &_format);

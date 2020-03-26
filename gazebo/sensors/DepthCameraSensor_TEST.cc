@@ -113,6 +113,85 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
     delete [] g_depthBuffer;
 }
 
+class DepthCameraReflectanceSensor_TEST : public ServerFixture
+{
+};
+
+std::mutex g_reflectanceMutex;
+unsigned int g_reflectanceCounter = 0;
+float *g_reflectanceBuffer = nullptr;
+
+/////////////////////////////////////////////////
+void OnNewReflectanceFrame(const float * _image,
+    unsigned int _width, unsigned int _height,
+    unsigned int _depth, const std::string & _format)
+{
+  EXPECT_EQ(_depth, 1u);
+  EXPECT_EQ(_format, std::string("REFLECTANCE"));
+  ASSERT_NE(nullptr, _image);
+  std::lock_guard<std::mutex> lock(g_reflectanceMutex);
+  if (!g_reflectanceBuffer)
+    g_reflectanceBuffer = new float[_width * _height];
+  memcpy(g_reflectanceBuffer,  _image, _width * _height * sizeof(_image[0]));
+  g_reflectanceCounter++;
+}
+
+/////////////////////////////////////////////////
+/// \brief Test Creation of a Depth Camera sensor
+TEST_F(DepthCameraReflectanceSensor_TEST, CreateDepthCamera)
+{
+  Load("worlds/reflectance.world");
+  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+
+  // Create the camera sensor
+  std::string sensorName = "default::camera_model::my_link::camera";
+
+  // Get a pointer to the depth camera sensor
+  sensors::DepthCameraSensorPtr sensor =
+     std::dynamic_pointer_cast<sensors::DepthCameraSensor>
+     (mgr->GetSensor(sensorName));
+
+  // Make sure the above dynamic cast worked.
+  ASSERT_NE(nullptr, sensor);
+
+  EXPECT_EQ(sensor->ImageWidth(), 640u);
+  EXPECT_EQ(sensor->ImageHeight(), 480u);
+  EXPECT_TRUE(sensor->IsActive());
+
+  rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
+  ASSERT_NE(nullptr, depthCamera);
+
+  event::ConnectionPtr c = depthCamera->ConnectNewReflectanceFrame(
+      std::bind(&::OnNewReflectanceFrame, std::placeholders::_1,
+      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+      std::placeholders::_5));
+
+  // wait for a few depth camera frames
+  unsigned int framesToWait = 10;
+  int i = 0;
+  while (i < 300 && g_reflectanceCounter < framesToWait)
+  {
+    common::Time::MSleep(20);
+    i++;
+  }
+  EXPECT_GE(g_reflectanceCounter, framesToWait);
+
+  std::lock_guard<std::mutex> lock(g_reflectanceMutex);
+
+  // Check the reflectance of the box
+  unsigned int index = ((sensor->ImageHeight() * 0.45) * sensor->ImageWidth())
+                       + sensor->ImageWidth() * 0.5;
+  for (unsigned int i = index - 25;
+      i < index + 25 ; ++i)
+  {
+    EXPECT_GT(g_reflectanceBuffer[i], 0);
+  }
+
+  depthCamera.reset();
+
+  if (g_reflectanceBuffer)
+    delete [] g_reflectanceBuffer;
+}
 
 using namespace gazebo;
 class DepthCameraSensor_normals_TEST : public ServerFixture
@@ -190,6 +269,8 @@ TEST_F(DepthCameraSensor_normals_TEST, CreateDepthCamera)
     i++;
   }
   EXPECT_GE(g_normalsCounter, framesToWait);
+
+  depthCamera.reset();
 }
 
 /////////////////////////////////////////////////
