@@ -10,16 +10,16 @@ if(WIN32 AND NOT UNIX)
   # compilation fails not finding symbols like _isatty, write, close etc.
   get_filename_component(windows_kits_dir
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot10]" ABSOLUTE)
-  set(programfilesx86 "ProgramFiles(x86)")  
+  set(programfilesx86 "ProgramFiles(x86)")
   find_path(WINDOWS_KITS_UCRT_INCLUDE NAMES assert.h
     PATHS
     "${windows_kits_dir}/include"
     "$ENV{ProgramFiles}/Windows Kits/10/include"
     "$ENV{${programfilesx86}}/Windows Kits/10/include"
-  )  
+  )
 
   message(STATUS "Found Windows SDK Universal CRT include directory: ${WINDOWS_KITS_UCRT_INCLUDE}")
-  include_directories(${WINDOWS_KITS_UCRT_INCLUDE})  
+  include_directories(${WINDOWS_KITS_UCRT_INCLUDE})
 endif()
 
 include_directories(SYSTEM
@@ -119,6 +119,7 @@ set (plugins_single_header
   PressurePlugin
   RayPlugin
   RaySensorNoisePlugin
+  ReflectancePlugin
   RubblePlugin
   ShaderParamVisualPlugin
   SimpleTrackedVehiclePlugin
