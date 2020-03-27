@@ -100,6 +100,9 @@ void DepthCameraSensor::Init()
         this->Name() + "_RttTex_Image");
     this->dataPtr->depthCamera->CreateDepthTexture(
         this->Name() + "_RttTex_Depth");
+    this->dataPtr->depthCamera->CreateNormalsTexture(
+        this->Name() + "_RttTex_Normals");
+
     ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
@@ -134,7 +137,10 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
 
   this->camera->PostRender();
 
-  if (this->imagePub && this->imagePub->HasConnections())
+  if (this->imagePub && this->imagePub->HasConnections() &&
+      // check if depth data is available. If not, the depth camera could be
+      // generating point clouds instead
+      this->dataPtr->depthCamera->DepthData())
   {
     msgs::ImageStamped msg;
     msgs::Set(msg.mutable_time(), this->scene->SimTime());
