@@ -8,6 +8,9 @@
 1. Fix problem with automoc in CMake 3.17
     * [Pull request 3206](https://bitbucket.org/osrf/gazebo/pull-requests/3206/)
 
+1. Fix macOS gui examples compilation
+    * [Pull request 3209](https://bitbucket.org/osrf/gazebo/pull-requests/3209/)
+
 1. Added normals to depth camera sensor
     * [Pull request 3193](https://bitbucket.org/osrf/gazebo/pull-requests/3193/)
 
