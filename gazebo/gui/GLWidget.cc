@@ -926,20 +926,11 @@ std::string GLWidget::OgreHandle() const
 {
   std::string ogreHandle;
 
-#if defined(__APPLE__)
-  ogreHandle = std::to_string(this->winId());
-#elif defined(WIN32)
+#if not defined(WIN32)
+  ogreHandle = std::to_string(static_cast<uint64_t>(this->winId()));
+#else
   ogreHandle = std::to_string(
       reinterpret_cast<uint32_t>(this->renderFrame->winId()));
-#else
-  QX11Info info = x11Info();
-  QWidget *q_parent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);
-  GZ_ASSERT(q_parent, "q_parent is null");
-
-  ogreHandle =
-    std::to_string(reinterpret_cast<uint64_t>(info.display())) + ":" +
-    std::to_string(static_cast<uint32_t>(info.screen())) + ":" +
-    std::to_string(static_cast<uint64_t>(q_parent->winId()));
 #endif
 
   return ogreHandle;
