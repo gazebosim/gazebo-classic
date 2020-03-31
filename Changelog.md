@@ -2,6 +2,9 @@
 
 ## Gazebo 9.XX.X (2020-XX-XX)
 
+1. Fix bounding box calculation for visuals that have links with pose offset
+    * [Pull request 3196](https://bitbucket.org/osrf/gazebo/pull-request/3196)
+
 1. Added reflectance to depth camera sensor
     * [Pull request 3194](https://bitbucket.org/osrf/gazebo/pull-requests/3194/)
 
