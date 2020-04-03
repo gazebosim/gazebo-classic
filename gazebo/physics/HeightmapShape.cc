@@ -308,6 +308,20 @@ float HeightmapShape::GetHeight(int _x, int _y) const
 }
 
 /////////////////////////////////////////////////
+void HeightmapShape::SetHeight(int _x, int _y, float _value)
+{
+  int index =  _y * this->vertSize + _x;
+  if (_x < 0 || _y < 0 || index >= static_cast<int>(this->heights.size()))
+  {
+    gzerr << "SetHeight position (" << _x << ", " << _y << ")"
+          << " is out of bounds" << std::endl;
+    return;
+  }
+
+  this->heights[index] = _value;
+}
+
+/////////////////////////////////////////////////
 float HeightmapShape::GetMaxHeight() const
 {
   float max = ignition::math::MIN_F;
