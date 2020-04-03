@@ -1,6 +1,15 @@
 ## Gazebo 9
 
-## Gazebo 9.XX.X (2020-XX-XX)
+## Gazebo 9.13.0 (2020-04-03)
+
+1. Use target based compile options to specify C++ standard
+    * [Pull request 3199](https://bitbucket.org/osrf/gazebo/pull-request/3199)
+
+1. Add SetHeight method to HeightmapShape class
+    * [Pull request 3210](https://bitbucket.org/osrf/gazebo/pull-request/3210)
+
+1. Added GAZEBO\_VISIBLE for WheelTrackedVehiclePlugin
+    * [Pull request 3211](https://bitbucket.org/osrf/gazebo/pull-request/3211)
 
 1. Fix bounding box calculation for visuals that have links with pose offset
     * [Pull request 3196](https://bitbucket.org/osrf/gazebo/pull-request/3196)
