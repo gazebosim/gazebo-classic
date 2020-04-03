@@ -263,11 +263,6 @@ if (MSVC)
   set(UNFILTERED_FLAGS "/EHsc")
 endif()
 
-# Visual Studio enables c++11 support by default
-if (NOT MSVC)
-  set(UNFILTERED_FLAGS "-std=c++11")
-endif()
-
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS} ${UNFILTERED_FLAGS}")
 
 #################################################
