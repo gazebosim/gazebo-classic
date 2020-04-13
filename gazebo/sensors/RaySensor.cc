@@ -40,6 +40,11 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 
+void RegisterLidarSensor()
+{
+  SensorFactory::RegisterSensor("lidar", NewRaySensor);
+}
+
 //////////////////////////////////////////////////
 RaySensor::RaySensor()
 : Sensor(sensors::RAY),

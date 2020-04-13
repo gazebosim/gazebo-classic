@@ -17,6 +17,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 #include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
@@ -448,4 +449,24 @@ const sdf::ElementPtr Base::GetSDF()
   GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
   this->sdf->Update();
   return this->sdf;
+}
+
+//////////////////////////////////////////////////
+std::optional<sdf::SemanticPose> Base::SDFSemanticPose() const
+{
+  return std::nullopt;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Base::SDFPoseRelativeToParent() const
+{
+  auto semPose = this->SDFSemanticPose();
+  if (semPose.has_value())
+  {
+    return common::resolveSdfPose(*semPose);
+  }
+  else
+  {
+    return this->sdf->Get<ignition::math::Pose3d>("pose");
+  }
 }

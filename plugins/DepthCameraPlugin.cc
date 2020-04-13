@@ -22,6 +22,10 @@
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(DepthCameraPlugin)
 
+// Added this map to avoid breaking the ABI
+static std::map<DepthCameraPlugin*, event::ConnectionPtr>
+                                                connection_normals_map;
+
 /////////////////////////////////////////////////
 DepthCameraPlugin::DepthCameraPlugin()
 : SensorPlugin(), width(0), height(0), depth(0)
@@ -34,6 +38,11 @@ DepthCameraPlugin::~DepthCameraPlugin()
   this->newDepthFrameConnection.reset();
   this->newRGBPointCloudConnection.reset();
   this->newImageFrameConnection.reset();
+
+  std::map<DepthCameraPlugin*, event::ConnectionPtr>::iterator it;
+  it = connection_normals_map.find(this);
+  it->second.reset();
+  connection_normals_map.erase(it);
 
   this->parentSensor.reset();
   this->depthCamera.reset();
@@ -72,6 +81,17 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
       std::bind(&DepthCameraPlugin::OnNewImageFrame,
         this, std::placeholders::_1, std::placeholders::_2,
         std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+
+  event::ConnectionPtr newNormalsFrameConnection =
+    this->depthCamera->ConnectNewNormalsPointCloud(
+            std::bind(&DepthCameraPlugin::OnNewNormalsFrame,
+            this, std::placeholders::_1, std::placeholders::_2,
+            std::placeholders::_3, std::placeholders::_4,
+            std::placeholders::_5));
+
+  connection_normals_map.
+        insert(std::pair<DepthCameraPlugin*, event::ConnectionPtr>
+               (this, newNormalsFrameConnection));
 
   this->parentSensor->SetActive(true);
 }
@@ -120,4 +140,13 @@ void DepthCameraPlugin::OnNewImageFrame(const unsigned char * /*_image*/,
     this->height, this->depth, this->format,
     "/tmp/depthCamera/me.jpg");
     */
+}
+
+/////////////////////////////////////////////////
+void DepthCameraPlugin::OnNewNormalsFrame(const float * /*_normals*/,
+                              unsigned int  /*_width*/,
+                              unsigned int /*_height*/,
+                              unsigned int /*_depth*/,
+                              const std::string &/*_format*/)
+{
 }

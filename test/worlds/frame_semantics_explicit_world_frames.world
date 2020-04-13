@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <world name="default">
+    <frame name="F1">
+      <pose>0 0 10 0 0 0</pose>
+    </frame>
+    <model name="M1">
+      <pose relative_to="F1">0.5 0 0 0 0 3.14159265358979</pose>
+      <link name="L1">
+        <pose>0.5 0 0 0 0 0</pose>
+        <visual name="V1">
+          <pose>0.0 0.2 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="M2">
+      <pose relative_to="M1">0.0 0.5 0 0 0 0</pose>
+      <link name="L2">
+        <pose>0.5 -0.5 0 0 0 0</pose>
+        <visual name="V2">
+          <pose>0.0 -0.2 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

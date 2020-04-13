@@ -21,8 +21,10 @@
 #include <string>
 #include <sstream>
 #include <ignition/math/Inertial.hh>
-#include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/SemanticVersion.hh>
+#include <ignition/math/Vector3.hh>
+#include <sdf/sdf_config.h>
 
 #include "gazebo/test/ServerFixture.hh"
 
@@ -153,82 +155,133 @@ class JointTest : public ServerFixture,
   ///        guaranteed to return a valid JointPtr, so the output should be
   ///        checked.
   /// \param[in] _opt Options for spawned model and joint.
-  public: physics::JointPtr SpawnJoint(const SpawnJointOptions &_opt)
+  public: physics::JointPtr SpawnJoint(const SpawnJointOptions &_opt,
+      const std::string &_sdfVersion = std::string(SDF_VERSION))
           {
-            msgs::Model msg;
+            msgs::Factory msg;
+            std::ostringstream modelStr;
             std::string modelName = this->GetUniqueString("joint_model");
-            msg.set_name(modelName);
-            msgs::Set(msg.mutable_pose(), _opt.modelPose);
+            ignition::math::SemanticVersion version(_sdfVersion);
 
+            modelStr
+              << "<sdf version='" << _sdfVersion << "'>"
+              << "<model name ='" << modelName << "'>"
+              << "  <pose>" << _opt.modelPose << "</pose>";
             if (!_opt.worldParent)
             {
-              msg.add_link();
-              int linkCount = msg.link_size();
-              auto link = msg.mutable_link(linkCount-1);
-
-              link->set_name("parent");
+              msgs::Link link;
+              link.set_name("parent");
               if (!_opt.noLinkPose)
               {
-                msgs::Set(link->mutable_pose(), _opt.parentLinkPose);
+                msgs::Set(link.mutable_pose(), _opt.parentLinkPose);
               }
+              modelStr << msgs::LinkToSDF(link)->ToString("");
             }
             if (!_opt.worldChild)
             {
-              msg.add_link();
-              int linkCount = msg.link_size();
-              auto link = msg.mutable_link(linkCount-1);
-
-              link->set_name("child");
+              msgs::Link link;
+              link.set_name("child");
               if (!_opt.noLinkPose)
               {
-                msgs::Set(link->mutable_pose(), _opt.childLinkPose);
+                msgs::Set(link.mutable_pose(), _opt.childLinkPose);
               }
               if (_opt.useChildLinkInertia)
               {
-                msgs::Set(link->mutable_inertial(), _opt.childLinkInertia);
+                msgs::Set(link.mutable_inertial(), _opt.childLinkInertia);
+              }
+              modelStr << msgs::LinkToSDF(link)->ToString("");
+            }
+            modelStr
+              << "  <joint name='joint' type='" << _opt.type << "'>"
+              << "    <pose>" << _opt.jointPose << "</pose>";
+            if (_opt.worldParent)
+              modelStr << "    <parent>world</parent>";
+            else
+              modelStr << "    <parent>parent</parent>";
+            if (_opt.worldChild)
+              modelStr << "    <child>world</child>";
+            else
+              modelStr << "    <child>child</child>";
+            if (version >= ignition::math::SemanticVersion(1, 7))
+            {
+              modelStr
+                << "    <axis>"
+                << "      <xyz";
+              if (_opt.useParentModelFrame)
+              {
+                modelStr << " expressed_in='__model__'";
+              }
+              modelStr
+                << ">" << _opt.axis << "</xyz>"
+                << "    </axis>";
+              // Hack: hardcode a second axis for universal joints
+              if (_opt.type == "universal" || _opt.type == "revolute2")
+              {
+                modelStr
+                  << "  <axis2>"
+                  << "    <xyz";
+                if (_opt.useParentModelFrame)
+                {
+                  modelStr << " expressed_in='__model__'";
+                }
+                modelStr
+                  << ">" << ignition::math::Vector3d::UnitY << "</xyz>"
+                  << "  </axis2>";
               }
             }
-            msg.add_joint();
-            auto jointMsg = msg.mutable_joint(0);
-            jointMsg->set_name("joint");
-            jointMsg->set_type(msgs::ConvertJointType(_opt.type));
-            msgs::Set(jointMsg->mutable_pose(), _opt.jointPose);
-            if (_opt.worldParent)
-            {
-              jointMsg->set_parent("world");
-            }
             else
             {
-              jointMsg->set_parent("parent");
+              modelStr
+                << "    <axis>"
+                << "      <xyz>" << _opt.axis << "</xyz>"
+                << "      <use_parent_model_frame>" << _opt.useParentModelFrame
+                << "      </use_parent_model_frame>"
+                << "    </axis>";
+              // Hack: hardcode a second axis for universal joints
+              if (_opt.type == "universal" || _opt.type == "revolute2")
+              {
+                modelStr
+                  << "  <axis2>"
+                  << "    <xyz>" << ignition::math::Vector3d::UnitY << "</xyz>"
+                  << "    <use_parent_model_frame>" << _opt.useParentModelFrame
+                  << "    </use_parent_model_frame>"
+                  << "  </axis2>";
+              }
             }
-            if (_opt.worldChild)
-            {
-              jointMsg->set_child("world");
-            }
-            else
-            {
-              jointMsg->set_child("child");
-            }
+            modelStr
+              << "  </joint>"
+              << "</model>"
+              << "</sdf>";
 
-            {
-              auto axis = jointMsg->mutable_axis1();
-              msgs::Set(axis->mutable_xyz(), _opt.axis);
-              axis->set_use_parent_model_frame(_opt.useParentModelFrame);
-            }
-            // Hack: hardcode a second axis for universal joints
-            if (_opt.type == "universal" || _opt.type == "revolute2")
-            {
-              auto axis2 = jointMsg->mutable_axis2();
-              msgs::Set(axis2->mutable_xyz(),
-                  ignition::math::Vector3d(0, 1, 0));
-              axis2->set_use_parent_model_frame(_opt.useParentModelFrame);
-            }
+            msg.set_sdf(modelStr.str());
+            this->factoryPub->Publish(msg);
 
-            auto model = this->SpawnModel(msg);
             physics::JointPtr joint;
-            if (model != NULL)
-              joint = model->GetJoint("joint");
+            if (_opt.wait != common::Time::Zero)
+            {
+              common::Time wallStart = common::Time::GetWallTime();
+              unsigned int waitCount = 0;
+              while (_opt.wait > (common::Time::GetWallTime() - wallStart) &&
+                     !this->HasEntity(modelName))
+              {
+                common::Time::MSleep(100);
+                if (++waitCount % 10 == 0)
+                {
+                  gzwarn << "Waiting " << waitCount / 10 << " seconds for "
+                         << _opt.type << " joint to spawn." << std::endl;
+                }
+              }
+              if (this->HasEntity(modelName) && waitCount >= 10)
+                gzwarn << _opt.type << " joint has spawned." << std::endl;
 
+              physics::WorldPtr world = physics::get_world("default");
+              if (world != NULL)
+              {
+                physics::ModelPtr model = world->ModelByName(modelName);
+                if (model != NULL)
+                  joint = model->GetJoint("joint");
+              }
+            }
             return joint;
           }
 

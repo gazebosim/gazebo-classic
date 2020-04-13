@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<!--
+  Example using a BVH animation taken from CMu's motion capture database:
+  https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion
+-->
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <actor name="actor">
+      <pose>2 2 2 0 0 0</pose>
+      <skin>
+        <filename>walk.dae</filename>
+      </skin>
+      <animation name="anim">
+        <filename>cmu-13_26.bvh</filename>
+      </animation>
+      <script>
+        <trajectory id="0" type="anim">
+          <waypoint>
+            <time>0</time>
+            <pose>0 1 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>10</time>
+            <pose>0 1 0 0 0 0</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+  </world>
+</sdf>

@@ -95,7 +95,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
     // attach axis2 to this visual
     msgs::Axis axis2Msg = _msg->axis2();
     dPtr->arrowVisual = this->CreateAxis(msgs::ConvertIgn(axis2Msg.xyz()),
-        axis2Msg.use_parent_model_frame(), _msg->type());
+        axis2Msg.xyz_expressed_in(), _msg->type());
 
     dPtr->parentAxisVis = jointVis;
   }
@@ -105,7 +105,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
     // axis1 is attached to child link
     msgs::Axis axis1Msg = _msg->axis1();
     dPtr->arrowVisual = this->CreateAxis(msgs::ConvertIgn(axis1Msg.xyz()),
-        axis1Msg.use_parent_model_frame(), _msg->type());
+        axis1Msg.xyz_expressed_in(), _msg->type());
   }
 
   // Scale according to the link it is attached to
@@ -131,7 +131,7 @@ void JointVisual::Load(ConstJointPtr &_msg,
 
   msgs::Axis axis1Msg = _msg->axis1();
   dPtr->arrowVisual = this->CreateAxis(msgs::ConvertIgn(axis1Msg.xyz()),
-      axis1Msg.use_parent_model_frame(), _msg->type());
+      axis1Msg.xyz_expressed_in(), _msg->type());
 
   // joint pose is always relative to the child link so update axis pose
   this->SetWorldPose(_worldPose);
@@ -144,6 +144,14 @@ void JointVisual::Load(ConstJointPtr &_msg,
 ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
     const bool _useParentFrame, const msgs::Joint::Type &_type)
 {
+  std::string xyzExpressedIn = _useParentFrame ? "__model__" : "";
+  return this->CreateAxis(_axis, xyzExpressedIn, _type);
+}
+
+/////////////////////////////////////////////////
+ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
+    const std::string &_xyzExpressedIn, const msgs::Joint::Type &_type)
+{
   ArrowVisualPtr axis;
 
   std::stringstream nameStr;
@@ -153,7 +161,7 @@ ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
   axis->Load();
   axis->SetMaterial("Gazebo/YellowTransparent");
 
-  this->UpdateAxis(axis, _axis, _useParentFrame, _type);
+  this->UpdateAxis(axis, _axis, _xyzExpressedIn, _type);
 
   return axis;
 }
@@ -162,6 +170,16 @@ ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
 void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     const ignition::math::Vector3d &_axis,
     const bool _useParentFrame,
+    const msgs::Joint::Type &_type)
+{
+  std::string xyzExpressedIn = _useParentFrame ? "__model__" : "";
+  this->UpdateAxis(_arrowVisual, _axis, xyzExpressedIn, _type);
+}
+
+/////////////////////////////////////////////////
+void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
+    const ignition::math::Vector3d &_axis,
+    const std::string &_xyzExpressedIn,
     const msgs::Joint::Type &_type)
 {
   JointVisualPrivate *dPtr =
@@ -181,7 +199,7 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     quat.Axis((v.Cross(u)).Normalize(), angle);
   _arrowVisual->SetRotation(quat);
 
-  if (_useParentFrame)
+  if (_xyzExpressedIn == "__model__")
   {
     VisualPtr linkVis = this->GetParent();
     ignition::math::Pose3d linkInitPose = linkVis->InitialRelativePose();
@@ -274,9 +292,9 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
     if (axis2Visual)
     {
       this->UpdateAxis(dPtr->arrowVisual, msgs::ConvertIgn(axis1Msg.xyz()),
-          axis1Msg.use_parent_model_frame(), _msg->type());
+          axis1Msg.xyz_expressed_in(), _msg->type());
       this->UpdateAxis(axis2Visual, msgs::ConvertIgn(axis2Msg.xyz()),
-          axis2Msg.use_parent_model_frame(), _msg->type());
+          axis2Msg.xyz_expressed_in(), _msg->type());
       // joint pose is always relative to the child link
       dPtr->parentAxisVis->SetWorldPose(msgs::ConvertIgn(_msg->pose()) +
           this->GetParent()->WorldPose());
@@ -301,13 +319,13 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
       if (dPtr->arrowVisual)
       {
         this->UpdateAxis(dPtr->arrowVisual, msgs::ConvertIgn(axis2Msg.xyz()),
-            axis2Msg.use_parent_model_frame(), _msg->type());
+            axis2Msg.xyz_expressed_in(), _msg->type());
       }
       // Previously had no axis
       else
       {
         dPtr->arrowVisual = this->CreateAxis(msgs::ConvertIgn(axis2Msg.xyz()),
-            axis2Msg.use_parent_model_frame(), _msg->type());
+            axis2Msg.xyz_expressed_in(), _msg->type());
       }
     }
   }
@@ -323,13 +341,13 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
     if (dPtr->arrowVisual)
     {
       this->UpdateAxis(dPtr->arrowVisual, msgs::ConvertIgn(axis1Msg.xyz()),
-          axis1Msg.use_parent_model_frame(), _msg->type());
+          axis1Msg.xyz_expressed_in(), _msg->type());
     }
     // Previously had no axis
     else
     {
       dPtr->arrowVisual = this->CreateAxis(msgs::ConvertIgn(axis1Msg.xyz()),
-          axis1Msg.use_parent_model_frame(), _msg->type());
+          axis1Msg.xyz_expressed_in(), _msg->type());
     }
   }
   // Now has no axis

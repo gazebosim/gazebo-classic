@@ -76,7 +76,14 @@ void ConfigWidget_TEST::JointMsgWidget()
     // axis1
     gazebo::msgs::Axis *axisMsg = jointMsg.mutable_axis1();
     gazebo::msgs::Set(axisMsg->mutable_xyz(), ignition::math::Vector3d::UnitX);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     axisMsg->set_use_parent_model_frame(false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     axisMsg->set_limit_lower(-999.0);
     axisMsg->set_limit_upper(999.0);
     axisMsg->set_limit_effort(-1.0);
@@ -131,7 +138,14 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(axisMsg->xyz().x(), 1.0);
     QCOMPARE(axisMsg->xyz().y(), 0.0);
     QCOMPARE(axisMsg->xyz().z(), 0.0);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     QCOMPARE(axisMsg->use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     QCOMPARE(axisMsg->limit_lower(), -999.0);
     QCOMPARE(axisMsg->limit_upper(), 999.0);
     QCOMPARE(axisMsg->limit_effort(), -1.0);
@@ -301,7 +315,14 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(axisMsg->xyz().x(), 0.0);
     QCOMPARE(axisMsg->xyz().y(), 1.0);
     QCOMPARE(axisMsg->xyz().z(), 0.0);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     QCOMPARE(axisMsg->use_parent_model_frame(), true);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     QCOMPARE(axisMsg->limit_lower(), -1.2);
     QCOMPARE(axisMsg->limit_upper(), -1.0);
     QCOMPARE(axisMsg->limit_effort(), 1.0);
@@ -313,7 +334,14 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(axis2Msg->xyz().x(), 0.0);
     QCOMPARE(axis2Msg->xyz().y(), 0.0);
     QCOMPARE(axis2Msg->xyz().z(), 1.0);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     QCOMPARE(axis2Msg->use_parent_model_frame(), true);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     QCOMPARE(axis2Msg->limit_lower(), -3.2);
     QCOMPARE(axis2Msg->limit_upper(), -3.0);
     QCOMPARE(axis2Msg->limit_effort(), 3.0);

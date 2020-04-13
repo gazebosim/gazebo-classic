@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 
@@ -162,6 +163,9 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
         &Scene::OnPoseMsg, this);
   }
   else
+  // When ready to use the direct API for updating scene poses from server,
+  // uncomment the following line and delete the if and else directly above
+  // if (!_isServer)
   {
     this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/info",
         &Scene::OnPoseMsg, this);
@@ -204,6 +208,8 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
+  this->dataPtr->initialized = false;
+
   this->dataPtr->connections.clear();
 
   this->dataPtr->poseSub.reset();
@@ -295,8 +301,6 @@ void Scene::Clear()
   this->dataPtr->skyxController = nullptr;
 
   RTShaderSystem::Instance()->RemoveScene(this->Name());
-
-  this->dataPtr->initialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -2130,9 +2134,23 @@ void Scene::PreRender()
     // Process the road messages.
     for (const auto &msg : roadMsgsCopy)
     {
-      Road2dPtr road(new Road2d(msg->name(), this->dataPtr->worldVisual));
-      road->Load(*msg);
-      this->dataPtr->visuals[road->GetId()] = road;
+      // do not add road if it already exists
+      bool addRoad = true;
+      for (const auto &it : this->dataPtr->visuals)
+      {
+        Road2dPtr road = std::dynamic_pointer_cast<Road2d>(it.second);
+        if (road && road->Name() == msg->name())
+        {
+          addRoad = false;
+          break;
+        }
+      }
+      if (addRoad)
+      {
+        Road2dPtr road(new Road2d(msg->name(), this->dataPtr->worldVisual));
+        road->Load(*msg);
+        this->dataPtr->visuals[road->GetId()] = road;
+      }
     }
 
     // official time stamp of approval
@@ -2154,7 +2172,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
   if (!this->dataPtr->enableVisualizations)
     return true;
 
-  if ((_msg->type() == "ray" || _msg->type() == "gpu_ray") && _msg->visualize()
+  if ((_msg->type() == "lidar" || _msg->type() == "gpu_lidar" ||
+       _msg->type() == "ray" || _msg->type() == "gpu_ray") && _msg->visualize()
       && !_msg->topic().empty())
   {
     std::string rayVisualName = _msg->parent() + "::" + _msg->name();
@@ -2865,6 +2884,17 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
     else
       this->dataPtr->poseMsgs.insert(std::make_pair(p.id(), p));
   }
+}
+
+/////////////////////////////////////////////////
+void Scene::UpdatePoses(const msgs::PosesStamped &_msg)
+{
+  auto msgptr = boost::make_shared<const msgs::PosesStamped>(_msg);
+  this->OnPoseMsg(msgptr);
+
+  std::unique_lock<std::mutex> lck(this->dataPtr->newPoseMutex);
+  this->dataPtr->newPoseAvailable = true;
+  this->dataPtr->newPoseCondition.notify_all();
 }
 
 /////////////////////////////////////////////////

@@ -144,7 +144,12 @@ ignition::math::Matrix4d NodeAnimation::FrameAt(double _time, bool _loop) const
   ignition::math::Matrix4d prevTrans = it1->second;
 
   double t = (time - prevKey) / (nextKey - prevKey);
-  GZ_ASSERT(t >= 0.0 && t <= 1.0, "t is not in the range 0.0..1.0");
+  if (t < 0.0 || t > 1.0)
+  {
+    gzerr << "Invalid time range for node animation: previous [" << prevKey
+          << "], next [" << nextKey << "]" << std::endl;
+    return ignition::math::Matrix4d();
+  }
 
   ignition::math::Vector3d nextPos = nextTrans.Translation();
   ignition::math::Vector3d prevPos = prevTrans.Translation();

@@ -68,20 +68,9 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
 
   // i = 0: joint between child link and parent link
   // i = 1: joint between child link and world
-  // i = 2: joint between world and parent link
-  for (int i = 0; i < 3; ++i)
+  for (int i = 0; i < 2; ++i)
   {
-    gzdbg << "SpawnJoint " << _jointType;
-    if (i / 2)
-    {
-      opt.worldChild = true;
-      std::cout << " world";
-    }
-    else
-    {
-      opt.worldChild = false;
-      std::cout << " child";
-    }
+    gzdbg << "SpawnJoint " << _jointType << " child";
     if (i % 2)
     {
       opt.worldParent = true;
@@ -94,18 +83,11 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     }
     std::cout << std::endl;
 
-    if (opt.worldChild && _physicsEngine == "dart")
-    {
-      gzerr << "dart seg-faults without a child link, skipping sub-test"
-            << std::endl;
-      break;
-    }
-
     // spawn joint using using parent model frame to define joint axis
     {
       gzdbg << "test case with joint axis specified in parent model frame.\n";
       opt.useParentModelFrame = true;
-      physics::JointPtr jointUseParentModelFrame = SpawnJoint(opt);
+      physics::JointPtr jointUseParentModelFrame = SpawnJoint(opt, "1.6");
       ASSERT_TRUE(jointUseParentModelFrame != NULL);
 
       if (opt.worldParent)
@@ -125,21 +107,19 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     {
       gzdbg << "test case with joint axis specified in child link frame.\n";
       opt.useParentModelFrame = false;
-      physics::JointPtr joint = SpawnJoint(opt);
+      physics::JointPtr joint = SpawnJoint(opt, "1.6");
       ASSERT_TRUE(joint != NULL);
 
-      if (opt.worldChild)
+      if (opt.worldParent)
       {
         gzdbg << "  where parent is world.\n";
-        this->CheckJointProperties(joint,
-          ignition::math::Vector3d(cos(Aj), sin(Aj), 0));
       }
       else
       {
         gzdbg << "  where parent is another link (not world).\n";
-        this->CheckJointProperties(joint,
-          ignition::math::Vector3d(cos(Am+Al+Aj), sin(Am+Al+Aj), 0));
       }
+      this->CheckJointProperties(joint,
+        ignition::math::Vector3d(cos(Am+Al+Aj), sin(Am+Al+Aj), 0));
     }
   }
 }

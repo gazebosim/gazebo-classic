@@ -384,7 +384,15 @@ if (PKG_CONFIG_FOUND)
     list(APPEND OGRE_LIBRARIES ${OGRE_Terrain_LIBRARIES})
     list(APPEND OGRE_LIBRARIES ${OGRE_Overlay_LIBRARIES})
     list(APPEND OGRE_LIBRARIES ${OGRE_Paging_LIBRARIES})
-    set(OGRE_PLUGINDIR ${OGRE_PLUGIN_DIR})
+    # Workaround for https://github.com/OGRECave/ogre/issues/1499
+    # On Ogre < 1.13, the definition of OGRE_PLUGIN_DIR in the OGRE CMake
+    # configuration file on Windows is wrong. To avoid problem, on Windows
+    # we set OGRE_PLUGINDIR manually
+    if (WIN32)
+      set(OGRE_PLUGINDIR ${OGRE_PREFIX_DIR}/bin)
+    else ()
+      set(OGRE_PLUGINDIR ${OGRE_PLUGIN_DIR})
+    endif ()
   endif ()
 
   if (NOT OGRE_FOUND)
@@ -598,12 +606,13 @@ endif ()
 
 ########################################
 # Find SDFormat
-find_package(sdformat8 REQUIRED)
-if (sdformat8_FOUND)
-  message (STATUS "Looking for SDFormat8  - found")
+set(SDF_MIN_REQUIRED_VERSION 9.1)
+find_package(sdformat9 ${SDF_MIN_REQUIRED_VERSION} REQUIRED)
+if (sdformat9_FOUND)
+  message (STATUS "Looking for SDFormat9  - found")
 else ()
-  message (STATUS "Looking for SDFormat8 - not found")
-  BUILD_ERROR ("Missing: SDF version >=8. Required for reading and writing SDF files.")
+  message (STATUS "Looking for SDFormat9 - not found")
+  BUILD_ERROR ("Missing: SDF version >=${SDF_MIN_REQUIRED_VERSION}. Required for reading and writing SDF files.")
 endif()
 
 ########################################

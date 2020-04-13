@@ -170,11 +170,6 @@ double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
     return (_time - t1) / (t2 - t1);
 }
 
-
-
-
-
-
 /////////////////////////////////////////////////
 PoseAnimation::PoseAnimation(const std::string &_name,
     double _length, bool _loop, double _tension)
@@ -267,13 +262,6 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
     _kf.Rotation(this->rotationSpline->Interpolate(firstKeyIndex, t));
   }
 }
-
-
-
-
-
-
-
 
 /////////////////////////////////////////////////
 NumericAnimation::NumericAnimation(const std::string &_name,

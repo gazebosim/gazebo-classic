@@ -30,6 +30,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Battery.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Light.hh"
@@ -113,6 +114,9 @@ class gazebo::physics::LinkPrivate
       /// playback.
       public: transport::SubscriberPtr audioContactsSub;
 #endif
+
+  /// \brief SDF Link DOM object
+  public: const sdf::Link *linkSDFDom = nullptr;
 };
 
 using namespace gazebo;
@@ -138,6 +142,16 @@ Link::~Link()
 //////////////////////////////////////////////////
 void Link::Load(sdf::ElementPtr _sdf)
 {
+  if (nullptr != this->GetModel())
+  {
+    auto *modelDom = this->GetModel()->GetSDFDom();
+    if (nullptr != modelDom)
+    {
+      this->dataPtr->linkSDFDom =
+        modelDom->LinkByName(_sdf->Get<std::string>("name"));
+    }
+  }
+
   Entity::Load(_sdf);
 
   // before loading child collision, we have to figure out if selfCollide is
@@ -295,8 +309,8 @@ void Link::Init()
   this->dataPtr->enabled = true;
 
   // Set Link pose before setting pose of child collisions
-  this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
-  this->SetInitialRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
+  this->SetRelativePose(this->SDFPoseRelativeToParent());
+  this->SetInitialRelativePose(this->SDFPoseRelativeToParent());
 
   // Call Init for child collisions, which whill set their pose
   Base_V::iterator iter;
@@ -1525,7 +1539,16 @@ void Link::UpdateVisualMsg()
     while (visualElem)
     {
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+      // The function `VisualFromSDF` does not support frame semantics so we
+      // need to update the pose of the msg object.
+      if (nullptr != this->dataPtr->linkSDFDom)
+      {
+        // TODO (addisu) Check the assumption that visualDom is always valid
+        auto *visualDom = this->dataPtr->linkSDFDom->VisualByName(msg.name());
 
+        msgs::Set(msg.mutable_pose(),
+                  common::resolveSdfPose(visualDom->SemanticPose()));
+      }
       bool newVis = true;
       std::string linkName = this->GetScopedName();
 
@@ -1917,6 +1940,7 @@ void Link::LoadLight(sdf::ElementPtr _sdf)
   LightPtr light(new physics::Light(shared_from_this()));
   light->SetStatic(true);
   light->ProcessMsg(msgs::LightFromSDF(_sdf));
+
   light->SetWorld(this->world);
   light->Load(_sdf);
   this->dataPtr->lights.push_back(light);
@@ -1930,4 +1954,20 @@ void Link::LoadLight(sdf::ElementPtr _sdf)
 const Link::Visuals_M &Link::Visuals() const
 {
   return this->visuals;
+}
+
+//////////////////////////////////////////////////
+const sdf::Link *Link::GetSDFDom() const
+{
+  return this->dataPtr->linkSDFDom;
+}
+
+//////////////////////////////////////////////////
+std::optional<sdf::SemanticPose> Link::SDFSemanticPose() const
+{
+  if (nullptr != this->dataPtr->linkSDFDom)
+  {
+    return this->dataPtr->linkSDFDom->SemanticPose();
+  }
+  return std::nullopt;
 }

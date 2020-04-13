@@ -22,6 +22,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Link.hh"
@@ -60,9 +61,6 @@ Joint::Joint(BasePtr _parent)
   this->stopDissipation[0] = 1.0;
   this->stopStiffness[1] = 1e8;
   this->stopDissipation[1] = 1.0;
-  // these flags are related to issue #494
-  this->axisParentModelFrame[0] = false;
-  this->axisParentModelFrame[1] = false;
 
   if (!this->sdfJoint)
   {
@@ -107,6 +105,15 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child,
 //////////////////////////////////////////////////
 void Joint::Load(sdf::ElementPtr _sdf)
 {
+  if (nullptr != this->model)
+  {
+    auto *modelDom = this->model->GetSDFDom();
+    if (nullptr != modelDom)
+    {
+      this->jointSDFDom = modelDom->JointByName(_sdf->Get<std::string>("name"));
+    }
+  }
+
   Base::Load(_sdf);
 
   // Joint force and torque feedback
@@ -142,10 +149,11 @@ void Joint::Load(sdf::ElementPtr _sdf)
     }
     sdf::ElementPtr axisElem = _sdf->GetElement(axisName);
     {
-      std::string param = "use_parent_model_frame";
-      if (axisElem->HasElement(param))
+      sdf::ElementPtr xyzElem = axisElem->GetElement("xyz");
+      if (xyzElem->HasAttribute("expressed_in"))
       {
-        this->axisParentModelFrame[index] = axisElem->Get<bool>(param);
+        this->axisExpressedIn[index] =
+            xyzElem->Get<std::string>("expressed_in");
       }
 
       // Axis dynamics
@@ -289,7 +297,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
       gzthrow("Couldn't Find Child Link[" + childName  + "]");
   }
 
-  this->LoadImpl(_sdf->Get<ignition::math::Pose3d>("pose"));
+  this->LoadImpl(this->SDFPoseRelativeToParent());
 }
 
 /////////////////////////////////////////////////
@@ -364,7 +372,7 @@ void Joint::Init()
   if (this->DOF() >= 1 && this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    this->SetAxis(0, axisElem->Get<ignition::math::Vector3d>("xyz"));
+    this->SetAxis(0, this->ResolveAxisXyz(0));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -381,7 +389,7 @@ void Joint::Init()
   if (this->DOF() >= 2 && this->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
-    this->SetAxis(1, axisElem->Get<ignition::math::Vector3d>("xyz"));
+    this->SetAxis(1, this->ResolveAxisXyz(1));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -628,7 +636,15 @@ void Joint::FillMsg(msgs::Joint &_msg)
     axis->set_limit_velocity(this->GetVelocityLimit(i));
     axis->set_damping(this->GetDamping(i));
     axis->set_friction(this->GetParam("friction", i));
-    axis->set_use_parent_model_frame(this->axisParentModelFrame[i]);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+    axis->set_use_parent_model_frame(false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
+    axis->set_xyz_expressed_in(this->axisExpressedIn[i]);
   }
 
   if (this->GetParent())
@@ -1252,6 +1268,79 @@ ignition::math::Pose3d Joint::AnchorErrorPose() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Vector3d Joint::ResolveAxisXyz(
+    const unsigned int _index,
+    const std::string &_resolveTo) const
+{
+  if (_index >= this->DOF())
+  {
+    gzerr << "ResolveAxisXyz error, _index[" << _index << "] out of range"
+          << std::endl;
+    return ignition::math::Vector3d::Zero;
+  }
+
+  // check if resolve-to matches expressed-in
+  if (_resolveTo == this->axisExpressedIn[_index])
+  {
+    return this->LocalAxis(_index);
+  }
+
+  // special legacy case:
+  // original sdf version < 1.7
+  // //joint/parent == world
+  // _resolveTo == ""
+  // //joint/axis/use_parent_model_frame == true
+  // this will be migrated to //joint/axis/xyz/@expressed_in == __model__
+  // but gazebo10 interpreted this joint axis in the world frame
+  auto sdfVersion =
+      ignition::math::SemanticVersion(this->sdf->OriginalVersion());
+  if (sdfVersion < ignition::math::SemanticVersion(1, 7)
+      && nullptr == this->parentLink
+      && _resolveTo.empty()
+      && "__model__" == this->axisExpressedIn[_index])
+  {
+    return this->WorldPose().Rot().Inverse() * this->LocalAxis(_index);
+  }
+
+  // try to use DOM API JointAxis::ResolveXyz
+  sdf::Errors errors;
+  if (nullptr != this->jointSDFDom)
+  {
+    auto jointAxis = this->jointSDFDom->Axis(_index);
+    if (nullptr != jointAxis)
+    {
+      ignition::math::Vector3d result;
+      errors = jointAxis->ResolveXyz(result, _resolveTo);
+      if (errors.empty())
+      {
+        return result;
+      }
+    }
+  }
+
+  // special case for expressed-in __model__ with empty resolve-to
+  if (_resolveTo.empty() && "__model__" == this->axisExpressedIn[_index])
+  {
+    auto globalAxis = this->model->WorldPose().Rot() * this->LocalAxis(_index);
+    return this->WorldPose().Rot().Inverse() * globalAxis;
+  }
+
+  gzerr << "There was an error in JointAxis::ResolveXyz\n";
+  for (const auto &err : errors)
+  {
+    gzerr << err.Message() << std::endl;
+  }
+
+  gzerr << "There is no optimal fallback since the expressed_in["
+        << this->axisExpressedIn[_index] << "] and "
+        << "_resolveTo[" << _resolveTo << "] "
+        << "parameters do not match. "
+        << "Falling back to using the raw axis xyz value.\n";
+
+  return this->LocalAxis(_index);
+}
+
+//////////////////////////////////////////////////
 ignition::math::Quaterniond Joint::AxisFrame(const unsigned int _index) const
 {
   if (_index >= this->DOF())
@@ -1261,18 +1350,7 @@ ignition::math::Quaterniond Joint::AxisFrame(const unsigned int _index) const
     return ignition::math::Quaterniond::Identity;
   }
 
-  // Legacy support for specifying axis in parent model frame (#494)
-  if (this->axisParentModelFrame[_index])
-  {
-    // Use parent model frame
-    if (this->parentLink)
-      return this->parentLink->GetModel()->WorldPose().Rot();
-
-    // Parent model is world, use world frame
-    return ignition::math::Quaterniond::Identity;
-  }
-
-  return this->WorldPose().Rot();
+  return this->WorldPose().Rot() * this->AxisFrameOffset(_index);
 }
 
 //////////////////////////////////////////////////
@@ -1286,23 +1364,51 @@ ignition::math::Quaterniond Joint::AxisFrameOffset(
     return ignition::math::Quaterniond::Identity;
   }
 
-  // Legacy support for specifying axis in parent model frame (#494)
-  if (this->axisParentModelFrame[_index])
+  // expressed-in joint frame
+  if (this->axisExpressedIn[_index].empty())
   {
-    // axis is defined in parent model frame, so return the rotation
-    // from joint frame to parent model frame, or
-    // world frame in absence of parent link.
-    ignition::math::Pose3d parentModelWorldPose;
-    auto jointWorldPose = this->WorldPose();
-    if (this->parentLink)
-    {
-      parentModelWorldPose = this->parentLink->GetModel()->WorldPose();
-    }
-    return (parentModelWorldPose - jointWorldPose).Rot();
+    return ignition::math::Quaterniond::Identity;
   }
 
-  // axis is defined in the joint frame, so
-  // return the rotation from joint frame to joint frame.
+  // special legacy case:
+  // original sdf version < 1.7
+  // //joint/parent == world
+  // //joint/axis/use_parent_model_frame == true
+  // this will be migrated to //joint/axis/xyz/@expressed_in == __model__
+  // but gazebo10 interpreted this joint axis in the world frame
+  auto sdfVersion =
+      ignition::math::SemanticVersion(this->sdf->OriginalVersion());
+  if (sdfVersion < ignition::math::SemanticVersion(1, 7)
+      && nullptr == this->parentLink
+      && "__model__" == this->axisExpressedIn[_index])
+  {
+    // Parent model is world, use world frame
+    return this->WorldPose().Rot().Inverse();
+  }
+
+  // try to use DOM API
+  sdf::Errors errors;
+  if (nullptr != this->jointSDFDom)
+  {
+    return common::resolveSdfPose(
+        this->jointSDFDom->SemanticPose(),
+        this->axisExpressedIn[_index]).Rot().Inverse();
+  }
+
+  // fallback behavior for model frame
+  if ("__model__" == this->axisExpressedIn[_index])
+  {
+    // Model frame
+    return this->WorldPose().Rot().Inverse() * this->model->WorldPose().Rot();
+  }
+
+  gzerr << "The DOM object is not available for computing the "
+        << "AxisFrameOffset.\n"
+        << "There is no optimal fallback since the expressed_in["
+        << this->axisExpressedIn[_index] << "] value is not empty or "
+        << "__model__. Falling back to the joint frame."
+        << std::endl;
+
   return ignition::math::Quaterniond::Identity;
 }
 
@@ -1322,6 +1428,22 @@ double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
   double x = this->Position(_index) -
     this->springReferencePosition[_index];
   return 0.5 * k * x * x;
+}
+
+//////////////////////////////////////////////////
+std::optional<sdf::SemanticPose> Joint::SDFSemanticPose() const
+{
+  if (nullptr != this->jointSDFDom)
+  {
+    return this->jointSDFDom->SemanticPose();
+  }
+  return std::nullopt;
+}
+
+//////////////////////////////////////////////////
+const sdf::Joint *Joint::GetSDFDom() const
+{
+  return this->jointSDFDom;
 }
 
 //////////////////////////////////////////////////

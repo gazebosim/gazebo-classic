@@ -45,6 +45,7 @@ TEST_F(WorldTest, UniqueModelName)
   msgs::Model msg;
   msg.set_name(modelName);
   msg.add_link();
+  msg.mutable_link(0)->set_name("l");
 
   std::string modelSDFStr(
     "<sdf version='" + std::string(SDF_VERSION) + "'>"

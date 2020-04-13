@@ -306,7 +306,14 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(ignition::math::equal(rev2Axis1Msg.limit_velocity(), -1.0));
   QVERIFY(ignition::math::equal(rev2Axis1Msg.damping(), 0.0));
   QVERIFY(ignition::math::equal(rev2Axis1Msg.friction(), 0.0));
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   QCOMPARE(rev2Axis1Msg.use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   msgs::Axis rev2Axis2Msg = rev2joint->jointMsg->axis2();
   QCOMPARE(msgs::ConvertIgn(rev2Axis2Msg.xyz()),
@@ -319,7 +326,14 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(ignition::math::equal(rev2Axis2Msg.limit_velocity(), -1.0));
   QVERIFY(ignition::math::equal(rev2Axis2Msg.damping(), 0.0));
   QVERIFY(ignition::math::equal(rev2Axis2Msg.friction(), 0.0));
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   QCOMPARE(rev2Axis2Msg.use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   // Add a prismatic joint
   jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
@@ -364,7 +378,14 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(ignition::math::equal(prisAxis1Msg.limit_velocity(), -1.0));
   QVERIFY(ignition::math::equal(prisAxis1Msg.damping(), 0.0));
   QVERIFY(ignition::math::equal(prisAxis1Msg.friction(), 0.0));
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   QCOMPARE(prisAxis1Msg.use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   // Add a gearbox joint
   jointMaker->AddJoint(gui::JointMaker::JOINT_GEARBOX);
@@ -409,7 +430,14 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(ignition::math::equal(gearboxAxis1Msg.limit_velocity(), -1.0));
   QVERIFY(ignition::math::equal(gearboxAxis1Msg.damping(), 0.0));
   QVERIFY(ignition::math::equal(gearboxAxis1Msg.friction(), 0.0));
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   QCOMPARE(gearboxAxis1Msg.use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   msgs::Axis gearboxAxis2Msg = gearboxJoint->jointMsg->axis2();
   QCOMPARE(msgs::ConvertIgn(gearboxAxis2Msg.xyz()),
@@ -422,7 +450,14 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(ignition::math::equal(gearboxAxis2Msg.limit_velocity(), -1.0));
   QVERIFY(ignition::math::equal(gearboxAxis2Msg.damping(), 0.0));
   QVERIFY(ignition::math::equal(gearboxAxis2Msg.friction(), 0.0));
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   QCOMPARE(gearboxAxis2Msg.use_parent_model_frame(), false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   // Add a fixed joint
   jointMaker->AddJoint(gui::JointMaker::JOINT_FIXED);

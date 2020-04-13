@@ -108,8 +108,7 @@ void DARTHingeJoint::SetAxis(const unsigned int _index,
           this->dataPtr->dtJoint);
     GZ_ASSERT(dtRevoluteJoint, "RevoluteJoint is NULL");
 
-    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(
-        this->AxisFrameOffset(0).RotateVector(_axis));
+    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
     dtRevoluteJoint->setAxis(dartAxis);
   }
   else
