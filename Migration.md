@@ -3418,7 +3418,7 @@ Gazebo 5.x uses features from the new c++11 standard. This requires to have a co
     + ***Replacement*** ConnectionPtr Events::ConnectWorldUpdateBegin(T _subscriber)
     ---
     + ***Removed:*** Events::DisconnectWorldUpdateStart(T _subscriber) `API change`
-    + ***Replacement*** ConnectionPtr Events::DiconnectWorldUpdateBegin(T _subscriber)
+    + ***Replacement*** ConnectionPtr Events::DisconnectWorldUpdateBegin(T _subscriber)
 1. **gazebo/physics/Link.hh**
     + ***Removed*** void Link::RemoveChildJoint(JointPtr _joint) `API change`
     + ***Replacement*** void Link::RemoveChildJoint(const std::string &_jointName)
