@@ -39,7 +39,7 @@ namespace gazebo
   /// 3. Echo the joy data to a terminal: ign topic -e -t /joy
   ///
   ///    Note: You will need
-  /// [ign-tools](https://bitbucket.org/ignitionrobotics/ign-tools)
+  /// [ign-tools](https://github.com/ignitionrobotics/ign-tools)
   ///
   /// # Usage
   ///

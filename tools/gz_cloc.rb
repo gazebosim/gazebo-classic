@@ -35,7 +35,7 @@ for y in (startYear..time.year)
     date = y.to_s + "-" + m.to_s
 
     # Update the repo
-    `hg up -C -d "#{date}"`
+    `git checkout `git rev-list -1 --before="#{date}" master`
 
     # Count lines of code
     result = `cloc --force-lang=\"C++\",cc --force-lang=\"C++\",c --force-lang=\"C++\",hh --force-lang=\"C++\",h --force-lang=\"C++\",hpp --exclude_dir=deps,Media,media,cmake,doc,build --csv --quiet --progress-rate=0 *`

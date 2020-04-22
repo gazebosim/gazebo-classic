@@ -153,7 +153,7 @@ void DARTModel::Init()
         {
           gzerr << "DART does not allow joint without child link. "
                 << "Please see issue #914. "
-                << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
+                << "(https://github.com/osrf/gazebo/issues/914)\n";
           continue;
         }
 

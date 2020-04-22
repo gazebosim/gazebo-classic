@@ -47,7 +47,7 @@ add_executable(gz gz.cc gz_topic.cc gz_log.cc gz_marker.cc)
 
 if (WIN32)
   # Force multiple definitions since there is a collision with sdformat GetAsEuler() function
-  # https://bitbucket.org/osrf/sdformat/src/a3fa3d1163cc2fe991ac106e51695b99f8b119ca/include/sdf/Types.hh?at=default&fileviewer=file-view-default#Types.hh-437
+  # https://github.com/osrf/sdformat/blob/master/include/sdf/Types.hh
   # it is defined inside an .hh file and bring to gz linking via sdformat and gazebo_gui/gazebo_common
   set_target_properties(gz PROPERTIES LINK_FLAGS "/FORCE:MULTIPLE")
 endif()
