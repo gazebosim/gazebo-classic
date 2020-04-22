@@ -51,7 +51,7 @@ void PolylineTest::ComputeVolume(const std::string &_physicsEngine)
   // The actual volume of the cube shape is 1*1*1.5 = 1.5
   // We expect ComputeVolume to be accurate because it's also a box
 
-  // see issue #1506 (https://bitbucket.org/osrf/gazebo/issue/1506)
+  // see issue #1506 (https://github.com/osrf/gazebo/issues/1506)
   if (_physicsEngine == "bullet")
   {
     EXPECT_NEAR(shape->ComputeVolume(), 1.5, 0.09);

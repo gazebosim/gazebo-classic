@@ -137,7 +137,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     gzerr << "Skip tests for child world link cases "
           << "since DART does not allow joint with world as child. "
           << "Please see issue #914. "
-          << "(https://bitbucket.org/osrf/gazebo/issue/914)"
+          << "(https://github.com/osrf/gazebo/issues/914)"
           << std::endl;
   }
   else
@@ -236,12 +236,12 @@ void JointSpawningTest::SpawnJointRotationalWorld(
         && worldChild)
     {
       // These physics engines don't support world as a child link.
-      // simbody https://bitbucket.org/osrf/gazebo/issue/861
-      // dart https://bitbucket.org/osrf/gazebo/issue/914
+      // simbody https://github.com/osrf/gazebo/issues/861
+      // dart https://github.com/osrf/gazebo/issues/914
       gzerr << "Skip tests for child world link cases since "
             << _physicsEngine
             << " does not allow joint with world as child. "
-            << "Please see bitbucket issues #861, #914."
+            << "Please see github issues #861, #914."
             << std::endl;
       continue;
     }

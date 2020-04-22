@@ -91,7 +91,7 @@ math::Vector3 DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
   }
 
   // TODO: Issue #494
-  // See: https://bitbucket.org/osrf/gazebo/issue/494
+  // See: https://github.com/osrf/gazebo/issues/494
   // joint-axis-reference-frame-doesnt-match
   return DARTTypes::ConvVec3(globalAxis);
 }
@@ -105,7 +105,7 @@ void DARTScrewJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
         reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
 
     // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494
+    // See: https://github.com/osrf/gazebo/issues/494
     // joint-axis-reference-frame-doesnt-match
     Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
     Eigen::Isometry3d dartTransfJointLeftToParentLink
