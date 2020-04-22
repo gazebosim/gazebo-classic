@@ -105,7 +105,7 @@ TEST_F(PluginTest, LoadVisualPlugin)
 
 // TODO: The following test actually fails due to current unsafe implementation
 // of plugin loading.
-// See https://bitbucket.org/osrf/gazebo/issues/2267 for details.
+// See https://github.com/osrf/gazebo/issues/2267 for details.
 
 /*
 TEST_F(PluginTest, LoadModelPluginWrong)

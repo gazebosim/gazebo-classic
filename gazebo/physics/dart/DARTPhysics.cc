@@ -597,7 +597,7 @@ void DARTPhysics::SetSolverType(const std::string &_type)
   if (_type == "dantzig")
   {
     // DART constraint solver refactored in 6.7, see issue 2605
-    // https://bitbucket.org/osrf/gazebo/issues/2605
+    // https://github.com/osrf/gazebo/issues/2605
 #if DART_MAJOR_MINOR_VERSION_AT_MOST(6, 6)
     this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
         dart::common::make_unique<dart::constraint::DantzigLCPSolver>(
@@ -616,7 +616,7 @@ void DARTPhysics::SetSolverType(const std::string &_type)
   else if (_type == "pgs")
   {
     // DART constraint solver refactored in 6.7, see issue 2605
-    // https://bitbucket.org/osrf/gazebo/issues/2605
+    // https://github.com/osrf/gazebo/issues/2605
 #if DART_MAJOR_MINOR_VERSION_AT_MOST(6, 6)
     this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
         dart::common::make_unique<dart::constraint::PGSLCPSolver>(
@@ -755,7 +755,7 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
         // ODE collision detectors have to be disabled because it causes
         // conflicts with the version of the internally compiled ODE library.
         // See also discussion in the PR:
-        // https://bitbucket.org/osrf/gazebo/pull-requests/2956/
+        // https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/2956/
         //   dart-heightmap-with-bullet-and-ode/diff#comment-81389484
         gzerr << "The use of the ODE collision detector with DART is disabled "
             << "because it causes conflicts with the version of ODE used in "

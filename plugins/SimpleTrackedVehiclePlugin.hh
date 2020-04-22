@@ -108,7 +108,7 @@ namespace gazebo {
     /// \brief Set collide categories and bits of all geometries to the
     ///        required values.
     ///
-    /// This is a workaround for https://bitbucket.org/osrf/gazebo/issues/1855 .
+    /// This is a workaround for https://github.com/osrf/gazebo/issues/1855 .
     protected: void SetGeomCategories();
 
     /// \brief Compute the direction of friction force in given contact point.
