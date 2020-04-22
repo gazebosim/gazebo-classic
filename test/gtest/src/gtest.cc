@@ -1140,6 +1140,8 @@ class Hunk {
         common_() {}
 
   void PushLine(char edit, const char* line) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch-default"
     switch (edit) {
       case ' ':
         ++common_;
@@ -1155,6 +1157,7 @@ class Hunk {
         hunk_adds_.push_back(std::make_pair('+', line));
         break;
     }
+#pragma GCC diagnostic pop
   }
 
   void PrintTo(std::ostream* os) {
