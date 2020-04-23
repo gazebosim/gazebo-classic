@@ -84,7 +84,7 @@ TEST_P(MultirayShapeTest, Standalone)
 }
 
 /////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, MultirayShapeTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, MultirayShapeTest,
     ::testing::Values("ode"),);  // NOLINT
 
 /////////////////////////////////////////////////

@@ -91,8 +91,7 @@ TEST_P(ExamplesBuild_Plugins, Plugins)
 }
 
 ///////////////////////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
-  "actor_collisions"
+INSTANTIATE_TEST_SUITE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values("actor_collisions"
   , "animate_joints"
   , "animate_pose"
   , "factory"
@@ -108,7 +107,7 @@ INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
   , "system_gui_plugin"
   , "trigger_light"
   , "world_edit"
-),);  // NOLINT
+));  // NOLINT
 
 ///////////////////////////////////////////////////////////////////
 TEST_P(ExamplesBuild_Standalone, Standalone)
@@ -117,8 +116,7 @@ TEST_P(ExamplesBuild_Standalone, Standalone)
 }
 
 ///////////////////////////////////////////////////////////////////
-auto standaloneValues = ::testing::Values(
-  "actuator"
+auto standaloneValues = ::testing::Values("actuator"
   , "animated_box"
   , "arrange"
   , "clone_simulation"
@@ -134,7 +132,7 @@ auto standaloneValues = ::testing::Values(
 #endif
   , "transporter"
 );
-INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, standaloneValues,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(Standalone, ExamplesBuild_Standalone, standaloneValues);  // NOLINT
 
 int main(int argc, char **argv)
 {

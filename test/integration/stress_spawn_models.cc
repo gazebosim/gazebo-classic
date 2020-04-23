@@ -63,12 +63,12 @@ TEST_P(SpawnModels, WirelessTransmitters)
 }
 
 /////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(TestTransceiverODE, SpawnModels,
+INSTANTIATE_TEST_SUITE_P(TestTransceiverODE, SpawnModels,
     ::testing::Values("ode"),);  // NOLINT
 
 /////////////////////////////////////////////////
 #ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestTransceiverBullet, SpawnModels,
+INSTANTIATE_TEST_SUITE_P(TestTransceiverBullet, SpawnModels,
     ::testing::Values("bullet"),);  // NOLINT
 #endif  // HAVE_BULLET
 

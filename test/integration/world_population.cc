@@ -174,7 +174,7 @@ TEST_P(WorldEnvPopulationTest, LoadEnvironment)
   LoadEnvironment(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldEnvPopulationTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, WorldEnvPopulationTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 ////////////////////////////////////////////////////////////////////////

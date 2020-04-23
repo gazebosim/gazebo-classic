@@ -647,7 +647,7 @@ TEST_P(JointForceTorqueTest, JointTorqueTest)
   JointTorqueTest(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointForceTorqueTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, JointForceTorqueTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)

@@ -496,7 +496,7 @@ TEST_P(PhysicsTorsionalFrictionTest, DepthTest)
   DepthTest(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTorsionalFrictionTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PhysicsTorsionalFrictionTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

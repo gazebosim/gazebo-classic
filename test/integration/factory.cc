@@ -1238,7 +1238,7 @@ TEST_P(FactoryTest, InvalidMeshInsertionWithWorld)
   world->Step(1);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, FactoryTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, FactoryTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

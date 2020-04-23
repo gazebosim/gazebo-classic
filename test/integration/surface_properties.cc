@@ -253,7 +253,7 @@ TEST_P(SurfaceTest, CollideBitmask)
   CollideBitmask(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(TestODE, SurfaceTest, ::testing::Values(
+INSTANTIATE_TEST_SUITE_P(TestODE, SurfaceTest, ::testing::Values(
       "ode", "bullet"),);  // NOLINT
 
 /////////////////////////////////////////////////

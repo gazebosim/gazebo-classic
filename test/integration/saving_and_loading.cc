@@ -249,7 +249,7 @@ TEST_P(SavingLoadingTest, LoadScaledModels)
   this->LoadScaledModels(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, SavingLoadingTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, SavingLoadingTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

@@ -144,7 +144,7 @@ void RestWebTest::FirstTest(const std::string &_physicsEngine)
   EXPECT_GT(count_after, count_before);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, RestWebTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, RestWebTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 // main, where we can specify to skip certain tests
 int main(int argc, char **argv)

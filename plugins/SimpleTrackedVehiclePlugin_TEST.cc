@@ -955,7 +955,7 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   EXPECT_NEAR(frictionDirection.Distance(expectedDir), 0, 1e-6);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines,
                         SimpleTrackedVehiclePluginTestParametrized,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 

@@ -403,7 +403,7 @@ TEST_P(WorldRemoveTest, RemoveWorldWithEntities)
   RemoveWorldWithEntities(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(WorldRemoveTest, WorldRemoveTest,
+INSTANTIATE_TEST_SUITE_P(WorldRemoveTest, WorldRemoveTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
@@ -597,7 +597,7 @@ TEST_P(WorldRemoveJointsTest, RemoveWorldWithJoint)
   RemoveWorldWithJoint(this->physicsEngine, this->jointType);
 }
 
-INSTANTIATE_TEST_CASE_P(RemoveJointTypes, WorldRemoveJointsTest,
+INSTANTIATE_TEST_SUITE_P(RemoveJointTypes, WorldRemoveJointsTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "prismatic"

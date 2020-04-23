@@ -297,7 +297,7 @@ TEST_P(WorldPlaybackTest, Seek)
 //   - state3.log: File recording a simulation with an object that didn't move
 //                 much. Two consecutive frames don't have consecutive
 //                 simulation "iterations".
-INSTANTIATE_TEST_CASE_P(LogFiles,
+INSTANTIATE_TEST_SUITE_P(LogFiles,
                         WorldPlaybackTest,
                         ::testing::Values("state.log",
                                           "state2.log",

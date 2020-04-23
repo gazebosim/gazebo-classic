@@ -108,7 +108,7 @@ TEST_P(PhysicsThreadSafeTest, LinkGet)
   LinkGet(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsThreadSafeTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PhysicsThreadSafeTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

@@ -538,7 +538,7 @@ TEST_P(JointTestScrew, ScrewJointLimitForce)
   ScrewJointLimitForce(this->physicsEngine);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTestScrew,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, JointTestScrew,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("screw")),);  // NOLINT
 

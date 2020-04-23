@@ -138,7 +138,7 @@ TEST_P(JointLiftDragPluginTest, LiftDragPlugin1)
   LiftDragPlugin1(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointLiftDragPluginTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, JointLiftDragPluginTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)

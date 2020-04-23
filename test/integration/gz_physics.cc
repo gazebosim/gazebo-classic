@@ -147,7 +147,7 @@ TEST_F(GzPhysics, UpdateRate)
   EXPECT_NEAR(world->Physics()->GetRealTimeUpdateRate(), 0.5, 1e-3);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, GzPhysics, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, GzPhysics, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

@@ -498,7 +498,7 @@ TEST_P(JointTest, DynamicJointVisualization)
   DynamicJointVisualization(this->physicsEngine);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, JointTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("")),);  // NOLINT
 

@@ -195,7 +195,7 @@ TEST_P(IntrospectionItemsTest, RegisteredItems)
   RegisteredItems(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, IntrospectionItemsTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, IntrospectionItemsTest,
     PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

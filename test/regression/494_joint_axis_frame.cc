@@ -234,7 +234,7 @@ TEST_P(Issue494Test, CheckAxisFrame)
   CheckAxisFrame(this->physicsEngine, this->jointType);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue494Test,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, Issue494Test,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "prismatic"

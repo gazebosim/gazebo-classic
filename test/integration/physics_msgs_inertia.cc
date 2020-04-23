@@ -477,7 +477,7 @@ TEST_P(InertiaMsgsTest, SetPendulumInertia)
   SetPendulumInertia(physicsEngine);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, InertiaMsgsTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, InertiaMsgsTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

@@ -42,7 +42,7 @@ TEST_P(NonDefaultWorld, Load)
   Load(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, NonDefaultWorld,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, NonDefaultWorld,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)

@@ -171,7 +171,7 @@ TEST_P(KinematicLoopTest, FreeLoop)
   FreeLoop(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, KinematicLoopTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, KinematicLoopTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

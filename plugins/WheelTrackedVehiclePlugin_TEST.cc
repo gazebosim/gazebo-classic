@@ -542,7 +542,7 @@ TEST_P(WheelTrackedVehiclePluginTestParametrized,
   EXPECT_DOUBLE_EQ(plugin.lastTracksVelMsg.y(), 0.0);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines,
                         WheelTrackedVehiclePluginTestParametrized,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 

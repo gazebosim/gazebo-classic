@@ -138,7 +138,7 @@ TEST_P(MagnetometerSensor_TEST, RotateMagnetometerSensorCheck)
   RotateMagnetometerSensorCheck(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, MagnetometerSensor_TEST,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, MagnetometerSensor_TEST,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

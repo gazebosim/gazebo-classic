@@ -118,7 +118,7 @@ TEST_P(PhysicsTest, DropTest)
   DropTest("ode", "world", GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(WorldStepSolvers, PhysicsTest,
+INSTANTIATE_TEST_SUITE_P(WorldStepSolvers, PhysicsTest,
                         WORLD_STEP_SOLVERS,);  // NOLINT
 
 int main(int argc, char **argv)

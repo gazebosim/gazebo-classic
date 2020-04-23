@@ -763,7 +763,7 @@ TEST_P(JointTestRevolute, UnwrappedAngle)
   UnwrappedAngle(this->physicsEngine);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTestRevolute,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, JointTestRevolute,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute")),);  // NOLINT
 

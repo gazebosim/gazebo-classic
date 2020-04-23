@@ -158,7 +158,7 @@ TEST_P(ImuSensor_TEST, LinearAccelerationTest)
   LinearAccelerationTest(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, ImuSensor_TEST,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, ImuSensor_TEST,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

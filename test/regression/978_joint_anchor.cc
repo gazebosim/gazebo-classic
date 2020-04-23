@@ -81,7 +81,7 @@ TEST_P(Issue978Test, JointAnchor)
   JointAnchor(this->physicsEngine);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue978Test,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, Issue978Test,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("")),);  // NOLINT
 

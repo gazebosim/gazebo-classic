@@ -358,7 +358,7 @@ TEST_P(JointGetForceTorqueTest, GetForceTorqueDemo)
 }
 
 /////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointGetForceTorqueTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, JointGetForceTorqueTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

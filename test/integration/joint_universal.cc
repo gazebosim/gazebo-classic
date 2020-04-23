@@ -482,7 +482,7 @@ TEST_P(JointTestUniversal, UniversalJointForce)
   UniversalJointForce(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTestUniversal,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, JointTestUniversal,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

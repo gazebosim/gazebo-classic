@@ -77,7 +77,7 @@ TEST_P(RayShapeTest, Standalone)
 }
 
 /////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, RayShapeTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, RayShapeTest,
     ::testing::Values("ode"),);  // NOLINT
 
 /////////////////////////////////////////////////

@@ -856,7 +856,7 @@ TEST_P(PhysicsLinkTest, SetVelocity)
   SetVelocity(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsLinkTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PhysicsLinkTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

@@ -273,7 +273,7 @@ void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
 
 
 // Run all test cases
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, SimEventsTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, SimEventsTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 TEST_P(SimEventsTest, JointEventSource)
 {

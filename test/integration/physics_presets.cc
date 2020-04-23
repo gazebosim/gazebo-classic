@@ -285,7 +285,7 @@ TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
   }
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PresetManagerTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PresetManagerTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

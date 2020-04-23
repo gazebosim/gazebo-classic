@@ -122,7 +122,7 @@ TEST_P(Issue2505Test, TestAxis)
 }
 
 /////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue2505Test, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, Issue2505Test, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 
 /////////////////////////////////////////////////

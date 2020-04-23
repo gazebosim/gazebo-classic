@@ -82,7 +82,7 @@ TEST_P(ForceTorqueSensor_TEST, ForceTorqueTest)
   ForceTorqueTest(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines,
                         ForceTorqueSensor_TEST,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 

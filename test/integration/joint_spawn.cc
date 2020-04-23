@@ -481,7 +481,7 @@ TEST_P(JointSpawningTest_RotationalWorld, SpawnJointRotationalWorld)
   SpawnJointRotationalWorld(this->physicsEngine, this->jointType);
 }
 
-INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_All,
+INSTANTIATE_TEST_SUITE_P(TestRuns, JointSpawningTest_All,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "prismatic"
@@ -493,7 +493,7 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_All,
                   , "gearbox")),);  // NOLINT
 
 // Skip prismatic, screw, and revolute2 because they allow translation
-INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_Rotational,
+INSTANTIATE_TEST_SUITE_P(TestRuns, JointSpawningTest_Rotational,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "universal"
@@ -501,7 +501,7 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_Rotational,
                   , "ball")),);  // NOLINT
 
 // Skip prismatic, screw, and revolute2 because they allow translation
-INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_RotationalWorld,
+INSTANTIATE_TEST_SUITE_P(TestRuns, JointSpawningTest_RotationalWorld,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "universal"

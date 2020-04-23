@@ -2283,7 +2283,7 @@ class TestNameIs {
 namespace internal {
 
 // This method expands all parameterized tests registered with macros TEST_P
-// and INSTANTIATE_TEST_CASE_P into regular tests and registers those.
+// and INSTANTIATE_TEST_SUITE_P into regular tests and registers those.
 // This will be done just once during the program runtime.
 void UnitTestImpl::RegisterParameterizedTests() {
 #if GTEST_HAS_PARAM_TEST

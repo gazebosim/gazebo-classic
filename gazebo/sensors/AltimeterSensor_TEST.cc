@@ -296,7 +296,7 @@ TEST_P(AltimeterSensor_TEST, NonzeroAltimeterSensorCheck)
   NonzeroAltimeterSensorCheck(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, AltimeterSensor_TEST,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, AltimeterSensor_TEST,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

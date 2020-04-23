@@ -167,7 +167,7 @@ TEST_P(AtmosphereTest, AtmosphereParamBool)
   AtmosphereParamBool(this->GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(Atmospheres, AtmosphereTest,
+INSTANTIATE_TEST_SUITE_P(Atmospheres, AtmosphereTest,
                         ::testing::Values("adiabatic"),);  // NOLINT
 
 int main(int argc, char **argv)

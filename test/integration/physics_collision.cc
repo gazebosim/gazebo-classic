@@ -361,7 +361,7 @@ TEST_P(PhysicsCollisionTest, PoseOffsets)
   PoseOffsets(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsCollisionTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PhysicsCollisionTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

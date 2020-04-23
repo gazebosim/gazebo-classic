@@ -73,7 +73,7 @@ TEST_P(Issue2239Test, TestRevolute2JointTeleport)
   this->TestRevolute2JointTeleport(this->physicsEngine);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue2239Test,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, Issue2239Test,
   ::testing::Combine(::testing::Values("ode", "dart"), ::testing::Values("")),);  // NOLINT
 
 /////////////////////////////////////////////////

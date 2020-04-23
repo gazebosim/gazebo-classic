@@ -217,7 +217,7 @@ TEST_P(SonarSensor_TEST, GroundPlane)
   GroundPlane(physics);
 }
 
-INSTANTIATE_TEST_CASE_P(SonarTests, SonarSensor_TEST,
+INSTANTIATE_TEST_SUITE_P(SonarTests, SonarSensor_TEST,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values(false, true)),);  // NOLINT
 

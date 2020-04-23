@@ -809,7 +809,7 @@ TEST_P(JointKinematicTest, SetPositionRotating)
   SetPositionRotating(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointKinematicTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, JointKinematicTest,
   PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)

@@ -420,7 +420,7 @@ TEST_P(TransceiverTest, FreqOutOfBounds)
 }
 
 /////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, TransceiverTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, TransceiverTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////

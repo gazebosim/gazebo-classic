@@ -834,7 +834,7 @@ TEST_P(ImuTest, EmptyWorldBias)
   Stationary_EmptyWorld_Bias(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, ImuTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, ImuTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 int main(int argc, char **argv)
 {

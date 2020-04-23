@@ -606,7 +606,7 @@ TEST_P(SdfFrameSemanticsTest, IncludedModel)
   EXPECT_EQ(expM2WorldPose, model2->WorldPose());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, SdfFrameSemanticsTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, SdfFrameSemanticsTest,
                         PHYSICS_ENGINE_VALUES,); // NOLINT
 
 /////////////////////////////////////////////////

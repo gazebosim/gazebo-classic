@@ -355,7 +355,7 @@ TEST_P(PhysicsMsgsTest, SpawnNestedModel)
   SpawnNestedModel(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsMsgsTest,
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PhysicsMsgsTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
