@@ -422,7 +422,7 @@ INSTANTIATE_TEST_SUITE_P(PhysicsEngines, WorldResetTest,
   ::testing::Values("worlds/empty.world",
                     "worlds/pr2.world",
                     "worlds/nested_model.world"),
-  ::testing::Range(1, 3)),);  // NOLINT
+  ::testing::Range(1, 3)));  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

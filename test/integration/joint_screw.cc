@@ -540,7 +540,7 @@ TEST_P(JointTestScrew, ScrewJointLimitForce)
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, JointTestScrew,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values("screw")),);  // NOLINT
+  ::testing::Values("screw")));  // NOLINT
 
 int main(int argc, char **argv)
 {

@@ -254,7 +254,7 @@ TEST_P(SurfaceTest, CollideBitmask)
 }
 
 INSTANTIATE_TEST_SUITE_P(TestODE, SurfaceTest, ::testing::Values(
-      "ode", "bullet"),);  // NOLINT
+      "ode", "bullet"));  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

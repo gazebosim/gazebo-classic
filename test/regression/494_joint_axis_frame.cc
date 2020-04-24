@@ -238,7 +238,7 @@ INSTANTIATE_TEST_SUITE_P(PhysicsEngines, Issue494Test,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "prismatic"
-                  , "universal")),);  // NOLINT
+                  , "universal")));  // NOLINT
 
 /////////////////////////////////////////////////
 /// Main

@@ -168,7 +168,7 @@ TEST_P(AtmosphereTest, AtmosphereParamBool)
 }
 
 INSTANTIATE_TEST_SUITE_P(Atmospheres, AtmosphereTest,
-                        ::testing::Values("adiabatic"),);  // NOLINT
+                        ::testing::Values("adiabatic"));  // NOLINT
 
 int main(int argc, char **argv)
 {

@@ -500,7 +500,7 @@ TEST_P(JointTest, DynamicJointVisualization)
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, JointTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values("")),);  // NOLINT
+  ::testing::Values("")));  // NOLINT
 
 int main(int argc, char **argv)
 {

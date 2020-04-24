@@ -606,7 +606,7 @@ INSTANTIATE_TEST_SUITE_P(RemoveJointTypes, WorldRemoveJointsTest,
                   , "fixed"
                   , "ball"
                   , "revolute2"
-                  , "gearbox")),);  // NOLINT
+                  , "gearbox")));  // NOLINT
 
 int main(int argc, char **argv)
 {

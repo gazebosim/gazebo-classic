@@ -219,7 +219,7 @@ TEST_P(SonarSensor_TEST, GroundPlane)
 
 INSTANTIATE_TEST_SUITE_P(SonarTests, SonarSensor_TEST,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values(false, true)),);  // NOLINT
+  ::testing::Values(false, true)));  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
