@@ -404,7 +404,7 @@ TEST_P(WorldRemoveTest, RemoveWorldWithEntities)
 }
 
 INSTANTIATE_TEST_SUITE_P(WorldRemoveTest, WorldRemoveTest,
-                        PHYSICS_ENGINE_VALUES,);  // NOLINT
+                        PHYSICS_ENGINE_VALUES);  // NOLINT
 
 /////////////////////////////////////////////////
 void WorldRemoveJointsTest::RemoveWorldWithJoint(

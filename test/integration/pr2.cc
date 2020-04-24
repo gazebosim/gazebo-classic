@@ -202,7 +202,7 @@ TEST_P(PR2Test, StaticPR2)
   StaticPR2(GetParam());
 }
 
-INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PR2Test, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PR2Test, PHYSICS_ENGINE_VALUES);  // NOLINT
 
 int main(int argc, char **argv)
 {

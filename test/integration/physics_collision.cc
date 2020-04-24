@@ -362,7 +362,7 @@ TEST_P(PhysicsCollisionTest, PoseOffsets)
 }
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PhysicsCollisionTest,
-                        PHYSICS_ENGINE_VALUES,);  // NOLINT
+                        PHYSICS_ENGINE_VALUES);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

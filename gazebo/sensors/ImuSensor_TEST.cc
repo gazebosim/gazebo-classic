@@ -159,7 +159,7 @@ TEST_P(ImuSensor_TEST, LinearAccelerationTest)
 }
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, ImuSensor_TEST,
-                        PHYSICS_ENGINE_VALUES,);  // NOLINT
+                        PHYSICS_ENGINE_VALUES);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

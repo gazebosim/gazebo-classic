@@ -483,7 +483,7 @@ TEST_P(JointTestUniversal, UniversalJointForce)
 }
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, JointTestUniversal,
-                        PHYSICS_ENGINE_VALUES,);  // NOLINT
+                        PHYSICS_ENGINE_VALUES);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

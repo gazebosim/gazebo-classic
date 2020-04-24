@@ -810,7 +810,7 @@ TEST_P(JointKinematicTest, SetPositionRotating)
 }
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, JointKinematicTest,
-  PHYSICS_ENGINE_VALUES,);  // NOLINT
+  PHYSICS_ENGINE_VALUES);  // NOLINT
 
 int main(int argc, char **argv)
 {

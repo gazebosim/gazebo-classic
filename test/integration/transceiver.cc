@@ -421,7 +421,7 @@ TEST_P(TransceiverTest, FreqOutOfBounds)
 
 /////////////////////////////////////////////////
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, TransceiverTest,
-                        PHYSICS_ENGINE_VALUES,);  // NOLINT
+                        PHYSICS_ENGINE_VALUES);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

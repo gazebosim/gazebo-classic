@@ -94,7 +94,7 @@ TEST_P(Pioneer2dx, StraightLine)
   StraightLine(GetParam());
 }
 
-INSTANTIATE_TEST_SUITE_P(PhysicsEngines, Pioneer2dx, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, Pioneer2dx, PHYSICS_ENGINE_VALUES);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

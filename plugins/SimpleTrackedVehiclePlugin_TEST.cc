@@ -957,7 +957,7 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines,
                         SimpleTrackedVehiclePluginTestParametrized,
-                        PHYSICS_ENGINE_VALUES,);  // NOLINT
+                        PHYSICS_ENGINE_VALUES);  // NOLINT
 
 int main(int argc, char **argv)
 {

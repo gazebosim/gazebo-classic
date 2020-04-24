@@ -166,7 +166,7 @@ TEST_P(AttachLightTest, LinkLight)
   LinkLight(GetParam());
 }
 
-INSTANTIATE_TEST_SUITE_P(PhysicsEngines, AttachLightTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, AttachLightTest, PHYSICS_ENGINE_VALUES);  // NOLINT
 
 int main(int argc, char **argv)
 {

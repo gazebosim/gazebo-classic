@@ -62,7 +62,7 @@ TEST_P(SpeedPR2Test, PR2World)
   PR2World(GetParam());
 }
 
-INSTANTIATE_TEST_SUITE_P(PhysicsEngines, SpeedPR2Test, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, SpeedPR2Test, PHYSICS_ENGINE_VALUES);  // NOLINT
 
 int main(int argc, char **argv)
 {

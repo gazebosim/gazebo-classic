@@ -415,7 +415,7 @@ TEST_P(WorldResetTest, WorldName)
 }
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, WorldControlResetTest,
-    PHYSICS_ENGINE_VALUES,);  // NOLINT
+    PHYSICS_ENGINE_VALUES);  // NOLINT
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, WorldResetTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,

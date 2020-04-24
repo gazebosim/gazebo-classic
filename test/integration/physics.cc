@@ -1569,7 +1569,7 @@ TEST_P(PhysicsTest, SpawnFixedJoint)
   SpawnFixedJoint(GetParam());
 }
 
-INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);  // NOLINT
 
 int main(int argc, char **argv)
 {

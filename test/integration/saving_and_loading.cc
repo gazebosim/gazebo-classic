@@ -250,7 +250,7 @@ TEST_P(SavingLoadingTest, LoadScaledModels)
 }
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, SavingLoadingTest,
-                        PHYSICS_ENGINE_VALUES,);  // NOLINT
+                        PHYSICS_ENGINE_VALUES);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

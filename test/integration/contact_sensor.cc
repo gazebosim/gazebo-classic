@@ -685,7 +685,7 @@ TEST_P(ContactSensor, TorqueTest)
   TorqueTest(GetParam());
 }
 
-INSTANTIATE_TEST_SUITE_P(PhysicsEngines, ContactSensor, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, ContactSensor, PHYSICS_ENGINE_VALUES);  // NOLINT
 
 int main(int argc, char **argv)
 {

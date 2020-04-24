@@ -857,7 +857,7 @@ TEST_P(PhysicsLinkTest, SetVelocity)
 }
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PhysicsLinkTest,
-                        PHYSICS_ENGINE_VALUES,);  // NOLINT
+                        PHYSICS_ENGINE_VALUES);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

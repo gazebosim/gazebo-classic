@@ -141,7 +141,7 @@ TEST_P(Issue1702Test, SpawnDeleteSpawnAgain)
   SpawnDeleteSpawnAgain(GetParam());
 }
 
-INSTANTIATE_TEST_SUITE_P(PhysicsEngines, Issue1702Test, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, Issue1702Test, PHYSICS_ENGINE_VALUES);  // NOLINT
 
 /////////////////////////////////////////////////
 /// Main

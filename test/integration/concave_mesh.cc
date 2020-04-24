@@ -163,7 +163,7 @@ TEST_P(ConcaveMeshTest, RayTest)
   }
 }
 
-INSTANTIATE_TEST_SUITE_P(PhysicsEngines, ConcaveMeshTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, ConcaveMeshTest, PHYSICS_ENGINE_VALUES);  // NOLINT
 
 int main(int argc, char **argv)
 {

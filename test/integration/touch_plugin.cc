@@ -243,7 +243,7 @@ TEST_P(TouchPluginTest, StartDisabled)
   StartDisabled(GetParam());
 }
 
-INSTANTIATE_TEST_SUITE_P(PhysicsEngines, TouchPluginTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
+INSTANTIATE_TEST_SUITE_P(PhysicsEngines, TouchPluginTest, PHYSICS_ENGINE_VALUES);  // NOLINT
 
 int main(int argc, char **argv)
 {

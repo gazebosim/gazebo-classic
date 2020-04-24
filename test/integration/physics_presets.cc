@@ -286,7 +286,7 @@ TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
 }
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PresetManagerTest,
-                        PHYSICS_ENGINE_VALUES,);  // NOLINT
+                        PHYSICS_ENGINE_VALUES);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

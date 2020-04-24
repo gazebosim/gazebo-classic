@@ -497,7 +497,7 @@ TEST_P(PhysicsTorsionalFrictionTest, DepthTest)
 }
 
 INSTANTIATE_TEST_SUITE_P(PhysicsEngines, PhysicsTorsionalFrictionTest,
-                        PHYSICS_ENGINE_VALUES,);  // NOLINT
+                        PHYSICS_ENGINE_VALUES);  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
