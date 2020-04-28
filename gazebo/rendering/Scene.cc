@@ -2134,9 +2134,23 @@ void Scene::PreRender()
     // Process the road messages.
     for (const auto &msg : roadMsgsCopy)
     {
-      Road2dPtr road(new Road2d(msg->name(), this->dataPtr->worldVisual));
-      road->Load(*msg);
-      this->dataPtr->visuals[road->GetId()] = road;
+      // do not add road if it already exists
+      bool addRoad = true;
+      for (const auto &it : this->dataPtr->visuals)
+      {
+        Road2dPtr road = std::dynamic_pointer_cast<Road2d>(it.second);
+        if (road && road->Name() == msg->name())
+        {
+          addRoad = false;
+          break;
+        }
+      }
+      if (addRoad)
+      {
+        Road2dPtr road(new Road2d(msg->name(), this->dataPtr->worldVisual));
+        road->Load(*msg);
+        this->dataPtr->visuals[road->GetId()] = road;
+      }
     }
 
     // official time stamp of approval
@@ -2158,7 +2172,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
   if (!this->dataPtr->enableVisualizations)
     return true;
 
-  if ((_msg->type() == "ray" || _msg->type() == "gpu_ray") && _msg->visualize()
+  if ((_msg->type() == "lidar" || _msg->type() == "gpu_lidar" ||
+       _msg->type() == "ray" || _msg->type() == "gpu_ray") && _msg->visualize()
       && !_msg->topic().empty())
   {
     std::string rayVisualName = _msg->parent() + "::" + _msg->name();

@@ -53,6 +53,10 @@ namespace gazebo {
   /// <body>  Body of the vehicle to which the two tracks are connected.
   /// <left_track>  The left track link's name.
   /// <right_track>  The right track link's name.
+  /// <left_flipper>  The name of a left flipper link.
+  ///     Can appear multiple times.
+  /// <right_flipper>  The name of a right flipper link.
+  ///     Can appear multiple times.
   /// <collide_without_contact_bitmask> Collision bitmask that will be set to
   ///     the whole vehicle (default is 1u).
 
@@ -61,7 +65,7 @@ namespace gazebo {
   {
     public: SimpleTrackedVehiclePlugin() = default;
 
-    public: virtual ~SimpleTrackedVehiclePlugin() = default;
+    public: virtual ~SimpleTrackedVehiclePlugin();
 
     /// \brief Called when the plugin is loaded
     /// \param[in] model Pointer to the model for which the plugin is loaded
@@ -95,6 +99,11 @@ namespace gazebo {
 
     /// \brief Compute and apply the forces that make the tracks move.
     protected: void DriveTracks(const common::UpdateInfo &/*_unused*/);
+
+    /// \brief Return the number of tracks on the given side. Should always be
+    /// at least 1 for the main track. If flippers are present, the number is
+    /// higher.
+    public: size_t GetNumTracks(Tracks side) const;
 
     /// \brief Set collide categories and bits of all geometries to the
     ///        required values.

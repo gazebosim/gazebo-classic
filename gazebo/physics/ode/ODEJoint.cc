@@ -53,6 +53,8 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->useImplicitSpringDamper = false;
   this->stopERP = 0.0;
   this->stopCFM = 0.0;
+  this->angleOffset[0] = 0.0;
+  this->angleOffset[1] = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -379,13 +381,6 @@ ignition::math::Vector3d ODEJoint::LinkTorque(
 void ODEJoint::SetAxis(const unsigned int _index,
     const ignition::math::Vector3d &_axis)
 {
-  // record axis in sdf element
-  if (_index == 0)
-    this->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
-  else if (_index == 1)
-    this->sdf->GetElement("axis2")->GetElement("xyz")->Set(_axis);
-  else
-    gzerr << "SetAxis index [" << _index << "] out of bounds\n";
 }
 
 //////////////////////////////////////////////////

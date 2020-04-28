@@ -364,7 +364,7 @@ void WorldState::SetInsertions(const std::vector<std::string> &_insertions)
   // Unwrap insertions from <sdf>
   for (const auto &insertion : _insertions)
   {
-    rootSDF->Root()->ClearElements();
+    rootSDF->Clear();
     // <sdf>
     if (sdf::readString(insertion, rootSDF))
     {

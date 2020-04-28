@@ -103,23 +103,23 @@ namespace gazebo
 
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) override;
 
       /// \brief Initialize a joint.
-      public: virtual void Init();
+      public: virtual void Init() override;
 
       /// \brief Finialize the object
-      public: virtual void Fini();
+      public: virtual void Fini() override;
 
       /// \brief Update the joint.
-      public: void Update();
+      public: void Update() override;
 
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to update from.
-      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf) override;
 
       /// \brief Reset the joint.
-      public: virtual void Reset();
+      public: virtual void Reset() override;
       using Base::Reset;
 
       /// \brief Set the joint state.
@@ -552,6 +552,15 @@ namespace gazebo
       /// in parent link frame.
       public: ignition::math::Pose3d AnchorErrorPose() const;
 
+      /// \brief Resolve axis xyz value to the named frame, defaulting to
+      /// the joint frame if no frame name is supplied.
+      /// \param[in] _index joint axis index.
+      /// \param[in] _resolveTo name of frame in which to resolve axis xyz.
+      /// return Resolved axis vector.
+      public: ignition::math::Vector3d ResolveAxisXyz(
+          const unsigned int _index,
+          const std::string &_resolveTo = "") const;
+
       /// \brief Get orientation of reference frame for specified axis,
       /// relative to world frame. The value of axisParentModelFrame
       /// is used to determine the appropriate frame.
@@ -580,6 +589,14 @@ namespace gazebo
       /// If using metric system, the unit of energy will be Joules.
       /// \return this joint's spring potential energy,
       public: double GetWorldEnergyPotentialSpring(unsigned int _index) const;
+
+      // Documentation inherited
+      public: virtual std::optional<sdf::SemanticPose> SDFSemanticPose()
+                  const override;
+
+      /// \brief Get the SDF DOM object of this joint
+      /// \return Pointer to SDF DOM Object
+      public: const sdf::Joint *GetSDFDom() const;
 
       /// \brief Helper function to get the position of an axis.
       ///
@@ -613,7 +630,7 @@ namespace gazebo
           const unsigned int _index, const double _position);
 
       /// \brief Register items in the introspection service.
-      protected: virtual void RegisterIntrospectionItems();
+      protected: virtual void RegisterIntrospectionItems() override;
 
       /// \brief Register position items in the introspection service.
       /// \param[in] _index Axis index.
@@ -681,10 +698,9 @@ namespace gazebo
       /// clears them at the end of update step.
       protected: JointWrench wrench;
 
-      /// \brief Flags that are set to true if an axis value is expressed
-      /// in the parent model frame. Otherwise use the joint frame.
-      /// See issue #494.
-      protected: bool axisParentModelFrame[MAX_JOINT_AXIS];
+      /// \brief Expressed-in values for each axis that are checked if
+      /// the DOM has errors.
+      protected: std::string axisExpressedIn[MAX_JOINT_AXIS];
 
       /// \brief An SDF pointer that allows us to only read the joint.sdf
       /// file once, which in turns limits disk reads.
@@ -707,6 +723,9 @@ namespace gazebo
 
       /// \brief Joint stop dissipation
       private: double stopDissipation[MAX_JOINT_AXIS];
+
+      /// \brief SDF Joint DOM object
+      private: const sdf::Joint *jointSDFDom = nullptr;
     };
     /// \}
   }

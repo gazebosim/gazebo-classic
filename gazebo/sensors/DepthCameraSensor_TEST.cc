@@ -34,10 +34,11 @@ float *g_depthBuffer = nullptr;
 /////////////////////////////////////////////////
 void OnNewDepthFrame(const float * _image,
     unsigned int _width, unsigned int _height,
-    unsigned int /*_depth*/, const std::string &/*_format*/)
+    unsigned int _depth, const std::string & _format)
 {
-  if (!_image)
-    return;
+  EXPECT_EQ(_depth, 1u);
+  EXPECT_EQ(_format, std::string("FLOAT32"));
+  ASSERT_NE(nullptr, _image);
   std::lock_guard<std::mutex> lock(g_depthMutex);
   if (!g_depthBuffer)
     g_depthBuffer = new float[_width * _height];
@@ -61,14 +62,14 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
      (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != nullptr);
+  ASSERT_NE(nullptr, sensor);
 
   EXPECT_EQ(sensor->ImageWidth(), 640u);
   EXPECT_EQ(sensor->ImageHeight(), 480u);
   EXPECT_TRUE(sensor->IsActive());
 
   rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
-  EXPECT_TRUE(depthCamera != nullptr);
+  ASSERT_NE(nullptr, depthCamera);
 
   event::ConnectionPtr c = depthCamera->ConnectNewDepthFrame(
       std::bind(&::OnNewDepthFrame, std::placeholders::_1,
@@ -76,13 +77,14 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
       std::placeholders::_5));
 
   // wait for a few depth camera frames
+  unsigned int framesToWait = 10;
   int i = 0;
-  while (g_depthCounter < 10 && i < 300)
+  while (i < 300 && g_depthCounter < framesToWait)
   {
-    common::Time::MSleep(10);
+    common::Time::MSleep(20);
     i++;
   }
-  EXPECT_LT(i, 300);
+  EXPECT_GE(g_depthCounter, framesToWait);
 
   unsigned int imageSize =
       sensor->ImageWidth() * sensor->ImageHeight();
@@ -109,6 +111,85 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
 
   if (g_depthBuffer)
     delete [] g_depthBuffer;
+}
+
+
+using namespace gazebo;
+class DepthCameraSensor_normals_TEST : public ServerFixture
+{
+};
+
+unsigned int g_normalsCounter = 0;
+
+/////////////////////////////////////////////////
+void OnNewNormalsFrame(const float * _normals,
+                       unsigned int _width,
+                       unsigned int _height,
+                       unsigned int _depth,
+                       const std::string & _format)
+{
+  EXPECT_EQ(_depth, 1u);
+  EXPECT_EQ(_format, std::string("NORMALS"));
+  for (unsigned int i = 0; i < _width; i++)
+  {
+    for (unsigned int j = 0; j < _height; j++)
+    {
+      unsigned int index = (j * _width) + i;
+      float x = _normals[4 * index];
+      float y = _normals[4 * index + 1];
+      float z = _normals[4 * index + 2];
+      EXPECT_NEAR(x, 0.0, 0.01);
+      EXPECT_NEAR(y, 0.0, 0.01);
+      // box
+      if (z < -0.5)
+        EXPECT_NEAR(z, -1.0, 0.01);
+      // background
+      else
+        EXPECT_NEAR(z, 0.0, 0.01);
+    }
+  }
+  g_normalsCounter++;
+}
+
+/////////////////////////////////////////////////
+/// \brief Test Creation of a Depth Camera sensor
+TEST_F(DepthCameraSensor_normals_TEST, CreateDepthCamera)
+{
+  Load("worlds/depth_camera2.world");
+  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+
+  // Create the camera sensor
+  std::string sensorName = "default::camera_model::my_link::camera";
+
+  // Get a pointer to the depth camera sensor
+  sensors::DepthCameraSensorPtr sensor =
+     std::dynamic_pointer_cast<sensors::DepthCameraSensor>
+     (mgr->GetSensor(sensorName));
+
+  // Make sure the above dynamic cast worked.
+  ASSERT_NE(nullptr, sensor);
+
+  EXPECT_EQ(sensor->ImageWidth(), 640u);
+  EXPECT_EQ(sensor->ImageHeight(), 480u);
+  EXPECT_TRUE(sensor->IsActive());
+
+  rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
+  ASSERT_NE(nullptr, depthCamera);
+
+  event::ConnectionPtr c2 = depthCamera->ConnectNewNormalsPointCloud(
+      std::bind(&::OnNewNormalsFrame, std::placeholders::_1,
+      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+      std::placeholders::_5));
+
+  unsigned int framesToWait = 10;
+  // wait for a few normals callbacks
+  int i = 0;
+  while (i < 300 && g_normalsCounter < framesToWait)
+  {
+    common::Time::MSleep(20);
+    i++;
+  }
+  EXPECT_GE(g_normalsCounter, framesToWait);
 }
 
 /////////////////////////////////////////////////

@@ -23,6 +23,7 @@
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/SemanticVersion.hh>
 #include <ignition/msgs/plugin_v.pb.h>
 #include <sstream>
 
@@ -70,8 +71,39 @@ Model::~Model()
 //////////////////////////////////////////////////
 void Model::Load(sdf::ElementPtr _sdf)
 {
-  Entity::Load(_sdf);
+  // Create a DOM object to compute the resolved initial pose (with frame
+  // semantics)
+  // Only <model> is supported right now, <actor> is not supported.
+  if (_sdf->GetName() == "model")
+  {
+    // If the model is initialized without a containing world, we create an
+    // isolated/standalone DOM object for the world. Otherwise, we'd obtain
+    // the model DOM from the world DOM.
+    const auto *worldDom = this->GetWorld()->GetSDFDom();
+    const std::string modelName = _sdf->Get<std::string>("name");
+    if (nullptr != worldDom && !modelName.empty())
+    {
+      this->modelSDFDom = worldDom->ModelByName(modelName);
+    }
 
+    ignition::math::SemanticVersion sdfOriginalVersion(_sdf->OriginalVersion());
+    if (sdfOriginalVersion >= ignition::math::SemanticVersion(1, 7))
+    {
+      if (nullptr == this->modelSDFDom)
+      {
+        this->modelSDFDomIsolated = std::make_unique<sdf::Model>();
+        sdf::Errors errors = this->modelSDFDomIsolated->Load(_sdf);
+        // Print errors and load the parts that worked.
+        for (const auto &error : errors)
+        {
+          gzerr << error << "\n";
+        }
+        this->modelSDFDom = this->modelSDFDomIsolated.get();
+      }
+    }
+  }
+
+  Entity::Load(_sdf);
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic(this->sdf->Get<bool>("static"));
@@ -241,10 +273,8 @@ void Model::LoadJoints()
 void Model::Init()
 {
   // Record the model's initial pose (for reseting)
-  ignition::math::Pose3d initPose =
-    this->sdf->Get<ignition::math::Pose3d>("pose");
-  this->SetInitialRelativePose(initPose);
-  this->SetRelativePose(initPose);
+  this->SetInitialRelativePose(this->SDFPoseRelativeToParent());
+  this->SetRelativePose(this->SDFPoseRelativeToParent());
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
@@ -522,6 +552,11 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
 const sdf::ElementPtr Model::GetSDF()
 {
   return Entity::GetSDF();
+}
+
+const sdf::Model *Model::GetSDFDom() const
+{
+  return this->modelSDFDom;
 }
 
 //////////////////////////////////////////////////
@@ -1775,4 +1810,13 @@ void Model::PluginInfo(const common::URI &_pluginUri,
 
   gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
       << std::endl;
+}
+
+std::optional<sdf::SemanticPose> Model::SDFSemanticPose() const
+{
+  if (nullptr != this->modelSDFDom)
+  {
+    return this->modelSDFDom->SemanticPose();
+  }
+  return std::nullopt;
 }

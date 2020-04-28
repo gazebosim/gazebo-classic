@@ -25,6 +25,20 @@
 
 #include "gazebo/rendering/RenderTypes.hh"
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
+// Since OGRE 1.11, the once public
+// Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelper
+// class and its descendant are now private classes of OGRE, see
+// * https://github.com/OGRECave/ogre/blob/master/Docs/1.11-Notes.md#other
+// * https://github.com/OGRECave/ogre/pull/722
+//
+// As these classes are heavily used in the Heightmap class implementation
+// (by accessing a protected Ogre class) we need to disable the definition
+// of the custom terrain  generator, and just use the Ogre default one.
+using Ogre::TechniqueType;
+#endif
+
+
 namespace Ogre
 {
   class PageManager;
@@ -43,6 +57,7 @@ namespace gazebo
 
   namespace rendering
   {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 11
     /// \internal
     /// \brief Custom terrain material generator for GLSL terrains.
     /// A custom material generator that lets Gazebo use GLSL shaders
@@ -184,6 +199,7 @@ namespace gazebo
         /// Original implementation from Ogre that generates Cg shaders
         protected: class ShaderHelperCg :
             public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg
+
         {
           public: virtual Ogre::HighLevelGpuProgramPtr generateFragmentProgram(
                       const SM2Profile *_prof, const Ogre::Terrain *_terrain,
@@ -232,6 +248,8 @@ namespace gazebo
 #endif
       };
     };
+// #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 11
+#endif
 
     /// \internal
     /// \brief Custom terrain material generator.
@@ -405,8 +423,10 @@ namespace gazebo
       /// \brief The raw height values received from physics.
       public: std::vector<float> heights;
 
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 11
       /// \brief Pointer to the terrain material generator.
       public: GzTerrainMatGen *gzMatGen = nullptr;
+#endif
 
       /// \brief A page provider is needed to use the paging system.
       public: DummyPageProvider dummyPageProvider;

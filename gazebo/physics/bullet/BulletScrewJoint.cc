@@ -322,8 +322,7 @@ void BulletScrewJoint::SetAxis(const unsigned int /*_index*/,
   if (!this->bulletScrew)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-    auto axisFrame = this->AxisFrame(0);
-    this->initialWorldAxis = axisFrame.RotateVector(_axis);
+    this->initialWorldAxis = this->WorldPose().Rot() * _axis;
   }
   else
   {

@@ -69,7 +69,17 @@ namespace gazebo
       /// \param[in] _type Type of axis.
       /// \returns Newly created arrow visual.
       public: ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis,
-          const bool _useParentFrame, const msgs::Joint::Type &_type);
+          const bool _useParentFrame, const msgs::Joint::Type &_type)
+          GAZEBO_DEPRECATED(11.0);
+
+      /// \brief Create an axis and attach it to the joint visual.
+      /// \param[in] _axis Axis vector
+      /// \param[in] _xyzExpressedIn Frame in which the axis vector is
+      /// expressed.
+      /// \param[in] _type Type of axis.
+      /// \returns Newly created arrow visual.
+      public: ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis,
+          const std::string &_xyzExpressedIn, const msgs::Joint::Type &_type);
 
       // Documentation Inherited.
       public: virtual void SetVisible(bool _visible, bool _cascade = true);
@@ -86,7 +96,18 @@ namespace gazebo
       /// \param[in] _type Type of axis.
       public: void UpdateAxis(ArrowVisualPtr _arrowVisual,
           const ignition::math::Vector3d &_axis, const bool _useParentFrame,
-          const msgs::Joint::Type &_type);
+          const msgs::Joint::Type &_type) GAZEBO_DEPRECATED(11.0);
+
+      /// \brief Update an axis' arrow visual.
+      /// \param[in] _arrowVisual Arrow visual to be updated.
+      /// \param[in] _axis Axis vector.
+      /// \param[in] _xyzExpressedIn Frame in which the axis vector is
+      /// expressed.
+      /// \param[in] _type Type of axis.
+      public: void UpdateAxis(ArrowVisualPtr _arrowVisual,
+                              const ignition::math::Vector3d &_axis,
+                              const std::string &_xyzExpressedIn,
+                              const msgs::Joint::Type &_type);
 
       /// \brief Get the JointVisual which is attached to the parent link.
       /// returns Parent axis visual.

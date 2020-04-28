@@ -42,6 +42,11 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("gpu_ray", GpuRaySensor)
 
+void RegisterGpuLidarSensor()
+{
+  SensorFactory::RegisterSensor("gpu_lidar", NewGpuRaySensor);
+}
+
 //////////////////////////////////////////////////
 GpuRaySensor::GpuRaySensor()
 : Sensor(sensors::IMAGE),
@@ -336,6 +341,24 @@ void GpuRaySensor::Fini()
   this->dataPtr->laserCam.reset();
 
   Sensor::Fini();
+}
+
+//////////////////////////////////////////////////
+void GpuRaySensor::SetActive(bool _value)
+{
+  Sensor::SetActive(_value);
+}
+
+//////////////////////////////////////////////////
+bool GpuRaySensor::NeedsUpdate()
+{
+  return Sensor::NeedsUpdate();
+}
+
+//////////////////////////////////////////////////
+void GpuRaySensor::Update(bool _force)
+{
+  Sensor::Update(_force);
 }
 
 //////////////////////////////////////////////////
@@ -664,4 +687,16 @@ bool GpuRaySensor::IsActive() const
 rendering::GpuLaserPtr GpuRaySensor::LaserCamera() const
 {
   return this->dataPtr->laserCam;
+}
+
+//////////////////////////////////////////////////
+double GpuRaySensor::NextRequiredTimestamp() const
+{
+  return Sensor::NextRequiredTimestamp();
+}
+
+//////////////////////////////////////////////////
+void GpuRaySensor::ResetLastUpdateTime()
+{
+  Sensor::ResetLastUpdateTime();
 }

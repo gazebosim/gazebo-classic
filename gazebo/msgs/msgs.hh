@@ -373,12 +373,16 @@ namespace gazebo
     /// \brief Create a msgs::Visual from a visual SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Visual object
+    /// Note: This function does not support frame semantics. The pose of the
+    /// output message will be just the value of the `<pose>` tag.
     GAZEBO_VISIBLE
     msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf);
 
     /// \brief Create a msgs::Collision from a collision SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Collision object
+    /// Note: This function does not support frame semantics. The pose of the
+    /// output message will be just the value of the `<pose>` tag.
     GAZEBO_VISIBLE
     msgs::Collision CollisionFromSDF(sdf::ElementPtr _sdf);
 

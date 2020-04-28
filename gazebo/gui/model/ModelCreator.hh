@@ -120,7 +120,8 @@ namespace gazebo
       public: void ModelChanged();
 
       /// \brief Helper function to manage writing files to disk.
-      public: void SaveModelFiles();
+      /// \return True if successfully saved.
+      public: bool SaveModelFiles();
 
       /// \brief Finish the model and create the entity on the gzserver.
       public: void FinishModel();

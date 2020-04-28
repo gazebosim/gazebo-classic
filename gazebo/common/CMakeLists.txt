@@ -59,6 +59,7 @@ set (sources
   MouseEvent.cc
   OBJLoader.cc
   PID.cc
+  SdfFrameSemantics.cc
   SemanticVersion.cc
   SkeletonAnimation.cc
   Skeleton.cc
@@ -117,6 +118,7 @@ set (headers
   OBJLoader.hh
   PID.hh
   Plugin.hh
+  SdfFrameSemantics.hh
   SemanticVersion.hh
   SkeletonAnimation.hh
   Skeleton.hh

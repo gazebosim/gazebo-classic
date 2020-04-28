@@ -17,12 +17,15 @@
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Distortion.hh"
@@ -81,16 +84,58 @@ void Sensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Sensor::Load(const std::string &_worldName)
 {
+  this->world = physics::get_world(_worldName);
+
   if (this->sdf->HasElement("pose"))
   {
     this->pose =
       this->sdf->Get<ignition::math::Pose3d>("pose");
+
+    std::string relativeTo =
+      this->sdf->GetElement("pose")->Get<std::string>("relative_to", "").first;
+
+    // Handle frame semantics if relativeTo has been set
+    if (!relativeTo.empty())
+    {
+      auto parentLink = boost::dynamic_pointer_cast<physics::Link>(
+          this->world->EntityByName(this->ParentName()));
+      auto parentJoint = boost::dynamic_pointer_cast<physics::Joint>(
+          this->world->BaseByName(this->ParentName()));
+
+      if (nullptr != parentLink)
+      {
+        auto linkSDFDom = parentLink->GetSDFDom();
+        if (nullptr != linkSDFDom )
+        {
+          auto *sensorSDFDom = linkSDFDom->SensorByName(this->Name());
+          if (nullptr != sensorSDFDom)
+          {
+            this->pose = common::resolveSdfPose(sensorSDFDom->SemanticPose());
+          }
+        }
+      }
+      else if (nullptr != parentJoint)
+      {
+        // sdf::Joint doesn't have API for accessing joint sensors. For now,
+        // manually resolve the pose
+        auto jointSDFDom = parentJoint->GetSDFDom();
+        if (nullptr != jointSDFDom)
+        {
+          // Suppose the sensor's pose is given in frame A, denoted by X_SA. To
+          // find the sensor's pose relative to the joint, X_SJ, we first find
+          // the joint's pose relative to frame A, X_JA and compute the product
+          // X_SJ = X_JA^-1 X_SA
+          auto jointPoseInA =
+            common::resolveSdfPose(jointSDFDom->SemanticPose(), relativeTo);
+          this->pose = jointPoseInA.Inverse() *
+            this->sdf->Get<ignition::math::Pose3d>("pose");
+        }
+      }
+    }
   }
 
   if (this->sdf->Get<bool>("always_on"))
     this->SetActive(true);
-
-  this->world = physics::get_world(_worldName);
 
   if (this->dataPtr->category == IMAGE)
     this->scene = rendering::get_scene(_worldName);

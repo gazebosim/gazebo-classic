@@ -96,15 +96,15 @@ void Entity::Load(sdf::ElementPtr _sdf)
   {
     if (this->parent && this->parentEntity)
     {
-      this->worldPose = this->sdf->Get<ignition::math::Pose3d>("pose") +
-                        this->parentEntity->worldPose;
+      this->worldPose =
+          this->parentEntity->worldPose * this->SDFPoseRelativeToParent();
     }
     else
     {
-      this->worldPose = this->sdf->Get<ignition::math::Pose3d>("pose");
+      this->worldPose = this->SDFPoseRelativeToParent();
     }
 
-    this->initialRelativePose = this->sdf->Get<ignition::math::Pose3d>("pose");
+    this->initialRelativePose = this->SDFPoseRelativeToParent();
   }
 
   if (this->parent)
@@ -635,6 +635,7 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
+  // TODO(addisu) Check if this needs semantic pose
   ignition::math::Pose3d newPose = _sdf->Get<ignition::math::Pose3d>("pose");
   if (newPose != this->RelativePose())
   {

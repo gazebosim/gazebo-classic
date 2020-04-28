@@ -74,8 +74,7 @@ void DARTHinge2Joint::SetAxis(const unsigned int _index,
           this->dataPtr->dtJoint);
     GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
 
-    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(
-        this->AxisFrameOffset(_index).RotateVector(_axis));
+    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
     dtUniversalJoint->setAxis1(dartAxis);
   }
   else if (_index == 1)
@@ -85,8 +84,7 @@ void DARTHinge2Joint::SetAxis(const unsigned int _index,
           this->dataPtr->dtJoint);
     GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
 
-    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(
-        this->AxisFrameOffset(_index).RotateVector(_axis));
+    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
     dtUniversalJoint->setAxis2(dartAxis);
   }
   else

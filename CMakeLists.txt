@@ -5,6 +5,10 @@ if(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0004 NEW)
 endif(COMMAND CMAKE_POLICY)
 
+if(POLICY CMP0100)
+  cmake_policy(SET CMP0100 NEW)
+endif()
+
 project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
@@ -245,7 +249,7 @@ endif()
 # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
 if (MSVC)
   # Default Windows-MSVC.cmake sets MSVC warning flag to /W3. Add some extra warning excludes.
-  set(WARN_LEVEL "/wd4005 /wd4068 /wd4244 /wd4267 /wd4996")
+  set(WARN_LEVEL "/wd4005 /wd4068 /wd4244 /wd4251 /wd4267 /wd4275 /wd4996")
 else()
   set(WARN_LEVEL "-Wall")
 endif()

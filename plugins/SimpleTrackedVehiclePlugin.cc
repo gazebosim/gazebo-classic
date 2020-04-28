@@ -29,9 +29,38 @@
 
 #include "plugins/SimpleTrackedVehiclePlugin.hh"
 
+namespace std {
+template<class T>
+class hash<boost::shared_ptr<T>> {
+  public: size_t operator()(const boost::shared_ptr<T>& key) const {
+    return (size_t)key.get();
+  }
+};
+}
+
+namespace gazebo
+{
+using namespace std;
+using namespace physics;
+/// \brief This is a temporary workaround to keep ABI compatibility in
+/// Gazebo 9. It should be deleted starting with Gazebo 10.
+unordered_map<LinkPtr, unordered_map<Tracks, Link_V> > globalTracks;
+}
+
 using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(SimpleTrackedVehiclePlugin)
+
+SimpleTrackedVehiclePlugin::~SimpleTrackedVehiclePlugin()
+{
+  if (this->body != nullptr)
+  {
+    if (globalTracks.find(this->body) != globalTracks.end())
+    {
+      globalTracks.erase(this->body);
+    }
+  }
+}
 
 void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
                                       sdf::ElementPtr _sdf)
@@ -75,23 +104,88 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
           << std::endl;
     throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
   }
+  else
+  {
+    gzmsg << "SimpleTrackedVehiclePlugin: Successfully added robot body link "
+          << this->body->GetName() << std::endl;
+  }
+
+  globalTracks.emplace(this->body,
+      std::unordered_map<Tracks, physics::Link_V>());
+  auto& gtracks = globalTracks.at(this->body);
 
   this->tracks[Tracks::LEFT] = _model->GetLink(
       _sdf->GetElement("left_track")->Get<std::string>());
-  if (this->tracks[Tracks::LEFT] == nullptr)
+  gtracks[Tracks::LEFT].push_back(this->tracks[Tracks::LEFT]);
+  if (gtracks[Tracks::LEFT].at(0) == nullptr)
   {
     gzerr << "SimpleTrackedVehiclePlugin: <left_track> link does not exist."
           << std::endl;
     throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
   }
+  else
+  {
+    gzmsg << "SimpleTrackedVehiclePlugin: Successfully added left track link "
+          << gtracks[Tracks::LEFT].at(0)->GetName() << std::endl;
+  }
 
   this->tracks[Tracks::RIGHT] = _model->GetLink(
       _sdf->GetElement("right_track")->Get<std::string>());
-  if (this->tracks[Tracks::RIGHT] == nullptr)
+  gtracks[Tracks::RIGHT].push_back(this->tracks[Tracks::RIGHT]);
+  if (gtracks[Tracks::RIGHT].at(0) == nullptr)
   {
     gzerr << "SimpleTrackedVehiclePlugin: <right_track> link does not exist."
           << std::endl;
     throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
+  }
+  else
+  {
+    gzmsg << "SimpleTrackedVehiclePlugin: Successfully added right track link "
+          << gtracks[Tracks::RIGHT].at(0)->GetName() << std::endl;
+  }
+
+  if (_sdf->HasElement("left_flipper"))
+  {
+    auto flipper = _sdf->GetElement("left_flipper");
+    while (flipper)
+    {
+      const auto flipperName = flipper->Get<std::string>();
+      const auto flipperLink = _model->GetLink(flipperName);
+      if (flipperLink == nullptr)
+      {
+        gzerr << "SimpleTrackedVehiclePlugin: <left_flipper> link '"
+              << flipperName << "' does not exist." << std::endl;
+      }
+      else
+      {
+        gtracks[Tracks::LEFT].push_back(flipperLink);
+        gzmsg << "SimpleTrackedVehiclePlugin: Successfully added left flipper "
+                 "link '" << flipperName << "'" << std::endl;
+      }
+      flipper = flipper->GetNextElement("left_flipper");
+    }
+  }
+
+  if (_sdf->HasElement("right_flipper"))
+  {
+    auto flipper = _sdf->GetElement("right_flipper");
+    while (flipper)
+    {
+      const auto flipperName = flipper->Get<std::string>();
+      const auto flipperLink = _model->GetLink(flipperName);
+      if (flipperLink == nullptr)
+      {
+        gzerr << "SimpleTrackedVehiclePlugin: <right_flipper> link '"
+              << flipperName << "' does not exist." << std::endl;
+      }
+      else
+      {
+        gtracks[Tracks::RIGHT].push_back(flipperLink);
+        gzmsg << "SimpleTrackedVehiclePlugin: Successfully added right flipper "
+                 "link '" << flipperName << "'" << std::endl;
+      }
+      flipper = flipper->GetNextElement("right_flipper");
+    }
   }
 
   this->LoadParam(_sdf, "collide_without_contact_bitmask",
@@ -140,9 +234,13 @@ void SimpleTrackedVehiclePlugin::SetTrackVelocityImpl(double _left,
 
 void SimpleTrackedVehiclePlugin::UpdateTrackSurface()
 {
-  for (auto track : this->tracks )
+  auto& gtracks = globalTracks.at(this->body);
+  for (auto trackSide : gtracks)
   {
-    this->SetLinkMu(track.second);
+    for (auto track : trackSide.second)
+    {
+      this->SetLinkMu(track);
+    }
   }
 }
 
@@ -173,18 +271,27 @@ void SimpleTrackedVehiclePlugin::SetGeomCategories()
     }
   }
 
-  for (auto track : this->tracks)
+  auto& gtracks = globalTracks.at(this->body);
+  for (auto trackSide : gtracks)
   {
-    auto trackLink = track.second;
-    for (auto const &collision : trackLink->GetCollisions())
+    for (auto trackLink : trackSide.second)
     {
       auto bits = ROBOT_CATEGORY | BELT_CATEGORY;
-      if (track.first == Tracks::LEFT)
+      if (trackSide.first == Tracks::LEFT)
         bits |= LEFT_CATEGORY;
 
-      collision->SetCategoryBits(bits);
+      for (auto const &collision : trackLink->GetCollisions())
+      {
+        collision->SetCategoryBits(bits);
+      }
     }
   }
+}
+
+size_t SimpleTrackedVehiclePlugin::GetNumTracks(const Tracks side) const
+{
+  auto& gtracks = globalTracks.at(this->body);
+  return gtracks[side].size();
 }
 
 void SimpleTrackedVehiclePlugin::DriveTracks(
@@ -229,12 +336,7 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
   ////////////////////////////////////////////////////////////////////////
   size_t i = 0;
   const auto contacts = this->contactManager->GetContacts();
-
-  // Get the body IDs of the tracks for reference
-  const dBodyID left = dynamic_cast<physics::ODELink &>(
-    *this->tracks[Tracks::LEFT]).GetODEId();
-  const dBodyID right = dynamic_cast<physics::ODELink &>(
-    *this->tracks[Tracks::RIGHT]).GetODEId();
+  const auto model = this->body->GetModel();
 
   for (auto contact : contacts)
   {
@@ -259,14 +361,17 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       continue;
     }
 
+    if (model != contact->collision1->GetLink()->GetModel() &&
+        model != contact->collision2->GetLink()->GetModel())
+    {
+      // Verify one of the collisions' bodies is a track of this vehicle
+      continue;
+    }
+
     dBodyID body1 = dynamic_cast<physics::ODELink&>(
       *contact->collision1->GetLink()).GetODEId();
     dBodyID body2 = dynamic_cast<physics::ODELink& >(
       *contact->collision2->GetLink()).GetODEId();
-
-    // Verify one of these bodies is a track of this vehicle
-    if (body1 != left && body1 != right && body2 != left && body2 != right)
-      continue;
 
     dGeomID geom1 = dynamic_cast<physics::ODECollision& >(
       *contact->collision1).GetCollisionId();

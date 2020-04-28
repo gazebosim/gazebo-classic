@@ -72,7 +72,14 @@ TEST_F(JointVisual_TEST, JointVisualTest)
     axis1->set_limit_velocity(1);
     axis1->set_damping(true);
     axis1->set_friction(true);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     axis1->set_use_parent_model_frame(true);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   }
   jointMsg->add_angle(-1.2);
   {
@@ -84,7 +91,14 @@ TEST_F(JointVisual_TEST, JointVisualTest)
     axis2->set_limit_velocity(2);
     axis2->set_damping(false);
     axis2->set_friction(false);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     axis2->set_use_parent_model_frame(false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   }
 
   // test calling constructor and Load functions and make sure
@@ -141,7 +155,14 @@ TEST_F(JointVisual_TEST, JointVisualTest)
     axis1->set_limit_velocity(1);
     axis1->set_damping(true);
     axis1->set_friction(true);
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     axis1->set_use_parent_model_frame(false);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
   }
   jointVis->UpdateFromMsg(jointMsg);
 

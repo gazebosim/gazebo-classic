@@ -149,6 +149,9 @@ World::World(const std::string &_name)
 
   this->dataPtr->prevStatTime = common::Time::GetWallTime();
   this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
+  this->dataPtr->logLastStatePlayedSimTime = common::Time(0);
+  this->dataPtr->logLastStatePlayedRealTime = common::Time(0);
+  this->dataPtr->logPlayRealTimeFactor = 0.0;
 
   this->dataPtr->connections.push_back(
      event::Events::ConnectStep(std::bind(&World::OnStep, this)));
@@ -172,6 +175,21 @@ void World::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->loaded = false;
   this->dataPtr->sdf = _sdf;
+
+  // Create a DOM object to compute the resolved initial pose (with frame
+  // semantics)
+  ignition::math::SemanticVersion sdfOriginalVersion(_sdf->OriginalVersion());
+  if (sdfOriginalVersion >= ignition::math::SemanticVersion(1, 7))
+  {
+    this->dataPtr->worldSDFDom = std::make_unique<sdf::World>();
+    sdf::Errors errors = this->dataPtr->worldSDFDom->Load(_sdf);
+
+    // Print errors and load the parts that worked.
+    for (const auto &error : errors)
+    {
+      gzerr << error << "\n";
+    }
+  }
 
   if (this->dataPtr->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
@@ -354,6 +372,11 @@ const sdf::ElementPtr World::SDF()
   return this->dataPtr->sdf;
 }
 
+const sdf::World *World::GetSDFDom() const
+{
+  return this->dataPtr->worldSDFDom.get();
+}
+
 //////////////////////////////////////////////////
 void World::Save(const std::string &_filename)
 {
@@ -382,6 +405,12 @@ void World::Init()
 //////////////////////////////////////////////////
 void World::Init(UpdateScenePosesFunc _func)
 {
+  if (nullptr == this->dataPtr->rootElement)
+  {
+    gzerr << "Null root element. Not initializing." << std::endl;
+    return;
+  }
+
   // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); ++i)
     this->dataPtr->rootElement->GetChild(i)->Init();
@@ -570,10 +599,32 @@ void World::LogStep()
       {
         this->dataPtr->stepInc = 1;
 
-        this->dataPtr->logPlayStateSDF->ClearElements();
+        this->dataPtr->logPlayStateSDF->Clear();
         sdf::readString(data, this->dataPtr->logPlayStateSDF);
 
         this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
+
+        // If it's the first step, we're going back in time or
+        // rt factor is close to zero, don't sleep.
+        if ((this->dataPtr->logPlayRealTimeFactor > 1e-5) &&
+            (this->dataPtr->logLastStatePlayedRealTime != common::Time(0)) &&
+            (this->dataPtr->logLastStatePlayedSimTime != common::Time(0)) &&
+            (this->dataPtr->logLastStatePlayedSimTime <
+               this->dataPtr->logPlayState.GetSimTime()))
+        {
+          common::Time timeUntilNextStep =
+              common::Time((this->dataPtr->logPlayState.GetSimTime()
+                           - this->dataPtr->logLastStatePlayedSimTime).Double()
+                           / this->dataPtr->logPlayRealTimeFactor);
+          common::Time realTimeOfNextStep =
+              this->dataPtr->logLastStatePlayedRealTime + timeUntilNextStep;
+          common::Time realTimeSleep =
+              realTimeOfNextStep - common::Time::GetWallTime();
+          if (realTimeSleep > common::Time(0))
+          {
+            common::Time::Sleep(realTimeSleep);
+          }
+        }
 
         // If the log file does not contain iterations we have to manually
         // increase the iteration counter in logPlayState.
@@ -583,6 +634,9 @@ void World::LogStep()
             this->dataPtr->iterations + 1);
         }
 
+        this->dataPtr->logLastStatePlayedRealTime = common::Time::GetWallTime();
+        this->dataPtr->logLastStatePlayedSimTime =
+            this->dataPtr->logPlayState.GetSimTime();
         this->SetState(this->dataPtr->logPlayState);
         this->Update();
       }
@@ -895,6 +949,13 @@ void World::Fini()
   }
   this->dataPtr->models.clear();
 
+  for (auto &road : this->dataPtr->roads)
+  {
+    if (road)
+      road->Fini();
+  }
+  this->dataPtr->roads.clear();
+
   for (auto &light : this->dataPtr->lights)
   {
     if (light)
@@ -959,6 +1020,13 @@ void World::ClearModels()
     this->RemoveModel(this->dataPtr->models[0]);
   }
   this->dataPtr->models.clear();
+
+  for (auto &road : this->dataPtr->roads)
+  {
+    if (road)
+      road->Fini();
+  }
+  this->dataPtr->roads.clear();
 
   this->SetPaused(pauseState);
 }
@@ -1170,6 +1238,7 @@ RoadPtr World::LoadRoad(sdf::ElementPtr _sdf , BasePtr _parent)
 {
   RoadPtr road(new Road(_parent));
   road->Load(_sdf);
+  this->dataPtr->roads.push_back(road);
   return road;
 }
 
@@ -1502,6 +1571,11 @@ void World::ProcessPlaybackControlMsgs()
       this->SetPaused(true);
       // ToDo: Update iterations if the log doesn't have it.
     }
+
+    if (msg.has_rt_factor())
+    {
+      this->dataPtr->logPlayRealTimeFactor = msg.rt_factor();
+    }
   }
 
   this->dataPtr->playbackControlMsgs.clear();
@@ -1818,6 +1892,12 @@ void World::ProcessRequestMsgs()
       std::string *serializedData = response.mutable_serialized_data();
       this->dataPtr->sceneMsg.SerializeToString(serializedData);
       response.set_type(this->dataPtr->sceneMsg.GetTypeName());
+
+      for (auto road : this->dataPtr->roads)
+      {
+        // this causes the roads to publish road msgs.
+        road->Init();
+      }
     }
     else if (requestMsg.request() == "spherical_coordinates_info")
     {
@@ -1980,7 +2060,7 @@ void World::ProcessFactoryMsgs()
 
   for (auto const &factoryMsg : factoryMsgsCopy)
   {
-    this->dataPtr->factorySDF->Root()->ClearElements();
+    this->dataPtr->factorySDF->Clear();
 
     if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
     {
@@ -2220,7 +2300,7 @@ void World::SetState(const WorldState &_state)
   auto insertions = _state.Insertions();
   for (auto const &insertion : insertions)
   {
-    this->dataPtr->factorySDF->Root()->ClearElements();
+    this->dataPtr->factorySDF->Clear();
 
     std::stringstream sdfStr;
     sdfStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -2580,9 +2660,9 @@ void World::ProcessMessages()
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
 
     if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
-         // When ready to use the direct API for updating scene poses from server,
-         // uncomment the following line:
-         // this->dataPtr->updateScenePoses ||
+      // When ready to use the direct API for updating scene poses from server,
+      // uncomment the following line:
+      // this->dataPtr->updateScenePoses ||
         (this->dataPtr->poseLocalPub &&
          this->dataPtr->poseLocalPub->HasConnections()))
     {

@@ -31,6 +31,9 @@ class ModelMaker_TEST : public QTestFixture
   /// \brief Test creating a model from a file.
   private slots: void FromFile();
 
+  /// \brief Test creating a model from a file with frame semantics.
+  private slots: void FromFileWithFrameSemantics();
+
   /// \brief Test creating a nested model from a file
   private slots: void FromNestedModelFile();
 

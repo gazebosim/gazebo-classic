@@ -356,11 +356,23 @@ namespace gazebo
       /// \brief Simulation time of the last log state captured.
       public: gazebo::common::Time logLastStateTime;
 
+      /// \brief Simulation time of the last log state played.
+      public: gazebo::common::Time logLastStatePlayedSimTime;
+
+      /// \brief Wall clock time when the last state was played.
+      public: gazebo::common::Time logLastStatePlayedRealTime;
+
+      /// \brief Log play real time factor
+      public: double logPlayRealTimeFactor;
+
       /// \brief URI of this world.
       public: common::URI uri;
 
       /// \brief All the introspection items regsitered for this.
       public: std::vector<common::URI> introspectionItems;
+
+      /// \brief A list of roads in the world
+      public: std::vector<RoadPtr> roads;
 
       /// \brief Node for ignition transport communication.
       public: ignition::transport::Node ignNode;
@@ -370,6 +382,9 @@ namespace gazebo
 
       /// \brief Callback function intended to call the scene with updated Poses
       public: UpdateScenePosesFunc updateScenePoses;
+
+      /// \brief SDF World DOM object
+      public: std::unique_ptr<sdf::World> worldSDFDom;
     };
   }
 }

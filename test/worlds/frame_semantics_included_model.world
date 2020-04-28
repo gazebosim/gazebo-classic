@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <world name="default">
+    <frame name="F_I">
+      <pose>5 0 5 0 0 0</pose>
+    </frame>
+    <include>
+      <name>M1</name>
+      <pose relative_to="F_I"/>
+      <static>false</static>
+      <uri>model://number1</uri>
+    </include>
+    <include>
+      <name>M2</name>
+      <static>false</static>
+      <pose relative_to="M1">0 1 0 0 0 0</pose>
+      <uri>model://number1</uri>
+    </include>
+  </world>
+</sdf>

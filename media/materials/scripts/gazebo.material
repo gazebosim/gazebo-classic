@@ -63,6 +63,30 @@ material Gazebo/XYZPoints
   }
 }
 
+vertex_program Gazebo/XYZNormalsVS glsl
+{
+  source depth_normals_map.vert
+}
+
+fragment_program Gazebo/XYZNormalsFS glsl
+{
+  source depth_normals_map.frag
+}
+
+material Gazebo/XYZNormals
+{
+  technique
+  {
+    pass normals_tex
+    {
+      separate_scene_blend one zero one zero
+
+      vertex_program_ref Gazebo/XYZNormalsVS { }
+      fragment_program_ref Gazebo/XYZNormalsFS { }
+    }
+  }
+}
+
 vertex_program Gazebo/LaserScan1stVS glsl
 {
   source laser_1st_pass.vert
