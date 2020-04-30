@@ -45,7 +45,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE HeightmapShape : public Shape
     {
       /// \brief height field type, float or double
-      public: typedef float HeightType;
+      public: typedef double HeightType;
 
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision object.
