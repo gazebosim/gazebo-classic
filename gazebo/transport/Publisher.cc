@@ -259,10 +259,13 @@ void Publisher::SendMessage()
           pubDataPtr, std::placeholders::_1), *pubIter);
 
       std::lock_guard<std::mutex> lock2(pubDataPtr->mutex);
-      if (result > 0)
-        pubDataPtr->pubIds[*pubIter] = result;
-      else
-        pubDataPtr->pubIds.erase(*pubIter);
+      if (pubDataPtr->pubIds.find(*pubIter) != pubDataPtr->pubIds.end())
+      {
+        if (result > 0)
+          pubDataPtr->pubIds[*pubIter] = result;
+        else
+          pubDataPtr->pubIds.erase(*pubIter);
+      }
     }
 
     // Clear the local buffer.
