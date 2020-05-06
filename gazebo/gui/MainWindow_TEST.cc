@@ -1095,7 +1095,7 @@ void MainWindow_TEST::MinimumSize()
   // Check that minimum size is smaller then a predefined size
   // This desired values are arbitrary, but increasing the minimum
   // size could create problems on small screens (such as laptop's).
-  // See https://bitbucket.org/osrf/gazebo/issues/1706 for more info.
+  // See https://github.com/osrf/gazebo/issues/1706 for more info.
   int desiredMinimumWidth  = 700;
   int desiredMinimumHeight = 710;
   QVERIFY(mainWindow->minimumSize().width() <= desiredMinimumWidth);

@@ -582,7 +582,7 @@ void DARTPhysics::SetSolverType(const std::string &_type)
   if (_type == "dantzig")
   {
     // DART constraint solver refactored in 6.7, see issue 2605
-    // https://bitbucket.org/osrf/gazebo/issues/2605
+    // https://github.com/osrf/gazebo/issues/2605
 #if DART_MAJOR_MINOR_VERSION_AT_MOST(6, 6)
     this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
         dart::common::make_unique<dart::constraint::DantzigLCPSolver>(
@@ -601,7 +601,7 @@ void DARTPhysics::SetSolverType(const std::string &_type)
   else if (_type == "pgs")
   {
     // DART constraint solver refactored in 6.7, see issue 2605
-    // https://bitbucket.org/osrf/gazebo/issues/2605
+    // https://github.com/osrf/gazebo/issues/2605
 #if DART_MAJOR_MINOR_VERSION_AT_MOST(6, 6)
     this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
         dart::common::make_unique<dart::constraint::PGSLCPSolver>(

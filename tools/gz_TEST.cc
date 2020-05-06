@@ -383,7 +383,7 @@ TEST_F(gzTest, Model)
     // The following expectation can fail, since Link::Fini publishes
     // an entity_delete request with the integer id of its visuals.
     // The expectation is disabled until model deletion is improved, see:
-    // https://bitbucket.org/osrf/gazebo_design/pull-requests/31
+    // https://github.com/osrf/gazebo_design/pull-requests/31
     // EXPECT_NE(g_msgDebugOut.find("my_box"), std::string::npos);
   }
 
@@ -488,7 +488,7 @@ TEST_F(gzTest, Model)
     // The following expectation can fail, since Link::Fini publishes
     // an entity_delete request with the integer id of its visuals.
     // The expectation is disabled until model deletion is improved, see:
-    // https://bitbucket.org/osrf/gazebo_design/pull-requests/31
+    // https://github.com/osrf/gazebo_design/pull-requests/31
     // EXPECT_NE(g_msgDebugOut.find("simple_arm"), std::string::npos);
   }
 

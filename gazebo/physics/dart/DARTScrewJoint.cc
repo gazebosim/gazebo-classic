@@ -116,7 +116,7 @@ ignition::math::Vector3d DARTScrewJoint::GlobalAxis(
   }
 
   // TODO: Issue #494
-  // See: https://bitbucket.org/osrf/gazebo/issue/494
+  // See: https://github.com/osrf/gazebo/issues/494
   // joint-axis-reference-frame-doesnt-match
   return DARTTypes::ConvVec3Ign(globalAxis);
 }
@@ -142,7 +142,7 @@ void DARTScrewJoint::SetAxis(const unsigned int _index,
     GZ_ASSERT(dtScrewJoint, "ScrewJoint is NULL");
 
     // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494
+    // See: https://github.com/osrf/gazebo/issues/494
     // joint-axis-reference-frame-doesnt-match
     Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
     Eigen::Isometry3d dartTransfJointLeftToParentLink

@@ -54,7 +54,7 @@ void DARTSurfaceParams::Load(sdf::ElementPtr _sdf)
       // Note this should not be looking in the "ode" block
       // Update this when sdformat has bullet friction parameters
       // See sdformat issue #31
-      // https://bitbucket.org/osrf/sdformat/issue/31
+      // https://github.com/osrf/sdformat/issue/31
       sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
       if (!frictionOdeElem)
         gzerr << "Surface friction ode sdf member is null" << std::endl;
