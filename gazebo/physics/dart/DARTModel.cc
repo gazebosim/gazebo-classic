@@ -149,7 +149,7 @@ void DARTModel::Init()
 
         // If this->dtBodyNode and itdtBodyNode are connected then don't enable
         // the pair.
-        // Please see: https://bitbucket.org/osrf/gazebo/issue/899
+        // Please see: https://github.com/osrf/gazebo/issues/899
         if ((itdtBodyNode1->getParentBodyNode() == itdtBodyNode2) ||
             itdtBodyNode2->getParentBodyNode() == itdtBodyNode1)
         {

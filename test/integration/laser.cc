@@ -44,7 +44,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   {
     gzerr << "Abort test since dart does not support ray shape, "
           << "Please see issue #911. "
-          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+          << "(https://github.com/osrf/gazebo/issues/911).\n";
     return;
   }
 
@@ -175,7 +175,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   {
     gzerr << "Abort test since dart does not support ray shape and sensor, "
           << "Please see issue #911. "
-          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+          << "(https://github.com/osrf/gazebo/issues/911).\n";
     return;
   }
 
@@ -282,7 +282,7 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
   {
     gzerr << "Abort test since dart does not support ray shape and sensor, "
           << "Please see issue #911. "
-          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+          << "(https://github.com/osrf/gazebo/issues/911).\n";
     return;
   }
 
@@ -383,7 +383,7 @@ void LaserTest::LaserScanResolution(const std::string &_physicsEngine)
   {
     gzerr << "Abort test since dart does not support ray shape and sensor, "
           << "Please see issue #911. "
-          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+          << "(https://github.com/osrf/gazebo/issues/911).\n";
     return;
   }
 
@@ -467,7 +467,7 @@ void LaserTest::GroundPlane(const std::string &_physicsEngine)
   {
     gzerr << "Abort test since dart does not support ray shape and sensor, "
           << "Please see issue #911. "
-          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+          << "(https://github.com/osrf/gazebo/issues/911).\n";
     return;
   }
 
@@ -540,7 +540,7 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   {
     gzerr << "Abort test since dart does not support ray shape and sensor, "
           << "Please see issue #911. "
-          << "(https://bitbucket.org/osrf/gazebo/issue/911).\n";
+          << "(https://github.com/osrf/gazebo/issues/911).\n";
     return;
   }
 

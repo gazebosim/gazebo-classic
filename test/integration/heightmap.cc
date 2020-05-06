@@ -676,7 +676,7 @@ TEST_P(HeightmapTest, LoadDEM)
 /////////////////////////////////////////////////
 //
 // Disabled: segfaults ocassionally
-// See https://bitbucket.org/osrf/gazebo/issue/521 for details
+// See https://github.com/osrf/gazebo/issues/521 for details
 
 /*
 TEST_P(HeightmapTest, Heights)

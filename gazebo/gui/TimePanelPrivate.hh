@@ -54,7 +54,7 @@ namespace gazebo
       /// \brief Subscriber to the statistics topic.
       /// Per issue #1919, this subscriber needs to be declared below any
       /// variables that it uses (like mutex, and the std::list's).
-      /// https://bitbucket.org/osrf/gazebo/issues/1919
+      /// https://github.com/osrf/gazebo/issues/1919
       public: transport::SubscriberPtr statsSub;
 
       /// \brief Publish user command messages for the server to place in the
