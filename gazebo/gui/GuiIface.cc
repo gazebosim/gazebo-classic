@@ -193,7 +193,7 @@ bool parse_args(int _argc, char **_argv)
   }
 
   /// Load the System plugins specified on the command line
-  /// see https://bitbucket.org/osrf/gazebo/issues/2279 for details
+  /// see https://github.com/osrf/gazebo/issues/2279 for details
   if (vm.count("gui-plugin"))
   {
     gzwarn << "g/gui-plugin is really loading a SystemPlugin. "
@@ -426,7 +426,8 @@ bool gui::run(int _argc, char **_argv)
   }
 
   // The following was added in
-  // https://bitbucket.org/osrf/gazebo/pull-requests/2923, but it is causing
+  // https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/2923,
+  // but it is causing
   // shutdown issues when gazebo is used with ros.
   // if (sigaction(SIGTERM, &sigact, NULL))
   // {

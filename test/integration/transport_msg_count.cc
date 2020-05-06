@@ -189,7 +189,8 @@ TEST_F(TransportMsgCountTest, MsgCount)
   // system itself. This test is designed to chedk that a local subscriber
   // also receives all the messages while there is a remote subscriber
   // at the same time. This test would fail before the bug fix in
-  // pull request 2657 (https://bitbucket.org/osrf/gazebo/pull-requests/2657).
+  // pull request 2657
+  // (https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/2657).
   transport::SubscriberPtr poseSub =
     node->Subscribe("/gazebo/ttest/test", &ReceivePosesStampedMsgCounter);
 

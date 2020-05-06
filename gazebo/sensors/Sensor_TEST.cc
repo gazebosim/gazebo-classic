@@ -49,7 +49,7 @@ void ReceiveImuMsg(ConstLaserScanStampedPtr &/*_msg*/)
 
 /////////////////////////////////////////////////
 /// \brief Test that sensors will continue to update after Reset World
-///        See bitbucket issue #236 for more background.
+///        See GitHub issue #236 for more background.
 TEST_F(Sensor_TEST, UpdateAfterReset)
 {
   // Load in a world with lasers
