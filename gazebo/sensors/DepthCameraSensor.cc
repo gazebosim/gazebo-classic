@@ -75,8 +75,8 @@ void DepthCameraSensor::Init()
     if (!this->scene)
       this->scene = rendering::create_scene(worldName, false, true);
 
-    this->dataPtr->depthCamera = this->scene->CreateDepthCamera(
-        this->sdf->Get<std::string>("name"), false);
+    std::string scopedName = this->parentName + "::" + this->Name();
+    this->dataPtr->depthCamera = this->scene->CreateDepthCamera(scopedName, false);
 
     if (!this->dataPtr->depthCamera)
     {
@@ -97,13 +97,13 @@ void DepthCameraSensor::Init()
 
     this->dataPtr->depthCamera->Init();
     this->dataPtr->depthCamera->CreateRenderTexture(
-        this->Name() + "_RttTex_Image");
+        scopedName + "_RttTex_Image");
     this->dataPtr->depthCamera->CreateDepthTexture(
-        this->Name() + "_RttTex_Depth");
+        scopedName + "_RttTex_Depth");
     this->dataPtr->depthCamera->CreateReflectanceTexture(
-        this->Name() + "_RttTex_Reflectance");
+        scopedName + "_RttTex_Reflectance");
     this->dataPtr->depthCamera->CreateNormalsTexture(
-        this->Name() + "_RttTex_Normals");
+        scopedName + "_RttTex_Normals");
 
     ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
