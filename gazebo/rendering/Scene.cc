@@ -604,7 +604,7 @@ CameraPtr Scene::CreateCamera(const std::string &_name, const bool _autoRender)
 DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
                                         const bool _autoRender)
 {
-  DepthCameraPtr camera(new DepthCamera(this->dataPtr->name + "::" + _name,
+  DepthCameraPtr camera(new DepthCamera(_name,
         shared_from_this(), _autoRender));
   this->dataPtr->cameras.push_back(camera);
 
