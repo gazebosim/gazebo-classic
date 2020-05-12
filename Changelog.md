@@ -2,6 +2,9 @@
 
 ## Gazebo 11.x.x (202x-xx-xx)
 
+1. Fix corruption when a URDF file is included from a SDFormat 1.6 model #2734
+    * [Pull request 2734](https://github.com/osrf/gazebo/pull/2734)
+
 1. Fix problem with automoc in CMake 3.17
     * [BitBucket pull request 3201](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3201/)
 
