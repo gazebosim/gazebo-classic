@@ -103,11 +103,16 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
   }
 
   this->dataPtr->modelSDF.reset(new sdf::SDF);
+  this->dataPtr->modelSDFUnconverted.reset(new sdf::SDF);
+
   sdf::initFile("root.sdf", this->dataPtr->modelSDF);
+  sdf::initFile("root.sdf", this->dataPtr->modelSDFUnconverted);
 
   sdf::Errors errors;
-  if (!sdf::readFileWithoutConversion(
-          _filename, this->dataPtr->modelSDF, errors))
+  sdf::readFileWithoutConversion(_filename, this->dataPtr->modelSDFUnconverted,
+                                 errors);
+  sdf::readFile(_filename, this->dataPtr->modelSDF, errors);
+  if (!errors.empty())
   {
     gzerr << "Unable to load file[" << _filename << "]\n";
     for (const auto &e : errors)
@@ -173,6 +178,9 @@ bool ModelMaker::InitSimpleShape(SimpleShapes _shape)
     gzerr << "Unable to load SDF [" << modelString << "]" << std::endl;
     return false;
   }
+  // Since simple shapes are already at the latest SDFormat version, we don't
+  // need to create an unconverted version.
+  this->dataPtr->modelSDFUnconverted = this->dataPtr->modelSDF;
 
   return this->Init();
 }
@@ -347,6 +355,7 @@ void ModelMaker::Stop()
   }
   this->dataPtr->modelVisual.reset();
   this->dataPtr->modelSDF.reset();
+  this->dataPtr->modelSDFUnconverted.reset();
 
   EntityMaker::Stop();
 }
@@ -358,9 +367,10 @@ void ModelMaker::CreateTheEntity()
   if (!this->dataPtr->clone)
   {
     sdf::ElementPtr modelElem;
-    if (this->dataPtr->modelSDF->Root()->HasElement("model"))
+    if (this->dataPtr->modelSDFUnconverted->Root()->HasElement("model"))
     {
-      modelElem = this->dataPtr->modelSDF->Root()->GetElement("model");
+      modelElem =
+          this->dataPtr->modelSDFUnconverted->Root()->GetElement("model");
     }
     else
     {
@@ -382,7 +392,7 @@ void ModelMaker::CreateTheEntity()
         this->dataPtr->modelVisual->WorldPose());
 
     // Spawn the model in the physics server
-    msg.set_sdf(this->dataPtr->modelSDF->ToString());
+    msg.set_sdf(this->dataPtr->modelSDFUnconverted->ToString());
   }
   else
   {

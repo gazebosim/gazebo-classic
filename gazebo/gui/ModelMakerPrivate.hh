@@ -39,8 +39,14 @@ namespace gazebo
       /// \brief A list of model visuals created by the model maker.
       public: std::list<rendering::VisualWeakPtr> visuals;
 
-      /// \brief The SDF representation of the model.
+      /// \brief The SDF representation of the model used for creating a visual
+      /// preview of the model
       public: sdf::SDFPtr modelSDF;
+
+      /// \brief The SDF representation of the model read in without conversion
+      /// to the latest SDFormat version. This is used for serializing and
+      /// sending the model to the server
+      public: sdf::SDFPtr modelSDFUnconverted;
 
       /// \brief True if the model is being created as a clone of an existing
       /// model.
