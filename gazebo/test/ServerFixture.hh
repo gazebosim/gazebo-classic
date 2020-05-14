@@ -267,7 +267,8 @@ namespace gazebo
                    bool _distortion = false, double _distortionK1 = 0.0,
                    double _distortionK2 = 0.0, double _distortionK3 = 0.0,
                    double _distortionP1 = 0.0, double _distortionP2 = 0.0,
-                   double _cx = 0.5, double _cy = 0.5);
+                   double _cx = 0.5, double _cy = 0.5,
+                   bool _strictRate = false);
 
     /// \brief Spawn a wide angle camera.
     /// \param[in] _modelName Name of the model.

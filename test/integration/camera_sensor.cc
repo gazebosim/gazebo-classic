@@ -267,11 +267,9 @@ TEST_F(CameraSensor, CheckThrottle)
   // spawn sensors of various sizes to test speed
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
-  unsigned int width  = 1280;
-  unsigned int height = 720;
-  // we choose a high fps on purpose. The goal is to check the effect
-  // of the flag "strict_rate".
-  double updateRate = 500;
+  unsigned int width  = 320;
+  unsigned int height = 240;  // 106 fps
+  double updateRate = 10;
   ignition::math::Pose3d setPose, testPose(ignition::math::Vector3d(-5, 0, 5),
       ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.Pos(),
@@ -288,7 +286,71 @@ TEST_F(CameraSensor, CheckThrottle)
   common::Timer timer;
   timer.Start();
 
+  // time how long it takes to get 50 images @ 10Hz
+  int total_images = 50;
+
+  while (imageCount < total_images)
+    common::Time::MSleep(10);
+  common::Time dt = timer.GetElapsed();
+  double rate = static_cast<double>(total_images)/dt.Double();
+  gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
+  EXPECT_GT(rate, 7.0);
+  EXPECT_LT(rate, 11.0);
+
+  c.reset();
+  delete [] img;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, CheckThrottleStrictRate)
+{
+  // Load sensor_strict_rate.world instead, and don't call SpawnCamera.
+  // That allows us to secify the custom namespace in the world file instead
+  // of modifying SpawnCamera() in ServerFixture.cc.
+  //Load("worlds/empty_test.world");
+  Load("worlds/sensor_strict_rate.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // TODO(mabelzhang) Read these values from the SDF. Is it possible?
+  // std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  /*
+  unsigned int width  = 1280;
+  unsigned int height = 720;
+  // we choose a high fps on purpose. The goal is to check the effect
+  // of the flag "strict_rate".
+  double updateRate = 500;
+  ignition::math::Pose3d setPose, testPose(ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate,
+      // use default values for distortion
+      "", 0.0, 0.0, false, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5,
+      false);
+  */
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  unsigned int width = camSensor->ImageWidth();
+  unsigned int height = camSensor->ImageHeight();
+  imageCount = 0;
+  img = new unsigned char[width * height*3];
+  event::ConnectionPtr c = camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  common::Timer timer;
+  timer.Start();
+
   // how many images produced for 5 seconds (in simulated clock domain)
+  double updateRate = camSensor->UpdateRate();
   int total_images = 5 * updateRate;
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);

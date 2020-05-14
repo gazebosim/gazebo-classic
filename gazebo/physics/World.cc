@@ -2662,7 +2662,7 @@ void World::ProcessMessages()
     if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
       // When ready to use the direct API for updating scene poses from server,
       // uncomment the following line:
-      // this->dataPtr->updateScenePoses ||
+         this->dataPtr->updateScenePoses ||
         (this->dataPtr->poseLocalPub &&
          this->dataPtr->poseLocalPub->HasConnections()))
     {
@@ -2730,11 +2730,11 @@ void World::ProcessMessages()
 
       // When ready to use the direct API for updating scene poses from server,
       // uncomment the following lines:
-      // // Execute callback to export Pose msg
-      // if (this->dataPtr->updateScenePoses)
-      // {
-      //   this->dataPtr->updateScenePoses(this->Name(), msg);
-      // }
+      // Execute callback to export Pose msg
+      if (this->dataPtr->updateScenePoses)
+      {
+        this->dataPtr->updateScenePoses(this->Name(), msg);
+      }
     }
 
     this->dataPtr->publishModelPoses.clear();

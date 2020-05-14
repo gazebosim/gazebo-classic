@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="camera_model">
+      <static>true</static>
+      <pose>0.0 0.0 0.5 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name="camera_sensor" type="camera" xmlns:strict_rate="placeholder">
+          <camera>
+            <horizontal_fov>1.0472</horizontal_fov>
+            <image>
+              <!--width>320</width>
+              <height>240</height-->
+              <width>1280</width>
+              <height>720</height>
+            </image>
+          </camera>
+          <always_on>1</always_on>
+          <!-- We choose a high fps on purpose. The goal is to check the effect
+            of the flag "strict_rate". -->
+          <update_rate>500</update_rate>
+          <strict_rate:value>true</strict_rate:value>
+          <visualize>true</visualize>
+        </sensor>
+      </link>
+    </model>
+
+    <model name="box">
+      <pose>3 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

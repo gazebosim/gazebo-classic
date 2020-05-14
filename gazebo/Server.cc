@@ -587,8 +587,8 @@ void Server::Run()
   while (!this->dataPtr->stop)
   {
     bool ret = rendering::wait_for_render_request("", 0.100);
-    if (ret == false)
-      gzerr << "time out reached!" << std::endl;
+    // if (ret == false)
+    //   gzerr << "time out reached!" << std::endl;
 
     this->ProcessControlMsgs();
 

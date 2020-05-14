@@ -167,8 +167,6 @@ void CameraSensor::Init()
         this->Type());
       this->noises[CAMERA_NOISE]->SetCamera(this->camera);
     }
-
-    this->dataPtr->hasStrictFps = cameraSdf->Get<bool>("strict_rate");
   }
   else
     gzerr << "No world name\n";
@@ -432,7 +430,7 @@ void CameraSensor::SetRendered(const bool _value)
 //////////////////////////////////////////////////
 double CameraSensor::NextRequiredTimestamp() const
 {
-  if (this->dataPtr->hasStrictFps
+  if (this->useStrictRate
       && !ignition::math::equal(this->updatePeriod.Double(), 0.0))
     return this->dataPtr->nextRenderingTime;
   else

@@ -65,6 +65,8 @@ Sensor::Sensor(SensorCategory _cat)
   this->dataPtr->updateDelay = common::Time(0.0);
   this->updatePeriod = common::Time(0.0);
 
+  this->useStrictRate = false;
+
   this->dataPtr->id = physics::getUniqueId();
 }
 
@@ -136,6 +138,8 @@ void Sensor::Load(const std::string &_worldName)
 
   if (this->sdf->Get<bool>("always_on"))
     this->SetActive(true);
+
+  this->useStrictRate = this->sdf->Get<bool>("strict_rate:value", false).first;
 
   if (this->dataPtr->category == IMAGE)
     this->scene = rendering::get_scene(_worldName);

@@ -235,6 +235,11 @@ namespace gazebo
       ///        Sensor::SetUpdateRate.
       protected: common::Time updatePeriod;
 
+      /// \brief Whether to enforce strict sensor update rate, even if physics
+      ///        time has to slow down to wait for sensor updates to satisfy
+      ///        the desired rate.
+      protected: bool useStrictRate;
+
       /// \brief Time of the last update.
       protected: common::Time lastUpdateTime;
 
