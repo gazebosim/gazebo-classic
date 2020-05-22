@@ -19,6 +19,7 @@
 #include <tinyxml.h>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <streambuf>
 
 #include <gazebo/common/common.hh>
 #include <gazebo/transport/transport.hh>
@@ -482,7 +483,12 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    return this->ProcessSpawn(sdf, modelName, pose, node);
+    // Use the FilePath() instead of filename because filename might be a
+    // model rectory
+    std::ifstream sdfFile(sdf->FilePath());
+    const std::string sdfString{std::istreambuf_iterator<char>(sdfFile),
+                                std::istreambuf_iterator<char>()};
+    return this->ProcessSpawn(sdfString, modelName, pose, node);
   }
   else if (this->vm.count("spawn-string"))
   {
@@ -509,7 +515,7 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    return this->ProcessSpawn(sdf, modelName, pose, node);
+    return this->ProcessSpawn(sdfString, modelName, pose, node);
   }
   else if (this->vm.count("info") || this->vm.count("pose"))
   {
@@ -549,27 +555,17 @@ bool ModelCommand::RunImpl()
 }
 
 /////////////////////////////////////////////////
-bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
+bool ModelCommand::ProcessSpawn(const std::string &_sdfString,
     const std::string &_name, const ignition::math::Pose3d &_pose,
     transport::NodePtr _node)
 {
-  sdf::ElementPtr modelElem = _sdf->Root()->GetElement("model");
-
-  if (!modelElem)
-  {
-    gzerr << "Unable to find <model> element.\n";
-    return false;
-  }
-
-  // Set the model name
-  if (!_name.empty())
-    modelElem->GetAttribute("name")->SetFromString(_name);
-
   transport::PublisherPtr pub = _node->Advertise<msgs::Factory>("~/factory");
   pub->WaitForConnection();
 
   msgs::Factory msg;
-  msg.set_sdf(_sdf->ToString());
+  // Set the model name
+  msg.set_new_name(_name);
+  msg.set_sdf(_sdfString);
   msgs::Set(msg.mutable_pose(), _pose);
   pub->Publish(msg, true);
 

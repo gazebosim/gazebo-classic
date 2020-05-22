@@ -15,6 +15,7 @@
  *
  */
 #include <sstream>
+#include <streambuf>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -119,7 +120,9 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
   }
 
   // Since the above didn't fail, we assume the file exists
-  std::ifstream inputFile(_filename);
+  // Use the FilePath() instead of _filename because _filename might be a model
+  // directory
+  std::ifstream inputFile(this->dataPtr->modelSDF->FilePath());
   this->dataPtr->modelSDFString =
       std::string(std::istreambuf_iterator<char>(inputFile),
                   std::istreambuf_iterator<char>());
