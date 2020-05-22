@@ -40,4 +40,7 @@ message Factory
   /// \brief Whether the server is allowed to rename the model in case of
   /// overlap with existing models.
   optional bool allow_renaming = 6 [default = true];
+
+  /// \brief New name of the entity
+  optional string new_name = 7;
 }
