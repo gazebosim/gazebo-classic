@@ -486,8 +486,11 @@ bool ModelCommand::RunImpl()
     // Use the FilePath() instead of filename because filename might be a
     // model rectory
     std::ifstream sdfFile(sdf->FilePath());
-    const std::string sdfString{std::istreambuf_iterator<char>(sdfFile),
-                                std::istreambuf_iterator<char>()};
+
+    // Using const std::string sdfString(arg, arg) confuses the compiler, so use
+    // move assignment
+    const auto sdfString = std::string(std::istreambuf_iterator<char>(sdfFile),
+                                       std::istreambuf_iterator<char>());
     return this->ProcessSpawn(sdfString, modelName, pose, node);
   }
   else if (this->vm.count("spawn-string"))

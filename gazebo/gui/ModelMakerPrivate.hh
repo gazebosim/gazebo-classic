@@ -18,6 +18,7 @@
 #define GAZEBO_GUI_MODELMAKER_PRIVATE_HH_
 
 #include <list>
+#include <string>
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/RenderTypes.hh"
