@@ -79,7 +79,6 @@ namespace gazebo
       private: std::string materialScheme;
     };
 
-
     /// \class ReflectanceRenderTargetListener
     /// \brief Ogre render target listener.
     class ReflectanceRenderTargetListener : public Ogre::RenderTargetListener
@@ -137,6 +136,12 @@ namespace gazebo
 
       /// \brief Scene pointer
       private: ScenePtr scene;
+
+      /// \brief Default reflectance material
+      private: Ogre::MaterialPtr reflectanceMaterial;
+
+      /// \brief Default reflectance material
+      private: Ogre::MaterialPtr blackMaterial;
     };
   }
 }
@@ -334,10 +339,10 @@ void DepthCamera::CreateReflectanceTexture(const std::string &_textureName)
         Ogre::ColourValue(Ogre::ColourValue(0, 0, 0)));
 
     this->dataPtr->reflectanceViewport->setOverlaysEnabled(false);
+    this->dataPtr->reflectanceViewport->setSkiesEnabled(false);
+    this->dataPtr->reflectanceViewport->setShadowsEnabled(false);
     this->dataPtr->reflectanceViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
-
-    this->dataPtr->reflectanceViewport->setMaterialScheme("reflectance_map");
 
     this->dataPtr->reflectanceMaterialSwitcher.reset(
         new ReflectanceMaterialSwitcher(this->scene,
@@ -789,14 +794,29 @@ void ReflectanceRenderTargetListener::postRenderTargetUpdate(
 ReflectanceMaterialListener::ReflectanceMaterialListener(ScenePtr _scene)
 :scene(_scene)
 {
+  // load the reflectance and black material
+  std::string material = "Gazebo/Reflectance";
+  Ogre::MaterialManager::getSingleton().load(material,
+      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  this->reflectanceMaterial =
+      Ogre::MaterialManager::getSingleton().getByName(material);
+
+  material = "Gazebo/Black";
+  Ogre::MaterialManager::getSingleton().load(material,
+      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  this->blackMaterial =
+      Ogre::MaterialManager::getSingleton().getByName("Gazebo/Black");
 }
 
 /////////////////////////////////////////////////
 Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
-    uint16_t /*_schemeIndex*/, const Ogre::String & /*_schemeName*/,
+    uint16_t /*_schemeIndex*/, const Ogre::String & _schemeName,
     Ogre::Material *_originalMaterial, uint16_t /*_lodIndex*/,
     const Ogre::Renderable *_rend)
 {
+  if (_schemeName != "reflectance_map")
+    return _originalMaterial->getBestTechnique();
+
   if (_rend && typeid(*_rend) == typeid(Ogre::SubEntity))
   {
     std::string material = "";
@@ -851,41 +871,34 @@ Ogre::Technique *ReflectanceMaterialListener::handleSchemeNotFound(
       if (!visual)
         return nullptr;
 
+      Ogre::MaterialPtr mat;
       const Ogre::Any reflectanceMapAny = visual->GetSceneNode()->
-                        getUserObjectBindings().getUserAny("reflectance_map");
+          getUserObjectBindings().getUserAny("reflectance_map");
       if (!reflectanceMapAny.isEmpty())
       {
-        material = "Gazebo/Reflectance";
         reflectanceMap = Ogre::any_cast<std::string>(reflectanceMapAny);
+
+        // clone the material for each unique reflectance map
+        std::string materialUnique = "Gazebo/Reflectance_" + reflectanceMap;
+        mat = Ogre::MaterialManager::getSingleton().getByName(materialUnique);
+        if (mat.isNull())
+        {
+          mat = this->reflectanceMaterial->clone(materialUnique);
+          Ogre::Technique *technique = mat->getTechnique(0);
+          if (!reflectanceMap.empty())
+          {
+            Ogre::TextureUnitState *tus = technique->getPass(0)->
+                getTextureUnitState(0);
+            tus->setTextureName(reflectanceMap);
+          }
+        }
       }
       else
       {
-        material = "Gazebo/Black";
+        mat = this->blackMaterial;
       }
-
-      // set the material for the models
-      Ogre::ResourcePtr res =
-          Ogre::MaterialManager::getSingleton().getByName(material);
-      if (res.isNull())
-      {
-        Ogre::MaterialManager::getSingleton().load(material,
-        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-      }
-      Ogre::MaterialPtr mat;
-      // OGRE 1.9 changes the shared pointer definition
-      #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
-      mat = static_cast<Ogre::MaterialPtr>(res);
-      #else
-      mat = res.staticCast<Ogre::Material>();
-      #endif
-
+      GZ_ASSERT(!mat.isNull(), "Reflectance material is null");
       Ogre::Technique *technique = mat->getTechnique(0);
-      if (!reflectanceMap.empty())
-      {
-        Ogre::TextureUnitState *tus = technique->getPass(0)->
-                                              getTextureUnitState(0);
-        tus->setTextureName(reflectanceMap);
-      }
 
       return technique;
     }
