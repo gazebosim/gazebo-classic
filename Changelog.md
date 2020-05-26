@@ -3,7 +3,7 @@
 ## Gazebo 9.XX.X (20XX-XX-XX)
 
 1. Fix multiple reflectance maps and improve performance
-    * [Pull request ]()
+    * [Pull request #2724](https://github.com/osrf/gazebo/pull/2742)
 
 ## Gazebo 9.13.0 (2020-04-03)
 
