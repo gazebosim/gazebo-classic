@@ -1,7 +1,7 @@
 # Check if SSE instructions are available on the machine where 
 # the project is compiled.
 
-IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
+IF(CMAKE_SYSTEM_NAME MATCHES "Linux" AND (NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm"))
    EXEC_PROGRAM(cat ARGS "/proc/cpuinfo" OUTPUT_VARIABLE CPUINFO)
 
    STRING(REGEX REPLACE "^.*(sse2).*$" "\\1" SSE_THERE ${CPUINFO})
@@ -90,7 +90,7 @@ ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Windows")
    set(SSE3_FOUND   false CACHE BOOL "SSE3 available on host")
    set(SSSE3_FOUND  false CACHE BOOL "SSSE3 available on host")
    set(SSE4_1_FOUND false CACHE BOOL "SSE4.1 available on host")
-ELSE(CMAKE_SYSTEM_NAME MATCHES "Linux")
+ELSE(CMAKE_SYSTEM_NAME MATCHES "Linux" AND (NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm"))
    set(SSE2_FOUND   true  CACHE BOOL "SSE2 available on host")
    set(SSE3_FOUND   false CACHE BOOL "SSE3 available on host")
    set(SSSE3_FOUND  false CACHE BOOL "SSSE3 available on host")
