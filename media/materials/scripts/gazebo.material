@@ -73,9 +73,9 @@ material Gazebo/Reflectance
       texture_unit
       {
       }
-      }
     }
   }
+}
 
 vertex_program Gazebo/XYZNormalsVS glsl
 {

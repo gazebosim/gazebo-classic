@@ -1,5 +1,10 @@
 ## Gazebo 9
 
+## Gazebo 9.XX.X (20XX-XX-XX)
+
+1. Fix multiple reflectance maps and improve performance
+    * [Pull request #2724](https://github.com/osrf/gazebo/pull/2742)
+
 ## Gazebo 9.13.0 (2020-04-03)
 
 1. Use target based compile options to specify C++ standard
