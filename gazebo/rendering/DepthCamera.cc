@@ -140,7 +140,7 @@ namespace gazebo
       /// \brief Default reflectance material
       private: Ogre::MaterialPtr reflectanceMaterial;
 
-      /// \brief Default reflectance material
+      /// \brief Black material for objects with no reflectance map
       private: Ogre::MaterialPtr blackMaterial;
     };
   }
