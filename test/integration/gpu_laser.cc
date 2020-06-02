@@ -16,6 +16,7 @@
 */
 
 #include <ignition/math/Helpers.hh>
+#include "gazebo/common/Timer.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/sensors/sensors.hh"
 
@@ -604,6 +605,61 @@ TEST_F(GPURaySensorTest, LaserScanResolution)
       EXPECT_NEAR(intersection.Z(), 0.0, rangeResolution);
     }
   }
+
+  c.reset();
+
+  delete [] scan;
+}
+
+TEST_F(GPURaySensorTest, StrictUpdateRate)
+{
+  Load("worlds/gpu_ray_strict_rate.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  std::string sensorName = "gpu_ray_sensor";
+  sensors::SensorPtr sensor = sensors::get_sensor(sensorName);
+  sensors::GpuRaySensorPtr raySensor =
+    std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
+  EXPECT_TRUE(raySensor != nullptr);
+  raySensor->SetActive(true);
+
+  float *scan = new float[raySensor->RangeCount()
+      * raySensor->VerticalRangeCount() * 3];
+  int scanCount = 0;
+  event::ConnectionPtr c =
+    raySensor->ConnectNewLaserFrame(
+        std::bind(&::OnNewLaserFrame, &scanCount, scan,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // wait for a few laser scans
+  common::Timer timer;
+  timer.Start();
+
+  // how many scans produced for 5 seconds (in simulated clock domain)
+  double updateRate = raySensor->UpdateRate();
+  int total_scans = 5 * updateRate;
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  double simT0 = world->SimTime().Double();
+
+  while (scanCount < total_scans)
+    common::Time::MSleep(1);
+
+  // check that the obtained rate is the one expected
+  double dt = world->SimTime().Double() - simT0;
+  double rate = static_cast<double>(total_scans) / dt;
+  gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
+  const double tolerance = 0.02;
+  EXPECT_GT(rate, updateRate * (1 - tolerance));
+  EXPECT_LT(rate, updateRate * (1 + tolerance));
 
   c.reset();
 

@@ -142,7 +142,14 @@ void Sensor::Load(const std::string &_worldName)
   this->useStrictRate = this->sdf->Get<bool>("strict_rate:value", false).first;
 
   if (this->dataPtr->category == IMAGE)
+  {
     this->scene = rendering::get_scene(_worldName);
+    // TODO(mabelzhang) Decide whether to have this in Sensor or individually
+    // in each of the rendering sensors
+    // this->connections.push_back(
+    //     event::Events::ConnectPreRenderEnded(
+    //       boost::bind(&Sensor::PrerenderEnded, this)));
+  }
 
   // loaded, but not updated
   this->lastUpdateTime = common::Time(0.0);
@@ -272,6 +279,16 @@ void Sensor::Update(const bool _force)
     }
   }
 }
+
+//////////////////////////////////////////////////
+// TODO(mabelzhang) To have this here for rendering sensors, this needs to
+// be virtual and be implemented by CameraSensor, MultiCameraSensor, and
+// GpuRaySensor.
+/*
+void CameraSensor::PrerenderEnded()
+{
+}
+*/
 
 //////////////////////////////////////////////////
 void Sensor::Fini()
@@ -520,4 +537,10 @@ double Sensor::NextRequiredTimestamp() const
 {
   // implementation by default: next required timestamp is ignored
   return std::numeric_limits<double>::quiet_NaN();
+}
+
+//////////////////////////////////////////////////
+bool Sensor::StrictRate() const
+{
+  return this->useStrictRate;
 }

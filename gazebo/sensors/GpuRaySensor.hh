@@ -270,6 +270,9 @@ namespace gazebo
       /// brief Render the camera.
       private: void Render();
 
+      /// \brief Handle the prerenderEnded event.
+      private: void PrerenderEnded();
+
       /// \internal
       /// \brief Private data pointer.
       private: std::unique_ptr<GpuRaySensorPrivate> dataPtr;

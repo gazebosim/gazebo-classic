@@ -185,6 +185,10 @@ namespace gazebo
       /// \return the timestamp
       public: virtual double NextRequiredTimestamp() const;
 
+      /// \brief Returns true if the sensor is to follow strict update rate
+      /// \return True when sensor should follow strict update rate
+      public: bool StrictRate() const;
+
       /// \brief This gets overwritten by derived sensor types.
       ///        This function is called during Sensor::Update.
       ///        And in turn, Sensor::Update is called by
