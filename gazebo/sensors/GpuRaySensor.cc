@@ -58,9 +58,6 @@ GpuRaySensor::GpuRaySensor()
   this->connections.push_back(
       event::Events::ConnectRender(
         std::bind(&GpuRaySensor::Render, this)));
-  this->connections.push_back(
-      event::Events::ConnectPreRenderEnded(
-        boost::bind(&GpuRaySensor::PrerenderEnded, this)));
 }
 
 //////////////////////////////////////////////////
@@ -83,6 +80,13 @@ std::string GpuRaySensor::Topic() const
 void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
+  // strict_rate parameter is parsed in Sensor::Load()
+  if (this->useStrictRate)
+  {
+    this->connections.push_back(
+        event::Events::ConnectPreRenderEnded(
+          boost::bind(&GpuRaySensor::PrerenderEnded, this)));
+  }
 }
 
 //////////////////////////////////////////////////

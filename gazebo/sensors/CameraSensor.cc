@@ -55,9 +55,6 @@ CameraSensor::CameraSensor()
   this->connections.push_back(
       event::Events::ConnectRender(
         std::bind(&CameraSensor::Render, this)));
-  this->connections.push_back(
-      event::Events::ConnectPreRenderEnded(
-        boost::bind(&CameraSensor::PrerenderEnded, this)));
 }
 
 //////////////////////////////////////////////////
@@ -96,6 +93,14 @@ std::string CameraSensor::TopicIgn() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
+  // strict_rate parameter is parsed in Sensor::Load()
+  if (this->useStrictRate)
+  {
+    this->connections.push_back(
+        event::Events::ConnectPreRenderEnded(
+          boost::bind(&CameraSensor::PrerenderEnded, this)));
+  }
+
   this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->Topic(), 50);
 
   ignition::transport::AdvertiseMessageOptions opts;
