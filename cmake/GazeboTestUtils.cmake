@@ -46,14 +46,9 @@ macro (gz_build_tests)
 
     link_directories(${PROJECT_BINARY_DIR}/test)
     target_link_libraries(${BINARY_NAME}
-      gtest
       gtest_main
       ${_extra_libs}
     )
-    if (UNIX)
-      # gtest uses pthread on UNIX
-      target_link_libraries(${BINARY_NAME} pthread)
-    endif()
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
 	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
