@@ -586,7 +586,8 @@ void Server::Run()
   // The server and sensor manager outlive worlds
   while (!this->dataPtr->stop)
   {
-    bool ret = rendering::wait_for_render_request("", 0.100);
+    rendering::wait_for_render_request("", 0.100);
+    // bool ret = rendering::wait_for_render_request("", 0.100);
     // if (ret == false)
     //   gzerr << "time out reached!" << std::endl;
 
