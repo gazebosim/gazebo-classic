@@ -521,3 +521,9 @@ double Sensor::NextRequiredTimestamp() const
   // implementation by default: next required timestamp is ignored
   return std::numeric_limits<double>::quiet_NaN();
 }
+
+//////////////////////////////////////////////////
+bool Sensor::StrictRate() const
+{
+  return this->useStrictRate;
+}
