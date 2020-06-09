@@ -76,7 +76,7 @@ namespace gazebo
   ///             definition are used.
   /// <robot_namespace>  Namespace used as a prefix for gazebo topic names.
   ///                    Default is the name of the model.
-  class TrackedVehiclePlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE TrackedVehiclePlugin : public ModelPlugin
   {
     /// \brief Default Contstuctor
     public: TrackedVehiclePlugin();
