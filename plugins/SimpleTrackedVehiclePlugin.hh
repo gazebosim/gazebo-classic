@@ -60,7 +60,7 @@ namespace gazebo {
   /// <collide_without_contact_bitmask> Collision bitmask that will be set to
   ///     the whole vehicle (default is 1u).
 
-  class SimpleTrackedVehiclePlugin :
+  class GZ_PLUGIN_VISIBLE SimpleTrackedVehiclePlugin :
     public TrackedVehiclePlugin
   {
     public: SimpleTrackedVehiclePlugin() = default;
