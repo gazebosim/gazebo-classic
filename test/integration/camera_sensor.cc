@@ -346,7 +346,7 @@ TEST_F(CameraSensor, CheckThrottleStrictRate)
   double dt = world->SimTime().Double() - simT0;
   double rate = static_cast<double>(total_images) / dt;
   gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
-  const double tolerance = 0.02;
+  const double tolerance = 0.06;
   EXPECT_GT(rate, updateRate * (1 - tolerance));
   EXPECT_LT(rate, updateRate * (1 + tolerance));
   c.reset();
