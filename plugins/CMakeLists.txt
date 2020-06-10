@@ -164,7 +164,7 @@ set(GAZEBO_PLUGIN_INSTALL_DIR
   ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/
 )
 
-add_library(TrackedVehiclePlugin STATIC TrackedVehiclePlugin.cc)
+add_library(TrackedVehiclePlugin SHARED TrackedVehiclePlugin.cc)
 target_link_libraries(TrackedVehiclePlugin
         libgazebo
         ${ogre_libraries}
