@@ -307,7 +307,6 @@ TEST_F(CameraSensor, CheckThrottleStrictRate)
   // Load camera_strict_rate.world instead, and don't call SpawnCamera.
   // That allows us to secify the custom namespace in the world file instead
   // of modifying SpawnCamera() in ServerFixture.cc.
-  // Load("worlds/empty_test.world");
   Load("worlds/camera_strict_rate.world");
 
   // Make sure the render engine is available.
@@ -318,23 +317,7 @@ TEST_F(CameraSensor, CheckThrottleStrictRate)
     return;
   }
 
-  // TODO(mabelzhang) Read these values from the SDF. Is it possible?
-  // std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
-  /*
-  unsigned int width  = 1280;
-  unsigned int height = 720;
-  // we choose a high fps on purpose. The goal is to check the effect
-  // of the flag "strict_rate".
-  double updateRate = 500;
-  ignition::math::Pose3d setPose, testPose(ignition::math::Vector3d(-5, 0, 5),
-      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
-  SpawnCamera(modelName, cameraName, setPose.Pos(),
-      setPose.Rot().Euler(), width, height, updateRate,
-      // use default values for distortion
-      "", 0.0, 0.0, false, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5,
-      false);
-  */
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);

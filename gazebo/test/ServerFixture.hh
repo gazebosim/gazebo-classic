@@ -254,6 +254,7 @@ namespace gazebo
     /// \param[in] _distortionP2 Distortion coefficient p2.
     /// \param[in] _cx Normalized optical center x, used for distortion.
     /// \param[in] _cy Normalized optical center y, used for distortion.
+    /// \param[in] _strictRate Flag to enable strict update rate adherence.
     protected: void SpawnCamera(const std::string &_modelName,
                    const std::string &_cameraName,
                    const ignition::math::Vector3d &_pos =

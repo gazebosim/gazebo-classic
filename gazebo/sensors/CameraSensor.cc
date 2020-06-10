@@ -214,7 +214,7 @@ bool CameraSensor::NeedsUpdate()
   if (this->useStrictRate)
   {
     double simTime = this->scene->SimTime().Double();
- 
+
     if (simTime < this->lastMeasurementTime.Double())
     {
       // Rendering sensors also set the lastMeasurementTime variable in Render()
@@ -224,9 +224,9 @@ bool CameraSensor::NeedsUpdate()
       this->ResetLastUpdateTime();
       return false;
     }
- 
+
     double dt = this->world->Physics()->GetMaxStepSize();
- 
+
     // If next rendering time is not set yet
     if (std::isnan(this->dataPtr->nextRenderingTime))
     {
@@ -242,10 +242,10 @@ bool CameraSensor::NeedsUpdate()
         return false;
       }
     }
- 
+
     if (simTime > this->dataPtr->nextRenderingTime + dt)
       return true;
- 
+
     // Trigger on the tick the closest from the targeted rendering time
     return (ignition::math::lessOrNearEqual(
           std::abs(simTime - this->dataPtr->nextRenderingTime), dt / 2.0));
@@ -299,10 +299,10 @@ void CameraSensor::Render()
   {
     if (!this->dataPtr->renderNeeded)
       return;
- 
+
     // Update all the cameras
     this->camera->Render();
- 
+
     this->dataPtr->rendered = true;
     this->dataPtr->renderNeeded = false;
   }
@@ -313,7 +313,7 @@ void CameraSensor::Render()
 
     // Update all the cameras
     this->camera->Render();
- 
+
     this->dataPtr->rendered = true;
     this->lastMeasurementTime = this->scene->SimTime();
   }
