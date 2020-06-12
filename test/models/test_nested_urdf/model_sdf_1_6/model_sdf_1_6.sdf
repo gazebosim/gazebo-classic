@@ -1,0 +1,10 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+    <model name='model_sdf_1_6'>
+        <!-- Include the raw model -->
+        <include>
+             <uri>model://model_urdf</uri>
+             <pose>0.0 0.0 0.1 0.0 0 0.0</pose>
+        </include>
+    </model>
+</sdf>

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<robot name="model_urdf">
+  <link name="base_link">
+    <inertial>
+      <mass value="1"/>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+   <visual>
+     <origin xyz="0 0 0.5" rpy="0 0 0" />
+     <geometry>
+       <box size="1 1 1" />
+     </geometry>
+     <material name="Red">
+       <color rgba="1.0 0.0 0.0 1.0"/>
+     </material>
+   </visual>
+   <collision>
+     <origin xyz="0 0 0.5" rpy="0 0 0"/>
+     <geometry>
+       <box size="1 1 1" />
+     </geometry>
+   </collision>
+  </link>
+  <joint name="joint_a1" type="continuous">
+    <origin xyz="0 0 1.0" rpy="0 -0 0"/>
+    <axis xyz="0 0 -1"/>
+    <parent link="base_link"/>
+    <child link="link_1"/>
+  </joint>
+  <link name="link_1">
+    <inertial>
+      <mass value="1"/>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+   <visual>
+     <origin xyz="0 0 0.5" rpy="0 0 0" />
+     <geometry>
+       <cylinder radius="0.6" length="1.0"/>
+     </geometry>
+     <material name="Green">
+       <color rgba="0.0 1.0 0.0 1.0"/>
+     </material>
+   </visual>
+   <collision>
+     <origin xyz="0 0 0.5" rpy="0 0 0"/>
+     <geometry>
+       <cylinder radius="0.6" length="1.0"/>
+     </geometry>
+   </collision>
+  </link>
+</robot>

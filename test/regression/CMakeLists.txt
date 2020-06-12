@@ -63,3 +63,10 @@ add_dependencies(${TEST_TYPE}_1112_force_torque_model_removal
                  ForceTorqueModelRemovalTestPlugin)
 add_dependencies(${TEST_TYPE}_1208_world_plugin_init
                  Issue1208Plugin)
+
+set (CMAKE_AUTOMOC ON)
+set(qt_tests
+  2728_gui_spawned_nested_urdf.cc
+)
+
+gz_build_qt_tests(${qt_tests})
