@@ -46,7 +46,7 @@ namespace gazebo
   ///               appear multiple times, once for each right wheel).
   /// <default_wheel_radius>  The radius used for wheels where radius
   ///                         autodetection fails (default is 0.5 meters).
-  class GAZEBO_VISIBLE WheelTrackedVehiclePlugin :
+  class GZ_PLUGIN_VISIBLE WheelTrackedVehiclePlugin :
     public TrackedVehiclePlugin
   {
     public: WheelTrackedVehiclePlugin() = default;

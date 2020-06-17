@@ -31,7 +31,7 @@ set (plugins
 )
 
 foreach (src ${plugins})
-  add_library(${src} SHARED ${src}.cc)
+  add_library(${src} STATIC ${src}.cc)
   target_link_libraries(${src} libgazebo ${ogre_libraries})
   add_dependencies(tests ${src})
 endforeach (src ${plugins})
