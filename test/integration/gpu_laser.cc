@@ -645,17 +645,23 @@ TEST_F(GPURaySensorTest, StrictUpdateRate)
 
   // how many scans produced for 5 seconds (in simulated clock domain)
   double updateRate = raySensor->UpdateRate();
-  int total_scans = 5 * updateRate;
+  int totalScans = 5 * updateRate;
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  double simT0 = world->SimTime().Double();
+  double simT0 = 0.0;
 
-  while (scanCount < total_scans)
+  while (scanCount < totalScans)
+  {
+    if (scanCount == 0)
+    {
+      simT0 = world->SimTime().Double();
+    }
     common::Time::MSleep(1);
+  }
 
   // check that the obtained rate is the one expected
   double dt = world->SimTime().Double() - simT0;
-  double rate = static_cast<double>(total_scans) / dt;
+  double rate = static_cast<double>(totalScans) / dt;
   gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
   const double tolerance = 0.02;
   EXPECT_GT(rate, updateRate * (1 - tolerance));

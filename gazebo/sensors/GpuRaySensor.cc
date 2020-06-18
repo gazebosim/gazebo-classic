@@ -21,7 +21,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
-#include "gazebo/physics/physics.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
