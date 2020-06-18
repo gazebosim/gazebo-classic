@@ -97,6 +97,12 @@ namespace gazebo
             Ogre::Vector3(static_cast<double>(this->camera->ViewportWidth()),
             static_cast<double>(this->camera->ViewportHeight()), 1.0));
 
+        if (!this->light)
+        {
+          // return if this->light is not set, we may still be initializing
+          return;
+        }
+
         // use light's world position for lens flare position
         if (this->light->Type() == "directional")
         {
@@ -393,6 +399,32 @@ void LensFlare::SetCamera(CameraPtr _camera)
   }
 
   this->dataPtr->camera = _camera;
+
+  if (!this->dataPtr->lensFlareInstance)
+  {
+    // set up the lens flare instance
+    Ogre::MaterialPtr lensFlareMaterial =
+        Ogre::MaterialManager::getSingleton().getByName(
+            "Gazebo/CameraLensFlare");
+    lensFlareMaterial = lensFlareMaterial->clone(
+            "Gazebo/" + this->dataPtr->camera->Name() + "_CameraLensFlare");
+
+    this->dataPtr->lensFlareCompositorListener.reset(new
+          LensFlareCompositorListener(this->dataPtr->camera, nullptr));
+    this->dataPtr->lensFlareCompositorListener->SetScale(
+        this->dataPtr->lensFlareScale);
+
+    this->dataPtr->lensFlareInstance =
+        Ogre::CompositorManager::getSingleton().addCompositor(
+        this->dataPtr->camera->OgreViewport(), "CameraLensFlare/Default");
+    this->dataPtr->lensFlareInstance->getTechnique()->getOutputTargetPass()->
+        getPass(0)->setMaterial(lensFlareMaterial);
+
+    this->dataPtr->lensFlareInstance->setEnabled(true);
+    this->dataPtr->lensFlareInstance->addListener(
+        this->dataPtr->lensFlareCompositorListener.get());
+  }
+
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
       std::bind(&LensFlare::Update, this));
 }
@@ -440,31 +472,6 @@ void LensFlare::Update()
 
   this->dataPtr->lightName = directionalLight->Name();
 
-  if (!this->dataPtr->lensFlareInstance)
-  {
-    // set up the lens flare instance
-    Ogre::MaterialPtr lensFlareMaterial =
-        Ogre::MaterialManager::getSingleton().getByName(
-            "Gazebo/CameraLensFlare");
-    lensFlareMaterial = lensFlareMaterial->clone(
-            "Gazebo/" + this->dataPtr->camera->Name() + "_CameraLensFlare");
-
-    this->dataPtr->lensFlareCompositorListener.reset(new
-          LensFlareCompositorListener(this->dataPtr->camera, directionalLight));
-    this->dataPtr->lensFlareCompositorListener->SetScale(
-        this->dataPtr->lensFlareScale);
-
-    this->dataPtr->lensFlareInstance =
-        Ogre::CompositorManager::getSingleton().addCompositor(
-        this->dataPtr->camera->OgreViewport(), "CameraLensFlare/Default");
-    this->dataPtr->lensFlareInstance->getTechnique()->getOutputTargetPass()->
-        getPass(0)->setMaterial(lensFlareMaterial);
-
-    this->dataPtr->lensFlareInstance->setEnabled(true);
-    this->dataPtr->lensFlareInstance->addListener(
-        this->dataPtr->lensFlareCompositorListener.get());
-  }
-  else
   {
     this->dataPtr->lensFlareCompositorListener->SetLight(directionalLight);
     this->dataPtr->lensFlareInstance->setEnabled(true);
