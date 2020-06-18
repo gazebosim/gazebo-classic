@@ -341,7 +341,7 @@ TEST_F(CameraSensor, CheckThrottleStrictRate)
 
   while (imageCount < totalImages)
   {
-    if (imageCount == 1)
+    if (imageCount == 0)
     {
       simT0 = world->SimTime().Double();
     }
