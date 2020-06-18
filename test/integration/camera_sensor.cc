@@ -268,7 +268,7 @@ TEST_F(CameraSensor, CheckThrottle)
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
   unsigned int width  = 320;
-  unsigned int height = 240;  // 106 fps
+  unsigned int height = 240;
   double updateRate = 10;
   ignition::math::Pose3d setPose, testPose(ignition::math::Vector3d(-5, 0, 5),
       ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
@@ -334,19 +334,25 @@ TEST_F(CameraSensor, CheckThrottleStrictRate)
 
   // how many images produced for 5 seconds (in simulated clock domain)
   double updateRate = camSensor->UpdateRate();
-  int total_images = 5 * updateRate;
+  int totalImages = 5 * updateRate;
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  double simT0 = world->SimTime().Double();
+  double simT0 = 0.0;
 
-  while (imageCount < total_images)
+  while (imageCount < totalImages)
+  {
+    if (imageCount == 1)
+    {
+      simT0 = world->SimTime().Double();
+    }
     common::Time::MSleep(1);
+  }
 
   // check that the obtained rate is the one expected
   double dt = world->SimTime().Double() - simT0;
-  double rate = static_cast<double>(total_images) / dt;
+  double rate = static_cast<double>(totalImages) / dt;
   gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
-  const double tolerance = 0.06;
+  const double tolerance = 0.02;
   EXPECT_GT(rate, updateRate * (1 - tolerance));
   EXPECT_LT(rate, updateRate * (1 + tolerance));
   c.reset();
