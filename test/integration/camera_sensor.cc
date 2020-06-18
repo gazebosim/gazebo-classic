@@ -268,7 +268,7 @@ TEST_F(CameraSensor, CheckThrottle)
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
   unsigned int width  = 320;
-  unsigned int height = 240;  // 106 fps
+  unsigned int height = 240;
   double updateRate = 10;
   ignition::math::Pose3d setPose, testPose(ignition::math::Vector3d(-5, 0, 5),
       ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
@@ -307,7 +307,6 @@ TEST_F(CameraSensor, CheckThrottleStrictRate)
   // Load camera_strict_rate.world instead, and don't call SpawnCamera.
   // That allows us to secify the custom namespace in the world file instead
   // of modifying SpawnCamera() in ServerFixture.cc.
-  //Load("worlds/empty_test.world");
   Load("worlds/camera_strict_rate.world");
 
   // Make sure the render engine is available.
@@ -318,22 +317,7 @@ TEST_F(CameraSensor, CheckThrottleStrictRate)
     return;
   }
 
-  // std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
-  /*
-  unsigned int width  = 1280;
-  unsigned int height = 720;
-  // we choose a high fps on purpose. The goal is to check the effect
-  // of the flag "strict_rate".
-  double updateRate = 500;
-  ignition::math::Pose3d setPose, testPose(ignition::math::Vector3d(-5, 0, 5),
-      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
-  SpawnCamera(modelName, cameraName, setPose.Pos(),
-      setPose.Rot().Euler(), width, height, updateRate,
-      // use default values for distortion
-      "", 0.0, 0.0, false, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5,
-      false);
-  */
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
@@ -350,21 +334,25 @@ TEST_F(CameraSensor, CheckThrottleStrictRate)
 
   // how many images produced for 5 seconds (in simulated clock domain)
   double updateRate = camSensor->UpdateRate();
-  int total_images = 5 * updateRate;
+  int totalImages = 5 * updateRate;
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
+  double simT0 = 0.0;
 
-  // Sleep until all expected images arrive
-  double simT0 = world->SimTime().Double();
-  while (imageCount < total_images)
+  while (imageCount < totalImages)
+  {
+    if (imageCount == 0)
+    {
+      simT0 = world->SimTime().Double();
+    }
     common::Time::MSleep(1);
-  double dt = world->SimTime().Double() - simT0;
+  }
 
   // check that the obtained rate is the one expected
-  double rate = static_cast<double>(total_images) / dt;
+  double dt = world->SimTime().Double() - simT0;
+  double rate = static_cast<double>(totalImages) / dt;
   gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
-  // Set a little higher than we actually want (2%), so that test isn't flakey
-  const double tolerance = 0.06;
+  const double tolerance = 0.02;
   EXPECT_GT(rate, updateRate * (1 - tolerance));
   EXPECT_LT(rate, updateRate * (1 + tolerance));
   c.reset();
