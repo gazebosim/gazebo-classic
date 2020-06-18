@@ -26,7 +26,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/physics/physics.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/rendering/Camera.hh"
