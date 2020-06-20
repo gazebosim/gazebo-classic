@@ -67,6 +67,13 @@ CameraSensor::~CameraSensor()
 void CameraSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
+  // strict_rate parameter is parsed in Sensor::Load()
+  if (this->useStrictRate)
+  {
+    this->connections.push_back(
+        event::Events::ConnectPreRenderEnded(
+          boost::bind(&CameraSensor::PrerenderEnded, this)));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -218,7 +225,11 @@ bool CameraSensor::NeedsUpdate()
 {
   if (this->useStrictRate)
   {
-    double simTime = this->scene->SimTime().Double();
+    double simTime;
+    if (this->scene)
+      simTime = this->scene->SimTime().Double();
+    else
+      simTime = this->world->SimTime().Double();
 
     if (simTime < this->lastMeasurementTime.Double())
     {
