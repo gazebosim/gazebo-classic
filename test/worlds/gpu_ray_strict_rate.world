@@ -46,6 +46,8 @@
             </range>
           </ray>
           <always_on>1</always_on>
+          <!-- We choose a high fps on purpose. The goal is to check the effect
+            of the flag "strict_rate". -->
           <update_rate>500</update_rate>
           <strict_rate:value>true</strict_rate:value>
           <visualize>false</visualize>
