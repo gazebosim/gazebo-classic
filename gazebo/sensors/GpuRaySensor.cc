@@ -93,6 +93,13 @@ void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 void GpuRaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
+  // strict_rate parameter is parsed in Sensor::Load()
+  if (this->useStrictRate)
+  {
+    this->connections.push_back(
+        event::Events::ConnectPreRenderEnded(
+          boost::bind(&GpuRaySensor::PrerenderEnded, this)));
+  }
 
   this->dataPtr->scanPub =
     this->node->Advertise<msgs::LaserScanStamped>(this->Topic(), 50);
@@ -369,8 +376,12 @@ bool GpuRaySensor::NeedsUpdate()
 {
   if (this->useStrictRate)
   {
-    double simTime = this->scene->SimTime().Double();
- 
+    double simTime;
+    if (this->scene)
+      simTime = this->scene->SimTime().Double();
+    else
+      simTime = this->world->SimTime().Double();
+
     if (simTime < this->lastMeasurementTime.Double())
     {
       // Rendering sensors also set the lastMeasurementTime variable in Render()
@@ -380,9 +391,9 @@ bool GpuRaySensor::NeedsUpdate()
       this->ResetLastUpdateTime();
       return false;
     }
- 
+
     double dt = this->world->Physics()->GetMaxStepSize();
- 
+
     // If next rendering time is not set yet
     if (std::isnan(this->dataPtr->nextRenderingTime))
     {
@@ -398,10 +409,10 @@ bool GpuRaySensor::NeedsUpdate()
         return false;
       }
     }
- 
+
     if (simTime > this->dataPtr->nextRenderingTime + dt)
       return true;
- 
+
     // Trigger on the tick the closest from the targeted rendering time
     return (ignition::math::lessOrNearEqual(
           std::abs(simTime - this->dataPtr->nextRenderingTime), dt / 2.0));
@@ -415,6 +426,7 @@ bool GpuRaySensor::NeedsUpdate()
 //////////////////////////////////////////////////
 void GpuRaySensor::Update(bool _force)
 {
+  /*
   if (this->useStrictRate)
   {
     if (this->IsActive() || _force)
@@ -427,6 +439,8 @@ void GpuRaySensor::Update(bool _force)
   {
     Sensor::Update(_force);
   }
+  */
+  Sensor::Update(_force);
 }
 
 //////////////////////////////////////////////////
@@ -653,7 +667,8 @@ int GpuRaySensor::Fiducial(const unsigned int /*_index*/) const
 //////////////////////////////////////////////////
 void GpuRaySensor::PrerenderEnded()
 {
-  if (this->dataPtr->laserCam && this->IsActive() && this->NeedsUpdate())
+  if (this->useStrictRate && this->dataPtr->laserCam && this->IsActive() &&
+      this->NeedsUpdate())
   {
     // compute next rendering time, take care of the case where period is zero.
     double dt;

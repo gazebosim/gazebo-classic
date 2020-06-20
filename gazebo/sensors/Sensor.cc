@@ -20,6 +20,7 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Console.hh"
@@ -144,11 +145,6 @@ void Sensor::Load(const std::string &_worldName)
   if (this->dataPtr->category == IMAGE)
   {
     this->scene = rendering::get_scene(_worldName);
-    // TODO(mabelzhang) Decide whether to have this in Sensor or individually
-    // in each of the rendering sensors
-    // this->connections.push_back(
-    //     event::Events::ConnectPreRenderEnded(
-    //       boost::bind(&Sensor::PrerenderEnded, this)));
   }
 
   // loaded, but not updated
@@ -238,57 +234,57 @@ void Sensor::Update(const bool _force)
 {
   if (this->IsActive() || _force)
   {
-    common::Time simTime;
-    if (this->dataPtr->category == IMAGE && this->scene)
-      simTime = this->scene->SimTime();
-    else
-      simTime = this->world->SimTime();
-
+    // TODO(mabelzhang): Does strict rate not need anything in the else-clause
+    // below at all? Strict rate PR did not use them
+    if (this->useStrictRate)
     {
-      std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
-
-      if (simTime <= this->lastUpdateTime && !_force)
-        return;
-
-      // Adjust time-to-update period to compensate for delays caused by another
-      // sensor's update in the same thread.
-      // NOTE: If you change this equation, also change the matching equation in
-      // Sensor::NeedsUpdate
-      common::Time adjustedElapsed = simTime -
-        this->lastUpdateTime + this->dataPtr->updateDelay;
-
-      if (adjustedElapsed < this->updatePeriod && !_force)
-        return;
-
-      this->dataPtr->updateDelay = std::max(common::Time::Zero,
-          adjustedElapsed - this->updatePeriod);
-
-      // if delay is more than a full update period, then give up trying
-      // to catch up. This happens normally when the sensor just changed from
-      // an inactive to an active state, or the sensor just cannot hit its
-      // target update rate (worst case).
-      if (this->dataPtr->updateDelay >= this->updatePeriod)
-        this->dataPtr->updateDelay = common::Time::Zero;
+      if (this->UpdateImpl(_force))
+        this->updated();
     }
-
-    if (this->UpdateImpl(_force))
+    else
     {
-      std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
-      this->lastUpdateTime = simTime;
-      this->updated();
+      common::Time simTime;
+      if (this->dataPtr->category == IMAGE && this->scene)
+        simTime = this->scene->SimTime();
+      else
+        simTime = this->world->SimTime();
+
+      {
+        std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
+
+        if (simTime <= this->lastUpdateTime && !_force)
+          return;
+
+        // Adjust time-to-update period to compensate for delays caused by another
+        // sensor's update in the same thread.
+        // NOTE: If you change this equation, also change the matching equation in
+        // Sensor::NeedsUpdate
+        common::Time adjustedElapsed = simTime -
+          this->lastUpdateTime + this->dataPtr->updateDelay;
+
+        if (adjustedElapsed < this->updatePeriod && !_force)
+          return;
+
+        this->dataPtr->updateDelay = std::max(common::Time::Zero,
+            adjustedElapsed - this->updatePeriod);
+
+        // if delay is more than a full update period, then give up trying
+        // to catch up. This happens normally when the sensor just changed from
+        // an inactive to an active state, or the sensor just cannot hit its
+        // target update rate (worst case).
+        if (this->dataPtr->updateDelay >= this->updatePeriod)
+          this->dataPtr->updateDelay = common::Time::Zero;
+      }
+
+      if (this->UpdateImpl(_force))
+      {
+        std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
+        this->lastUpdateTime = simTime;
+        this->updated();
+      }
     }
   }
 }
-
-//////////////////////////////////////////////////
-// TODO(mabelzhang) To have this here for rendering sensors, this needs to
-// be virtual and be implemented by CameraSensor, MultiCameraSensor, and
-// GpuRaySensor.
-/*
-void CameraSensor::PrerenderEnded()
-{
-}
-*/
 
 //////////////////////////////////////////////////
 void Sensor::Fini()

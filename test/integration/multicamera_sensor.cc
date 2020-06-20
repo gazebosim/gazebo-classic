@@ -569,6 +569,71 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
 }
 
 /////////////////////////////////////////////////
+// TODO(mabelzhang): adapt to MultiCameraSensor. Create SDF file.
+/*
+TEST_F(MultiCameraSensorTest, StrictUpdateRate)
+{
+  Load("worlds/multi_camera_strict_rate.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  std::string sensorName = "multi_camera_sensor";
+  sensors::SensorPtr sensor = sensors::get_sensor(sensorName);
+  sensors::MultiCameraSensorPtr raySensor =
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
+  EXPECT_TRUE(raySensor != nullptr);
+  raySensor->SetActive(true);
+
+  float *scan = new float[raySensor->RangeCount()
+      * raySensor->VerticalRangeCount() * 3];
+  int scanCount = 0;
+  event::ConnectionPtr c =
+    raySensor->ConnectNewLaserFrame(
+        std::bind(&::OnNewLaserFrame, &scanCount, scan,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // wait for a few laser scans
+  common::Timer timer;
+  timer.Start();
+
+  // how many scans produced for 5 seconds (in simulated clock domain)
+  double updateRate = raySensor->UpdateRate();
+  int totalScans = 5 * updateRate;
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  double simT0 = 0.0;
+
+  while (scanCount < totalScans)
+  {
+    if (scanCount == 0)
+    {
+      simT0 = world->SimTime().Double();
+    }
+    common::Time::MSleep(1);
+  }
+
+  // check that the obtained rate is the one expected
+  double dt = world->SimTime().Double() - simT0;
+  double rate = static_cast<double>(totalScans) / dt;
+  gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
+  const double tolerance = 0.02;
+  EXPECT_GT(rate, updateRate * (1 - tolerance));
+  EXPECT_LT(rate, updateRate * (1 + tolerance));
+
+  c.reset();
+
+  delete [] scan;
+}
+*/
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
