@@ -99,6 +99,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
     this->connections.push_back(
         event::Events::ConnectPreRenderEnded(
           boost::bind(&GpuRaySensor::PrerenderEnded, this)));
+  }
 
   this->dataPtr->scanPub =
     this->node->Advertise<msgs::LaserScanStamped>(this->Topic(), 50);
@@ -380,7 +381,7 @@ bool GpuRaySensor::NeedsUpdate()
       simTime = this->scene->SimTime().Double();
     else
       simTime = this->world->SimTime().Double();
- 
+
     if (simTime < this->lastMeasurementTime.Double())
     {
       // Rendering sensors also set the lastMeasurementTime variable in Render()
@@ -390,9 +391,9 @@ bool GpuRaySensor::NeedsUpdate()
       this->ResetLastUpdateTime();
       return false;
     }
- 
+
     double dt = this->world->Physics()->GetMaxStepSize();
- 
+
     // If next rendering time is not set yet
     if (std::isnan(this->dataPtr->nextRenderingTime))
     {
@@ -408,10 +409,10 @@ bool GpuRaySensor::NeedsUpdate()
         return false;
       }
     }
- 
+
     if (simTime > this->dataPtr->nextRenderingTime + dt)
       return true;
- 
+
     // Trigger on the tick the closest from the targeted rendering time
     return (ignition::math::lessOrNearEqual(
           std::abs(simTime - this->dataPtr->nextRenderingTime), dt / 2.0));
