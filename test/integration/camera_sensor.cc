@@ -302,7 +302,7 @@ TEST_F(CameraSensor, CheckThrottle)
 }
 
 /////////////////////////////////////////////////
-TEST_F(CameraSensor, CheckThrottleStrictRate)
+TEST_F(CameraSensor, StrictUpdateRate)
 {
   // Load camera_strict_rate.world instead, and don't call SpawnCamera.
   // That allows us to secify the custom namespace in the world file instead
@@ -341,6 +341,8 @@ TEST_F(CameraSensor, CheckThrottleStrictRate)
 
   while (imageCount < totalImages)
   {
+    // An approximation of when we receive the first image. In reality one
+    // iteration before we receive the second image.
     if (imageCount == 0)
     {
       simT0 = world->SimTime().Double();
