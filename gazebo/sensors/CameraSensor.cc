@@ -494,4 +494,3 @@ void CameraSensor::ResetLastUpdateTime()
   if (this->useStrictRate)
     this->dataPtr->nextRenderingTime = std::numeric_limits<double>::quiet_NaN();
 }
-
