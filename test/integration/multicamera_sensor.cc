@@ -569,11 +569,9 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
 }
 
 /////////////////////////////////////////////////
-// TODO(mabelzhang): adapt to MultiCameraSensor. Create SDF file.
-/*
-TEST_F(MultiCameraSensorTest, StrictUpdateRate)
+TEST_F(MultiCameraSensor, StrictUpdateRate)
 {
-  Load("worlds/multi_camera_strict_rate.world");
+  Load("worlds/multicamera_strict_rate_test.world");
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -583,36 +581,55 @@ TEST_F(MultiCameraSensorTest, StrictUpdateRate)
     return;
   }
 
-  std::string sensorName = "multi_camera_sensor";
+  std::string sensorName = "multicamera_sensor";
   sensors::SensorPtr sensor = sensors::get_sensor(sensorName);
-  sensors::MultiCameraSensorPtr raySensor =
+  sensors::MultiCameraSensorPtr multiCamSensor =
     std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
-  EXPECT_TRUE(raySensor != nullptr);
-  raySensor->SetActive(true);
+  EXPECT_TRUE(multiCamSensor != nullptr);
+  multiCamSensor->SetActive(true);
 
-  float *scan = new float[raySensor->RangeCount()
-      * raySensor->VerticalRangeCount() * 3];
-  int scanCount = 0;
-  event::ConnectionPtr c =
-    raySensor->ConnectNewLaserFrame(
-        std::bind(&::OnNewLaserFrame, &scanCount, scan,
+  // 3 cameras
+  EXPECT_TRUE(multiCamSensor->CameraCount() == 3u);
+  int imageCount0 = 0;
+  unsigned char* img0 = new unsigned char[
+      multiCamSensor->ImageWidth(0) * multiCamSensor->ImageHeight(0) * 3];
+  event::ConnectionPtr c0 = multiCamSensor->Camera(0)->ConnectNewImageFrame(
+        std::bind(&::OnNewFrameTest, &imageCount0, img0,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
 
-  // wait for a few laser scans
+  int imageCount1 = 0;
+  unsigned char* img1 = new unsigned char[
+      multiCamSensor->ImageWidth(1) * multiCamSensor->ImageHeight(1) * 3];
+  event::ConnectionPtr c1 = multiCamSensor->Camera(1)->ConnectNewImageFrame(
+        std::bind(&::OnNewFrameTest, &imageCount1, img1,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  int imageCount2 = 0;
+  unsigned char* img2 = new unsigned char[
+      multiCamSensor->ImageWidth(2) * multiCamSensor->ImageHeight(2) * 3];
+  event::ConnectionPtr c2 = multiCamSensor->Camera(2)->ConnectNewImageFrame(
+        std::bind(&::OnNewFrameTest, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
   common::Timer timer;
   timer.Start();
 
-  // how many scans produced for 5 seconds (in simulated clock domain)
-  double updateRate = raySensor->UpdateRate();
-  int totalScans = 5 * updateRate;
+  // how many images produced for 5 seconds (in simulated clock domain)
+  double updateRate = multiCamSensor->UpdateRate();
+  int totalImagesPerCam = 5 * updateRate;
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
   double simT0 = 0.0;
 
-  while (scanCount < totalScans)
+  while (imageCount0 < totalImagesPerCam || imageCount1 < totalImagesPerCam ||
+      imageCount2 < totalImagesPerCam)
   {
-    if (scanCount == 0)
+    // An approximation of when we receive the first image. In reality one
+    // iteration before we receive the second image.
+    if (imageCount0 == 0)
     {
       simT0 = world->SimTime().Double();
     }
@@ -621,17 +638,19 @@ TEST_F(MultiCameraSensorTest, StrictUpdateRate)
 
   // check that the obtained rate is the one expected
   double dt = world->SimTime().Double() - simT0;
-  double rate = static_cast<double>(totalScans) / dt;
+  double rate = static_cast<double>(totalImagesPerCam) / dt;
   gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
   const double tolerance = 0.02;
   EXPECT_GT(rate, updateRate * (1 - tolerance));
   EXPECT_LT(rate, updateRate * (1 + tolerance));
 
-  c.reset();
-
-  delete [] scan;
+  c0.reset();
+  c1.reset();
+  c2.reset();
+  delete [] img0;
+  delete [] img1;
+  delete [] img2;
 }
-*/
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
