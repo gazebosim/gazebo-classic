@@ -1,9 +1,18 @@
 ## Gazebo 9
 
+## Gazebo 9.xx.x (202x-xx-xx)
+
+1. LensFlare: initialize OGRE compositors during plugin initialization
+    * [Pull request #2762](https://github.com/osrf/gazebo/pull/2762)
+
+1. Fixes for ARM: FindSSE, TrackedVehiclePlugin and PluginInterfaceTest
+    * [Pull request #2754](https://github.com/osrf/gazebo/pull/2754)
+    * [Pull request #2748](https://github.com/osrf/gazebo/pull/2748)
+
 ## Gazebo 9.13.1 (2020-05-28)
 
 1. Fix multiple reflectance maps and improve performance
-    * [Pull request #2724](https://github.com/osrf/gazebo/pull/2742)
+    * [Pull request #2742](https://github.com/osrf/gazebo/pull/2742)
 
 ## Gazebo 9.13.0 (2020-04-03)
 
