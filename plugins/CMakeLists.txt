@@ -165,7 +165,7 @@ set (DARTplugins
   GravityCompensationPlugin
 )
 
-add_library(TrackedVehiclePlugin STATIC TrackedVehiclePlugin.cc)
+add_library(TrackedVehiclePlugin SHARED TrackedVehiclePlugin.cc)
 target_link_libraries(TrackedVehiclePlugin
         libgazebo
         ${ogre_libraries}

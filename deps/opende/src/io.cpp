@@ -31,7 +31,7 @@ reference:
 #include <string>
 #include <string.h>
 #include <stdlib.h>
-#include "io.h"
+#include "internal_io.h"
 #include "ioh5.h"
 #include "objects.h"
 #include "joints/joint.h"
