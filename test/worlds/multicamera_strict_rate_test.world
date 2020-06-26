@@ -28,7 +28,7 @@
           </geometry>
         </visual>
 
-        <sensor name="multicamera_sensor" type="multicamera" xmlns:strict_rate="placeholder">
+        <sensor name="multicamera_sensor" type="multicamera" xmlns:strict_rate="https://github.com/osrf/gazebo/issues/2736">
           <!-- We choose a high fps on purpose. The goal is to check the effect
             of the flag "strict_rate". -->
           <update_rate>500</update_rate>

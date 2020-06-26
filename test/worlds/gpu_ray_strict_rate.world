@@ -22,7 +22,7 @@
             </mesh>
           </geometry>
         </visual>
-        <sensor name="gpu_ray_sensor" type="gpu_ray" xmlns:strict_rate="placeholder">
+        <sensor name="gpu_ray_sensor" type="gpu_ray" xmlns:strict_rate="https://github.com/osrf/gazebo/issues/2736">
           <pose>0.1 0 0.0175 0 -0 0</pose>
           <ray>
             <scan>

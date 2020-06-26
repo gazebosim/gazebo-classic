@@ -9,7 +9,7 @@
     <model name="logical_camera_model">
       <pose>0 0 1 0 0 0</pose>
       <link name="link">
-        <sensor name="logical_camera_sensor" type="logical_camera" xmlns:strict_rate="placeholder">
+        <sensor name="logical_camera_sensor" type="logical_camera" xmlns:strict_rate="https://github.com/osrf/gazebo/issues/2736">
           <pose>0 0 1 0 0 0</pose>
           <logical_camera>
             <near>0.55</near>
