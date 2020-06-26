@@ -15,6 +15,8 @@
  *
  */
 
+#include <array>
+
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/SystemPaths.hh"
 
@@ -71,61 +73,111 @@ void GuiSpawnedNestedURDFTest::SpawnNestedURDF()
 
   // Get the items in the list
   auto tree = insertModelWidget->findChildren<QTreeWidget *>();
-  QVERIFY(tree.size() == 1u);
-  auto modelItem = tree[0]->findItems(QString("model_sdf_1_6"),
-      Qt::MatchContains | Qt::MatchRecursive);
-  QVERIFY(modelItem.size() > 0);
 
-  // Trigger signal as if item was clicked
-  QMetaObject::invokeMethod(tree[0], "itemClicked", Q_ARG(QTreeWidgetItem *,
-      modelItem[0]), Q_ARG(int, 0));
+  std::array modelNames{"model_urdf", "model_sdf_1_6", "model_sdf_1_7"};
+  for (std::size_t i = 0; i < modelNames.size(); ++i)
+  {
+    std::string modelName = modelNames[i];
+    QVERIFY(tree.size() == 1u);
+    auto modelItem = tree[0]->findItems(QString::fromStdString(modelName),
+        Qt::MatchContains | Qt::MatchRecursive);
+    QVERIFY(modelItem.size() > 0);
 
-  QTest::mouseMove(glWidget, QPoint(-mainWindow->width() * 0.5,
-                                    -mainWindow->height() * 0.5));
-  this->ProcessEventsAndDraw(mainWindow);
-  const std::string modelName = "model_sdf_1_6";
-  const std::string baseLinkName = "model_urdf::base_link";
-  const std::string link1Name = "model_urdf::link_1";
+    QPoint mousePos(glWidget->width() * 0.25 * (1 + i),
+                    glWidget->height() * 0.5);
 
-  // Check visual shows the links in the right positions
-  auto modelVis = scene->GetVisual(modelName);
-  QVERIFY(modelVis != nullptr);
+    // Trigger signal as if item was clicked
+    QMetaObject::invokeMethod(tree[0], "itemClicked", Q_ARG(QTreeWidgetItem *,
+          modelItem[0]), Q_ARG(int, 0));
 
-  auto baseLinkVis = scene->GetVisual(modelName + "::" + baseLinkName);
-  QVERIFY(baseLinkVis != nullptr);
+    QTest::mouseMove(glWidget, mousePos);
+    this->ProcessEventsAndDraw(mainWindow);
 
-  auto link1Vis = scene->GetVisual(modelName + "::" + link1Name);
-  QVERIFY(link1Vis != nullptr);
+    std::string modelNamePrefix = "model_urdf::";
+    if (modelName == "model_urdf")
+      modelNamePrefix = "";
 
-  QCOMPARE(ignition::math::Pose3d(0, 0, 0.1, 0, 0, 0), baseLinkVis->WorldPose());
-  QCOMPARE(ignition::math::Pose3d(0, 0, 1.1, 0, 0, 0), link1Vis->WorldPose());
+    const std::string baseLinkName = modelNamePrefix + "base_link";
+    const std::string link1Name = modelNamePrefix + "link_1";
 
-  // Press the mouse in the scene to finish inserting a model
-  QTest::mouseRelease(
-      glWidget, Qt::LeftButton, 0,
-      QPoint(-mainWindow->width() * 0.5, -mainWindow->height() * 0.5));
+    // Check visual shows the links in the right positions
+    auto modelVis = scene->GetVisual(modelName);
+    QVERIFY(modelVis != nullptr);
 
-  this->ProcessEventsAndDraw(mainWindow);
+    auto baseLinkVis = scene->GetVisual(modelName + "::" + baseLinkName);
+    QVERIFY(baseLinkVis != nullptr);
 
-  baseLinkVis = scene->GetVisual(modelName + "::" + baseLinkName);
-  QVERIFY(baseLinkVis != nullptr);
+    auto link1Vis = scene->GetVisual(modelName + "::" + link1Name);
+    QVERIFY(link1Vis != nullptr);
 
-  link1Vis = scene->GetVisual(modelName + "::" + link1Name);
-  QVERIFY(link1Vis != nullptr);
-  // Check that after insertion that the link poses are still as expected
-  QCOMPARE(ignition::math::Pose3d(0, 0, 0.1, 0, 0, 0), baseLinkVis->WorldPose());
-  QCOMPARE(ignition::math::Pose3d(0, 0, 1.1, 0, 0, 0), link1Vis->WorldPose());
+    if (modelName == "model_urdf")
+    {
+      // There is no offset of 0.1 when spawning model_urdf directly
+      QVERIFY(std::fabs(0.0 - baseLinkVis->WorldPose().Pos().Z()) < 1e-5);
+      QVERIFY(std::fabs(1.0 - link1Vis->WorldPose().Pos().Z()) < 1e-5);
+    }
+    else
+    {
+      QVERIFY(std::fabs(0.1 - baseLinkVis->WorldPose().Pos().Z()) < 1e-5);
+      QVERIFY(std::fabs(1.1 - link1Vis->WorldPose().Pos().Z()) < 1e-5);
+    }
+    // Press the mouse in the scene to finish inserting a model
+    QTest::mouseRelease(glWidget, Qt::LeftButton, 0, mousePos);
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    baseLinkVis = scene->GetVisual(modelName + "::" + baseLinkName);
+    QVERIFY(baseLinkVis != nullptr);
+
+    link1Vis = scene->GetVisual(modelName + "::" + link1Name);
+    QVERIFY(link1Vis != nullptr);
+    // Check that after insertion that the link poses are still as expected
+    if (modelName == "model_urdf")
+    {
+      // There is no offset of 0.1 when spawning model_urdf directly
+      QVERIFY(std::fabs(baseLinkVis->WorldPose().Pos().Z()) < 1e-5);
+      QVERIFY(std::fabs(1.0 - link1Vis->WorldPose().Pos().Z()) < 1e-5);
+    }
+    else
+    {
+      QVERIFY(std::fabs(0.1 - baseLinkVis->WorldPose().Pos().Z()) < 1e-5);
+      QVERIFY(std::fabs(1.1 - link1Vis->WorldPose().Pos().Z()) < 1e-5);
+    }
+  }
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
   QVERIFY(world != NULL);
-
   world->SetPaused(false);
 
   this->ProcessEventsAndDraw(mainWindow, 30);
   // Check that after insertion that the link poses are still as expected
-  QVERIFY(std::fabs(baseLinkVis->WorldPose().Pos().Z()) < 1e-5);
-  QVERIFY(std::fabs(1.0 - link1Vis->WorldPose().Pos().Z()) < 1e-5);
+  // We have to find the links again because a new set of Visuals will have been
+  // created
+  for (std::size_t i = 0; i < modelNames.size(); ++i)
+  {
+    std::string modelName = modelNames[i];
+
+    std::string modelNamePrefix = "model_urdf::";
+    if (modelName == "model_urdf")
+      modelNamePrefix = "";
+
+    const std::string baseLinkName = modelNamePrefix + "base_link";
+    const std::string link1Name = modelNamePrefix + "link_1";
+
+    // Check visual shows the links in the right positions
+    auto modelVis = scene->GetVisual(modelName);
+    QVERIFY(modelVis != nullptr);
+
+    auto baseLinkVis = scene->GetVisual(modelName + "::" + baseLinkName);
+    QVERIFY(baseLinkVis != nullptr);
+
+    auto link1Vis = scene->GetVisual(modelName + "::" + link1Name);
+    QVERIFY(link1Vis != nullptr);
+
+    QVERIFY(std::fabs(baseLinkVis->WorldPose().Pos().Z()) < 1e-5);
+    QVERIFY(std::fabs(1.0 - link1Vis->WorldPose().Pos().Z()) < 1e-5);
+  }
 
   mainWindow->close();
   delete mainWindow;

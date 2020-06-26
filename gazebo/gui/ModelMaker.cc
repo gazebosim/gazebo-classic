@@ -120,9 +120,8 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
   }
 
   // Since the above didn't fail, we assume the file exists
-  // Use the FilePath() instead of _filename because _filename might be a model
-  // directory
-  std::ifstream inputFile(this->dataPtr->modelSDF->FilePath());
+  // We also assume that _filename is a path to a file, not to a model directory
+  std::ifstream inputFile(_filename);
   this->dataPtr->modelSDFString =
       std::string(std::istreambuf_iterator<char>(inputFile),
                   std::istreambuf_iterator<char>());

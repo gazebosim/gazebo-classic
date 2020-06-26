@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- This assumes that the 'test/models' directory has been added to GAZEBO_MODEL_PATH -->
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <!-- The included model is specified in URDF -->
+    <include>
+        <uri>model://model_urdf</uri>
+        <!-- A z axis offset of 0.1 is added in the other models. Since we are-->
+        <!-- including the URDF directly here, we also add the offset here-->
+        <pose>0.0 0.0 0.1 0.0 0 0.0</pose>
+    </include>
+    <!-- The included model is an SDF 1.6 model that itself includes a URDF model-->
+    <include>
+        <uri>model://model_sdf_1_6</uri>
+        <pose>5.0 0.0 0.0 0.0 0 0.0</pose>
+    </include>
+
+    <!-- The included model is an SDF 1.7 model that itself includes a URDF model-->
+    <include>
+        <uri>model://model_sdf_1_7</uri>
+        <pose>10.0 0.0 0.0 0.0 0 0.0</pose>
+    </include>
+  </world>
+</sdf>
+

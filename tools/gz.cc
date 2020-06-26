@@ -483,9 +483,9 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    // Use the FilePath() instead of filename because filename might be a
-    // model rectory
-    std::ifstream sdfFile(sdf->FilePath());
+    // Use sdf::getModelFilePath() instead of filename because filename
+    // might be a model rectory
+    std::ifstream sdfFile(sdf::getModelFilePath(filename));
 
     // Using const std::string sdfString(arg, arg) confuses the compiler, so use
     // move assignment
