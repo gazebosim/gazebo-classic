@@ -36,9 +36,8 @@ class GuiSpawnedNestedURDFTest: public QTestFixture
 {
   Q_OBJECT
 
- private slots: void SpawnNestedURDF();
+  private slots: void SpawnNestedURDF();
 };
-
 
 /////////////////////////////////////////////////
 void GuiSpawnedNestedURDFTest::SpawnNestedURDF()
