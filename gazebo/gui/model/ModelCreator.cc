@@ -21,6 +21,7 @@
 
 #include <sdf/sdf.hh>
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/MouseEvent.hh"
@@ -1852,6 +1853,8 @@ void ModelCreator::CreateTheEntity()
     }
     modelElem->GetAttribute("name")->Set(modelElemName);
   }
+
+  common::convertToFullPaths(modelElem);
 
   msg.set_sdf(this->dataPtr->modelSDF->ToString());
   msgs::Set(msg.mutable_pose(), this->dataPtr->modelPose);

@@ -1147,6 +1147,42 @@ TEST_F(FactoryTest, FilenameModelDatabase)
 }
 
 //////////////////////////////////////////////////
+TEST_F(FactoryTest, FilenameModelDatabaseRelativePaths)
+{
+  this->Load("worlds/empty.world", true);
+
+  // Test database
+  common::SystemPaths::Instance()->AddModelPaths(
+    PROJECT_SOURCE_PATH "/test/models/testdb");
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Publish factory msg
+  msgs::Factory msg;
+  msg.set_sdf_filename("model://cococan_relative_paths");
+
+  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  pub->Publish(msg);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("cococan") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  auto model = world->ModelByName("cococan");
+  ASSERT_NE(nullptr, model);
+
+  auto link = model->LinkByName("link");
+  ASSERT_NE(nullptr, link);
+}
+
+//////////////////////////////////////////////////
 #ifdef HAVE_IGNITION_FUEL_TOOLS
 TEST_F(FactoryTest, FilenameFuelURL)
 {

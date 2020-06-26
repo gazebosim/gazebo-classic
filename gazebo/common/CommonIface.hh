@@ -31,6 +31,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include <sdf/Element.hh>
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -181,6 +183,25 @@ namespace gazebo
     GZ_COMMON_VISIBLE
     std::string unique_file_path(const std::string &_pathAndName,
                                  const std::string &_extension);
+
+    /// \brief Combine a URI and a file path into a full path.
+    /// If the URI is already a full path or contains a scheme, it won't be
+    /// modified.
+    /// If the URI is a relative path, the file path will be prepended.
+    /// \param[in] _uri URI, which can have a scheme, or be full or relative
+    /// paths.
+    /// \param[in] _filePath The path to a file in disk.
+    /// \return The full path URI.
+    GZ_COMMON_VISIBLE
+    std::string asFullPath(const std::string &_uri,
+        const std::string &_filePath);
+
+    /// \brief Convert all the URIs nested inside the given element to
+    /// full paths based on the SDF element's file path.
+    /// \sa asFullPath
+    /// \param[in, out] _elem Element that will have its paths converted.
+    GZ_COMMON_VISIBLE
+    void convertToFullPaths(const sdf::ElementPtr &_elem);
     /// \}
   }
 

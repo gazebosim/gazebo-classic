@@ -873,7 +873,8 @@ namespace gazebo
         msgs::Set(result.mutable_scale(),
             _sdf->Get<ignition::math::Vector3d>("scale"));
 
-        result.set_filename(_sdf->Get<std::string>("uri"));
+        result.set_filename(common::asFullPath(_sdf->Get<std::string>("uri"),
+            _sdf->FilePath()));
 
         if (_sdf->HasElement("submesh"))
         {
