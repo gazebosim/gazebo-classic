@@ -76,6 +76,12 @@ namespace gazebo
       public: virtual void notifyMaterialRender(unsigned int _passId,
                                                 Ogre::MaterialPtr &_mat)
       {
+        if (!this->light)
+        {
+          // return if this->light is not set, we may still be initializing
+          return;
+        }
+
         GZ_ASSERT(!_mat.isNull(), "Null OGRE material");
         // These calls are setting parameters that are declared in two places:
         // 1. media/materials/scripts/gazebo.material, in
@@ -96,12 +102,6 @@ namespace gazebo
         params->setNamedConstant("viewport",
             Ogre::Vector3(static_cast<double>(this->camera->ViewportWidth()),
             static_cast<double>(this->camera->ViewportHeight()), 1.0));
-
-        if (!this->light)
-        {
-          // return if this->light is not set, we may still be initializing
-          return;
-        }
 
         // use light's world position for lens flare position
         if (this->light->Type() == "directional")
@@ -472,10 +472,8 @@ void LensFlare::Update()
 
   this->dataPtr->lightName = directionalLight->Name();
 
-  {
-    this->dataPtr->lensFlareCompositorListener->SetLight(directionalLight);
-    this->dataPtr->lensFlareInstance->setEnabled(true);
-  }
+  this->dataPtr->lensFlareCompositorListener->SetLight(directionalLight);
+  this->dataPtr->lensFlareInstance->setEnabled(true);
 
   // disconnect
   this->dataPtr->preRenderConnection.reset();
