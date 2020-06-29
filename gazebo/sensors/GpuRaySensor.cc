@@ -690,7 +690,7 @@ void GpuRaySensor::Render()
   {
     if (!this->dataPtr->renderNeeded)
       return;
- 
+
     this->dataPtr->laserCam->Render();
     this->dataPtr->rendered = true;
     this->dataPtr->renderNeeded = false;
@@ -699,9 +699,9 @@ void GpuRaySensor::Render()
   {
     if (!this->dataPtr->laserCam || !this->IsActive() || !this->NeedsUpdate())
       return;
- 
+
     this->lastMeasurementTime = this->scene->SimTime();
- 
+
     this->dataPtr->laserCam->Render();
     this->dataPtr->rendered = true;
   }

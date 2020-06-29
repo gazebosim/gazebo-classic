@@ -581,7 +581,8 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "<pose>" << _pos << " " << _rpy << "</pose>"
     << "<link name ='body'>"
     << "  <sensor name ='" << _cameraName
-    << "' type ='camera' xmlns:strict_rate='https://github.com/osrf/gazebo/issues/2736'>"
+    << "' type ='camera' "
+    << "xmlns:strict_rate='https://github.com/osrf/gazebo/issues/2736'>"
     << "    <always_on>1</always_on>"
     << "    <update_rate>" << _rate << "</update_rate>"
     << "    <strict_rate:value>" << _strictRate << "</strict_rate:value>"

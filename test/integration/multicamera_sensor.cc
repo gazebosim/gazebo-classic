@@ -589,7 +589,7 @@ TEST_F(MultiCameraSensor, StrictUpdateRate)
   multiCamSensor->SetActive(true);
 
   // 3 cameras
-  EXPECT_TRUE(multiCamSensor->CameraCount() == 3u);
+  EXPECT_EQ(multiCamSensor->CameraCount(), 3u);
   int imageCount0 = 0;
   unsigned char* img0 = new unsigned char[
       multiCamSensor->ImageWidth(0) * multiCamSensor->ImageHeight(0) * 3];

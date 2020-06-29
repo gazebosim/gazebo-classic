@@ -255,10 +255,10 @@ void Sensor::Update(const bool _force)
         if (simTime <= this->lastUpdateTime && !_force)
           return;
 
-        // Adjust time-to-update period to compensate for delays caused by another
-        // sensor's update in the same thread.
-        // NOTE: If you change this equation, also change the matching equation in
-        // Sensor::NeedsUpdate
+        // Adjust time-to-update period to compensate for delays caused by
+        // another sensor's update in the same thread.
+        // NOTE: If you change this equation, also change the matching equation
+        // in Sensor::NeedsUpdate
         common::Time adjustedElapsed = simTime -
           this->lastUpdateTime + this->dataPtr->updateDelay;
 
