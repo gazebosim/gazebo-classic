@@ -24,6 +24,8 @@
 
 using namespace gazebo;
 
+bool g_lockstep = false;
+
 //////////////////////////////////////////////////
 bool rendering::load()
 {
@@ -133,4 +135,16 @@ void rendering::update_scene_poses(const std::string &_name,
   {
     scene->UpdatePoses(_msg);
   }
+}
+
+//////////////////////////////////////////////////
+void rendering::set_lockstep_enabled(bool _enable)
+{
+  g_lockstep = _enable;
+}
+
+//////////////////////////////////////////////////
+bool rendering::lockstep_enabled()
+{
+  return g_lockstep;
 }

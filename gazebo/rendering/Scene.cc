@@ -62,6 +62,7 @@
 #include "gazebo/rendering/TransmitterVisual.hh"
 #include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/RayQuery.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
 #include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
@@ -157,14 +158,13 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       &Scene::OnLightModifyMsg, this);
 
   this->dataPtr->isServer = _isServer;
-  /*
-  if (_isServer)
+
+  if (_isServer && !rendering::lockstep_enabled())
   {
     this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/local/info",
         &Scene::OnPoseMsg, this);
   }
   else
-  */
   // When ready to use the direct API for updating scene poses from server,
   // uncomment the following line and delete the if and else directly above
   if (!_isServer)

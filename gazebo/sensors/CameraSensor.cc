@@ -67,6 +67,7 @@ CameraSensor::~CameraSensor()
 void CameraSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
+  this->useStrictRate = this->useStrictRate && rendering::lockstep_enabled();
   // strict_rate parameter is parsed in Sensor::Load()
   if (this->useStrictRate)
   {
