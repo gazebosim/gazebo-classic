@@ -793,9 +793,14 @@ void Visual::SetScale(const math::Vector3 &_scale)
 
   this->dataPtr->scale = _scale.Ign();
 
-  this->dataPtr->sceneNode->setScale(
-      Conversions::Convert(math::Vector3(this->dataPtr->scale)));
-
+  if (!isnan(this->dataPtr->scale.X()) && !isnan(this->dataPtr->scale.Y())
+      && !isnan(this->dataPtr->scale.Z()))
+  {
+    this->dataPtr->sceneNode->setScale(
+        Conversions::Convert(this->dataPtr->scale));
+  } else {
+    gzerr << Name() << " Scale contains NaNs. Collisions may not visualize properly." << std::endl;
+  }
   // Scale selection object in case we have one attached. Other children were
   // scaled from UpdateGeomSize
   for (auto child : this->dataPtr->children)
