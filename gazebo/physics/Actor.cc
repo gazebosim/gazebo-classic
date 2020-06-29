@@ -48,6 +48,12 @@ class gazebo::physics::ActorPrivate
   /// \brief Rotations to align BVH skeleton to DAE skin
   public: std::map<std::string, ignition::math::Matrix4d>
       rotationAligner;
+
+  /// \brief Last animated frame
+  public: std::map<std::string, ignition::math::Matrix4d> lastFrame;
+
+  /// \brief Last map associating skeleton nodes from skin and animation
+  public: std::map<std::string, std::string> lastSkelMap;
 };
 
 using namespace gazebo;
@@ -667,13 +673,16 @@ bool Actor::IsActive() const
 ///////////////////////////////////////////////////
 void Actor::Update()
 {
+  common::Time currentTime = this->world->SimTime();
   if (!this->active)
+  {
+    this->SetPose(this->dataPtr->lastFrame, this->dataPtr->lastSkelMap,
+                  currentTime.Double());
     return;
+  }
 
   if (this->skelAnimation.empty() && this->trajectories.empty())
     return;
-
-  common::Time currentTime = this->world->SimTime();
 
   // do not refresh animation faster than 30 Hz sim time
   if ((currentTime - this->prevFrameTime).Double() < (1.0 / 30.0))
@@ -688,12 +697,17 @@ void Actor::Update()
 
     // waiting for delayed start
     if (this->scriptTime < 0)
+    {
+      this->SetPose(this->dataPtr->lastFrame, this->dataPtr->lastSkelMap,
+                    currentTime.Double());
       return;
+    }
 
     if (this->scriptTime >= this->scriptLength)
     {
       if (!this->loop)
       {
+        this->active = false;
         return;
       }
       else
@@ -720,7 +734,6 @@ void Actor::Update()
           << std::endl;
       return;
     }
-
     this->scriptTime = this->scriptTime - tinfo->startTime;
   }
   else
@@ -840,6 +853,9 @@ void Actor::Update()
   rootM.SetTranslation(rootM.Translation() * this->skinScale);
 
   frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
+
+  this->dataPtr->lastFrame = frame;
+  this->dataPtr->lastSkelMap = skelMap;
 
   this->SetPose(frame, skelMap, currentTime.Double());
 }
