@@ -483,9 +483,20 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    // Use sdf::getModelFilePath() instead of filename because filename
-    // might be a model rectory
-    std::ifstream sdfFile(sdf::getModelFilePath(filename));
+    std::string resolvedFileName = filename;
+    if (common::isDirectory(filename))
+    {
+      // Use sdf::getModelFilePath() instead of filename because filename
+      // might be a model rectory
+      resolvedFileName = sdf::getModelFilePath(filename);
+      if (resolvedFileName.empty())
+      {
+        std::cerr
+            << "The provided file is a directory, but a model could not found"
+            << std::endl;
+      }
+    }
+    std::ifstream sdfFile(resolvedFileName);
 
     // Using const std::string sdfString(arg, arg) confuses the compiler, so use
     // move assignment
@@ -565,10 +576,47 @@ bool ModelCommand::ProcessSpawn(const std::string &_sdfString,
   transport::PublisherPtr pub = _node->Advertise<msgs::Factory>("~/factory");
   pub->WaitForConnection();
 
+  // To set the name of the model, we have to parse the file, set the name and
+  // reserialize to SDFormat. However, loading it using libsdformat will result
+  // in upconversion, which we would like to avoid because the resulting
+  // document will lose its OriginalVersion attribute.
+
+  TiXmlDocument doc;
+  doc.Parse(_sdfString.c_str());
+  auto *root = doc.RootElement();
+  if (nullptr == root)
+  {
+    std::cerr << "Invalid XML file" << std::endl;
+    std::cout << _sdfString << std::endl;
+    return false;
+  }
+
+  // Handle SDFormat and URDF separately
+  if (root->ValueStr() == "sdf")
+  {
+    auto *model = root->FirstChildElement("model");
+    if (nullptr != model)
+    {
+      model->SetAttribute("name", _name);
+    }
+    else
+    {
+      std::cerr << "Could not find <model> tag in SDFormat file" << std::endl;
+    }
+  }
+  else if (root->ValueStr() == "robot")
+  {
+    root->SetAttribute("name", _name);
+  }
+  else
+  {
+    std::cerr << "Unknown file format" << std::endl;
+  }
+
+  TiXmlPrinter printer;
+  doc.Accept(&printer);
   msgs::Factory msg;
-  // Set the model name
-  msg.set_new_name(_name);
-  msg.set_sdf(_sdfString);
+  msg.set_sdf(printer.Str());
   msgs::Set(msg.mutable_pose(), _pose);
   pub->Publish(msg, true);
 

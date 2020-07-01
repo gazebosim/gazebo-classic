@@ -2173,11 +2173,6 @@ void World::ProcessFactoryMsgs()
         elem->GetElement("pose")->Set(msgs::ConvertIgn(factoryMsg.pose()));
       }
 
-      if (factoryMsg.has_new_name())
-      {
-        elem->GetAttribute("name")->Set(factoryMsg.new_name());
-      }
-
       if (isActor)
       {
         ActorPtr actor = this->LoadActor(elem, this->dataPtr->rootElement);
