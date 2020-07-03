@@ -260,7 +260,7 @@ filter_valid_compiler_flags(${WARN_LEVEL}
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
 if (UNIX AND NOT APPLE)
-  filter_valid_compiler_flags(-fvisibility=hidden -fvisibility-inlines-hidden)
+  filter_valid_compiler_flags(-fvisibility-inlines-hidden)
 endif()
 
 if (MSVC)

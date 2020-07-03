@@ -1,0 +1,474 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <model name="sphere">
+      <pose>2 0 0 0 0 0</pose>
+      <link name="body">
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="geom">
+          <geometry>
+            <sphere>
+              <radius>1</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <static>true</static>
+    </model>
+    <model name="camera_model">
+      <pose>0 0 0 0 0 0</pose>
+      <link name="my_link">
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <sensor name="camera" type="depth">
+          <camera>
+            <horizontal_fov>1.04719755</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>20</far>
+            </clip>
+          </camera>
+          <plugin filename="libDepthCameraPlugin.so" name="depth_camera_plugin" />
+          <always_on>true</always_on>
+          <update_rate>10</update_rate>
+        </sensor>
+      </link>
+      <static>true</static>
+    </model>
+    <model name="camera_model1">
+      <pose>0 1 0 0 0 0</pose>
+      <link name="my_link1">
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <sensor name="camera" type="wideanglecamera">
+          <camera>
+            <horizontal_fov>1.047</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>240</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+            <lens>
+              <type>gnomonical</type>
+              <scale_to_hfov>true</scale_to_hfov>
+              <cutoff_angle>1.5707</cutoff_angle>
+              <env_texture_size>512</env_texture_size>
+            </lens>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
+          <plugin name="lensflare" filename="libLensFlareSensorPlugin.so"/>
+        </sensor>
+      </link>
+      <static>true</static>
+    </model>
+    <model name="camera_model2">
+      <pose>1 0 0 0 0 0</pose>
+      <link name="my_link2">
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <sensor name="camera2" type="camera">
+          <camera>
+            <horizontal_fov>1.04719755</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>20</far>
+            </clip>
+          </camera>
+          <plugin filename="libCameraPlugin.so" name="camera_plugin" />
+          <always_on>true</always_on>
+          <update_rate>10</update_rate>
+        </sensor>
+      </link>
+      <static>true</static>
+    </model>
+    <model name="model_1">
+      <static>true</static>
+      <pose>0 0 0.035 0. 0 0</pose>
+      <link name="link_1">
+        <inertial>
+          <mass>0.1</mass>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://hokuyo/meshes/hokuyo.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="collision-base">
+          <pose>0 0 -0.0145 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.041</size>
+            </box>
+          </geometry>
+        </collision>
+        <collision name="collision-top">
+          <pose>0 0 0.0205 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.021</radius>
+              <length>0.029</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <sensor name='gps' type='gps'>
+          <always_on>1</always_on>
+          <update_rate>10.000000</update_rate>
+          <gps>
+            <position_sensing>
+              <horizontal>
+                <noise type='gaussian_quantized'>
+                  <mean>0</mean>
+                  <stddev>1</stddev>
+                  <bias_mean>3</bias_mean>
+                  <bias_stddev>1</bias_stddev>
+                  <precision>0.5</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise type='gaussian_quantized'>
+                  <mean>0</mean>
+                  <stddev>1</stddev>
+                  <bias_mean>3</bias_mean>
+                  <bias_stddev>1</bias_stddev>
+                  <precision>1.0</precision>
+                </noise>
+              </vertical>
+            </position_sensing>
+            <velocity_sensing>
+              <horizontal>
+                <noise type='gaussian_quantized'>
+                  <mean>0</mean>
+                  <stddev>0.1</stddev>
+                  <bias_mean>0.1</bias_mean>
+                  <bias_stddev>0.1</bias_stddev>
+                  <precision>0.1</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise type='gaussian_quantized'>
+                  <mean>0</mean>
+                  <stddev>0.2</stddev>
+                  <bias_mean>0.2</bias_mean>
+                  <bias_stddev>0.2</bias_stddev>
+                  <precision>0.2</precision>
+                </noise>
+              </vertical>
+            </velocity_sensing>
+          </gps>
+        </sensor>
+        <sensor name="laser_sensor" type="gpu_ray">
+          <pose>0.1 0 0.0175 0 -0 0</pose>
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>640</samples>
+                <resolution>1</resolution>
+                <min_angle>-1.396263</min_angle>
+                <max_angle>1.396263</max_angle>
+              </horizontal>
+              <vertical>
+                <samples>1</samples>
+                <resolution>1</resolution>
+                <min_angle>0</min_angle>
+                <max_angle>0</max_angle>
+              </vertical>
+            </scan>
+            <range>
+              <min>0.08</min>
+              <max>10.0</max>
+              <resolution>0.01</resolution>
+            </range>
+          </ray>
+          <always_on>1</always_on>
+          <update_rate>100</update_rate>
+          <visualize>true</visualize>
+          <plugin filename="libGpuRayPlugin.so" name="gpuray_plugin" />
+        </sensor>
+        <sensor name="imu" type="imu">
+          <always_on>true</always_on>
+        </sensor>
+        <sensor name="magnetometer" type="magnetometer">
+          <always_on>1</always_on>
+          <update_rate>20.0</update_rate>
+          <magnetometer>
+          </magnetometer>
+        </sensor>
+        <sensor name='altimeter' type='altimeter'>
+          <always_on>1</always_on>
+          <update_rate>10.0</update_rate>
+          <altimeter>
+          </altimeter>
+        </sensor>
+        <sensor name='contact' type='contact'>
+          <always_on>1</always_on>
+          <update_rate>10.0</update_rate>
+          <altimeter>
+          </altimeter>
+        </sensor>
+        <sensor name='force_torque' type='force_torque'>
+          <update_rate>30</update_rate>
+          <always_on>true</always_on>
+        </sensor>
+      </link>
+    </model>
+
+
+        <actor name="actor1">
+          <pose>0 5 1.25 0 0 0</pose>
+          <skin>
+            <filename>walk.dae</filename>
+            <scale>1.0</scale>
+          </skin>
+          <animation name="walking">
+            <filename>walk.dae</filename>
+            <scale>1.000000</scale>
+            <interpolate_x>true</interpolate_x>
+          </animation>
+
+          <plugin name="actor1_plugin" filename="libActorPlugin.so">
+            <target>0 -5 1.2138</target>
+            <target_weight>1.15</target_weight>
+            <obstacle_weight>1.8</obstacle_weight>
+            <animation_factor>5.1</animation_factor>
+            <!-- Usage: Modify the set of models that the vector field should
+                 ignore when moving the actor -->
+            <ignore_obstacles>
+              <model>cafe</model>
+              <model>ground_plane</model>
+            </ignore_obstacles>
+          </plugin>
+        </actor>
+
+        <model name="test_vehicle">
+          <pose frame=''>2 2 0 0 0 0</pose>
+          <link name='base_link'>
+            <pose frame=''>0 0 0 0 0 0</pose>
+            <inertial>
+              <pose frame=''>0 0 0 0 0 0</pose>
+              <mass>2.0</mass>
+              <inertia>
+                <ixx>0.1</ixx>
+                <ixy>0</ixy>
+                <ixz>0</ixz>
+                <iyy>0.1</iyy>
+                <iyz>0</iyz>
+                <izz>0.1</izz>
+              </inertia>
+            </inertial>
+            <collision name='base_link_collision'>
+              <pose frame=''>0 0 0 0 0 0</pose>
+              <geometry>
+                <box>
+                  <size>0.5 0.5 0.2</size>
+                </box>
+              </geometry>
+            </collision>
+            <visual name='base_link_visual'>
+              <pose frame=''>0 0 0 0 0 0</pose>
+              <geometry>
+                <box>
+                  <size>0.5 0.5 0.2</size>
+                </box>
+              </geometry>
+            </visual>
+            <self_collide>0</self_collide>
+            <gravity>1</gravity>
+            <kinematic>0</kinematic>
+          </link>
+
+          <link name='left_track'>
+            <pose frame=''>0 0.55 0 1.5701 -0 0</pose>
+            <inertial>
+              <pose frame=''>0 0 0 0 -0 0</pose>
+              <mass>0.5</mass>
+              <inertia>
+                <ixx>0.001</ixx>
+                <ixy>0</ixy>
+                <ixz>0</ixz>
+                <iyy>0.0001</iyy>
+                <iyz>0</iyz>
+                <izz>0.001</izz>
+              </inertia>
+            </inertial>
+            <collision name='left_track_collision'>
+              <pose frame=''>0 0 0 0 0 0</pose>
+              <geometry>
+                <cylinder>
+                  <radius>0.5</radius>
+                  <length>0.1</length>
+                </cylinder>
+              </geometry>
+            </collision>
+            <visual name='left_track_visual'>
+              <pose frame=''>0 0 0 0 0 0</pose>
+              <geometry>
+                <cylinder>
+                  <radius>0.5</radius>
+                  <length>0.1</length>
+                </cylinder>
+              </geometry>
+            </visual>
+            <gravity>1</gravity>
+            <kinematic>0</kinematic>
+          </link>
+          <joint name='left_track_j' type='revolute'>
+            <child>left_track</child>
+            <parent>base_link</parent>
+            <axis>
+              <xyz>0 1 0</xyz>
+              <limit>
+              </limit>
+              <use_parent_model_frame>1</use_parent_model_frame>
+            </axis>
+          </joint>
+
+          <link name='right_track'>
+            <pose frame=''>0 -0.55 0 -1.5701 0 0</pose>
+            <inertial>
+              <pose frame=''>0 0 0 0 0 0</pose>
+              <mass>0.5</mass>
+              <inertia>
+                <ixx>0.001</ixx>
+                <ixy>0</ixy>
+                <ixz>0</ixz>
+                <iyy>0.0001</iyy>
+                <iyz>0</iyz>
+                <izz>0.001</izz>
+              </inertia>
+            </inertial>
+            <collision name='right_track_collision'>
+              <pose frame=''>0 0 0 0 0 0</pose>
+              <geometry>
+                <cylinder>
+                  <radius>0.5</radius>
+                  <length>0.1</length>
+                </cylinder>
+              </geometry>
+            </collision>
+            <visual name='right_track_visual'>
+              <pose frame=''>0 0 0 0 0 0</pose>
+              <geometry>
+                <cylinder>
+                  <radius>0.5</radius>
+                  <length>0.1</length>
+                </cylinder>
+              </geometry>
+            </visual>
+            <gravity>1</gravity>
+            <kinematic>0</kinematic>
+          </link>
+
+          <joint name='right_track_j' type='revolute'>
+            <child>right_track</child>
+            <parent>base_link</parent>
+            <axis>
+              <xyz>0 1 0</xyz>
+              <limit>
+              </limit>
+              <use_parent_model_frame>1</use_parent_model_frame>
+            </axis>
+          </joint>
+
+          <plugin filename="libDiffDrivePlugin.so" name="test_vehicle">
+            <body>base_link</body>
+            <left_joint>left_track_j</left_joint>
+            <right_joint>right_track_j</right_joint>
+          </plugin>
+
+          <plugin filename="libKeysToCmdVelPlugin.so" name="keyboard_control">
+            <cmd_vel_topic>~/test_vehicle/vel_cmd</cmd_vel_topic>
+            <linear_increment>0.25</linear_increment>
+            <angular_increment>0.2</angular_increment>
+          </plugin>
+        </model>
+  </world>
+</sdf>

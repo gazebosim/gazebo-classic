@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include "ignition/common/Profiler.hh"
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
@@ -225,6 +227,9 @@ bool Sensor::NeedsUpdate()
 //////////////////////////////////////////////////
 void Sensor::Update(const bool _force)
 {
+  // //IGN_PROFILE_THREAD_NAME("Sensor");
+  //IGN_PROFILE("Sensor");
+  //IGN_PROFILE_BEGIN("Sensor::Update");
   if (this->IsActive() || _force)
   {
     common::Time simTime;
@@ -267,6 +272,7 @@ void Sensor::Update(const bool _force)
       this->updated();
     }
   }
+  //IGN_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

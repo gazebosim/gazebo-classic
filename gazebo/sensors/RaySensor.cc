@@ -16,6 +16,8 @@
 */
 #include <boost/algorithm/string.hpp>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/MultiRayShape.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -342,6 +344,8 @@ int RaySensor::Fiducial(const unsigned int _index) const
 //////////////////////////////////////////////////
 bool RaySensor::UpdateImpl(const bool /*_force*/)
 {
+  IGN_PROFILE("RaySensor");
+  IGN_PROFILE_BEGIN("RaySensor::update");
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
   // need to move mutex lock after this? or make the OnNewLaserScan connection
@@ -496,9 +500,12 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
       scan->add_intensities(intensity);
     }
   }
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("RaySensor::publish");
   if (this->dataPtr->scanPub && this->dataPtr->scanPub->HasConnections())
     this->dataPtr->scanPub->Publish(this->dataPtr->laserMsg);
+  IGN_PROFILE_END();
 
   return true;
 }

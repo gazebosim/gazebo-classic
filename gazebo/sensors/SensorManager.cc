@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include "ignition/common/Profiler.hh"
+
 #include <functional>
 #include <boost/bind.hpp>
 #include "gazebo/common/Assert.hh"
@@ -546,8 +548,13 @@ void SensorManager::SensorContainer::RunLoop()
   else
     sleepTime.Set(0, 1e6);
 
+  IGN_PROFILE_THREAD_NAME("SensorManager");
+
   while (!this->stop)
   {
+    IGN_PROFILE("SensorManagerLoop");
+    // IGN_PROFILE_BEGIN("SensorManagerLoop");
+
     // If all the sensors get deleted, wait here.
     // Use a while loop since world resets will notify the runCondition.
     while (this->sensors.empty())
@@ -560,7 +567,9 @@ void SensorManager::SensorContainer::RunLoop()
     // Get the start time of the update.
     startTime = world->SimTime();
 
+    IGN_PROFILE_BEGIN("UpdateSensors");
     this->Update(false);
+    IGN_PROFILE_END();
 
     // Compute the time it took to update the sensors.
     // It's possible that the world time was reset during the Update. This
@@ -595,10 +604,14 @@ void SensorManager::SensorContainer::RunLoop()
         eventTime, &this->runCondition);
 
     // This if statement helps prevent deadlock on osx during teardown.
+    IGN_PROFILE_BEGIN("Sleeping");
     if (!this->stop)
     {
       this->runCondition.wait(timingLock);
     }
+    IGN_PROFILE_END();
+
+    // IGN_PROFILE_END();
   }
 }
 
@@ -615,7 +628,9 @@ void SensorManager::SensorContainer::Update(bool _force)
        iter != this->sensors.end(); ++iter)
   {
     GZ_ASSERT((*iter) != nullptr, "Sensor is null");
+    IGN_PROFILE_BEGIN((*iter)->Name().c_str());
     (*iter)->Update(_force);
+    IGN_PROFILE_END();
   }
 }
 

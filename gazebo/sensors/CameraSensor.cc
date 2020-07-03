@@ -16,7 +16,7 @@
 */
 #include <boost/algorithm/string.hpp>
 #include <functional>
-
+#include <ignition/common/Profiler.hh>
 #include <ignition/msgs/Utility.hh>
 
 #include "gazebo/common/Events.hh"
@@ -225,11 +225,16 @@ void CameraSensor::Render()
 //////////////////////////////////////////////////
 bool CameraSensor::UpdateImpl(const bool /*_force*/)
 {
+  IGN_PROFILE("CameraSensor");
+
   if (!this->dataPtr->rendered)
     return false;
 
+  IGN_PROFILE_BEGIN("CameraSensor::PostRender");
   this->camera->PostRender();
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("DepthCameraSensor::fillarray");
 
   if ((this->imagePub && this->imagePub->HasConnections()) ||
       this->imagePubIgn.HasConnections())
@@ -275,6 +280,7 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
   }
 
   this->dataPtr->rendered = false;
+  IGN_PROFILE_END();
   return true;
 }
 

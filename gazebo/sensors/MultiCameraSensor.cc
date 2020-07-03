@@ -16,6 +16,7 @@
 */
 #include <boost/algorithm/string.hpp>
 #include <functional>
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Exception.hh"
@@ -251,6 +252,9 @@ void MultiCameraSensor::Render()
 //////////////////////////////////////////////////
 bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
 {
+  IGN_PROFILE("MultiCameraSensor");
+  IGN_PROFILE_BEGIN("MultiCameraSensor::update");
+
   std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
 
   if (!this->dataPtr->rendered)
@@ -274,9 +278,12 @@ bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
           image->width() * (*iter)->ImageDepth() * image->height());
     }
   }
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("MultiCameraSensor::publish");
   if (publish)
     this->dataPtr->imagePub->Publish(this->dataPtr->msg);
+  IGN_PROFILE_END();
 
   this->dataPtr->rendered = false;
   return true;

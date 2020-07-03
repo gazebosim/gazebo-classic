@@ -17,6 +17,8 @@
 
 #include <functional>
 
+#include <ignition/common/Profiler.hh>
+
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
@@ -174,6 +176,8 @@ void ElevatorPlugin::MoveToFloor(const int _floor)
 /////////////////////////////////////////////////
 void ElevatorPlugin::Update(const common::UpdateInfo &_info)
 {
+  IGN_PROFILE("ElevatorPlugin")
+  IGN_PROFILE_BEGIN("ElevatorPlugin::Update");
   std::lock_guard<std::mutex> lock(this->dataPtr->stateMutex);
 
   // Process the states
@@ -190,6 +194,7 @@ void ElevatorPlugin::Update(const common::UpdateInfo &_info)
   // Update the controllers
   this->dataPtr->doorController->Update(_info);
   this->dataPtr->liftController->Update(_info);
+  IGN_PROFILE_END();
 }
 
 ////////////////////////////////////////////////
@@ -239,6 +244,9 @@ void ElevatorPluginPrivate::CloseState::Start()
 /////////////////////////////////////////////////
 bool ElevatorPluginPrivate::CloseState::Update()
 {
+  IGN_PROFILE("ElevatorPlugin::CloseState")
+  IGN_PROFILE_BEGIN("ElevatorPlugin::CloseState::Update");
+
   if (!this->started)
   {
     this->Start();
@@ -251,6 +259,7 @@ bool ElevatorPluginPrivate::CloseState::Update()
       this->ctrl->GetState() ==
       ElevatorPluginPrivate::DoorController::STATIONARY;
   }
+  IGN_PROFILE_END();
 }
 
 ////////////////////////////////////////////////
@@ -272,6 +281,9 @@ void ElevatorPluginPrivate::OpenState::Start()
 /////////////////////////////////////////////////
 bool ElevatorPluginPrivate::OpenState::Update()
 {
+  IGN_PROFILE("ElevatorPlugin::OpenState")
+  IGN_PROFILE_BEGIN("ElevatorPlugin::OpenState::Update");
+
   if (!this->started)
   {
     this->Start();
@@ -284,6 +296,7 @@ bool ElevatorPluginPrivate::OpenState::Update()
       this->ctrl->GetState() ==
       ElevatorPluginPrivate::DoorController::STATIONARY;
   }
+  IGN_PROFILE_END();
 }
 
 ////////////////////////////////////////////////
@@ -305,6 +318,9 @@ void ElevatorPluginPrivate::MoveState::Start()
 /////////////////////////////////////////////////
 bool ElevatorPluginPrivate::MoveState::Update()
 {
+  IGN_PROFILE("ElevatorPlugin::MoveState")
+  IGN_PROFILE_BEGIN("ElevatorPlugin::MoveState::Update");
+
   if (!this->started)
   {
     this->Start();
@@ -315,6 +331,7 @@ bool ElevatorPluginPrivate::MoveState::Update()
     return this->ctrl->GetState() ==
       ElevatorPluginPrivate::LiftController::STATIONARY;
   }
+  IGN_PROFILE_END();
 }
 
 ////////////////////////////////////////////////
@@ -337,6 +354,9 @@ void ElevatorPluginPrivate::WaitState::Start()
 /////////////////////////////////////////////////
 bool ElevatorPluginPrivate::WaitState::Update()
 {
+  IGN_PROFILE("ElevatorPlugin::WaitState")
+  IGN_PROFILE_BEGIN("ElevatorPlugin::WaitState::Update");
+
   if (!this->started)
   {
     this->Start();
@@ -349,6 +369,7 @@ bool ElevatorPluginPrivate::WaitState::Update()
     else
       return false;
   }
+  IGN_PROFILE_END();
 }
 
 ////////////////////////////////////////////////
@@ -393,6 +414,9 @@ void ElevatorPluginPrivate::DoorController::Reset()
 bool ElevatorPluginPrivate::DoorController::Update(
     const common::UpdateInfo &_info)
 {
+  IGN_PROFILE("ElevatorPlugin::DoorController")
+  IGN_PROFILE_BEGIN("ElevatorPlugin::DoorController::Update");
+
   // Bootstrap the time.
   if (this->prevSimTime == common::Time::Zero)
   {
@@ -420,6 +444,7 @@ bool ElevatorPluginPrivate::DoorController::Update(
     this->state = MOVING;
     return false;
   }
+  IGN_PROFILE_END();
 }
 
 ////////////////////////////////////////////////
@@ -444,6 +469,9 @@ void ElevatorPluginPrivate::LiftController::Reset()
 bool ElevatorPluginPrivate::LiftController::Update(
     const common::UpdateInfo &_info)
 {
+  IGN_PROFILE("ElevatorPlugin::LiftController")
+  IGN_PROFILE_BEGIN("ElevatorPlugin::LiftController::Update");
+
   // Bootstrap the time.
   if (this->prevSimTime == common::Time::Zero)
   {
@@ -469,6 +497,7 @@ bool ElevatorPluginPrivate::LiftController::Update(
     this->state = ElevatorPluginPrivate::LiftController::MOVING;
     return false;
   }
+  IGN_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

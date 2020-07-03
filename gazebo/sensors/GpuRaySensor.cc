@@ -15,6 +15,7 @@
  *
 */
 #include <boost/algorithm/string.hpp>
+#include <ignition/common/Profiler.hh>
 #include <functional>
 #include <ignition/math.hh>
 #include <ignition/math/Helpers.hh>
@@ -597,10 +598,15 @@ void GpuRaySensor::Render()
 //////////////////////////////////////////////////
 bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
 {
+  IGN_PROFILE("GpuRaySensor");
+
   if (!this->dataPtr->rendered)
     return false;
-
+  IGN_PROFILE_BEGIN("GpuRaySensor::PostRender");
   this->dataPtr->laserCam->PostRender();
+  IGN_PROFILE_END();
+
+  IGN_PROFILE_BEGIN("GpuRaySensor::fillarray");
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -672,7 +678,7 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
     this->dataPtr->scanPub->Publish(this->dataPtr->laserMsg);
 
   this->dataPtr->rendered = false;
-
+  IGN_PROFILE_END();
   return true;
 }
 
