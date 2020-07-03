@@ -793,8 +793,9 @@ void Visual::SetScale(const math::Vector3 &_scale)
 
   this->dataPtr->scale = _scale.Ign();
 
-  if (!isnan(this->dataPtr->scale.X()) && !isnan(this->dataPtr->scale.Y())
-      && !isnan(this->dataPtr->scale.Z()))
+  if (!ignition::math::isnan(this->dataPtr->scale.X())
+      && !ignition::math::isnan(this->dataPtr->scale.Y())
+      && !ignition::math::isnan(this->dataPtr->scale.Z()))
   {
     this->dataPtr->sceneNode->setScale(
         Conversions::Convert(this->dataPtr->scale));
