@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <math.h>
+
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
