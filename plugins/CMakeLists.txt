@@ -161,7 +161,7 @@ set (DARTplugins
 )
 
 set(GAZEBO_PLUGIN_INSTALL_DIR
-  ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/
+  ${CMAKE_INSTALL_FULL_LIBDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/
 )
 
 add_library(TrackedVehiclePlugin SHARED TrackedVehiclePlugin.cc)
