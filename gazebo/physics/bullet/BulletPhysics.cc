@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <string>
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/physics/bullet/BulletTypes.hh"
@@ -384,6 +385,7 @@ void BulletPhysics::Init()
 //////////////////////////////////////////////////
 void BulletPhysics::InitForThread()
 {
+  IGN_PROFILE_THREAD_NAME("BullerPhysics");
 }
 
 /////////////////////////////////////////////////
@@ -485,6 +487,8 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 //////////////////////////////////////////////////
 void BulletPhysics::UpdateCollision()
 {
+  IGN_PROFILE("BulletPhysics:UpdateCollision");
+
   this->contactManager->ResetCount();
 
   if (!this->world->PhysicsEnabled())
@@ -499,21 +503,31 @@ void BulletPhysics::UpdateCollision()
     // points to happen. So because UpdatePhysics() won't be
     // called, we have to do this here with
     // this->dynamicsWorld->performDiscreteCollisionDetection().
+
+    IGN_PROFILE_BEGIN("performDiscreteCollisionDetection");
     this->dynamicsWorld->performDiscreteCollisionDetection();
+    IGN_PROFILE_END();
+
     // In addition, the contacts have to be updated in the contact
     // manager and for the feedback.
+    IGN_PROFILE_BEGIN("UpdateContacts");
     UpdateContacts(this->dynamicsWorld, this->maxStepSize);
+    IGN_PROFILE_END();
   }
 }
 
 //////////////////////////////////////////////////
 void BulletPhysics::UpdatePhysics()
 {
+  IGN_PROFILE("BulletPhysics:UpdatePhysics");
+
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
+  IGN_PROFILE_BEGIN("BulletPhysics:stepSimulation");
   this->dynamicsWorld->stepSimulation(
     this->maxStepSize, 1, this->maxStepSize);
+  IGN_PROFILE_END();
 }
 
 //////////////////////////////////////////////////
