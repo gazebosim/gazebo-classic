@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Events.hh"
@@ -142,6 +143,8 @@ void MisalignmentPluginPrivate::Enable(ConstIntPtr &_msg)
 /////////////////////////////////////////////////
 void MisalignmentPluginPrivate::OnUpdate(const common::UpdateInfo &_info)
 {
+  IGN_PROFILE("MisalignmentPluginPrivate");
+  IGN_PROFILE_BEGIN("MisalignmentPluginPrivate::update");
   // These poses may or may not be in world frame
   ignition::math::Pose3d refPose = this->referencePose;
   ignition::math::Pose3d tgtPose = this->targetPose;
@@ -162,6 +165,7 @@ void MisalignmentPluginPrivate::OnUpdate(const common::UpdateInfo &_info)
           gzwarn << "Did not find target " << this->targetFrameName << "\n";
           this->didWarnTgt = true;
         }
+        IGN_PROFILE_END();
         return;
       }
       this->didWarnTgt = false;
@@ -193,6 +197,7 @@ void MisalignmentPluginPrivate::OnUpdate(const common::UpdateInfo &_info)
             << this->referenceFrameName << "\n";
           this->didWarnRef = true;
         }
+        IGN_PROFILE_END();
         return;
       }
       this->didWarnRef = false;
@@ -246,6 +251,7 @@ void MisalignmentPluginPrivate::OnUpdate(const common::UpdateInfo &_info)
   msgs::Set(msg.mutable_time(), _info.simTime);
   msgs::Set(msg.mutable_pose(), misalignment);
   this->pubMisalignment->Publish(msg);
+  IGN_PROFILE_END();
 }
 
 

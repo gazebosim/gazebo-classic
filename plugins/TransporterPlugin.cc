@@ -17,6 +17,8 @@
 
 #include <functional>
 
+#include <ignition/common/Profiler.hh>
+
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
@@ -147,6 +149,8 @@ void TransporterPlugin::OnActivation(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void TransporterPlugin::Update()
 {
+  IGN_PROFILE("TransporterPlugin");
+  IGN_PROFILE_BEGIN("TransporterPlugin::update");
   // Get all the models
   physics::Model_V models = this->dataPtr->world->Models();
 
@@ -184,4 +188,5 @@ void TransporterPlugin::Update()
       }
     }
   }
+  IGN_PROFILE_END();
 }

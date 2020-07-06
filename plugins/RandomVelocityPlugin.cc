@@ -17,6 +17,7 @@
 
 #include <functional>
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Rand.hh>
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
@@ -144,6 +145,8 @@ void RandomVelocityPlugin::Reset()
 /////////////////////////////////////////////////
 void RandomVelocityPlugin::Update(const common::UpdateInfo &_info)
 {
+  IGN_PROFILE("RandomVelocityPlugin");
+  IGN_PROFILE_BEGIN("RandomVelocityPlugin::update");
   GZ_ASSERT(this->dataPtr->link, "<link> in RandomVelocity plugin is null");
 
   // Short-circuit in case the link is invalid.
@@ -180,4 +183,5 @@ void RandomVelocityPlugin::Update(const common::UpdateInfo &_info)
 
   // Apply velocity
   this->dataPtr->link->SetLinearVel(this->dataPtr->velocity);
+  IGN_PROFILE_END();
 }

@@ -17,6 +17,7 @@
 
 #include <functional>
 #include <boost/algorithm/string.hpp>
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Vector3.hh>
 #include <gazebo/physics/Base.hh>
 #include "PressurePlugin.hh"
@@ -126,6 +127,9 @@ void PressurePlugin::Init()
 /////////////////////////////////////////////////
 void PressurePlugin::OnUpdate()
 {
+  IGN_PROFILE("PressurePlugin");
+  IGN_PROFILE_BEGIN("PressurePlugin::update");
+
   msgs::Tactile tactileMsg;
 
   // For each collision attached to this sensor
@@ -171,4 +175,5 @@ void PressurePlugin::OnUpdate()
     if (this->tactilePub && tactileMsg.pressure_size() > 0)
       this->tactilePub->Publish(tactileMsg);
   }
+  IGN_PROFILE_END();
 }

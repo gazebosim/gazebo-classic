@@ -17,6 +17,8 @@
 
 #include <functional>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/VehiclePlugin.hh"
@@ -184,6 +186,8 @@ void VehiclePlugin::Init()
 /////////////////////////////////////////////////
 void VehiclePlugin::OnUpdate()
 {
+  IGN_PROFILE("VehiclePlugin");
+  IGN_PROFILE_BEGIN("VehiclePlugin::update");
   // Get the normalized gas and brake amount
   double gas = this->gasJoint->Position(0) / this->maxGas;
   double brake = this->brakeJoint->Position(0) / this->maxBrake;
@@ -266,6 +270,7 @@ void VehiclePlugin::OnUpdate()
       this->chassis->AddForceAtWorldPosition(axis * -amt, p.Pos());
     }
   }
+  IGN_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

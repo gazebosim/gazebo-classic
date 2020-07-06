@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 
+#include "ignition/common/Profiler.hh"
 #include "gazebo/common/PID.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
@@ -132,12 +133,16 @@ void GimbalSmall2dPlugin::OnUpdate()
   if (!this->dataPtr->tiltJoint)
     return;
 
+  IGN_PROFILE("GimbalSmall2dPlugin");
+  IGN_PROFILE_BEGIN("GimbalSmall2dPlugin::update");
+
   double angle = this->dataPtr->tiltJoint->Position(0);
 
   common::Time time = this->dataPtr->model->GetWorld()->SimTime();
   if (time < this->dataPtr->lastUpdateTime)
   {
     this->dataPtr->lastUpdateTime = time;
+    IGN_PROFILE_END();
     return;
   }
   else if (time > this->dataPtr->lastUpdateTime)
@@ -159,4 +164,5 @@ void GimbalSmall2dPlugin::OnUpdate()
     m.set_data(ss.str());
     this->dataPtr->pub->Publish(m);
   }
+  IGN_PROFILE_END();
 }

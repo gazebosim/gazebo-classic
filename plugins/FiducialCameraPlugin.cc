@@ -18,6 +18,7 @@
 #include <vector>
 #include <functional>
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
 
@@ -186,6 +187,8 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     const unsigned int /*_width*/, const unsigned int /*_height*/,
     const unsigned int /*_depth*/, const std::string &/*_format*/)
 {
+  IGN_PROFILE("FiducialCameraPlugin");
+  IGN_PROFILE_BEGIN("FiducialCameraPlugin::update");
   if (!this->dataPtr->selectionBuffer)
   {
     std::string cameraName = this->dataPtr->camera->OgreCamera()->getName();
@@ -243,7 +246,11 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     }
   }
 
+  IGN_PROFILE_END();
+
+  IGN_PROFILE_BEGIN("FiducialCameraPlugin::publish");
   this->dataPtr->Publish(results);
+  IGN_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

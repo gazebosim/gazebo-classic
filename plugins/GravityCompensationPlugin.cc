@@ -19,6 +19,8 @@
 
 #include <boost/filesystem.hpp>
 
+#include <ignition/common/Profiler.hh>
+
 #include <gazebo/transport/Node.hh>
 #include <gazebo/transport/Subscriber.hh>
 #include <gazebo/common/Events.hh>
@@ -193,6 +195,9 @@ void GravityCompensationPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void GravityCompensationPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
+  IGN_PROFILE("GravityCompensationPlugin");
+  IGN_PROFILE_BEGIN("GravityCompensationPlugin::update");
+
   dart::dynamics::Joint *dtJoint = this->dataPtr->skel->getRootJoint();
   if (dtJoint == nullptr)
   {
@@ -238,6 +243,7 @@ void GravityCompensationPlugin::Update(const common::UpdateInfo &/*_info*/)
       joint->SetForce(i, forces[dtJoint->getIndexInSkeleton(i)]);
     }
   }
+  IGN_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

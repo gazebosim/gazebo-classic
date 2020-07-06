@@ -17,6 +17,8 @@
 
 #include <functional>
 
+#include <ignition/common/Profiler.hh>
+
 #include "ActuatorPlugin.hh"
 
 using namespace gazebo;
@@ -166,6 +168,8 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void ActuatorPlugin::WorldUpdateCallback()
 {
+  IGN_PROFILE("ActuatorPlugin");
+  IGN_PROFILE_BEGIN("ActuatorPlugin::WorldUpdateCallback");
   // Update the stored joints according to the desired model.
   for (unsigned int i = 0; i < this->joints.size(); i++)
   {
@@ -176,4 +180,5 @@ void ActuatorPlugin::WorldUpdateCallback()
               this->actuators[i]);
     this->joints[i]->SetEffortLimit(index, maxForce);
   }
+  IGN_PROFILE_END();
 }

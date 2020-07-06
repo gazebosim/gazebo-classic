@@ -17,6 +17,8 @@
 
 #include <boost/pointer_cast.hpp>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 
@@ -210,6 +212,8 @@ void WheelTrackedVehiclePlugin::UpdateTrackSurface()
 
 void WheelTrackedVehiclePlugin::OnUpdate()
 {
+  IGN_PROFILE("WheelTrackedVehiclePlugin");
+  IGN_PROFILE_BEGIN("WheelTrackedVehiclePlugin::update");
   std::lock_guard<std::mutex> lock(this->mutex);
 
   for (auto trackPair : this->trackNames)
@@ -222,4 +226,5 @@ void WheelTrackedVehiclePlugin::OnUpdate()
       wheel->joint->SetVelocity(0, angularVelocity);
     }
   }
+  IGN_PROFILE_END();
 }
