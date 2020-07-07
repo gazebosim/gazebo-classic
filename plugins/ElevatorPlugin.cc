@@ -176,7 +176,7 @@ void ElevatorPlugin::MoveToFloor(const int _floor)
 /////////////////////////////////////////////////
 void ElevatorPlugin::Update(const common::UpdateInfo &_info)
 {
-  IGN_PROFILE("ElevatorPlugin")
+  IGN_PROFILE("ElevatorPlugin");
   IGN_PROFILE_BEGIN("ElevatorPlugin::Update");
   std::lock_guard<std::mutex> lock(this->dataPtr->stateMutex);
 
@@ -244,7 +244,7 @@ void ElevatorPluginPrivate::CloseState::Start()
 /////////////////////////////////////////////////
 bool ElevatorPluginPrivate::CloseState::Update()
 {
-  IGN_PROFILE("ElevatorPlugin::CloseState")
+  IGN_PROFILE("ElevatorPlugin::CloseState");
   IGN_PROFILE_BEGIN("ElevatorPlugin::CloseState::Update");
 
   if (!this->started)
@@ -281,7 +281,7 @@ void ElevatorPluginPrivate::OpenState::Start()
 /////////////////////////////////////////////////
 bool ElevatorPluginPrivate::OpenState::Update()
 {
-  IGN_PROFILE("ElevatorPlugin::OpenState")
+  IGN_PROFILE("ElevatorPlugin::OpenState");
   IGN_PROFILE_BEGIN("ElevatorPlugin::OpenState::Update");
 
   if (!this->started)
@@ -318,7 +318,7 @@ void ElevatorPluginPrivate::MoveState::Start()
 /////////////////////////////////////////////////
 bool ElevatorPluginPrivate::MoveState::Update()
 {
-  IGN_PROFILE("ElevatorPlugin::MoveState")
+  IGN_PROFILE("ElevatorPlugin::MoveState");
   IGN_PROFILE_BEGIN("ElevatorPlugin::MoveState::Update");
 
   if (!this->started)
@@ -354,7 +354,7 @@ void ElevatorPluginPrivate::WaitState::Start()
 /////////////////////////////////////////////////
 bool ElevatorPluginPrivate::WaitState::Update()
 {
-  IGN_PROFILE("ElevatorPlugin::WaitState")
+  IGN_PROFILE("ElevatorPlugin::WaitState");
   IGN_PROFILE_BEGIN("ElevatorPlugin::WaitState::Update");
 
   if (!this->started)
@@ -414,7 +414,7 @@ void ElevatorPluginPrivate::DoorController::Reset()
 bool ElevatorPluginPrivate::DoorController::Update(
     const common::UpdateInfo &_info)
 {
-  IGN_PROFILE("ElevatorPlugin::DoorController")
+  IGN_PROFILE("ElevatorPlugin::DoorController");
   IGN_PROFILE_BEGIN("ElevatorPlugin::DoorController::Update");
 
   // Bootstrap the time.
@@ -469,7 +469,7 @@ void ElevatorPluginPrivate::LiftController::Reset()
 bool ElevatorPluginPrivate::LiftController::Update(
     const common::UpdateInfo &_info)
 {
-  IGN_PROFILE("ElevatorPlugin::LiftController")
+  IGN_PROFILE("ElevatorPlugin::LiftController");
   IGN_PROFILE_BEGIN("ElevatorPlugin::LiftController::Update");
 
   // Bootstrap the time.
