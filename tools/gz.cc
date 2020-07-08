@@ -491,9 +491,8 @@ bool ModelCommand::RunImpl()
       resolvedFileName = sdf::getModelFilePath(filename);
       if (resolvedFileName.empty())
       {
-        std::cerr
-            << "The provided file is a directory, but a model could not found"
-            << std::endl;
+        std::cerr << "The provided file is a directory, but a model could not "
+                  << "be found" << std::endl;
       }
     }
     std::ifstream sdfFile(resolvedFileName);
@@ -579,7 +578,8 @@ bool ModelCommand::ProcessSpawn(const std::string &_sdfString,
   // To set the name of the model, we have to parse the file, set the name and
   // reserialize to SDFormat. However, loading it using libsdformat will result
   // in upconversion, which we would like to avoid because the resulting
-  // document will lose its OriginalVersion attribute.
+  // document will lose its OriginalVersion attribute. So, instead, we parse and
+  // edit the model name with TinyXML.
 
   TiXmlDocument doc;
   doc.Parse(_sdfString.c_str());
