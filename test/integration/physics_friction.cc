@@ -485,13 +485,17 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
           << std::endl;
     return;
   }
+#ifdef HAVE_DART
+#if DART_MAJOR_MINOR_VERSION_AT_MOST(6, 9)
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test since there's an issue with dart's friction"
-          << " parameters (#1000)"
+    gzerr << "Aborting test since dart 6.9 and earlier doesn't support"
+          << " body-fixed friction directions (#1000)."
           << std::endl;
     return;
   }
+#endif
+#endif
 
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
@@ -502,6 +506,14 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+#ifdef HAVE_DART
+  // Use bullet collision detector with DART
+  if (_physicsEngine == "dart")
+  {
+    physics->SetParam("collision_detector", std::string("bullet"));
+  }
+#endif
 
   // set the gravity vector
   // small positive y component
