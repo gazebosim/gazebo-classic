@@ -164,7 +164,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
     this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/local/info",
         &Scene::OnPoseMsg, this);
   }
-  else
+
   // When ready to use the direct API for updating scene poses from server,
   // uncomment the following line and delete the if and else directly above
   if (!_isServer)

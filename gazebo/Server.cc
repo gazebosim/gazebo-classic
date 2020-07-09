@@ -289,8 +289,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
   if (this->dataPtr->vm.count("lockstep"))
   {
     this->dataPtr->lockstep = true;
-    rendering::set_lockstep_enabled(this->dataPtr->lockstep);
   }
+  rendering::set_lockstep_enabled(this->dataPtr->lockstep);
 
   if (!this->PreLoad())
   {
