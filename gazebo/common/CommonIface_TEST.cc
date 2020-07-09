@@ -22,6 +22,9 @@
 #include <sstream>
 #include <boost/filesystem.hpp>
 
+#include <ignition/common/Filesystem.hh>
+#include <sdf/parser.hh>
+
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "test/util.hh"
@@ -299,7 +302,7 @@ TEST_F(CommonIface_TEST, asFullPath)
     EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
 
     // File
-    auto filePath = common::joinPaths(path, "file.sdf");
+    auto filePath = ignition::common::joinPaths(path, "file.sdf");
 
     EXPECT_EQ("C:\\abs\\path\\file\\meshes\\collision.dae",
         common::asFullPath(relativeUriUnix, filePath));
@@ -325,7 +328,7 @@ TEST_F(CommonIface_TEST, asFullPath)
     EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
 
     // File
-    auto filePath = common::joinPaths(path, "file.sdf");
+    auto filePath = ignition::common::joinPaths(path, "file.sdf");
 
     EXPECT_EQ("/abs/path/file/meshes/collision.dae",
         common::asFullPath(relativeUriUnix, filePath));
@@ -336,6 +339,87 @@ TEST_F(CommonIface_TEST, asFullPath)
     EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, filePath));
   }
 #endif
+}
+
+/////////////////////////////////////////////////
+TEST_F(CommonIface_TEST, fullPathsMesh)
+{
+  std::string filePath{"/tmp/model.sdf"};
+  std::string relativePath{"meshes/collision.dae"};
+
+  std::stringstream ss;
+  ss << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='mesh_model'>"
+    << "<link name ='link'>"
+    << "  <collision name ='collision'>"
+    << "    <geometry>"
+    << "      <mesh>"
+    << "        <uri>" << relativePath << "</uri>"
+    << "      </mesh>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << "      <mesh><uri>" << relativePath << "</uri></mesh>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  auto modelElem = std::make_shared<sdf::Element>();
+  sdf::initFile("model.sdf", modelElem);
+  sdf::readString(ss.str(), modelElem);
+
+  // Before conversion
+  ASSERT_NE(nullptr, modelElem);
+
+  auto linkElem = modelElem->GetElement("link");
+  ASSERT_NE(nullptr, linkElem);
+
+  for (auto elemStr : {"collision", "visual"})
+  {
+    auto elem = linkElem->GetElement(elemStr);
+    ASSERT_NE(nullptr, elem);
+
+    auto geometryElem = elem->GetElement("geometry");
+    ASSERT_NE(nullptr, geometryElem);
+
+    auto meshElem = geometryElem->GetElement("mesh");
+    ASSERT_NE(nullptr, meshElem);
+
+    auto uriElem = meshElem->GetElement("uri");
+    ASSERT_NE(nullptr, uriElem);
+
+    EXPECT_EQ(relativePath, uriElem->Get<std::string>());
+    uriElem->SetFilePath(filePath);
+  }
+
+  common::convertToFullPaths(modelElem);
+
+  // After conversion
+  ASSERT_NE(nullptr, modelElem);
+
+  linkElem = modelElem->GetElement("link");
+  ASSERT_NE(nullptr, linkElem);
+
+  for (auto elemStr : {"collision", "visual"})
+  {
+    auto elem = linkElem->GetElement(elemStr);
+    ASSERT_NE(nullptr, elem);
+
+    auto geometryElem = elem->GetElement("geometry");
+    ASSERT_NE(nullptr, geometryElem);
+
+    auto meshElem = geometryElem->GetElement("mesh");
+    ASSERT_NE(nullptr, meshElem);
+
+    auto uriElem = meshElem->GetElement("uri");
+    ASSERT_NE(nullptr, uriElem);
+
+    EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
+        uriElem->Get<std::string>());
+  }
 }
 
 /////////////////////////////////////////////////
