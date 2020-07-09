@@ -570,7 +570,7 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     const std::string &_noiseType, double _noiseMean, double _noiseStdDev,
     bool _distortion, double _distortionK1, double _distortionK2,
     double _distortionK3, double _distortionP1, double _distortionP2,
-    double _cx, double _cy, bool _strictRate)
+    double _cx, double _cy)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -581,11 +581,9 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "<pose>" << _pos << " " << _rpy << "</pose>"
     << "<link name ='body'>"
     << "  <sensor name ='" << _cameraName
-    << "' type ='camera' "
-    << "xmlns:strict_rate='https://github.com/osrf/gazebo/issues/2736'>"
+    << "' type ='camera'>"
     << "    <always_on>1</always_on>"
     << "    <update_rate>" << _rate << "</update_rate>"
-    << "    <strict_rate:value>" << _strictRate << "</strict_rate:value>"
     << "    <visualize>true</visualize>"
     << "    <camera>"
     << "      <horizontal_fov>0.78539816339744828</horizontal_fov>"

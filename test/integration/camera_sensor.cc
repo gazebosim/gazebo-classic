@@ -307,7 +307,7 @@ TEST_F(CameraSensor, StrictUpdateRate)
   // Load camera_strict_rate.world instead, and don't call SpawnCamera.
   // That allows us to secify the custom namespace in the world file instead
   // of modifying SpawnCamera() in ServerFixture.cc.
-  Load("worlds/camera_strict_rate.world");
+  LoadArgs(" --lockstep worlds/camera_strict_rate.world");
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==

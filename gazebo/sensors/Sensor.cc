@@ -140,7 +140,7 @@ void Sensor::Load(const std::string &_worldName)
   if (this->sdf->Get<bool>("always_on"))
     this->SetActive(true);
 
-  this->useStrictRate = this->sdf->Get<bool>("strict_rate:value", false).first;
+  this->useStrictRate = rendering::lockstep_enabled();
 
   if (this->dataPtr->category == IMAGE)
   {

@@ -159,6 +159,8 @@ World::World(const std::string &_name)
      event::Events::ConnectPause(
        std::bind(&World::SetPaused, this, std::placeholders::_1)));
 
+  this->dataPtr->waitForSensors = nullptr;
+
   // Make sure dbs are initialized
   common::ModelDatabase::Instance();
   common::FuelModelDatabase::Instance();
