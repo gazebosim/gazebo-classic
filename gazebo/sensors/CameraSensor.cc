@@ -67,8 +67,7 @@ CameraSensor::~CameraSensor()
 void CameraSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
-  this->useStrictRate = this->useStrictRate && rendering::lockstep_enabled();
-  // strict_rate parameter is parsed in Sensor::Load()
+  // useStrictRate is set in Sensor::Load()
   if (this->useStrictRate)
   {
     this->connections.push_back(
@@ -101,7 +100,7 @@ std::string CameraSensor::TopicIgn() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  // strict_rate parameter is parsed in Sensor::Load()
+  // useStrictRate is set in Sensor::Load()
   if (this->useStrictRate)
   {
     this->connections.push_back(
