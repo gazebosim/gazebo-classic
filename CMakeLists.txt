@@ -37,6 +37,14 @@ if(NOT DEFINED BUILD_TESTING)
     set(BUILD_TESTING OFF)
 endif()
 
+option(ENABLE_PROFILER "Enable Ignition Profiler" FALSE)
+
+if(ENABLE_PROFILER)
+  add_definitions("-DIGN_PROFILER_ENABLE=1")
+else()
+  add_definitions("-DIGN_PROFILER_ENABLE=0")
+endif()
+
 #============================================================================
 # We turn off extensions because (1) we do not ever want to use non-standard
 # compiler extensions, and (2) this variable is on by default, causing cmake

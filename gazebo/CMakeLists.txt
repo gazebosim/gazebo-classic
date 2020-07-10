@@ -51,10 +51,8 @@ add_dependencies(gazebo_sensors gazebo_rendering)
 
 gz_add_executable(gzserver server_main.cc)
 
-if (${IGN_PROFILER_ENABLE})
-  target_compile_definitions(gzserver PUBLIC "IGN_PROFILER_ENABLE=1")
+if (${ENABLE_PROFILER})
   set(IGN_PROFILE_LIBS ${IGNITION-COMMON_LIBRARIES})
-  target_include_directories(gzserver PUBLIC ${ignition-common3_INCLUDE_DIRS})
 endif()
 
 target_link_libraries(gzserver

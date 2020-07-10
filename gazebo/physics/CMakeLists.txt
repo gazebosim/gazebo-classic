@@ -158,10 +158,8 @@ target_compile_definitions(gazebo_physics
   PRIVATE BUILDING_DLL_GZ_PHYSICS
 )
 
-if (${IGN_PROFILER_ENABLE})
-  target_compile_definitions(gazebo_physics PUBLIC "IGN_PROFILER_ENABLE=1")
+if (${ENABLE_PROFILER})
   set(IGN_PROFILE_LIBS ${IGNITION-COMMON_LIBRARIES})
-  target_include_directories(gazebo_physics PUBLIC ${ignition-common3_INCLUDE_DIRS})
 endif()
 
 target_link_libraries(gazebo_physics
