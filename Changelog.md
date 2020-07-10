@@ -3,7 +3,7 @@
 ## Gazebo 9.xx.x (202x-xx-xx)
 
 1. Fix sensor update rate throttling when new sensors are spawned
-    * [Pull request #](https://github.com/osrf/gazebo/pull/)
+    * [Pull request #2784](https://github.com/osrf/gazebo/pull/2784)
 
 1. LensFlare: initialize OGRE compositors during plugin initialization
     * [Pull request #2762](https://github.com/osrf/gazebo/pull/2762)
