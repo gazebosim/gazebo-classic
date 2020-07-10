@@ -65,6 +65,8 @@ Sensor::Sensor(SensorCategory _cat)
   this->dataPtr->updateDelay = common::Time(0.0);
   this->updatePeriod = common::Time(0.0);
 
+  this->useStrictRate = false;
+
   this->dataPtr->id = physics::getUniqueId();
 }
 
@@ -136,6 +138,8 @@ void Sensor::Load(const std::string &_worldName)
 
   if (this->sdf->Get<bool>("always_on"))
     this->SetActive(true);
+
+  this->useStrictRate = rendering::lockstep_enabled();
 
   if (this->dataPtr->category == IMAGE)
     this->scene = rendering::get_scene(_worldName);
@@ -516,4 +520,10 @@ double Sensor::NextRequiredTimestamp() const
 {
   // implementation by default: next required timestamp is ignored
   return std::numeric_limits<double>::quiet_NaN();
+}
+
+//////////////////////////////////////////////////
+bool Sensor::StrictRate() const
+{
+  return this->useStrictRate;
 }

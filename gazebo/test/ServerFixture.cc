@@ -586,7 +586,6 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "    <update_rate>" << _rate << "</update_rate>"
     << "    <visualize>true</visualize>"
     << "    <camera>"
-    << "      <strict_rate>true</strict_rate>"
     << "      <horizontal_fov>0.78539816339744828</horizontal_fov>"
     << "      <image>"
     << "        <width>" << _width << "</width>"

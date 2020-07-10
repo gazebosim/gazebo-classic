@@ -36,8 +36,6 @@ namespace gazebo
       /// \brief Timestamp of the forthcoming rendering
       public: double nextRenderingTime
                            = std::numeric_limits<double>::quiet_NaN();
-
-      public: bool hasStrictFps = true;
     };
   }
 }

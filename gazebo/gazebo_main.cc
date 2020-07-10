@@ -72,6 +72,8 @@ void help()
   << "  -o [ --profile ] arg          Physics preset profile name from the "
   << "options in\n"
   << "                                the world file.\n"
+  << "  --lockstep                    Lockstep simulation so sensor update "
+  <<                                  "rates are respected.\n"
   << "\n";
 }
 

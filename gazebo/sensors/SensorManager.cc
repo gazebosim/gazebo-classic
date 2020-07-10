@@ -334,9 +334,10 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
   this->worlds[_worldName] = physics::get_world(_worldName);
 
   // Provide the wait function to the given world
-  this->worlds[_worldName]->SetSensorWaitFunc(
-      std::bind(&SensorManager::WaitForSensors, this,
-        std::placeholders::_1, std::placeholders::_2));
+  if (sensor->StrictRate())
+    this->worlds[_worldName]->SetSensorWaitFunc(
+        std::bind(&SensorManager::WaitForSensors, this,
+          std::placeholders::_1, std::placeholders::_2));
 
   // If the SensorManager has not been initialized, then it's okay to push
   // the sensor into one of the sensor vectors because the sensor will get
