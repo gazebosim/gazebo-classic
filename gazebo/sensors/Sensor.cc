@@ -234,8 +234,6 @@ void Sensor::Update(const bool _force)
 {
   if (this->IsActive() || _force)
   {
-    // TODO(mabelzhang): Does strict rate not need anything in the else-clause
-    // below at all? Strict rate PR did not use them
     if (this->useStrictRate)
     {
       if (this->UpdateImpl(_force))
