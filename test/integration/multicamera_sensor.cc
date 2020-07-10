@@ -571,7 +571,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
 /////////////////////////////////////////////////
 TEST_F(MultiCameraSensor, StrictUpdateRate)
 {
-  Load("worlds/multicamera_strict_rate_test.world");
+  LoadArgs(" --lockstep worlds/multicamera_strict_rate_test.world");
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==

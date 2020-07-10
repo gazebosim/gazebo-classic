@@ -166,7 +166,7 @@ TEST_F(LogicalCameraSensor, NestedModels)
 /////////////////////////////////////////////////
 TEST_F(LogicalCameraSensor, StrictUpdateRate)
 {
-  Load("worlds/logical_camera_strict_rate.world");
+  LoadArgs(" --lockstep worlds/logical_camera_strict_rate.world");
 
   // Wait until the sensors have been initialized
   while (!sensors::SensorManager::Instance()->SensorsInitialized())

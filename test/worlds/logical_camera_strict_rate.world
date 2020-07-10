@@ -9,7 +9,7 @@
     <model name="logical_camera_model">
       <pose>0 0 1 0 0 0</pose>
       <link name="link">
-        <sensor name="logical_camera_sensor" type="logical_camera" xmlns:strict_rate="https://github.com/osrf/gazebo/issues/2736">
+        <sensor name="logical_camera_sensor" type="logical_camera">
           <pose>0 0 1 0 0 0</pose>
           <logical_camera>
             <near>0.55</near>
@@ -22,9 +22,8 @@
           <always_on>true</always_on>
 
           <!-- We choose a high fps on purpose. The goal is to check the effect
-            of the flag "strict_rate". -->
+            of lockstep. -->
           <update_rate>500</update_rate>
-          <strict_rate:value>true</strict_rate:value>
         </sensor>
       </link>
     </model>

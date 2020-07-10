@@ -618,7 +618,7 @@ TEST_P(LaserTest, LaserNoise)
 
 void LaserTest::LaserStrictUpdateRate(const std::string &_physicsEngine)
 {
-  Load("worlds/laser_hit_strict_rate_test.world");
+  LoadArgs(" --lockstep worlds/laser_hit_strict_rate_test.world");
 
   // Wait until the sensors have been initialized
   while (!sensors::SensorManager::Instance()->SensorsInitialized())

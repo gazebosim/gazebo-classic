@@ -28,11 +28,10 @@
           </geometry>
         </visual>
 
-        <sensor name="multicamera_sensor" type="multicamera" xmlns:strict_rate="https://github.com/osrf/gazebo/issues/2736">
+        <sensor name="multicamera_sensor" type="multicamera">
           <!-- We choose a high fps on purpose. The goal is to check the effect
-            of the flag "strict_rate". -->
+            of lockstep. -->
           <update_rate>500</update_rate>
-          <strict_rate:value>true</strict_rate:value>
 
           <camera name="top_left">
             <pose>0 -0.1 0.1 0 0 0</pose>

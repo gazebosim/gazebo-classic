@@ -691,7 +691,8 @@ TEST_P(ContactSensor, TorqueTest)
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::StrictUpdateRateTest(const std::string &_physicsEngine)
 {
-  Load("worlds/contact_strict_rate.world", true, _physicsEngine);
+  LoadArgs(" --lockstep -u -e " + _physicsEngine +
+      " worlds/contact_strict_rate.world");
 
   // Wait until the sensors have been initialized
   while (!sensors::SensorManager::Instance()->SensorsInitialized())
