@@ -275,20 +275,6 @@ bool CameraSensor::NeedsUpdate()
 //////////////////////////////////////////////////
 void CameraSensor::Update(bool _force)
 {
-  /*
-  if (this->useStrictRate)
-  {
-    if (this->IsActive() || _force)
-    {
-      if (this->UpdateImpl(_force))
-        this->updated();
-    }
-  }
-  else
-  {
-    Sensor::Update(_force);
-  }
-  */
   Sensor::Update(_force);
 }
 

@@ -80,7 +80,7 @@ std::string GpuRaySensor::Topic() const
 void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
-  // strict_rate parameter is parsed in Sensor::Load()
+  // useStrictRate is set in Sensor::Load()
   if (this->useStrictRate)
   {
     this->connections.push_back(
@@ -93,7 +93,7 @@ void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 void GpuRaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  // strict_rate parameter is parsed in Sensor::Load()
+  // useStrictRate is set in Sensor::Load()
   if (this->useStrictRate)
   {
     this->connections.push_back(
@@ -426,20 +426,6 @@ bool GpuRaySensor::NeedsUpdate()
 //////////////////////////////////////////////////
 void GpuRaySensor::Update(bool _force)
 {
-  /*
-  if (this->useStrictRate)
-  {
-    if (this->IsActive() || _force)
-    {
-      if (this->UpdateImpl(_force))
-        this->updated();
-    }
-  }
-  else
-  {
-    Sensor::Update(_force);
-  }
-  */
   Sensor::Update(_force);
 }
 

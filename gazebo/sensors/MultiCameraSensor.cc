@@ -80,7 +80,7 @@ std::string MultiCameraSensor::Topic() const
 void MultiCameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  // strict_rate parameter is parsed in Sensor::Load()
+  // useStrictRate is set in Sensor::Load()
   if (this->useStrictRate)
   {
     this->connections.push_back(
