@@ -47,6 +47,11 @@ class ImuTest : public ServerFixture,
   /// in the empty world.  Test basic IMU outputs with bias enabled.
   public: void Stationary_EmptyWorld_Bias(const std::string &_physicsEngine);
 
+  /// \brief Spawn a static model with an ImuSensor attached
+  /// in the empty world.  Test basic IMU outputs with strict update rate.
+  public: void Stationary_EmptyWorld_StrictRate(
+              const std::string &_physicsEngine);
+
   /// \brief Return gravity rotated by some orientation
   /// \param[in] _rot User specified rotation
   /// \param[out] _g gravity in user specified orientation
@@ -65,6 +70,10 @@ class ImuTest : public ServerFixture,
                ignition::math::Vector3d &_rateMean,
                ignition::math::Vector3d &_accelMean,
                ignition::math::Quaterniond &_orientation);
+
+  /// \brief Increment message counter
+  /// \param[out] _msgCounter number of messages received so far
+  private: void OnNewUpdate(int* _msgCounter);
 };
 
 void ImuTest::GetGravity(const ignition::math::Quaterniond &_rot,
@@ -107,6 +116,11 @@ void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
   _rateMean = rateSum / _cnt;
   _accelMean = accelSum / _cnt;
   _orientation = _imu->Orientation();
+}
+
+void ImuTest::OnNewUpdate(int* _msgCounter)
+{
+  *_msgCounter += 1;
 }
 
 void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
@@ -832,6 +846,62 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
 TEST_P(ImuTest, EmptyWorldBias)
 {
   Stationary_EmptyWorld_Bias(GetParam());
+}
+
+void ImuTest::Stationary_EmptyWorld_StrictRate(
+    const std::string &_physicsEngine)
+{
+  LoadArgs(" --lockstep -u -e " + _physicsEngine +
+      " worlds/imu_strict_rate_test.world");
+
+  // Wait until the sensors have been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
+  std::string imuName = "imu_sensor";
+  sensors::SensorPtr sensor = sensors::get_sensor(imuName);
+  sensors::ImuSensorPtr imuSensor =
+      std::dynamic_pointer_cast<sensors::ImuSensor>(sensor);
+  ASSERT_TRUE(imuSensor != NULL);
+
+  int msgCount = 0;
+  event::ConnectionPtr c = imuSensor->ConnectUpdated(
+      std::bind(&ImuTest::OnNewUpdate, this, &msgCount));
+  common::Timer timer;
+  SetPause(false);
+  timer.Start();
+
+  // how many msgs produced for 5 seconds (in simulated clock domain)
+  double updateRate = imuSensor->UpdateRate();
+  int totalMsgs = 5 * updateRate;
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  double simT0 = 0.0;
+
+  while (msgCount < totalMsgs)
+  {
+    // An approximation of when we receive the first image. In reality one
+    // iteration before we receive the second image.
+    if (msgCount == 0)
+    {
+      simT0 = world->SimTime().Double();
+    }
+    common::Time::MSleep(1);
+  }
+
+  // check that the obtained rate is the one expected
+  double dt = world->SimTime().Double() - simT0;
+  double rate = static_cast<double>(totalMsgs) / dt;
+  gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
+  const double tolerance = 0.02;
+  EXPECT_GT(rate, updateRate * (1 - tolerance));
+  EXPECT_LT(rate, updateRate * (1 + tolerance));
+  c.reset();
+}
+
+TEST_P(ImuTest, StrictUpdateRate)
+{
+  Stationary_EmptyWorld_StrictRate(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, ImuTest, PHYSICS_ENGINE_VALUES,);  // NOLINT

@@ -706,7 +706,7 @@ void ContactSensor::StrictUpdateRateTest(const std::string &_physicsEngine)
 
   g_messageCount = 0;
   transport::SubscriberPtr sub = this->node->Subscribe(
-    "/gazebo/default/physics/contacts", &ContactSensor::Callback, this);
+      "/gazebo/default/physics/contacts", &ContactSensor::Callback, this);
   common::Timer timer;
   SetPause(false);
   timer.Start();
