@@ -627,12 +627,12 @@ void LaserTest::LaserStrictUpdateRate(const std::string &_physicsEngine)
   std::string rayName = "laser";
   sensors::SensorPtr sensor = sensors::get_sensor(rayName);
   sensors::RaySensorPtr raySensor =
-    std::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+      std::dynamic_pointer_cast<sensors::RaySensor>(sensor);
   ASSERT_TRUE(raySensor != NULL);
 
   int msgCount = 0;
   event::ConnectionPtr c = raySensor->ConnectUpdated(
-        std::bind(&LaserTest::OnNewUpdate, this, &msgCount));
+      std::bind(&LaserTest::OnNewUpdate, this, &msgCount));
   common::Timer timer;
   timer.Start();
 
@@ -666,7 +666,7 @@ void LaserTest::LaserStrictUpdateRate(const std::string &_physicsEngine)
 
 TEST_P(LaserTest, LaserStrictUpdateRate)
 {
-  LaserUnitNoise(GetParam());
+  LaserStrictUpdateRate(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, LaserTest, PHYSICS_ENGINE_VALUES,);  // NOLINT
