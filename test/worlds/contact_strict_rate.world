@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdf version='1.5'>
-  <world name='default'>
+  <world name='world_1'>
     <scene>
       <shadows>1</shadows>
       <ambient>0.4 0.4 0.4 1</ambient>

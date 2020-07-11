@@ -706,7 +706,7 @@ void ContactSensor::StrictUpdateRateTest(const std::string &_physicsEngine)
 
   g_messageCount = 0;
   transport::SubscriberPtr sub = this->node->Subscribe(
-      "/gazebo/default/physics/contacts", &ContactSensor::Callback, this);
+      "/gazebo/world_1/physics/contacts", &ContactSensor::Callback, this);
   common::Timer timer;
   SetPause(false);
   timer.Start();
@@ -714,7 +714,7 @@ void ContactSensor::StrictUpdateRateTest(const std::string &_physicsEngine)
   // how many msgs produced for 5 seconds (in simulated clock domain)
   double updateRate = contactSensor->UpdateRate();
   unsigned int totalMsgs = 5 * updateRate;
-  physics::WorldPtr world = physics::get_world("default");
+  physics::WorldPtr world = physics::get_world("world_1");
   ASSERT_TRUE(world != NULL);
   double simT0 = 0.0;
 
