@@ -32,7 +32,9 @@ class TransceiverTest : public ServerFixture,
   public: void TxRxEmptySpace(const std::string &_physicsEngine);
   public: void TxRxObstacle(const std::string &_physicsEngine);
   public: void TxRxFreqOutOfBounds(const std::string &_physicsEngine);
+  public: void TxRxStrictUpdateRate(const std::string &_physicsEngine);
   private: void RxMsg(const ConstWirelessNodesPtr &_msg);
+  private: void OnNewUpdate(int* _msgCounter);
 
   private: static const double MinFreq;
   private: static const double MaxFreq;
@@ -68,6 +70,12 @@ void TransceiverTest::RxMsg(const ConstWirelessNodesPtr &_msg)
   // Just copy the message
   this->nodesMsg = _msg;
   this->receivedMsg = true;
+}
+
+/////////////////////////////////////////////////
+void TransceiverTest::OnNewUpdate(int* _msgCounter)
+{
+  *_msgCounter += 1;
 }
 
 /////////////////////////////////////////////////
@@ -389,6 +397,64 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
+void TransceiverTest::TxRxStrictUpdateRate(const std::string &_physicsEngine)
+{
+  LoadArgs(" --lockstep -u -e " + _physicsEngine +
+      " worlds/transceiver_strict_rate.world");
+
+  // Wait until the sensors have been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
+  std::string txSensorName = "tx_sensor";
+  sensors::SensorPtr txSensor = sensors::get_sensor(txSensorName);
+  sensors::WirelessTransmitterPtr tx =
+      std::dynamic_pointer_cast<sensors::WirelessTransmitter>(txSensor);
+  ASSERT_TRUE(tx != NULL);
+
+  std::string rxSensorName = "rx_sensor";
+  sensors::SensorPtr rxSensor = sensors::get_sensor(rxSensorName);
+  sensors::WirelessReceiverPtr rx =
+      std::dynamic_pointer_cast<sensors::WirelessReceiver>(rxSensor);
+  ASSERT_TRUE(rx != NULL);
+
+  // Connect update callback and start timer
+  int msgCount = 0;
+  event::ConnectionPtr c = rx->ConnectUpdated(
+      std::bind(&TransceiverTest::OnNewUpdate, this, &msgCount));
+  common::Timer timer;
+  SetPause(false);
+  timer.Start();
+
+  // how many msgs produced for 5 seconds (in simulated clock domain)
+  double updateRate = rx->UpdateRate();
+  int totalMsgs = 5 * updateRate;
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  double simT0 = 0.0;
+
+  while (msgCount < totalMsgs)
+  {
+    // An approximation of when we receive the first image. In reality one
+    // iteration before we receive the second image.
+    if (msgCount == 0)
+    {
+      simT0 = world->SimTime().Double();
+    }
+    common::Time::MSleep(1);
+  }
+
+  // check that the obtained rate is the one expected
+  double dt = world->SimTime().Double() - simT0;
+  double rate = static_cast<double>(totalMsgs) / dt;
+  gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
+  const double tolerance = 0.02;
+  EXPECT_GT(rate, updateRate * (1 - tolerance));
+  EXPECT_LT(rate, updateRate * (1 + tolerance));
+  c.reset();
+}
+
+/////////////////////////////////////////////////
 TEST_P(TransceiverTest, EmptyWorld)
 {
   TxRxEmptySpace(GetParam());
@@ -417,6 +483,12 @@ TEST_P(TransceiverTest, Obstacle)
 TEST_P(TransceiverTest, FreqOutOfBounds)
 {
   TxRxFreqOutOfBounds(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(TransceiverTest, StrictUpdateRate)
+{
+  TxRxStrictUpdateRate(GetParam());
 }
 
 /////////////////////////////////////////////////
