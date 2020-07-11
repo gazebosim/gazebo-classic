@@ -613,7 +613,7 @@ TEST_F(GPURaySensorTest, LaserScanResolution)
 
 TEST_F(GPURaySensorTest, StrictUpdateRate)
 {
-  LoadArgs(" --lockstep worlds/gpu_ray_strict_rate.world");
+  LoadArgs(" --lockstep worlds/gpu_laser_strict_rate.world");
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
