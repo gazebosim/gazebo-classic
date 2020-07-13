@@ -35,6 +35,10 @@ using namespace sensors;
 /// for timing coordination.
 boost::mutex g_sensorTimingMutex;
 
+/// \brief Flag to indicate if number of sensors has changed and that the
+/// max update rate needs to be recalculated
+bool g_sensorsDirty = true;
+
 //////////////////////////////////////////////////
 SensorManager::SensorManager()
   : initialized(false), removeAllSensors(false)
@@ -527,23 +531,34 @@ void SensorManager::SensorContainer::RunLoop()
       return;
   }
 
+
+  auto computeMaxUpdateRate = [&]()
   {
-    boost::recursive_mutex::scoped_lock lock(this->mutex);
-
-    // Get the minimum update rate from the sensors.
-    for (Sensor_V::iterator iter = this->sensors.begin();
-        iter != this->sensors.end() && !this->stop; ++iter)
     {
-      GZ_ASSERT((*iter) != nullptr, "Sensor is null");
-      maxUpdateRate = std::max((*iter)->UpdateRate(), maxUpdateRate);
-    }
-  }
+      boost::recursive_mutex::scoped_lock lock(this->mutex);
 
-  // Calculate an appropriate sleep time.
-  if (maxUpdateRate > 0)
-    sleepTime.Set(1.0 / (maxUpdateRate));
-  else
-    sleepTime.Set(0, 1e6);
+      if (!g_sensorsDirty)
+        return;
+
+      // Get the minimum update rate from the sensors.
+      for (Sensor_V::iterator iter = this->sensors.begin();
+          iter != this->sensors.end() && !this->stop; ++iter)
+      {
+        GZ_ASSERT((*iter) != nullptr, "Sensor is null");
+        maxUpdateRate = std::max((*iter)->UpdateRate(), maxUpdateRate);
+      }
+
+      g_sensorsDirty = false;
+    }
+
+    // Calculate an appropriate sleep time.
+    if (maxUpdateRate > 0)
+      sleepTime.Set(1.0 / (maxUpdateRate));
+    else
+      sleepTime.Set(0, 1e6);
+  };
+
+  computeMaxUpdateRate();
 
   while (!this->stop)
   {
@@ -555,6 +570,8 @@ void SensorManager::SensorContainer::RunLoop()
       if (this->stop)
         return;
     }
+
+    computeMaxUpdateRate();
 
     // Get the start time of the update.
     startTime = world->SimTime();
@@ -653,6 +670,7 @@ void SensorManager::SensorContainer::AddSensor(SensorPtr _sensor)
   {
     boost::recursive_mutex::scoped_lock lock(this->mutex);
     this->sensors.push_back(_sensor);
+    g_sensorsDirty = true;
   }
 
   // Tell the run loop that we have received a sensor
@@ -681,6 +699,8 @@ bool SensorManager::SensorContainer::RemoveSensor(const std::string &_name)
       break;
     }
   }
+
+  g_sensorsDirty = true;
 
   return removed;
 }
@@ -716,6 +736,8 @@ void SensorManager::SensorContainer::RemoveSensors()
     GZ_ASSERT((*iter) != nullptr, "Sensor is null");
     (*iter)->Fini();
   }
+
+  g_sensorsDirty = true;
 
   this->sensors.clear();
 }
