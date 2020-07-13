@@ -301,8 +301,8 @@ void ImuSensor::SetWorldToReferenceOrientation(
 //////////////////////////////////////////////////
 bool ImuSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("ImuSensor");
-  IGN_PROFILE_BEGIN("ImuSensor::update");
+  IGN_PROFILE("ImuSensor::UpdateImpl");
+  IGN_PROFILE_BEGIN("Update");
   msgs::LinkData msg;
   int readIndex = 0;
 
@@ -435,7 +435,7 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
     }
     IGN_PROFILE_END();
 
-    IGN_PROFILE_BEGIN("ImuSensor::publish");
+    IGN_PROFILE_BEGIN("Publish");
     // Publish the message
     if (this->dataPtr->pub)
       this->dataPtr->pub->Publish(this->dataPtr->imuMsg);

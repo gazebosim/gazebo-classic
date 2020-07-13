@@ -524,7 +524,7 @@ void BulletPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
-  IGN_PROFILE_BEGIN("BulletPhysics:stepSimulation");
+  IGN_PROFILE_BEGIN("stepSimulation");
   this->dynamicsWorld->stepSimulation(
     this->maxStepSize, 1, this->maxStepSize);
   IGN_PROFILE_END();

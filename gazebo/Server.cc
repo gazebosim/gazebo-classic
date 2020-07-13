@@ -588,17 +588,20 @@ void Server::Run()
   // The server and sensor manager outlive worlds
   while (!this->dataPtr->stop)
   {
-    IGN_PROFILE("gzserver_loop");
+    IGN_PROFILE("Server::Run");
     IGN_PROFILE_BEGIN("ProcessControlMsgs");
     this->ProcessControlMsgs();
     IGN_PROFILE_END();
 
-    if (physics::worlds_running()) {
-      IGN_PROFILE_BEGIN("sensors::run_once");
+    if (physics::worlds_running())
+    {
+      IGN_PROFILE_BEGIN("run_once");
       sensors::run_once();
       IGN_PROFILE_END();
-    } else if (sensors::running()) {
-      IGN_PROFILE_BEGIN("sensors::stop");
+    }
+    else if (sensors::running())
+    {
+      IGN_PROFILE_BEGIN("stop");
       sensors::stop();
       IGN_PROFILE_END();
     }

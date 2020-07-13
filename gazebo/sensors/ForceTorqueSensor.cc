@@ -202,8 +202,8 @@ ignition::math::Vector3d ForceTorqueSensor::Torque() const
 //////////////////////////////////////////////////
 bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("ForceTorqueSensor");
-  IGN_PROFILE_BEGIN("ForceTorqueSensor::update");
+  IGN_PROFILE("ForceTorqueSensor::UpdateImpl");
+  IGN_PROFILE_BEGIN("Update");
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -265,7 +265,7 @@ bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
   }
 
   IGN_PROFILE_END();
-  IGN_PROFILE_BEGIN("ForceTorqueSensor::publish");
+  IGN_PROFILE_BEGIN("Publish");
 
   msgs::Set(this->dataPtr->wrenchMsg.mutable_wrench()->mutable_force(),
       measuredForce);

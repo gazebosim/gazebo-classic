@@ -301,8 +301,8 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
   if (this->contactManager->GetContactCount() == 0)
     return;
 
-  IGN_PROFILE("SimpleTrackedVehiclePlugin");
-  IGN_PROFILE_BEGIN("SimpleTrackedVehiclePlugin::update");
+  IGN_PROFILE("SimpleTrackedVehiclePlugin::DriveTracks");
+  IGN_PROFILE_BEGIN("Update");
 
   /////////////////////////////////////////////
   // Calculate the desired center of rotation

@@ -117,15 +117,15 @@ void RFIDSensor::Init()
 //////////////////////////////////////////////////
 bool RFIDSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("RFIDSensor");
-  IGN_PROFILE_BEGIN("RFIDSensor::EvaluateTags");
+  IGN_PROFILE("RFIDSensor::UpdateImpl");
+  IGN_PROFILE_BEGIN("EvaluateTags");
   this->EvaluateTags();
   IGN_PROFILE_END();
   this->lastMeasurementTime = this->world->SimTime();
 
   if (this->dataPtr->scanPub)
   {
-    IGN_PROFILE_BEGIN("ImuSensor::Publish");
+    IGN_PROFILE_BEGIN("Publish");
     msgs::Pose msg;
     msgs::Set(&msg, this->dataPtr->entity->WorldPose());
     this->dataPtr->scanPub->Publish(msg);

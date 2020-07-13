@@ -400,7 +400,7 @@ void ODEPhysics::UpdateCollision()
     ODECollision *collision2 = this->dataPtr->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->dataPtr->contactCollisions);
   }
-  DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "collideTrimeshes");
+  DIAG_TIMER_LAP("UpdateCollision", "collideTrimeshes");
   IGN_PROFILE_END();
 
   DIAG_TIMER_STOP("ODEPhysics::UpdateCollision");
@@ -947,7 +947,7 @@ void ODEPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 //////////////////////////////////////////////////
 void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
-  IGN_PROFILE("CollisionCallback");
+  IGN_PROFILE("ODEPhysics::CollisionCallback");
   dBodyID b1 = dGeomGetBody(_o1);
   dBodyID b2 = dGeomGetBody(_o2);
 

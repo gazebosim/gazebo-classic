@@ -195,8 +195,8 @@ void GravityCompensationPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void GravityCompensationPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
-  IGN_PROFILE("GravityCompensationPlugin");
-  IGN_PROFILE_BEGIN("GravityCompensationPlugin::update");
+  IGN_PROFILE("GravityCompensationPlugin::Update");
+  IGN_PROFILE_BEGIN("Update");
 
   dart::dynamics::Joint *dtJoint = this->dataPtr->skel->getRootJoint();
   if (dtJoint == nullptr)

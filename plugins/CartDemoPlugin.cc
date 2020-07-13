@@ -112,8 +112,8 @@ void CartDemoPlugin::Init()
 /////////////////////////////////////////////////
 void CartDemoPlugin::OnUpdate()
 {
-  IGN_PROFILE("CartDemoPlugin");
-  IGN_PROFILE_BEGIN("CartDemoPlugin::update");
+  IGN_PROFILE("CartDemoPlugin::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   common::Time currTime = this->model->GetWorld()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;

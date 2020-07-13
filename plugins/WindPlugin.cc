@@ -293,8 +293,8 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
 /////////////////////////////////////////////////
 void WindPlugin::OnUpdate()
 {
-  IGN_PROFILE("WindPlugin");
-  IGN_PROFILE_BEGIN("WindPlugin::update");
+  IGN_PROFILE("WindPlugin::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   // Update loop for using the force on mass approximation
   // This is not recommended. Please use the LiftDragPlugin instead.
 

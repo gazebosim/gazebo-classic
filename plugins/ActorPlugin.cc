@@ -154,8 +154,8 @@ void ActorPlugin::HandleObstacles(ignition::math::Vector3d &_pos)
 /////////////////////////////////////////////////
 void ActorPlugin::OnUpdate(const common::UpdateInfo &_info)
 {
-  IGN_PROFILE("ActorPlugin");
-  IGN_PROFILE_BEGIN("ActorPlugin::update");
+  IGN_PROFILE("ActorPlugin::UpdateImpl");
+  IGN_PROFILE_BEGIN("Update");
 
   // Time delta
   double dt = (_info.simTime - this->lastUpdate).Double();

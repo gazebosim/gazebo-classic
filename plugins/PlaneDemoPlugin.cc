@@ -365,8 +365,8 @@ void PlaneDemoPlugin::Init()
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::OnUpdate()
 {
-  IGN_PROFILE("PlaneDemoPlugin");
-  IGN_PROFILE_BEGIN("PlaneDemoPlugin::update");
+  IGN_PROFILE("PlaneDemoPlugin:OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   // gzdbg << "executing OnUpdate.\n";
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);

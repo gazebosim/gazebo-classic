@@ -100,8 +100,8 @@ void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 /////////////////////////////////////////////////
 void DiffDrivePlugin::OnUpdate()
 {
-  IGN_PROFILE("DiffDrivePlugin");
-  IGN_PROFILE_BEGIN("DiffDrivePlugin::update");
+  IGN_PROFILE("DiffDrivePlugin::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
 
   /* double d1, d2;
   double dr, da;

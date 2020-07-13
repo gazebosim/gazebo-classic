@@ -140,11 +140,11 @@ void LogicalCameraSensorPrivate::AddVisibleModels(
 //////////////////////////////////////////////////
 bool LogicalCameraSensor::UpdateImpl(const bool _force)
 {
-  IGN_PROFILE("LogicalCameraSensor");
+  IGN_PROFILE("LogicalCameraSensor::UpdateImpl");
   // Only compute if active, or the update is forced
   if (_force || this->IsActive())
   {
-    IGN_PROFILE_BEGIN("LogicalCameraSensor::update");
+    IGN_PROFILE_BEGIN("Update");
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
     this->dataPtr->msg.clear_model();
 
@@ -162,7 +162,7 @@ bool LogicalCameraSensor::UpdateImpl(const bool _force)
     this->dataPtr->AddVisibleModels(myPose, this->world->Models());
     IGN_PROFILE_END();
 
-    IGN_PROFILE_BEGIN("LogicalCameraSensor::publish");
+    IGN_PROFILE_BEGIN("Publish");
     // Send the message.
     this->dataPtr->pub->Publish(this->dataPtr->msg);
     IGN_PROFILE_END();

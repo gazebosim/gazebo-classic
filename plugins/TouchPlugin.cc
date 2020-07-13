@@ -147,8 +147,8 @@ void TouchPlugin::Enable(ConstIntPtr &_msg)
 /////////////////////////////////////////////////
 void TouchPlugin::OnUpdate(const common::UpdateInfo &_info)
 {
-  IGN_PROFILE("TouchPlugin");
-  IGN_PROFILE_BEGIN("TouchPlugin::update");
+  IGN_PROFILE("TouchPlugin::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   // Get all contacts across all sensors
   msgs::Contacts contacts;
 

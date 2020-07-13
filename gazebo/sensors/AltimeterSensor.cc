@@ -125,8 +125,8 @@ void AltimeterSensor::Init()
 //////////////////////////////////////////////////
 bool AltimeterSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("AltimeterSensor");
-  IGN_PROFILE_BEGIN("AltimeterSensor::update");
+  IGN_PROFILE("AltimeterSensor::UpdateImpl");
+  IGN_PROFILE_BEGIN("Update");
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Get latest pose information
@@ -167,7 +167,7 @@ bool AltimeterSensor::UpdateImpl(const bool /*_force*/)
     }
   }
   IGN_PROFILE_END();
-  IGN_PROFILE_BEGIN("AltimeterSensor::publish");
+  IGN_PROFILE_BEGIN("Publish");
   // Save the time of the measurement
   msgs::Set(this->dataPtr->altMsg.mutable_time(), this->world->SimTime());
 

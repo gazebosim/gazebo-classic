@@ -127,8 +127,8 @@ void PressurePlugin::Init()
 /////////////////////////////////////////////////
 void PressurePlugin::OnUpdate()
 {
-  IGN_PROFILE("PressurePlugin");
-  IGN_PROFILE_BEGIN("PressurePlugin::update");
+  IGN_PROFILE("PressurePlugin:OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
 
   msgs::Tactile tactileMsg;
 

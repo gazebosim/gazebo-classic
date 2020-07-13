@@ -149,8 +149,8 @@ void TransporterPlugin::OnActivation(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void TransporterPlugin::Update()
 {
-  IGN_PROFILE("TransporterPlugin");
-  IGN_PROFILE_BEGIN("TransporterPlugin::update");
+  IGN_PROFILE("TransporterPlugin::Update");
+  IGN_PROFILE_BEGIN("Update");
   // Get all the models
   physics::Model_V models = this->dataPtr->world->Models();
 

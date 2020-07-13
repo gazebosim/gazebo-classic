@@ -413,7 +413,7 @@ void SimbodyPhysics::InitForThread()
 void SimbodyPhysics::UpdateCollision()
 {
   IGN_PROFILE("SimbodyPhysics::UpdateCollision");
-  IGN_PROFILE_BEGIN("SimbodyPhysics::UpdateCollision");
+  IGN_PROFILE_BEGIN("UpdateCollision");
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
   this->contactManager->ResetCount();
@@ -644,7 +644,7 @@ void SimbodyPhysics::UpdateCollision()
 void SimbodyPhysics::UpdatePhysics()
 {
   IGN_PROFILE("SimbodyPhysics::UpdatePhysics");
-  IGN_PROFILE_BEGIN("SimbodyPhysics::UpdatePhysics");
+  IGN_PROFILE_BEGIN("UpdatePhysics");
 
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);

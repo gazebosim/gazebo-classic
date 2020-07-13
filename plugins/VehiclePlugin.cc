@@ -186,8 +186,8 @@ void VehiclePlugin::Init()
 /////////////////////////////////////////////////
 void VehiclePlugin::OnUpdate()
 {
-  IGN_PROFILE("VehiclePlugin");
-  IGN_PROFILE_BEGIN("VehiclePlugin::update");
+  IGN_PROFILE("VehiclePlugin::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   // Get the normalized gas and brake amount
   double gas = this->gasJoint->Position(0) / this->maxGas;
   double brake = this->brakeJoint->Position(0) / this->maxBrake;

@@ -168,8 +168,8 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void ActuatorPlugin::WorldUpdateCallback()
 {
-  IGN_PROFILE("ActuatorPlugin");
-  IGN_PROFILE_BEGIN("ActuatorPlugin::WorldUpdateCallback");
+  IGN_PROFILE("ActuatorPlugin::WorldUpdateCallback");
+  IGN_PROFILE_BEGIN("WorldUpdateCallback");
   // Update the stored joints according to the desired model.
   for (unsigned int i = 0; i < this->joints.size(); i++)
   {

@@ -252,8 +252,8 @@ void MultiCameraSensor::Render()
 //////////////////////////////////////////////////
 bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("MultiCameraSensor");
-  IGN_PROFILE_BEGIN("MultiCameraSensor::update");
+  IGN_PROFILE("MultiCameraSensor::UpdateImpl");
+  IGN_PROFILE_BEGIN("Update");
 
   std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
 
@@ -280,7 +280,7 @@ bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
   }
   IGN_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("MultiCameraSensor::publish");
+  IGN_PROFILE_BEGIN("Publish");
   if (publish)
     this->dataPtr->imagePub->Publish(this->dataPtr->msg);
   IGN_PROFILE_END();

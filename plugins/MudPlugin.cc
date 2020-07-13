@@ -180,8 +180,8 @@ void MudPlugin::OnContact(ConstContactsPtr &_msg)
 /////////////////////////////////////////////////
 void MudPlugin::OnUpdate()
 {
-  IGN_PROFILE("MudPlugin");
-  IGN_PROFILE_BEGIN("MudPlugin::update");
+  IGN_PROFILE("MudPlugin:OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   double dt = this->physics->GetMaxStepSize();
   if (dt < 1e-6)
     dt = 1e-6;

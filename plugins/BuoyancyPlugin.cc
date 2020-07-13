@@ -154,8 +154,8 @@ void BuoyancyPlugin::Init()
 /////////////////////////////////////////////////
 void BuoyancyPlugin::OnUpdate()
 {
-  IGN_PROFILE("BuoyancyPlugin");
-  IGN_PROFILE_BEGIN("BuoyancyPlugin::update");
+  IGN_PROFILE("BuoyancyPlugin::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   for (auto link : this->model->GetLinks())
   {
     VolumeProperties volumeProperties = this->volPropsMap[link->GetId()];

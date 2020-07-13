@@ -145,8 +145,8 @@ void RandomVelocityPlugin::Reset()
 /////////////////////////////////////////////////
 void RandomVelocityPlugin::Update(const common::UpdateInfo &_info)
 {
-  IGN_PROFILE("RandomVelocityPlugin");
-  IGN_PROFILE_BEGIN("RandomVelocityPlugin::update");
+  IGN_PROFILE("RandomVelocityPlugin:Update");
+  IGN_PROFILE_BEGIN("Update");
   GZ_ASSERT(this->dataPtr->link, "<link> in RandomVelocity plugin is null");
 
   // Short-circuit in case the link is invalid.

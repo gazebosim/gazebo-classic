@@ -415,7 +415,7 @@ static void RetrieveDARTCollisions(
 void DARTPhysics::UpdateCollision()
 {
   IGN_PROFILE("DARTPhysics::UpdateCollision");
-  IGN_PROFILE_BEGIN("DARTPhysics::UpdateCollision");
+  IGN_PROFILE_BEGIN("UpdateCollision");
 
   if (!this->world->PhysicsEnabled())
   {
@@ -440,7 +440,7 @@ void DARTPhysics::UpdateCollision()
 void DARTPhysics::UpdatePhysics()
 {
   IGN_PROFILE("DARTPhysics::UpdatePhysics");
-  IGN_PROFILE_BEGIN("DARTPhysics::Update");
+  IGN_PROFILE_BEGIN("Update");
 
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);

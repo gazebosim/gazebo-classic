@@ -212,8 +212,8 @@ void WheelTrackedVehiclePlugin::UpdateTrackSurface()
 
 void WheelTrackedVehiclePlugin::OnUpdate()
 {
-  IGN_PROFILE("WheelTrackedVehiclePlugin");
-  IGN_PROFILE_BEGIN("WheelTrackedVehiclePlugin::update");
+  IGN_PROFILE("WheelTrackedVehiclePlugin::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   std::lock_guard<std::mutex> lock(this->mutex);
 
   for (auto trackPair : this->trackNames)

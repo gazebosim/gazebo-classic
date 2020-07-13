@@ -133,8 +133,8 @@ void GimbalSmall2dPlugin::OnUpdate()
   if (!this->dataPtr->tiltJoint)
     return;
 
-  IGN_PROFILE("GimbalSmall2dPlugin");
-  IGN_PROFILE_BEGIN("GimbalSmall2dPlugin::update");
+  IGN_PROFILE("GimbalSmall2dPlugin::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
 
   double angle = this->dataPtr->tiltJoint->Position(0);
 

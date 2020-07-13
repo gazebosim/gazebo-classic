@@ -189,8 +189,8 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void LinkPlot3DPlugin::OnUpdate()
 {
-  IGN_PROFILE("LinkPlot3DPlugin");
-  IGN_PROFILE_BEGIN("LinkPlot3DPlugin::update");
+  IGN_PROFILE("LinkPlot3DPlugin::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   auto currentTime = this->dataPtr->world->SimTime();
 
   // check for world reset

@@ -177,8 +177,8 @@ void LiftDragPlugin::OnUpdate()
   if (vel.Length() <= 0.01)
     return;
 
-  IGN_PROFILE("LiftDragPlugin");
-  IGN_PROFILE_BEGIN((std::string("LiftDragPlugin::Update") + std::string(this->link->GetName())).c_str());
+  IGN_PROFILE("LiftDragPlugin::OnUpdate");
+  IGN_PROFILE_BEGIN(std::string(this->link->GetName()).c_str());
 
   // pose of body
   ignition::math::Pose3d pose = this->link->WorldPose();

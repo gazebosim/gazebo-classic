@@ -117,8 +117,8 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 {
-  IGN_PROFILE("SkidSteerDrivePlugin");
-  IGN_PROFILE_BEGIN("SkidSteerDrivePlugin::update");
+  IGN_PROFILE("SkidSteerDrivePlugin::OnVelMsg");
+  IGN_PROFILE_BEGIN("Update");
   // gzmsg << "cmd_vel: " << msg->position().x() << ", "
   //       << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
 

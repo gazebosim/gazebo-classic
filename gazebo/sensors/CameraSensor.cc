@@ -225,16 +225,16 @@ void CameraSensor::Render()
 //////////////////////////////////////////////////
 bool CameraSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("CameraSensor");
+  IGN_PROFILE("CameraSensor::UpdateImpl");
 
   if (!this->dataPtr->rendered)
     return false;
 
-  IGN_PROFILE_BEGIN("CameraSensor::PostRender");
+  IGN_PROFILE_BEGIN("PostRender");
   this->camera->PostRender();
   IGN_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("DepthCameraSensor::fillarray");
+  IGN_PROFILE_BEGIN("fillarray");
 
   if ((this->imagePub && this->imagePub->HasConnections()) ||
       this->imagePubIgn.HasConnections())
@@ -375,4 +375,3 @@ void CameraSensor::ResetLastUpdateTime()
 {
   Sensor::ResetLastUpdateTime();
 }
-

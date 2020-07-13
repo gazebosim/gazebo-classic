@@ -670,7 +670,7 @@ void World::Step()
   DIAG_TIMER_START("World::Step");
 
   IGN_PROFILE("World::Step");
-  IGN_PROFILE_BEGIN("World::loadPlugins");
+  IGN_PROFILE_BEGIN("loadPlugins");
   /// need this because ODE does not call dxReallocateWorldProcessContext()
   /// until dWorld.*Step
   /// Plugins that manipulate joints (and probably other properties) require
@@ -684,14 +684,14 @@ void World::Step()
   IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Step", "loadPlugins");
 
-  IGN_PROFILE_BEGIN("World::publishWorldStats");
+  IGN_PROFILE_BEGIN("publishWorldStats");
   // Send statistics about the world simulation
   this->PublishWorldStats();
   IGN_PROFILE_END();
 
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
 
-  IGN_PROFILE_BEGIN("World::sleepOffset");
+  IGN_PROFILE_BEGIN("sleepOffset");
   double updatePeriod = this->dataPtr->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
@@ -714,7 +714,7 @@ void World::Step()
   IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Step", "sleepOffset");
 
-  IGN_PROFILE_BEGIN("World::worldUpdateMutex");
+  IGN_PROFILE_BEGIN("worldUpdateMutex");
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
   if (common::Time::GetWallTime() - this->dataPtr->prevStepWallTime +
@@ -751,7 +751,7 @@ void World::Step()
   }
   IGN_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("World::Step");
+  IGN_PROFILE_BEGIN("Step");
 
   gazebo::util::IntrospectionManager::Instance()->NotifyUpdates();
 
@@ -795,7 +795,7 @@ void World::Update()
   DIAG_TIMER_START("World::Update");
 
   IGN_PROFILE("World::Update");
-  IGN_PROFILE_BEGIN("World::Events::needsReset");
+  IGN_PROFILE_BEGIN("needsReset");
   if (this->dataPtr->needsReset)
   {
     if (this->dataPtr->resetAll)
@@ -810,26 +810,26 @@ void World::Update()
   IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "needsReset");
 
-  IGN_PROFILE_BEGIN("World::Events::worldUpdateBegin");
+  IGN_PROFILE_BEGIN("worldUpdateBegin");
   this->dataPtr->updateInfo.simTime = this->SimTime();
   this->dataPtr->updateInfo.realTime = this->RealTime();
   event::Events::worldUpdateBegin(this->dataPtr->updateInfo);
   IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "Events::worldUpdateBegin");
 
-  IGN_PROFILE_BEGIN("World::Model::Update");
+  IGN_PROFILE_BEGIN("Update");
   // Update all the models
   (*this.*dataPtr->modelUpdateFunc)();
   IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "Model::Update");
 
-  IGN_PROFILE_BEGIN("World::PhysicsEngine::UpdateCollision");
+  IGN_PROFILE_BEGIN("UpdateCollision");
   // This must be called before PhysicsEngine::UpdatePhysics for ODE.
   this->dataPtr->physicsEngine->UpdateCollision();
   IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
 
-  IGN_PROFILE_BEGIN("World::PhysicsEngine::beforePhysicsUpdate");
+  IGN_PROFILE_BEGIN("beforePhysicsUpdate");
   // Wait for logging to finish, if it's running.
   if (util::LogRecord::Instance()->Running())
   {
@@ -856,7 +856,7 @@ void World::Update()
   // Update the physics engine
   if (this->dataPtr->enablePhysicsEngine && this->dataPtr->physicsEngine)
   {
-    IGN_PROFILE_BEGIN("World::PhysicsEngine::UpdatePhysics");
+    IGN_PROFILE_BEGIN("UpdatePhysics");
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->dataPtr->physicsEngine->UpdatePhysics();
 
@@ -867,7 +867,7 @@ void World::Update()
     //   ode --> MoveCallback sets the dirtyPoses
     //           and we need to propagate it into Entity::worldPose
     {
-      IGN_PROFILE_BEGIN("World::SetWorldPose(dirtyPoses)");
+      IGN_PROFILE_BEGIN("SetWorldPose(dirtyPoses)");
       // block any other pose updates (e.g. Joint::SetPosition)
       boost::recursive_mutex::scoped_lock plock(
           *this->Physics()->GetPhysicsUpdateMutex());
@@ -884,14 +884,14 @@ void World::Update()
     DIAG_TIMER_LAP("World::Update", "SetWorldPose(dirtyPoses)");
   }
 
-  IGN_PROFILE_BEGIN("World::LogRecordNotify");
+  IGN_PROFILE_BEGIN("LogRecordNotify");
   // Only update state information if logging data.
   if (util::LogRecord::Instance()->Running())
     this->dataPtr->logCondition.notify_one();
   IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "LogRecordNotify");
 
-  IGN_PROFILE_BEGIN("World::ContactManager::PublishContacts");
+  IGN_PROFILE_BEGIN("PublishContacts");
   // Output the contact information
   this->dataPtr->physicsEngine->GetContactManager()->PublishContacts();
 

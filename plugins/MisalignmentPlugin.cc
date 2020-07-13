@@ -143,8 +143,8 @@ void MisalignmentPluginPrivate::Enable(ConstIntPtr &_msg)
 /////////////////////////////////////////////////
 void MisalignmentPluginPrivate::OnUpdate(const common::UpdateInfo &_info)
 {
-  IGN_PROFILE("MisalignmentPluginPrivate");
-  IGN_PROFILE_BEGIN("MisalignmentPluginPrivate::update");
+  IGN_PROFILE("MisalignmentPluginPrivate::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   // These poses may or may not be in world frame
   ignition::math::Pose3d refPose = this->referencePose;
   ignition::math::Pose3d tgtPose = this->targetPose;

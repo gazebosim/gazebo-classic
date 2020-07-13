@@ -83,8 +83,8 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 /////////////////////////////////////////////////
 void JointTrajectoryPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 {
-  IGN_PROFILE("JointTrajectoryPlugin");
-  IGN_PROFILE_BEGIN("JointTrajectoryPlugin::update");
+  IGN_PROFILE("JointTrajectoryPlugin::UpdateStates");
+  IGN_PROFILE_BEGIN("Update");
   common::Time cur_time = this->world->SimTime();
 
   // for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();

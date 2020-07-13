@@ -134,15 +134,15 @@ void DepthCameraSensor::Init()
 //////////////////////////////////////////////////
 bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("DepthCameraSensor");
+  IGN_PROFILE("DepthCameraSensor::UpdateImpl");
   if (!this->Rendered())
     return false;
 
-  IGN_PROFILE_BEGIN("DepthCameraSensor::PostRender");
+  IGN_PROFILE_BEGIN("PostRender");
   this->camera->PostRender();
   IGN_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("DepthCameraSensor::fillarray");
+  IGN_PROFILE_BEGIN("fillarray");
 
   if (this->imagePub && this->imagePub->HasConnections() &&
       // check if depth data is available. If not, the depth camera could be

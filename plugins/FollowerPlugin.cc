@@ -261,7 +261,7 @@ void FollowerPlugin::OnNewDepthFrame(const float *_image,
     const unsigned int /*_depth*/, const std::string &/*_format*/)
 {
   IGN_PROFILE("FollowerPlugin::OnNewDepthFrame");
-  IGN_PROFILE_BEGIN("FollowerPlugin::fillarray");
+  IGN_PROFILE_BEGIN("fillarray");
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -284,8 +284,8 @@ void FollowerPlugin::OnNewDepthFrame(const float *_image,
 /////////////////////////////////////////////////
 void FollowerPlugin::UpdateFollower()
 {
-  IGN_PROFILE("FollowerPlugin");
-  IGN_PROFILE_BEGIN("FollowerPlugin::update");
+  IGN_PROFILE("FollowerPlugin::UpdateFollower");
+  IGN_PROFILE_BEGIN("Update");
 
   if (this->dataPtr->imageMsg.width() == 0u ||
       this->dataPtr->imageMsg.height() == 0u)

@@ -552,8 +552,7 @@ void SensorManager::SensorContainer::RunLoop()
 
   while (!this->stop)
   {
-    IGN_PROFILE("SensorManagerLoop");
-    // IGN_PROFILE_BEGIN("SensorManagerLoop");
+    IGN_PROFILE("SensorManager::RunLoop");
 
     // If all the sensors get deleted, wait here.
     // Use a while loop since world resets will notify the runCondition.
@@ -610,8 +609,6 @@ void SensorManager::SensorContainer::RunLoop()
       this->runCondition.wait(timingLock);
     }
     IGN_PROFILE_END();
-
-    // IGN_PROFILE_END();
   }
 }
 
