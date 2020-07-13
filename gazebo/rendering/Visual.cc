@@ -799,7 +799,9 @@ void Visual::SetScale(const math::Vector3 &_scale)
   {
     this->dataPtr->sceneNode->setScale(
         Conversions::Convert(this->dataPtr->scale));
-  } else {
+  }
+  else
+  {
     gzerr << GetName() << ": Size of the collision contains one or several zeros." <<
       " Collisions may not visualize properly." << std::endl;
   }
