@@ -45,6 +45,8 @@ using namespace sensors;
 
 sdf::ElementPtr SensorPrivate::sdfSensor;
 
+bool Sensor::useStrictRate = false;
+
 //////////////////////////////////////////////////
 Sensor::Sensor(SensorCategory _cat)
 : dataPtr(new SensorPrivate)
@@ -65,8 +67,6 @@ Sensor::Sensor(SensorCategory _cat)
 
   this->dataPtr->updateDelay = common::Time(0.0);
   this->updatePeriod = common::Time(0.0);
-
-  this->useStrictRate = false;
 
   this->dataPtr->id = physics::getUniqueId();
 }
