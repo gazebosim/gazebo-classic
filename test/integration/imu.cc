@@ -851,6 +851,13 @@ TEST_P(ImuTest, EmptyWorldBias)
 void ImuTest::Stationary_EmptyWorld_StrictRate(
     const std::string &_physicsEngine)
 {
+  // static models not fully working in simbody yet
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #860.\n";
+    return;
+  }
+
   LoadArgs(" --lockstep -u -e " + _physicsEngine +
       " worlds/imu_strict_rate_test.world");
 
