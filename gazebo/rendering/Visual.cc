@@ -626,7 +626,6 @@ void Visual::DetachVisual(const std::string &_name)
 //////////////////////////////////////////////////
 void Visual::AttachObject(Ogre::MovableObject *_obj)
 {
-  static std::atomic_uint64_t id = 0;
   // This code makes plane render before grids. This allows grids to overlay
   // planes, and then other elements to overlay both planes and grids.
   // if (this->dataPtr->sdf->HasElement("geometry"))
@@ -648,7 +647,7 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
         {
           std::string newMaterialName;
           newMaterialName = this->dataPtr->sceneNode->getName() +
-              "_MATERIAL_" + material->getName() + "_" + boost::lexical_cast<std::string>(id++);
+              "_MATERIAL_" + material->getName();
 
           // keep a pointer to the original submesh material so it can be used
           // to restore material state when setting transparency
