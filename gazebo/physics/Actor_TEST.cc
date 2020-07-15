@@ -103,6 +103,62 @@ TEST_F(ActorTest, TrajectoryFromSDF)
 }
 
 //////////////////////////////////////////////////
+TEST_F(ActorTest, ActorCollision)
+{
+  // Load a world with an actor
+  this->Load("examples/plugins/actor_collisions/actor_collisions_noloop.world",
+             true);
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Get model
+  auto model = world->ModelByName("actor");
+  ASSERT_TRUE(model != nullptr);
+
+  // Convert to actor
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(model);
+  ASSERT_TRUE(actor != nullptr);
+
+  // Check collisions are enabled for joints defined in .world
+  std::vector<std::string> linkNames = {"LHipJoint", "LeftUpLeg", "LeftLeg",
+                                        "LeftFoot", "RHipJoint", "RightUpLeg",
+                                         "RightLeg", "RightFoot", "LowerBack",
+                                         "Spine", "Neck", "Neck1",
+                                         "LeftShoulder", "RightShoulder",
+                                         "LeftArm", "LeftForeArm",
+                                         "RightArm", "RightForeArm",
+                                         "LeftFingerBase", "RightFingerBase"};
+  for (const auto &name : linkNames)
+  {
+    auto link = actor->GetLink(name);
+    ASSERT_GT(link->GetCollisions().size(), 0u);
+  }
+
+  // Pass some time and check actor is inactive
+  world->Step(20000);
+  EXPECT_FALSE(actor->IsActive());
+
+  // Check collisions are still enabled when actor is inactive
+  std::map<std::string, ignition::math::Vector3d> linkPose;
+  for (const auto &name : linkNames)
+  {
+    auto link = actor->GetLink(name);
+    linkPose[name] = link->WorldPose().Pos();
+    ASSERT_GT(link->GetCollisions().size(), 0u);
+  }
+
+  // Pass some time and check link pose does not change when actor is inactive
+  world->Step(2000);
+  for (const auto &name : linkNames)
+  {
+    auto link = actor->GetLink(name);
+    EXPECT_NEAR(link->WorldPose().Pos().X(), linkPose[name].X(), 1e-4);
+    EXPECT_NEAR(link->WorldPose().Pos().Y(), linkPose[name].Y(), 1e-4);
+    EXPECT_NEAR(link->WorldPose().Pos().Z(), linkPose[name].Z(), 1e-4);
+  }
+}
+
+//////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
