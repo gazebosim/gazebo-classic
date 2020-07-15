@@ -2,6 +2,8 @@
 
 ## Gazebo 9.xx.x (202x-xx-xx)
 
+## Gazebo 9.13.2 (202x-xx-xx)
+
 1. Fix sensor update rate throttling when new sensors are spawned
     * [Pull request #2784](https://github.com/osrf/gazebo/pull/2784)
 
