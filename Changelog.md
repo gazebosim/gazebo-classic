@@ -2,11 +2,19 @@
 
 ## Gazebo 9.xx.x (202x-xx-xx)
 
+## Gazebo 9.13.2 (202x-xx-xx)
+
 1. Fix sensor update rate throttling when new sensors are spawned
     * [Pull request #2784](https://github.com/osrf/gazebo/pull/2784)
 
+1. Fix crash when collision size is zero
+    * [Pull request #2768](https://github.com/osrf/gazebo/pull/2768)
+
 1. LensFlare: initialize OGRE compositors during plugin initialization
-    * [Pull request #2762](https://github.com/osrf/gazebo/pull/2762)
+    * [Pull request #2764](https://github.com/osrf/gazebo/pull/2764)
+
+1. Fix pkg-config boost entries for Ubuntu Focal
+    * [Pull request #2751](https://github.com/osrf/gazebo/pull/2751)
 
 1. Fixes for ARM: FindSSE, TrackedVehiclePlugin and PluginInterfaceTest
     * [Pull request #2754](https://github.com/osrf/gazebo/pull/2754)
