@@ -8,7 +8,7 @@
   end
   # convert quaternion to Euler angles
   # taken from ignition math Quaternion class
-  # https://bitbucket.org/ignitionrobotics/ign-math/src/ignition-math2_2.2.2/include/ignition/math/Quaternion.hh#Quaternion.hh-315
+  # https://github.com/ignitionrobotics/ign-math/blob/ignition-math2_2.2.2/include/ignition/math/Quaternion.hh
   def rpy_from_q(q_in)
     q = q_in.normalize
     q2 = q.map {|x| x*x }

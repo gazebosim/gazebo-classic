@@ -60,7 +60,7 @@ namespace gazebo {
   /// <collide_without_contact_bitmask> Collision bitmask that will be set to
   ///     the whole vehicle (default is 1u).
 
-  class SimpleTrackedVehiclePlugin :
+  class GZ_PLUGIN_VISIBLE SimpleTrackedVehiclePlugin :
     public TrackedVehiclePlugin
   {
     public: SimpleTrackedVehiclePlugin() = default;
@@ -108,7 +108,7 @@ namespace gazebo {
     /// \brief Set collide categories and bits of all geometries to the
     ///        required values.
     ///
-    /// This is a workaround for https://bitbucket.org/osrf/gazebo/issues/1855 .
+    /// This is a workaround for https://github.com/osrf/gazebo/issues/1855 .
     protected: void SetGeomCategories();
 
     /// \brief Compute the direction of friction force in given contact point.

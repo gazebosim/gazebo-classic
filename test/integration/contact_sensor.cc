@@ -235,7 +235,7 @@ TEST_P(ContactSensor, MoveTool)
 
 ////////////////////////////////////////////////////////////////////////
 // Test having multiple contact sensors under a single link.
-// https://bitbucket.org/osrf/gazebo/issue/960
+// https://github.com/osrf/gazebo/issues/960
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
 {

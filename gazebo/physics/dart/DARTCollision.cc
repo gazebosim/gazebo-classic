@@ -130,7 +130,7 @@ unsigned int DARTCollision::GetCollideBits() const
 // This function should should achieve the same as this expression should:
 // ``v[i] = val;``
 // Given that i = [0..2].
-// See also https://bitbucket.org/ignitionrobotics/ign-math/issues/73
+// See also https://github.com/ignitionrobotics/ign-math/issues/73
 template<typename Float>
 void SetVector(const size_t _i, const Float _val,
                ignition::math::Vector3d &_v)
@@ -167,7 +167,7 @@ ignition::math::AxisAlignedBox UpdateAABB(
   // To construct a valid return object, use the constructor which takes two
   // vectors as arguments, the values don't actually matter.
   // See also issue #72:
-  // https://bitbucket.org/ignitionrobotics/ign-math/issues/72/
+  // https://github.com/ignitionrobotics/ign-math/issues/72/
   ignition::math::AxisAlignedBox result(_a);
 
   // for all 3 axes

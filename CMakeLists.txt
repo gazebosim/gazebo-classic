@@ -43,7 +43,7 @@ endif()
 # to choose the flag -std=gnu++14 instead of -std=c++14 when the C++14
 # features are requested. Explicitly turning this flag off will force cmake to
 # choose -std=c++14.
-# See https://bitbucket.org/ignitionrobotics/ign-cmake/issues/13 for more info.
+# See https://github.com/ignitionrobotics/ign-cmake/issues/13 for more info.
 set(CMAKE_CXX_EXTENSIONS off)
 
 ########################################

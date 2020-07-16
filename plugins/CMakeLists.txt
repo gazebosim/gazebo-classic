@@ -20,7 +20,7 @@ if(WIN32 AND NOT UNIX)
 
   # It is not really clear why including the UCRT headers is useful, and why the above CMake find
   # logic should work, however it is kept to support the existing Jenkins on Windows jobs.
-  # See https://bitbucket.org/osrf/gazebo/issues/2701 for more info
+  # See https://github.com/osrf/gazebo/issues/2701 for more info
   if(${WINDOWS_KITS_UCRT_INCLUDE})
     message(STATUS "Found Windows SDK Universal CRT include directory: ${WINDOWS_KITS_UCRT_INCLUDE}")
     include_directories(${WINDOWS_KITS_UCRT_INCLUDE})
@@ -165,7 +165,7 @@ set (DARTplugins
   GravityCompensationPlugin
 )
 
-add_library(TrackedVehiclePlugin STATIC TrackedVehiclePlugin.cc)
+add_library(TrackedVehiclePlugin SHARED TrackedVehiclePlugin.cc)
 target_link_libraries(TrackedVehiclePlugin
         libgazebo
         ${ogre_libraries}

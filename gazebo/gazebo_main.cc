@@ -146,8 +146,8 @@ int main(int _argc, char **_argv)
   }
 
   // The following was added in
-  // https://bitbucket.org/osrf/gazebo/pull-requests/2923, but it is causing
-  // shutdown issues when gazebo is used with ros.
+  // https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/2923,
+  // but it is causing shutdown issues when gazebo is used with ros.
   // if (sigaction(SIGTERM, &sigact, NULL))
   // {
   //   std::cerr << "Stopping. Unable to catch SIGTERM.\n";
