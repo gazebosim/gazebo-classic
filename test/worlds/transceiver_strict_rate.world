@@ -8,7 +8,7 @@
       <uri>model://sun</uri>
     </include>
 
-    <model name="camera_model">
+    <model name="tx_model">
       <static>true</static>
       <pose>-10.0 0.0 0.5 0 0 0</pose>
       <link name="link">
@@ -19,15 +19,11 @@
             </box>
           </geometry>
         </visual>
-        <!-- High fps high-res camera to test strict rate -->
-        <sensor name="camera_sensor" type="camera">
-          <camera>
-            <horizontal_fov>1.0472</horizontal_fov>
-            <image>
-              <width>1280</width>
-              <height>720</height>
-            </image>
-          </camera>
+        <sensor name="tx_sensor" type="wireless_transmitter">
+          <transceiver>
+            <essid>MyESSID</essid>
+            <frequency>2442.0</frequency>
+          </transceiver>
           <always_on>1</always_on>
           <!-- We choose a high fps on purpose. The goal is to check the effect
             of lockstep. -->
@@ -37,7 +33,7 @@
       </link>
     </model>
 
-    <model name="box">
+    <model name="rx_model">
       <pose>13 0 0.5 0 0 0</pose>
       <link name="link">
         <visual name="visual">
@@ -47,29 +43,19 @@
             </box>
           </geometry>
         </visual>
-        <!-- Regular camera, to make sure strict rate is only applied to the sensor intended -->
-        <sensor name="camera_sensor_regular" type="camera">
-          <camera>
-            <horizontal_fov>1.0472</horizontal_fov>
-            <image>
-              <width>320</width>
-              <height>240</height>
-            </image>
-          </camera>
+        <sensor name="rx_sensor" type="wireless_receiver">
+          <transceiver>
+            <gain>2.5</gain>
+            <power>14.5</power>
+          </transceiver>
           <always_on>1</always_on>
-          <update_rate>30</update_rate>
+          <!-- We choose a high fps on purpose. The goal is to check the effect
+            of lockstep. -->
+          <update_rate>500</update_rate>
           <visualize>true</visualize>
         </sensor>
       </link>
     </model>
-
-    <!-- Double pendulum -->
-    <include>
-      <name>active_pendulum</name>
-      <uri>model://double_pendulum_with_base</uri>
-      <pose>2 0 0 0 0 0</pose>
-      <scale>0.5 0.5 0.5</scale>
-    </include>
 
   </world>
 </sdf>

@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_SENSORS_GPURAYENSOR_PRIVATE_HH_
 #define _GAZEBO_SENSORS_GPURAYENSOR_PRIVATE_HH_
 
+#include <limits>
 #include <mutex>
 #include <sdf/sdf.hh>
 
@@ -86,6 +87,13 @@ namespace gazebo
 
       /// \brief True if the sensor was rendered.
       public: bool rendered;
+
+      /// \brief True if the sensor needs a rendering
+      public: bool renderNeeded = false;
+
+      /// \brief Timestamp of the forthcoming rendering
+      public: double nextRenderingTime
+                           = std::numeric_limits<double>::quiet_NaN();
     };
   }
 }

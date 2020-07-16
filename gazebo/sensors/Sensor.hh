@@ -205,6 +205,13 @@ namespace gazebo
       /// \param[in] _sdf SDF parameters.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
 
+      /// \brief Whether to enforce strict sensor update rate, even if physics
+      ///        time has to slow down to wait for sensor updates to satisfy
+      ///        the desired rate.
+      /// \details static type to avoid breaking ABI and because lockstep
+      ///          setting is global.
+      protected: static bool useStrictRate;
+
       /// \brief True if sensor generation is active.
       protected: bool active;
 
@@ -238,11 +245,6 @@ namespace gazebo
       /// \brief Desired time between updates, set indirectly by
       ///        Sensor::SetUpdateRate.
       protected: common::Time updatePeriod;
-
-      /// \brief Whether to enforce strict sensor update rate, even if physics
-      ///        time has to slow down to wait for sensor updates to satisfy
-      ///        the desired rate.
-      protected: bool useStrictRate;
 
       /// \brief Time of the last update.
       protected: common::Time lastUpdateTime;

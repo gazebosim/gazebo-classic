@@ -21,6 +21,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
@@ -79,12 +80,26 @@ std::string GpuRaySensor::Topic() const
 void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
+  // useStrictRate is set in Sensor::Load()
+  if (this->useStrictRate)
+  {
+    this->connections.push_back(
+        event::Events::ConnectPreRenderEnded(
+          boost::bind(&GpuRaySensor::PrerenderEnded, this)));
+  }
 }
 
 //////////////////////////////////////////////////
 void GpuRaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
+  // useStrictRate is set in Sensor::Load()
+  if (this->useStrictRate)
+  {
+    this->connections.push_back(
+        event::Events::ConnectPreRenderEnded(
+          boost::bind(&GpuRaySensor::PrerenderEnded, this)));
+  }
 
   this->dataPtr->scanPub =
     this->node->Advertise<msgs::LaserScanStamped>(this->Topic(), 50);
@@ -346,13 +361,66 @@ void GpuRaySensor::Fini()
 //////////////////////////////////////////////////
 void GpuRaySensor::SetActive(bool _value)
 {
+  // If this sensor is reactivated
+  if (this->useStrictRate && _value && !this->IsActive())
+  {
+    // the next rendering time must be reset to ensure it is properly
+    // computed by GpuRaySensor::NeedsUpdate.
+    this->dataPtr->nextRenderingTime = std::numeric_limits<double>::quiet_NaN();
+  }
   Sensor::SetActive(_value);
 }
 
 //////////////////////////////////////////////////
 bool GpuRaySensor::NeedsUpdate()
 {
-  return Sensor::NeedsUpdate();
+  if (this->useStrictRate)
+  {
+    double simTime;
+    if (this->scene)
+      simTime = this->scene->SimTime().Double();
+    else
+      simTime = this->world->SimTime().Double();
+
+    if (simTime < this->lastMeasurementTime.Double())
+    {
+      // Rendering sensors also set the lastMeasurementTime variable in Render()
+      // and lastUpdateTime in Sensor::Update based on Scene::SimTime() which
+      // could be outdated when the world is reset. In this case reset
+      // the variables back to 0.
+      this->ResetLastUpdateTime();
+      return false;
+    }
+
+    double dt = this->world->Physics()->GetMaxStepSize();
+
+    // If next rendering time is not set yet
+    if (std::isnan(this->dataPtr->nextRenderingTime))
+    {
+      if (this->updatePeriod == 0
+          || (simTime > 0.0 &&
+          std::abs(std::fmod(simTime, this->updatePeriod.Double())) < dt))
+      {
+        this->dataPtr->nextRenderingTime = simTime;
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    if (simTime > this->dataPtr->nextRenderingTime + dt)
+      return true;
+
+    // Trigger on the tick the closest from the targeted rendering time
+    return (ignition::math::lessOrNearEqual(
+          std::abs(simTime - this->dataPtr->nextRenderingTime), dt / 2.0));
+  }
+  else
+  {
+    return Sensor::NeedsUpdate();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -583,15 +651,46 @@ int GpuRaySensor::Fiducial(const unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
+void GpuRaySensor::PrerenderEnded()
+{
+  if (this->useStrictRate && this->dataPtr->laserCam && this->IsActive() &&
+      this->NeedsUpdate())
+  {
+    // compute next rendering time, take care of the case where period is zero.
+    double dt;
+    if (this->updatePeriod <= 0.0)
+      dt = this->world->Physics()->GetMaxStepSize();
+    else
+      dt = this->updatePeriod.Double();
+    this->dataPtr->nextRenderingTime += dt;
+
+    this->dataPtr->renderNeeded = true;
+    this->lastMeasurementTime = this->scene->SimTime();
+  }
+}
+
+//////////////////////////////////////////////////
 void GpuRaySensor::Render()
 {
-  if (!this->dataPtr->laserCam || !this->IsActive() || !this->NeedsUpdate())
-    return;
+  if (this->useStrictRate)
+  {
+    if (!this->dataPtr->renderNeeded)
+      return;
 
-  this->lastMeasurementTime = this->scene->SimTime();
+    this->dataPtr->laserCam->Render();
+    this->dataPtr->rendered = true;
+    this->dataPtr->renderNeeded = false;
+  }
+  else
+  {
+    if (!this->dataPtr->laserCam || !this->IsActive() || !this->NeedsUpdate())
+      return;
 
-  this->dataPtr->laserCam->Render();
-  this->dataPtr->rendered = true;
+    this->lastMeasurementTime = this->scene->SimTime();
+
+    this->dataPtr->laserCam->Render();
+    this->dataPtr->rendered = true;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -692,11 +791,23 @@ rendering::GpuLaserPtr GpuRaySensor::LaserCamera() const
 //////////////////////////////////////////////////
 double GpuRaySensor::NextRequiredTimestamp() const
 {
-  return Sensor::NextRequiredTimestamp();
+  if (this->useStrictRate)
+  {
+    if (!ignition::math::equal(this->updatePeriod.Double(), 0.0))
+      return this->dataPtr->nextRenderingTime;
+    else
+      return std::numeric_limits<double>::quiet_NaN();
+  }
+  else
+  {
+    return Sensor::NextRequiredTimestamp();
+  }
 }
 
 //////////////////////////////////////////////////
 void GpuRaySensor::ResetLastUpdateTime()
 {
   Sensor::ResetLastUpdateTime();
+  if (this->useStrictRate)
+    this->dataPtr->nextRenderingTime = std::numeric_limits<double>::quiet_NaN();
 }
