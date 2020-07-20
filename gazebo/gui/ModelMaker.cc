@@ -15,6 +15,7 @@
  *
  */
 #include <sstream>
+#include <streambuf>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -103,11 +104,12 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
   }
 
   this->dataPtr->modelSDF.reset(new sdf::SDF);
-  sdf::initFile("root.sdf", this->dataPtr->modelSDF);
 
+  sdf::initFile("root.sdf", this->dataPtr->modelSDF);
   sdf::Errors errors;
-  if (!sdf::readFileWithoutConversion(
-          _filename, this->dataPtr->modelSDF, errors))
+
+  sdf::readFile(_filename, this->dataPtr->modelSDF, errors);
+  if (!errors.empty())
   {
     gzerr << "Unable to load file[" << _filename << "]\n";
     for (const auto &e : errors)
@@ -116,6 +118,14 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
     }
     return false;
   }
+
+  // Since the above didn't fail, we assume the file exists
+  // We also assume that _filename is a path to a file, not to a model directory
+  std::ifstream inputFile(_filename);
+  this->dataPtr->modelSDFString =
+      std::string(std::istreambuf_iterator<char>(inputFile),
+                  std::istreambuf_iterator<char>());
+
   if (this->dataPtr->modelSDF->Root()->HasElement("model"))
   {
     common::convertPosesToSdf16(
@@ -173,6 +183,7 @@ bool ModelMaker::InitSimpleShape(SimpleShapes _shape)
     gzerr << "Unable to load SDF [" << modelString << "]" << std::endl;
     return false;
   }
+  this->dataPtr->modelSDFString = modelString;
 
   return this->Init();
 }
@@ -347,6 +358,7 @@ void ModelMaker::Stop()
   }
   this->dataPtr->modelVisual.reset();
   this->dataPtr->modelSDF.reset();
+  this->dataPtr->modelSDFString.clear();
 
   EntityMaker::Stop();
 }
@@ -357,32 +369,11 @@ void ModelMaker::CreateTheEntity()
   msgs::Factory msg;
   if (!this->dataPtr->clone)
   {
-    sdf::ElementPtr modelElem;
-    if (this->dataPtr->modelSDF->Root()->HasElement("model"))
-    {
-      modelElem = this->dataPtr->modelSDF->Root()->GetElement("model");
-    }
-    else
-    {
-      gzerr << "Couldn't find model element in sdf, won't create entity."
-            << std::endl;
-      return;
-    }
-
-    // The server will generate a unique name in case of name collision
-    std::string modelName = modelElem->Get<std::string>("name");
-
-    // Remove the topic namespace from the model name. This will get re-inserted
-    // by the World automatically
-    modelName.erase(0, this->dataPtr->node->GetTopicNamespace().size()+2);
-
     // The the SDF model's name
-    modelElem->GetAttribute("name")->Set(modelName);
-    modelElem->GetElement("pose")->Set(
-        this->dataPtr->modelVisual->WorldPose());
+    msgs::Set(msg.mutable_pose(), this->dataPtr->modelVisual->WorldPose());
 
     // Spawn the model in the physics server
-    msg.set_sdf(this->dataPtr->modelSDF->ToString());
+    msg.set_sdf(this->dataPtr->modelSDFString);
   }
   else
   {

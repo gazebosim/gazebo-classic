@@ -143,12 +143,12 @@ namespace gazebo
     protected: virtual bool RunImpl();
 
     /// \brief Spawn helper function.
-    /// \param[in] _sdf SDF model to spawn.
+    /// \param[in] _sdfString SDF string of model to spawn.
     /// \param[in] _name Name for the model.
     /// \param[in] _pose Pose of the model.
     /// \param[in] _node Node for communication.
     /// \return True if the spawn message was sent.
-    private: bool ProcessSpawn(sdf::SDFPtr _sdf,
+    private: bool ProcessSpawn(const std::string &_sdfString,
                  const std::string &_name, const ignition::math::Pose3d &_pose,
                  transport::NodePtr _node);
   };

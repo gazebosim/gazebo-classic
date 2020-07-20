@@ -35,6 +35,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 #include "gazebo/common/URI.hh"
 
 #include "gazebo/physics/Gripper.hh"
@@ -86,20 +87,19 @@ void Model::Load(sdf::ElementPtr _sdf)
       this->modelSDFDom = worldDom->ModelByName(modelName);
     }
 
-    ignition::math::SemanticVersion sdfOriginalVersion(_sdf->OriginalVersion());
-    if (sdfOriginalVersion >= ignition::math::SemanticVersion(1, 7))
+    if (nullptr == this->modelSDFDom)
     {
-      if (nullptr == this->modelSDFDom)
+      this->modelSDFDomIsolated = std::make_unique<sdf::Model>();
+      sdf::Errors errors = this->modelSDFDomIsolated->Load(_sdf);
+      // Print errors and load the parts that worked.
+      for (const auto &error : errors)
       {
-        this->modelSDFDomIsolated = std::make_unique<sdf::Model>();
-        sdf::Errors errors = this->modelSDFDomIsolated->Load(_sdf);
-        // Print errors and load the parts that worked.
-        for (const auto &error : errors)
+        if (common::isSdfFrameSemanticsError(error))
         {
           gzerr << error << "\n";
         }
-        this->modelSDFDom = this->modelSDFDomIsolated.get();
       }
+      this->modelSDFDom = this->modelSDFDomIsolated.get();
     }
   }
 

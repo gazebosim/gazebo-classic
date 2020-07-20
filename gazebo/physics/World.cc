@@ -52,6 +52,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/URI.hh"
 
@@ -178,14 +179,13 @@ void World::Load(sdf::ElementPtr _sdf)
 
   // Create a DOM object to compute the resolved initial pose (with frame
   // semantics)
-  ignition::math::SemanticVersion sdfOriginalVersion(_sdf->OriginalVersion());
-  if (sdfOriginalVersion >= ignition::math::SemanticVersion(1, 7))
-  {
-    this->dataPtr->worldSDFDom = std::make_unique<sdf::World>();
-    sdf::Errors errors = this->dataPtr->worldSDFDom->Load(_sdf);
+  this->dataPtr->worldSDFDom = std::make_unique<sdf::World>();
+  sdf::Errors errors = this->dataPtr->worldSDFDom->Load(_sdf);
 
-    // Print errors and load the parts that worked.
-    for (const auto &error : errors)
+  // Print errors and load the parts that worked.
+  for (const auto &error : errors)
+  {
+    if (common::isSdfFrameSemanticsError(error))
     {
       gzerr << error << "\n";
     }
