@@ -1,6 +1,14 @@
 ## Gazebo 11
 
-## Gazebo 11.x.x (202x-xx-xx)
+## Gazebo 11.1.0 (202x-xx-xx)
+
+1. Platform fixes for arm and Windows: FindSSE, Tracked Plugins, io.h header
+    * https://github.com/osrf/gazebo/pull/2753
+    * https://github.com/osrf/gazebo/pull/2748
+    * https://github.com/osrf/gazebo/pull/2745
+
+1. Fixed crash when collision size is zero
+    * [GitHub pull request 2770](https://github.com/osrf/gazebo/pull/2770)
 
 1. Fix corruption when a URDF file is included from a SDFormat 1.6 model #2734
     * [Pull request 2734](https://github.com/osrf/gazebo/pull/2734)
