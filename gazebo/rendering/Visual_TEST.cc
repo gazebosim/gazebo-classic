@@ -1588,10 +1588,11 @@ TEST_F(Visual_TEST, ConvertVisualType)
       rendering::Visual::ConvertVisualType(msgs::Visual::PHYSICS));
 }
 
-TEST_F(Visual_TEST, collisionZero)
+TEST_F(Visual_TEST, CollisionZero)
 {
-  // This test checks that there isn't a segmentation fault when inserting zero collision geometries
-  // Load a world containing 3 simple shapes with collision geometry equals to zero
+  // This test checks that there isn't a segmentation fault when inserting zero collision
+  // geometries.
+  // Load a world containing 3 simple shapes with collision geometry equals to zero.
   Load("worlds/collision_zero.world");
 
   // Get the scene
@@ -1614,6 +1615,14 @@ TEST_F(Visual_TEST, collisionZero)
     common::Time::MSleep(1000);
     sleep++;
   }
+  scene->ShowCollisions(true);
+  
+  // box
+  ASSERT_NE(box, nullptr);
+  // cylinder
+  ASSERT_NE(cylinder, nullptr);
+  // sphere
+  ASSERT_NE(sphere, nullptr);
 }
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, Scale)
