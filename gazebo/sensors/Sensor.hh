@@ -83,7 +83,7 @@ namespace gazebo
 
       /// \brief Update the sensor.
       /// \param[in] _force True to force update, false otherwise.
-      public: void Update(const bool _force);
+      public: virtual void Update(const bool _force);
 
       /// \brief Get the update rate of the sensor.
       /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
@@ -165,7 +165,7 @@ namespace gazebo
       public: SensorCategory Category() const;
 
       /// \brief Reset the lastUpdateTime to zero.
-      public: void ResetLastUpdateTime();
+      public: virtual void ResetLastUpdateTime();
 
       /// \brief Get the sensor's ID.
       /// \return The sensor's ID.
@@ -181,6 +181,14 @@ namespace gazebo
       /// \return The sensor's noise model for the given noise type
       public: NoisePtr Noise(const SensorNoiseType _type) const;
 
+      /// \brief Get the next timestamp that will be used by the sensor
+      /// \return the timestamp
+      public: virtual double NextRequiredTimestamp() const;
+
+      /// \brief Returns true if the sensor is to follow strict update rate
+      /// \return True when sensor should follow strict update rate
+      public: bool StrictRate() const;
+
       /// \brief This gets overwritten by derived sensor types.
       ///        This function is called during Sensor::Update.
       ///        And in turn, Sensor::Update is called by
@@ -191,11 +199,18 @@ namespace gazebo
 
       /// \brief Return true if the sensor needs to be updated.
       /// \return True when sensor should be updated.
-      protected: bool NeedsUpdate();
+      protected: virtual bool NeedsUpdate();
 
       /// \brief Load a plugin for this sensor.
       /// \param[in] _sdf SDF parameters.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
+
+      /// \brief Whether to enforce strict sensor update rate, even if physics
+      ///        time has to slow down to wait for sensor updates to satisfy
+      ///        the desired rate.
+      /// \details static type to avoid breaking ABI and because lockstep
+      ///          setting is global.
+      protected: static bool useStrictRate;
 
       /// \brief True if sensor generation is active.
       protected: bool active;
@@ -240,6 +255,9 @@ namespace gazebo
 
       /// \brief Noise added to sensor data
       protected: std::map<SensorNoiseType, NoisePtr> noises;
+
+      /// \brief Event triggered when a sensor is updated.
+      protected: event::EventT<void()> updated;
 
       /// \brief Ignition transport node
       protected: ignition::transport::Node nodeIgn;

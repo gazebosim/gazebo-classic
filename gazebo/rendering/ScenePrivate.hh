@@ -216,6 +216,15 @@ namespace gazebo
       /// \brief List of road messages to process.
       public: RoadMsgs_L roadMsgs;
 
+      /// \brief used to wake up upon new Pose available
+      public: std::condition_variable newPoseCondition;
+
+      /// \brief Flag indicating that a new pose msg is available
+      public: bool newPoseAvailable = false;
+
+      /// \brief Protects flag newPoseAvailable
+      public: std::mutex newPoseMutex;
+
       /// \brief Mutex to lock the various message buffers.
       public: std::mutex *receiveMutex = nullptr;
 

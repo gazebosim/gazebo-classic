@@ -607,7 +607,7 @@ namespace gazebo
       /// \param[in] _scene Pointer to the scene.
       public: void SetScene(ScenePtr _scene);
 
-      /// \brief Get current.
+      /// \brief Get current scene.
       /// \return Pointer to the scene.
       public: ScenePtr GetScene() const;
 
