@@ -29,6 +29,8 @@
 #include <gazebo/common/CommonTypes.hh>
 #include "gazebo/util/system.hh"
 
+#include <ignition/common/Profiler.hh>
+
 namespace gazebo
 {
   /// \ingroup gazebo_event
@@ -268,13 +270,18 @@ namespace gazebo
       /// \brief Signal the event for all subscribers.
       public: void Signal()
       {
+        IGN_PROFILE("Event::Signal");
+
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if (iter.second->on){
+            IGN_PROFILE_BEGIN("callback0");
             iter.second->callback();
+            IGN_PROFILE_END();
+          }
         }
       }
 
@@ -283,13 +290,18 @@ namespace gazebo
       public: template< typename P >
               void Signal(const P &_p)
       {
+        IGN_PROFILE("Event::Signal");
+
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if (iter.second->on){
+            IGN_PROFILE_BEGIN("callback1");
             iter.second->callback(_p);
+            IGN_PROFILE_END();
+          }
         }
       }
 
@@ -299,13 +311,18 @@ namespace gazebo
       public: template< typename P1, typename P2 >
               void Signal(const P1 &_p1, const P2 &_p2)
       {
+        IGN_PROFILE("Event::Signal");
+
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if (iter.second->on){
+            IGN_PROFILE_BEGIN("callback2");
             iter.second->callback(_p1, _p2);
+            IGN_PROFILE_END();
+          }
         }
       }
 
@@ -316,13 +333,18 @@ namespace gazebo
       public: template< typename P1, typename P2, typename P3 >
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3)
       {
+        IGN_PROFILE("Event::Signal");
+
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if (iter.second->on){
+            IGN_PROFILE_BEGIN("callback3");
             iter.second->callback(_p1, _p2, _p3);
+            IGN_PROFILE_END();
+          }
         }
       }
 
@@ -335,13 +357,18 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4)
       {
+        IGN_PROFILE("Event::Signal");
+
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if (iter.second->on){
+            IGN_PROFILE_BEGIN("callback4");
             iter.second->callback(_p1, _p2, _p3, _p4);
+            IGN_PROFILE_END();
+          }
         }
       }
 
@@ -356,13 +383,18 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4, const P5 &_p5)
       {
+        IGN_PROFILE("Event::Signal");
+
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if (iter.second->on){
+            IGN_PROFILE_BEGIN("callback5");
             iter.second->callback(_p1, _p2, _p3, _p4, _p5);
+            IGN_PROFILE_END();
+          }
         }
       }
 
@@ -378,13 +410,18 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6)
       {
+        IGN_PROFILE("Event::Signal");
+
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if (iter.second->on){
+            IGN_PROFILE_BEGIN("callback6");
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6);
+            IGN_PROFILE_END();
+          }
         }
       }
 
@@ -401,13 +438,18 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7)
       {
+        IGN_PROFILE("Event::Signal");
+
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if (iter.second->on){
+            IGN_PROFILE_BEGIN("callback7");
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
+            IGN_PROFILE_END();
+          }
         }
       }
 
@@ -426,6 +468,8 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8)
       {
+        IGN_PROFILE("Event::Signal");
+
         this->Cleanup();
 
         this->SetSignaled(true);
@@ -433,7 +477,9 @@ namespace gazebo
         {
           if (iter.second->on)
           {
+            IGN_PROFILE_BEGIN("callback8");
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+            IGN_PROFILE_END();
           }
         }
       }
@@ -455,6 +501,8 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8, const P9 &_p9)
       {
+        IGN_PROFILE("Event::Signal");
+
         this->Cleanup();
 
         this->SetSignaled(true);
@@ -462,8 +510,10 @@ namespace gazebo
         {
           if (iter.second->on)
           {
+            IGN_PROFILE_BEGIN("callback9");
             iter.second->callback(
                 _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
+            IGN_PROFILE_END();
           }
         }
       }
@@ -491,10 +541,14 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
+          IGN_PROFILE("Event::Signal");
+
           if (iter.second->on)
           {
+            IGN_PROFILE_BEGIN("callback10");
             iter.second->callback(
                 _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
+            IGN_PROFILE_END();
           }
         }
       }
