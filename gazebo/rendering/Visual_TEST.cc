@@ -1617,7 +1617,6 @@ TEST_F(Visual_TEST, CollisionZero)
     sleep++;
   }
   scene->ShowCollisions(true);
-
   // box
   ASSERT_NE(box, nullptr);
   // cylinder
