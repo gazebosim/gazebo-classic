@@ -1543,6 +1543,42 @@ TEST_F(Visual_TEST, ConvertVisualType)
       rendering::Visual::ConvertVisualType(msgs::Visual::PHYSICS));
 }
 
+TEST_F(Visual_TEST, CollisionZero)
+{
+  // This test checks that there isn't a segmentation fault when inserting
+  // zero collision geometries.
+  // Load a world containing 3 simple shapes with collision geometry equals
+  // to zero.
+  Load("worlds/collision_zero.world");
+
+  // Get the scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_NE(scene, nullptr);
+
+  // Wait until all models are inserted
+  int sleep = 0;
+  int maxSleep = 10;
+  rendering::VisualPtr box, sphere, cylinder;
+  while ((!box || !sphere || !cylinder) && sleep < maxSleep)
+  {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
+    box = scene->GetVisual("box");
+    cylinder = scene->GetVisual("cylinder");
+    sphere = scene->GetVisual("sphere");
+    common::Time::MSleep(1000);
+    sleep++;
+  }
+  scene->ShowCollisions(true);
+  // box
+  ASSERT_NE(box, nullptr);
+  // cylinder
+  ASSERT_NE(cylinder, nullptr);
+  // sphere
+  ASSERT_NE(sphere, nullptr);
+}
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, Scale)
 {
