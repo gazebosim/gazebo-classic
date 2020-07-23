@@ -39,6 +39,9 @@ boost::mutex g_sensorTimingMutex;
 /// max update rate needs to be recalculated
 bool g_sensorsDirty = true;
 
+std::condition_variable
+    SensorManager::ImageSensorContainer::conditionPrerendered;
+
 //////////////////////////////////////////////////
 SensorManager::SensorManager()
   : initialized(false), removeAllSensors(false)

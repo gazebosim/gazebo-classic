@@ -293,7 +293,10 @@ namespace gazebo
                  public: virtual void Update(bool _force = false);
 
                  /// \brief used to wait for the end of prerendering
-                 private: std::condition_variable conditionPrerendered;
+                 /// Declared static to keep ABI compatibility. There should
+                 /// only be one instance of ImageSensorContainer so using
+                 /// a static variable should be fine.
+                 private: static std::condition_variable conditionPrerendered;
                };
       /// \endcond
 
