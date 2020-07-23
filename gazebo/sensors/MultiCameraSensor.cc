@@ -36,6 +36,7 @@
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/SensorPrivate.hh"
 #include "gazebo/sensors/MultiCameraSensorPrivate.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
 
@@ -49,6 +50,10 @@ MultiCameraSensor::MultiCameraSensor()
 : Sensor(sensors::IMAGE),
   dataPtr(new MultiCameraSensorPrivate)
 {
+  this->dataPtr->extension = std::make_shared<RenderingSensorExt>(this);
+  auto ext = std::dynamic_pointer_cast<SensorExt>(this->dataPtr->extension);
+  this->SetExtension(ext);
+
   this->dataPtr->rendered = false;
   this->connections.push_back(
       event::Events::ConnectRender(
@@ -232,71 +237,6 @@ rendering::CameraPtr MultiCameraSensor::Camera(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void MultiCameraSensor::SetActive(bool _value)
-{
-  // If this sensor is reactivated
-  if (this->useStrictRate && _value && !this->IsActive())
-  {
-    // the next rendering time must be reset to ensure it is properly
-    // computed by Sensor::NeedsUpdate.
-    this->dataPtr->nextRenderingTime = std::numeric_limits<double>::quiet_NaN();
-  }
-  Sensor::SetActive(_value);
-}
-
-//////////////////////////////////////////////////
-bool MultiCameraSensor::NeedsUpdate()
-{
-  if (this->useStrictRate)
-  {
-    double simTime;
-    if (this->scene)
-      simTime = this->scene->SimTime().Double();
-    else
-      simTime = this->world->SimTime().Double();
-
-    if (simTime < this->lastMeasurementTime.Double())
-    {
-      // Rendering sensors also set the lastMeasurementTime variable in Render()
-      // and lastUpdateTime in Sensor::Update based on Scene::SimTime() which
-      // could be outdated when the world is reset. In this case reset
-      // the variables back to 0.
-      this->ResetLastUpdateTime();
-      return false;
-    }
-
-    double dt = this->world->Physics()->GetMaxStepSize();
-
-    // If next rendering time is not set yet
-    if (std::isnan(this->dataPtr->nextRenderingTime))
-    {
-      if (this->updatePeriod == 0
-          || (simTime > 0.0 &&
-          std::abs(std::fmod(simTime, this->updatePeriod.Double())) < dt))
-      {
-        this->dataPtr->nextRenderingTime = simTime;
-        return true;
-      }
-      else
-      {
-        return false;
-      }
-    }
-
-    if (simTime > this->dataPtr->nextRenderingTime + dt)
-      return true;
-
-    // Trigger on the tick the closest from the targeted rendering time
-    return (ignition::math::lessOrNearEqual(
-          std::abs(simTime - this->dataPtr->nextRenderingTime), dt / 2.0));
-  }
-  else
-  {
-    return Sensor::NeedsUpdate();
-  }
-}
-
-//////////////////////////////////////////////////
 void MultiCameraSensor::PrerenderEnded()
 {
   if (this->useStrictRate && this->dataPtr->cameras.size() > 0 &&
@@ -308,7 +248,8 @@ void MultiCameraSensor::PrerenderEnded()
       dt = this->world->Physics()->GetMaxStepSize();
     else
       dt = this->updatePeriod.Double();
-    this->dataPtr->nextRenderingTime += dt;
+    this->dataPtr->extension->SetNextRenderingTime(
+        this->dataPtr->extension->NextRenderingTime() + dt);
 
     this->dataPtr->renderNeeded = true;
     this->lastMeasurementTime = this->scene->SimTime();
@@ -455,28 +396,4 @@ bool MultiCameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->dataPtr->imagePub && this->dataPtr->imagePub->HasConnections());
-}
-
-//////////////////////////////////////////////////
-double MultiCameraSensor::NextRequiredTimestamp() const
-{
-  if (this->useStrictRate)
-  {
-    if (!ignition::math::equal(this->updatePeriod.Double(), 0.0))
-      return this->dataPtr->nextRenderingTime;
-    else
-      return std::numeric_limits<double>::quiet_NaN();
-  }
-  else
-  {
-    return Sensor::NextRequiredTimestamp();
-  }
-}
-
-//////////////////////////////////////////////////
-void MultiCameraSensor::ResetLastUpdateTime()
-{
-  Sensor::ResetLastUpdateTime();
-  if (this->useStrictRate)
-    this->dataPtr->nextRenderingTime = std::numeric_limits<double>::quiet_NaN();
 }

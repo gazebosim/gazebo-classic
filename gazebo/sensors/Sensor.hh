@@ -41,7 +41,9 @@ namespace gazebo
   namespace sensors
   {
     // Forward declare private data
+    class RenderingSensorExtPrivate;
     class SensorPrivate;
+    class SensorExt;
 
     /// \addtogroup gazebo_sensors
     /// \{
@@ -83,7 +85,7 @@ namespace gazebo
 
       /// \brief Update the sensor.
       /// \param[in] _force True to force update, false otherwise.
-      public: virtual void Update(const bool _force);
+      public: void Update(const bool _force);
 
       /// \brief Get the update rate of the sensor.
       /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
@@ -165,7 +167,7 @@ namespace gazebo
       public: SensorCategory Category() const;
 
       /// \brief Reset the lastUpdateTime to zero.
-      public: virtual void ResetLastUpdateTime();
+      public: void ResetLastUpdateTime();
 
       /// \brief Get the sensor's ID.
       /// \return The sensor's ID.
@@ -183,7 +185,7 @@ namespace gazebo
 
       /// \brief Get the next timestamp that will be used by the sensor
       /// \return the timestamp
-      public: virtual double NextRequiredTimestamp() const;
+      public: double NextRequiredTimestamp() const;
 
       /// \brief Returns true if the sensor is to follow strict update rate
       /// \return True when sensor should follow strict update rate
@@ -199,7 +201,14 @@ namespace gazebo
 
       /// \brief Return true if the sensor needs to be updated.
       /// \return True when sensor should be updated.
-      protected: virtual bool NeedsUpdate();
+      protected: bool NeedsUpdate();
+
+      /// \internal
+      /// \brief Set sensor extension. The extension class consts of
+      /// functions/features that could not be added to the core Sensor class
+      /// for ABI compatibility reason. For internal use only
+      /// \param[in] _ext Extension class
+      protected: void SetExtension(std::shared_ptr<SensorExt> _ext);
 
       /// \brief Load a plugin for this sensor.
       /// \param[in] _sdf SDF parameters.
@@ -256,16 +265,84 @@ namespace gazebo
       /// \brief Noise added to sensor data
       protected: std::map<SensorNoiseType, NoisePtr> noises;
 
-      /// \brief Event triggered when a sensor is updated.
-      protected: event::EventT<void()> updated;
-
       /// \brief Ignition transport node
       protected: ignition::transport::Node nodeIgn;
 
       /// \internal
       /// \brief Data pointer for private data
       private: std::unique_ptr<SensorPrivate> dataPtr;
+
+      /// \internal
+      /// \brief Extension class for sensors
+      private: friend class SensorExt;
+
+      /// \brief Extension class for rendering sensors
+      private: friend class RenderingSensorExt;
     };
+
+    /// \brief Extension class for sensor
+    /// Function are added here to preserve ABI compatibility of the base
+    /// sensor class
+    class SensorExt
+    {
+      /// \brief Constructor
+      /// \param[in] _sensor Pointer to parent sensor
+      public: SensorExt(Sensor *_sensor);
+
+      /// \brief Destructor
+      public: virtual ~SensorExt() = default;
+
+      /// \brief Set whether the sensor is active or not.
+      /// \param[in] _value True if active, false if not.
+      public: virtual void SetActive(bool _value);
+
+      /// \brief Reset the lastUpdateTime to zero.
+      public: virtual void ResetLastUpdateTime();
+
+      /// \brief Get next rendering time
+      /// \return next rendering time
+      public: virtual double NextRequiredTimestamp() const;
+
+      /// \brief Return true if the sensor needs to be updated.
+      /// \return True when sensor should be updated.
+      public: virtual bool NeedsUpdate();
+
+      /// \brief Pointer to parent sensor
+      protected: Sensor *sensor = nullptr;
+    };
+
+    /// \brief Extension class for rendering sensors
+    /// Function are added here to preserve ABI compatibility of rendering
+    /// sensor classes
+    class RenderingSensorExt : public SensorExt
+    {
+      /// \brief Constructor
+      public: RenderingSensorExt(Sensor *_sensor);
+
+      // Documentation inherited.
+      public: virtual void SetActive(bool _value) override;
+
+      // Documentation inherited.
+      public: virtual void ResetLastUpdateTime() override;
+
+      // Documentation inherited.
+      public: virtual double NextRequiredTimestamp() const override;
+
+      // Documentation inherited.
+      public: virtual bool NeedsUpdate() override;
+
+      /// \brief Set next rendering time
+      /// \param[in] _t Time to set to.
+      public: void SetNextRenderingTime(double _t);
+
+      /// \brief Get next rendering time
+      /// \return next rendering time
+      public: double NextRenderingTime() const;
+
+      /// \brief Data pointer for private data
+      private: std::unique_ptr<RenderingSensorExtPrivate> dataPtr;
+    };
+
     /// \}
   }
 }

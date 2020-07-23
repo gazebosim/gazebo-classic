@@ -22,6 +22,7 @@
 #include <limits>
 
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
@@ -50,9 +51,8 @@ namespace gazebo
       /// \brief True if the sensor needs a rendering
       public: bool renderNeeded = false;
 
-      /// \brief Timestamp of the forthcoming rendering
-      public: double nextRenderingTime
-                           = std::numeric_limits<double>::quiet_NaN();
+      /// \brief Rendering sensor extension class for ABI incompatible changes
+      public: std::shared_ptr<RenderingSensorExt> extension;
     };
   }
 }
