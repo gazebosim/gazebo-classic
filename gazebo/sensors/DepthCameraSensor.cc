@@ -100,6 +100,8 @@ void DepthCameraSensor::Init()
         this->Name() + "_RttTex_Image");
     this->dataPtr->depthCamera->CreateDepthTexture(
         this->Name() + "_RttTex_Depth");
+    this->dataPtr->depthCamera->CreateReflectanceTexture(
+        this->Name() + "_RttTex_Reflectance");
     this->dataPtr->depthCamera->CreateNormalsTexture(
         this->Name() + "_RttTex_Normals");
 

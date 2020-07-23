@@ -339,7 +339,7 @@ void Distortion::SetCamera(CameraPtr _camera)
   this->dataPtr->lensDistortionInstance->setEnabled(true);
 
   // Add callback to set scaling factor before rendering
-  // See https://bitbucket.org/osrf/gazebo/pull-requests/2963
+  // See https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/2963
   this->dataPtr->lensDistortionInstance->addListener(this->dataPtr.get());
 }
 

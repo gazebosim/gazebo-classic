@@ -169,7 +169,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
 
   // This test block demonstrates issue #2309 titled:
   // Simbody exception when manipulating object twice while paused
-  // https://bitbucket.org/osrf/gazebo/issues/2309
+  // https://github.com/osrf/gazebo/issues/2309
   {
     transport::PublisherPtr userCmdPub =
         this->node->Advertise<msgs::UserCmd>("~/user_cmd");

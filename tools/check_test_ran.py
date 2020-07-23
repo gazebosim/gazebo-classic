@@ -89,7 +89,7 @@ def check_main():
     test_file = sys.argv[1]
         
     # kill rogue gzservers from INTEGRATION_world_clone test
-    # https://bitbucket.org/osrf/gazebo/issue/1299
+    # https://github.com/osrf/gazebo/issues/1299
     if 'INTEGRATION_world_clone' in test_file:
         process = subprocess.Popen(['ps', 'ax'], stdout=subprocess.PIPE)
         stdout, stderr = process.communicate()
