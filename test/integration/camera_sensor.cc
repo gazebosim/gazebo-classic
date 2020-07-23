@@ -268,7 +268,7 @@ TEST_F(CameraSensor, CheckThrottle)
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
   unsigned int width  = 320;
-  unsigned int height = 240;  // 106 fps
+  unsigned int height = 240;
   double updateRate = 10;
   ignition::math::Pose3d setPose, testPose(ignition::math::Vector3d(-5, 0, 5),
       ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
@@ -296,6 +296,67 @@ TEST_F(CameraSensor, CheckThrottle)
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
   EXPECT_GT(rate, 7.0);
   EXPECT_LT(rate, 11.0);
+
+  c.reset();
+  delete [] img;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, StrictUpdateRate)
+{
+  // Load camera_strict_rate.world instead, and don't call SpawnCamera.
+  // That allows us to secify the custom namespace in the world file instead
+  // of modifying SpawnCamera() in ServerFixture.cc.
+  LoadArgs(" --lockstep worlds/camera_strict_rate.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  std::string cameraName = "camera_sensor";
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  unsigned int width = camSensor->ImageWidth();
+  unsigned int height = camSensor->ImageHeight();
+  imageCount = 0;
+  img = new unsigned char[width * height*3];
+  event::ConnectionPtr c = camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  common::Timer timer;
+  timer.Start();
+
+  // how many images produced for 5 seconds (in simulated clock domain)
+  double updateRate = camSensor->UpdateRate();
+  int totalImages = 5 * updateRate;
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  double simT0 = 0.0;
+
+  while (imageCount < totalImages)
+  {
+    // An approximation of when we receive the first image. In reality one
+    // iteration before we receive the second image.
+    if (imageCount == 0)
+    {
+      simT0 = world->SimTime().Double();
+    }
+    common::Time::MSleep(1);
+  }
+
+  // check that the obtained rate is the one expected
+  double dt = world->SimTime().Double() - simT0;
+  double rate = static_cast<double>(totalImages) / dt;
+  gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
+  const double tolerance = 0.02;
+  EXPECT_GT(rate, updateRate * (1 - tolerance));
+  EXPECT_LT(rate, updateRate * (1 + tolerance));
   c.reset();
   delete [] img;
 }

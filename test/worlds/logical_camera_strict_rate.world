@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="default">
+    <gravity>0 0 0</gravity>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="logical_camera_model">
+      <pose>0 0 1 0 0 0</pose>
+      <link name="link">
+        <sensor name="logical_camera_sensor" type="logical_camera">
+          <pose>0 0 1 0 0 0</pose>
+          <logical_camera>
+            <near>0.55</near>
+            <far>5</far>
+            <horizontal_fov>1.05</horizontal_fov>
+            <aspect_ratio>1.8</aspect_ratio>
+          </logical_camera>
+
+          <visualize>true</visualize>
+          <always_on>true</always_on>
+
+          <!-- We choose a high fps on purpose. The goal is to check the effect
+            of lockstep. -->
+          <update_rate>500</update_rate>
+        </sensor>
+      </link>
+    </model>
+  </world>
+</sdf>

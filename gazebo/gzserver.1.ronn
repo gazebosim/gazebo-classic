@@ -19,6 +19,8 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
  Produce this help message.
 * -u, --pause :
  Start the server in a paused state.
+* --lockstep :
+ Lockstep simulation so sensor update rates are respected.
 * -e, --physics arg :
  Specify a physics engine (ode|bullet|dart|simbody).
 * -p, --play arg :

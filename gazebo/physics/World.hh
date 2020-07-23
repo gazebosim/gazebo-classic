@@ -459,6 +459,10 @@ namespace gazebo
       /// \return Unique model name.
       public: std::string UniqueModelName(const std::string &_name);
 
+      /// \brief Set callback 'waitForSensors'
+      /// \param[in] function to be called
+      public: void SetSensorWaitFunc(std::function<void(double, double)> _func);
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.

@@ -377,6 +377,9 @@ namespace gazebo
       /// \brief Node for ignition transport communication.
       public: ignition::transport::Node ignNode;
 
+      /// \brief Wait until no sensors use the current step any more
+      public: std::function<void(double, double)> waitForSensors;
+
       /// \brief Callback function intended to call the scene with updated Poses
       public: UpdateScenePosesFunc updateScenePoses;
 

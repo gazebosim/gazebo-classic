@@ -160,6 +160,8 @@ World::World(const std::string &_name)
      event::Events::ConnectPause(
        std::bind(&World::SetPaused, this, std::placeholders::_1)));
 
+  this->dataPtr->waitForSensors = nullptr;
+
   // Make sure dbs are initialized
   common::ModelDatabase::Instance();
   common::FuelModelDatabase::Instance();
@@ -663,6 +665,12 @@ bool World::SensorsInitialized() const
   return this->dataPtr->sensorsInitialized;
 }
 
+/////////////////////////////////////////////////
+void World::SetSensorWaitFunc(std::function<void(double, double)> _func)
+{
+  this->dataPtr->waitForSensors = _func;
+}
+
 //////////////////////////////////////////////////
 void World::Step()
 {
@@ -684,6 +692,10 @@ void World::Step()
   this->PublishWorldStats();
 
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
+
+  if (this->dataPtr->waitForSensors)
+    this->dataPtr->waitForSensors(this->dataPtr->simTime.Double(),
+        this->dataPtr->physicsEngine->GetMaxStepSize());
 
   double updatePeriod = this->dataPtr->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
@@ -2652,7 +2664,7 @@ void World::ProcessMessages()
     if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
       // When ready to use the direct API for updating scene poses from server,
       // uncomment the following line:
-      // this->dataPtr->updateScenePoses ||
+         this->dataPtr->updateScenePoses ||
         (this->dataPtr->poseLocalPub &&
          this->dataPtr->poseLocalPub->HasConnections()))
     {
@@ -2720,11 +2732,11 @@ void World::ProcessMessages()
 
       // When ready to use the direct API for updating scene poses from server,
       // uncomment the following lines:
-      // // Execute callback to export Pose msg
-      // if (this->dataPtr->updateScenePoses)
-      // {
-      //   this->dataPtr->updateScenePoses(this->Name(), msg);
-      // }
+      // Execute callback to export Pose msg
+      if (this->dataPtr->updateScenePoses)
+      {
+        this->dataPtr->updateScenePoses(this->Name(), msg);
+      }
     }
 
     this->dataPtr->publishModelPoses.clear();

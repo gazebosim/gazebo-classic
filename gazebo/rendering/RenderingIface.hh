@@ -55,6 +55,31 @@ namespace gazebo
     void update_scene_poses(const std::string &_name,
                             const msgs::PosesStamped &_msg);
 
+    /// \brief Set whether to enable lockstepping for rendering and physics.
+    /// If enabled, the poses of objects in rendering will be updated via
+    /// direct API call instead of transport.
+    /// \param[in] _enable True to enable lockstepping, false to disable
+    /// \sa update_scene_poses
+    GZ_RENDERING_VISIBLE
+    void set_lockstep_enabled(bool _enable);
+
+    /// \brief Get whether or not lockstepping is enabled for rendering and
+    /// physics. If enabled, the poses of objects in rendering is updated via
+    /// direct API call instead of transport.
+    /// \return True if lockstepping is enabled, false if disabled
+    /// \sa lockstep_enabled
+    GZ_RENDERING_VISIBLE
+    bool lockstep_enabled();
+
+    /// \brief wait until a render request occurs
+    /// \param[in] _name Name of the scene to retrieve
+    /// \param[in] _timeoutsec timeout expressed in seconds
+    /// \return true if a render request occured, false in case
+    ///          we waited until the timeout
+    GZ_RENDERING_VISIBLE
+    bool wait_for_render_request(const std::string &_name,
+                                 const double _timeoutsec);
+
     /// \brief create rendering::Scene by name.
     /// \param[in] _name Name of the scene to create.
     /// \param[in] _enableVisualizations True enables visualization

@@ -128,6 +128,9 @@ namespace gazebo
       /// \param[in] _value New rendered value.
       protected: void SetRendered(const bool _value);
 
+      /// \brief Handle the prerenderEnded event.
+      protected: void PrerenderEnded();
+
       /// \brief Pointer to the camera.
       protected: rendering::CameraPtr camera;
 
