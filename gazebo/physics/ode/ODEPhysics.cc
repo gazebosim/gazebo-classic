@@ -28,7 +28,7 @@
 
 #include <ignition/math/Rand.hh>
 #include <ignition/math/Vector3.hh>
-#include <ignition/common/Profiler.hh>
+#include <gazebo/util/Profiler.hh>
 
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Assert.hh"

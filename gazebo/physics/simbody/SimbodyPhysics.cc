@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include <ignition/common/Profiler.hh>
+#include <gazebo/util/Profiler.hh>
 
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyModel.hh"

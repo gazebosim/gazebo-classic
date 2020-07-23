@@ -19,7 +19,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include <ignition/common/Profiler.hh>
+#include <gazebo/util/Profiler.hh>
 
 #include <gazebo/transport/Node.hh>
 #include <gazebo/transport/Subscriber.hh>

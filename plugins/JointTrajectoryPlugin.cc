@@ -17,7 +17,7 @@
 
 #include <functional>
 
-#include <ignition/common/Profiler.hh>
+#include <gazebo/util/Profiler.hh>
 
 #include <plugins/JointTrajectoryPlugin.hh>
 

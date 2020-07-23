@@ -21,7 +21,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include <ignition/common/Profiler.hh>
+#include <gazebo/util/Profiler.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Quaternion.hh>

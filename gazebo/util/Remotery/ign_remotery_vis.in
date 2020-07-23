@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+VIS_PATH=@CMAKE_INSTALL_PREFIX@/@IGN_PROFILER_VIS_PATH@/index.html
+
+if [ -x "$(command -v xdg-open)" ]; then
+  xdg-open $VIS_PATH
+elif [ -x "$(command -v open)" ]; then
+  open $VIS_PATH
+fi

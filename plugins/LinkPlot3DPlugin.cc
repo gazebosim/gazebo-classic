@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include <ignition/common/Profiler.hh>
+#include <gazebo/util/Profiler.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/msgs.hh>

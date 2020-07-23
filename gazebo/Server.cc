@@ -33,7 +33,7 @@
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Rand.hh>
-#include "ignition/common/Profiler.hh"
+#include "gazebo/util/Profiler.hh"
 
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"

@@ -18,7 +18,7 @@
 #include <functional>
 
 #include <ignition/math.hh>
-#include <ignition/common/Profiler.hh>
+#include <gazebo/util/Profiler.hh>
 #include "gazebo/physics/physics.hh"
 #include "plugins/ActorPlugin.hh"
 

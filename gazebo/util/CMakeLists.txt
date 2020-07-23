@@ -11,6 +11,78 @@ include_directories(${TBB_INCLUDEDIR}
 
 link_directories(${tinyxml2_LIBRARY_DIRS} ${IGNITION-MSGS_LIBRARY_DIRS})
 
+if(ENABLE_PROFILER)
+  set(
+    PROFILER_SRCS
+    Profiler.cc
+  )
+
+  set(
+    PROFILER_HEADERS
+    Profiler.hh
+  )
+
+  set(
+    PROFILER_TESTS
+  )
+
+  set(
+    Remotery_SRC
+    ./Remotery/lib/Remotery.c
+    ./Remotery/lib/Remotery.h
+  )
+
+  if(APPLE)
+    set(
+      Remotery_SRC
+      ${Remotery_SRC}
+      ./Remotery/lib/RemoteryMetal.mm
+    )
+    find_library(FOUNDATION Foundation
+      HINTS /System/Library/Frameworks
+    )
+  endif()
+
+  set(RMT_ENABLED 1)
+  set(RMT_USE_TINYCRT 0)
+  set(RMT_USE_CUDA 0)
+  set(RMT_USE_D3D11 0)
+  set(RMT_USE_OPENGL 0)
+  set(RMT_USE_METAL 0)
+
+  if(UNIX OR WIN32)
+    set(RMT_USE_OPENGL 1)
+  endif()
+
+  if(WIN32)
+    set(RMT_USE_D3D11 1)
+  endif()
+
+  if(APPLE)
+    set (RMT_USE_METAL 1)
+  endif()
+
+  configure_file(RemoteryConfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/RemoteryConfig.h)
+
+  list(APPEND PROFILER_SRCS ${Remotery_SRC} RemoteryProfilerImpl.cc)
+
+  set (profiler_sources
+    ${PROFILER_SRCS}
+  )
+
+  set (headers
+    ${PROFILER_HEADERS}
+  )
+
+  set (gtest_profiler_sources
+    ${PROFILER_TESTS}
+  )
+  gz_build_tests(${gtest_profiler_sources} EXTRA_LIBS gazebo_profiler)
+
+  gz_add_library(gazebo_profiler ${profiler_sources})
+
+endif()
+
 set (sources
   Diagnostics.cc
   IgnMsgSdf.cc
@@ -53,6 +125,7 @@ set (gtest_sources
   LogPlay_TEST.cc
   LogRecord_TEST.cc
   OpenAL_TEST.cc
+  system.hh
 )
 
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_util)
@@ -71,15 +144,21 @@ target_compile_definitions(gazebo_util
   PRIVATE BUILDING_DLL_GZ_UTIL BUILDING_DLL
 )
 
+if(ENABLE_PROFILER)
+  set(PROFILER_LIBRARIES gazebo_profiler)
+endif()
+
 add_dependencies(gazebo_util
   gazebo_common
   gazebo_msgs
+  ${PROFILER_LIBRARIES}
 )
 
 target_link_libraries(gazebo_util
   gazebo_common
   gazebo_transport
   gazebo_msgs
+  ${PROFILER_LIBRARIES}
   ${tinyxml2_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES}
@@ -97,6 +176,8 @@ if (WIN32)
   include_directories(IGNITION-MSGS_INCLUDE_DIR)
 endif()
 
+gz_install_library(gazebo_profiler)
+gz_install_includes("profiler" ${profiler_headers})
 
 gz_install_library(gazebo_util)
 gz_install_includes("util" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/util.hh)

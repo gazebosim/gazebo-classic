@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <ignition/common/Profiler.hh>
+#include <gazebo/util/Profiler.hh>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/msgs/msgs.hh"

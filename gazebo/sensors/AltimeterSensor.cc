@@ -16,7 +16,7 @@
 */
 #include <boost/algorithm/string.hpp>
 
-#include <ignition/common/Profiler.hh>
+#include <gazebo/util/Profiler.hh>
 
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"

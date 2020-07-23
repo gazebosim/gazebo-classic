@@ -230,6 +230,13 @@ endif ()
 
 gz_add_library(gazebo_common ${sources})
 
+if(ENABLE_PROFILER)
+  add_dependencies(gazebo_common
+    gazebo_profiler
+  )
+  set(PROFILER_LIBRARIES gazebo_profiler)
+endif()
+
 set_property(
   SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc Console.cc
   PROPERTY COMPILE_DEFINITIONS
@@ -263,6 +270,7 @@ target_link_libraries(gazebo_common
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
   ${IGNITION-FUEL_TOOLS_LIBRARIES}
+  ${PROFILER_LIBRARIES}
 )
 
 if (UNIX)

@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <string>
 
-#include <ignition/common/Profiler.hh>
+#include <gazebo/util/Profiler.hh>
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/physics/bullet/BulletTypes.hh"
