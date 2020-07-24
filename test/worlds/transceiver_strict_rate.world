@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="tx_model">
+      <static>true</static>
+      <pose>-10.0 0.0 0.5 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name="tx_sensor" type="wireless_transmitter">
+          <transceiver>
+            <essid>MyESSID</essid>
+            <frequency>2442.0</frequency>
+          </transceiver>
+          <always_on>1</always_on>
+          <!-- We choose a high fps on purpose. The goal is to check the effect
+            of lockstep. -->
+          <update_rate>500</update_rate>
+          <visualize>true</visualize>
+        </sensor>
+      </link>
+    </model>
+
+    <model name="rx_model">
+      <pose>13 0 0.5 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name="rx_sensor" type="wireless_receiver">
+          <transceiver>
+            <gain>2.5</gain>
+            <power>14.5</power>
+          </transceiver>
+          <always_on>1</always_on>
+          <!-- We choose a high fps on purpose. The goal is to check the effect
+            of lockstep. -->
+          <update_rate>500</update_rate>
+          <visualize>true</visualize>
+        </sensor>
+      </link>
+    </model>
+
+  </world>
+</sdf>
