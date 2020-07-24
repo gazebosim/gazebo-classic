@@ -53,6 +53,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/URI.hh"
 
@@ -160,6 +161,8 @@ World::World(const std::string &_name)
      event::Events::ConnectPause(
        std::bind(&World::SetPaused, this, std::placeholders::_1)));
 
+  this->dataPtr->waitForSensors = nullptr;
+
   // Make sure dbs are initialized
   common::ModelDatabase::Instance();
   common::FuelModelDatabase::Instance();
@@ -179,14 +182,13 @@ void World::Load(sdf::ElementPtr _sdf)
 
   // Create a DOM object to compute the resolved initial pose (with frame
   // semantics)
-  ignition::math::SemanticVersion sdfOriginalVersion(_sdf->OriginalVersion());
-  if (sdfOriginalVersion >= ignition::math::SemanticVersion(1, 7))
-  {
-    this->dataPtr->worldSDFDom = std::make_unique<sdf::World>();
-    sdf::Errors errors = this->dataPtr->worldSDFDom->Load(_sdf);
+  this->dataPtr->worldSDFDom = std::make_unique<sdf::World>();
+  sdf::Errors errors = this->dataPtr->worldSDFDom->Load(_sdf);
 
-    // Print errors and load the parts that worked.
-    for (const auto &error : errors)
+  // Print errors and load the parts that worked.
+  for (const auto &error : errors)
+  {
+    if (common::isSdfFrameSemanticsError(error))
     {
       gzerr << error << "\n";
     }
@@ -664,6 +666,12 @@ bool World::SensorsInitialized() const
   return this->dataPtr->sensorsInitialized;
 }
 
+/////////////////////////////////////////////////
+void World::SetSensorWaitFunc(std::function<void(double, double)> _func)
+{
+  this->dataPtr->waitForSensors = _func;
+}
+
 //////////////////////////////////////////////////
 void World::Step()
 {
@@ -692,6 +700,10 @@ void World::Step()
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
 
   IGN_PROFILE_BEGIN("sleepOffset");
+  if (this->dataPtr->waitForSensors)
+    this->dataPtr->waitForSensors(this->dataPtr->simTime.Double(),
+        this->dataPtr->physicsEngine->GetMaxStepSize());
+
   double updatePeriod = this->dataPtr->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
@@ -2681,7 +2693,7 @@ void World::ProcessMessages()
     if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
       // When ready to use the direct API for updating scene poses from server,
       // uncomment the following line:
-      // this->dataPtr->updateScenePoses ||
+         this->dataPtr->updateScenePoses ||
         (this->dataPtr->poseLocalPub &&
          this->dataPtr->poseLocalPub->HasConnections()))
     {
@@ -2749,11 +2761,11 @@ void World::ProcessMessages()
 
       // When ready to use the direct API for updating scene poses from server,
       // uncomment the following lines:
-      // // Execute callback to export Pose msg
-      // if (this->dataPtr->updateScenePoses)
-      // {
-      //   this->dataPtr->updateScenePoses(this->Name(), msg);
-      // }
+      // Execute callback to export Pose msg
+      if (this->dataPtr->updateScenePoses)
+      {
+        this->dataPtr->updateScenePoses(this->Name(), msg);
+      }
     }
 
     this->dataPtr->publishModelPoses.clear();

@@ -46,6 +46,12 @@ namespace gazebo
     /// resolved
     GZ_COMMON_VISIBLE void convertPosesToSdf16(
         const sdf::ElementPtr &_modelElem);
+
+    /// \brief Check whether the SDFormat error is related to frame semantics
+    /// \param[in] _err SDFormat error
+    /// \return True if the error code of the error is related to frame
+    /// semantics
+    GZ_COMMON_VISIBLE bool isSdfFrameSemanticsError(const sdf::Error &_err);
     /// \}
   }
 }

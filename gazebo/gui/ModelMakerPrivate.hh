@@ -18,6 +18,7 @@
 #define GAZEBO_GUI_MODELMAKER_PRIVATE_HH_
 
 #include <list>
+#include <string>
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -39,8 +40,13 @@ namespace gazebo
       /// \brief A list of model visuals created by the model maker.
       public: std::list<rendering::VisualWeakPtr> visuals;
 
-      /// \brief The SDF representation of the model.
+      /// \brief The SDF representation of the model used for creating a visual
+      /// preview of the model
       public: sdf::SDFPtr modelSDF;
+
+      /// \brief The SDF string of the model used for publishing factory
+      /// messages
+      public: std::string modelSDFString;
 
       /// \brief True if the model is being created as a clone of an existing
       /// model.

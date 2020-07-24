@@ -142,7 +142,7 @@ void WideAngleCameraSensor::Init()
 //////////////////////////////////////////////////
 void WideAngleCameraSensor::Load(const std::string &_worldName)
 {
-  Sensor::Load(_worldName);
+  CameraSensor::Load(_worldName);
   this->imagePub = this->node->Advertise<msgs::ImageStamped>(
       this->Topic(), 50);
 

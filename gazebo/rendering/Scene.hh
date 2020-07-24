@@ -127,6 +127,11 @@ namespace gazebo
       /// \brief Process all received messages.
       public: void PreRender();
 
+      /// \brief Wait until a render request occurs
+      /// \param[in] _timeoutsec timeout expressed in seconds
+      /// \return True if timeout was NOT met
+      public: bool WaitForRenderRequest(double _timeoutsec);
+
       /// \brief Get the OGRE scene manager.
       /// \return Pointer to the Ogre SceneManager.
       public: Ogre::SceneManager *OgreSceneManager() const;

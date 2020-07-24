@@ -62,6 +62,7 @@
 #include "gazebo/rendering/TransmitterVisual.hh"
 #include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/RayQuery.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
 #include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
@@ -157,15 +158,16 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       &Scene::OnLightModifyMsg, this);
 
   this->dataPtr->isServer = _isServer;
-  if (_isServer)
+
+  if (_isServer && !rendering::lockstep_enabled())
   {
     this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/local/info",
         &Scene::OnPoseMsg, this);
   }
-  else
+
   // When ready to use the direct API for updating scene poses from server,
   // uncomment the following line and delete the if and else directly above
-  // if (!_isServer)
+  if (!_isServer)
   {
     this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/info",
         &Scene::OnPoseMsg, this);
@@ -2888,6 +2890,24 @@ void Scene::UpdatePoses(const msgs::PosesStamped &_msg)
   std::unique_lock<std::mutex> lck(this->dataPtr->newPoseMutex);
   this->dataPtr->newPoseAvailable = true;
   this->dataPtr->newPoseCondition.notify_all();
+}
+
+/////////////////////////////////////////////////
+bool Scene::WaitForRenderRequest(double _timeoutsec)
+{
+  std::unique_lock<std::mutex> lck(this->dataPtr->newPoseMutex);
+
+  while (!this->dataPtr->newPoseAvailable)
+  {
+    auto ret = this->dataPtr->newPoseCondition.wait_for(lck,
+      std::chrono::duration<double>(_timeoutsec));
+
+    if (ret == std::cv_status::timeout)
+      return false;
+  }
+
+  this->dataPtr->newPoseAvailable = false;
+  return true;
 }
 
 /////////////////////////////////////////////////

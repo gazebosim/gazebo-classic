@@ -55,8 +55,23 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Init();
 
+      /// \brief reset timing related members
+      protected: void ResetLastUpdateTime() override;
+
+      /// \brief Return true if the sensor needs to be updated.
+      /// \return True when sensor should be updated.
+      protected: bool NeedsUpdate() override;
+
+      /// \brief Return the next timestamp going to be used by the sensor
+      /// \return the timestamp
+      public: double NextRequiredTimestamp() const override;
+
       // Documentation inherited
       public: virtual std::string Topic() const;
+
+      /// \brief Set whether the sensor is active or not.
+      /// \param[in] _value True if active, false if not.
+      public: void SetActive(bool _value) override;
 
       /// \brief Get the number of cameras.
       /// \return The number of cameras.
@@ -104,6 +119,9 @@ namespace gazebo
 
       /// \brief Handle the render event.
       private: void Render();
+
+      /// \brief Handle the prerenderEnded event.
+      private: void PrerenderEnded();
 
       /// \internal
       /// \brief Private data pointer
