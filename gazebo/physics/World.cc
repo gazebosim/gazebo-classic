@@ -386,7 +386,8 @@ void World::Init()
 }
 
 //////////////////////////////////////////////////
-void World::Init(UpdateScenePosesFunc _func)
+void World::Init(std::function<
+    void(const std::string &, const msgs::PosesStamped &)> _func)
 {
   // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); ++i)

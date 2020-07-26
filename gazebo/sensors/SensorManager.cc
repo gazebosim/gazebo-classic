@@ -19,6 +19,8 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
 
+#include "gazebo/msgs/poses_stamped.pb.h"
+
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/World.hh"
