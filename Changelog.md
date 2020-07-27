@@ -2,6 +2,9 @@
 
 ## Gazebo 11.x.x (202x-xx-xx)
 
+1. Fix pkg-config boost entries for Ubuntu Focal
+    * [Pull request #](https://github.com/osrf/gazebo/pull/)
+
 1. Fix corruption when a URDF file is included from a SDFormat 1.6 model #2734
     * [Pull request 2734](https://github.com/osrf/gazebo/pull/2734)
 

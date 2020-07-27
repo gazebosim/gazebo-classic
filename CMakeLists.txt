@@ -397,6 +397,8 @@ else (build_errors)
     endif()
     # Remove the prefix lib (not always present, like in pthread)
     string (REPLACE "lib" "" bname "${bname}")
+    # Some boost versions add the Boost:: component to cmake, need to change that to boost_ prefix
+    string (REPLACE "Boost::" "boost_" bname "${bname}")
     set (Boost_PKGCONFIG_LIBS "${Boost_PKGCONFIG_LIBS} ${bname}")
   endforeach(b)
 
