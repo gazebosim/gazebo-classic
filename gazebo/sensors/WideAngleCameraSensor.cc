@@ -182,7 +182,8 @@ bool WideAngleCameraSensor::UpdateImpl(const bool _force)
   IGN_PROFILE("WideAngleCameraSensor::UpdateImpl");
   IGN_PROFILE_BEGIN("Update");
 
-  if (!CameraSensor::UpdateImpl(_force)) {
+  if (!CameraSensor::UpdateImpl(_force))
+  {
     IGN_PROFILE_END();
     return false;
   }

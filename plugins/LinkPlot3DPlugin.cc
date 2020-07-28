@@ -204,7 +204,8 @@ void LinkPlot3DPlugin::OnUpdate()
   }
 
   // Throttle update
-  if ((currentTime - this->dataPtr->prevTime).Double() < this->dataPtr->period){
+  if ((currentTime - this->dataPtr->prevTime).Double() < this->dataPtr->period)
+  {
     IGN_PROFILE_END();
     return;
   }

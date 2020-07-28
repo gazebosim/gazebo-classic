@@ -401,5 +401,4 @@ void LiftDragPlugin::OnUpdate()
   this->link->AddForceAtRelativePosition(force, this->cp);
   this->link->AddTorque(torque);
   IGN_PROFILE_END();
-
 }

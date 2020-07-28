@@ -24,12 +24,12 @@
 #include <memory>
 #include <mutex>
 
-#include <gazebo/gazebo_config.h>
-#include <gazebo/common/Time.hh>
-#include <gazebo/common/CommonTypes.hh>
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
-#include <ignition/common/Profiler.hh>
+#include "ignition/common/Profiler.hh"
 
 namespace gazebo
 {
@@ -277,7 +277,8 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on){
+          if (iter.second->on)
+          {
             IGN_PROFILE_BEGIN("callback0");
             iter.second->callback();
             IGN_PROFILE_END();
@@ -297,7 +298,8 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on){
+          if (iter.second->on)
+          {
             IGN_PROFILE_BEGIN("callback1");
             iter.second->callback(_p);
             IGN_PROFILE_END();
@@ -318,7 +320,8 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on){
+          if (iter.second->on)
+          {
             IGN_PROFILE_BEGIN("callback2");
             iter.second->callback(_p1, _p2);
             IGN_PROFILE_END();
@@ -340,7 +343,8 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on){
+          if (iter.second->on)
+          {
             IGN_PROFILE_BEGIN("callback3");
             iter.second->callback(_p1, _p2, _p3);
             IGN_PROFILE_END();
@@ -364,7 +368,8 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on){
+          if (iter.second->on)
+          {
             IGN_PROFILE_BEGIN("callback4");
             iter.second->callback(_p1, _p2, _p3, _p4);
             IGN_PROFILE_END();
@@ -390,7 +395,8 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on){
+          if (iter.second->on)
+          {
             IGN_PROFILE_BEGIN("callback5");
             iter.second->callback(_p1, _p2, _p3, _p4, _p5);
             IGN_PROFILE_END();
@@ -417,7 +423,8 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on){
+          if (iter.second->on)
+          {
             IGN_PROFILE_BEGIN("callback6");
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6);
             IGN_PROFILE_END();
@@ -445,7 +452,8 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on){
+          if (iter.second->on)
+          {
             IGN_PROFILE_BEGIN("callback7");
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
             IGN_PROFILE_END();
