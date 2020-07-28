@@ -616,7 +616,7 @@ TEST_P(LaserTest, LaserNoise)
   LaserUnitNoise(GetParam());
 }
 
-void LaserTest::LaserStrictUpdateRate(const std::string &_physicsEngine)
+void LaserTest::LaserStrictUpdateRate(const std::string &)
 {
   LoadArgs(" --lockstep worlds/laser_hit_strict_rate_test.world");
 
