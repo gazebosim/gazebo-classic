@@ -927,7 +927,16 @@ rendering::UserCameraPtr GLWidget::Camera() const
 //////////////////////////////////////////////////
 std::string GLWidget::OgreHandle() const
 {
-  return std::to_string(static_cast<uint64_t>(this->winId()));
+  std::string ogreHandle;
+
+#if not defined(WIN32)
+  ogreHandle = std::to_string(static_cast<uint64_t>(this->winId()));
+#else
+  ogreHandle = std::to_string(
+      reinterpret_cast<uint32_t>(this->renderFrame->winId()));
+#endif
+
+  return ogreHandle;
 }
 
 /////////////////////////////////////////////////
