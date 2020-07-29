@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/msgs.hh>
@@ -188,6 +189,8 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void LinkPlot3DPlugin::OnUpdate()
 {
+  IGN_PROFILE("LinkPlot3DPlugin::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   auto currentTime = this->dataPtr->world->SimTime();
 
   // check for world reset
@@ -196,12 +199,16 @@ void LinkPlot3DPlugin::OnUpdate()
     this->dataPtr->prevTime = currentTime;
     for (auto &plot : this->dataPtr->plots)
       plot.msg.mutable_point()->Clear();
+    IGN_PROFILE_END();
     return;
   }
 
   // Throttle update
   if ((currentTime - this->dataPtr->prevTime).Double() < this->dataPtr->period)
+  {
+    IGN_PROFILE_END();
     return;
+  }
 
   this->dataPtr->prevTime = currentTime;
 
@@ -224,4 +231,5 @@ void LinkPlot3DPlugin::OnUpdate()
       this->dataPtr->node.Request("/marker", plot.msg);
     }
   }
+  IGN_PROFILE_END();
 }

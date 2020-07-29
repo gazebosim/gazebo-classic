@@ -1,0 +1,1390 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <wind>
+      <linear_velocity>0 1 0</linear_velocity>
+    </wind>
+
+    <!-- Load the plugin for the wind -->
+    <plugin name="wind" filename="libWindPlugin.so">
+      <horizontal>
+        <magnitude>
+          <time_for_rise>10</time_for_rise>
+          <sin>
+            <amplitude_percent>0.05</amplitude_percent>
+            <period>60</period>
+          </sin>
+          <noise type="gaussian">
+           <mean>0</mean>
+           <stddev>0.0002</stddev>
+          </noise>
+        </magnitude>
+        <direction>
+          <time_for_rise>30</time_for_rise>
+          <sin>
+            <amplitude>5</amplitude>
+            <period>20</period>
+          </sin>
+          <noise type="gaussian">
+           <mean>0</mean>
+           <stddev>0.03</stddev>
+          </noise>
+        </direction>
+      </horizontal>
+      <vertical>
+        <noise type="gaussian">
+         <mean>0</mean>
+         <stddev>0.03</stddev>
+        </noise>
+      </vertical>
+    </plugin>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <model name="sphere">
+      <pose>2 0 0 0 0 0</pose>
+      <link name="body">
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="geom">
+          <geometry>
+            <sphere>
+              <radius>1</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <static>true</static>
+    </model>
+    <model name="camera_model">
+      <pose>0 0 0 0 0 0</pose>
+      <link name="my_link">
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <sensor name="camera" type="depth">
+          <camera>
+            <horizontal_fov>1.04719755</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>20</far>
+            </clip>
+          </camera>
+          <plugin filename="libDepthCameraPlugin.so" name="depth_camera_plugin" />
+          <always_on>true</always_on>
+          <update_rate>10</update_rate>
+        </sensor>
+      </link>
+      <static>true</static>
+    </model>
+    <model name="camera_model1">
+      <pose>0 1 0 0 0 0</pose>
+      <link name="my_link1">
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <sensor name="camera" type="wideanglecamera">
+          <camera>
+            <horizontal_fov>1.047</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>240</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+            <lens>
+              <type>gnomonical</type>
+              <scale_to_hfov>true</scale_to_hfov>
+              <cutoff_angle>1.5707</cutoff_angle>
+              <env_texture_size>512</env_texture_size>
+            </lens>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
+          <plugin name="lensflare" filename="libLensFlareSensorPlugin.so"/>
+        </sensor>
+      </link>
+      <static>true</static>
+    </model>
+    <model name="camera_model2">
+      <pose>1 0 0 0 0 0</pose>
+      <link name="my_link2">
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <sensor name="camera2" type="camera">
+          <camera>
+            <horizontal_fov>1.04719755</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>20</far>
+            </clip>
+          </camera>
+          <plugin filename="libCameraPlugin.so" name="camera_plugin" />
+          <always_on>true</always_on>
+          <update_rate>10</update_rate>
+        </sensor>
+      </link>
+      <static>true</static>
+    </model>
+    <model name="model_1">
+      <static>true</static>
+      <pose>0 0 0.035 0. 0 0</pose>
+      <link name="link_1">
+        <inertial>
+          <mass>0.1</mass>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://hokuyo/meshes/hokuyo.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="collision-base">
+          <pose>0 0 -0.0145 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.041</size>
+            </box>
+          </geometry>
+        </collision>
+        <collision name="collision-top">
+          <pose>0 0 0.0205 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.021</radius>
+              <length>0.029</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <sensor name='gps' type='gps'>
+          <always_on>1</always_on>
+          <update_rate>10.000000</update_rate>
+          <gps>
+            <position_sensing>
+              <horizontal>
+                <noise type='gaussian_quantized'>
+                  <mean>0</mean>
+                  <stddev>1</stddev>
+                  <bias_mean>3</bias_mean>
+                  <bias_stddev>1</bias_stddev>
+                  <precision>0.5</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise type='gaussian_quantized'>
+                  <mean>0</mean>
+                  <stddev>1</stddev>
+                  <bias_mean>3</bias_mean>
+                  <bias_stddev>1</bias_stddev>
+                  <precision>1.0</precision>
+                </noise>
+              </vertical>
+            </position_sensing>
+            <velocity_sensing>
+              <horizontal>
+                <noise type='gaussian_quantized'>
+                  <mean>0</mean>
+                  <stddev>0.1</stddev>
+                  <bias_mean>0.1</bias_mean>
+                  <bias_stddev>0.1</bias_stddev>
+                  <precision>0.1</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise type='gaussian_quantized'>
+                  <mean>0</mean>
+                  <stddev>0.2</stddev>
+                  <bias_mean>0.2</bias_mean>
+                  <bias_stddev>0.2</bias_stddev>
+                  <precision>0.2</precision>
+                </noise>
+              </vertical>
+            </velocity_sensing>
+          </gps>
+        </sensor>
+        <sensor name="laser_sensor" type="gpu_ray">
+          <pose>0.1 0 0.0175 0 -0 0</pose>
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>640</samples>
+                <resolution>1</resolution>
+                <min_angle>-1.396263</min_angle>
+                <max_angle>1.396263</max_angle>
+              </horizontal>
+              <vertical>
+                <samples>1</samples>
+                <resolution>1</resolution>
+                <min_angle>0</min_angle>
+                <max_angle>0</max_angle>
+              </vertical>
+            </scan>
+            <range>
+              <min>0.08</min>
+              <max>10.0</max>
+              <resolution>0.01</resolution>
+            </range>
+          </ray>
+          <always_on>1</always_on>
+          <update_rate>100</update_rate>
+          <visualize>true</visualize>
+          <plugin filename="libGpuRayPlugin.so" name="gpuray_plugin" />
+        </sensor>
+        <sensor name="imu" type="imu">
+          <always_on>true</always_on>
+        </sensor>
+        <sensor name="magnetometer" type="magnetometer">
+          <always_on>1</always_on>
+          <update_rate>20.0</update_rate>
+          <magnetometer>
+          </magnetometer>
+        </sensor>
+        <sensor name='altimeter' type='altimeter'>
+          <always_on>1</always_on>
+          <update_rate>10.0</update_rate>
+          <altimeter>
+          </altimeter>
+        </sensor>
+        <sensor name='contact' type='contact'>
+          <always_on>1</always_on>
+          <update_rate>10.0</update_rate>
+          <altimeter>
+          </altimeter>
+        </sensor>
+        <sensor name='force_torque' type='force_torque'>
+          <update_rate>30</update_rate>
+          <always_on>true</always_on>
+        </sensor>
+      </link>
+    </model>
+    <actor name="actor1">
+      <pose>0 5 1.25 0 0 0</pose>
+      <skin>
+        <filename>walk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name="walking">
+        <filename>walk.dae</filename>
+        <scale>1.000000</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+
+      <plugin name="actor1_plugin" filename="libActorPlugin.so">
+        <target>0 -5 1.2138</target>
+        <target_weight>1.15</target_weight>
+        <obstacle_weight>1.8</obstacle_weight>
+        <animation_factor>5.1</animation_factor>
+        <!-- Usage: Modify the set of models that the vector field should
+             ignore when moving the actor -->
+        <ignore_obstacles>
+          <model>cafe</model>
+          <model>ground_plane</model>
+        </ignore_obstacles>
+      </plugin>
+    </actor>
+
+    <model name="test_vehicle">
+      <pose frame=''>2 2 0 0 0 0</pose>
+      <link name='base_link'>
+        <pose frame=''>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <mass>2.0</mass>
+          <inertia>
+            <ixx>0.1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.1</iyy>
+            <iyz>0</iyz>
+            <izz>0.1</izz>
+          </inertia>
+        </inertial>
+        <collision name='base_link_collision'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='base_link_visual'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <gravity>1</gravity>
+        <kinematic>0</kinematic>
+      </link>
+
+      <link name='left_track'>
+        <pose frame=''>0 0.55 0 1.5701 -0 0</pose>
+        <inertial>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <mass>0.5</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='left_track_collision'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name='left_track_visual'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <gravity>1</gravity>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='left_track_j' type='revolute'>
+        <child>left_track</child>
+        <parent>base_link</parent>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+          </limit>
+          <use_parent_model_frame>1</use_parent_model_frame>
+        </axis>
+      </joint>
+
+      <link name='right_track'>
+        <pose frame=''>0 -0.55 0 -1.5701 0 0</pose>
+        <inertial>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <mass>0.5</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_track_collision'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name='right_track_visual'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <gravity>1</gravity>
+        <kinematic>0</kinematic>
+      </link>
+
+      <joint name='right_track_j' type='revolute'>
+        <child>right_track</child>
+        <parent>base_link</parent>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+          </limit>
+          <use_parent_model_frame>1</use_parent_model_frame>
+        </axis>
+      </joint>
+
+      <plugin filename="libDiffDrivePlugin.so" name="test_vehicle">
+        <body>base_link</body>
+        <left_joint>left_track_j</left_joint>
+        <right_joint>right_track_j</right_joint>
+      </plugin>
+
+      <plugin filename="libKeysToCmdVelPlugin.so" name="keyboard_control">
+        <cmd_vel_topic>~/test_vehicle/vel_cmd</cmd_vel_topic>
+        <linear_increment>0.25</linear_increment>
+        <angular_increment>0.2</angular_increment>
+      </plugin>
+    </model>
+
+    <model name='actuator_example'>
+      <pose frame=''>-5 0 0 0 0 0</pose>
+      <link name='top'>
+        <visual name='top_visual'>
+          <pose>0 0 1.5 0 -0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+         <collision name='top_collision'>
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <pose>0 0 1.5 0 0 0</pose>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+      </link>
+      <link name='base'>
+        <visual name='base_visual'>
+          <pose>0 0 0.5 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>1.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+         <collision name='base_collision'>
+          <geometry>
+            <cylinder>
+              <radius>1.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <pose>0 0 0.5 0 0 0</pose>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <inertial>
+          <mass>1</mass>
+          <pose>0 0 0 0 -0 0</pose>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+      </link>
+      <joint name='JOINT_0' type='revolute'>
+        <parent>base</parent>
+        <child>top</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>0</use_parent_model_frame>
+          <limit>
+            <lower>1e-16</lower>
+            <upper>1e16</upper>
+          </limit>
+        </axis>
+        <pose>0 0 1 0 -0 0</pose>
+      </joint>
+      <static>0</static>
+      <allow_auto_disable>1</allow_auto_disable>
+
+      <plugin name="actuator_plugin" filename="libActuatorPlugin.so">
+        <actuator>
+          <name>actuator_0</name>
+          <joint>JOINT_0</joint>
+          <index>0</index>
+          <type>electric_motor</type>
+          <power>20</power>
+          <max_velocity>6</max_velocity>
+          <max_torque>10.0</max_torque>
+        </actuator>
+      </plugin>
+    </model>
+
+    <model name="test_model">
+      <pose>5 0 0.7 0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <pose>0 0 -0.55 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 0.1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <max_vel>100</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 -0.55 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 0.1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+        <collision name="collision2">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.5</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <max_vel>100</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual2">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <link name="bar_1">
+        <pose>0.45 0 -0.5 0 0 0</pose>
+        <inertial>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+          <mass>0.1</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.02 1.0 0.02</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <max_vel>100</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.02 1.0 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="bar_12_joint" type="revolute">
+        <parent>bar_2</parent>
+        <child>bar_1</child>
+        <pose>0 0.5 0 0 0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="bar_13_joint" type="revolute">
+        <parent>bar_3</parent>
+        <child>bar_1</child>
+        <pose>0 -0.5 0 0 0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <link name="bar_2">
+        <pose>0.5 0.5 -0.5 0 0 0</pose>
+        <inertial>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+          <mass>0.1</mass>
+        </inertial>
+        <collision name="collision">
+          <pose>-0.025 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.05 0.02 0.02</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <max_vel>100</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>-0.025 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.05 0.02 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="bar_2_joint" type="revolute">
+        <parent>link</parent>
+        <child>bar_2</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <link name="bar_3">
+        <pose>0.5 -0.5 -0.5 0 0 0</pose>
+        <inertial>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+          <mass>0.1</mass>
+        </inertial>
+        <collision name="collision">
+          <pose>-0.025 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.05 0.02 0.02</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <max_vel>100</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>-0.025 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.05 0.02 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="bar_3_joint" type="revolute">
+        <parent>link</parent>
+        <child>bar_3</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <link name="wheel_1">
+        <pose>0.5 0.55 -0.5 1.57079633 0 0</pose>
+        <inertial>
+          <inertia>
+            <ixx>0.01</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <fdir1>1 0 0</fdir1>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <max_vel>100</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="wheel_1_joint" type="revolute">
+        <parent>bar_2</parent>
+        <child>wheel_1</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <link name="wheel_2">
+        <pose>0.5 -0.55 -0.5 1.57079633 0 0</pose>
+        <inertial>
+          <inertia>
+            <ixx>0.01</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <fdir1>1 0 0</fdir1>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <max_vel>100</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="wheel_2_joint" type="revolute">
+        <parent>bar_3</parent>
+        <child>wheel_2</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <link name="wheel_3">
+        <pose>-0.5 0.55 -0.5 1.57079633 0 0</pose>
+        <inertial>
+          <inertia>
+            <ixx>0.01</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <fdir1>1 0 0</fdir1>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <max_vel>100</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="wheel_3_joint" type="revolute">
+        <parent>link</parent>
+        <child>wheel_3</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <dynamics>
+            <damping>0.0</damping>
+            <friction>0.0</friction>
+          </dynamics>
+          <xyz>0 1 0</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <link name="wheel_4">
+        <pose>-0.5 -0.55 -0.5 1.57079633 0 0</pose>
+        <inertial>
+          <inertia>
+            <ixx>0.01</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <fdir1>1 0 0</fdir1>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <max_vel>100</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.2</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="wheel_4_joint" type="revolute">
+        <parent>link</parent>
+        <child>wheel_4</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <dynamics>
+            <damping>0.0</damping>
+            <friction>0.0</friction>
+          </dynamics>
+          <xyz>0 1 0</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <link name="sphere_link">
+        <pose>0 0 0.5 0 0 0</pose>
+        <inertial>
+          <inertia>
+            <ixx>0.1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.1</iyy>
+            <iyz>0</iyz>
+            <izz>0.1</izz>
+          </inertia>
+          <mass>10.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.25</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <fdir1>1 0 0</fdir1>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <max_vel>10</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.25</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="joint_sphere" type="revolute">
+        <parent>link</parent>
+        <child>sphere_link</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <link name="cylinder_link">
+        <pose>0 0 0.25 0 0 0</pose>
+        <inertial>
+          <inertia>
+            <ixx>0.1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.1</iyy>
+            <iyz>0</iyz>
+            <izz>0.1</izz>
+          </inertia>
+          <mass>10.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.5</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <max_vel>10</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.5</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="joint_cylinder" type="revolute">
+        <parent>sphere_link</parent>
+        <child>cylinder_link</child>
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <plugin name="cart_test_plugin" filename="libCartDemoPlugin.so">
+        <steer>bar_2_joint</steer>
+        <steer_pid>10 0.1 0.5</steer_pid>
+        <steer_ilim>-10 10</steer_ilim>
+        <steer_pos>0.0</steer_pos>
+        <!-- steer -->
+        <steer_vel>0</steer_vel>
+        <!-- not used -->
+        <steer_eff>100.0</steer_eff>
+        <!-- max pos pid effort -->
+        <right>wheel_3_joint</right>
+        <right_pid>0.1 0.0 0.001</right_pid>
+        <right_ilim>-.1 .1</right_ilim>
+        <right_pos>0</right_pos>
+        <!-- final position pid -->
+        <right_vel>0</right_vel>
+        <!-- final velocity pid -->
+        <right_eff>0.1</right_eff>
+        <!-- drive torque -->
+        <left>wheel_4_joint</left>
+        <left_pid>0.1 0.0 0.001</left_pid>
+        <left_ilim>-.1 .1</left_ilim>
+        <left_pos>0</left_pos>
+        <!-- final position pid -->
+        <left_vel>0</left_vel>
+        <!-- final velocity pid -->
+        <left_eff>0.1</left_eff>
+        <!-- drive torque -->
+      </plugin>
+    </model>
+    <model name="cessna_c172">
+      <pose>-5 -5 0.7 0 0 0</pose>
+
+      <include>
+        <uri>model://cessna</uri>
+      </include>
+
+      <link name="blade_1_visual">
+        <pose>1.79 0 1.350 0 0 0</pose>
+        <gravity>0</gravity>
+      </link>
+
+      <link name="wing_body_debug_visuals">
+        <pose>0 0 0.495 0 0 0</pose>
+        <gravity>0</gravity>
+      </link>
+
+      <!-- Plugins for controlling the thrust and control surfaces -->
+      <plugin name="cessna_control" filename="libCessnaPlugin.so">
+        <propeller>cessna_c172::propeller_joint</propeller>
+        <propeller_max_rpm>2500</propeller_max_rpm>
+        <left_aileron>cessna_c172::left_aileron_joint</left_aileron>
+        <left_flap>cessna_c172::left_flap_joint</left_flap>
+        <right_aileron>cessna_c172::right_aileron_joint</right_aileron>
+        <right_flap>cessna_c172::right_flap_joint</right_flap>
+        <elevators>cessna_c172::elevators_joint</elevators>
+        <rudder>cessna_c172::rudder_joint</rudder>
+        <propeller_p_gain>10000</propeller_p_gain>
+        <propeller_i_gain>0</propeller_i_gain>
+        <propeller_d_gain>0</propeller_d_gain>
+        <surfaces_p_gain>2000</surfaces_p_gain>
+        <surfaces_i_gain>0</surfaces_i_gain>
+        <surfaces_d_gain>0</surfaces_d_gain>
+      </plugin>
+      <plugin name="propeller_top_blade" filename="libLiftDragPlugin.so">
+        <a0>0.4</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>0</cma>
+        <alpha_stall>1.5</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-0.37 0 0.77</cp>
+        <area>0.1</area>
+        <air_density>1.2041</air_density>
+        <forward>0 -1 0</forward>
+        <upward>1 0 0</upward>
+        <link_name>cessna_c172::propeller</link_name>
+      </plugin>
+      <plugin name="propeller_bottom_blade" filename="libLiftDragPlugin.so">
+        <a0>0.4</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>0</cma>
+        <alpha_stall>1.5</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-0.37 0 -0.77</cp>
+        <area>0.1</area>
+        <air_density>1.2041</air_density>
+        <forward>0 1 0</forward>
+        <upward>1 0 0</upward>
+        <link_name>cessna_c172::propeller</link_name>
+      </plugin>
+
+      <plugin name="left_wing" filename="libLiftDragPlugin.so">
+        <a0>0.05984281113</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>-1.8</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-1 2.205 1.5</cp>
+        <area>8.08255</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>cessna_c172::body</link_name>
+        <control_joint_name>cessna_c172::left_aileron_joint</control_joint_name>
+        <control_joint_rad_to_cl>-2.0</control_joint_rad_to_cl>
+      </plugin>
+
+      <plugin name="right_wing" filename="libLiftDragPlugin.so">
+        <a0>0.05984281113</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>-1.8</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-1 -2.205 1.5</cp>
+        <area>8.08255</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>cessna_c172::body</link_name>
+        <control_joint_name>
+          cessna_c172::right_aileron_joint
+        </control_joint_name>
+        <control_joint_rad_to_cl>-2.0</control_joint_rad_to_cl>
+      </plugin>
+
+      <plugin name="elevator" filename="libLiftDragPlugin.so">
+        <a0>-0.2</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>-1.8</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-5.45 0 0.55</cp>
+        <area>2.03458</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>cessna_c172::body</link_name>
+        <control_joint_name>cessna_c172::elevators_joint</control_joint_name>
+        <control_joint_rad_to_cl>-4.0</control_joint_rad_to_cl>
+      </plugin>
+
+      <plugin name="rudder" filename="libLiftDragPlugin.so">
+        <a0>0</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>-1.8</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-6 0 1.55</cp>
+        <area>1.5329</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 1 0</upward>
+        <link_name>cessna_c172::body</link_name>
+        <control_joint_name>cessna_c172::rudder_joint</control_joint_name>
+        <control_joint_rad_to_cl>4.0</control_joint_rad_to_cl>
+      </plugin>
+    </model>
+  </world>
+</sdf>

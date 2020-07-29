@@ -19,6 +19,7 @@
 #include <mutex>
 #include <string>
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/AxisAlignedBox.hh>
 
 #include <sdf/sdf.hh>
@@ -259,6 +260,9 @@ void FollowerPlugin::OnNewDepthFrame(const float *_image,
     const unsigned int _width, const unsigned int _height,
     const unsigned int /*_depth*/, const std::string &/*_format*/)
 {
+  IGN_PROFILE("FollowerPlugin::OnNewDepthFrame");
+  IGN_PROFILE_BEGIN("fillarray");
+
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   float f;
@@ -274,14 +278,19 @@ void FollowerPlugin::OnNewDepthFrame(const float *_image,
   }
 
   memcpy(this->dataPtr->depthBuffer, _image, depthBufferSize);
+  IGN_PROFILE_END();
 }
 
 /////////////////////////////////////////////////
 void FollowerPlugin::UpdateFollower()
 {
+  IGN_PROFILE("FollowerPlugin::UpdateFollower");
+  IGN_PROFILE_BEGIN("Update");
+
   if (this->dataPtr->imageMsg.width() == 0u ||
       this->dataPtr->imageMsg.height() == 0u)
   {
+    IGN_PROFILE_END();
     return;
   }
 
@@ -311,6 +320,7 @@ void FollowerPlugin::UpdateFollower()
     // Brakes on!
     this->dataPtr->leftJoint->SetVelocity(0, 0);
     this->dataPtr->rightJoint->SetVelocity(0, 0);
+    IGN_PROFILE_END();
     return;
   }
 
@@ -334,4 +344,5 @@ void FollowerPlugin::UpdateFollower()
 
   this->dataPtr->leftJoint->SetVelocity(0, leftVelDesired);
   this->dataPtr->rightJoint->SetVelocity(0, rightVelDesired);
+  IGN_PROFILE_END();
 }

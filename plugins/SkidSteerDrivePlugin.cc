@@ -17,6 +17,8 @@
 
 #include <string>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/SkidSteerDrivePlugin.hh"
@@ -115,6 +117,8 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 {
+  IGN_PROFILE("SkidSteerDrivePlugin::OnVelMsg");
+  IGN_PROFILE_BEGIN("Update");
   // gzmsg << "cmd_vel: " << msg->position().x() << ", "
   //       << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
 
@@ -126,4 +130,6 @@ void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
   this->joints[RIGHT_REAR ]->SetVelocity(0, vel_lin - vel_rot);
   this->joints[LEFT_FRONT ]->SetVelocity(0, vel_lin + vel_rot);
   this->joints[LEFT_REAR  ]->SetVelocity(0, vel_lin + vel_rot);
+
+  IGN_PROFILE_END();
 }

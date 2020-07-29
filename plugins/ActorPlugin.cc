@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <ignition/math.hh>
+#include <ignition/common/Profiler.hh>
 #include "gazebo/physics/physics.hh"
 #include "plugins/ActorPlugin.hh"
 
@@ -153,6 +154,9 @@ void ActorPlugin::HandleObstacles(ignition::math::Vector3d &_pos)
 /////////////////////////////////////////////////
 void ActorPlugin::OnUpdate(const common::UpdateInfo &_info)
 {
+  IGN_PROFILE("ActorPlugin::UpdateImpl");
+  IGN_PROFILE_BEGIN("Update");
+
   // Time delta
   double dt = (_info.simTime - this->lastUpdate).Double();
 
@@ -206,4 +210,5 @@ void ActorPlugin::OnUpdate(const common::UpdateInfo &_info)
   this->actor->SetScriptTime(this->actor->ScriptTime() +
     (distanceTraveled * this->animationFactor));
   this->lastUpdate = _info.simTime;
+  IGN_PROFILE_END();
 }

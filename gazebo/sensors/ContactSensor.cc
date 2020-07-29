@@ -17,6 +17,8 @@
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -131,6 +133,9 @@ void ContactSensor::Init()
 //////////////////////////////////////////////////
 bool ContactSensor::UpdateImpl(const bool /*_force*/)
 {
+  IGN_PROFILE("ContactSensor::UpdateImpl");
+  IGN_PROFILE_BEGIN("Update");
+
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Don't do anything if there is no new data to process.
@@ -186,6 +191,9 @@ bool ContactSensor::UpdateImpl(const bool /*_force*/)
     }
   }
 
+  IGN_PROFILE_END();
+  IGN_PROFILE_BEGIN("Publish");
+
   // Clear the incoming contact list.
   this->dataPtr->incomingContacts.clear();
 
@@ -200,6 +208,7 @@ bool ContactSensor::UpdateImpl(const bool /*_force*/)
     this->dataPtr->contactsPub->Publish(this->dataPtr->contactsMsg);
   }
 
+  IGN_PROFILE_END();
   return true;
 }
 

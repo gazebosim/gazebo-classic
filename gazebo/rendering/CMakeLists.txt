@@ -219,6 +219,10 @@ target_compile_definitions(gazebo_rendering
   PRIVATE BUILDING_DLL_GZ_RENDERING
 )
 
+if (${ENABLE_PROFILER})
+  set(IGN_PROFILE_LIBS ${IGNITION-COMMON_LIBRARIES})
+endif()
+
 target_link_libraries(gazebo_rendering
   gazebo_common
   gazebo_msgs
@@ -228,6 +232,7 @@ target_link_libraries(gazebo_rendering
   ${tinyxml_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES}
+  ${IGN_PROFILE_LIBS}
 )
 
 if (HAVE_OCULUS)

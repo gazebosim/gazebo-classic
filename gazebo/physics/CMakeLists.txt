@@ -158,6 +158,10 @@ target_compile_definitions(gazebo_physics
   PRIVATE BUILDING_DLL_GZ_PHYSICS
 )
 
+if (${ENABLE_PROFILER})
+  set(IGN_PROFILE_LIBS ${IGNITION-COMMON_LIBRARIES})
+endif()
+
 target_link_libraries(gazebo_physics
   gazebo_common
   gazebo_util
@@ -165,6 +169,7 @@ target_link_libraries(gazebo_physics
   gazebo_opcode
   ${Boost_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
+  ${IGN_PROFILE_LIBS}
 )
 
 # Link in Bullet support if present
