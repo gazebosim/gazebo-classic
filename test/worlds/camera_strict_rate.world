@@ -34,19 +34,6 @@
           <update_rate>500</update_rate>
           <visualize>true</visualize>
         </sensor>
-      </link>
-    </model>
-
-    <model name="box">
-      <pose>13 0 0.5 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-        </visual>
         <!-- Regular camera, to make sure strict rate is only applied to the sensor intended -->
         <sensor name="camera_sensor_regular" type="camera">
           <camera>
