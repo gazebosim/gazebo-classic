@@ -17,6 +17,8 @@
 
 #include <functional>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/CartDemoPlugin.hh"
@@ -110,6 +112,8 @@ void CartDemoPlugin::Init()
 /////////////////////////////////////////////////
 void CartDemoPlugin::OnUpdate()
 {
+  IGN_PROFILE("CartDemoPlugin::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   common::Time currTime = this->model->GetWorld()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
@@ -176,4 +180,5 @@ void CartDemoPlugin::OnUpdate()
     this->joints[i]->SetForce(0, eff);
   }
   gzdbg << "\n";
+  IGN_PROFILE_END();
 }

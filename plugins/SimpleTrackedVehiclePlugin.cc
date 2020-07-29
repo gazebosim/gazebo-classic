@@ -18,6 +18,7 @@
 #include <functional>
 #include <vector>
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 
@@ -300,6 +301,9 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
   if (this->contactManager->GetContactCount() == 0)
     return;
 
+  IGN_PROFILE("SimpleTrackedVehiclePlugin::DriveTracks");
+  IGN_PROFILE_BEGIN("Update");
+
   /////////////////////////////////////////////
   // Calculate the desired center of rotation
   /////////////////////////////////////////////
@@ -476,6 +480,7 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       continue;
     }
   }
+  IGN_PROFILE_END();
 }
 
 ignition::math::Vector3d SimpleTrackedVehiclePlugin::ComputeFrictionDirection(

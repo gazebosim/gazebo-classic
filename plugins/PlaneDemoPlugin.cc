@@ -18,6 +18,7 @@
 #include <chrono>
 #include <functional>
 #include <thread>
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 
@@ -364,6 +365,8 @@ void PlaneDemoPlugin::Init()
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::OnUpdate()
 {
+  IGN_PROFILE("PlaneDemoPlugin:OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
   // gzdbg << "executing OnUpdate.\n";
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -398,6 +401,7 @@ void PlaneDemoPlugin::OnUpdate()
     }
     this->dataPtr->lastUpdateTime = curTime;
   }
+  IGN_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

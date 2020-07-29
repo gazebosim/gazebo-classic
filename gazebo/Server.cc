@@ -33,6 +33,7 @@
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Rand.hh>
+#include "ignition/common/Profiler.hh"
 
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
@@ -596,10 +597,13 @@ void Server::Run()
 
   this->dataPtr->initialized = true;
 
+  IGN_PROFILE_THREAD_NAME("gzserver");
   // Stay on this loop until Gazebo needs to be shut down
   // The server and sensor manager outlive worlds
   while (!this->dataPtr->stop)
   {
+    IGN_PROFILE("Server::Run");
+    IGN_PROFILE_BEGIN("ProcessControlMsgs");
     if (this->dataPtr->lockstep)
       rendering::wait_for_render_request("", 0.100);
     // bool ret = rendering::wait_for_render_request("", 0.100);
@@ -607,11 +611,20 @@ void Server::Run()
     //   gzerr << "time out reached!" << std::endl;
 
     this->ProcessControlMsgs();
+    IGN_PROFILE_END();
 
     if (physics::worlds_running())
+    {
+      IGN_PROFILE_BEGIN("run_once");
       sensors::run_once();
+      IGN_PROFILE_END();
+    }
     else if (sensors::running())
+    {
+      IGN_PROFILE_BEGIN("stop");
       sensors::stop();
+      IGN_PROFILE_END();
+    }
 
     if (!this->dataPtr->lockstep)
       common::Time::MSleep(1);
