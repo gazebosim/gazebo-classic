@@ -81,6 +81,8 @@ if(ENABLE_PROFILER)
 
   gz_add_library(gazebo_profiler ${profiler_sources})
 
+  gz_install_library(gazebo_profiler)
+  gz_install_includes("profiler" ${profiler_headers})
 endif()
 
 set (sources
@@ -175,9 +177,6 @@ endif()
 if (WIN32)
   include_directories(IGNITION-MSGS_INCLUDE_DIR)
 endif()
-
-gz_install_library(gazebo_profiler)
-gz_install_includes("profiler" ${profiler_headers})
 
 gz_install_library(gazebo_util)
 gz_install_includes("util" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/util.hh)
