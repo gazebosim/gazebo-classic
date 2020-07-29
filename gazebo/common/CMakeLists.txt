@@ -247,6 +247,7 @@ target_compile_definitions(gazebo_common
 
 target_link_libraries(gazebo_common
   ${IGNITION-MATH_LIBRARIES}
+  ${IGNITION-COMMON_LIBRARIES}
   ${libdl_library}
   ${libtool_library}
   ${Boost_LIBRARIES}

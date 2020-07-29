@@ -17,6 +17,8 @@
 
 #include <string>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyModel.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
@@ -404,11 +406,14 @@ void SimbodyPhysics::InitModel(const physics::ModelPtr _model)
 //////////////////////////////////////////////////
 void SimbodyPhysics::InitForThread()
 {
+  IGN_PROFILE_THREAD_NAME("SimbodyPhysics");
 }
 
 //////////////////////////////////////////////////
 void SimbodyPhysics::UpdateCollision()
 {
+  IGN_PROFILE("SimbodyPhysics::UpdateCollision");
+  IGN_PROFILE_BEGIN("UpdateCollision");
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
   this->contactManager->ResetCount();
@@ -632,11 +637,15 @@ void SimbodyPhysics::UpdateCollision()
       }
     }
   }
+  IGN_PROFILE_END();
 }
 
 //////////////////////////////////////////////////
 void SimbodyPhysics::UpdatePhysics()
 {
+  IGN_PROFILE("SimbodyPhysics::UpdatePhysics");
+  IGN_PROFILE_BEGIN("UpdatePhysics");
+
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
@@ -705,6 +714,7 @@ void SimbodyPhysics::UpdatePhysics()
   // FIXME:  this needs to happen before forces are applied for the next step
   // FIXME:  but after we've gotten everything from current state
   this->discreteForces.clearAllForces(this->integ->updAdvancedState());
+  IGN_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

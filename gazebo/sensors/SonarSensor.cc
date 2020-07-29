@@ -16,6 +16,7 @@
 */
 #include <boost/algorithm/string.hpp>
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/World.hh"
@@ -252,6 +253,9 @@ double SonarSensor::Range()
 //////////////////////////////////////////////////
 bool SonarSensor::UpdateImpl(const bool /*_force*/)
 {
+  IGN_PROFILE("SonarSensor::UpdateImpl");
+  IGN_PROFILE_BEGIN("Update");
+
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   this->lastMeasurementTime = this->world->SimTime();
@@ -313,11 +317,14 @@ bool SonarSensor::UpdateImpl(const bool /*_force*/)
 
   // Clear the incoming contact list.
   this->dataPtr->incomingContacts.clear();
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("Publish");
   this->dataPtr->update(this->dataPtr->sonarMsg);
 
   if (this->dataPtr->sonarPub)
     this->dataPtr->sonarPub->Publish(this->dataPtr->sonarMsg);
+  IGN_PROFILE_END();
 
   return true;
 }

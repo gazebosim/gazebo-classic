@@ -39,6 +39,8 @@
 #include "gazebo/sensors/CameraSensorPrivate.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 
+#include "gazebo/util/Profiler.hh"
+
 using namespace gazebo;
 using namespace sensors;
 
@@ -205,11 +207,16 @@ void CameraSensor::Render()
 //////////////////////////////////////////////////
 bool CameraSensor::UpdateImpl(const bool /*_force*/)
 {
+  IGN_PROFILE("CameraSensor::UpdateImpl");
+
   if (!this->dataPtr->rendered)
     return false;
 
+  IGN_PROFILE_BEGIN("PostRender");
   this->camera->PostRender();
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("fillarray");
 
   if ((this->imagePub && this->imagePub->HasConnections()) ||
       this->imagePubIgn.HasConnections())
@@ -255,6 +262,7 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
   }
 
   this->dataPtr->rendered = false;
+  IGN_PROFILE_END();
   return true;
 }
 
@@ -337,4 +345,3 @@ void CameraSensor::SetRendered(const bool _value)
 {
   this->dataPtr->rendered = _value;
 }
-

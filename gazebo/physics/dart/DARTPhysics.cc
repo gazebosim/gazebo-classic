@@ -56,6 +56,8 @@
 
 #include "gazebo/physics/dart/DARTPhysicsPrivate.hh"
 
+#include "gazebo/util/Profiler.hh"
+
 using namespace gazebo;
 using namespace physics;
 
@@ -120,6 +122,7 @@ void DARTPhysics::Reset()
 //////////////////////////////////////////////////
 void DARTPhysics::InitForThread()
 {
+  IGN_PROFILE_THREAD_NAME("DARTPhysics");
 }
 
 
@@ -396,6 +399,9 @@ static void RetrieveDARTCollisions(
 //////////////////////////////////////////////////
 void DARTPhysics::UpdateCollision()
 {
+  IGN_PROFILE("DARTPhysics::UpdateCollision");
+  IGN_PROFILE_BEGIN("UpdateCollision");
+
   if (!this->world->PhysicsEnabled())
   {
     dart::collision::CollisionResult localResult;
@@ -412,11 +418,15 @@ void DARTPhysics::UpdateCollision()
 
     RetrieveDARTCollisions(this, &localResult, this->GetContactManager());
   }
+  IGN_PROFILE_END();
 }
 
 //////////////////////////////////////////////////
 void DARTPhysics::UpdatePhysics()
 {
+  IGN_PROFILE("DARTPhysics::UpdatePhysics");
+  IGN_PROFILE_BEGIN("Update");
+
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
@@ -451,6 +461,7 @@ void DARTPhysics::UpdatePhysics()
         this,
         &(this->dataPtr->dtWorld->getLastCollisionResult()),
         this->GetContactManager());
+  IGN_PROFILE_END();
 }
 
 //////////////////////////////////////////////////
@@ -811,4 +822,3 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
 {
   return StaticFindDARTLink(this, _dtBodyNode);
 }
-
