@@ -22,7 +22,9 @@
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/ModelTreeWidget.hh"
 
+#ifdef __APPLE__
 using namespace boost::placeholders;
+#endif
 using namespace gazebo;
 using namespace gui;
 

@@ -30,7 +30,9 @@
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/SchematicViewWidget.hh"
 
+#ifdef __APPLE__
 using namespace boost::placeholders;
+#endif
 using namespace gazebo;
 using namespace gui;
 
