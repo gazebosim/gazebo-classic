@@ -18,6 +18,7 @@
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Console.hh"
@@ -41,10 +42,15 @@ using namespace sensors;
 
 sdf::ElementPtr SensorPrivate::sdfSensor;
 
+bool Sensor::useStrictRate = false;
+
 //////////////////////////////////////////////////
 Sensor::Sensor(SensorCategory _cat)
 : dataPtr(new SensorPrivate)
 {
+  this->dataPtr->extension = std::make_shared<SensorExt>(this);
+  this->SetExtension(this->dataPtr->extension);
+
   if (!this->dataPtr->sdfSensor)
   {
     this->dataPtr->sdfSensor.reset(new sdf::Element);
@@ -90,10 +96,14 @@ void Sensor::Load(const std::string &_worldName)
   if (this->sdf->Get<bool>("always_on"))
     this->SetActive(true);
 
+  this->useStrictRate = rendering::lockstep_enabled();
+
   this->world = physics::get_world(_worldName);
 
   if (this->dataPtr->category == IMAGE)
+  {
     this->scene = rendering::get_scene(_worldName);
+  }
 
   // loaded, but not updated
   this->lastUpdateTime = common::Time(0.0);
@@ -152,29 +162,7 @@ uint32_t Sensor::ParentId() const
 //////////////////////////////////////////////////
 bool Sensor::NeedsUpdate()
 {
-  // Adjust time-to-update period to compensate for delays caused by another
-  // sensor's update in the same thread.
-
-  common::Time simTime;
-  if (this->dataPtr->category == IMAGE && this->scene)
-    simTime = this->scene->SimTime();
-  else
-    simTime = this->world->SimTime();
-
-  // case when last update occurred in the future probably due to
-  // world reset
-  if (simTime <= this->lastMeasurementTime)
-  {
-    // Rendering sensors also set the lastMeasurementTime variable in Render()
-    // and lastUpdateTime in Sensor::Update based on Scene::SimTime() which
-    // could be outdated when the world is reset. In this case reset
-    // the variables back to 0.
-    this->ResetLastUpdateTime();
-    return false;
-  }
-
-  return (simTime - this->lastMeasurementTime +
-      this->dataPtr->updateDelay) >= this->updatePeriod;
+  return this->dataPtr->extension->NeedsUpdate();
 }
 
 //////////////////////////////////////////////////
@@ -182,44 +170,52 @@ void Sensor::Update(const bool _force)
 {
   if (this->IsActive() || _force)
   {
-    common::Time simTime;
-    if (this->dataPtr->category == IMAGE && this->scene)
-      simTime = this->scene->SimTime();
-    else
-      simTime = this->world->SimTime();
-
+    if (this->useStrictRate)
     {
-      std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
-
-      if (simTime <= this->lastUpdateTime && !_force)
-        return;
-
-      // Adjust time-to-update period to compensate for delays caused by another
-      // sensor's update in the same thread.
-      // NOTE: If you change this equation, also change the matching equation in
-      // Sensor::NeedsUpdate
-      common::Time adjustedElapsed = simTime -
-        this->lastUpdateTime + this->dataPtr->updateDelay;
-
-      if (adjustedElapsed < this->updatePeriod && !_force)
-        return;
-
-      this->dataPtr->updateDelay = std::max(common::Time::Zero,
-          adjustedElapsed - this->updatePeriod);
-
-      // if delay is more than a full update period, then give up trying
-      // to catch up. This happens normally when the sensor just changed from
-      // an inactive to an active state, or the sensor just cannot hit its
-      // target update rate (worst case).
-      if (this->dataPtr->updateDelay >= this->updatePeriod)
-        this->dataPtr->updateDelay = common::Time::Zero;
+      if (this->UpdateImpl(_force))
+        this->dataPtr->updated();
     }
-
-    if (this->UpdateImpl(_force))
+    else
     {
-      std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
-      this->lastUpdateTime = simTime;
-      this->dataPtr->updated();
+      common::Time simTime;
+      if (this->dataPtr->category == IMAGE && this->scene)
+        simTime = this->scene->SimTime();
+      else
+        simTime = this->world->SimTime();
+
+      {
+        std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
+
+        if (simTime <= this->lastUpdateTime && !_force)
+          return;
+
+        // Adjust time-to-update period to compensate for delays caused by
+        // another sensor's update in the same thread.
+        // NOTE: If you change this equation, also change the matching equation
+        // in Sensor::NeedsUpdate
+        common::Time adjustedElapsed = simTime -
+          this->lastUpdateTime + this->dataPtr->updateDelay;
+
+        if (adjustedElapsed < this->updatePeriod && !_force)
+          return;
+
+        this->dataPtr->updateDelay = std::max(common::Time::Zero,
+            adjustedElapsed - this->updatePeriod);
+
+        // if delay is more than a full update period, then give up trying
+        // to catch up. This happens normally when the sensor just changed from
+        // an inactive to an active state, or the sensor just cannot hit its
+        // target update rate (worst case).
+        if (this->dataPtr->updateDelay >= this->updatePeriod)
+          this->dataPtr->updateDelay = common::Time::Zero;
+      }
+
+      if (this->UpdateImpl(_force))
+      {
+        std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
+        this->lastUpdateTime = simTime;
+        this->dataPtr->updated();
+      }
     }
   }
 }
@@ -291,7 +287,7 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Sensor::SetActive(const bool _value)
 {
-  this->active = _value;
+  this->dataPtr->extension->SetActive(_value);
 }
 
 //////////////////////////////////////////////////
@@ -454,14 +450,197 @@ NoisePtr Sensor::Noise(const SensorNoiseType _type) const
 //////////////////////////////////////////////////
 void Sensor::ResetLastUpdateTime()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
-  this->lastUpdateTime = 0.0;
-  this->lastMeasurementTime = 0.0;
-  this->dataPtr->updateDelay = 0.0;
+  this->dataPtr->extension->ResetLastUpdateTime();
 }
 
 //////////////////////////////////////////////////
 event::ConnectionPtr Sensor::ConnectUpdated(std::function<void()> _subscriber)
 {
   return this->dataPtr->updated.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+double Sensor::NextRequiredTimestamp() const
+{
+  return this->dataPtr->extension->NextRequiredTimestamp();
+}
+
+//////////////////////////////////////////////////
+bool Sensor::StrictRate() const
+{
+  return this->useStrictRate;
+}
+
+//////////////////////////////////////////////////
+void Sensor::SetExtension(std::shared_ptr<SensorExt> _ext)
+{
+  this->dataPtr->extension = _ext;
+}
+
+//////////////////////////////////////////////////
+SensorExt::SensorExt(Sensor *_sensor)
+{
+  this->sensor = _sensor;
+}
+
+//////////////////////////////////////////////////
+void SensorExt::SetActive(bool _value)
+{
+  this->sensor->active = _value;
+}
+
+//////////////////////////////////////////////////
+void SensorExt::ResetLastUpdateTime()
+{
+  std::lock_guard<std::mutex> lock(sensor->dataPtr->mutexLastUpdateTime);
+  this->sensor->lastUpdateTime = 0.0;
+  this->sensor->lastMeasurementTime = 0.0;
+  this->sensor->dataPtr->updateDelay = 0.0;
+}
+
+//////////////////////////////////////////////////
+double SensorExt::NextRequiredTimestamp() const
+{
+  // implementation by default: next required timestamp is ignored
+  return std::numeric_limits<double>::quiet_NaN();
+}
+
+//////////////////////////////////////////////////
+bool SensorExt::NeedsUpdate()
+{
+  // Adjust time-to-update period to compensate for delays caused by another
+  // sensor's update in the same thread.
+
+  common::Time simTime;
+  if (this->sensor->dataPtr->category == IMAGE && this->sensor->scene)
+    simTime = sensor->scene->SimTime();
+  else
+    simTime = this->sensor->world->SimTime();
+
+  // case when last update occurred in the future probably due to
+  // world reset
+  if (simTime <= this->sensor->lastMeasurementTime)
+  {
+    // Rendering sensors also set the lastMeasurementTime variable in Render()
+    // and lastUpdateTime in Sensor::Update based on Scene::SimTime() which
+    // could be outdated when the world is reset. In this case reset
+    // the variables back to 0.
+    this->sensor->ResetLastUpdateTime();
+    return false;
+  }
+
+  return (simTime - this->sensor->lastMeasurementTime +
+      this->sensor->dataPtr->updateDelay) >= this->sensor->updatePeriod;
+}
+
+//////////////////////////////////////////////////
+RenderingSensorExt::RenderingSensorExt(Sensor *_sensor)
+  : SensorExt(_sensor), dataPtr(new RenderingSensorExtPrivate)
+{
+}
+
+//////////////////////////////////////////////////
+void RenderingSensorExt::SetActive(bool _value)
+{
+  // If this sensor is reactivated
+  if (this->sensor->useStrictRate && _value && !this->sensor->IsActive())
+  {
+    // the next rendering time must be reset to ensure it is properly
+    // computed by CameraSensor::NeedsUpdate.
+    this->dataPtr->nextRenderingTime =
+        std::numeric_limits<double>::quiet_NaN();
+  }
+  SensorExt::SetActive(_value);
+}
+
+//////////////////////////////////////////////////
+void RenderingSensorExt::ResetLastUpdateTime()
+{
+  SensorExt::ResetLastUpdateTime();
+  if (this->sensor->useStrictRate)
+  {
+    this->dataPtr->nextRenderingTime =
+      std::numeric_limits<double>::quiet_NaN();
+  }
+}
+
+//////////////////////////////////////////////////
+double RenderingSensorExt::NextRequiredTimestamp() const
+{
+  if (this->sensor->useStrictRate)
+  {
+    if (!ignition::math::equal(this->sensor->updatePeriod.Double(), 0.0))
+      return this->dataPtr->nextRenderingTime;
+    else
+      return std::numeric_limits<double>::quiet_NaN();
+  }
+  else
+  {
+    return SensorExt::NextRequiredTimestamp();
+  }
+}
+
+//////////////////////////////////////////////////
+bool RenderingSensorExt::NeedsUpdate()
+{
+  if (this->sensor->useStrictRate)
+  {
+    double simTime;
+    if (this->sensor->scene)
+      simTime = this->sensor->scene->SimTime().Double();
+    else
+      simTime = this->sensor->world->SimTime().Double();
+
+    if (simTime < this->sensor->lastMeasurementTime.Double())
+    {
+      // Rendering sensors also set the lastMeasurementTime variable in Render()
+      // and lastUpdateTime in Sensor::Update based on Scene::SimTime() which
+      // could be outdated when the world is reset. In this case reset
+      // the variables back to 0.
+      this->ResetLastUpdateTime();
+      return false;
+    }
+
+    double dt = this->sensor->world->Physics()->GetMaxStepSize();
+
+    // If next rendering time is not set yet
+    if (std::isnan(this->dataPtr->nextRenderingTime))
+    {
+      if (this->sensor->updatePeriod == 0
+          || (simTime > 0.0 &&
+          std::abs(std::fmod(simTime, this->sensor->updatePeriod.Double()))
+          < dt))
+      {
+        this->dataPtr->nextRenderingTime = simTime;
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    if (simTime > this->dataPtr->nextRenderingTime + dt)
+      return true;
+
+    // Trigger on the tick the closest from the targeted rendering time
+    return (ignition::math::lessOrNearEqual(
+          std::abs(simTime - this->dataPtr->nextRenderingTime), dt / 2.0));
+  }
+  else
+  {
+    return SensorExt::NeedsUpdate();
+  }
+}
+
+//////////////////////////////////////////////////
+void RenderingSensorExt::SetNextRenderingTime(double _t)
+{
+  this->dataPtr->nextRenderingTime = _t;
+}
+
+//////////////////////////////////////////////////
+double RenderingSensorExt::NextRenderingTime() const
+{
+  return this->dataPtr->nextRenderingTime;
 }

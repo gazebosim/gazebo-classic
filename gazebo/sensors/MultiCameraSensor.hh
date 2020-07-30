@@ -105,6 +105,9 @@ namespace gazebo
       /// \brief Handle the render event.
       private: void Render();
 
+      /// \brief Handle the prerenderEnded event.
+      private: void PrerenderEnded();
+
       /// \internal
       /// \brief Private data pointer
       private: std::unique_ptr<MultiCameraSensorPrivate> dataPtr;

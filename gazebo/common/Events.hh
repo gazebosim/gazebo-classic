@@ -161,6 +161,14 @@ namespace gazebo
               { return createSensor.Connect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief End of prerender phase signal
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static ConnectionPtr ConnectPreRenderEnded(T _subscriber)
+              { return preRenderEnded.Connect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Render start signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
@@ -253,6 +261,9 @@ namespace gazebo
 
       /// \brief Pre-render
       public: static EventT<void ()> preRender;
+
+      /// \brief End of Pre-render
+      public: static EventT<void ()> preRenderEnded;
 
       /// \brief Render
       public: static EventT<void ()> render;

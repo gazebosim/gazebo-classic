@@ -22,6 +22,7 @@
 #include "gazebo/common/EnumIface.hh"
 #include "gazebo/common/Image.hh"
 
+#include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/transport/transport.hh"
@@ -35,6 +36,7 @@
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/SensorPrivate.hh"
 #include "gazebo/sensors/MultiCameraSensorPrivate.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
 
@@ -48,6 +50,10 @@ MultiCameraSensor::MultiCameraSensor()
 : Sensor(sensors::IMAGE),
   dataPtr(new MultiCameraSensorPrivate)
 {
+  this->dataPtr->extension = std::make_shared<RenderingSensorExt>(this);
+  auto ext = std::dynamic_pointer_cast<SensorExt>(this->dataPtr->extension);
+  this->SetExtension(ext);
+
   this->dataPtr->rendered = false;
   this->connections.push_back(
       event::Events::ConnectRender(
@@ -79,6 +85,13 @@ std::string MultiCameraSensor::Topic() const
 void MultiCameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
+  // useStrictRate is set in Sensor::Load()
+  if (this->useStrictRate)
+  {
+    this->connections.push_back(
+        event::Events::ConnectPreRenderEnded(
+          boost::bind(&MultiCameraSensor::PrerenderEnded, this)));
+  }
 
   // Create the publisher of image data.
   this->dataPtr->imagePub =
@@ -224,28 +237,74 @@ rendering::CameraPtr MultiCameraSensor::Camera(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
+void MultiCameraSensor::PrerenderEnded()
+{
+  if (this->useStrictRate && this->dataPtr->cameras.size() > 0 &&
+      this->IsActive() && this->NeedsUpdate())
+  {
+    // compute next rendering time, take care of the case where period is zero.
+    double dt;
+    if (this->updatePeriod <= 0.0)
+      dt = this->world->Physics()->GetMaxStepSize();
+    else
+      dt = this->updatePeriod.Double();
+    this->dataPtr->extension->SetNextRenderingTime(
+        this->dataPtr->extension->NextRenderingTime() + dt);
+
+    this->dataPtr->renderNeeded = true;
+    this->lastMeasurementTime = this->scene->SimTime();
+  }
+}
+
+//////////////////////////////////////////////////
 void MultiCameraSensor::Render()
 {
-  if (!this->IsActive() || !this->NeedsUpdate())
+  if (this->useStrictRate)
   {
-    return;
-  }
+    if (!this->dataPtr->renderNeeded)
+    {
+      return;
+    }
 
-  // Update all the cameras
-  std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
-  if (this->dataPtr->cameras.empty())
+    // Update all the cameras
+    std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
+    if (this->dataPtr->cameras.empty())
+    {
+      return;
+    }
+
+    for (auto iter = this->dataPtr->cameras.begin();
+        iter != this->dataPtr->cameras.end(); ++iter)
+    {
+      (*iter)->Render();
+    }
+
+    this->dataPtr->rendered = true;
+    this->dataPtr->renderNeeded = false;
+  }
+  else
   {
-    return;
-  }
+    if (!this->IsActive() || !this->NeedsUpdate())
+    {
+      return;
+    }
 
-  for (auto iter = this->dataPtr->cameras.begin();
-      iter != this->dataPtr->cameras.end(); ++iter)
-  {
-    (*iter)->Render();
-  }
+    // Update all the cameras
+    std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
+    if (this->dataPtr->cameras.empty())
+    {
+      return;
+    }
 
-  this->dataPtr->rendered = true;
-  this->lastMeasurementTime = this->scene->SimTime();
+    for (auto iter = this->dataPtr->cameras.begin();
+        iter != this->dataPtr->cameras.end(); ++iter)
+    {
+      (*iter)->Render();
+    }
+
+    this->dataPtr->rendered = true;
+    this->lastMeasurementTime = this->scene->SimTime();
+  }
 }
 
 //////////////////////////////////////////////////

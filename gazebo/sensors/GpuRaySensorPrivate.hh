@@ -21,6 +21,7 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -86,6 +87,12 @@ namespace gazebo
 
       /// \brief True if the sensor was rendered.
       public: bool rendered;
+
+      /// \brief True if the sensor needs a rendering
+      public: bool renderNeeded = false;
+
+      /// \brief Rendering sensor extension class for ABI incompatible changes
+      public: std::shared_ptr<RenderingSensorExt> extension;
     };
   }
 }

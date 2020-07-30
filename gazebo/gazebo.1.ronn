@@ -49,6 +49,8 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
  Load a server plugin.
 * -o, --profile arg :
  Physics preset profile name from the options in the world file.
+* --lockstep :
+ Lockstep simulation so sensor update rates are respected.
 
 
 ## AUTHOR
