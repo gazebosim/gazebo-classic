@@ -22,6 +22,7 @@
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/ModelTreeWidget.hh"
 
+using namespace boost::placeholders;
 using namespace gazebo;
 using namespace gui;
 

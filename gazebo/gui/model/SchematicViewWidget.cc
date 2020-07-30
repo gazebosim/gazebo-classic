@@ -30,6 +30,7 @@
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/SchematicViewWidget.hh"
 
+using namespace boost::placeholders;
 using namespace gazebo;
 using namespace gui;
 
