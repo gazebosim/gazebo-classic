@@ -22,6 +22,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
@@ -35,6 +36,7 @@
 
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/SensorPrivate.hh"
 #include "gazebo/sensors/GpuRaySensorPrivate.hh"
 #include "gazebo/sensors/GpuRaySensor.hh"
 
@@ -48,6 +50,10 @@ GpuRaySensor::GpuRaySensor()
 : Sensor(sensors::IMAGE),
   dataPtr(new GpuRaySensorPrivate)
 {
+  this->dataPtr->extension = std::make_shared<RenderingSensorExt>(this);
+  auto ext = std::dynamic_pointer_cast<SensorExt>(this->dataPtr->extension);
+  this->SetExtension(ext);
+
   this->dataPtr->rendered = false;
   this->active = false;
   this->connections.push_back(
@@ -75,12 +81,26 @@ std::string GpuRaySensor::Topic() const
 void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
+  // useStrictRate is set in Sensor::Load()
+  if (this->useStrictRate)
+  {
+    this->connections.push_back(
+        event::Events::ConnectPreRenderEnded(
+          boost::bind(&GpuRaySensor::PrerenderEnded, this)));
+  }
 }
 
 //////////////////////////////////////////////////
 void GpuRaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
+  // useStrictRate is set in Sensor::Load()
+  if (this->useStrictRate)
+  {
+    this->connections.push_back(
+        event::Events::ConnectPreRenderEnded(
+          boost::bind(&GpuRaySensor::PrerenderEnded, this)));
+  }
 
   this->dataPtr->scanPub =
     this->node->Advertise<msgs::LaserScanStamped>(this->Topic(), 50);
@@ -561,15 +581,47 @@ int GpuRaySensor::Fiducial(const unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
+void GpuRaySensor::PrerenderEnded()
+{
+  if (this->useStrictRate && this->dataPtr->laserCam && this->IsActive() &&
+      this->NeedsUpdate())
+  {
+    // compute next rendering time, take care of the case where period is zero.
+    double dt;
+    if (this->updatePeriod <= 0.0)
+      dt = this->world->Physics()->GetMaxStepSize();
+    else
+      dt = this->updatePeriod.Double();
+    this->dataPtr->extension->SetNextRenderingTime(
+        this->dataPtr->extension->NextRenderingTime() + dt);
+
+    this->dataPtr->renderNeeded = true;
+    this->lastMeasurementTime = this->scene->SimTime();
+  }
+}
+
+//////////////////////////////////////////////////
 void GpuRaySensor::Render()
 {
-  if (!this->dataPtr->laserCam || !this->IsActive() || !this->NeedsUpdate())
-    return;
+  if (this->useStrictRate)
+  {
+    if (!this->dataPtr->renderNeeded)
+      return;
 
-  this->lastMeasurementTime = this->scene->SimTime();
+    this->dataPtr->laserCam->Render();
+    this->dataPtr->rendered = true;
+    this->dataPtr->renderNeeded = false;
+  }
+  else
+  {
+    if (!this->dataPtr->laserCam || !this->IsActive() || !this->NeedsUpdate())
+      return;
 
-  this->dataPtr->laserCam->Render();
-  this->dataPtr->rendered = true;
+    this->lastMeasurementTime = this->scene->SimTime();
+
+    this->dataPtr->laserCam->Render();
+    this->dataPtr->rendered = true;
+  }
 }
 
 //////////////////////////////////////////////////

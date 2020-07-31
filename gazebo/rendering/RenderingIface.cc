@@ -20,8 +20,11 @@
 
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Scene.hh"
 
 using namespace gazebo;
+
+bool g_lockstep = false;
 
 //////////////////////////////////////////////////
 bool rendering::load()
@@ -106,4 +109,42 @@ rendering::ScenePtr rendering::create_scene(const std::string &_name,
 void rendering::remove_scene(const std::string &_name)
 {
   rendering::RenderEngine::Instance()->RemoveScene(_name);
+}
+
+//////////////////////////////////////////////////
+bool rendering::wait_for_render_request(const std::string &_name,
+                                        const double _timeoutsec)
+{
+  ScenePtr scene = get_scene(_name);
+
+  if (!scene)
+  {
+    common::Time::NSleep(_timeoutsec * 1e9);
+    return false;
+  }
+
+  return scene->WaitForRenderRequest(_timeoutsec);
+}
+
+//////////////////////////////////////////////////
+void rendering::update_scene_poses(const std::string &_name,
+                                   const msgs::PosesStamped &_msg)
+{
+  ScenePtr scene = get_scene(_name);
+  if (scene && scene->Initialized())
+  {
+    scene->UpdatePoses(_msg);
+  }
+}
+
+//////////////////////////////////////////////////
+void rendering::set_lockstep_enabled(bool _enable)
+{
+  g_lockstep = _enable;
+}
+
+//////////////////////////////////////////////////
+bool rendering::lockstep_enabled()
+{
+  return g_lockstep;
 }

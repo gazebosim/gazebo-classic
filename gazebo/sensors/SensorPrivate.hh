@@ -19,11 +19,13 @@
 
 #include <mutex>
 #include <sdf/sdf.hh>
+#include <limits>
 
 #include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -57,6 +59,18 @@ namespace gazebo
       /// \brief An SDF pointer that allows us to only read the sensor.sdf
       /// file once, which in turns limits disk reads.
       public: static sdf::ElementPtr sdfSensor;
+
+      /// \brief Sensor extension class for ABI incompatible changes
+      public: std::shared_ptr<SensorExt> extension;
+    };
+
+    /// \internal
+    /// \brief Rendering sensor extension private data.
+    class RenderingSensorExtPrivate
+    {
+      /// \brief Timestamp of the forthcoming rendering
+      public: double nextRenderingTime
+          = std::numeric_limits<double>::quiet_NaN();
     };
     /// \}
   }

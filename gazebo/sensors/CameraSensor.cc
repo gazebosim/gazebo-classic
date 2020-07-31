@@ -24,6 +24,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 
+#include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/rendering/Camera.hh"
@@ -36,6 +37,7 @@
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 
+#include "gazebo/sensors/SensorPrivate.hh"
 #include "gazebo/sensors/CameraSensorPrivate.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 
@@ -51,6 +53,10 @@ CameraSensor::CameraSensor()
 : Sensor(sensors::IMAGE),
   dataPtr(new CameraSensorPrivate)
 {
+  this->dataPtr->extension = std::make_shared<RenderingSensorExt>(this);
+  auto ext = std::dynamic_pointer_cast<SensorExt>(this->dataPtr->extension);
+  this->SetExtension(ext);
+
   this->connections.push_back(
       event::Events::ConnectRender(
         std::bind(&CameraSensor::Render, this)));
@@ -66,6 +72,13 @@ CameraSensor::~CameraSensor()
 void CameraSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
+  // useStrictRate is set in Sensor::Load()
+  if (this->useStrictRate)
+  {
+    this->connections.push_back(
+        event::Events::ConnectPreRenderEnded(
+          boost::bind(&CameraSensor::PrerenderEnded, this)));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -92,6 +105,14 @@ std::string CameraSensor::TopicIgn() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
+  // useStrictRate is set in Sensor::Load()
+  if (this->useStrictRate)
+  {
+    this->connections.push_back(
+        event::Events::ConnectPreRenderEnded(
+          boost::bind(&CameraSensor::PrerenderEnded, this)));
+  }
+
   this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->Topic(), 50);
 
   ignition::transport::AdvertiseMessageOptions opts;
@@ -192,16 +213,50 @@ void CameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
+void CameraSensor::PrerenderEnded()
+{
+  if (this->useStrictRate && this->camera && this->IsActive() &&
+      this->NeedsUpdate())
+  {
+    // compute next rendering time, take care of the case where period is zero.
+    double dt;
+    if (this->updatePeriod <= 0.0)
+      dt = this->world->Physics()->GetMaxStepSize();
+    else
+      dt = this->updatePeriod.Double();
+    this->dataPtr->extension->SetNextRenderingTime(
+        this->dataPtr->extension->NextRenderingTime() + dt);
+
+    this->dataPtr->renderNeeded = true;
+    this->lastMeasurementTime = this->scene->SimTime();
+  }
+}
+
+//////////////////////////////////////////////////
 void CameraSensor::Render()
 {
-  if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
-    return;
+  if (this->useStrictRate)
+  {
+    if (!this->dataPtr->renderNeeded)
+      return;
 
-  // Update all the cameras
-  this->camera->Render();
+    // Update all the cameras
+    this->camera->Render();
 
-  this->dataPtr->rendered = true;
-  this->lastMeasurementTime = this->scene->SimTime();
+    this->dataPtr->rendered = true;
+    this->dataPtr->renderNeeded = false;
+  }
+  else
+  {
+    if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
+      return;
+
+    // Update all the cameras
+    this->camera->Render();
+
+    this->dataPtr->rendered = true;
+    this->lastMeasurementTime = this->scene->SimTime();
+  }
 }
 
 //////////////////////////////////////////////////

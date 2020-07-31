@@ -159,6 +159,8 @@ World::World(const std::string &_name)
      event::Events::ConnectPause(
        std::bind(&World::SetPaused, this, std::placeholders::_1)));
 
+  this->dataPtr->waitForSensors = nullptr;
+
   // Make sure dbs are initialized
   common::ModelDatabase::Instance();
 #ifdef HAVE_IGNITION_FUEL_TOOLS
@@ -381,6 +383,13 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
+  this->Init(nullptr);
+}
+
+//////////////////////////////////////////////////
+void World::Init(std::function<
+    void(const std::string &, const msgs::PosesStamped &)> _func)
+{
   // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); ++i)
     this->dataPtr->rootElement->GetChild(i)->Init();
@@ -435,6 +444,8 @@ void World::Init()
       break;
     }
   }
+
+  this->dataPtr->updateScenePoses = _func;
 
   this->dataPtr->initialized = true;
 
@@ -602,6 +613,13 @@ bool World::SensorsInitialized() const
   return this->dataPtr->sensorsInitialized;
 }
 
+/////////////////////////////////////////////////
+void World::SetSensorWaitFunc(std::function<void(double, double)> _func)
+{
+  this->dataPtr->waitForSensors = _func;
+}
+
+
 //////////////////////////////////////////////////
 void World::Step()
 {
@@ -630,6 +648,10 @@ void World::Step()
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
 
   IGN_PROFILE_BEGIN("sleepOffset");
+  if (this->dataPtr->waitForSensors)
+    this->dataPtr->waitForSensors(this->dataPtr->simTime.Double(),
+        this->dataPtr->physicsEngine->GetMaxStepSize());
+
   double updatePeriod = this->dataPtr->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
@@ -2614,6 +2636,9 @@ void World::ProcessMessages()
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
 
     if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
+      // When ready to use the direct API for updating scene poses from server,
+      // uncomment the following line:
+         this->dataPtr->updateScenePoses ||
         (this->dataPtr->poseLocalPub &&
          this->dataPtr->poseLocalPub->HasConnections()))
     {
@@ -2677,6 +2702,14 @@ void World::ProcessMessages()
         // rendering::Scene depends on this timestamp, which is used by
         // rendering sensors to time stamp their data
         this->dataPtr->poseLocalPub->Publish(msg);
+      }
+
+      // When ready to use the direct API for updating scene poses from server,
+      // uncomment the following lines:
+      // Execute callback to export Pose msg
+      if (this->dataPtr->updateScenePoses)
+      {
+        this->dataPtr->updateScenePoses(this->Name(), msg);
       }
     }
     this->dataPtr->publishModelPoses.clear();

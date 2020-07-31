@@ -17,6 +17,8 @@
 #ifndef GAZEBO_SENSORS_CAMERASENSOR_PRIVATE_HH_
 #define GAZEBO_SENSORS_CAMERASENSOR_PRIVATE_HH_
 
+#include "gazebo/sensors/Sensor.hh"
+
 namespace gazebo
 {
   namespace sensors
@@ -27,6 +29,12 @@ namespace gazebo
     {
       /// \brief True if the sensor was rendered.
       public: bool rendered = false;
+
+      /// \brief True if the sensor needs a rendering
+      public: bool renderNeeded = false;
+
+      /// \brief Rendering sensor extension class for ABI incompatible changes
+      public: std::shared_ptr<RenderingSensorExt> extension;
     };
   }
 }

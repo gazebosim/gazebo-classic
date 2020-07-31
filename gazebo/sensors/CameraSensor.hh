@@ -52,18 +52,18 @@ namespace gazebo
       /// \param[in] _sdf SDF Sensor parameters
       /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName,
-                                sdf::ElementPtr _sdf);
+                                sdf::ElementPtr _sdf) override;
 
       /// \brief Load the sensor with default parameters
       /// \param[in] _worldName Name of world to load from
-      public: virtual void Load(const std::string &_worldName);
+      public: virtual void Load(const std::string &_worldName) override;
 
       /// \brief Initialize the camera
-      public: virtual void Init();
+      public: virtual void Init() override;
 
       /// \brief Gets the topic name of the sensor
       /// \return Topic name
-      public: virtual std::string Topic() const;
+      public: virtual std::string Topic() const override;
 
       /// \brief Gets the ignition topic name of the sensor
       /// \return Ignition topic name
@@ -91,13 +91,13 @@ namespace gazebo
       public: bool SaveFrame(const std::string &_filename);
 
       // Documentation inherited
-      public: virtual bool IsActive() const;
+      public: virtual bool IsActive() const override;
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(const bool _force);
+      protected: virtual bool UpdateImpl(const bool _force) override;
 
       /// \brief Finalize the camera
-      protected: virtual void Fini();
+      protected: virtual void Fini() override;
 
       /// \brief Handle the render event.
       protected: virtual void Render();
@@ -108,6 +108,9 @@ namespace gazebo
       /// \brief Set the value of the rendered flag
       /// \param[in] _value New rendered value.
       protected: void SetRendered(const bool _value);
+
+      /// \brief Handle the prerenderEnded event.
+      protected: void PrerenderEnded();
 
       /// \brief Pointer to the camera.
       protected: rendering::CameraPtr camera;
