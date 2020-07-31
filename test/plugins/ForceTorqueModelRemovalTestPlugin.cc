@@ -19,7 +19,9 @@
 
 #include "gazebo/sensors/ForceTorqueSensor.hh"
 
-
+#ifdef __APPLE__
+using namespace boost::placeholders;
+#endif
 using namespace gazebo;
 
 GZ_REGISTER_SENSOR_PLUGIN(ForceTorqueModelRemovalTestPlugin)
