@@ -129,11 +129,11 @@ documented just below this comment.
 
 #ifdef RMT_DLL
     #if defined (RMT_PLATFORM_WINDOWS)
-    #define RMT_API __declspec(dllexport)
-        // #if defined (RMT_IMPL)
-        // #else
-        //     #define RMT_API __declspec(dllimport)
-        // #endif
+        #if defined (RMT_IMPL)
+            #define RMT_API __declspec(dllexport)
+        #else
+            #define RMT_API __declspec(dllimport)
+        #endif
     #elif defined (RMT_PLATFORM_POSIX)
         #if defined (RMT_IMPL)
             #define RMT_API __attribute__((visibility("default")))
