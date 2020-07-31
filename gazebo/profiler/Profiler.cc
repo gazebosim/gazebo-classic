@@ -14,8 +14,7 @@
  * limitations under the License.
  *
  */
-#include "gazebo/util/Profiler.hh" // NOLINT(*)
-#include "gazebo/common/Console.hh"
+#include "gazebo/profiler/Profiler.hh" // NOLINT(*)
 
 #include "ProfilerImpl.hh"
 
@@ -23,8 +22,7 @@
 #include "RemoteryProfilerImpl.hh"
 // #endif  // IGN_PROFILER_REMOTERY
 
-using namespace ignition;
-using namespace common;
+using namespace ignition::common;
 
 //////////////////////////////////////////////////
 Profiler::Profiler():
@@ -34,15 +32,15 @@ Profiler::Profiler():
   impl = new RemoteryProfilerImpl();
 // #endif  // IGN_PROFILER_REMOTERY
 
-  if (this->impl == nullptr)
-  {
-    gzwarn << "No profiler implementation detected, profiling is disabled"
-            << std::endl;
-  }
-  else
-  {
-    gzdbg << "Ignition profiling with: " << impl->Name() << std::endl;
-  }
+  // if (this->impl == nullptr)
+  // {
+  //   gzwarn << "No profiler implementation detected, profiling is disabled"
+  //           << std::endl;
+  // }
+  // else
+  // {
+  //   gzdbg << "Ignition profiling with: " << impl->Name() << std::endl;
+  // }
 }
 
 //////////////////////////////////////////////////

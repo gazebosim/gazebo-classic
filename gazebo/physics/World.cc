@@ -63,7 +63,7 @@
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/LogRecord.hh"
-#include "gazebo/util/Profiler.hh"
+#include "gazebo/profiler/Profiler.hh"
 
 #include "gazebo/physics/Road.hh"
 #include "gazebo/physics/RayShape.hh"

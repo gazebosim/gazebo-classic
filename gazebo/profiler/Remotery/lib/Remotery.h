@@ -47,7 +47,7 @@ documented just below this comment.
 #define RMT_ENABLED 1
 #endif
 
-// Help performance of the server sending data to the client by marking this machine as little-endian 
+// Help performance of the server sending data to the client by marking this machine as little-endian
 #ifndef RMT_ASSUME_LITTLE_ENDIAN
 #define RMT_ASSUME_LITTLE_ENDIAN 0
 #endif
@@ -129,11 +129,11 @@ documented just below this comment.
 
 #ifdef RMT_DLL
     #if defined (RMT_PLATFORM_WINDOWS)
-        #if defined (RMT_IMPL)
-            #define RMT_API __declspec(dllexport)
-        #else
-            #define RMT_API __declspec(dllimport)
-        #endif
+    #define RMT_API __declspec(dllexport)
+        // #if defined (RMT_IMPL)
+        // #else
+        //     #define RMT_API __declspec(dllimport)
+        // #endif
     #elif defined (RMT_PLATFORM_POSIX)
         #if defined (RMT_IMPL)
             #define RMT_API __attribute__((visibility("default")))

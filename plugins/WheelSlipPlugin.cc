@@ -17,7 +17,7 @@
 #include <map>
 #include <mutex>
 
-#include <gazebo/util/Profiler.hh>
+#include <gazebo/profiler/Profiler.hh>
 
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/CommonTypes.hh>

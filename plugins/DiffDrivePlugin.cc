@@ -21,7 +21,7 @@
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
-#include "gazebo/util/Profiler.hh"
+#include "gazebo/profiler/Profiler.hh"
 #include "plugins/DiffDrivePlugin.hh"
 
 using namespace gazebo;

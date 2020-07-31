@@ -17,7 +17,7 @@
 
 #include <functional>
 #include <string>
-#include <gazebo/util/Profiler.hh>
+#include <gazebo/profiler/Profiler.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/sensors/SensorManager.hh>

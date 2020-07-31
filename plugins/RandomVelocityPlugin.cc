@@ -17,7 +17,7 @@
 
 #include <functional>
 
-#include <gazebo/util/Profiler.hh>
+#include <gazebo/profiler/Profiler.hh>
 #include <ignition/math/Rand.hh>
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>

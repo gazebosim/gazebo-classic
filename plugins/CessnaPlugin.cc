@@ -18,7 +18,7 @@
 #include <functional>
 #include <string>
 #include <sdf/sdf.hh>
-#include <gazebo/util/Profiler.hh>
+#include <gazebo/profiler/Profiler.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/msgs/msgs.hh>

@@ -22,6 +22,8 @@
 #include <string>
 
 #include <gazebo/common/SingletonT.hh>
+#include <gazebo/profiler/Remotery/lib/Remotery.h>
+#include <gazebo/util/system.hh>
 
 namespace ignition
 {
@@ -51,7 +53,7 @@ namespace ignition
     /// * IGN_PROFILE_END - End a named profile sample
     /// * IGN_PROFILE - RAII-style profile sample. The sample will end at the
     ///     end of the current scope.
-    class GZ_UTIL_VISIBLE Profiler
+    class GZ_PROFILER_VISIBLE Profiler
         : public virtual SingletonT<Profiler>
     {
       /// \brief Constructor
@@ -100,7 +102,7 @@ namespace ignition
     /// \brief Used to provide C++ RAII-style profiling sample.
     /// The sample will start on the construction of the `ScopedProfile` object
     /// and stop when the object leaves scope.
-    class GZ_UTIL_VISIBLE ScopedProfile
+    class GZ_PROFILER_VISIBLE ScopedProfile
     {
       /// \brief Constructor. Starts profile sample.
       /// \param[in] _name Name of the sample

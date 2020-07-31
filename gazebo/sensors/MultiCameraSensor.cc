@@ -16,7 +16,7 @@
 */
 #include <boost/algorithm/string.hpp>
 #include <functional>
-#include <gazebo/util/Profiler.hh>
+#include <gazebo/profiler/Profiler.hh>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Exception.hh"

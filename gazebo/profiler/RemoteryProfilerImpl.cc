@@ -190,15 +190,15 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
     static_cast<RemoteryProfilerImpl *>(_context)->HandleInput(_text);
   };
 
-  gzdbg << "Staring ign-common profiler impl: Remotery" <<
-    " (port: " << this->settings->port << ")" << std::endl;
+  // gzdbg << "Staring ign-common profiler impl: Remotery" <<
+  //   " (port: " << this->settings->port << ")" << std::endl;
   rmtError error;
   error = rmt_CreateGlobalInstance(&this->rmt);
 
   if (RMT_ERROR_NONE != error)
   {
-    gzerr << "Error launching Remotery: " <<
-      rmtErrorToString(error) << std::endl;
+    // gzerr << "Error launching Remotery: " <<
+    //   rmtErrorToString(error) << std::endl;
     this->rmt = nullptr;
   }
 }

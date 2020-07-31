@@ -17,7 +17,7 @@
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 
-#include <gazebo/util/Profiler.hh>
+#include <gazebo/profiler/Profiler.hh>
 
 #include "gazebo/common/Exception.hh"
 

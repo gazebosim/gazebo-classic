@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include <gazebo/util/Profiler.hh>
+#include <gazebo/profiler/Profiler.hh>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Events.hh"

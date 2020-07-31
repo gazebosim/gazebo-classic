@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gazebo/util/Profiler.hh"
+#include "gazebo/profiler/Profiler.hh"
 
 #include "gazebo/transport/transport.hh"
 

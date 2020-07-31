@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/util/Profiler.hh"
+#include "gazebo/profiler/Profiler.hh"
 #include "gazebo/common/PID.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
