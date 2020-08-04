@@ -72,21 +72,15 @@ target_compile_definitions(gazebo_util
   PRIVATE BUILDING_DLL_GZ_UTIL BUILDING_DLL
 )
 
-if(ENABLE_PROFILER)
-  set(PROFILER_LIBRARIES gazebo_profiler)
-endif()
-
 add_dependencies(gazebo_util
   gazebo_common
   gazebo_msgs
-  ${PROFILER_LIBRARIES}
 )
 
 target_link_libraries(gazebo_util
   gazebo_common
   gazebo_transport
   gazebo_msgs
-  ${PROFILER_LIBRARIES}
   ${tinyxml2_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES}

@@ -15,12 +15,12 @@
  *
  */
 
-#ifndef IGNITION_COMMON_PROFILERIMPL_HH_
-#define IGNITION_COMMON_PROFILERIMPL_HH_
+#ifndef GAZEBO_COMMON_PROFILERIMPL_HH_
+#define GAZEBO_COMMON_PROFILERIMPL_HH_
 
 #include <string>
 
-namespace ignition
+namespace gazebo
 {
   namespace common
   {
@@ -61,4 +61,4 @@ namespace ignition
   }
 }
 
-#endif  // IGNITION_COMMON_PROFILERIMPL_HH_
+#endif  // GAZEBO_COMMON_PROFILERIMPL_HH_

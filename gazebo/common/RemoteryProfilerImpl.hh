@@ -15,17 +15,17 @@
  *
  */
 
-#ifndef IGNITION_COMMON_REMOTERYPROFILERIMPL_HH_
-#define IGNITION_COMMON_REMOTERYPROFILERIMPL_HH_
+#ifndef GAZEBO_COMMON_REMOTERYPROFILERIMPL_HH_
+#define GAZEBO_COMMON_REMOTERYPROFILERIMPL_HH_
 
 #include <string>
 
-#include "gazebo/profiler/RemoteryConfig.h"
-#include <gazebo/profiler/Remotery/lib/Remotery.h>
+#include "gazebo/common/RemoteryConfig.h"
+#include <gazebo/common/Remotery/lib/Remotery.h>
 
 #include "ProfilerImpl.hh"
 
-namespace ignition
+namespace gazebo
 {
   namespace common
   {
@@ -89,4 +89,4 @@ namespace ignition
   }
 }
 
-#endif  // IGNITION_COMMON_PROFILERIMPL_HH_
+#endif  // GAZEBO_COMMON_PROFILERIMPL_HH_

@@ -14,33 +14,19 @@
  * limitations under the License.
  *
  */
-#include "gazebo/profiler/Profiler.hh" // NOLINT(*)
+
+#include "gazebo/common/Profiler.hh"
 
 #include "ProfilerImpl.hh"
-
-// #ifdef IGN_PROFILER_REMOTERY
 #include "RemoteryProfilerImpl.hh"
-// #endif  // IGN_PROFILER_REMOTERY
 
-using namespace ignition::common;
+using namespace gazebo::common;
 
 //////////////////////////////////////////////////
 Profiler::Profiler():
   impl(nullptr)
 {
-// #ifdef IGN_PROFILER_REMOTERY
   impl = new RemoteryProfilerImpl();
-// #endif  // IGN_PROFILER_REMOTERY
-
-  // if (this->impl == nullptr)
-  // {
-  //   gzwarn << "No profiler implementation detected, profiling is disabled"
-  //           << std::endl;
-  // }
-  // else
-  // {
-  //   gzdbg << "Ignition profiling with: " << impl->Name() << std::endl;
-  // }
 }
 
 //////////////////////////////////////////////////

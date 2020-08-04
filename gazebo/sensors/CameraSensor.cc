@@ -41,7 +41,7 @@
 #include "gazebo/sensors/CameraSensorPrivate.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 
-#include "gazebo/profiler/Profiler.hh"
+#include "gazebo/common/Profiler.hh"
 
 using namespace gazebo;
 using namespace sensors;

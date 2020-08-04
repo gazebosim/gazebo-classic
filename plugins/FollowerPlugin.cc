@@ -29,7 +29,7 @@
 #include <gazebo/rendering/DepthCamera.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/sensors/sensors.hh>
-#include <gazebo/profiler/Profiler.hh>
+#include <gazebo/common/Profiler.hh>
 
 #include "plugins/FollowerPlugin.hh"
 

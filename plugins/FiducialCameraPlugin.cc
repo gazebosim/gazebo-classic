@@ -18,7 +18,7 @@
 #include <vector>
 #include <functional>
 
-#include <gazebo/profiler/Profiler.hh>
+#include <gazebo/common/Profiler.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
 

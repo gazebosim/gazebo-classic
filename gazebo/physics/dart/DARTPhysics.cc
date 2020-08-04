@@ -56,7 +56,7 @@
 
 #include "gazebo/physics/dart/DARTPhysicsPrivate.hh"
 
-#include "gazebo/profiler/Profiler.hh"
+#include "gazebo/common/Profiler.hh"
 
 using namespace gazebo;
 using namespace physics;

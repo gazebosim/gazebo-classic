@@ -15,13 +15,10 @@
  *
  */
 
-// #include "ignition/common/config.hh"
-
 #include "RemoteryProfilerImpl.hh"
 #include "gazebo/common/Console.hh"
-// #include "ignition/common/Util.hh"
 
-using namespace ignition;
+using namespace gazebo;
 using namespace common;
 
 std::string rmtErrorToString(rmtError error) {
@@ -190,15 +187,15 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
     static_cast<RemoteryProfilerImpl *>(_context)->HandleInput(_text);
   };
 
-  // gzdbg << "Staring ign-common profiler impl: Remotery" <<
-  //   " (port: " << this->settings->port << ")" << std::endl;
+  gzmsg << "Staring profiler impl: Remotery" <<
+     " (port: " << this->settings->port << ")" << std::endl;
   rmtError error;
   error = rmt_CreateGlobalInstance(&this->rmt);
 
   if (RMT_ERROR_NONE != error)
   {
-    // gzerr << "Error launching Remotery: " <<
-    //   rmtErrorToString(error) << std::endl;
+    gzerr << "Error launching Remotery: " <<
+        rmtErrorToString(error) << std::endl;
     this->rmt = nullptr;
   }
 }

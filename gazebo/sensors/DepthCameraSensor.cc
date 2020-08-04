@@ -16,7 +16,7 @@
 */
 #include <functional>
 
-#include "gazebo/profiler/Profiler.hh"
+#include "gazebo/common/Profiler.hh"
 
 #include "gazebo/physics/World.hh"
 

@@ -72,7 +72,7 @@ if(ENABLE_PROFILER)
   gz_install_library(gazebo_profiler)
 
   gz_install_includes("profiler" Profiler.hh)
-  gz_install_includes("profiler/Remotery/lib" Remotery/lib/Remotery.h)
+  gz_install_includes("common/Remotery/lib" Remotery/lib/Remotery.h)
 
   target_compile_definitions(gazebo_profiler
     PRIVATE BUILDING_DLL_GZ_PROFILER

@@ -29,7 +29,7 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
-#include "gazebo/profiler/Profiler.hh"
+#include "gazebo/common/Profiler.hh"
 
 namespace gazebo
 {

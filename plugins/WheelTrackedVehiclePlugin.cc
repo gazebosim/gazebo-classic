@@ -17,7 +17,7 @@
 
 #include <boost/pointer_cast.hpp>
 
-#include <gazebo/profiler/Profiler.hh>
+#include <gazebo/common/Profiler.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"

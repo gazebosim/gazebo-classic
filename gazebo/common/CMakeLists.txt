@@ -215,6 +215,60 @@ if (HAVE_IGNITION_FUEL_TOOLS)
   )
 endif()
 
+# Do not install profiler headers.
+if(ENABLE_PROFILER)
+  set(
+    sources ${sources}
+    Profiler.cc
+  )
+
+  set(
+    headers ${headers}
+    Profiler.hh
+  )
+
+  set(
+    Remotery_SRC
+    ./Remotery/lib/Remotery.c
+    ./Remotery/lib/Remotery.h
+  )
+
+  if(APPLE)
+    set(
+      Remotery_SRC
+      ${Remotery_SRC}
+      ./Remotery/lib/RemoteryMetal.mm
+    )
+    find_library(FOUNDATION Foundation
+      HINTS /System/Library/Frameworks
+    )
+  endif()
+
+  set(RMT_ENABLED 1)
+  set(RMT_USE_TINYCRT 0)
+  set(RMT_USE_CUDA 0)
+  set(RMT_USE_D3D11 0)
+  set(RMT_USE_OPENGL 0)
+  set(RMT_USE_METAL 0)
+
+  if(UNIX OR WIN32)
+    set(RMT_USE_OPENGL 1)
+  endif()
+
+  if(WIN32)
+    set(RMT_USE_D3D11 1)
+  endif()
+
+  if(APPLE)
+    set (RMT_USE_METAL 1)
+  endif()
+
+  configure_file(RemoteryConfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/RemoteryConfig.h)
+
+  list(APPEND sources ${Remotery_SRC} RemoteryProfilerImpl.cc)
+
+endif()
+
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common ${tinyxml_LIBRARIES})
 
 set (common_headers "")
@@ -229,13 +283,6 @@ if (WIN32)
 endif ()
 
 gz_add_library(gazebo_common ${sources})
-
-if(ENABLE_PROFILER)
-  add_dependencies(gazebo_common
-    gazebo_profiler
-  )
-  set(PROFILER_LIBRARIES gazebo_profiler)
-endif()
 
 set_property(
   SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc Console.cc
@@ -254,7 +301,6 @@ target_compile_definitions(gazebo_common
 
 target_link_libraries(gazebo_common
   ${IGNITION-MATH_LIBRARIES}
-  ${IGNITION-COMMON_LIBRARIES}
   ${libdl_library}
   ${libtool_library}
   ${Boost_LIBRARIES}
@@ -272,6 +318,12 @@ target_link_libraries(gazebo_common
   ${IGNITION-FUEL_TOOLS_LIBRARIES}
   ${PROFILER_LIBRARIES}
 )
+
+if(ENABLE_PROFILER)
+  target_compile_definitions(gazebo_common
+    PRIVATE BUILDING_DLL_GZ_PROFILER
+  )
+endif()
 
 if (UNIX)
   target_link_libraries(gazebo_common pthread)

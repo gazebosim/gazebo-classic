@@ -19,7 +19,7 @@
 #include <functional>
 #include <string>
 
-#include <gazebo/profiler/Profiler.hh>
+#include <gazebo/common/Profiler.hh>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Assert.hh"

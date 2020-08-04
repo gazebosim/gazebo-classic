@@ -17,7 +17,7 @@
 #include <string>
 #include <functional>
 
-#include <gazebo/profiler/Profiler.hh>
+#include <gazebo/common/Profiler.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"

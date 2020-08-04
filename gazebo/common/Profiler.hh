@@ -15,17 +15,25 @@
  *
  */
 
-#ifndef IGNITION_COMMON_PROFILER_HH_
-#define IGNITION_COMMON_PROFILER_HH_
+/*
+  This is a backport of ignition/common/Profiler.hh
+*/
+
+
+#ifndef GAZEBO_COMMON_PROFILER_HH_
+#define GAZEBO_COMMON_PROFILER_HH_
 
 #include <memory>
 #include <string>
 
 #include <gazebo/common/SingletonT.hh>
-#include <gazebo/profiler/Remotery/lib/Remotery.h>
+#include <gazebo/common/Remotery/lib/Remotery.h>
 #include <gazebo/util/system.hh>
 
-namespace ignition
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_COMMON_VISIBLE, gazebo, common, Profiler)
+
+namespace gazebo
 {
   namespace common
   {
@@ -53,7 +61,7 @@ namespace ignition
     /// * IGN_PROFILE_END - End a named profile sample
     /// * IGN_PROFILE - RAII-style profile sample. The sample will end at the
     ///     end of the current scope.
-    class GZ_PROFILER_VISIBLE Profiler
+    class GZ_COMMON_VISIBLE Profiler
         : public virtual SingletonT<Profiler>
     {
       /// \brief Constructor
@@ -102,7 +110,7 @@ namespace ignition
     /// \brief Used to provide C++ RAII-style profiling sample.
     /// The sample will start on the construction of the `ScopedProfile` object
     /// and stop when the object leaves scope.
-    class GZ_PROFILER_VISIBLE ScopedProfile
+    class GZ_COMMON_VISIBLE ScopedProfile
     {
       /// \brief Constructor. Starts profile sample.
       /// \param[in] _name Name of the sample
@@ -130,21 +138,21 @@ namespace ignition
 #if IGN_PROFILER_ENABLE
 /// \brief Set name of profiled thread
 #define IGN_PROFILE_THREAD_NAME(name) \
-    ignition::common::Profiler::Instance()->SetThreadName(name);
+    gazebo::common::Profiler::Instance()->SetThreadName(name);
 /// \brief Log profiling text, if supported by implementation
 #define IGN_PROFILE_LOG_TEXT(name) \
-    ignition::common::Profiler::Instance()->LogText(name);
+    gazebo::common::Profiler::Instance()->LogText(name);
 /// \brief Being profiling sample
 #define IGN_PROFILE_BEGIN(name) \
-    ignition::common::Profiler::Instance()->BeginSample(name)
+    gazebo::common::Profiler::Instance()->BeginSample(name)
 /// \brief End profiling sample
 #define IGN_PROFILE_END() \
-    ignition::common::Profiler::Instance()->EndSample()
+    gazebo::common::Profiler::Instance()->EndSample()
 
 /// \brief Convenience wrapper for scoped profiling sample. Use IGN_PROFILE
 #define IGN_PROFILE_L(name, line) \
 static uint32_t __hash##line = 0; \
-ignition::common::ScopedProfile __profile##line(name, &__hash##line);
+gazebo::common::ScopedProfile __profile##line(name, &__hash##line);
 /// \brief Scoped profiling sample. Sample will stop at end of scope.
 #define IGN_PROFILE(name)             IGN_PROFILE_L(name, __LINE__);
 
@@ -160,6 +168,6 @@ ignition::common::ScopedProfile __profile##line(name, &__hash##line);
 
 /// \brief Macro to determine if profiler is enabled and has an implementation.
 #define IGN_PROFILER_VALID \
-    IGN_PROFILER_ENABLE && ignition::common::Profiler::Instance()->Valid()
+    IGN_PROFILER_ENABLE && gazebo::common::Profiler::Instance()->Valid()
 
-#endif  // IGNITION_COMMON_PROFILER_HH_
+#endif  // GAZEBO_COMMON_PROFILER_HH_
