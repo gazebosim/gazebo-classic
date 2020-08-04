@@ -1,4 +1,11 @@
 <?xml version="1.0" ?>
+<!--
+
+  This world can be used to demonstrate the profiler in action.
+
+  See the tutorial: http://gazebosim.org/tutorials?tut=profiler
+
+-->
 <sdf version="1.5">
   <world name="default">
     <wind>

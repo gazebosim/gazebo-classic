@@ -217,32 +217,26 @@ endif()
 
 # Do not install profiler headers.
 if(ENABLE_PROFILER)
-  set(
-    sources ${sources}
+  set (sources ${sources}
     Profiler.cc
   )
 
-  set(
-    headers ${headers}
-    Profiler.hh
-  )
-
-  set(
-    Remotery_SRC
+  set (remotery_sources
     ./Remotery/lib/Remotery.c
     ./Remotery/lib/Remotery.h
+    RemoteryProfilerImpl.cc
   )
 
-  if(APPLE)
-    set(
-      Remotery_SRC
-      ${Remotery_SRC}
+  if (APPLE)
+    set (remotery_sources ${remotery_sources}
       ./Remotery/lib/RemoteryMetal.mm
     )
     find_library(FOUNDATION Foundation
       HINTS /System/Library/Frameworks
     )
   endif()
+
+  list(APPEND sources ${remotery_sources})
 
   set(RMT_ENABLED 1)
   set(RMT_USE_TINYCRT 0)
@@ -264,8 +258,6 @@ if(ENABLE_PROFILER)
   endif()
 
   configure_file(RemoteryConfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/RemoteryConfig.h)
-
-  list(APPEND sources ${Remotery_SRC} RemoteryProfilerImpl.cc)
 
 endif()
 

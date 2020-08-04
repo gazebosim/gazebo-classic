@@ -15,7 +15,7 @@
  *
 */
 #include <boost/algorithm/string.hpp>
-#include <gazebo/common/Profiler.hh>
+#include "gazebo/common/Profiler.hh"
 #include <functional>
 #include <ignition/math.hh>
 #include <ignition/math/Helpers.hh>

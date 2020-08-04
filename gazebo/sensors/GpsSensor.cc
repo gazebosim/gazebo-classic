@@ -16,7 +16,7 @@
 */
 #include <boost/algorithm/string.hpp>
 
-#include <gazebo/common/Profiler.hh>
+#include "gazebo/common/Profiler.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 

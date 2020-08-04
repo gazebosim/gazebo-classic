@@ -15,8 +15,7 @@
  *
  */
 
-#include "gazebo/common/Profiler.hh"
-
+#include "Profiler.hh"
 #include "ProfilerImpl.hh"
 #include "RemoteryProfilerImpl.hh"
 

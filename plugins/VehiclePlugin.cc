@@ -17,7 +17,7 @@
 
 #include <functional>
 
-#include <gazebo/common/Profiler.hh>
+#include "gazebo/common/Profiler.hh"
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"

@@ -40,7 +40,7 @@ typedef SSIZE_T ssize_t;
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
-#include <gazebo/common/Profiler.hh>
+#include "gazebo/common/Profiler.hh"
 #include <ignition/math/Filter.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Plugin.hh>

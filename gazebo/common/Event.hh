@@ -27,9 +27,8 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/util/system.hh"
-
 #include "gazebo/common/Profiler.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

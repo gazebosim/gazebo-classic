@@ -19,7 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include <gazebo/common/Profiler.hh>
+#include "gazebo/common/Profiler.hh"
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"

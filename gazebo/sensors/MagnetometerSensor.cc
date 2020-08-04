@@ -15,7 +15,7 @@
  *
 */
 #include <boost/algorithm/string.hpp>
-#include <gazebo/common/Profiler.hh>
+#include "gazebo/common/Profiler.hh"
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/transport/Node.hh"
