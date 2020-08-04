@@ -128,8 +128,8 @@ void MagnetometerSensor::Init()
 //////////////////////////////////////////////////
 bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("MagnetometerSensor::UpdateImpl");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("MagnetometerSensor::UpdateImpl");
+  GZ_PROFILE_BEGIN("Update");
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Get latest pose information
@@ -174,13 +174,13 @@ bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
 
   // Save the time of the measurement
   msgs::Set(this->dataPtr->magMsg.mutable_time(), this->world->SimTime());
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("Publish");
+  GZ_PROFILE_BEGIN("Publish");
   // Publish the message if needed
   if (this->dataPtr->magPub)
     this->dataPtr->magPub->Publish(this->dataPtr->magMsg);
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
   return true;
 }

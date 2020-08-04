@@ -618,11 +618,11 @@ void SensorManager::SensorContainer::RunLoop()
 
   computeMaxUpdateRate();
 
-  IGN_PROFILE_THREAD_NAME("SensorManager");
+  GZ_PROFILE_THREAD_NAME("SensorManager");
 
   while (!this->stop)
   {
-    IGN_PROFILE("SensorManager::RunLoop");
+    GZ_PROFILE("SensorManager::RunLoop");
 
     // If all the sensors get deleted, wait here.
     // Use a while loop since world resets will notify the runCondition.
@@ -638,9 +638,9 @@ void SensorManager::SensorContainer::RunLoop()
     // Get the start time of the update.
     startTime = world->SimTime();
 
-    IGN_PROFILE_BEGIN("UpdateSensors");
+    GZ_PROFILE_BEGIN("UpdateSensors");
     this->Update(false);
-    IGN_PROFILE_END();
+    GZ_PROFILE_END();
 
     // Compute the time it took to update the sensors.
     // It's possible that the world time was reset during the Update. This
@@ -675,12 +675,12 @@ void SensorManager::SensorContainer::RunLoop()
         eventTime, &this->runCondition);
 
     // This if statement helps prevent deadlock on osx during teardown.
-    IGN_PROFILE_BEGIN("Sleeping");
+    GZ_PROFILE_BEGIN("Sleeping");
     if (!this->stop)
     {
       this->runCondition.wait(timingLock);
     }
-    IGN_PROFILE_END();
+    GZ_PROFILE_END();
   }
 }
 
@@ -697,9 +697,9 @@ void SensorManager::SensorContainer::Update(bool _force)
        iter != this->sensors.end(); ++iter)
   {
     GZ_ASSERT((*iter) != nullptr, "Sensor is null");
-    IGN_PROFILE_BEGIN((*iter)->Name().c_str());
+    GZ_PROFILE_BEGIN((*iter)->Name().c_str());
     (*iter)->Update(_force);
-    IGN_PROFILE_END();
+    GZ_PROFILE_END();
   }
 }
 

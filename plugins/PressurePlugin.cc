@@ -127,8 +127,8 @@ void PressurePlugin::Init()
 /////////////////////////////////////////////////
 void PressurePlugin::OnUpdate()
 {
-  IGN_PROFILE("PressurePlugin:OnUpdate");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("PressurePlugin:OnUpdate");
+  GZ_PROFILE_BEGIN("Update");
 
   msgs::Tactile tactileMsg;
 
@@ -175,5 +175,5 @@ void PressurePlugin::OnUpdate()
     if (this->tactilePub && tactileMsg.pressure_size() > 0)
       this->tactilePub->Publish(tactileMsg);
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }

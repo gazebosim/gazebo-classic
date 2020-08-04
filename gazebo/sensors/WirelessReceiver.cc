@@ -103,8 +103,8 @@ void WirelessReceiver::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("WirelessReceiver::UpdateImpl");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("WirelessReceiver::UpdateImpl");
+  GZ_PROFILE_BEGIN("Update");
 
   std::string txEssid;
   msgs::WirelessNodes msg;
@@ -142,13 +142,13 @@ bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
       wirelessNode->set_signal_level(rxPower);
     }
   }
-  IGN_PROFILE_END();
-  IGN_PROFILE_BEGIN("Publish");
+  GZ_PROFILE_END();
+  GZ_PROFILE_BEGIN("Publish");
   if (msg.node_size() > 0)
   {
     this->pub->Publish(msg);
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
   return true;
 }

@@ -55,11 +55,11 @@ namespace gazebo
     /// The profiler header also exports several convenience macros to make
     /// adding inspection points easier.
     ///
-    /// * IGN_PROFILE_THREAD_NAME - Set the name of the current profiled thread.
-    /// * IGN_PROFILE_LOG_TEXT - Log text to the profiler console (if supported)
-    /// * IGN_PROFILE_BEGIN - Begin a named profile sample
-    /// * IGN_PROFILE_END - End a named profile sample
-    /// * IGN_PROFILE - RAII-style profile sample. The sample will end at the
+    /// * GZ_PROFILE_THREAD_NAME - Set the name of the current profiled thread.
+    /// * GZ_PROFILE_LOG_TEXT - Log text to the profiler console (if supported)
+    /// * GZ_PROFILE_BEGIN - Begin a named profile sample
+    /// * GZ_PROFILE_END - End a named profile sample
+    /// * GZ_PROFILE - RAII-style profile sample. The sample will end at the
     ///     end of the current scope.
     class GZ_COMMON_VISIBLE Profiler
         : public virtual SingletonT<Profiler>
@@ -130,44 +130,44 @@ namespace gazebo
   }
 }
 
-#ifndef IGN_PROFILER_ENABLE
+#ifndef GZ_PROFILER_ENABLE
 /// Always set this variable to some value
-#define IGN_PROFILER_ENABLE 0
+#define GZ_PROFILER_ENABLE 0
 #endif
 
-#if IGN_PROFILER_ENABLE
+#if GZ_PROFILER_ENABLE
 /// \brief Set name of profiled thread
-#define IGN_PROFILE_THREAD_NAME(name) \
+#define GZ_PROFILE_THREAD_NAME(name) \
     gazebo::common::Profiler::Instance()->SetThreadName(name);
 /// \brief Log profiling text, if supported by implementation
-#define IGN_PROFILE_LOG_TEXT(name) \
+#define GZ_PROFILE_LOG_TEXT(name) \
     gazebo::common::Profiler::Instance()->LogText(name);
 /// \brief Being profiling sample
-#define IGN_PROFILE_BEGIN(name) \
+#define GZ_PROFILE_BEGIN(name) \
     gazebo::common::Profiler::Instance()->BeginSample(name)
 /// \brief End profiling sample
-#define IGN_PROFILE_END() \
+#define GZ_PROFILE_END() \
     gazebo::common::Profiler::Instance()->EndSample()
 
-/// \brief Convenience wrapper for scoped profiling sample. Use IGN_PROFILE
-#define IGN_PROFILE_L(name, line) \
+/// \brief Convenience wrapper for scoped profiling sample. Use GZ_PROFILE
+#define GZ_PROFILE_L(name, line) \
 static uint32_t __hash##line = 0; \
 gazebo::common::ScopedProfile __profile##line(name, &__hash##line);
 /// \brief Scoped profiling sample. Sample will stop at end of scope.
-#define IGN_PROFILE(name)             IGN_PROFILE_L(name, __LINE__);
+#define GZ_PROFILE(name)             GZ_PROFILE_L(name, __LINE__);
 
 #else
 
-#define IGN_PROFILE_THREAD_NAME(name) ((void) name)
-#define IGN_PROFILE_LOG_TEXT(name)    ((void) name)
-#define IGN_PROFILE_BEGIN(name)       ((void) name)
-#define IGN_PROFILE_END()             ((void) 0)
-#define IGN_PROFILE_L(name, line)     ((void) name)
-#define IGN_PROFILE(name)             ((void) name)
-#endif  // IGN_PROFILER_ENABLE
+#define GZ_PROFILE_THREAD_NAME(name) ((void) name)
+#define GZ_PROFILE_LOG_TEXT(name)    ((void) name)
+#define GZ_PROFILE_BEGIN(name)       ((void) name)
+#define GZ_PROFILE_END()             ((void) 0)
+#define GZ_PROFILE_L(name, line)     ((void) name)
+#define GZ_PROFILE(name)             ((void) name)
+#endif  // GZ_PROFILER_ENABLE
 
 /// \brief Macro to determine if profiler is enabled and has an implementation.
-#define IGN_PROFILER_VALID \
-    IGN_PROFILER_ENABLE && gazebo::common::Profiler::Instance()->Valid()
+#define GZ_PROFILER_VALID \
+    GZ_PROFILER_ENABLE && gazebo::common::Profiler::Instance()->Valid()
 
 #endif  // GAZEBO_COMMON_PROFILER_HH_

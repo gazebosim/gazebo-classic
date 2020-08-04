@@ -220,7 +220,7 @@ target_compile_definitions(gazebo_rendering
 )
 
 if (${ENABLE_PROFILER})
-  set(IGN_PROFILE_LIBS ${IGNITION-COMMON_LIBRARIES})
+  set(GZ_PROFILE_LIBS ${IGNITION-COMMON_LIBRARIES})
 endif()
 
 target_link_libraries(gazebo_rendering
@@ -232,7 +232,7 @@ target_link_libraries(gazebo_rendering
   ${tinyxml_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES}
-  ${IGN_PROFILE_LIBS}
+  ${GZ_PROFILE_LIBS}
 )
 
 if (HAVE_OCULUS)

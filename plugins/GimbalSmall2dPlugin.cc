@@ -133,8 +133,8 @@ void GimbalSmall2dPlugin::OnUpdate()
   if (!this->dataPtr->tiltJoint)
     return;
 
-  IGN_PROFILE("GimbalSmall2dPlugin::OnUpdate");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("GimbalSmall2dPlugin::OnUpdate");
+  GZ_PROFILE_BEGIN("Update");
 
   double angle = this->dataPtr->tiltJoint->Position(0);
 
@@ -142,7 +142,7 @@ void GimbalSmall2dPlugin::OnUpdate()
   if (time < this->dataPtr->lastUpdateTime)
   {
     this->dataPtr->lastUpdateTime = time;
-    IGN_PROFILE_END();
+    GZ_PROFILE_END();
     return;
   }
   else if (time > this->dataPtr->lastUpdateTime)
@@ -164,5 +164,5 @@ void GimbalSmall2dPlugin::OnUpdate()
     m.set_data(ss.str());
     this->dataPtr->pub->Publish(m);
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }

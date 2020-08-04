@@ -154,8 +154,8 @@ void BuoyancyPlugin::Init()
 /////////////////////////////////////////////////
 void BuoyancyPlugin::OnUpdate()
 {
-  IGN_PROFILE("BuoyancyPlugin::OnUpdate");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("BuoyancyPlugin::OnUpdate");
+  GZ_PROFILE_BEGIN("Update");
   for (auto link : this->model->GetLinks())
   {
     VolumeProperties volumeProperties = this->volPropsMap[link->GetId()];
@@ -176,5 +176,5 @@ void BuoyancyPlugin::OnUpdate()
 
     link->AddLinkForce(buoyancyLinkFrame, volumeProperties.cov);
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }

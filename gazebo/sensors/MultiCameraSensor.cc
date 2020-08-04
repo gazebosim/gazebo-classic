@@ -311,8 +311,8 @@ void MultiCameraSensor::Render()
 //////////////////////////////////////////////////
 bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("MultiCameraSensor::UpdateImpl");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("MultiCameraSensor::UpdateImpl");
+  GZ_PROFILE_BEGIN("Update");
 
   std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
 
@@ -337,12 +337,12 @@ bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
           image->width() * (*iter)->ImageDepth() * image->height());
     }
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("Publish");
+  GZ_PROFILE_BEGIN("Publish");
   if (publish)
     this->dataPtr->imagePub->Publish(this->dataPtr->msg);
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
   this->dataPtr->rendered = false;
   return true;

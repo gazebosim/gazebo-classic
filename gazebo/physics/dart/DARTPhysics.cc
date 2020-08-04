@@ -122,7 +122,7 @@ void DARTPhysics::Reset()
 //////////////////////////////////////////////////
 void DARTPhysics::InitForThread()
 {
-  IGN_PROFILE_THREAD_NAME("DARTPhysics");
+  GZ_PROFILE_THREAD_NAME("DARTPhysics");
 }
 
 
@@ -399,8 +399,8 @@ static void RetrieveDARTCollisions(
 //////////////////////////////////////////////////
 void DARTPhysics::UpdateCollision()
 {
-  IGN_PROFILE("DARTPhysics::UpdateCollision");
-  IGN_PROFILE_BEGIN("UpdateCollision");
+  GZ_PROFILE("DARTPhysics::UpdateCollision");
+  GZ_PROFILE_BEGIN("UpdateCollision");
 
   if (!this->world->PhysicsEnabled())
   {
@@ -418,14 +418,14 @@ void DARTPhysics::UpdateCollision()
 
     RetrieveDARTCollisions(this, &localResult, this->GetContactManager());
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////
 void DARTPhysics::UpdatePhysics()
 {
-  IGN_PROFILE("DARTPhysics::UpdatePhysics");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("DARTPhysics::UpdatePhysics");
+  GZ_PROFILE_BEGIN("Update");
 
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
@@ -461,7 +461,7 @@ void DARTPhysics::UpdatePhysics()
         this,
         &(this->dataPtr->dtWorld->getLastCollisionResult()),
         this->GetContactManager());
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

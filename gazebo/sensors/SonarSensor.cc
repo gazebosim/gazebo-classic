@@ -253,8 +253,8 @@ double SonarSensor::Range()
 //////////////////////////////////////////////////
 bool SonarSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("SonarSensor::UpdateImpl");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("SonarSensor::UpdateImpl");
+  GZ_PROFILE_BEGIN("Update");
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -317,14 +317,14 @@ bool SonarSensor::UpdateImpl(const bool /*_force*/)
 
   // Clear the incoming contact list.
   this->dataPtr->incomingContacts.clear();
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("Publish");
+  GZ_PROFILE_BEGIN("Publish");
   this->dataPtr->update(this->dataPtr->sonarMsg);
 
   if (this->dataPtr->sonarPub)
     this->dataPtr->sonarPub->Publish(this->dataPtr->sonarMsg);
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
   return true;
 }

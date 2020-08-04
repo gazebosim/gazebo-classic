@@ -385,7 +385,7 @@ void BulletPhysics::Init()
 //////////////////////////////////////////////////
 void BulletPhysics::InitForThread()
 {
-  IGN_PROFILE_THREAD_NAME("BullerPhysics");
+  GZ_PROFILE_THREAD_NAME("BullerPhysics");
 }
 
 /////////////////////////////////////////////////
@@ -487,7 +487,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 //////////////////////////////////////////////////
 void BulletPhysics::UpdateCollision()
 {
-  IGN_PROFILE("BulletPhysics:UpdateCollision");
+  GZ_PROFILE("BulletPhysics:UpdateCollision");
 
   this->contactManager->ResetCount();
 
@@ -504,30 +504,30 @@ void BulletPhysics::UpdateCollision()
     // called, we have to do this here with
     // this->dynamicsWorld->performDiscreteCollisionDetection().
 
-    IGN_PROFILE_BEGIN("performDiscreteCollisionDetection");
+    GZ_PROFILE_BEGIN("performDiscreteCollisionDetection");
     this->dynamicsWorld->performDiscreteCollisionDetection();
-    IGN_PROFILE_END();
+    GZ_PROFILE_END();
 
     // In addition, the contacts have to be updated in the contact
     // manager and for the feedback.
-    IGN_PROFILE_BEGIN("UpdateContacts");
+    GZ_PROFILE_BEGIN("UpdateContacts");
     UpdateContacts(this->dynamicsWorld, this->maxStepSize);
-    IGN_PROFILE_END();
+    GZ_PROFILE_END();
   }
 }
 
 //////////////////////////////////////////////////
 void BulletPhysics::UpdatePhysics()
 {
-  IGN_PROFILE("BulletPhysics:UpdatePhysics");
+  GZ_PROFILE("BulletPhysics:UpdatePhysics");
 
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
-  IGN_PROFILE_BEGIN("stepSimulation");
+  GZ_PROFILE_BEGIN("stepSimulation");
   this->dynamicsWorld->stepSimulation(
     this->maxStepSize, 1, this->maxStepSize);
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

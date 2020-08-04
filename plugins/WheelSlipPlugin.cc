@@ -457,8 +457,8 @@ void WheelSlipPlugin::SetSlipComplianceLongitudinal(const double _compliance)
 /////////////////////////////////////////////////
 void WheelSlipPlugin::Update()
 {
-  IGN_PROFILE("WheelSlipPlugin::OnUpdate");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("WheelSlipPlugin::OnUpdate");
+  GZ_PROFILE_BEGIN("Update");
   // Get slip data so it can be published later
   std::map<std::string, ignition::math::Vector3d> slips;
   this->GetSlips(slips);
@@ -519,5 +519,5 @@ void WheelSlipPlugin::Update()
         params.slipPub->Publish(msg);
     }
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }

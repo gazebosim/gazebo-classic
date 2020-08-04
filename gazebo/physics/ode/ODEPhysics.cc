@@ -353,7 +353,7 @@ void ODEPhysics::Init()
 //////////////////////////////////////////////////
 void ODEPhysics::InitForThread()
 {
-  IGN_PROFILE_THREAD_NAME("ODEPhysics");
+  GZ_PROFILE_THREAD_NAME("ODEPhysics");
   dAllocateODEDataForThread(dAllocateMaskAll);
 }
 
@@ -361,8 +361,8 @@ void ODEPhysics::InitForThread()
 void ODEPhysics::UpdateCollision()
 {
   DIAG_TIMER_START("ODEPhysics::UpdateCollision");
-  IGN_PROFILE("ODEPhysics:UpdateCollision");
-  IGN_PROFILE_BEGIN("dSpaceCollide");
+  GZ_PROFILE("ODEPhysics:UpdateCollision");
+  GZ_PROFILE_BEGIN("dSpaceCollide");
 
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
   dJointGroupEmpty(this->dataPtr->contactGroup);
@@ -378,9 +378,9 @@ void ODEPhysics::UpdateCollision()
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide(this->dataPtr->spaceId, this, CollisionCallback);
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "dSpaceCollide");
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("collideShapes");
+  GZ_PROFILE_BEGIN("collideShapes");
   // Generate non-trimesh collisions.
   for (i = 0; i < this->dataPtr->collidersCount; ++i)
   {
@@ -388,10 +388,10 @@ void ODEPhysics::UpdateCollision()
         this->dataPtr->colliders[i].second, this->dataPtr->contactCollisions);
   }
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "collideShapes");
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
 
-  IGN_PROFILE_BEGIN("collideTrimeshes");
+  GZ_PROFILE_BEGIN("collideTrimeshes");
   // Generate trimesh collision.
   // This must happen in this thread sequentially
   for (i = 0; i < this->dataPtr->trimeshCollidersCount; ++i)
@@ -401,7 +401,7 @@ void ODEPhysics::UpdateCollision()
     this->Collide(collision1, collision2, this->dataPtr->contactCollisions);
   }
   DIAG_TIMER_LAP("UpdateCollision", "collideTrimeshes");
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
   DIAG_TIMER_STOP("ODEPhysics::UpdateCollision");
 }
@@ -410,7 +410,7 @@ void ODEPhysics::UpdateCollision()
 void ODEPhysics::UpdatePhysics()
 {
   DIAG_TIMER_START("ODEPhysics::UpdatePhysics");
-  IGN_PROFILE("ODEPhysics:UpdatePhysics");
+  GZ_PROFILE("ODEPhysics:UpdatePhysics");
 
   // need to lock, otherwise might conflict with world resetting
   {
@@ -947,7 +947,7 @@ void ODEPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 //////////////////////////////////////////////////
 void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
-  IGN_PROFILE("ODEPhysics::CollisionCallback");
+  GZ_PROFILE("ODEPhysics::CollisionCallback");
   dBodyID b1 = dGeomGetBody(_o1);
   dBodyID b2 = dGeomGetBody(_o2);
 

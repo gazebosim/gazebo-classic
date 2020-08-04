@@ -133,8 +133,8 @@ void ContactSensor::Init()
 //////////////////////////////////////////////////
 bool ContactSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("ContactSensor::UpdateImpl");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("ContactSensor::UpdateImpl");
+  GZ_PROFILE_BEGIN("Update");
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -191,8 +191,8 @@ bool ContactSensor::UpdateImpl(const bool /*_force*/)
     }
   }
 
-  IGN_PROFILE_END();
-  IGN_PROFILE_BEGIN("Publish");
+  GZ_PROFILE_END();
+  GZ_PROFILE_BEGIN("Publish");
 
   // Clear the incoming contact list.
   this->dataPtr->incomingContacts.clear();
@@ -208,7 +208,7 @@ bool ContactSensor::UpdateImpl(const bool /*_force*/)
     this->dataPtr->contactsPub->Publish(this->dataPtr->contactsMsg);
   }
 
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
   return true;
 }
 

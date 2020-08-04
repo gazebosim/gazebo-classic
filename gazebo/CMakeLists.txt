@@ -52,7 +52,7 @@ add_dependencies(gazebo_sensors gazebo_rendering)
 gz_add_executable(gzserver server_main.cc)
 
 if (${ENABLE_PROFILER})
-  set(IGN_PROFILE_LIBS ${IGNITION-COMMON_LIBRARIES})
+  set(GZ_PROFILE_LIBS ${IGNITION-COMMON_LIBRARIES})
 endif()
 
 target_link_libraries(gzserver
@@ -68,7 +68,7 @@ target_link_libraries(gzserver
   ${freeimage_LIBRARIES}
   ${TBB_LIBRARIES}
   ${ogre_libraries}
-  ${IGN_PROFILE_LIBS}
+  ${GZ_PROFILE_LIBS}
 )
 
 if (UNIX)

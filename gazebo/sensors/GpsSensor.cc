@@ -125,9 +125,9 @@ void GpsSensor::Init()
 //////////////////////////////////////////////////
 bool GpsSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("GpsSensor::UpdateImpl");
+  GZ_PROFILE("GpsSensor::UpdateImpl");
 
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE_BEGIN("Update");
   // Get latest pose information
   if (this->dataPtr->parentLink)
   {
@@ -184,12 +184,12 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
   this->lastMeasurementTime = this->world->SimTime();
   msgs::Set(this->dataPtr->lastGpsMsg.mutable_time(),
       this->lastMeasurementTime);
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("Publish");
+  GZ_PROFILE_BEGIN("Publish");
   if (this->dataPtr->gpsPub)
     this->dataPtr->gpsPub->Publish(this->dataPtr->lastGpsMsg);
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
   return true;
 }
 

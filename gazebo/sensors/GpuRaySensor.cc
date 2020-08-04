@@ -627,15 +627,15 @@ void GpuRaySensor::Render()
 //////////////////////////////////////////////////
 bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("GpuRaySensor::UpdateImpl");
+  GZ_PROFILE("GpuRaySensor::UpdateImpl");
 
   if (!this->dataPtr->rendered)
     return false;
-  IGN_PROFILE_BEGIN("PostRender");
+  GZ_PROFILE_BEGIN("PostRender");
   this->dataPtr->laserCam->PostRender();
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("fillarray");
+  GZ_PROFILE_BEGIN("fillarray");
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -707,7 +707,7 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
     this->dataPtr->scanPub->Publish(this->dataPtr->laserMsg);
 
   this->dataPtr->rendered = false;
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
   return true;
 }
 

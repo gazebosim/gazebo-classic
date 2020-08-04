@@ -339,8 +339,8 @@ int RaySensor::Fiducial(const unsigned int _index) const
 //////////////////////////////////////////////////
 bool RaySensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("RaySensor::UpdateImpl");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("RaySensor::UpdateImpl");
+  GZ_PROFILE_BEGIN("Update");
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
   // need to move mutex lock after this? or make the OnNewLaserScan connection
@@ -495,12 +495,12 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
       scan->add_intensities(intensity);
     }
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("Publish");
+  GZ_PROFILE_BEGIN("Publish");
   if (this->dataPtr->scanPub && this->dataPtr->scanPub->HasConnections())
     this->dataPtr->scanPub->Publish(this->dataPtr->laserMsg);
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
   return true;
 }

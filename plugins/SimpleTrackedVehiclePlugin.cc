@@ -301,8 +301,8 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
   if (this->contactManager->GetContactCount() == 0)
     return;
 
-  IGN_PROFILE("SimpleTrackedVehiclePlugin::DriveTracks");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("SimpleTrackedVehiclePlugin::DriveTracks");
+  GZ_PROFILE_BEGIN("Update");
 
   /////////////////////////////////////////////
   // Calculate the desired center of rotation
@@ -480,7 +480,7 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       continue;
     }
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }
 
 ignition::math::Vector3d SimpleTrackedVehiclePlugin::ComputeFrictionDirection(

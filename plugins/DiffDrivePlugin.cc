@@ -100,8 +100,8 @@ void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 /////////////////////////////////////////////////
 void DiffDrivePlugin::OnUpdate()
 {
-  IGN_PROFILE("DiffDrivePlugin::OnUpdate");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("DiffDrivePlugin::OnUpdate");
+  GZ_PROFILE_BEGIN("Update");
 
   /* double d1, d2;
   double dr, da;
@@ -123,5 +123,5 @@ void DiffDrivePlugin::OnUpdate()
 
   this->leftJoint->SetVelocity(0, leftVelDesired);
   this->rightJoint->SetVelocity(0, rightVelDesired);
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }

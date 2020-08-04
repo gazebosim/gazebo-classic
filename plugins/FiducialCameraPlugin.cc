@@ -187,8 +187,8 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     const unsigned int /*_width*/, const unsigned int /*_height*/,
     const unsigned int /*_depth*/, const std::string &/*_format*/)
 {
-  IGN_PROFILE("FiducialCameraPlugin::OnNewFrame");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("FiducialCameraPlugin::OnNewFrame");
+  GZ_PROFILE_BEGIN("Update");
   if (!this->dataPtr->selectionBuffer)
   {
     std::string cameraName = this->dataPtr->camera->OgreCamera()->getName();
@@ -246,11 +246,11 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     }
   }
 
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("Publish");
+  GZ_PROFILE_BEGIN("Publish");
   this->dataPtr->Publish(results);
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

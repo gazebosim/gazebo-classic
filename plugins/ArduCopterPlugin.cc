@@ -466,8 +466,8 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void ArduCopterPlugin::OnUpdate()
 {
-  IGN_PROFILE("ArduCopterPlugin::OnUpdate");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("ArduCopterPlugin::OnUpdate");
+  GZ_PROFILE_BEGIN("Update");
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->SimTime();
@@ -475,24 +475,24 @@ void ArduCopterPlugin::OnUpdate()
   // Update the control surfaces and publish the new state.
   if (curTime > this->dataPtr->lastControllerUpdateTime)
   {
-    IGN_PROFILE_BEGIN("ReceiveMotorCommand");
+    GZ_PROFILE_BEGIN("ReceiveMotorCommand");
     this->ReceiveMotorCommand();
-    IGN_PROFILE_END();
+    GZ_PROFILE_END();
 
     if (this->dataPtr->arduCopterOnline)
     {
-      IGN_PROFILE_BEGIN("ApplyMotorForces");
+      GZ_PROFILE_BEGIN("ApplyMotorForces");
       this->ApplyMotorForces((curTime -
         this->dataPtr->lastControllerUpdateTime).Double());
-      IGN_PROFILE_END();
-      IGN_PROFILE_BEGIN("SendState");
+      GZ_PROFILE_END();
+      GZ_PROFILE_BEGIN("SendState");
       this->SendState();
-      IGN_PROFILE_END();
+      GZ_PROFILE_END();
     }
   }
 
   this->dataPtr->lastControllerUpdateTime = curTime;
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

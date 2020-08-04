@@ -179,12 +179,12 @@ void WideAngleCameraSensor::Fini()
 //////////////////////////////////////////////////
 bool WideAngleCameraSensor::UpdateImpl(const bool _force)
 {
-  IGN_PROFILE("WideAngleCameraSensor::UpdateImpl");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("WideAngleCameraSensor::UpdateImpl");
+  GZ_PROFILE_BEGIN("Update");
 
   if (!CameraSensor::UpdateImpl(_force))
   {
-    IGN_PROFILE_END();
+    GZ_PROFILE_END();
     return false;
   }
 
@@ -223,7 +223,7 @@ bool WideAngleCameraSensor::UpdateImpl(const bool _force)
 
     this->dataPtr->lensPub->Publish(msg);
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 
   return true;
 }

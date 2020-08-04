@@ -154,7 +154,7 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void CessnaPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
-  IGN_PROFILE("CessnaPlugin::OnUpdate");
+  GZ_PROFILE("CessnaPlugin::OnUpdate");
   std::lock_guard<std::mutex> lock(this->mutex);
 
   gazebo::common::Time curTime = this->model->GetWorld()->SimTime();
@@ -162,12 +162,12 @@ void CessnaPlugin::Update(const common::UpdateInfo &/*_info*/)
   if (curTime > this->lastControllerUpdateTime)
   {
     // Update the control surfaces and publish the new state.
-    IGN_PROFILE_BEGIN("Update");
+    GZ_PROFILE_BEGIN("Update");
     this->UpdatePIDs((curTime - this->lastControllerUpdateTime).Double());
-    IGN_PROFILE_END();
-    IGN_PROFILE_BEGIN("Publish");
+    GZ_PROFILE_END();
+    GZ_PROFILE_BEGIN("Publish");
     this->PublishState();
-    IGN_PROFILE_END();
+    GZ_PROFILE_END();
 
     this->lastControllerUpdateTime = curTime;
   }

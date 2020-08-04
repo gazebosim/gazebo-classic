@@ -212,8 +212,8 @@ void WheelTrackedVehiclePlugin::UpdateTrackSurface()
 
 void WheelTrackedVehiclePlugin::OnUpdate()
 {
-  IGN_PROFILE("WheelTrackedVehiclePlugin::OnUpdate");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("WheelTrackedVehiclePlugin::OnUpdate");
+  GZ_PROFILE_BEGIN("Update");
   std::lock_guard<std::mutex> lock(this->mutex);
 
   for (auto trackPair : this->trackNames)
@@ -226,5 +226,5 @@ void WheelTrackedVehiclePlugin::OnUpdate()
       wheel->joint->SetVelocity(0, angularVelocity);
     }
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }

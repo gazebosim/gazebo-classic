@@ -301,8 +301,8 @@ void ImuSensor::SetWorldToReferenceOrientation(
 //////////////////////////////////////////////////
 bool ImuSensor::UpdateImpl(const bool /*_force*/)
 {
-  IGN_PROFILE("ImuSensor::UpdateImpl");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("ImuSensor::UpdateImpl");
+  GZ_PROFILE_BEGIN("Update");
   msgs::LinkData msg;
   int readIndex = 0;
 
@@ -433,13 +433,13 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
           break;
       }
     }
-    IGN_PROFILE_END();
+    GZ_PROFILE_END();
 
-    IGN_PROFILE_BEGIN("Publish");
+    GZ_PROFILE_BEGIN("Publish");
     // Publish the message
     if (this->dataPtr->pub)
       this->dataPtr->pub->Publish(this->dataPtr->imuMsg);
-    IGN_PROFILE_END();
+    GZ_PROFILE_END();
   }
 
   return true;

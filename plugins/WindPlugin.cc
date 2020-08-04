@@ -187,8 +187,8 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
 /////////////////////////////////////////////////
 void WindPlugin::OnUpdate()
 {
-  IGN_PROFILE("WindPlugin::OnUpdate");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("WindPlugin::OnUpdate");
+  GZ_PROFILE_BEGIN("Update");
   // Get all the models
   physics::Model_V models = this->world->Models();
 
@@ -210,5 +210,5 @@ void WindPlugin::OnUpdate()
           (link->RelativeWindLinearVel() - link->RelativeLinearVel()));
     }
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }

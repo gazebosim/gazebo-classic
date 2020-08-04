@@ -195,8 +195,8 @@ void GravityCompensationPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void GravityCompensationPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
-  IGN_PROFILE("GravityCompensationPlugin::Update");
-  IGN_PROFILE_BEGIN("Update");
+  GZ_PROFILE("GravityCompensationPlugin::Update");
+  GZ_PROFILE_BEGIN("Update");
 
   dart::dynamics::Joint *dtJoint = this->dataPtr->skel->getRootJoint();
   if (dtJoint == nullptr)
@@ -243,7 +243,7 @@ void GravityCompensationPlugin::Update(const common::UpdateInfo &/*_info*/)
       joint->SetForce(i, forces[dtJoint->getIndexInSkeleton(i)]);
     }
   }
-  IGN_PROFILE_END();
+  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

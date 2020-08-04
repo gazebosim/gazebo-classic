@@ -194,8 +194,8 @@ RemoteryProfilerImpl::RemoteryProfilerImpl()
 
   if (RMT_ERROR_NONE != error)
   {
-    gzerr << "Error launching Remotery: " <<
-        rmtErrorToString(error) << std::endl;
+    // gzerr << "Error launching Remotery: " <<
+    //     rmtErrorToString(error) << std::endl;
     this->rmt = nullptr;
   }
 }
