@@ -131,10 +131,6 @@ namespace gazebo
       private: void PublishImpl(const google::protobuf::Message &_message,
                                 bool _block);
 
-      /// \brief Callback when a publish is completed
-      /// \param[in] _id ID associated with the publication.
-      private: void OnPublishComplete(uint32_t _id);
-
       /// \brief Topic on which messages are published.
       private: std::string topic;
 
@@ -173,6 +169,7 @@ namespace gazebo
       private: uint32_t pubId;
 
       /// \brief Current publication ids.
+      /// This variable is no longer used. Kept here for ABI compatibility.
       private: std::map<uint32_t, int> pubIds;
 
       /// \brief Unique ID for this publisher.

@@ -31,6 +31,48 @@ using namespace transport;
 
 uint32_t Publisher::idCounter = 0;
 
+namespace gazebo
+{
+/// \brief Private class for Publisher
+class PublisherPrivate
+{
+  /// \brief Callback when a publish is completed
+  /// \param[in] _id ID associated with the publication.
+  public: void OnPublishComplete(uint32_t _pubId);
+
+  /// \brief Current publication ids.
+  public: std::map<uint32_t, int> pubIds;
+
+  /// \brief Mutex to protect pubIds
+  public: std::mutex mutex;
+};
+}
+
+/// \brief Mutex to protect publisherMap
+static std::mutex pubMapMutex;
+
+/// \brief A map of Publisher id and its shared pointer
+static std::map<uint32_t, std::shared_ptr<PublisherPrivate>> publisherMap;
+
+//////////////////////////////////////////////////
+void PublisherPrivate::OnPublishComplete(uint32_t _id)
+{
+  try
+  {
+    // This is the deeply unsatisfying way of dealing with a race
+    // condition where the publisher is destroyed before all
+    // OnPublishComplete callbacks are fired.
+    std::lock_guard<std::mutex> lock(this->mutex);
+    std::map<uint32_t, int>::iterator iter = this->pubIds.find(_id);
+    if (iter != this->pubIds.end() && (--iter->second) <= 0)
+      this->pubIds.erase(iter);
+  }
+  catch(...)
+  {
+    return;
+  }
+}
+
 //////////////////////////////////////////////////
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
                      unsigned int _limit, double _hzRate)
@@ -43,6 +85,9 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
   this->queueLimitWarned = false;
   this->pubId = 0;
   this->id = ++idCounter;
+
+  std::lock_guard<std::mutex> lock(pubMapMutex);
+  publisherMap[this->id] = std::make_shared<PublisherPrivate>();
 }
 
 //////////////////////////////////////////////////
@@ -160,15 +205,32 @@ void Publisher::SendMessage()
   std::list<MessagePtr> localBuffer;
   std::list<uint32_t> localIds;
 
+  std::shared_ptr<PublisherPrivate> pubDataPtr;
+  {
+    std::lock_guard<std::mutex> lock2(pubMapMutex);
+    pubDataPtr = publisherMap[this->id];
+  }
+
   {
     boost::mutex::scoped_lock lock(this->mutex);
-    if (!this->pubIds.empty() || this->messages.empty())
+    if (this->messages.empty())
       return;
+
+    {
+      std::lock_guard<std::mutex> lock2(pubDataPtr->mutex);
+      if (!pubDataPtr->pubIds.empty())
+        return;
+    }
 
     for (unsigned int i = 0; i < this->messages.size(); ++i)
     {
       this->pubId = (this->pubId + 1) % 10000;
-      this->pubIds[this->pubId] = 0;
+
+      {
+        std::lock_guard<std::mutex> lock2(pubDataPtr->mutex);
+        pubDataPtr->pubIds[this->pubId] = 0;
+      }
+
       localIds.push_back(this->pubId);
     }
 
@@ -188,12 +250,14 @@ void Publisher::SendMessage()
     {
       // Send the latest message.
       int result = this->publication->Publish(*iter,
-          boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
+          boost::bind(&PublisherPrivate::OnPublishComplete,
+          pubDataPtr, _1), *pubIter);
 
+      std::lock_guard<std::mutex> lock2(pubDataPtr->mutex);
       if (result > 0)
-        this->pubIds[*pubIter] = result;
+        pubDataPtr->pubIds[*pubIter] = result;
       else
-        this->pubIds.erase(*pubIter);
+        pubDataPtr->pubIds.erase(*pubIter);
     }
 
     // Clear the local buffer.
@@ -228,30 +292,6 @@ std::string Publisher::GetMsgType() const
 }
 
 //////////////////////////////////////////////////
-void Publisher::OnPublishComplete(uint32_t _id)
-{
-  // A null node indicates that the publisher may have been destroyed
-  // so do not do anything
-  if (!this->node)
-    return;
-
-  try {
-    // This is the deeply unsatisfying way of dealing with a race
-    // condition where the publisher is destroyed before all
-    // OnPublishComplete callbacks are fired.
-    boost::mutex::scoped_lock lock(this->mutex);
-
-    std::map<uint32_t, int>::iterator iter = this->pubIds.find(_id);
-    if (iter != this->pubIds.end() && (--iter->second) <= 0)
-      this->pubIds.erase(iter);
-  }
-  catch(...)
-  {
-    return;
-  }
-}
-
-//////////////////////////////////////////////////
 void Publisher::SetPublication(PublicationPtr _publication)
 {
   this->publication = _publication;
@@ -268,6 +308,9 @@ void Publisher::Fini()
     TopicManager::Instance()->Unadvertise(this->topic, this->id);
 
   this->node.reset();
+
+  std::lock_guard<std::mutex> lock(pubMapMutex);
+  publisherMap.erase(this->id);
 }
 
 //////////////////////////////////////////////////
