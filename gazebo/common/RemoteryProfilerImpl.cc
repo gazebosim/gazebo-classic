@@ -15,6 +15,10 @@
  *
  */
 
+/*
+  This is a backport of Ignition Common's profiler
+*/
+
 #include "RemoteryProfilerImpl.hh"
 #include "gazebo/common/Console.hh"
 

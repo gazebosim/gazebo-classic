@@ -15,6 +15,10 @@
  *
  */
 
+/*
+  This is a backport of Ignition Common's profiler
+*/
+
 #include "Profiler.hh"
 #include "ProfilerImpl.hh"
 #include "RemoteryProfilerImpl.hh"

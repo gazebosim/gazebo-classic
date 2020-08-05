@@ -15,6 +15,10 @@
  *
  */
 
+/*
+  This is a backport of Ignition Common's profiler
+*/
+
 #ifndef GAZEBO_COMMON_REMOTERYPROFILERIMPL_HH_
 #define GAZEBO_COMMON_REMOTERYPROFILERIMPL_HH_
 

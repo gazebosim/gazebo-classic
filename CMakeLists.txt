@@ -37,7 +37,7 @@ if(NOT DEFINED BUILD_TESTING)
     set(BUILD_TESTING OFF)
 endif()
 
-option(ENABLE_PROFILER "Enable Ignition Profiler" FALSE)
+option(ENABLE_PROFILER "Enable Gazebo Profiler" FALSE)
 
 if(ENABLE_PROFILER)
   add_definitions("-DGZ_PROFILER_ENABLE=1")
