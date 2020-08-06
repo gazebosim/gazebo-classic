@@ -17,8 +17,6 @@
 
 #include <functional>
 
-#include "gazebo/common/Profiler.hh"
-
 #include "ActuatorPlugin.hh"
 
 using namespace gazebo;
@@ -168,8 +166,6 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void ActuatorPlugin::WorldUpdateCallback()
 {
-  GZ_PROFILE("ActuatorPlugin::WorldUpdateCallback");
-  GZ_PROFILE_BEGIN("WorldUpdateCallback");
   // Update the stored joints according to the desired model.
   for (unsigned int i = 0; i < this->joints.size(); i++)
   {
@@ -180,5 +176,4 @@ void ActuatorPlugin::WorldUpdateCallback()
               this->actuators[i]);
     this->joints[i]->SetEffortLimit(index, maxForce);
   }
-  GZ_PROFILE_END();
 }

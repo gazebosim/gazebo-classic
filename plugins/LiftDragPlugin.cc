@@ -19,7 +19,6 @@
 #include <functional>
 #include <string>
 
-#include "gazebo/common/Profiler.hh"
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Assert.hh"
@@ -176,9 +175,6 @@ void LiftDragPlugin::OnUpdate()
 
   if (vel.Length() <= 0.01)
     return;
-
-  GZ_PROFILE("LiftDragPlugin::OnUpdate");
-  GZ_PROFILE_BEGIN(std::string(this->link->GetName()).c_str());
 
   // pose of body
   ignition::math::Pose3d pose = this->link->WorldPose();
@@ -400,5 +396,4 @@ void LiftDragPlugin::OnUpdate()
   // apply forces at cg (with torques for position shift)
   this->link->AddForceAtRelativePosition(force, this->cp);
   this->link->AddTorque(torque);
-  GZ_PROFILE_END();
 }

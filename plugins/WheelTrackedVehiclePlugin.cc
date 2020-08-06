@@ -17,8 +17,6 @@
 
 #include <boost/pointer_cast.hpp>
 
-#include "gazebo/common/Profiler.hh"
-
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 
@@ -212,8 +210,6 @@ void WheelTrackedVehiclePlugin::UpdateTrackSurface()
 
 void WheelTrackedVehiclePlugin::OnUpdate()
 {
-  GZ_PROFILE("WheelTrackedVehiclePlugin::OnUpdate");
-  GZ_PROFILE_BEGIN("Update");
   std::lock_guard<std::mutex> lock(this->mutex);
 
   for (auto trackPair : this->trackNames)
@@ -226,5 +222,4 @@ void WheelTrackedVehiclePlugin::OnUpdate()
       wheel->joint->SetVelocity(0, angularVelocity);
     }
   }
-  GZ_PROFILE_END();
 }

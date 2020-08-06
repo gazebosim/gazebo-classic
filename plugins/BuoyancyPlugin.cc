@@ -15,7 +15,6 @@
  *
 */
 
-#include "gazebo/common/Profiler.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "plugins/BuoyancyPlugin.hh"
@@ -154,8 +153,6 @@ void BuoyancyPlugin::Init()
 /////////////////////////////////////////////////
 void BuoyancyPlugin::OnUpdate()
 {
-  GZ_PROFILE("BuoyancyPlugin::OnUpdate");
-  GZ_PROFILE_BEGIN("Update");
   for (auto link : this->model->GetLinks())
   {
     VolumeProperties volumeProperties = this->volPropsMap[link->GetId()];
@@ -176,5 +173,4 @@ void BuoyancyPlugin::OnUpdate()
 
     link->AddLinkForce(buoyancyLinkFrame, volumeProperties.cov);
   }
-  GZ_PROFILE_END();
 }

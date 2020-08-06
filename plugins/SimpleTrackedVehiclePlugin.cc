@@ -18,7 +18,6 @@
 #include <functional>
 #include <vector>
 
-#include "gazebo/common/Profiler.hh"
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 
@@ -301,9 +300,6 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
   if (this->contactManager->GetContactCount() == 0)
     return;
 
-  GZ_PROFILE("SimpleTrackedVehiclePlugin::DriveTracks");
-  GZ_PROFILE_BEGIN("Update");
-
   /////////////////////////////////////////////
   // Calculate the desired center of rotation
   /////////////////////////////////////////////
@@ -480,7 +476,6 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       continue;
     }
   }
-  GZ_PROFILE_END();
 }
 
 ignition::math::Vector3d SimpleTrackedVehiclePlugin::ComputeFrictionDirection(

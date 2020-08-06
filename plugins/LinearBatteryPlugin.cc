@@ -17,8 +17,6 @@
 #include <string>
 #include <functional>
 
-#include "gazebo/common/Profiler.hh"
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Battery.hh"
@@ -128,8 +126,6 @@ void LinearBatteryPlugin::Reset()
 /////////////////////////////////////////////////
 double LinearBatteryPlugin::OnUpdateVoltage(const common::BatteryPtr &_battery)
 {
-  GZ_PROFILE("LinearBatteryPlugin::OnUpdateVoltage");
-  GZ_PROFILE_BEGIN("Update");
   double dt = this->world->Physics()->GetMaxStepSize();
   double totalpower = 0.0;
   double k = dt / this->tau;
@@ -145,8 +141,6 @@ double LinearBatteryPlugin::OnUpdateVoltage(const common::BatteryPtr &_battery)
   this->ismooth = this->ismooth + k * (this->iraw - this->ismooth);
 
   this->q = this->q - GZ_SEC_TO_HOUR(dt * this->ismooth);
-
-  GZ_PROFILE_END();
 
   return this->e0 + this->e1 * (1 - this->q / this->c)
     - this->r * this->ismooth;

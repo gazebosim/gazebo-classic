@@ -17,8 +17,6 @@
 
 #include <functional>
 
-#include "gazebo/common/Profiler.hh"
-
 #include <plugins/JointTrajectoryPlugin.hh>
 
 namespace gazebo
@@ -83,8 +81,6 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 /////////////////////////////////////////////////
 void JointTrajectoryPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 {
-  GZ_PROFILE("JointTrajectoryPlugin::UpdateStates");
-  GZ_PROFILE_BEGIN("Update");
   common::Time cur_time = this->world->SimTime();
 
   // for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
@@ -108,7 +104,6 @@ void JointTrajectoryPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 
   // resume original pause-state
   this->world->SetPaused(is_paused);
-  GZ_PROFILE_END();
 }
 
 GZ_REGISTER_MODEL_PLUGIN(JointTrajectoryPlugin)

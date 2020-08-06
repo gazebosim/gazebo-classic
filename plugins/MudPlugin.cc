@@ -21,7 +21,6 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "gazebo/common/Profiler.hh"
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Quaternion.hh>
@@ -180,8 +179,6 @@ void MudPlugin::OnContact(ConstContactsPtr &_msg)
 /////////////////////////////////////////////////
 void MudPlugin::OnUpdate()
 {
-  GZ_PROFILE("MudPlugin:OnUpdate");
-  GZ_PROFILE_BEGIN("Update");
   double dt = this->physics->GetMaxStepSize();
   if (dt < 1e-6)
     dt = 1e-6;
@@ -355,5 +352,4 @@ void MudPlugin::OnUpdate()
           << " waited 1.0 s without contact messages\n";
     this->newMsgWait = 0;
   }
-  GZ_PROFILE_END();
 }

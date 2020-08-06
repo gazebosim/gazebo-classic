@@ -18,7 +18,6 @@
 #include <vector>
 #include <functional>
 
-#include "gazebo/common/Profiler.hh"
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
 
@@ -187,8 +186,6 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     const unsigned int /*_width*/, const unsigned int /*_height*/,
     const unsigned int /*_depth*/, const std::string &/*_format*/)
 {
-  GZ_PROFILE("FiducialCameraPlugin::OnNewFrame");
-  GZ_PROFILE_BEGIN("Update");
   if (!this->dataPtr->selectionBuffer)
   {
     std::string cameraName = this->dataPtr->camera->OgreCamera()->getName();
@@ -246,11 +243,7 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     }
   }
 
-  GZ_PROFILE_END();
-
-  GZ_PROFILE_BEGIN("Publish");
   this->dataPtr->Publish(results);
-  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

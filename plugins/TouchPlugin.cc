@@ -17,7 +17,6 @@
 
 #include <functional>
 #include <string>
-#include "gazebo/common/Profiler.hh"
 #include <gazebo/common/Assert.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/sensors/SensorManager.hh>
@@ -147,8 +146,6 @@ void TouchPlugin::Enable(ConstIntPtr &_msg)
 /////////////////////////////////////////////////
 void TouchPlugin::OnUpdate(const common::UpdateInfo &_info)
 {
-  GZ_PROFILE("TouchPlugin::OnUpdate");
-  GZ_PROFILE_BEGIN("Update");
   // Get all contacts across all sensors
   msgs::Contacts contacts;
 
@@ -184,7 +181,6 @@ void TouchPlugin::OnUpdate(const common::UpdateInfo &_info)
               << std::endl;
       }
       this->touchStart = common::Time::Zero;
-      GZ_PROFILE_END();
       return;
     }
   }
@@ -204,7 +200,6 @@ void TouchPlugin::OnUpdate(const common::UpdateInfo &_info)
       gzmsg << "Not touching anything" << std::endl;
     }
     this->touchStart = common::Time::Zero;
-    GZ_PROFILE_END();
     return;
   }
 
@@ -236,5 +231,5 @@ void TouchPlugin::OnUpdate(const common::UpdateInfo &_info)
     m->set_data(0);
     this->Enable(m);
   }
-  GZ_PROFILE_END();
 }
+

@@ -17,8 +17,6 @@
 
 #include <functional>
 
-#include "gazebo/common/Profiler.hh"
-
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
@@ -149,8 +147,6 @@ void TransporterPlugin::OnActivation(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void TransporterPlugin::Update()
 {
-  GZ_PROFILE("TransporterPlugin::Update");
-  GZ_PROFILE_BEGIN("Update");
   // Get all the models
   physics::Model_V models = this->dataPtr->world->Models();
 
@@ -188,5 +184,4 @@ void TransporterPlugin::Update()
       }
     }
   }
-  GZ_PROFILE_END();
 }

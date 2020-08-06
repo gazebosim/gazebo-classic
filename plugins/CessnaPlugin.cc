@@ -18,7 +18,6 @@
 #include <functional>
 #include <string>
 #include <sdf/sdf.hh>
-#include "gazebo/common/Profiler.hh"
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/msgs/msgs.hh>
@@ -154,7 +153,6 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void CessnaPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
-  GZ_PROFILE("CessnaPlugin::OnUpdate");
   std::lock_guard<std::mutex> lock(this->mutex);
 
   gazebo::common::Time curTime = this->model->GetWorld()->SimTime();
@@ -162,12 +160,8 @@ void CessnaPlugin::Update(const common::UpdateInfo &/*_info*/)
   if (curTime > this->lastControllerUpdateTime)
   {
     // Update the control surfaces and publish the new state.
-    GZ_PROFILE_BEGIN("Update");
     this->UpdatePIDs((curTime - this->lastControllerUpdateTime).Double());
-    GZ_PROFILE_END();
-    GZ_PROFILE_BEGIN("Publish");
     this->PublishState();
-    GZ_PROFILE_END();
 
     this->lastControllerUpdateTime = curTime;
   }

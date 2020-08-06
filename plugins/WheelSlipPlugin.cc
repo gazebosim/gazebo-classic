@@ -17,8 +17,6 @@
 #include <map>
 #include <mutex>
 
-#include "gazebo/common/Profiler.hh"
-
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/CommonTypes.hh>
 #include <gazebo/common/Console.hh>
@@ -457,8 +455,6 @@ void WheelSlipPlugin::SetSlipComplianceLongitudinal(const double _compliance)
 /////////////////////////////////////////////////
 void WheelSlipPlugin::Update()
 {
-  GZ_PROFILE("WheelSlipPlugin::OnUpdate");
-  GZ_PROFILE_BEGIN("Update");
   // Get slip data so it can be published later
   std::map<std::string, ignition::math::Vector3d> slips;
   this->GetSlips(slips);
@@ -519,5 +515,4 @@ void WheelSlipPlugin::Update()
         params.slipPub->Publish(msg);
     }
   }
-  GZ_PROFILE_END();
 }

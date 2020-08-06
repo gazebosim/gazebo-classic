@@ -21,7 +21,6 @@
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
-#include "gazebo/common/Profiler.hh"
 #include "plugins/DiffDrivePlugin.hh"
 
 using namespace gazebo;
@@ -100,9 +99,6 @@ void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 /////////////////////////////////////////////////
 void DiffDrivePlugin::OnUpdate()
 {
-  GZ_PROFILE("DiffDrivePlugin::OnUpdate");
-  GZ_PROFILE_BEGIN("Update");
-
   /* double d1, d2;
   double dr, da;
 
@@ -123,5 +119,4 @@ void DiffDrivePlugin::OnUpdate()
 
   this->leftJoint->SetVelocity(0, leftVelDesired);
   this->rightJoint->SetVelocity(0, rightVelDesired);
-  GZ_PROFILE_END();
 }

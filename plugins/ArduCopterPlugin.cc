@@ -40,7 +40,6 @@ typedef SSIZE_T ssize_t;
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
-#include "gazebo/common/Profiler.hh"
 #include <ignition/math/Filter.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Plugin.hh>
@@ -466,8 +465,6 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void ArduCopterPlugin::OnUpdate()
 {
-  GZ_PROFILE("ArduCopterPlugin::OnUpdate");
-  GZ_PROFILE_BEGIN("Update");
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->SimTime();
@@ -475,24 +472,16 @@ void ArduCopterPlugin::OnUpdate()
   // Update the control surfaces and publish the new state.
   if (curTime > this->dataPtr->lastControllerUpdateTime)
   {
-    GZ_PROFILE_BEGIN("ReceiveMotorCommand");
     this->ReceiveMotorCommand();
-    GZ_PROFILE_END();
-
     if (this->dataPtr->arduCopterOnline)
     {
-      GZ_PROFILE_BEGIN("ApplyMotorForces");
       this->ApplyMotorForces((curTime -
         this->dataPtr->lastControllerUpdateTime).Double());
-      GZ_PROFILE_END();
-      GZ_PROFILE_BEGIN("SendState");
       this->SendState();
-      GZ_PROFILE_END();
     }
   }
 
   this->dataPtr->lastControllerUpdateTime = curTime;
-  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

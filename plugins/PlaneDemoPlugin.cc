@@ -18,7 +18,6 @@
 #include <chrono>
 #include <functional>
 #include <thread>
-#include "gazebo/common/Profiler.hh"
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 
@@ -365,8 +364,6 @@ void PlaneDemoPlugin::Init()
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::OnUpdate()
 {
-  GZ_PROFILE("PlaneDemoPlugin:OnUpdate");
-  GZ_PROFILE_BEGIN("Update");
   // gzdbg << "executing OnUpdate.\n";
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -401,7 +398,6 @@ void PlaneDemoPlugin::OnUpdate()
     }
     this->dataPtr->lastUpdateTime = curTime;
   }
-  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

@@ -17,8 +17,6 @@
 
 #include <functional>
 
-#include "gazebo/common/Profiler.hh"
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "plugins/WindPlugin.hh"
@@ -187,8 +185,6 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
 /////////////////////////////////////////////////
 void WindPlugin::OnUpdate()
 {
-  GZ_PROFILE("WindPlugin::OnUpdate");
-  GZ_PROFILE_BEGIN("Update");
   // Get all the models
   physics::Model_V models = this->world->Models();
 
@@ -210,5 +206,4 @@ void WindPlugin::OnUpdate()
           (link->RelativeWindLinearVel() - link->RelativeLinearVel()));
     }
   }
-  GZ_PROFILE_END();
 }

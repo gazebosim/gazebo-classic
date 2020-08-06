@@ -29,7 +29,6 @@
 #include <gazebo/rendering/DepthCamera.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/sensors/sensors.hh>
-#include "gazebo/common/Profiler.hh"
 
 #include "plugins/FollowerPlugin.hh"
 
@@ -260,9 +259,6 @@ void FollowerPlugin::OnNewDepthFrame(const float *_image,
     const unsigned int _width, const unsigned int _height,
     const unsigned int /*_depth*/, const std::string &/*_format*/)
 {
-  GZ_PROFILE("FollowerPlugin::OnNewDepthFrame");
-  GZ_PROFILE_BEGIN("fillarray");
-
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   float f;
@@ -278,19 +274,14 @@ void FollowerPlugin::OnNewDepthFrame(const float *_image,
   }
 
   memcpy(this->dataPtr->depthBuffer, _image, depthBufferSize);
-  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////
 void FollowerPlugin::UpdateFollower()
 {
-  GZ_PROFILE("FollowerPlugin::UpdateFollower");
-  GZ_PROFILE_BEGIN("Update");
-
   if (this->dataPtr->imageMsg.width() == 0u ||
       this->dataPtr->imageMsg.height() == 0u)
   {
-    GZ_PROFILE_END();
     return;
   }
 
@@ -320,7 +311,6 @@ void FollowerPlugin::UpdateFollower()
     // Brakes on!
     this->dataPtr->leftJoint->SetVelocity(0, 0);
     this->dataPtr->rightJoint->SetVelocity(0, 0);
-    GZ_PROFILE_END();
     return;
   }
 
@@ -344,5 +334,4 @@ void FollowerPlugin::UpdateFollower()
 
   this->dataPtr->leftJoint->SetVelocity(0, leftVelDesired);
   this->dataPtr->rightJoint->SetVelocity(0, rightVelDesired);
-  GZ_PROFILE_END();
 }
