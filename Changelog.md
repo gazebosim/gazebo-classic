@@ -1,8 +1,8 @@
 ## Gazebo 7
 
-## Gazebo 7.X.X (2019-XX-XX)
+## Gazebo 7.X.X (2020-XX-XX)
 
-## Gazebo 7.16.1 (2019-07-28)
+## Gazebo 7.16.1 (2020-07-28)
 
 1. Remove X11 call from Gazebo 7
     * [BitBucket pull request 3195](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3195)
