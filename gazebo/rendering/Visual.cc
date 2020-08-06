@@ -2147,6 +2147,15 @@ ignition::math::AxisAlignedBox Visual::BoundingBox() const
       ignition::math::Vector3d::Zero,
       ignition::math::Vector3d::Zero);
   this->BoundsHelper(this->GetSceneNode(), box);
+
+  // return zero size box if bbox is empty to avoid breaking other features,
+  // e.g. CoM visualization of empty visual
+  if (box == emptyBox)
+  {
+     return ignition::math::Box(ignition::math::Vector3d::Zero,
+         ignition::math::Vector3d::Zero);
+  }
+
   return box;
 }
 
@@ -2711,7 +2720,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
-    this->ProcessMaterialMsg(_msg->material());
+    this->ProcessMaterialMsg(msgs::ConvertIgnMsg(_msg->material()));
   }
 
   if (_msg->has_transparency())
@@ -3635,7 +3644,7 @@ void Visual::AddPendingChild(std::pair<VisualType,
 }
 
 /////////////////////////////////////////////////
-void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
+void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
 {
   if (_msg.has_lighting())
   {
@@ -3686,19 +3695,21 @@ void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
 
   if (_msg.has_shader_type())
   {
-    if (_msg.shader_type() == msgs::Material::VERTEX)
+    if (_msg.shader_type() == ignition::msgs::Material::VERTEX)
     {
       this->SetShaderType("vertex");
     }
-    else if (_msg.shader_type() == msgs::Material::PIXEL)
+    else if (_msg.shader_type() == ignition::msgs::Material::PIXEL)
     {
       this->SetShaderType("pixel");
     }
-    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+    else if (_msg.shader_type() ==
+        ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
     {
       this->SetShaderType("normal_map_object_space");
     }
-    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+    else if (_msg.shader_type() ==
+        ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
     {
       this->SetShaderType("normal_map_tangent_space");
     }
@@ -3708,9 +3719,7 @@ void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
     }
 
     if (_msg.has_normal_map())
-    {
       this->SetNormalMap(_msg.normal_map());
-    }
   }
 }
 

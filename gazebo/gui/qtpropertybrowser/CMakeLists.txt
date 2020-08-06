@@ -27,6 +27,14 @@ QT5_ADD_RESOURCES(resources_RCC ${resources})
 
 add_library(gzqtpropertybrowser STATIC ${sources} ${resources_RCC})
 set_target_properties(gzqtpropertybrowser PROPERTIES POSITION_INDEPENDENT_CODE ON)
+# Visual Studio enables c++11 support by default
+if (NOT MSVC)
+  if(CMAKE_VERSION VERSION_LESS 3.8.2)
+    target_compile_options(gzqtpropertybrowser PUBLIC -std=c++11)
+  else()
+    target_compile_features(gzqtpropertybrowser PUBLIC cxx_std_11)
+  endif()
+endif()
 #set(CMAKE_PACKAGE_QTGUI TRUE)
 #
 #add_definitions( ${QT_DEFINITIONS} )

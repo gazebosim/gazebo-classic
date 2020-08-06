@@ -89,6 +89,11 @@ namespace gazebo
       /// \return The height at a the specified location.
       public: HeightType GetHeight(int _x, int _y) const;
 
+      /// \brief Sets a height value at a position.
+      /// \param[in] _x X position.
+      /// \param[in] _y Y position.
+      public: void SetHeight(int _x, int _y, float _value);
+
       /// \brief Fill a geometry message with this shape's data. Raw height
       /// data are not packed in this message to minimize packet size.
       /// \param[in] _msg Message to fill.

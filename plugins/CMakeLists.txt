@@ -10,13 +10,13 @@ if(WIN32 AND NOT UNIX)
   # compilation fails not finding symbols like _isatty, write, close etc.
   get_filename_component(windows_kits_dir
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot10]" ABSOLUTE)
-  set(programfilesx86 "ProgramFiles(x86)")  
+  set(programfilesx86 "ProgramFiles(x86)")
   find_path(WINDOWS_KITS_UCRT_INCLUDE NAMES assert.h
     PATHS
     "${windows_kits_dir}/include"
     "$ENV{ProgramFiles}/Windows Kits/10/include"
     "$ENV{${programfilesx86}}/Windows Kits/10/include"
-  )  
+  )
 
   # It is not really clear why including the UCRT headers is useful, and why the above CMake find
   # logic should work, however it is kept to support the existing Jenkins on Windows jobs.
@@ -124,6 +124,7 @@ set (plugins_single_header
   PressurePlugin
   RayPlugin
   RaySensorNoisePlugin
+  ReflectancePlugin
   RubblePlugin
   ShaderParamVisualPlugin
   SimpleTrackedVehiclePlugin
@@ -163,6 +164,10 @@ set (GUIplugins
 
 set (DARTplugins
   GravityCompensationPlugin
+)
+
+set(GAZEBO_PLUGIN_INSTALL_DIR
+  ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/
 )
 
 add_library(TrackedVehiclePlugin SHARED TrackedVehiclePlugin.cc)
