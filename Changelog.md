@@ -7,6 +7,8 @@
 1. Lockstep between sensors and physics
     * [Pull request #2793](https://github.com/osrf/gazebo/pull/2793)
 
+## Gazebo 9.14.0 (2020-07-20)
+
 1. Fix sensor update rate throttling when new sensors are spawned
     * [Pull request #2784](https://github.com/osrf/gazebo/pull/2784)
 
