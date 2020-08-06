@@ -1135,7 +1135,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
               ignition::math::Vector3d(f, 0, 0));
           // The following has been failing since pull request #1284,
           // so it has been disabled.
-          // See bitbucket.org/osrf/gazebo/issue/1394
+          // See github.com/osrf/gazebo/issues/1394
           // EXPECT_EQ(boxModel->GetLink("link")->GetWorldForce(),
           //  ignition:: ignition::math::Vector3d(f, 0, 0));
         }
@@ -1529,7 +1529,7 @@ TEST_P(PhysicsTest, CollisionFiltering)
 /////////////////////////////////////////////////
 // This test verifies that gazebo doesn't crash when collisions occur
 // and the <world><physics><ode><max_contacts> value is zero.
-// The crash was reported in issue #593 on bitbucket
+// The crash was reported in issue #593 on github
 TEST_F(PhysicsTest, ZeroMaxContactsODE)
 {
   // Load an empty world

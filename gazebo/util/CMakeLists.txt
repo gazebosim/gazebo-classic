@@ -86,7 +86,7 @@ target_link_libraries(gazebo_util
 )
 
 # define if tinxml2 major version >= 6
-# https://bitbucket.org/ignitionrobotics/ign-common/issues/28
+# https://github.com/ignitionrobotics/ign-common/issues/28
 if (NOT tinyxml2_VERSION VERSION_LESS "6.0.0")
   message(STATUS "tinyxml2_VERSION ${tinyxml2_VERSION} >= 6.0.0")
   target_compile_definitions(gazebo_util

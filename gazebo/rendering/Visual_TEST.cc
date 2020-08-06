@@ -189,6 +189,51 @@ TEST_F(Visual_TEST, BoundingBox)
   ignition::math::Box emptyBoundingBox = emptyVis->BoundingBox();
   EXPECT_EQ(ignition::math::Vector3d::Zero, emptyBoundingBox.Min());
   EXPECT_EQ(ignition::math::Vector3d::Zero, emptyBoundingBox.Max());
+
+  // spawn box with link offset
+  double zOffset = 10.0;
+  std::ostringstream linkOffsetStream;
+  ignition::math::Pose3d linkOffsetPose1(0, 0, zOffset, 0, 0, 0);
+  ignition::math::Vector3d linkOffsetSize(1, 1, 1);
+  linkOffsetStream << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='link_offset_box'>"
+    << "<link name ='body'>"
+    << "  <pose>" << linkOffsetPose1 << "</pose>"
+    << "  <collision name ='geom'>"
+    << "    <geometry>"
+    << "      <box><size>" << linkOffsetSize << "</size></box>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << "      <box><size>" << linkOffsetSize << "</size></box>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+  SpawnSDF(linkOffsetStream.str());
+
+  sleep = 0;
+  rendering::VisualPtr visualOffset;
+  while (!visualOffset && sleep < maxSleep)
+  {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
+    visualOffset = scene->GetVisual("link_offset_box");
+    common::Time::MSleep(1000);
+    sleep++;
+  }
+  ASSERT_NE(visualOffset, nullptr);
+
+  // verify bounding box
+  ignition::math::Vector3d bboxMinOffset(-0.5, -0.5, -0.5 + zOffset);
+  ignition::math::Vector3d bboxMaxOffset(0.5, 0.5, 0.5 + zOffset);
+  ignition::math::Box boundingBoxOffset = visualOffset->BoundingBox();
+  EXPECT_EQ(boundingBoxOffset.Min(), bboxMinOffset);
+  EXPECT_EQ(boundingBoxOffset.Max(), bboxMaxOffset);
 }
 
 /////////////////////////////////////////////////
@@ -1543,6 +1588,42 @@ TEST_F(Visual_TEST, ConvertVisualType)
       rendering::Visual::ConvertVisualType(msgs::Visual::PHYSICS));
 }
 
+TEST_F(Visual_TEST, CollisionZero)
+{
+  // This test checks that there isn't a segmentation fault when inserting
+  // zero collision geometries.
+  // Load a world containing 3 simple shapes with collision geometry equals
+  // to zero.
+  Load("worlds/collision_zero.world");
+
+  // Get the scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_NE(scene, nullptr);
+
+  // Wait until all models are inserted
+  int sleep = 0;
+  int maxSleep = 10;
+  rendering::VisualPtr box, sphere, cylinder;
+  while ((!box || !sphere || !cylinder) && sleep < maxSleep)
+  {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
+    box = scene->GetVisual("box");
+    cylinder = scene->GetVisual("cylinder");
+    sphere = scene->GetVisual("sphere");
+    common::Time::MSleep(1000);
+    sleep++;
+  }
+  scene->ShowCollisions(true);
+  // box
+  ASSERT_NE(box, nullptr);
+  // cylinder
+  ASSERT_NE(cylinder, nullptr);
+  // sphere
+  ASSERT_NE(sphere, nullptr);
+}
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, Scale)
 {

@@ -146,6 +146,14 @@ target_link_libraries(gazebomsgs_out ${GZ_PROTOBUF_LIBRARY} ${GZ_PROTOBUF_PROTOC
 if (UNIX)
   target_link_libraries(gazebomsgs_out pthread)
 endif()
+# Visual Studio enables c++11 support by default
+if (NOT MSVC)
+  if(CMAKE_VERSION VERSION_LESS 3.8.2)
+    target_compile_options(gazebomsgs_out PRIVATE -std=c++11)
+  else()
+    target_compile_features(gazebomsgs_out PRIVATE cxx_std_11)
+  endif()
+endif()
 
 set (sources msgs.cc MsgFactory.cc)
 set (headers msgs.hh MsgFactory.hh)

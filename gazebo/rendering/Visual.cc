@@ -811,9 +811,18 @@ void Visual::SetScale(const ignition::math::Vector3d &_scale)
 
   this->dataPtr->scale = _scale;
 
-  this->dataPtr->sceneNode->setScale(
-      Conversions::Convert(this->dataPtr->scale));
-
+  if (!ignition::math::isnan(this->dataPtr->scale.X())
+      && !ignition::math::isnan(this->dataPtr->scale.Y())
+      && !ignition::math::isnan(this->dataPtr->scale.Z()))
+  {
+    this->dataPtr->sceneNode->setScale(
+        Conversions::Convert(this->dataPtr->scale));
+  }
+  else
+  {
+    gzerr << Name() << ": Size of the collision contains one or several zeros." <<
+      " Collisions may not visualize properly." << std::endl;
+  }
   // Scale selection object in case we have one attached. Other children were
   // scaled from UpdateGeomSize
   for (auto child : this->dataPtr->children)
@@ -2134,10 +2143,23 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 ignition::math::Box Visual::BoundingBox() const
 {
-  ignition::math::Box box(
-      ignition::math::Vector3d::Zero,
-      ignition::math::Vector3d::Zero);
+  ignition::math::Box emptyBox;
+  emptyBox.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
+      ignition::math::MAX_D);
+  emptyBox.Max().Set(-ignition::math::MAX_D, -ignition::math::MAX_D,
+     -ignition::math::MAX_D);
+
+  ignition::math::Box box = emptyBox;
   this->BoundsHelper(this->GetSceneNode(), box);
+
+  // return zero size box if bbox is empty to avoid breaking other features,
+  // e.g. CoM visualization of empty visual
+  if (box == emptyBox)
+  {
+     return ignition::math::Box(ignition::math::Vector3d::Zero,
+         ignition::math::Vector3d::Zero);
+  }
+
   return box;
 }
 
