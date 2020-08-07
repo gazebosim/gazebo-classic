@@ -24,10 +24,9 @@
 #include <memory>
 #include <mutex>
 
-#include "gazebo/gazebo_config.h"
-#include "gazebo/common/Time.hh"
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/Profiler.hh"
+#include <gazebo/gazebo_config.h>
+#include <gazebo/common/Time.hh>
+#include <gazebo/common/CommonTypes.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -269,19 +268,13 @@ namespace gazebo
       /// \brief Signal the event for all subscribers.
       public: void Signal()
       {
-        GZ_PROFILE("Event::Signal");
-
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
           if (iter.second->on)
-          {
-            GZ_PROFILE_BEGIN("callback0");
             iter.second->callback();
-            GZ_PROFILE_END();
-          }
         }
       }
 
@@ -290,19 +283,13 @@ namespace gazebo
       public: template< typename P >
               void Signal(const P &_p)
       {
-        GZ_PROFILE("Event::Signal");
-
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
           if (iter.second->on)
-          {
-            GZ_PROFILE_BEGIN("callback1");
             iter.second->callback(_p);
-            GZ_PROFILE_END();
-          }
         }
       }
 
@@ -312,19 +299,13 @@ namespace gazebo
       public: template< typename P1, typename P2 >
               void Signal(const P1 &_p1, const P2 &_p2)
       {
-        GZ_PROFILE("Event::Signal");
-
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
           if (iter.second->on)
-          {
-            GZ_PROFILE_BEGIN("callback2");
             iter.second->callback(_p1, _p2);
-            GZ_PROFILE_END();
-          }
         }
       }
 
@@ -335,19 +316,13 @@ namespace gazebo
       public: template< typename P1, typename P2, typename P3 >
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3)
       {
-        GZ_PROFILE("Event::Signal");
-
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
           if (iter.second->on)
-          {
-            GZ_PROFILE_BEGIN("callback3");
             iter.second->callback(_p1, _p2, _p3);
-            GZ_PROFILE_END();
-          }
         }
       }
 
@@ -360,19 +335,13 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4)
       {
-        GZ_PROFILE("Event::Signal");
-
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
           if (iter.second->on)
-          {
-            GZ_PROFILE_BEGIN("callback4");
             iter.second->callback(_p1, _p2, _p3, _p4);
-            GZ_PROFILE_END();
-          }
         }
       }
 
@@ -387,19 +356,13 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4, const P5 &_p5)
       {
-        GZ_PROFILE("Event::Signal");
-
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
           if (iter.second->on)
-          {
-            GZ_PROFILE_BEGIN("callback5");
             iter.second->callback(_p1, _p2, _p3, _p4, _p5);
-            GZ_PROFILE_END();
-          }
         }
       }
 
@@ -415,19 +378,13 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6)
       {
-        GZ_PROFILE("Event::Signal");
-
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
           if (iter.second->on)
-          {
-            GZ_PROFILE_BEGIN("callback6");
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6);
-            GZ_PROFILE_END();
-          }
         }
       }
 
@@ -444,19 +401,13 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7)
       {
-        GZ_PROFILE("Event::Signal");
-
         this->Cleanup();
 
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
           if (iter.second->on)
-          {
-            GZ_PROFILE_BEGIN("callback7");
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
-            GZ_PROFILE_END();
-          }
         }
       }
 
@@ -475,8 +426,6 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8)
       {
-        GZ_PROFILE("Event::Signal");
-
         this->Cleanup();
 
         this->SetSignaled(true);
@@ -484,9 +433,7 @@ namespace gazebo
         {
           if (iter.second->on)
           {
-            GZ_PROFILE_BEGIN("callback8");
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
-            GZ_PROFILE_END();
           }
         }
       }
@@ -508,8 +455,6 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8, const P9 &_p9)
       {
-        GZ_PROFILE("Event::Signal");
-
         this->Cleanup();
 
         this->SetSignaled(true);
@@ -517,10 +462,8 @@ namespace gazebo
         {
           if (iter.second->on)
           {
-            GZ_PROFILE_BEGIN("callback9");
             iter.second->callback(
                 _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
-            GZ_PROFILE_END();
           }
         }
       }
@@ -548,14 +491,10 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          GZ_PROFILE("Event::Signal");
-
           if (iter.second->on)
           {
-            GZ_PROFILE_BEGIN("callback10");
             iter.second->callback(
                 _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
-            GZ_PROFILE_END();
           }
         }
       }
