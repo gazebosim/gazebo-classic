@@ -28,7 +28,6 @@
 #include "sdf/JointAxis.hh"
 #include "sdf/SemanticPose.hh"
 
-
 namespace gazebo
 {
 namespace common
@@ -173,9 +172,15 @@ void convertPosesToSdf16(const sdf::ElementPtr &_modelElem)
       }
     }
   }
-  // TODO (addisu) Revisit when composition with frame semantics is
-  // supported in sdformat
-  // Models
+
+  for (std::size_t modelInd = 0; modelInd < modelSDFDom.ModelCount();
+       ++modelInd)
+  {
+    auto *nestedModelDom = modelSDFDom.ModelByIndex(modelInd);
+    updateIfRelativeTo(nestedModelDom->Element(),
+                       nestedModelDom->SemanticPose());
+    convertPosesToSdf16(nestedModelDom->Element());
+  }
 }
 }
 }

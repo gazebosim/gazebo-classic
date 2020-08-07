@@ -77,14 +77,32 @@ void Model::Load(sdf::ElementPtr _sdf)
   // Only <model> is supported right now, <actor> is not supported.
   if (_sdf->GetName() == "model")
   {
-    // If the model is initialized without a containing world, we create an
-    // isolated/standalone DOM object for the world. Otherwise, we'd obtain
-    // the model DOM from the world DOM.
-    const auto *worldDom = this->GetWorld()->GetSDFDom();
-    const std::string modelName = _sdf->Get<std::string>("name");
-    if (nullptr != worldDom && !modelName.empty())
+    const auto modelName = _sdf->Get<std::string>("name");
+
+    // If the model is initialized without a containing parent model or world,
+    // we create an isolated/standalone DOM object for the model. Otherwise,
+    // we'd obtain the model DOM from the parent DOM.
+    BasePtr parentEntity = this->GetParent();
+    if (nullptr != parentEntity && !modelName.empty())
     {
-      this->modelSDFDom = worldDom->ModelByName(modelName);
+      if (boost::dynamic_pointer_cast<Model>(parentEntity))
+      {
+        auto parentDom =
+            boost::dynamic_pointer_cast<Model>(parentEntity)->GetSDFDom();
+        if (nullptr != parentDom)
+        {
+          this->modelSDFDom = parentDom->ModelByName(modelName);
+        }
+      }
+      else
+      {
+        // If the parent is not a model, we assume it's a world.
+        auto parentDom = this->GetWorld()->GetSDFDom();
+        if (nullptr != parentDom)
+        {
+          this->modelSDFDom = parentDom->ModelByName(modelName);
+        }
+      }
     }
 
     if (nullptr == this->modelSDFDom)

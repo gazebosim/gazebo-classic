@@ -42,6 +42,10 @@ class ModelMaker_TEST : public QTestFixture
 
   /// \brief Test creating a nested model by copying another nested model.
   private slots: void FromNestedModel();
+
+  /// \brief Test creating a nested model with frame semantics (SDFormat 1.7)
+  /// from a file
+  private slots: void FromNestedModelFileWithFrameSemantics();
 };
 
 #endif

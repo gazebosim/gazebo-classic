@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <string.h>
+#include <string>
 
 #include <ignition/math/Pose3.hh>
 
@@ -27,7 +27,7 @@
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
-class PhysicsMsgsTest : public ServerFixture,
+class NestedModelTest : public ServerFixture,
                         public testing::WithParamInterface<const char*>
 {
   /// \brief Test loading a world with nested model.
@@ -41,7 +41,7 @@ class PhysicsMsgsTest : public ServerFixture,
 
 
 ////////////////////////////////////////////////////////////////////////
-void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
+void NestedModelTest::LoadNestedModel(const std::string &_physicsEngine)
 {
   // load a world with a nested model
   Load("worlds/nested_model.world", true, _physicsEngine);
@@ -147,7 +147,7 @@ void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
 }
 
 ////////////////////////////////////////////////////////////////////////
-void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
+void NestedModelTest::SpawnNestedModel(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
@@ -173,7 +173,7 @@ void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   std::ostringstream sdfStream;
-  sdfStream << "<sdf version='" << SDF_VERSION << "'>"
+  sdfStream << "<sdf version='1.6'>"
     << "<model name ='model_00'>"
     << "  <pose>0 0 1 0 0 0</pose>"
     << "  <model name ='model_01'>"
@@ -344,18 +344,18 @@ void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-TEST_P(PhysicsMsgsTest, LoadNestedModel)
+TEST_P(NestedModelTest, LoadNestedModel)
 {
   LoadNestedModel(GetParam());
 }
 
 /////////////////////////////////////////////////
-TEST_P(PhysicsMsgsTest, SpawnNestedModel)
+TEST_P(NestedModelTest, SpawnNestedModel)
 {
   SpawnNestedModel(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsMsgsTest,
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, NestedModelTest,
                         PHYSICS_ENGINE_VALUES,);  // NOLINT
 
 /////////////////////////////////////////////////
