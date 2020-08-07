@@ -250,8 +250,8 @@ void Publisher::SendMessage()
     {
       // Send the latest message.
       int result = this->publication->Publish(*iter,
-          boost::bind(&PublisherPrivate::OnPublishComplete,
-          pubDataPtr, _1), *pubIter);
+          std::bind(&PublisherPrivate::OnPublishComplete,
+          pubDataPtr, std::placeholders::_1), *pubIter);
 
       std::lock_guard<std::mutex> lock2(pubDataPtr->mutex);
       if (result > 0)
@@ -307,10 +307,12 @@ void Publisher::Fini()
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic, this->id);
 
-  this->node.reset();
+  {
+    std::lock_guard<std::mutex> lock(pubMapMutex);
+    publisherMap.erase(this->id);
+  }
 
-  std::lock_guard<std::mutex> lock(pubMapMutex);
-  publisherMap.erase(this->id);
+  this->node.reset();
 }
 
 //////////////////////////////////////////////////
