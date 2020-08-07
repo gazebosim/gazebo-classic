@@ -91,12 +91,19 @@ void Model::Load(sdf::ElementPtr _sdf)
     {
       this->modelSDFDomIsolated = std::make_unique<sdf::Model>();
       sdf::Errors errors = this->modelSDFDomIsolated->Load(_sdf);
-      // Print errors and load the parts that worked.
-      for (const auto &error : errors)
+      auto sdfVersion =
+        ignition::math::SemanticVersion(_sdf->OriginalVersion());
+      // Only print out errors if the original SDFormat version does not support
+      // frame semantics
+      if (sdfVersion >= ignition::math::SemanticVersion(1, 7))
       {
-        if (common::isSdfFrameSemanticsError(error))
+        // Print errors and load the parts that worked.
+        for (const auto &error : errors)
         {
-          gzerr << error << "\n";
+          if (common::isSdfFrameSemanticsError(error))
+          {
+            gzerr << error << "\n";
+          }
         }
       }
       this->modelSDFDom = this->modelSDFDomIsolated.get();

@@ -15,6 +15,8 @@
  *
  */
 
+#include <ignition/math/SemanticVersion.hh>
+
 #include "gazebo/common/SdfFrameSemantics.hh"
 #include "gazebo/common/Console.hh"
 
@@ -25,6 +27,7 @@
 #include "sdf/Joint.hh"
 #include "sdf/JointAxis.hh"
 #include "sdf/SemanticPose.hh"
+
 
 namespace gazebo
 {
@@ -84,11 +87,18 @@ void convertPosesToSdf16(const sdf::ElementPtr &_modelElem)
   sdf::Model modelSDFDom;
   sdf::Errors errors = modelSDFDom.Load(_modelElem);
 
-  for (const auto &error : errors)
+  auto sdfVersion =
+      ignition::math::SemanticVersion(_modelElem->OriginalVersion());
+  // Only print out errors if the original SDFormat version does not support
+  // frame semantics
+  if (sdfVersion >= ignition::math::SemanticVersion(1, 7))
   {
-    if (isSdfFrameSemanticsError(error))
+    for (const auto &error : errors)
     {
-      gzerr << error << "\n";
+      if (isSdfFrameSemanticsError(error))
+      {
+        gzerr << error << "\n";
+      }
     }
   }
 

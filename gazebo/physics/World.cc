@@ -30,6 +30,7 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <ignition/math/Rand.hh>
+#include <ignition/math/SemanticVersion.hh>
 
 #include <gazebo/gazebo_config.h>
 
@@ -186,11 +187,18 @@ void World::Load(sdf::ElementPtr _sdf)
   sdf::Errors errors = this->dataPtr->worldSDFDom->Load(_sdf);
 
   // Print errors and load the parts that worked.
-  for (const auto &error : errors)
+  auto sdfVersion =
+    ignition::math::SemanticVersion(_sdf->OriginalVersion());
+  // Only print out errors if the original SDFormat version does not support
+  // frame semantics
+  if (sdfVersion >= ignition::math::SemanticVersion(1, 7))
   {
-    if (common::isSdfFrameSemanticsError(error))
+    for (const auto &error : errors)
     {
-      gzerr << error << "\n";
+      if (common::isSdfFrameSemanticsError(error))
+      {
+        gzerr << error << "\n";
+      }
     }
   }
 
