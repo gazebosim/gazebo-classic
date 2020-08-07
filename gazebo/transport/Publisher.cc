@@ -52,6 +52,11 @@ class PublisherPrivate
 static std::mutex pubMapMutex;
 
 /// \brief A map of Publisher id and its shared pointer
+/// The PublisherPrivate object has to be stored in a global static map
+/// and not within the Publisher class. This is because we need to keep the
+/// PublisherPrivate object alive for the caller of the OnPublisherComplete,
+/// otherwise we run into a situation in which the caller invokes a
+/// function of a destroyed object
 static std::map<uint32_t, std::shared_ptr<PublisherPrivate>> publisherMap;
 
 //////////////////////////////////////////////////
