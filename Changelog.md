@@ -2,10 +2,13 @@
 
 ## Gazebo 9.xx.x (202x-xx-xx)
 
-## Gazebo 9.14.0 (2020-08-06)
+## Gazebo 9.14.0 (2020-08-07)
 
 1. Lockstep between sensors and physics
     * [Pull request #2793](https://github.com/osrf/gazebo/pull/2793)
+
+1. Fix race condition on Publisher shutdown
+    * [Pull request #2812](https://github.com/osrf/gazebo/pull/2812)
 
 ## Gazebo 9.13.2 (2020-07-20)
 
