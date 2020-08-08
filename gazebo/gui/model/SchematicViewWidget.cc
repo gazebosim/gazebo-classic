@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include <ignition/math/Color.hh>
 
 #include "gazebo/rendering/Material.hh"
@@ -30,7 +32,6 @@
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/SchematicViewWidget.hh"
 
-using namespace boost::placeholders;
 using namespace gazebo;
 using namespace gui;
 
@@ -83,32 +84,34 @@ void SchematicViewWidget::Reset()
 /////////////////////////////////////////////////
 void SchematicViewWidget::Init()
 {
+  using namespace std::placeholders;
+
   this->connections.push_back(gui::model::Events::ConnectLinkInserted(
-      boost::bind(&SchematicViewWidget::AddNode, this, _1)));
+      std::bind(&SchematicViewWidget::AddNode, this, _1)));
 
   this->connections.push_back(gui::model::Events::ConnectLinkRemoved(
-      boost::bind(&SchematicViewWidget::RemoveNode, this, _1)));
+      std::bind(&SchematicViewWidget::RemoveNode, this, _1)));
 
   this->connections.push_back(gui::model::Events::ConnectJointInserted(
-      boost::bind(&SchematicViewWidget::AddEdge, this, _1, _2, _3, _4, _5)));
+      std::bind(&SchematicViewWidget::AddEdge, this, _1, _2, _3, _4, _5)));
 
   this->connections.push_back(gui::model::Events::ConnectJointRemoved(
-      boost::bind(&SchematicViewWidget::RemoveEdge, this, _1)));
+      std::bind(&SchematicViewWidget::RemoveEdge, this, _1)));
 
   this->connections.push_back(gui::model::Events::ConnectJointChanged(
-      boost::bind(&SchematicViewWidget::UpdateEdge, this, _1, _2, _3, _4, _5)));
+      std::bind(&SchematicViewWidget::UpdateEdge, this, _1, _2, _3, _4, _5)));
 
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&SchematicViewWidget::OnDeselectAll, this, _1, _2)));
+       std::bind(&SchematicViewWidget::OnDeselectAll, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedEntity(
-       boost::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
+       std::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
-       boost::bind(&SchematicViewWidget::OnSetSelectedJoint, this, _1, _2)));
+       std::bind(&SchematicViewWidget::OnSetSelectedJoint, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////

@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/gui/GuiEvents.hh"
@@ -22,7 +24,6 @@
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/ModelTreeWidget.hh"
 
-using namespace boost::placeholders;
 using namespace gazebo;
 using namespace gui;
 
@@ -161,21 +162,23 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
   // Connections
+  using namespace std::placeholders;
+
   this->connections.push_back(
       gui::model::Events::ConnectSaveModel(
-      boost::bind(&ModelTreeWidget::OnSaveModel, this, _1)));
+      std::bind(&ModelTreeWidget::OnSaveModel, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectNewModel(
-      boost::bind(&ModelTreeWidget::OnNewModel, this)));
+      std::bind(&ModelTreeWidget::OnNewModel, this)));
 
   this->connections.push_back(
       gui::model::Events::ConnectModelPropertiesChanged(
-      boost::bind(&ModelTreeWidget::OnModelPropertiesChanged, this, _1, _2)));
+      std::bind(&ModelTreeWidget::OnModelPropertiesChanged, this, _1, _2)));
 
   this->connections.push_back(
       gui::model::Events::ConnectModelNameChanged(
-      boost::bind(&ModelTreeWidget::OnModelNameChanged, this, _1)));
+      std::bind(&ModelTreeWidget::OnModelNameChanged, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectNestedModelInserted(
@@ -184,51 +187,51 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
 
   this->connections.push_back(
       gui::model::Events::ConnectLinkInserted(
-      boost::bind(&ModelTreeWidget::OnLinkInserted, this, _1)));
+      std::bind(&ModelTreeWidget::OnLinkInserted, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectJointInserted(
-      boost::bind(&ModelTreeWidget::OnJointInserted, this, _1, _2, _3, _4)));
+      std::bind(&ModelTreeWidget::OnJointInserted, this, _1, _2, _3, _4)));
 
   this->connections.push_back(
       gui::model::Events::ConnectModelPluginInserted(
-      boost::bind(&ModelTreeWidget::OnModelPluginInserted, this, _1)));
+      std::bind(&ModelTreeWidget::OnModelPluginInserted, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectNestedModelRemoved(
-      boost::bind(&ModelTreeWidget::OnNestedModelRemoved, this, _1)));
+      std::bind(&ModelTreeWidget::OnNestedModelRemoved, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectLinkRemoved(
-      boost::bind(&ModelTreeWidget::OnLinkRemoved, this, _1)));
+      std::bind(&ModelTreeWidget::OnLinkRemoved, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectJointRemoved(
-      boost::bind(&ModelTreeWidget::OnJointRemoved, this, _1)));
+      std::bind(&ModelTreeWidget::OnJointRemoved, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectModelPluginRemoved(
-      boost::bind(&ModelTreeWidget::OnModelPluginRemoved, this, _1)));
+      std::bind(&ModelTreeWidget::OnModelPluginRemoved, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectJointNameChanged(
-      boost::bind(&ModelTreeWidget::OnJointNameChanged, this, _1, _2)));
+      std::bind(&ModelTreeWidget::OnJointNameChanged, this, _1, _2)));
 
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&ModelTreeWidget::OnDeselectAll, this, _1, _2)));
+       std::bind(&ModelTreeWidget::OnDeselectAll, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedEntity(
-       boost::bind(&ModelTreeWidget::OnSetSelectedEntity, this, _1, _2)));
+       std::bind(&ModelTreeWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
-       boost::bind(&ModelTreeWidget::OnSetSelectedJoint, this, _1, _2)));
+       std::bind(&ModelTreeWidget::OnSetSelectedJoint, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedModelPlugin(
-     boost::bind(&ModelTreeWidget::OnSetSelectedModelPlugin, this, _1, _2)));
+     std::bind(&ModelTreeWidget::OnSetSelectedModelPlugin, this, _1, _2)));
 
   this->ClearModelTree();
 }
