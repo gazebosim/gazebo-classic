@@ -15,7 +15,7 @@
  *
 */
 
-#include <functional>
+#include <boost/version.hpp>
 
 #include <ignition/math/Color.hh>
 
@@ -84,34 +84,36 @@ void SchematicViewWidget::Reset()
 /////////////////////////////////////////////////
 void SchematicViewWidget::Init()
 {
-  using namespace std::placeholders;
+  #if BOOST_VERSION >= 107300
+  using namespace boost::placeholders;
+  #endif
 
   this->connections.push_back(gui::model::Events::ConnectLinkInserted(
-      std::bind(&SchematicViewWidget::AddNode, this, _1)));
+      boost::bind(&SchematicViewWidget::AddNode, this, _1)));
 
   this->connections.push_back(gui::model::Events::ConnectLinkRemoved(
-      std::bind(&SchematicViewWidget::RemoveNode, this, _1)));
+      boost::bind(&SchematicViewWidget::RemoveNode, this, _1)));
 
   this->connections.push_back(gui::model::Events::ConnectJointInserted(
-      std::bind(&SchematicViewWidget::AddEdge, this, _1, _2, _3, _4, _5)));
+      boost::bind(&SchematicViewWidget::AddEdge, this, _1, _2, _3, _4, _5)));
 
   this->connections.push_back(gui::model::Events::ConnectJointRemoved(
-      std::bind(&SchematicViewWidget::RemoveEdge, this, _1)));
+      boost::bind(&SchematicViewWidget::RemoveEdge, this, _1)));
 
   this->connections.push_back(gui::model::Events::ConnectJointChanged(
-      std::bind(&SchematicViewWidget::UpdateEdge, this, _1, _2, _3, _4, _5)));
+      boost::bind(&SchematicViewWidget::UpdateEdge, this, _1, _2, _3, _4, _5)));
 
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       std::bind(&SchematicViewWidget::OnDeselectAll, this, _1, _2)));
+       boost::bind(&SchematicViewWidget::OnDeselectAll, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedEntity(
-       std::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
+       boost::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
-       std::bind(&SchematicViewWidget::OnSetSelectedJoint, this, _1, _2)));
+       boost::bind(&SchematicViewWidget::OnSetSelectedJoint, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////
