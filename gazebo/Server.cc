@@ -49,14 +49,18 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/sensors/SensorsIface.hh"
+#include "gazebo/sensors/Sensor.hh"
 
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
 
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/Master.hh"
 #include "gazebo/Server.hh"
@@ -541,6 +545,74 @@ void Server::Fini()
   gazebo::shutdown();
 }
 
+std::map<std::string, gazebo::common::Time> sensorsLastMeasurementTime;
+std::map<std::string, double> sensorsUpdateRate;
+/// \brief Publisher for run-time simulation performance metrics..
+transport::PublisherPtr performanceMetricsPub;
+
+void PublishPerformanceMetrics()
+{
+  physics::WorldPtr world = physics::get_world("default");
+
+  /// Outgoing run-time simulation performance metrics.
+  msgs::PerformanceMetrics performanceMetricsMsg;
+
+  // Real time factor
+  common::Time realTime = world->RealTime();
+  common::Time simTime = world->SimTime();
+  if (realTime == 0)
+    simTime = 0;
+  else
+    simTime = simTime / realTime;
+
+  if (simTime > 0)
+    performanceMetricsMsg.set_real_time_factor(simTime.Double());
+  else
+    performanceMetricsMsg.set_real_time_factor(0.0);
+
+  /// update sim time for sensors
+  for (auto model: world->Models())
+  {
+    for (auto link: model->GetLinks())
+    {
+      for (unsigned int i = 0; i < link->GetSensorCount(); i++)
+      {
+        std::string name = link->GetSensorName(i);
+        sensors::SensorPtr sensor = sensors::get_sensor(name);
+
+        auto ret = sensorsLastMeasurementTime.insert(
+            std::pair<std::string, gazebo::common::Time>(name, 0));
+        if (ret.second==false)
+        {
+          double updateRate = (sensor->LastMeasurementTime() - sensorsLastMeasurementTime[name]).Double();
+          sensorsLastMeasurementTime[name] = sensor->LastMeasurementTime();
+          if (updateRate > 0.0)
+          {
+            auto ret2 = sensorsUpdateRate.insert(
+                std::pair<std::string,double>(name, 0));
+            if (ret2.second==false)
+            {
+              sensorsUpdateRate[name] = updateRate;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  for (auto sensorUpdateRate: sensorsUpdateRate)
+  {
+    msgs::PerformanceMetrics::PerformanceSensorMetrics * performanceSensorMetricsMsg =
+      performanceMetricsMsg.add_sensor();
+    performanceSensorMetricsMsg->set_sensor_names(sensorUpdateRate.first);
+    performanceSensorMetricsMsg->set_sim_sensor_update_rates(sensorUpdateRate.second);
+  }
+
+  // Publish data
+  if (performanceMetricsPub && performanceMetricsPub->HasConnections())
+    performanceMetricsPub->Publish(performanceMetricsMsg);
+}
+
 /////////////////////////////////////////////////
 void Server::Run()
 {
@@ -596,6 +668,10 @@ void Server::Run()
 
   this->dataPtr->initialized = true;
 
+  performanceMetricsPub =
+   this->dataPtr->node->Advertise<msgs::PerformanceMetrics>(
+       "~/performance_metrics", 100, 5);
+
   // Stay on this loop until Gazebo needs to be shut down
   // The server and sensor manager outlive worlds
   while (!this->dataPtr->stop)
@@ -609,6 +685,8 @@ void Server::Run()
       sensors::run_once();
     else if (sensors::running())
       sensors::stop();
+
+    PublishPerformanceMetrics();
 
     if (!this->dataPtr->lockstep)
       common::Time::MSleep(1);

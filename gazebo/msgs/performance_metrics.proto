@@ -1,0 +1,19 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PerformanceMetrics
+/// \brief A message for run-time simulation performance metrics
+
+message PerformanceMetrics
+{
+
+  message PerformanceSensorMetrics
+  {
+    required string sensor_names             = 1;
+    required double sim_sensor_update_rates  = 2;
+  }
+
+  required double real_time_factor         = 1[default=0.0];
+  repeated PerformanceSensorMetrics sensor = 2;
+}
