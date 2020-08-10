@@ -2143,22 +2143,9 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 ignition::math::AxisAlignedBox Visual::BoundingBox() const
 {
-  ignition::math::Box emptyBox;
-  emptyBox.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
-      ignition::math::MAX_D);
-  emptyBox.Max().Set(-ignition::math::MAX_D, -ignition::math::MAX_D,
-     -ignition::math::MAX_D);
-
-  ignition::math::Box box = emptyBox;
-  this->BoundsHelper(this->GetSceneNode(), box);
-
-  // return zero size box if bbox is empty to avoid breaking other features,
-  // e.g. CoM visualization of empty visual
-  if (box == emptyBox)
-  {
-     return ignition::math::Box(ignition::math::Vector3d::Zero,
-         ignition::math::Vector3d::Zero);
-  }
+  ignition::math::AxisAlignedBox box(
+      ignition::math::Vector3d::Zero,
+      ignition::math::Vector3d::Zero);
 
   return box;
 }
@@ -2724,7 +2711,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
-    this->ProcessMaterialMsg(msgs::ConvertIgnMsg(_msg->material()));
+    this->ProcessMaterialMsg(_msg->material());
   }
 
   if (_msg->has_transparency())
@@ -3648,7 +3635,7 @@ void Visual::AddPendingChild(std::pair<VisualType,
 }
 
 /////////////////////////////////////////////////
-void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
+void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
 {
   if (_msg.has_lighting())
   {
@@ -3699,21 +3686,21 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
 
   if (_msg.has_shader_type())
   {
-    if (_msg.shader_type() == ignition::msgs::Material::VERTEX)
+    if (_msg.shader_type() == msgs::Material::VERTEX)
     {
       this->SetShaderType("vertex");
     }
-    else if (_msg.shader_type() == ignition::msgs::Material::PIXEL)
+    else if (_msg.shader_type() == msgs::Material::PIXEL)
     {
       this->SetShaderType("pixel");
     }
     else if (_msg.shader_type() ==
-        ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+        msgs::Material::NORMAL_MAP_OBJECT_SPACE)
     {
       this->SetShaderType("normal_map_object_space");
     }
     else if (_msg.shader_type() ==
-        ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+        msgs::Material::NORMAL_MAP_TANGENT_SPACE)
     {
       this->SetShaderType("normal_map_tangent_space");
     }
