@@ -189,7 +189,7 @@ TEST_F(Visual_TEST, BoundingBox)
   ignition::math::AxisAlignedBox emptyBoundingBox = emptyVis->BoundingBox();
   EXPECT_EQ(ignition::math::Vector3d::Zero, emptyBoundingBox.Min());
   EXPECT_EQ(ignition::math::Vector3d::Zero, emptyBoundingBox.Max());
- }
+}
 
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, Geometry)
