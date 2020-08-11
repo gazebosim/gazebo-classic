@@ -15,6 +15,7 @@
  *
 */
 #include <boost/algorithm/string.hpp>
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/World.hh"
@@ -139,9 +140,11 @@ void LogicalCameraSensorPrivate::AddVisibleModels(
 //////////////////////////////////////////////////
 bool LogicalCameraSensor::UpdateImpl(const bool _force)
 {
+  GZ_PROFILE("LogicalCameraSensor::UpdateImpl");
   // Only compute if active, or the update is forced
   if (_force || this->IsActive())
   {
+    GZ_PROFILE_BEGIN("Update");
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
     this->dataPtr->msg.clear_model();
 
@@ -157,9 +160,12 @@ bool LogicalCameraSensor::UpdateImpl(const bool _force)
 
     // Recursively check if models and nested models are in the frustum.
     this->dataPtr->AddVisibleModels(myPose, this->world->Models());
+    GZ_PROFILE_END();
 
+    GZ_PROFILE_BEGIN("Publish");
     // Send the message.
     this->dataPtr->pub->Publish(this->dataPtr->msg);
+    GZ_PROFILE_END();
   }
 
   return true;

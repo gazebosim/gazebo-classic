@@ -63,6 +63,7 @@
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/LogRecord.hh"
+#include "gazebo/common/Profiler.hh"
 
 #include "gazebo/physics/Road.hh"
 #include "gazebo/physics/RayShape.hh"
@@ -624,6 +625,8 @@ void World::Step()
 {
   DIAG_TIMER_START("World::Step");
 
+  GZ_PROFILE("World::Step");
+  GZ_PROFILE_BEGIN("loadPlugins");
   /// need this because ODE does not call dxReallocateWorldProcessContext()
   /// until dWorld.*Step
   /// Plugins that manipulate joints (and probably other properties) require
@@ -634,13 +637,17 @@ void World::Step()
     this->dataPtr->pluginsLoaded = true;
   }
 
+  GZ_PROFILE_END();
   DIAG_TIMER_LAP("World::Step", "loadPlugins");
 
+  GZ_PROFILE_BEGIN("publishWorldStats");
   // Send statistics about the world simulation
   this->PublishWorldStats();
+  GZ_PROFILE_END();
 
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
 
+  GZ_PROFILE_BEGIN("sleepOffset");
   if (this->dataPtr->waitForSensors)
     this->dataPtr->waitForSensors(this->dataPtr->simTime.Double(),
         this->dataPtr->physicsEngine->GetMaxStepSize());
@@ -664,8 +671,10 @@ void World::Step()
   this->dataPtr->sleepOffset = (actualSleep - sleepTime) * 0.01 +
                       this->dataPtr->sleepOffset * 0.99;
 
+  GZ_PROFILE_END();
   DIAG_TIMER_LAP("World::Step", "sleepOffset");
 
+  GZ_PROFILE_BEGIN("worldUpdateMutex");
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
   if (common::Time::GetWallTime() - this->dataPtr->prevStepWallTime +
@@ -700,6 +709,9 @@ void World::Step()
       this->dataPtr->pauseTime += stepTime;
     }
   }
+  GZ_PROFILE_END();
+
+  GZ_PROFILE_BEGIN("Step");
 
   gazebo::util::IntrospectionManager::Instance()->NotifyUpdates();
 
@@ -709,6 +721,7 @@ void World::Step()
 
   if (g_clearModels)
     this->ClearModels();
+  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////
@@ -741,6 +754,8 @@ void World::Update()
 {
   DIAG_TIMER_START("World::Update");
 
+  GZ_PROFILE("World::Update");
+  GZ_PROFILE_BEGIN("needsReset");
   if (this->dataPtr->needsReset)
   {
     if (this->dataPtr->resetAll)
@@ -752,24 +767,29 @@ void World::Update()
     this->dataPtr->needsReset = false;
     return;
   }
+  GZ_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "needsReset");
 
+  GZ_PROFILE_BEGIN("worldUpdateBegin");
   this->dataPtr->updateInfo.simTime = this->SimTime();
   this->dataPtr->updateInfo.realTime = this->RealTime();
   event::Events::worldUpdateBegin(this->dataPtr->updateInfo);
-
+  GZ_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "Events::worldUpdateBegin");
 
+  GZ_PROFILE_BEGIN("Update");
   // Update all the models
   (*this.*dataPtr->modelUpdateFunc)();
-
+  GZ_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "Model::Update");
 
+  GZ_PROFILE_BEGIN("UpdateCollision");
   // This must be called before PhysicsEngine::UpdatePhysics for ODE.
   this->dataPtr->physicsEngine->UpdateCollision();
-
+  GZ_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
 
+  GZ_PROFILE_BEGIN("beforePhysicsUpdate");
   // Wait for logging to finish, if it's running.
   if (util::LogRecord::Instance()->Running())
   {
@@ -790,20 +810,24 @@ void World::Update()
   this->dataPtr->updateInfo.realTime = this->RealTime();
   event::Events::beforePhysicsUpdate(this->dataPtr->updateInfo);
 
+  GZ_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "Events::beforePhysicsUpdate");
 
   // Update the physics engine
   if (this->dataPtr->enablePhysicsEngine && this->dataPtr->physicsEngine)
   {
+    GZ_PROFILE_BEGIN("UpdatePhysics");
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->dataPtr->physicsEngine->UpdatePhysics();
 
+    GZ_PROFILE_END();
     DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdatePhysics");
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
     //           and we need to propagate it into Entity::worldPose
     {
+      GZ_PROFILE_BEGIN("SetWorldPose(dirtyPoses)");
       // block any other pose updates (e.g. Joint::SetPosition)
       boost::recursive_mutex::scoped_lock plock(
           *this->Physics()->GetPhysicsUpdateMutex());
@@ -814,19 +838,24 @@ void World::Update()
       }
 
       this->dataPtr->dirtyPoses.clear();
+      GZ_PROFILE_END();
     }
 
     DIAG_TIMER_LAP("World::Update", "SetWorldPose(dirtyPoses)");
   }
 
+  GZ_PROFILE_BEGIN("LogRecordNotify");
   // Only update state information if logging data.
   if (util::LogRecord::Instance()->Running())
     this->dataPtr->logCondition.notify_one();
+  GZ_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "LogRecordNotify");
 
+  GZ_PROFILE_BEGIN("PublishContacts");
   // Output the contact information
   this->dataPtr->physicsEngine->GetContactManager()->PublishContacts();
 
+  GZ_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "ContactManager::PublishContacts");
 
   event::Events::worldUpdateEnd();

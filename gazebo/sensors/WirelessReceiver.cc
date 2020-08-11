@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "gazebo/common/Profiler.hh"
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -102,6 +103,9 @@ void WirelessReceiver::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
 {
+  GZ_PROFILE("WirelessReceiver::UpdateImpl");
+  GZ_PROFILE_BEGIN("Update");
+
   std::string txEssid;
   msgs::WirelessNodes msg;
   double rxPower;
@@ -138,10 +142,13 @@ bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
       wirelessNode->set_signal_level(rxPower);
     }
   }
+  GZ_PROFILE_END();
+  GZ_PROFILE_BEGIN("Publish");
   if (msg.node_size() > 0)
   {
     this->pub->Publish(msg);
   }
+  GZ_PROFILE_END();
 
   return true;
 }

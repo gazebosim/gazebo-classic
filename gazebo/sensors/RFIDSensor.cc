@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include "gazebo/common/Profiler.hh"
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/physics/World.hh"
@@ -115,14 +117,19 @@ void RFIDSensor::Init()
 //////////////////////////////////////////////////
 bool RFIDSensor::UpdateImpl(const bool /*_force*/)
 {
+  GZ_PROFILE("RFIDSensor::UpdateImpl");
+  GZ_PROFILE_BEGIN("EvaluateTags");
   this->EvaluateTags();
+  GZ_PROFILE_END();
   this->lastMeasurementTime = this->world->SimTime();
 
   if (this->dataPtr->scanPub)
   {
+    GZ_PROFILE_BEGIN("Publish");
     msgs::Pose msg;
     msgs::Set(&msg, this->dataPtr->entity->WorldPose());
     this->dataPtr->scanPub->Publish(msg);
+    GZ_PROFILE_END();
   }
 
   return true;

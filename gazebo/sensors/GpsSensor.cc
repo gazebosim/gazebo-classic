@@ -16,6 +16,8 @@
 */
 #include <boost/algorithm/string.hpp>
 
+#include "gazebo/common/Profiler.hh"
+
 #include "gazebo/sensors/SensorFactory.hh"
 
 #include "gazebo/common/common.hh"
@@ -123,6 +125,9 @@ void GpsSensor::Init()
 //////////////////////////////////////////////////
 bool GpsSensor::UpdateImpl(const bool /*_force*/)
 {
+  GZ_PROFILE("GpsSensor::UpdateImpl");
+
+  GZ_PROFILE_BEGIN("Update");
   // Get latest pose information
   if (this->dataPtr->parentLink)
   {
@@ -179,10 +184,12 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
   this->lastMeasurementTime = this->world->SimTime();
   msgs::Set(this->dataPtr->lastGpsMsg.mutable_time(),
       this->lastMeasurementTime);
+  GZ_PROFILE_END();
 
+  GZ_PROFILE_BEGIN("Publish");
   if (this->dataPtr->gpsPub)
     this->dataPtr->gpsPub->Publish(this->dataPtr->lastGpsMsg);
-
+  GZ_PROFILE_END();
   return true;
 }
 
