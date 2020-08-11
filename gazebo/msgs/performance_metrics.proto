@@ -10,8 +10,10 @@ message PerformanceMetrics
 
   message PerformanceSensorMetrics
   {
-    required string sensor_names             = 1;
-    required double sim_sensor_update_rates  = 2;
+    required string sensor_name             = 1;
+    required double real_sensor_update_rate = 2;
+    required double sim_sensor_update_rate  = 3;
+    optional double fps                     = 4;
   }
 
   required double real_time_factor         = 1[default=0.0];

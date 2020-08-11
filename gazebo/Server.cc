@@ -48,6 +48,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 
+#include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/Sensor.hh"
 
@@ -59,6 +60,7 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Model.hh"
 
+#include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
@@ -546,7 +548,14 @@ void Server::Fini()
 }
 
 std::map<std::string, gazebo::common::Time> sensorsLastMeasurementTime;
-std::map<std::string, double> sensorsUpdateRate;
+std::map<std::string, gazebo::common::Time> worldLastMeasurementTime;
+struct sensorPerformanceMetricsType
+{
+  double sensorRealUpdateRate;
+  double sensorSimUpdateRate;
+  double sensorFPS;
+};
+std::map<std::string, struct sensorPerformanceMetricsType> sensorPerformanceMetrics;
 /// \brief Publisher for run-time simulation performance metrics..
 transport::PublisherPtr performanceMetricsPub;
 
@@ -582,17 +591,38 @@ void PublishPerformanceMetrics()
 
         auto ret = sensorsLastMeasurementTime.insert(
             std::pair<std::string, gazebo::common::Time>(name, 0));
+        worldLastMeasurementTime.insert(
+                std::pair<std::string, gazebo::common::Time>(name, 0));
         if (ret.second==false)
         {
-          double updateRate = (sensor->LastMeasurementTime() - sensorsLastMeasurementTime[name]).Double();
+          double updateSimRate =
+            (sensor->LastMeasurementTime() - sensorsLastMeasurementTime[name]).Double();
+          double updateRealRate =
+            (world->RealTime() - worldLastMeasurementTime[name]).Double();
           sensorsLastMeasurementTime[name] = sensor->LastMeasurementTime();
-          if (updateRate > 0.0)
+          if (updateSimRate > 0.0)
           {
-            auto ret2 = sensorsUpdateRate.insert(
-                std::pair<std::string,double>(name, 0));
+            struct sensorPerformanceMetricsType emptySensorPerfomanceMetrics;
+            auto ret2 = sensorPerformanceMetrics.insert(
+                std::pair<std::string, struct sensorPerformanceMetricsType>
+                  (name, emptySensorPerfomanceMetrics));
             if (ret2.second==false)
             {
-              sensorsUpdateRate[name] = updateRate;
+              sensorPerformanceMetrics[name].sensorSimUpdateRate = 1.0/updateSimRate;
+              sensorPerformanceMetrics[name].sensorRealUpdateRate = 1.0/updateRealRate;
+              worldLastMeasurementTime[name] = world->RealTime();
+
+              // Special case for stereo cameras
+              sensors::CameraSensorPtr cameraSensor =
+                std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+              if (nullptr != cameraSensor)
+              {
+                sensorPerformanceMetrics[name].sensorFPS = cameraSensor->Camera()->AvgFPS();
+              }
+              else
+              {
+                sensorPerformanceMetrics[name].sensorFPS = -1;
+              }
             }
           }
         }
@@ -600,12 +630,20 @@ void PublishPerformanceMetrics()
     }
   }
 
-  for (auto sensorUpdateRate: sensorsUpdateRate)
+  for (auto sensorPerformanceMetric: sensorPerformanceMetrics)
   {
     msgs::PerformanceMetrics::PerformanceSensorMetrics * performanceSensorMetricsMsg =
       performanceMetricsMsg.add_sensor();
-    performanceSensorMetricsMsg->set_sensor_names(sensorUpdateRate.first);
-    performanceSensorMetricsMsg->set_sim_sensor_update_rates(sensorUpdateRate.second);
+    performanceSensorMetricsMsg->set_sensor_name(sensorPerformanceMetric.first);
+    performanceSensorMetricsMsg->set_real_sensor_update_rate(
+      sensorPerformanceMetric.second.sensorRealUpdateRate);
+    performanceSensorMetricsMsg->set_sim_sensor_update_rate(
+      sensorPerformanceMetric.second.sensorSimUpdateRate);
+    if (sensorPerformanceMetric.second.sensorFPS >= 0.0)
+    {
+      performanceSensorMetricsMsg->set_fps(
+        sensorPerformanceMetric.second.sensorFPS);
+    }
   }
 
   // Publish data
