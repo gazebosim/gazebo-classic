@@ -97,6 +97,5 @@ if (WIN32)
   include_directories(IGNITION-MSGS_INCLUDE_DIR)
 endif()
 
-
 gz_install_library(gazebo_util)
 gz_install_includes("util" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/util.hh)

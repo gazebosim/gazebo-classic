@@ -15,6 +15,8 @@
  *
  */
 
+#include <functional>
+
 #include "plugins/ForceTorqueModelRemovalTestPlugin.hh"
 
 #include "gazebo/sensors/ForceTorqueSensor.hh"
@@ -53,7 +55,8 @@ void ForceTorqueModelRemovalTestPlugin::Load(sensors::SensorPtr _sensor,
 
   // Create connection
   this->updateConnection = gazebo::event::Events::ConnectWorldUpdateBegin(
-       boost::bind(&ForceTorqueModelRemovalTestPlugin::onUpdate, this, _1));
+       std::bind(&ForceTorqueModelRemovalTestPlugin::onUpdate, this,
+                 std::placeholders::_1));
 }
 
 void ForceTorqueModelRemovalTestPlugin::onUpdate(

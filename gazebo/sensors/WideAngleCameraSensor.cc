@@ -19,6 +19,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "gazebo/common/Profiler.hh"
+
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Image.hh"
@@ -177,8 +179,14 @@ void WideAngleCameraSensor::Fini()
 //////////////////////////////////////////////////
 bool WideAngleCameraSensor::UpdateImpl(const bool _force)
 {
+  GZ_PROFILE("WideAngleCameraSensor::UpdateImpl");
+  GZ_PROFILE_BEGIN("Update");
+
   if (!CameraSensor::UpdateImpl(_force))
+  {
+    GZ_PROFILE_END();
     return false;
+  }
 
   if (this->dataPtr->lensPub && this->dataPtr->lensPub->HasConnections())
   {
@@ -215,6 +223,7 @@ bool WideAngleCameraSensor::UpdateImpl(const bool _force)
 
     this->dataPtr->lensPub->Publish(msg);
   }
+  GZ_PROFILE_END();
 
   return true;
 }

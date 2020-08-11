@@ -15,6 +15,7 @@
  *
 */
 #include <boost/algorithm/string.hpp>
+#include "gazebo/common/Profiler.hh"
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/transport/Node.hh"
@@ -127,6 +128,8 @@ void MagnetometerSensor::Init()
 //////////////////////////////////////////////////
 bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
 {
+  GZ_PROFILE("MagnetometerSensor::UpdateImpl");
+  GZ_PROFILE_BEGIN("Update");
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Get latest pose information
@@ -171,10 +174,13 @@ bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
 
   // Save the time of the measurement
   msgs::Set(this->dataPtr->magMsg.mutable_time(), this->world->SimTime());
+  GZ_PROFILE_END();
 
+  GZ_PROFILE_BEGIN("Publish");
   // Publish the message if needed
   if (this->dataPtr->magPub)
     this->dataPtr->magPub->Publish(this->dataPtr->magMsg);
+  GZ_PROFILE_END();
 
   return true;
 }

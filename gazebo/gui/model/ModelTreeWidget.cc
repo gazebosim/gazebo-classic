@@ -15,6 +15,8 @@
  *
 */
 
+#include <boost/version.hpp>
+
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/gui/GuiEvents.hh"
@@ -160,6 +162,10 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
   // Connections
+  #if BOOST_VERSION >= 107300
+  using namespace boost::placeholders;
+  #endif
+
   this->connections.push_back(
       gui::model::Events::ConnectSaveModel(
       boost::bind(&ModelTreeWidget::OnSaveModel, this, _1)));
