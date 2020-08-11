@@ -29,12 +29,6 @@
               <uri>file://media/models/box-assimp-3.dae</uri>
             </mesh>
           </geometry>
-          <!-- <material> -->
-          <!--   <script> -->
-          <!--     <uri>file://media/materials/scripts/gazebo.material</uri> -->
-          <!--     <name>Gazebo/Red</name> -->
-          <!--   </script> -->
-          <!-- </material> -->
         </visual>
         <visual name="visual-assimp-4">
           <pose>0 -5 0.5 0 0 0</pose>
@@ -43,12 +37,6 @@
               <uri>file://media/models/box-assimp-4.dae</uri>
             </mesh>
           </geometry>
-          <!-- <material> -->
-          <!--   <script> -->
-          <!--     <uri>file://media/materials/scripts/gazebo.material</uri> -->
-          <!--     <name>Gazebo/Red</name> -->
-          <!--   </script> -->
-          <!-- </material> -->
         </visual>
       </link>
     </model>
