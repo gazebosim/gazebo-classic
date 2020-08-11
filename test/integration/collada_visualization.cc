@@ -50,5 +50,35 @@ void ColladaVisualization::MultipleTextureCoordinates()
   delete mainWindow;
 }
 
+/////////////////////////////////////////////////
+void ColladaVisualization::AssimpVersion4MultipleInputWithSameOffset()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/multiple_input_with_same_offset_test.world",
+             false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // There should be two triangles.
+  QCOMPARE(cam->TriangleCount(), 24u);
+
+  mainWindow->close();
+  delete mainWindow;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ColladaVisualization)

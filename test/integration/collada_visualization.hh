@@ -28,6 +28,10 @@ class ColladaVisualization : public QTestFixture
   /// \brief Test loading a collada mesh that has multiple texture
   /// coordinates
   private slots: void MultipleTextureCoordinates();
+
+  /// \brief Test loading a collada mesh that has multiple inputs
+  /// with same offset, see https://github.com/osrf/gazebo/issues/2682
+  void AssimpVersion4MultipleInputWithSameOffset();
 };
 
 #endif
