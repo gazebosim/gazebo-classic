@@ -53,7 +53,6 @@ set (gtest_sources
   LogPlay_TEST.cc
   LogRecord_TEST.cc
   OpenAL_TEST.cc
-  system.hh
 )
 
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_util)
