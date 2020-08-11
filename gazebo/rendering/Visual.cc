@@ -2146,7 +2146,7 @@ ignition::math::AxisAlignedBox Visual::BoundingBox() const
   ignition::math::AxisAlignedBox box(
       ignition::math::Vector3d::Zero,
       ignition::math::Vector3d::Zero);
-
+  this->BoundsHelper(this->GetSceneNode(), box);
   return box;
 }
 
