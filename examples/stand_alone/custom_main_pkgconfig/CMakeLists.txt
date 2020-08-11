@@ -12,3 +12,9 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 
 add_executable(custom_main custom_main.cc)
 target_link_libraries(custom_main ${GAZEBO_LIBRARIES})
+
+if(${CMAKE_VERSION} VERSION_LESS "3.13.0") 
+  link_directories(${Boost_LIBRARY_DIRS})
+else()
+  target_link_directories(custom_main PUBLIC ${Boost_LIBRARY_DIRS})
+endif()

@@ -15,6 +15,8 @@
  *
 */
 
+#include <boost/version.hpp>
+
 #include <ignition/math/Color.hh>
 
 #include "gazebo/rendering/Material.hh"
@@ -82,6 +84,10 @@ void SchematicViewWidget::Reset()
 /////////////////////////////////////////////////
 void SchematicViewWidget::Init()
 {
+  #if BOOST_VERSION >= 107300
+  using namespace boost::placeholders;
+  #endif
+
   this->connections.push_back(gui::model::Events::ConnectLinkInserted(
       boost::bind(&SchematicViewWidget::AddNode, this, _1)));
 
