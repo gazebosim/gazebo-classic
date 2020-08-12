@@ -38,7 +38,7 @@
 #include <ignition/msgs/stringmsg.pb.h>
 
 #include "ignition/common/Profiler.hh"
-#include <ignition/common/URI.hh>
+#include "ignition/common/URI.hh"
 #include "gazebo/common/FuelModelDatabase.hh"
 
 #include "gazebo/transport/Node.hh"

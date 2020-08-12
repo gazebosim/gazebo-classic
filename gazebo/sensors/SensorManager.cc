@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include "ignition/common/Profiler.hh"
 
 #include <functional>
 #include <boost/bind.hpp>
@@ -29,6 +28,8 @@
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/util/LogPlay.hh"
+
+#include "ignition/common/Profiler.hh"
 
 using namespace gazebo;
 using namespace sensors;
