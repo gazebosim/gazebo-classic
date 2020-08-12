@@ -3694,11 +3694,13 @@ void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
     {
       this->SetShaderType("pixel");
     }
-    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+    else if (_msg.shader_type() ==
+        msgs::Material::NORMAL_MAP_OBJECT_SPACE)
     {
       this->SetShaderType("normal_map_object_space");
     }
-    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+    else if (_msg.shader_type() ==
+        msgs::Material::NORMAL_MAP_TANGENT_SPACE)
     {
       this->SetShaderType("normal_map_tangent_space");
     }
@@ -3708,9 +3710,7 @@ void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
     }
 
     if (_msg.has_normal_map())
-    {
       this->SetNormalMap(_msg.normal_map());
-    }
   }
 }
 

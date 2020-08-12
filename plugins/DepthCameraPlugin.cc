@@ -24,8 +24,9 @@ GZ_REGISTER_SENSOR_PLUGIN(DepthCameraPlugin)
 
 // Added this map to avoid breaking the ABI
 static std::map<DepthCameraPlugin*, event::ConnectionPtr>
+                                                connection_reflectance_map;
+static std::map<DepthCameraPlugin*, event::ConnectionPtr>
                                                 connection_normals_map;
-
 /////////////////////////////////////////////////
 DepthCameraPlugin::DepthCameraPlugin()
 : SensorPlugin(), width(0), height(0), depth(0)
@@ -40,6 +41,9 @@ DepthCameraPlugin::~DepthCameraPlugin()
   this->newImageFrameConnection.reset();
 
   std::map<DepthCameraPlugin*, event::ConnectionPtr>::iterator it;
+  it = connection_reflectance_map.find(this);
+  it->second.reset();
+  connection_reflectance_map.erase(it);
   it = connection_normals_map.find(this);
   it->second.reset();
   connection_normals_map.erase(it);
@@ -81,6 +85,17 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
       std::bind(&DepthCameraPlugin::OnNewImageFrame,
         this, std::placeholders::_1, std::placeholders::_2,
         std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+
+  event::ConnectionPtr newReflectanceFrameConnection =
+    this->depthCamera->ConnectNewReflectanceFrame(
+            std::bind(&DepthCameraPlugin::OnNewReflectanceFrame,
+            this, std::placeholders::_1, std::placeholders::_2,
+            std::placeholders::_3, std::placeholders::_4,
+            std::placeholders::_5));
+
+  connection_reflectance_map.
+        insert(std::pair<DepthCameraPlugin*, event::ConnectionPtr>
+               (this, newReflectanceFrameConnection));
 
   event::ConnectionPtr newNormalsFrameConnection =
     this->depthCamera->ConnectNewNormalsPointCloud(
@@ -140,6 +155,15 @@ void DepthCameraPlugin::OnNewImageFrame(const unsigned char * /*_image*/,
     this->height, this->depth, this->format,
     "/tmp/depthCamera/me.jpg");
     */
+}
+
+/////////////////////////////////////////////////
+void DepthCameraPlugin::OnNewReflectanceFrame(const float * /*_normals*/,
+                              unsigned int  /*_width*/,
+                              unsigned int /*_height*/,
+                              unsigned int /*_depth*/,
+                              const std::string &/*_format*/)
+{
 }
 
 /////////////////////////////////////////////////

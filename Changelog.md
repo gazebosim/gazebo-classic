@@ -352,10 +352,53 @@
 
 ## Gazebo 9
 
-## Gazebo 9.XX.X (2020-XX-XX)
+## Gazebo 9.xx.x (202x-xx-xx)
+
+## Gazebo 9.13.2 (202x-xx-xx)
+
+1. Fix sensor update rate throttling when new sensors are spawned
+    * [Pull request #2784](https://github.com/osrf/gazebo/pull/2784)
+
+1. Fix crash when collision size is zero
+    * [Pull request #2768](https://github.com/osrf/gazebo/pull/2768)
+
+1. LensFlare: initialize OGRE compositors during plugin initialization
+    * [Pull request #2764](https://github.com/osrf/gazebo/pull/2764)
+
+1. Fix pkg-config boost entries for Ubuntu Focal
+    * [Pull request #2751](https://github.com/osrf/gazebo/pull/2751)
+
+1. Fixes for ARM: FindSSE, TrackedVehiclePlugin and PluginInterfaceTest
+    * [Pull request #2754](https://github.com/osrf/gazebo/pull/2754)
+    * [Pull request #2748](https://github.com/osrf/gazebo/pull/2748)
+
+## Gazebo 9.13.1 (2020-05-28)
+
+1. Fix multiple reflectance maps and improve performance
+    * [Pull request #2742](https://github.com/osrf/gazebo/pull/2742)
+
+## Gazebo 9.13.0 (2020-04-03)
+
+1. Use target based compile options to specify C++ standard
+    * [BitBucket pull request 3199](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3199)
+
+1. Add SetHeight method to HeightmapShape class
+    * [BitBucket pull request 3210](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3210)
+
+1. Added GAZEBO\_VISIBLE for WheelTrackedVehiclePlugin
+    * [BitBucket pull request 3211](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3211)
+
+1. Fix bounding box calculation for visuals that have links with pose offset
+    * [BitBucket pull request 3196](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3196)
+
+1. Added reflectance to depth camera sensor
+    * [BitBucket pull request 3194](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3194/)
 
 1. Fix problem with automoc in CMake 3.17
     * [BitBucket pull request 3206](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3206/)
+
+1. Fix macOS gui examples compilation
+    * [BitBucket pull request 3209](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3209/)
 
 1. Added normals to depth camera sensor
     * [BitBucket pull request 3193](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3193/)

@@ -1521,7 +1521,7 @@ New optional dependencies: `ign-fuel-tools`,`ign-common1`
 
 1. **gz log**
    Gazebo log files no longer store velocity data and have reduced floating point precision.
-   See [BitBucket pull request 2715](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/2715/)
+   See [BitBucket pull request 2715](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/2715/add-log-record-filter-options)
    for further details.
 
 ## Gazebo 7.3.1 to 7.X
