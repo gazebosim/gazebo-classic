@@ -42,6 +42,8 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
 
+#include "ignition/fuel_tools/Interface.hh"
+
 using namespace gazebo;
 
 #ifdef _WIN32
@@ -152,7 +154,21 @@ void common::add_search_path_suffix(const std::string &_suffix)
 /////////////////////////////////////////////////
 std::string common::find_file(const std::string &_file)
 {
-  return common::SystemPaths::Instance()->FindFile(_file, true);
+  std::string path = common::SystemPaths::Instance()->FindFile(_file, true);
+  if (path.empty())
+  {
+    gzwarn << "Trying to find the model in Fuel [" << _file << "]" << std::endl;
+    path = ignition::fuel_tools::fetchResource(_file);
+    if (path.empty())
+    {
+      gzwarn << "Not able to download or find the model [" << _file << "]" << std::endl;
+    }
+    else
+    {
+      gzwarn << "Model ready to use [" << _file << "]" << std::endl;
+    }
+  }
+  return path;
 }
 
 /////////////////////////////////////////////////
