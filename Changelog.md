@@ -1,18 +1,58 @@
 ## Gazebo 11
 
-## Gazebo 11.x.x (202x-xx-xx)
+## Gazebo 11.1.0 (2020-08-12)
+
+1. Enable DART support in gazebo11 .deb packages
+    * [Issue #2752](https://github.com/osrf/gazebo/issues/2752)
+
+1. LensFlare: initialize OGRE compositors during plugin initialization
+    * [Pull request #2764](https://github.com/osrf/gazebo/pull/2764)
+
+1. Add gazebo common profiler
+    * [Pull request #2776](https://github.com/osrf/gazebo/pull/2776)
 
 1. Fix pkg-config boost entries for Ubuntu Focal
     * [Pull request #2797](https://github.com/osrf/gazebo/pull/2797)
 
-1. Fix corruption when a URDF file is included from a SDFormat 1.6 model #2734
+1. Fix corruption when a URDF file is included from a SDFormat 1.6 model
     * [Pull request 2734](https://github.com/osrf/gazebo/pull/2734)
 
 1. Preserve GAZEBO_MASTER_URI if set before setup.sh
     * [GitHub pull request 2737](https://github.com/osrf/gazebo/pull/2737)
 
+1. Fix sensor update rate throttling when new sensors are spawned
+    * [Pull request #2784](https://github.com/osrf/gazebo/pull/2784)
+
+1. Fix crash when collision size is zero
+    * [Pull request #2768](https://github.com/osrf/gazebo/pull/2768)
+
+1. LensFlare: initialize OGRE compositors during plugin initialization
+    * [Pull request #2764](https://github.com/osrf/gazebo/pull/2764)
+
+1. Fix pkg-config boost entries for Ubuntu Focal
+    * [Pull request #2751](https://github.com/osrf/gazebo/pull/2751)
+
+1. Fixes for ARM: FindSSE, TrackedVehiclePlugin and PluginInterfaceTest
+    * [Pull request #2754](https://github.com/osrf/gazebo/pull/2754)
+    * [Pull request #2748](https://github.com/osrf/gazebo/pull/2748)
+
+1. Fix multiple reflectance maps and improve performance
+    * [Pull request #2742](https://github.com/osrf/gazebo/pull/2742)
+
+1. Fixed fails for OSX: Added using namespace boost::placeholders
+    * [Pull request #2809](https://github.com/osrf/gazebo/pull/2809)
+
+1. Add SetHeight method to HeightmapShape class
+    * [BitBucket pull request 3210](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3210)
+
 1. Fix problem with automoc in CMake 3.17
     * [BitBucket pull request 3201](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3201/)
+
+1. Fix bounding box calculation for visuals that have links with pose offset
+    * [BitBucket pull request 3196](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3196)
+
+1. Added reflectance to depth camera sensor
+    * [BitBucket pull request 3194](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3194/)
 
 1. Added normals to depth camera sensor
     * [BitBucket pull request 3193](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3193/)
