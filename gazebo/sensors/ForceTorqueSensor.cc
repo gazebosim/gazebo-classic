@@ -16,6 +16,8 @@
 */
 #include <boost/algorithm/string.hpp>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Joint.hh"
@@ -200,6 +202,9 @@ ignition::math::Vector3d ForceTorqueSensor::Torque() const
 //////////////////////////////////////////////////
 bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
 {
+  IGN_PROFILE("ForceTorqueSensor::UpdateImpl");
+  IGN_PROFILE_BEGIN("Update");
+
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   this->lastMeasurementTime = this->world->SimTime();
@@ -259,6 +264,9 @@ bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
     }
   }
 
+  IGN_PROFILE_END();
+  IGN_PROFILE_BEGIN("Publish");
+
   msgs::Set(this->dataPtr->wrenchMsg.mutable_wrench()->mutable_force(),
       measuredForce);
   msgs::Set(this->dataPtr->wrenchMsg.mutable_wrench()->mutable_torque(),
@@ -268,6 +276,7 @@ bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
 
   if (this->dataPtr->wrenchPub)
     this->dataPtr->wrenchPub->Publish(this->dataPtr->wrenchMsg);
+  IGN_PROFILE_END();
 
   return true;
 }

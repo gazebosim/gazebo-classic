@@ -16,6 +16,8 @@
 */
 #include <functional>
 
+#include "ignition/common/Profiler.hh"
+
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/rendering/DepthCamera.hh"
@@ -100,6 +102,8 @@ void DepthCameraSensor::Init()
         this->Name() + "_RttTex_Image");
     this->dataPtr->depthCamera->CreateDepthTexture(
         this->Name() + "_RttTex_Depth");
+    this->dataPtr->depthCamera->CreateReflectanceTexture(
+        this->Name() + "_RttTex_Reflectance");
     this->dataPtr->depthCamera->CreateNormalsTexture(
         this->Name() + "_RttTex_Normals");
 
@@ -132,10 +136,15 @@ void DepthCameraSensor::Init()
 //////////////////////////////////////////////////
 bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
 {
+  IGN_PROFILE("DepthCameraSensor::UpdateImpl");
   if (!this->Rendered())
     return false;
 
+  IGN_PROFILE_BEGIN("PostRender");
   this->camera->PostRender();
+  IGN_PROFILE_END();
+
+  IGN_PROFILE_BEGIN("fillarray");
 
   if (this->imagePub && this->imagePub->HasConnections() &&
       // check if depth data is available. If not, the depth camera could be
@@ -180,6 +189,7 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
   }
 
   this->SetRendered(false);
+  IGN_PROFILE_END();
   return true;
 }
 

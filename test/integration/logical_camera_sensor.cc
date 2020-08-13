@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/common/Timer.hh"
+
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/sensors/LogicalCameraSensor.hh"
 
@@ -24,6 +26,12 @@ using namespace gazebo;
 class LogicalCameraSensor : public ServerFixture
 {
 };
+
+/////////////////////////////////////////////////
+void OnNewUpdate(int* _msgCounter)
+{
+  *_msgCounter += 1;
+}
 
 /////////////////////////////////////////////////
 TEST_F(LogicalCameraSensor, GroundPlane)
@@ -153,6 +161,55 @@ TEST_F(LogicalCameraSensor, NestedModels)
   // We should now detect the nested model
   ASSERT_EQ(1, cam->Image().model_size());
   EXPECT_EQ("base_target::nested_target", cam->Image().model(0).name());
+}
+
+/////////////////////////////////////////////////
+TEST_F(LogicalCameraSensor, StrictUpdateRate)
+{
+  LoadArgs(" --lockstep worlds/logical_camera_strict_rate.world");
+
+  // Wait until the sensors have been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
+  std::string cameraName = "logical_camera_sensor";
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::LogicalCameraSensorPtr logCamSensor =
+    std::dynamic_pointer_cast<sensors::LogicalCameraSensor>(sensor);
+  ASSERT_TRUE(logCamSensor != NULL);
+
+  int msgCount = 0;
+  event::ConnectionPtr c = logCamSensor->ConnectUpdated(
+        std::bind(&::OnNewUpdate, &msgCount));
+  common::Timer timer;
+  timer.Start();
+
+  // how many msgs produced for 5 seconds (in simulated clock domain)
+  double updateRate = logCamSensor->UpdateRate();
+  int totalMsgs = 5 * updateRate;
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  double simT0 = 0.0;
+
+  while (msgCount < totalMsgs)
+  {
+    // An approximation of when we receive the first image. In reality one
+    // iteration before we receive the second image.
+    if (msgCount == 0)
+    {
+      simT0 = world->SimTime().Double();
+    }
+    common::Time::MSleep(1);
+  }
+
+  // check that the obtained rate is the one expected
+  double dt = world->SimTime().Double() - simT0;
+  double rate = static_cast<double>(totalMsgs) / dt;
+  gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
+  const double tolerance = 0.02;
+  EXPECT_GT(rate, updateRate * (1 - tolerance));
+  EXPECT_LT(rate, updateRate * (1 + tolerance));
+  c.reset();
 }
 
 /////////////////////////////////////////////////

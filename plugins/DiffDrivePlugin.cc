@@ -17,6 +17,7 @@
 
 #include <functional>
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/AxisAlignedBox.hh>
 
 #include "gazebo/physics/physics.hh"
@@ -99,6 +100,9 @@ void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 /////////////////////////////////////////////////
 void DiffDrivePlugin::OnUpdate()
 {
+  IGN_PROFILE("DiffDrivePlugin::OnUpdate");
+  IGN_PROFILE_BEGIN("Update");
+
   /* double d1, d2;
   double dr, da;
 
@@ -119,4 +123,5 @@ void DiffDrivePlugin::OnUpdate()
 
   this->leftJoint->SetVelocity(0, leftVelDesired);
   this->rightJoint->SetVelocity(0, rightVelDesired);
+  IGN_PROFILE_END();
 }

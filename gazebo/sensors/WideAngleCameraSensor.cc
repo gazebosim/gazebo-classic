@@ -19,6 +19,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Image.hh"
@@ -140,7 +142,7 @@ void WideAngleCameraSensor::Init()
 //////////////////////////////////////////////////
 void WideAngleCameraSensor::Load(const std::string &_worldName)
 {
-  Sensor::Load(_worldName);
+  CameraSensor::Load(_worldName);
   this->imagePub = this->node->Advertise<msgs::ImageStamped>(
       this->Topic(), 50);
 
@@ -177,8 +179,14 @@ void WideAngleCameraSensor::Fini()
 //////////////////////////////////////////////////
 bool WideAngleCameraSensor::UpdateImpl(const bool _force)
 {
+  IGN_PROFILE("WideAngleCameraSensor::UpdateImpl");
+  IGN_PROFILE_BEGIN("Update");
+
   if (!CameraSensor::UpdateImpl(_force))
+  {
+    IGN_PROFILE_END();
     return false;
+  }
 
   if (this->dataPtr->lensPub && this->dataPtr->lensPub->HasConnections())
   {
@@ -215,6 +223,7 @@ bool WideAngleCameraSensor::UpdateImpl(const bool _force)
 
     this->dataPtr->lensPub->Publish(msg);
   }
+  IGN_PROFILE_END();
 
   return true;
 }

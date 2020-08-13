@@ -185,6 +185,10 @@ namespace gazebo
       /// \return the timestamp
       public: virtual double NextRequiredTimestamp() const;
 
+      /// \brief Returns true if the sensor is to follow strict update rate
+      /// \return True when sensor should follow strict update rate
+      public: bool StrictRate() const;
+
       /// \brief This gets overwritten by derived sensor types.
       ///        This function is called during Sensor::Update.
       ///        And in turn, Sensor::Update is called by
@@ -200,6 +204,13 @@ namespace gazebo
       /// \brief Load a plugin for this sensor.
       /// \param[in] _sdf SDF parameters.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
+
+      /// \brief Whether to enforce strict sensor update rate, even if physics
+      ///        time has to slow down to wait for sensor updates to satisfy
+      ///        the desired rate.
+      /// \details static type to avoid breaking ABI and because lockstep
+      ///          setting is global.
+      protected: static bool useStrictRate;
 
       /// \brief True if sensor generation is active.
       protected: bool active;

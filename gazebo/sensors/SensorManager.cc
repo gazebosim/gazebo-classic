@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include "ignition/common/Profiler.hh"
+
 #include <functional>
 #include <boost/bind.hpp>
 #include "gazebo/common/Assert.hh"
@@ -34,6 +36,10 @@ using namespace sensors;
 /// \brief A mutex used by SensorContainer and SimTimeEventHandler
 /// for timing coordination.
 boost::mutex g_sensorTimingMutex;
+
+/// \brief Flag to indicate if number of sensors has changed and that the
+/// max update rate needs to be recalculated
+bool g_sensorsDirty = true;
 
 //////////////////////////////////////////////////
 SensorManager::SensorManager()
@@ -106,6 +112,20 @@ bool SensorManager::Running() const
       return true;
   }
   return false;
+}
+
+//////////////////////////////////////////////////
+void SensorManager::WaitForSensors(double _clk, double _dt)
+{
+  double tnext = this->NextRequiredTimestamp();
+
+  while (!std::isnan(tnext)
+      && ignition::math::lessOrNearEqual(tnext - _dt / 2.0, _clk)
+      && physics::worlds_running())
+  {
+    this->WaitForPrerendered(0.001);
+    tnext = this->NextRequiredTimestamp();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -206,6 +226,27 @@ void SensorManager::ResetLastUpdateTimes()
 }
 
 //////////////////////////////////////////////////
+double SensorManager::NextRequiredTimestamp()
+{
+  double rv = std::numeric_limits<double>::quiet_NaN();
+
+  // scan all sensors whose category is IMAGE
+  for (auto& s : this->sensorContainers[sensors::IMAGE]->sensors)
+  {
+    // skip deactivated sensors
+    if (!s->IsActive()) continue;
+
+    double candidate = s->NextRequiredTimestamp();
+    // take the smallest valid value
+    if (!std::isnan(candidate)
+        && (std::isnan(rv) || rv > candidate))
+      rv = candidate;
+  }
+
+  return rv;
+}
+
+//////////////////////////////////////////////////
 void SensorManager::Init()
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
@@ -297,6 +338,12 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
   // Load the sensor
   sensor->Load(_worldName, _elem);
   this->worlds[_worldName] = physics::get_world(_worldName);
+
+  // Provide the wait function to the given world
+  if (sensor->StrictRate())
+    this->worlds[_worldName]->SetSensorWaitFunc(
+        std::bind(&SensorManager::WaitForSensors, this,
+          std::placeholders::_1, std::placeholders::_2));
 
   // If the SensorManager has not been initialized, then it's okay to push
   // the sensor into one of the sensor vectors because the sensor will get
@@ -404,6 +451,16 @@ void SensorManager::RemoveSensor(const std::string &_name)
     // to ensure correct access to rendering resources.
     this->removeSensors.push_back(sensor->ScopedName());
   }
+}
+
+//////////////////////////////////////////////////
+bool SensorManager::WaitForPrerendered(double _timeoutsec)
+{
+  if (this->sensorContainers[sensors::IMAGE]->sensors.size() > 0)
+    return ((ImageSensorContainer*)this->sensorContainers[sensors::IMAGE])
+                ->WaitForPrerendered(_timeoutsec);
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -528,26 +585,41 @@ void SensorManager::SensorContainer::RunLoop()
       return;
   }
 
+
+  auto computeMaxUpdateRate = [&]()
   {
-    boost::recursive_mutex::scoped_lock lock(this->mutex);
-
-    // Get the minimum update rate from the sensors.
-    for (Sensor_V::iterator iter = this->sensors.begin();
-        iter != this->sensors.end() && !this->stop; ++iter)
     {
-      GZ_ASSERT((*iter) != nullptr, "Sensor is null");
-      maxUpdateRate = std::max((*iter)->UpdateRate(), maxUpdateRate);
-    }
-  }
+      boost::recursive_mutex::scoped_lock lock(this->mutex);
 
-  // Calculate an appropriate sleep time.
-  if (maxUpdateRate > 0)
-    sleepTime.Set(1.0 / (maxUpdateRate));
-  else
-    sleepTime.Set(0, 1e6);
+      if (!g_sensorsDirty)
+        return;
+
+      // Get the minimum update rate from the sensors.
+      for (Sensor_V::iterator iter = this->sensors.begin();
+          iter != this->sensors.end() && !this->stop; ++iter)
+      {
+        GZ_ASSERT((*iter) != nullptr, "Sensor is null");
+        maxUpdateRate = std::max((*iter)->UpdateRate(), maxUpdateRate);
+      }
+
+      g_sensorsDirty = false;
+    }
+
+    // Calculate an appropriate sleep time.
+    if (maxUpdateRate > 0)
+      sleepTime.Set(1.0 / (maxUpdateRate));
+    else
+      sleepTime.Set(0, 1e6);
+  };
+
+  computeMaxUpdateRate();
+
+  IGN_PROFILE_THREAD_NAME("SensorManager");
 
   while (!this->stop)
   {
+    IGN_PROFILE("SensorManager::RunLoop");
+
     // If all the sensors get deleted, wait here.
     // Use a while loop since world resets will notify the runCondition.
     while (this->sensors.empty())
@@ -557,10 +629,14 @@ void SensorManager::SensorContainer::RunLoop()
         return;
     }
 
+    computeMaxUpdateRate();
+
     // Get the start time of the update.
     startTime = world->SimTime();
 
+    IGN_PROFILE_BEGIN("UpdateSensors");
     this->Update(false);
+    IGN_PROFILE_END();
 
     // Compute the time it took to update the sensors.
     // It's possible that the world time was reset during the Update. This
@@ -595,10 +671,12 @@ void SensorManager::SensorContainer::RunLoop()
         eventTime, &this->runCondition);
 
     // This if statement helps prevent deadlock on osx during teardown.
+    IGN_PROFILE_BEGIN("Sleeping");
     if (!this->stop)
     {
       this->runCondition.wait(timingLock);
     }
+    IGN_PROFILE_END();
   }
 }
 
@@ -615,7 +693,9 @@ void SensorManager::SensorContainer::Update(bool _force)
        iter != this->sensors.end(); ++iter)
   {
     GZ_ASSERT((*iter) != nullptr, "Sensor is null");
+    IGN_PROFILE_BEGIN((*iter)->Name().c_str());
     (*iter)->Update(_force);
+    IGN_PROFILE_END();
   }
 }
 
@@ -654,6 +734,7 @@ void SensorManager::SensorContainer::AddSensor(SensorPtr _sensor)
   {
     boost::recursive_mutex::scoped_lock lock(this->mutex);
     this->sensors.push_back(_sensor);
+    g_sensorsDirty = true;
   }
 
   // Tell the run loop that we have received a sensor
@@ -682,6 +763,8 @@ bool SensorManager::SensorContainer::RemoveSensor(const std::string &_name)
       break;
     }
   }
+
+  g_sensorsDirty = true;
 
   return removed;
 }
@@ -718,13 +801,22 @@ void SensorManager::SensorContainer::RemoveSensors()
     (*iter)->Fini();
   }
 
+  g_sensorsDirty = true;
+
   this->sensors.clear();
 }
 
 //////////////////////////////////////////////////
 void SensorManager::ImageSensorContainer::Update(bool _force)
 {
+  // Prerender phase
   event::Events::preRender();
+
+  // Signals end of prerender phase
+  event::Events::preRenderEnded();
+
+  // Notify that prerender is over
+  this->conditionPrerendered.notify_all();
 
   // Tell all the cameras to render
   event::Events::render();
@@ -735,8 +827,16 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
   SensorContainer::Update(_force);
 }
 
-
-
+//////////////////////////////////////////////////
+bool SensorManager::ImageSensorContainer::WaitForPrerendered(double _timeoutsec)
+{
+  std::cv_status ret;
+  std::mutex mtx;
+  std::unique_lock<std::mutex> lck(mtx);
+  ret = this->conditionPrerendered.wait_for(lck,
+      std::chrono::duration<double>(_timeoutsec));
+  return (ret == std::cv_status::no_timeout);
+}
 
 /////////////////////////////////////////////////
 SimTimeEventHandler::SimTimeEventHandler()

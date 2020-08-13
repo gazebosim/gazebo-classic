@@ -30,6 +30,7 @@
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
 /// \brief Explicit instantiation for typed SingletonT.
@@ -105,6 +106,11 @@ namespace gazebo
       /// \param[in] _force True force update, false if not
       public: void Update(bool _force = false);
 
+      /// \brief Amongst all IMAGE sensors, returns the forthcoming timestamp
+      ///          used by one (or several) sensor
+      /// \return the timestamp
+      public: double NextRequiredTimestamp();
+
       /// \brief Init all the sensors
       public: void Init();
 
@@ -172,6 +178,16 @@ namespace gazebo
 
       /// \brief Reset last update times in all sensors.
       public: void ResetLastUpdateTimes();
+
+      /// \brief Block until all sensors do not need current world tick
+      /// \param[in] _clk simulated clock of the world
+      /// \param[in] _dt world time step
+      private: void WaitForSensors(double _clk, double _dt);
+
+      /// \brief Wait until pre-rendering phase is over.
+      /// \param[in] _timeoutsec timeout expressed in seconds
+      /// \return True if timeout has NOT been met
+      private: bool WaitForPrerendered(double _timeoutsec);
 
       /// \brief Add a new sensor to a sensor container.
       /// \param[in] _sensor Pointer to a sensor to add.
@@ -266,6 +282,11 @@ namespace gazebo
       /// the SensorContainer.
       private: class ImageSensorContainer : public SensorContainer
                {
+                 /// \brief Wait until pre-rendering phase is over.
+                 /// \param[in] _timeoutsec timeout expressed in seconds
+                 /// \return True if timeout has NOT been met
+                 public: bool WaitForPrerendered(double _timeoutsec);
+
                  /// \brief The special update for image based sensors.
                  /// \param[in] _force True to force the sensors to update,
                  /// even if they are not active.

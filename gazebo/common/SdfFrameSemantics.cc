@@ -55,17 +55,25 @@ ignition::math::Pose3d resolveSdfPose(const sdf::SemanticPose &_semPose,
   return pose;
 }
 
+bool isSdfFrameSemanticsError(const sdf::Error &_err)
+{
+  switch (_err.Code())
+  {
+    case sdf::ErrorCode::FRAME_ATTACHED_TO_INVALID:
+    case sdf::ErrorCode::FRAME_ATTACHED_TO_CYCLE:
+    case sdf::ErrorCode::FRAME_ATTACHED_TO_GRAPH_ERROR:
+    case sdf::ErrorCode::POSE_RELATIVE_TO_INVALID:
+    case sdf::ErrorCode::POSE_RELATIVE_TO_CYCLE:
+    case sdf::ErrorCode::POSE_RELATIVE_TO_GRAPH_ERROR:
+      return true;
+    default:
+      return false;
+  }
+}
+
 /////////////////////////////////////////////////
 void convertPosesToSdf16(const sdf::ElementPtr &_modelElem)
 {
-  ignition::math::SemanticVersion sdfOriginalVersion(
-      _modelElem->OriginalVersion());
-  // sdf < 1.7 does not support frame semantics
-  if (sdfOriginalVersion < ignition::math::SemanticVersion(1, 7))
-  {
-    return;
-  }
-
   // Only <model> is supported right now, <actor> is not supported.
   if (_modelElem->GetName() != "model")
   {
@@ -75,14 +83,17 @@ void convertPosesToSdf16(const sdf::ElementPtr &_modelElem)
   // SDF Model DOM object to be used for resolving poses with frame semantics
   sdf::Model modelSDFDom;
   sdf::Errors errors = modelSDFDom.Load(_modelElem);
-  if (!errors.empty())
+
+  for (const auto &error : errors)
   {
-    for (const auto &error : errors)
+    if (isSdfFrameSemanticsError(error))
     {
       gzerr << error << "\n";
     }
-    return;
   }
+
+  // Continue to try to resolve poses even if there were errors when loading the
+  // model
 
   // Convenience lambda to set the resolved pose on the elementptr if a
   // relative_to attribute is set.

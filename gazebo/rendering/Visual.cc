@@ -812,9 +812,18 @@ void Visual::SetScale(const ignition::math::Vector3d &_scale)
 
   this->dataPtr->scale = _scale;
 
-  this->dataPtr->sceneNode->setScale(
-      Conversions::Convert(this->dataPtr->scale));
-
+  if (!ignition::math::isnan(this->dataPtr->scale.X())
+      && !ignition::math::isnan(this->dataPtr->scale.Y())
+      && !ignition::math::isnan(this->dataPtr->scale.Z()))
+  {
+    this->dataPtr->sceneNode->setScale(
+        Conversions::Convert(this->dataPtr->scale));
+  }
+  else
+  {
+    gzerr << Name() << ": Size of the collision contains one or several zeros."
+      << " Collisions may not visualize properly." << std::endl;
+  }
   // Scale selection object in case we have one attached. Other children were
   // scaled from UpdateGeomSize
   for (auto child : this->dataPtr->children)
@@ -3687,11 +3696,13 @@ void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
     {
       this->SetShaderType("pixel");
     }
-    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+    else if (_msg.shader_type() ==
+        msgs::Material::NORMAL_MAP_OBJECT_SPACE)
     {
       this->SetShaderType("normal_map_object_space");
     }
-    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+    else if (_msg.shader_type() ==
+        msgs::Material::NORMAL_MAP_TANGENT_SPACE)
     {
       this->SetShaderType("normal_map_tangent_space");
     }
@@ -3701,9 +3712,7 @@ void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
     }
 
     if (_msg.has_normal_map())
-    {
       this->SetNormalMap(_msg.normal_map());
-    }
   }
 }
 

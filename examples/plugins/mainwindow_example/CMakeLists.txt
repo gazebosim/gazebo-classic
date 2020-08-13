@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
+if(POLICY CMP0100)
+  cmake_policy(SET CMP0100 NEW)
+endif()
+
 find_package (Qt5Core REQUIRED)
 find_package (Qt5Widgets REQUIRED)
 set (CMAKE_AUTOMOC ON)

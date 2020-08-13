@@ -38,6 +38,7 @@ EventT<void ()> Events::worldReset;
 EventT<void ()> Events::timeReset;
 
 EventT<void ()> Events::preRender;
+EventT<void ()> Events::preRenderEnded;
 EventT<void ()> Events::render;
 EventT<void ()> Events::postRender;
 

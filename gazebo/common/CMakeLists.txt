@@ -242,6 +242,7 @@ target_link_libraries(gazebo_common
     ignition-common3::graphics
     ${IGNITION-FUEL_TOOLS_LIBRARIES}
     ${IGNITION-MATH_LIBRARIES}
+    ${IGNITION-COMMON_LIBRARIES}
     ${libdl_library}
     ${libtar_LIBRARIES}
     ${SDFormat_LIBRARIES}

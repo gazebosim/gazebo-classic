@@ -41,6 +41,7 @@ class ContactSensor : public ServerFixture,
   public: void MultipleSensors(const std::string &_physicsEngine);
   public: void StackTest(const std::string &_physicsEngine);
   public: void TorqueTest(const std::string &_physicsEngine);
+  public: void StrictUpdateRateTest(const std::string &_physicsEngine);
 
   /// \brief Callback for sensor subscribers in MultipleSensors test.
   private: void Callback(const ConstContactsPtr &_msg);
@@ -683,6 +684,63 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 TEST_P(ContactSensor, TorqueTest)
 {
   TorqueTest(GetParam());
+}
+
+////////////////////////////////////////////////////////////////////////
+// Test strict update rate of contact sensor.
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::StrictUpdateRateTest(const std::string &_physicsEngine)
+{
+  LoadArgs(" --lockstep -u -e " + _physicsEngine +
+      " worlds/contact_strict_rate.world");
+
+  // Wait until the sensors have been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
+  std::string contactSensorName = "sensor_contact";
+  sensors::SensorPtr sensor = sensors::get_sensor(contactSensorName);
+  sensors::ContactSensorPtr contactSensor =
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
+  ASSERT_TRUE(contactSensor != NULL);
+
+  g_messageCount = 0;
+  transport::SubscriberPtr sub = this->node->Subscribe(
+      "/gazebo/world_1/physics/contacts", &ContactSensor::Callback, this);
+  common::Timer timer;
+  SetPause(false);
+  timer.Start();
+
+  // how many msgs produced for 5 seconds (in simulated clock domain)
+  double updateRate = contactSensor->UpdateRate();
+  unsigned int totalMsgs = 5 * updateRate;
+  physics::WorldPtr world = physics::get_world("world_1");
+  ASSERT_TRUE(world != NULL);
+  double simT0 = 0.0;
+
+  while (g_messageCount < totalMsgs)
+  {
+    // An approximation of when we receive the first image. In reality one
+    // iteration before we receive the second image.
+    if (g_messageCount == 0)
+    {
+      simT0 = world->SimTime().Double();
+    }
+    common::Time::MSleep(1);
+  }
+
+  // check that the obtained rate is the one expected
+  double dt = world->SimTime().Double() - simT0;
+  double rate = static_cast<double>(totalMsgs) / dt;
+  gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
+  const double tolerance = 0.02;
+  EXPECT_GT(rate, updateRate * (1 - tolerance));
+  EXPECT_LT(rate, updateRate * (1 + tolerance));
+}
+
+TEST_P(ContactSensor, StrictUpdateRateTest)
+{
+  StrictUpdateRateTest(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, ContactSensor, PHYSICS_ENGINE_VALUES,);  // NOLINT

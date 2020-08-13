@@ -36,6 +36,7 @@
 #include <ignition/msgs/plugin_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
 
+#include "ignition/common/Profiler.hh"
 #include <ignition/common/URI.hh>
 #include "gazebo/common/FuelModelDatabase.hh"
 
@@ -52,6 +53,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/common/SdfFrameSemantics.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/URI.hh"
 
@@ -159,6 +161,8 @@ World::World(const std::string &_name)
      event::Events::ConnectPause(
        std::bind(&World::SetPaused, this, std::placeholders::_1)));
 
+  this->dataPtr->waitForSensors = nullptr;
+
   // Make sure dbs are initialized
   common::ModelDatabase::Instance();
   common::FuelModelDatabase::Instance();
@@ -178,14 +182,13 @@ void World::Load(sdf::ElementPtr _sdf)
 
   // Create a DOM object to compute the resolved initial pose (with frame
   // semantics)
-  ignition::math::SemanticVersion sdfOriginalVersion(_sdf->OriginalVersion());
-  if (sdfOriginalVersion >= ignition::math::SemanticVersion(1, 7))
-  {
-    this->dataPtr->worldSDFDom = std::make_unique<sdf::World>();
-    sdf::Errors errors = this->dataPtr->worldSDFDom->Load(_sdf);
+  this->dataPtr->worldSDFDom = std::make_unique<sdf::World>();
+  sdf::Errors errors = this->dataPtr->worldSDFDom->Load(_sdf);
 
-    // Print errors and load the parts that worked.
-    for (const auto &error : errors)
+  // Print errors and load the parts that worked.
+  for (const auto &error : errors)
+  {
+    if (common::isSdfFrameSemanticsError(error))
     {
       gzerr << error << "\n";
     }
@@ -663,11 +666,19 @@ bool World::SensorsInitialized() const
   return this->dataPtr->sensorsInitialized;
 }
 
+/////////////////////////////////////////////////
+void World::SetSensorWaitFunc(std::function<void(double, double)> _func)
+{
+  this->dataPtr->waitForSensors = _func;
+}
+
 //////////////////////////////////////////////////
 void World::Step()
 {
   DIAG_TIMER_START("World::Step");
 
+  IGN_PROFILE("World::Step");
+  IGN_PROFILE_BEGIN("loadPlugins");
   /// need this because ODE does not call dxReallocateWorldProcessContext()
   /// until dWorld.*Step
   /// Plugins that manipulate joints (and probably other properties) require
@@ -678,12 +689,20 @@ void World::Step()
     this->dataPtr->pluginsLoaded = true;
   }
 
+  IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Step", "loadPlugins");
 
+  IGN_PROFILE_BEGIN("publishWorldStats");
   // Send statistics about the world simulation
   this->PublishWorldStats();
+  IGN_PROFILE_END();
 
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
+
+  IGN_PROFILE_BEGIN("sleepOffset");
+  if (this->dataPtr->waitForSensors)
+    this->dataPtr->waitForSensors(this->dataPtr->simTime.Double(),
+        this->dataPtr->physicsEngine->GetMaxStepSize());
 
   double updatePeriod = this->dataPtr->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
@@ -704,8 +723,10 @@ void World::Step()
   this->dataPtr->sleepOffset = (actualSleep - sleepTime) * 0.01 +
                       this->dataPtr->sleepOffset * 0.99;
 
+  IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Step", "sleepOffset");
 
+  IGN_PROFILE_BEGIN("worldUpdateMutex");
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
   if (common::Time::GetWallTime() - this->dataPtr->prevStepWallTime +
@@ -740,6 +761,9 @@ void World::Step()
       this->dataPtr->pauseTime += stepTime;
     }
   }
+  IGN_PROFILE_END();
+
+  IGN_PROFILE_BEGIN("Step");
 
   gazebo::util::IntrospectionManager::Instance()->NotifyUpdates();
 
@@ -749,6 +773,7 @@ void World::Step()
 
   if (g_clearModels)
     this->ClearModels();
+  IGN_PROFILE_END();
 }
 
 //////////////////////////////////////////////////
@@ -781,6 +806,8 @@ void World::Update()
 {
   DIAG_TIMER_START("World::Update");
 
+  IGN_PROFILE("World::Update");
+  IGN_PROFILE_BEGIN("needsReset");
   if (this->dataPtr->needsReset)
   {
     if (this->dataPtr->resetAll)
@@ -792,24 +819,29 @@ void World::Update()
     this->dataPtr->needsReset = false;
     return;
   }
+  IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "needsReset");
 
+  IGN_PROFILE_BEGIN("worldUpdateBegin");
   this->dataPtr->updateInfo.simTime = this->SimTime();
   this->dataPtr->updateInfo.realTime = this->RealTime();
   event::Events::worldUpdateBegin(this->dataPtr->updateInfo);
-
+  IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "Events::worldUpdateBegin");
 
+  IGN_PROFILE_BEGIN("Update");
   // Update all the models
   (*this.*dataPtr->modelUpdateFunc)();
-
+  IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "Model::Update");
 
+  IGN_PROFILE_BEGIN("UpdateCollision");
   // This must be called before PhysicsEngine::UpdatePhysics for ODE.
   this->dataPtr->physicsEngine->UpdateCollision();
-
+  IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
 
+  IGN_PROFILE_BEGIN("beforePhysicsUpdate");
   // Wait for logging to finish, if it's running.
   if (util::LogRecord::Instance()->Running())
   {
@@ -830,20 +862,24 @@ void World::Update()
   this->dataPtr->updateInfo.realTime = this->RealTime();
   event::Events::beforePhysicsUpdate(this->dataPtr->updateInfo);
 
+  IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "Events::beforePhysicsUpdate");
 
   // Update the physics engine
   if (this->dataPtr->enablePhysicsEngine && this->dataPtr->physicsEngine)
   {
+    IGN_PROFILE_BEGIN("UpdatePhysics");
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->dataPtr->physicsEngine->UpdatePhysics();
 
+    IGN_PROFILE_END();
     DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdatePhysics");
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
     //           and we need to propagate it into Entity::worldPose
     {
+      IGN_PROFILE_BEGIN("SetWorldPose(dirtyPoses)");
       // block any other pose updates (e.g. Joint::SetPosition)
       boost::recursive_mutex::scoped_lock plock(
           *this->Physics()->GetPhysicsUpdateMutex());
@@ -854,19 +890,24 @@ void World::Update()
       }
 
       this->dataPtr->dirtyPoses.clear();
+      IGN_PROFILE_END();
     }
 
     DIAG_TIMER_LAP("World::Update", "SetWorldPose(dirtyPoses)");
   }
 
+  IGN_PROFILE_BEGIN("LogRecordNotify");
   // Only update state information if logging data.
   if (util::LogRecord::Instance()->Running())
     this->dataPtr->logCondition.notify_one();
+  IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "LogRecordNotify");
 
+  IGN_PROFILE_BEGIN("PublishContacts");
   // Output the contact information
   this->dataPtr->physicsEngine->GetContactManager()->PublishContacts();
 
+  IGN_PROFILE_END();
   DIAG_TIMER_LAP("World::Update", "ContactManager::PublishContacts");
 
   event::Events::worldUpdateEnd();
@@ -2652,7 +2693,7 @@ void World::ProcessMessages()
     if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
       // When ready to use the direct API for updating scene poses from server,
       // uncomment the following line:
-      // this->dataPtr->updateScenePoses ||
+         this->dataPtr->updateScenePoses ||
         (this->dataPtr->poseLocalPub &&
          this->dataPtr->poseLocalPub->HasConnections()))
     {
@@ -2720,11 +2761,11 @@ void World::ProcessMessages()
 
       // When ready to use the direct API for updating scene poses from server,
       // uncomment the following lines:
-      // // Execute callback to export Pose msg
-      // if (this->dataPtr->updateScenePoses)
-      // {
-      //   this->dataPtr->updateScenePoses(this->Name(), msg);
-      // }
+      // Execute callback to export Pose msg
+      if (this->dataPtr->updateScenePoses)
+      {
+        this->dataPtr->updateScenePoses(this->Name(), msg);
+      }
     }
 
     this->dataPtr->publishModelPoses.clear();

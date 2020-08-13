@@ -19,6 +19,7 @@
 #include <tinyxml.h>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <streambuf>
 
 #include <gazebo/common/common.hh>
 #include <gazebo/transport/transport.hh>
@@ -482,7 +483,25 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    return this->ProcessSpawn(sdf, modelName, pose, node);
+    std::string resolvedFileName = filename;
+    if (common::isDirectory(filename))
+    {
+      // Use sdf::getModelFilePath() instead of filename because filename
+      // might be a model rectory
+      resolvedFileName = sdf::getModelFilePath(filename);
+      if (resolvedFileName.empty())
+      {
+        std::cerr << "The provided file is a directory, but a model could not "
+                  << "be found" << std::endl;
+      }
+    }
+    std::ifstream sdfFile(resolvedFileName);
+
+    // Using const std::string sdfString(arg, arg) confuses the compiler, so use
+    // move assignment
+    const auto sdfString = std::string(std::istreambuf_iterator<char>(sdfFile),
+                                       std::istreambuf_iterator<char>());
+    return this->ProcessSpawn(sdfString, modelName, pose, node);
   }
   else if (this->vm.count("spawn-string"))
   {
@@ -509,7 +528,7 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    return this->ProcessSpawn(sdf, modelName, pose, node);
+    return this->ProcessSpawn(sdfString, modelName, pose, node);
   }
   else if (this->vm.count("info") || this->vm.count("pose"))
   {
@@ -549,27 +568,55 @@ bool ModelCommand::RunImpl()
 }
 
 /////////////////////////////////////////////////
-bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
+bool ModelCommand::ProcessSpawn(const std::string &_sdfString,
     const std::string &_name, const ignition::math::Pose3d &_pose,
     transport::NodePtr _node)
 {
-  sdf::ElementPtr modelElem = _sdf->Root()->GetElement("model");
-
-  if (!modelElem)
-  {
-    gzerr << "Unable to find <model> element.\n";
-    return false;
-  }
-
-  // Set the model name
-  if (!_name.empty())
-    modelElem->GetAttribute("name")->SetFromString(_name);
-
   transport::PublisherPtr pub = _node->Advertise<msgs::Factory>("~/factory");
   pub->WaitForConnection();
 
+  // To set the name of the model, we have to parse the file, set the name and
+  // reserialize to SDFormat. However, loading it using libsdformat will result
+  // in upconversion, which we would like to avoid because the resulting
+  // document will lose its OriginalVersion attribute. So, instead, we parse and
+  // edit the model name with TinyXML.
+
+  TiXmlDocument doc;
+  doc.Parse(_sdfString.c_str());
+  auto *root = doc.RootElement();
+  if (nullptr == root)
+  {
+    std::cerr << "Invalid XML file" << std::endl;
+    std::cout << _sdfString << std::endl;
+    return false;
+  }
+
+  // Handle SDFormat and URDF separately
+  if (root->ValueStr() == "sdf")
+  {
+    auto *model = root->FirstChildElement("model");
+    if (nullptr != model)
+    {
+      model->SetAttribute("name", _name);
+    }
+    else
+    {
+      std::cerr << "Could not find <model> tag in SDFormat file" << std::endl;
+    }
+  }
+  else if (root->ValueStr() == "robot")
+  {
+    root->SetAttribute("name", _name);
+  }
+  else
+  {
+    std::cerr << "Unknown file format" << std::endl;
+  }
+
+  TiXmlPrinter printer;
+  doc.Accept(&printer);
   msgs::Factory msg;
-  msg.set_sdf(_sdf->ToString());
+  msg.set_sdf(printer.Str());
   msgs::Set(msg.mutable_pose(), _pose);
   pub->Publish(msg, true);
 

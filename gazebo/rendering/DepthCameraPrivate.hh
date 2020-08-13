@@ -36,6 +36,20 @@ namespace gazebo
 {
   namespace rendering
   {
+    // Forward declare private data.
+    class DepthCameraPrivate;
+    class ReflectanceRenderTargetListener;
+    class ReflectanceMaterialListener;
+    class ReflectanceMaterialSwitcher;
+
+    // typedefs that are used only in this class
+    using ReflectanceRenderTargetListenerPtr =
+        std::shared_ptr<ReflectanceRenderTargetListener>;
+    using ReflectanceMaterialListenerPtr =
+        std::shared_ptr<ReflectanceMaterialListener>;
+    using ReflectanceMaterialSwitcherPtr =
+        std::shared_ptr<ReflectanceMaterialSwitcher>;
+
     /// \internal
     /// \brief Private data for the DepthCameraPrivate class
     class DepthCameraPrivate
@@ -49,11 +63,17 @@ namespace gazebo
       /// \brief True to generate point clouds
       public: bool outputPoints;
 
+      /// \brief True to generate reflectance
+      public: bool outputReflectance;
+
       /// \brief True to generate normals
       public: bool outputNormals;
 
       /// \brief Point cloud data buffer
       public: float *pcdBuffer = nullptr;
+
+      /// \brief reflectance data buffer
+      public: float *reflectanceBuffer = nullptr;
 
       /// \brief Point cloud data buffer
       public: float *normalsBuffer = nullptr;
@@ -64,8 +84,14 @@ namespace gazebo
       /// \brief Point cloud view port
       public: Ogre::Viewport *normalsViewport = nullptr;
 
+      /// \brief reflectance view port
+      public: Ogre::Viewport *reflectanceViewport = nullptr;
+
       /// \brief Point cloud material
       public: Ogre::Material *pcdMaterial = nullptr;
+
+      /// \brief reflectance material
+      public: Ogre::Material *reflectanceMaterial = nullptr;
 
       /// \brief Point cloud material
       public: Ogre::Material *normalsMaterial = nullptr;
@@ -73,11 +99,20 @@ namespace gazebo
       /// \brief Point cloud texture
       public: Ogre::Texture *pcdTexture = nullptr;
 
-      /// \brief Point cloud texture
-      public: Ogre::Texture *normalsTextures = nullptr;
+      /// \brief reflectance texture
+      public: Ogre::Texture *reflectanceTextures = nullptr;
 
       /// \brief Point cloud texture
       public: Ogre::RenderTarget *pcdTarget = nullptr;
+
+      /// \brief reflectance texture
+      public: Ogre::RenderTarget *reflectanceTarget = nullptr;
+
+      /// \brief Pointer to reflectance material switcher.
+      public: ReflectanceMaterialSwitcherPtr reflectanceMaterialSwitcher;
+
+      /// \brief normals texture
+      public: Ogre::Texture *normalsTextures = nullptr;
 
       /// \brief Point cloud texture
       public: Ogre::RenderTarget *normalsTarget = nullptr;
@@ -89,6 +124,10 @@ namespace gazebo
       /// \brief Event used to signal depth data
       public: event::EventT<void(const float *, unsigned int, unsigned int,
                    unsigned int, const std::string &)> newDepthFrame;
+
+      /// \brief Event used to signal reflectance data
+      public: event::EventT<void(const float *, unsigned int, unsigned int,
+                  unsigned int, const std::string &)> newReflectanceFrame;
 
       /// \brief Event used to signal normals point cloud data
       public: event::EventT<void(const float *, unsigned int, unsigned int,
