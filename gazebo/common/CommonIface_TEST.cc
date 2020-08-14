@@ -395,10 +395,40 @@ TEST_F(CommonIface_TEST, fullPathsMesh)
     uriElem->SetFilePath(filePath);
   }
 
+  auto sdfString = modelElem->ToString("");
+
+  // SDF element conversion
   common::convertToFullPaths(modelElem);
 
-  // After conversion
   ASSERT_NE(nullptr, modelElem);
+
+  linkElem = modelElem->GetElement("link");
+  ASSERT_NE(nullptr, linkElem);
+
+  for (auto elemStr : {"collision", "visual"})
+  {
+    auto elem = linkElem->GetElement(elemStr);
+    ASSERT_NE(nullptr, elem);
+
+    auto geometryElem = elem->GetElement("geometry");
+    ASSERT_NE(nullptr, geometryElem);
+
+    auto meshElem = geometryElem->GetElement("mesh");
+    ASSERT_NE(nullptr, meshElem);
+
+    auto uriElem = meshElem->GetElement("uri");
+    ASSERT_NE(nullptr, uriElem);
+
+    EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
+        uriElem->Get<std::string>());
+  }
+
+
+  // SDF string conversion
+  sdfString = "<sdf version='" + std::string(SDF_VERSION) + "'>\n" + sdfString +
+      "\n</sdf>";
+  common::convertToFullPaths(sdfString, modelElem->FilePath());
+  sdf::readString(sdfString, modelElem);
 
   linkElem = modelElem->GetElement("link");
   ASSERT_NE(nullptr, linkElem);

@@ -127,6 +127,9 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
       std::string(std::istreambuf_iterator<char>(inputFile),
                   std::istreambuf_iterator<char>());
 
+  common::convertToFullPaths(this->dataPtr->modelSDFString,
+      this->dataPtr->modelSDF->FilePath());
+
   if (this->dataPtr->modelSDF->Root()->HasElement("model"))
   {
     common::convertPosesToSdf16(

@@ -200,8 +200,19 @@ namespace gazebo
     /// full paths based on the SDF element's file path.
     /// \sa asFullPath
     /// \param[in, out] _elem Element that will have its paths converted.
+    /// \param[in] _filePath Optional filepath to override `_elem->FilePath()`.
     GZ_COMMON_VISIBLE
-    void convertToFullPaths(const sdf::ElementPtr &_elem);
+    void convertToFullPaths(const sdf::ElementPtr &_elem,
+        const std::string &_filePath = {});
+
+    /// \brief Convert all the URIs nested inside the given SDF string to
+    /// full paths based on the SDF element's file path.
+    /// \sa asFullPath
+    /// \param[in, out] _sdfString SDF file in string format
+    /// \param[in] _filePath Path to SDF file
+    GZ_COMMON_VISIBLE
+    void convertToFullPaths(std::string &_sdfString,
+        const std::string &_filePath);
     /// \}
   }
 

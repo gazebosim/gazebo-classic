@@ -39,6 +39,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
+#include <sdf/sdf.hh>
+
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/ffmpeg_inc.h>
 
@@ -500,17 +502,38 @@ std::string common::asFullPath(const std::string &_uri,
 }
 
 //////////////////////////////////////////////////
-void common::convertToFullPaths(const sdf::ElementPtr &_elem)
+void common::convertToFullPaths(const sdf::ElementPtr &_elem,
+    const std::string &_filePath)
 {
   for (auto child = _elem->GetFirstElement(); child != nullptr;
       child = child->GetNextElement())
   {
-    common::convertToFullPaths(child);
+    common::convertToFullPaths(child, _filePath);
   }
 
   if (_elem->GetName() == "uri")
   {
+    auto filePath = _filePath.empty() ? _elem->FilePath() : _filePath;
     _elem->Set(common::asFullPath(_elem->Get<std::string>(),
-        _elem->FilePath()));
+        filePath));
   }
+}
+
+//////////////////////////////////////////////////
+void common::convertToFullPaths(std::string &_sdfString,
+    const std::string &_filePath)
+{
+  sdf::SDFPtr sdf = std::make_shared<sdf::SDF>();
+  sdf::initFile("root.sdf", sdf);
+
+  if (!sdf::readString(_sdfString, sdf))
+  {
+    return;
+  }
+
+  sdf->Root()->SetFilePath(_filePath);
+
+  convertToFullPaths(sdf->Root(), _filePath);
+
+  _sdfString = sdf->Root()->ToString("");
 }
