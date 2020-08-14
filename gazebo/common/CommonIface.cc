@@ -511,7 +511,12 @@ void common::convertToFullPaths(const sdf::ElementPtr &_elem,
     common::convertToFullPaths(child, _filePath);
   }
 
-  if (_elem->GetName() == "uri")
+  // * All <uri>
+  // * All <filename> which are children of <animation> or <skin>
+  if (_elem->GetName() == "uri" ||
+      ((_elem->GetParent()->GetName() == "animation" ||
+        _elem->GetParent()->GetName() == "skin") &&
+      _elem->GetName() == "filename"))
   {
     auto filePath = _filePath.empty() ? _elem->FilePath() : _filePath;
     _elem->Set(common::asFullPath(_elem->Get<std::string>(),

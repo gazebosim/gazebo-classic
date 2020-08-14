@@ -453,6 +453,54 @@ TEST_F(CommonIface_TEST, fullPathsMesh)
 }
 
 /////////////////////////////////////////////////
+TEST_F(CommonIface_TEST, fullPathsActor)
+{
+  std::string filePath{"/tmp/actor.sdf"};
+  std::string relativePath{"meshes/walk.dae"};
+
+  std::stringstream ss;
+  ss << "<sdf version='" << SDF_VERSION << "'>"
+    << "<actor name='actor_test'>"
+    << "  <skin>"
+    << "    <filename>" << relativePath << "</filename>"
+    << "  </skin>"
+    << "  <animation name='walk'>"
+    << "    <filename>" << relativePath << "</filename>"
+    << "  </animation>"
+    << "</actor>"
+    << "</sdf>";
+
+  auto actorElem = std::make_shared<sdf::Element>();
+  sdf::initFile("actor.sdf", actorElem);
+  sdf::readString(ss.str(), actorElem);
+
+  // Before conversion
+  ASSERT_NE(nullptr, actorElem);
+
+  auto skinElem = actorElem->GetElement("skin");
+  ASSERT_NE(nullptr, skinElem);
+  EXPECT_EQ(relativePath, skinElem->Get<std::string>());
+
+  auto animationElem = actorElem->GetElement("animation");
+  ASSERT_NE(nullptr, animationElem);
+  EXPECT_EQ(relativePath, animationElem->Get<std::string>());
+
+  // SDF element conversion
+  common::convertToFullPaths(actorElem);
+  ASSERT_NE(nullptr, actorElem);
+
+  skinElem = actorElem->GetElement("skin");
+  ASSERT_NE(nullptr, skinElem);
+  EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
+      skinElem->Get<std::string>());
+
+  animationElem = actorElem->GetElement("animation");
+  ASSERT_NE(nullptr, animationElem);
+  EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
+      animationElem->Get<std::string>());
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
