@@ -215,6 +215,62 @@ if (HAVE_IGNITION_FUEL_TOOLS)
   )
 endif()
 
+# Start profiler
+set (sources ${sources}
+  Profiler.cc
+)
+
+set (remotery_sources
+  ./Remotery/lib/Remotery.c
+  ./Remotery/lib/Remotery.h
+  RemoteryProfilerImpl.cc
+)
+
+if (APPLE)
+  set (remotery_sources ${remotery_sources}
+    ./Remotery/lib/RemoteryMetal.mm
+  )
+  find_library(FOUNDATION Foundation
+    HINTS /System/Library/Frameworks
+  )
+endif()
+
+list(APPEND sources ${remotery_sources})
+
+set(RMT_ENABLED 1)
+set(RMT_USE_TINYCRT 0)
+set(RMT_USE_CUDA 0)
+set(RMT_USE_D3D11 0)
+set(RMT_USE_OPENGL 0)
+set(RMT_USE_METAL 0)
+
+if(UNIX OR WIN32)
+  set(RMT_USE_OPENGL 1)
+endif()
+
+if(WIN32)
+  set(RMT_USE_D3D11 1)
+endif()
+
+if(APPLE)
+  set (RMT_USE_METAL 1)
+endif()
+
+configure_file(RemoteryConfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/RemoteryConfig.h)
+
+set(GZ_PROFILER_VIS_PATH share/gazebo-${GAZEBO_MAJOR_VERSION}/profiler_vis)
+
+configure_file(Remotery/gz_remotery_vis.in
+  ${CMAKE_CURRENT_BINARY_DIR}/gz_remotery_vis)
+
+install(PROGRAMS
+  ${CMAKE_CURRENT_BINARY_DIR}/gz_remotery_vis
+  DESTINATION bin)
+
+install(DIRECTORY Remotery/vis/
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/${GZ_PROFILER_VIS_PATH})
+# End profiler
+
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common ${tinyxml_LIBRARIES})
 
 set (common_headers "")
@@ -262,7 +318,14 @@ target_link_libraries(gazebo_common
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
   ${IGNITION-FUEL_TOOLS_LIBRARIES}
+  ${PROFILER_LIBRARIES}
 )
+
+if(ENABLE_PROFILER)
+  target_compile_definitions(gazebo_common
+    PRIVATE BUILDING_DLL_GZ_PROFILER
+  )
+endif()
 
 if (UNIX)
   target_link_libraries(gazebo_common pthread)

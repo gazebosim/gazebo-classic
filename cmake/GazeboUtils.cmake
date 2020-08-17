@@ -131,7 +131,11 @@ endmacro()
 #################################################
 macro (gz_install_library _name)
   set_target_properties(${_name} PROPERTIES SOVERSION ${GAZEBO_MAJOR_VERSION} VERSION ${GAZEBO_VERSION_FULL})
-  install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
+  install (TARGETS ${_name}
+    ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+    LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+    RUNTIME DESTINATION ${BIN_INSTALL_DIR}
+    COMPONENT shlib)
 endmacro ()
 
 #################################################

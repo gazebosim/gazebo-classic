@@ -15,6 +15,7 @@
  *
 */
 #include <boost/algorithm/string.hpp>
+#include "gazebo/common/Profiler.hh"
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/transport/Node.hh"
@@ -300,6 +301,8 @@ void ImuSensor::SetWorldToReferenceOrientation(
 //////////////////////////////////////////////////
 bool ImuSensor::UpdateImpl(const bool /*_force*/)
 {
+  GZ_PROFILE("ImuSensor::UpdateImpl");
+  GZ_PROFILE_BEGIN("Update");
   msgs::LinkData msg;
   int readIndex = 0;
 
@@ -430,10 +433,13 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
           break;
       }
     }
+    GZ_PROFILE_END();
 
+    GZ_PROFILE_BEGIN("Publish");
     // Publish the message
     if (this->dataPtr->pub)
       this->dataPtr->pub->Publish(this->dataPtr->imuMsg);
+    GZ_PROFILE_END();
   }
 
   return true;

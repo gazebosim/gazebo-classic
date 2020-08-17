@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include "gazebo/common/Profiler.hh"
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"

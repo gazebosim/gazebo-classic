@@ -33,6 +33,7 @@
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Rand.hh>
+#include "gazebo/common/Profiler.hh"
 
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
@@ -710,19 +711,31 @@ void Server::Run()
    this->dataPtr->node->Advertise<msgs::PerformanceMetrics>(
        "~/performance_metrics", 100, 5);
 
+  GZ_PROFILE_THREAD_NAME("gzserver");
   // Stay on this loop until Gazebo needs to be shut down
   // The server and sensor manager outlive worlds
   while (!this->dataPtr->stop)
   {
+    GZ_PROFILE("Server::Run");
+    GZ_PROFILE_BEGIN("ProcessControlMsgs");
     if (this->dataPtr->lockstep)
       rendering::wait_for_render_request("", 0.100);
 
     this->ProcessControlMsgs();
+    GZ_PROFILE_END();
 
     if (physics::worlds_running())
+    {
+      GZ_PROFILE_BEGIN("run_once");
       sensors::run_once();
+      GZ_PROFILE_END();
+    }
     else if (sensors::running())
+    {
+      GZ_PROFILE_BEGIN("stop");
       sensors::stop();
+      GZ_PROFILE_END();
+    }
 
     PublishPerformanceMetrics();
 

@@ -16,6 +16,8 @@
 */
 #include <functional>
 
+#include "gazebo/common/Profiler.hh"
+
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/rendering/DepthCamera.hh"
@@ -134,10 +136,15 @@ void DepthCameraSensor::Init()
 //////////////////////////////////////////////////
 bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
 {
+  GZ_PROFILE("DepthCameraSensor::UpdateImpl");
   if (!this->Rendered())
     return false;
 
+  GZ_PROFILE_BEGIN("PostRender");
   this->camera->PostRender();
+  GZ_PROFILE_END();
+
+  GZ_PROFILE_BEGIN("fillarray");
 
   if (this->imagePub && this->imagePub->HasConnections() &&
       // check if depth data is available. If not, the depth camera could be
@@ -182,6 +189,7 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
   }
 
   this->SetRendered(false);
+  GZ_PROFILE_END();
   return true;
 }
 
