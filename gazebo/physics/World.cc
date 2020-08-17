@@ -179,6 +179,7 @@ void World::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->loaded = false;
   this->dataPtr->sdf = _sdf;
+  common::convertToFullPaths(this->dataPtr->sdf);
 
   // Create a DOM object to compute the resolved initial pose (with frame
   // semantics)
@@ -2091,6 +2092,7 @@ void World::ProcessFactoryMsgs()
 
   for (auto const &factoryMsg : factoryMsgsCopy)
   {
+
     this->dataPtr->factorySDF->Clear();
 
     if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
@@ -2122,9 +2124,11 @@ void World::ProcessFactoryMsgs()
 
       if (!sdf::readFile(filename, this->dataPtr->factorySDF))
       {
-        gzerr << "Unable to read sdf file.\n";
+        gzerr << "Unable to read sdf file [" << filename << "]\n";
         continue;
       }
+
+      common::convertToFullPaths(this->dataPtr->factorySDF->Root());
     }
     else if (factoryMsg.has_clone_model_name())
     {

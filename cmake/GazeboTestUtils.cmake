@@ -54,6 +54,14 @@ macro (gz_build_tests)
       # gtest uses pthread on UNIX
       target_link_libraries(${BINARY_NAME} pthread)
     endif()
+    # Visual Studio enables c++11 support by default
+    if (NOT MSVC)
+      if(CMAKE_VERSION VERSION_LESS 3.8.2)
+        target_compile_options(${BINARY_NAME} PRIVATE -std=c++11)
+      else()
+        target_compile_features(${BINARY_NAME} PRIVATE cxx_std_11)
+      endif()
+    endif()
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
 	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)

@@ -1,0 +1,91 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <model  name="box">
+      <pose>1 0 0.1 0 0 0</pose>
+      <link name="box_link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>.2 .2 .2</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+          <plugin filename="libReflectancePlugin.so" name="reflectance_plugin">
+            <reflectance_map>
+              <uri>file://media/materials/textures</uri>
+              <name>terrain.png</name>
+            </reflectance_map>
+          </plugin>
+        </visual>
+        <collision name="visual">
+          <geometry>
+            <box>
+              <size>.2 .2 .2</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <model name="camera_model">
+      <pose>0 0 0 0 0 0</pose>
+      <link name="my_link">
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <sensor name="camera" type="depth">
+          <camera>
+            <horizontal_fov>1.04719755</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+            <save enabled='0'>
+              <path>__default__</path>
+            </save>
+            <depth_camera>
+              <output>points;reflectance</output>
+            </depth_camera>
+          </camera>
+          <plugin filename="libDepthCameraPlugin.so" name="depth_camera_plugin" />
+          <always_on>true</always_on>
+          <update_rate>10.0</update_rate>
+        </sensor>
+      </link>
+      <static>true</static>
+    </model>
+
+  </world>
+</sdf>

@@ -22,6 +22,9 @@
 #include <sstream>
 #include <boost/filesystem.hpp>
 
+#include <ignition/common/Filesystem.hh>
+#include <sdf/parser.hh>
+
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "test/util.hh"
@@ -251,6 +254,250 @@ TEST_F(CommonIface_TEST, directoryOps)
   EXPECT_TRUE(common::copyDir(src, dest));
   EXPECT_TRUE(common::exists(destFile2Path.string()));
   EXPECT_FALSE(common::exists(destFilePath.string()));
+}
+
+/////////////////////////////////////////////////
+TEST_F(CommonIface_TEST, asFullPath)
+{
+  const std::string relativeUriUnix{"meshes/collision.dae"};
+  const std::string relativeUriWindows{"meshes\\collision.dae"};
+  const std::string absoluteUriUnix{"/path/to/collision.dae"};
+  const std::string absoluteUriWindows{"C:\\path\\to\\collision.dae"};
+  const std::string schemeUri{"https://website.com/collision.dae"};
+
+  // Empty path
+  {
+    const std::string path{""};
+
+    EXPECT_EQ(relativeUriUnix, common::asFullPath(relativeUriUnix, path));
+    EXPECT_EQ(relativeUriWindows, common::asFullPath(relativeUriWindows, path));
+    EXPECT_EQ(absoluteUriUnix, common::asFullPath(absoluteUriUnix, path));
+    EXPECT_EQ(absoluteUriWindows, common::asFullPath(absoluteUriWindows, path));
+    EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
+  }
+
+  // Data string
+  {
+    const std::string path{"data-string"};
+
+    EXPECT_EQ(relativeUriUnix, common::asFullPath(relativeUriUnix, path));
+    EXPECT_EQ(relativeUriWindows, common::asFullPath(relativeUriWindows, path));
+    EXPECT_EQ(absoluteUriUnix, common::asFullPath(absoluteUriUnix, path));
+    EXPECT_EQ(absoluteUriWindows, common::asFullPath(absoluteUriWindows, path));
+    EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
+  }
+
+#ifdef _WIN32
+  {
+    // Absolute Windows path
+    const std::string path{"C:\\abs\\path\\file"};
+
+    // Directory
+    EXPECT_EQ("C:\\abs\\path\\meshes\\collision.dae",
+        common::asFullPath(relativeUriUnix, path));
+    EXPECT_EQ("C:\\abs\\path\\meshes\\collision.dae",
+        common::asFullPath(relativeUriWindows, path));
+    // TODO(anyone) Support absolute Unix-style URIs on Windows
+    EXPECT_EQ(absoluteUriWindows, common::asFullPath(absoluteUriWindows, path));
+    EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
+
+    // File
+    auto filePath = ignition::common::joinPaths(path, "file.sdf");
+
+    EXPECT_EQ("C:\\abs\\path\\file\\meshes\\collision.dae",
+        common::asFullPath(relativeUriUnix, filePath));
+    EXPECT_EQ("C:\\abs\\path\\file\\meshes\\collision.dae",
+        common::asFullPath(relativeUriWindows, filePath));
+    // TODO(anyone) Support absolute Unix-style URIs on Windows
+    EXPECT_EQ(absoluteUriWindows, common::asFullPath(absoluteUriWindows,
+        filePath));
+    EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, filePath));
+  }
+#else
+  {
+    // Absolute Unix path
+    const std::string path{"/abs/path/file"};
+
+    // Directory
+    EXPECT_EQ("/abs/path/meshes/collision.dae",
+        common::asFullPath(relativeUriUnix, path));
+    EXPECT_EQ("/abs/path/meshes/collision.dae",
+        common::asFullPath(relativeUriWindows, path));
+    EXPECT_EQ(absoluteUriUnix, common::asFullPath(absoluteUriUnix, path));
+    // TODO(anyone) Support absolute Windows paths on Unix
+    EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
+
+    // File
+    auto filePath = ignition::common::joinPaths(path, "file.sdf");
+
+    EXPECT_EQ("/abs/path/file/meshes/collision.dae",
+        common::asFullPath(relativeUriUnix, filePath));
+    EXPECT_EQ("/abs/path/file/meshes/collision.dae",
+        common::asFullPath(relativeUriWindows, filePath));
+    EXPECT_EQ(absoluteUriUnix, common::asFullPath(absoluteUriUnix, filePath));
+    // TODO(anyone) Support absolute Windows paths on Unix
+    EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, filePath));
+  }
+#endif
+}
+
+/////////////////////////////////////////////////
+TEST_F(CommonIface_TEST, fullPathsMesh)
+{
+  std::string filePath{"/tmp/model.sdf"};
+  std::string relativePath{"meshes/collision.dae"};
+
+  std::stringstream ss;
+  ss << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='mesh_model'>"
+    << "<link name ='link'>"
+    << "  <collision name ='collision'>"
+    << "    <geometry>"
+    << "      <mesh>"
+    << "        <uri>" << relativePath << "</uri>"
+    << "      </mesh>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << "      <mesh><uri>" << relativePath << "</uri></mesh>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  auto modelElem = std::make_shared<sdf::Element>();
+  sdf::initFile("model.sdf", modelElem);
+  sdf::readString(ss.str(), modelElem);
+
+  // Before conversion
+  ASSERT_NE(nullptr, modelElem);
+
+  auto linkElem = modelElem->GetElement("link");
+  ASSERT_NE(nullptr, linkElem);
+
+  for (auto elemStr : {"collision", "visual"})
+  {
+    auto elem = linkElem->GetElement(elemStr);
+    ASSERT_NE(nullptr, elem);
+
+    auto geometryElem = elem->GetElement("geometry");
+    ASSERT_NE(nullptr, geometryElem);
+
+    auto meshElem = geometryElem->GetElement("mesh");
+    ASSERT_NE(nullptr, meshElem);
+
+    auto uriElem = meshElem->GetElement("uri");
+    ASSERT_NE(nullptr, uriElem);
+
+    EXPECT_EQ(relativePath, uriElem->Get<std::string>());
+    uriElem->SetFilePath(filePath);
+  }
+
+  auto sdfString = modelElem->ToString("");
+
+  // SDF element conversion
+  common::convertToFullPaths(modelElem);
+
+  ASSERT_NE(nullptr, modelElem);
+
+  linkElem = modelElem->GetElement("link");
+  ASSERT_NE(nullptr, linkElem);
+
+  for (auto elemStr : {"collision", "visual"})
+  {
+    auto elem = linkElem->GetElement(elemStr);
+    ASSERT_NE(nullptr, elem);
+
+    auto geometryElem = elem->GetElement("geometry");
+    ASSERT_NE(nullptr, geometryElem);
+
+    auto meshElem = geometryElem->GetElement("mesh");
+    ASSERT_NE(nullptr, meshElem);
+
+    auto uriElem = meshElem->GetElement("uri");
+    ASSERT_NE(nullptr, uriElem);
+
+    EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
+        uriElem->Get<std::string>());
+  }
+
+
+  // SDF string conversion
+  sdfString = "<sdf version='" + std::string(SDF_VERSION) + "'>\n" + sdfString +
+      "\n</sdf>";
+  common::convertToFullPaths(sdfString, modelElem->FilePath());
+  sdf::readString(sdfString, modelElem);
+
+  linkElem = modelElem->GetElement("link");
+  ASSERT_NE(nullptr, linkElem);
+
+  for (auto elemStr : {"collision", "visual"})
+  {
+    auto elem = linkElem->GetElement(elemStr);
+    ASSERT_NE(nullptr, elem);
+
+    auto geometryElem = elem->GetElement("geometry");
+    ASSERT_NE(nullptr, geometryElem);
+
+    auto meshElem = geometryElem->GetElement("mesh");
+    ASSERT_NE(nullptr, meshElem);
+
+    auto uriElem = meshElem->GetElement("uri");
+    ASSERT_NE(nullptr, uriElem);
+
+    EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
+        uriElem->Get<std::string>());
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(CommonIface_TEST, fullPathsActor)
+{
+  std::string filePath{"/tmp/actor.sdf"};
+  std::string relativePath{"meshes/walk.dae"};
+
+  std::stringstream ss;
+  ss << "<sdf version='" << SDF_VERSION << "'>"
+    << "<actor name='actor_test'>"
+    << "  <skin>"
+    << "    <filename>" << relativePath << "</filename>"
+    << "  </skin>"
+    << "  <animation name='walk'>"
+    << "    <filename>" << relativePath << "</filename>"
+    << "  </animation>"
+    << "</actor>"
+    << "</sdf>";
+
+  auto actorElem = std::make_shared<sdf::Element>();
+  sdf::initFile("actor.sdf", actorElem);
+  sdf::readString(ss.str(), actorElem);
+
+  // Before conversion
+  ASSERT_NE(nullptr, actorElem);
+
+  auto skinElem = actorElem->GetElement("skin");
+  ASSERT_NE(nullptr, skinElem);
+  EXPECT_EQ(relativePath, skinElem->Get<std::string>());
+
+  auto animationElem = actorElem->GetElement("animation");
+  ASSERT_NE(nullptr, animationElem);
+  EXPECT_EQ(relativePath, animationElem->Get<std::string>());
+
+  // SDF element conversion
+  common::convertToFullPaths(actorElem);
+  ASSERT_NE(nullptr, actorElem);
+
+  skinElem = actorElem->GetElement("skin");
+  ASSERT_NE(nullptr, skinElem);
+  EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
+      skinElem->Get<std::string>());
+
+  animationElem = actorElem->GetElement("animation");
+  ASSERT_NE(nullptr, animationElem);
+  EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
+      animationElem->Get<std::string>());
 }
 
 /////////////////////////////////////////////////

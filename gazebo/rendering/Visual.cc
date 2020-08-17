@@ -469,7 +469,8 @@ void Visual::Load()
       // Add all the URI paths to the render engine
       while (uriElem)
       {
-        std::string matUri = uriElem->Get<std::string>();
+        auto matUri = common::asFullPath(uriElem->Get<std::string>(),
+            scriptElem->FilePath());
         if (!matUri.empty())
           RenderEngine::Instance()->AddResourcePath(matUri);
         uriElem = uriElem->GetNextElement("uri");
@@ -2935,17 +2936,18 @@ std::string Visual::GetMeshName() const
     }
     else if (geomElem->HasElement("mesh"))
     {
-      sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
-      std::string filename;
+      sdf::ElementPtr meshElem = geomElem->GetElement("mesh");
 
-      std::string uri = tmpElem->Get<std::string>("uri");
-      if (uri.empty())
+      if (!meshElem->HasElement("uri"))
       {
-        gzerr << "<uri> element missing for geometry element:\n";
+        gzerr << "<uri> element missing for geometry element\n";
         return std::string();
       }
 
-      filename = common::find_file(uri);
+      auto uri = common::asFullPath(meshElem->Get<std::string>("uri"),
+          meshElem->FilePath());
+
+      auto filename = common::find_file(uri);
 
       if (filename == "__default__" || filename.empty())
         gzerr << "No mesh specified\n";
@@ -3694,11 +3696,13 @@ void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
     {
       this->SetShaderType("pixel");
     }
-    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+    else if (_msg.shader_type() ==
+        msgs::Material::NORMAL_MAP_OBJECT_SPACE)
     {
       this->SetShaderType("normal_map_object_space");
     }
-    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+    else if (_msg.shader_type() ==
+        msgs::Material::NORMAL_MAP_TANGENT_SPACE)
     {
       this->SetShaderType("normal_map_tangent_space");
     }
@@ -3708,9 +3712,7 @@ void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
     }
 
     if (_msg.has_normal_map())
-    {
       this->SetNormalMap(_msg.normal_map());
-    }
   }
 }
 

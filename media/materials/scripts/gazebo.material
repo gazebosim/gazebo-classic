@@ -63,6 +63,20 @@ material Gazebo/XYZPoints
   }
 }
 
+material Gazebo/Reflectance
+{
+  technique
+  {
+    pass
+    {
+      lighting off
+      texture_unit
+      {
+      }
+    }
+  }
+}
+
 vertex_program Gazebo/XYZNormalsVS glsl
 {
   source depth_normals_map.vert

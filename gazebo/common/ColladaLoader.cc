@@ -1595,8 +1595,12 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     polylistInputXml = polylistInputXml->NextSiblingElement("input");
   }
 
+  std::set<int> totalInputs;
   for (const auto &input : inputs)
-    inputSize += input.second.size();
+  {
+    totalInputs.insert(input.second.begin(), input.second.end());
+  }
+  inputSize += totalInputs.size();
 
   // read vcount
   // break poly into triangles
