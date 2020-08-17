@@ -562,6 +562,9 @@ transport::PublisherPtr performanceMetricsPub;
 
 void PublishPerformanceMetrics()
 {
+  if (!performanceMetricsPub || !performanceMetricsPub->HasConnections())
+    return;
+
   physics::WorldPtr world = physics::get_world("default");
 
   /// Outgoing run-time simulation performance metrics.
@@ -598,11 +601,12 @@ void PublishPerformanceMetrics()
         {
           double updateSimRate =
             (sensor->LastMeasurementTime() - sensorsLastMeasurementTime[name]).Double();
-          double updateRealRate =
-            (world->RealTime() - worldLastMeasurementTime[name]).Double();
           sensorsLastMeasurementTime[name] = sensor->LastMeasurementTime();
           if (updateSimRate > 0.0)
           {
+            double updateRealRate =
+              (world->RealTime() - worldLastMeasurementTime[name]).Double();
+
             struct sensorPerformanceMetricsType emptySensorPerfomanceMetrics;
             auto ret2 = sensorPerformanceMetrics.insert(
                 std::pair<std::string, struct sensorPerformanceMetricsType>
@@ -648,8 +652,7 @@ void PublishPerformanceMetrics()
   }
 
   // Publish data
-  if (performanceMetricsPub && performanceMetricsPub->HasConnections())
-    performanceMetricsPub->Publish(performanceMetricsMsg);
+  performanceMetricsPub->Publish(performanceMetricsMsg);
 }
 
 /////////////////////////////////////////////////
@@ -709,7 +712,7 @@ void Server::Run()
 
   performanceMetricsPub =
    this->dataPtr->node->Advertise<msgs::PerformanceMetrics>(
-       "~/performance_metrics", 100, 5);
+       "/gazebo/performance_metrics", 100, 5);
 
   GZ_PROFILE_THREAD_NAME("gzserver");
   // Stay on this loop until Gazebo needs to be shut down
