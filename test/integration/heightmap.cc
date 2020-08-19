@@ -69,6 +69,9 @@ class HeightmapTest : public ServerFixture,
   //  is the collision detector to use in DART. Can be fcl, dart, bullet or ode.
   public: void TerrainCollision(const std::string &_physicsEngine,
                                 const std::string &_dartCollision = "");
+  // \brief Test dropping boxes on asymmetric terrain
+  // \param[in] _physics the physics engine to test
+  public: void TerrainCollisionAsymmetric(const std::string &_physics);
 
   /// \brief Test loading a heightmap that has no visuals
   public: void NoVisual();
@@ -885,6 +888,75 @@ void HeightmapTest::TerrainCollision(const std::string &_physicsEngine,
 }
 
 /////////////////////////////////////////////////
+void HeightmapTest::TerrainCollisionAsymmetric(const std::string &_physics)
+{
+  if (_physics == "bullet")
+  {
+    gzerr << "Skipping test for bullet. See issue #2506" << std::endl;
+    return;
+  }
+
+  if (_physics == "simbody")
+  {
+    // SimbodyHeightmapShape unimplemented.
+    gzerr << "Aborting test for " << _physics << std::endl;
+    return;
+  }
+
+  Load("worlds/heightmap.world", true, _physics);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  if (_physics == "dart")
+  {
+#ifdef HAVE_DART
+    physics::PhysicsEnginePtr engine = world->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet")
+    {
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
+  }
+
+  // each box has an initial z position of 10. meters
+  physics::ModelPtr box1 = GetModel("box1");
+  physics::ModelPtr box2 = GetModel("box2");
+  physics::ModelPtr box3 = GetModel("box3");
+  physics::ModelPtr box4 = GetModel("box4");
+  ASSERT_NE(box1, nullptr);
+  ASSERT_NE(box2, nullptr);
+  ASSERT_NE(box3, nullptr);
+  ASSERT_NE(box4, nullptr);
+  EXPECT_GE(box1->WorldPose().Pos().Z(), 9.9);
+  EXPECT_GE(box2->WorldPose().Pos().Z(), 9.9);
+  EXPECT_GE(box3->WorldPose().Pos().Z(), 9.9);
+  EXPECT_GE(box4->WorldPose().Pos().Z(), 9.9);
+
+  // step the world and verify that only box2 falls
+  world->Step(1000);
+
+  EXPECT_GE(box1->WorldPose().Pos().Z(), 9.9);
+  EXPECT_GE(box3->WorldPose().Pos().Z(), 9.9);
+  EXPECT_GE(box4->WorldPose().Pos().Z(), 9.9);
+
+  EXPECT_LT(box2->WorldPose().Pos().Z(), 5.5);
+}
+
+/////////////////////////////////////////////////
 TEST_F(HeightmapTest, NotSquareImage)
 {
   NotSquareImage();
@@ -1053,6 +1125,12 @@ TEST_F(HeightmapTest, TerrainCollisionDartBullet)
 #endif
 
   TerrainCollision("dart", "bullet");
+}
+
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, TerrainCollisionAsymmetric)
+{
+  TerrainCollisionAsymmetric(GetParam());
 }
 
 /////////////////////////////////////////////////
