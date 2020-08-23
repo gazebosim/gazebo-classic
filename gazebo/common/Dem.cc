@@ -215,6 +215,11 @@ void Dem::GetGeoReference(double _x, double _y,
     sourceCs.importFromWkt(&importString);
     targetCs.SetWellKnownGeogCS("WGS84");
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
+    if (nullptr == cT)
+    {
+      gzthrow("Unable to transform terrain coordinate system to WGS84 for "
+          << "coordinates (" << _x << "," << _y << ")\n");
+    }
 
     xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
     yGeoDeg = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
@@ -223,6 +228,8 @@ void Dem::GetGeoReference(double _x, double _y,
 
     _latitude.Degree(yGeoDeg);
     _longitude.Degree(xGeoDeg);
+
+    OCTDestroyCoordinateTransformation(cT);
   }
   else
     gzthrow("Unable to obtain the georeferenced values for coordinates ("
