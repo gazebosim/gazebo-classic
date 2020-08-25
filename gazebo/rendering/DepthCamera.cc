@@ -801,11 +801,11 @@ ReflectanceMaterialListener::ReflectanceMaterialListener(ScenePtr _scene)
   this->reflectanceMaterial =
       Ogre::MaterialManager::getSingleton().getByName(material);
 
-  material = "Gazebo/Black";
+  material = "Gazebo/BlackUnlit";
   Ogre::MaterialManager::getSingleton().load(material,
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
   this->blackMaterial =
-      Ogre::MaterialManager::getSingleton().getByName("Gazebo/Black");
+      Ogre::MaterialManager::getSingleton().getByName("Gazebo/BlackUnlit");
 }
 
 /////////////////////////////////////////////////

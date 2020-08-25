@@ -240,6 +240,19 @@ material Gazebo/Black
   }
 }
 
+material Gazebo/BlackUnlit
+{
+  technique
+  {
+    lighting off
+    pass
+    {
+      ambient 0 0 0 1
+      diffuse 0 0 0 1
+      specular 0 0 0 1
+    }
+  }
+}
 
 material Gazebo/Red
 {
