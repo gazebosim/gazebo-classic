@@ -73,7 +73,7 @@ void ColladaVisualization::AssimpVersion4MultipleInputWithSameOffset()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  // There should be two triangles.
+  // There should be 12 triangles in each of the two models.
   QCOMPARE(cam->TriangleCount(), 24u);
 
   mainWindow->close();
