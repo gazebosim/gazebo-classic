@@ -479,11 +479,17 @@ TEST_F(CommonIface_TEST, fullPathsActor)
 
   auto skinElem = actorElem->GetElement("skin");
   ASSERT_NE(nullptr, skinElem);
-  EXPECT_EQ(relativePath, skinElem->Get<std::string>());
+  auto skinFilenameElem = skinElem->GetElement("filename");
+  ASSERT_NE(nullptr, skinFilenameElem);
+  EXPECT_EQ(relativePath, skinFilenameElem->Get<std::string>());
+  skinFilenameElem->SetFilePath(filePath);
 
   auto animationElem = actorElem->GetElement("animation");
   ASSERT_NE(nullptr, animationElem);
-  EXPECT_EQ(relativePath, animationElem->Get<std::string>());
+  auto animationFilenameElem = animationElem->GetElement("filename");
+  ASSERT_NE(nullptr, animationFilenameElem);
+  EXPECT_EQ(relativePath, animationFilenameElem->Get<std::string>());
+  animationFilenameElem->SetFilePath(filePath);
 
   // SDF element conversion
   common::convertToFullPaths(actorElem);
@@ -491,13 +497,17 @@ TEST_F(CommonIface_TEST, fullPathsActor)
 
   skinElem = actorElem->GetElement("skin");
   ASSERT_NE(nullptr, skinElem);
+  skinFilenameElem = skinElem->GetElement("filename");
+  ASSERT_NE(nullptr, skinFilenameElem);
   EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
-      skinElem->Get<std::string>());
+      skinFilenameElem->Get<std::string>());
 
   animationElem = actorElem->GetElement("animation");
   ASSERT_NE(nullptr, animationElem);
+  animationFilenameElem = animationElem->GetElement("filename");
+  ASSERT_NE(nullptr, animationFilenameElem);
   EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
-      animationElem->Get<std::string>());
+      animationFilenameElem->Get<std::string>());
 }
 
 /////////////////////////////////////////////////
