@@ -33,7 +33,10 @@
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Rand.hh>
-#include "ignition/common/Profiler.hh"
+#include <ignition/common/Profiler.hh>
+#include <ignition/common/Filesystem.hh>
+#include <ignition/common/URI.hh>
+#include <ignition/fuel_tools/Interface.hh>
 
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
@@ -61,10 +64,6 @@
 
 #include "gazebo/Master.hh"
 #include "gazebo/Server.hh"
-
-#include "ignition/common/Filesystem.hh"
-#include "ignition/common/URI.hh"
-#include "ignition/fuel_tools/Interface.hh"
 
 namespace po = boost::program_options;
 using namespace gazebo;

@@ -1249,6 +1249,68 @@ TEST_F(FactoryTest, FilenameFuelURL)
   // Check model was spawned
   ASSERT_NE(nullptr, world->ModelByName("test_box"));
 }
+
+TEST_F(FactoryTest, worldWithFuelModels)
+{
+  this->Load("worlds/fuel_models.world", true);
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("Radio") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("Radio"));
+}
+
+TEST_F(FactoryTest, FuelURIAsWorldArgument)
+{
+  this->Load(
+    "https://staging-fuel.ignitionrobotics.org/1.0/chapulina/worlds/Shapes",
+    true);
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("box") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("box"));
+
+  sleep = 0;
+  maxSleep = 50;
+  while (!world->ModelByName("cylinder") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("cylinder"));
+
+  sleep = 0;
+  maxSleep = 50;
+  while (!world->ModelByName("sphere") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("sphere"));
+}
 #endif
 
 //////////////////////////////////////////////////
