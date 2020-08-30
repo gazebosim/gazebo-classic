@@ -161,6 +161,7 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
+  cmake_policy(SET CMP0057 NEW)
   set(DART_MIN_REQUIRED_VERSION 6.6)
   find_package(DART ${DART_MIN_REQUIRED_VERSION} CONFIG OPTIONAL_COMPONENTS collision-bullet collision-ode utils-urdf)
   if (DART_FOUND)
