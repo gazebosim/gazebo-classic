@@ -33,6 +33,7 @@
 
 #include "gazebo/common/common.hh"
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/rendering/MovableText.hh"
 
 #define POS_TEX_BINDING    0
@@ -176,11 +177,14 @@ void MovableText::Load(const std::string &_name,
 //////////////////////////////////////////////////
 void MovableText::Update()
 {
+  GZ_PROFILE("rendering::MovableText::Update");
+  GZ_PROFILE_BEGIN("Update");
   if (this->dataPtr->dirty)
   {
     this->SetupGeometry();
     this->dataPtr->dirty = false;
   }
+  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

@@ -15,6 +15,7 @@
  *
 */
 #include "gazebo/common/Color.hh"
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -140,6 +141,8 @@ void Material::CreateMaterials()
 //////////////////////////////////////////////////
 void Material::Update(const gazebo::common::Material *_mat)
 {
+  GZ_PROFILE("rendering::Material::Update");
+  GZ_PROFILE_BEGIN("Update");
   Ogre::MaterialPtr matPtr;
 
   if (Ogre::MaterialManager::getSingleton().resourceExists(_mat->GetName()))
@@ -187,6 +190,7 @@ void Material::Update(const gazebo::common::Material *_mat)
     texState->setTextureName(_mat->GetTextureImage());
     texState->setName(_mat->GetTextureImage());
   }
+  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

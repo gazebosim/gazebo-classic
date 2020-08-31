@@ -37,6 +37,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/CustomPSSMShadowCameraSetup.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -634,8 +635,13 @@ Ogre::PSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
 /////////////////////////////////////////////////
 void RTShaderSystem::Update()
 {
+  GZ_PROFILE("rendering::RTShaderSystem::Update");
+  GZ_PROFILE_BEGIN("Update");
   if (!this->dataPtr->initialized || !this->dataPtr->updateShaders)
+  {
+    GZ_PROFILE_END();
     return;
+  }
 
   for (const auto &scene : this->dataPtr->scenes)
   {
@@ -646,6 +652,7 @@ void RTShaderSystem::Update()
     }
   }
   this->dataPtr->updateShaders = false;
+  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

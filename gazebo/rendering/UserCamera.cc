@@ -23,6 +23,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/Profiler.hh"
 
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -230,6 +231,8 @@ void UserCamera::SetWorldPose(const ignition::math::Pose3d &_pose)
 //////////////////////////////////////////////////
 void UserCamera::Update()
 {
+  GZ_PROFILE("rendering::UserCamera::Update");
+  GZ_PROFILE_BEGIN("Update");
   Camera::Update();
 
   if (this->dataPtr->viewController)
@@ -237,6 +240,7 @@ void UserCamera::Update()
 
   // publish camera pose
   this->dataPtr->posePub->Publish(msgs::Convert(this->WorldPose()));
+  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

@@ -27,6 +27,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 #include "SkyX.h"
 
+#include "gazebo/common/Profiler.hh"
+
 namespace SkyX
 {
   SkyX::SkyX(Ogre::SceneManager* sm, Controller* c)
@@ -142,8 +144,11 @@ namespace SkyX
 
   void SkyX::update(const Ogre::Real& timeSinceLastFrame)
   {
+    GZ_PROFILE("rendering::SkyX::Update");
+    GZ_PROFILE_BEGIN("Update");
     if (!mCreated || !this->mEnabled)
     {
+      GZ_PROFILE_END();
       return;
     }
 
@@ -181,6 +186,7 @@ namespace SkyX
       mCloudsManager->update();
       mVCloudsManager->update(timeSinceLastFrame);
     }
+    GZ_PROFILE_END();
   }
 
   void SkyX::notifyCameraRender(Ogre::Camera* c)

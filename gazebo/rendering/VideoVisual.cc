@@ -16,8 +16,9 @@
 */
 #include <boost/bind.hpp>
 
-#include "gazebo/common/Video.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/Profiler.hh"
+#include "gazebo/common/Video.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/VideoVisualPrivate.hh"
@@ -110,6 +111,8 @@ VideoVisual::~VideoVisual()
 /////////////////////////////////////////////////
 void VideoVisual::PreRender()
 {
+  GZ_PROFILE("rendering::VideoVisual::PreRender");
+  GZ_PROFILE_BEGIN("prerender");
   VideoVisualPrivate *dPtr =
       reinterpret_cast<VideoVisualPrivate *>(this->dataPtr);
 
@@ -153,4 +156,5 @@ void VideoVisual::PreRender()
 
   // Unlock the pixel buffer
   pixelBuffer->unlock();
+  GZ_PROFILE_END();
 }

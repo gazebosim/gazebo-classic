@@ -23,6 +23,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 #include <vector>
 #include "VClouds/Lightning.h"
+#include "gazebo/common/Profiler.hh"
 
 namespace SkyX { namespace VClouds
 {
@@ -200,8 +201,11 @@ namespace SkyX { namespace VClouds
 
   void Lightning::update(Ogre::Real timeSinceLastFrame)
   {
+    GZ_PROFILE("rendering::Lightning::Update");
+    GZ_PROFILE_BEGIN("Update");
     if (!mCreated)
     {
+      GZ_PROFILE_END();
       return;
     }
 
@@ -260,6 +264,7 @@ namespace SkyX { namespace VClouds
     mIntensity = alpha;
 
     _updateData(alpha, mTime > 1 ? 1 : mTime, mTime);
+    GZ_PROFILE_END();
   }
 
   void Lightning::_updateRenderQueueGroup(const Ogre::uint8& rqg)

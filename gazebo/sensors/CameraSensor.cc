@@ -235,10 +235,15 @@ void CameraSensor::PrerenderEnded()
 //////////////////////////////////////////////////
 void CameraSensor::Render()
 {
+  GZ_PROFILE("sensor::CameraSensor::Render");
+  GZ_PROFILE_BEGIN("Render");
   if (this->useStrictRate)
   {
     if (!this->dataPtr->renderNeeded)
+    {
+      GZ_PROFILE_END();
       return;
+    }
 
     // Update all the cameras
     this->camera->Render();
@@ -248,8 +253,10 @@ void CameraSensor::Render()
   }
   else
   {
-    if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
+    if (!this->camera || !this->IsActive() || !this->NeedsUpdate()){
+      GZ_PROFILE_END();
       return;
+    }
 
     // Update all the cameras
     this->camera->Render();
@@ -257,6 +264,7 @@ void CameraSensor::Render()
     this->dataPtr->rendered = true;
     this->lastMeasurementTime = this->scene->SimTime();
   }
+  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

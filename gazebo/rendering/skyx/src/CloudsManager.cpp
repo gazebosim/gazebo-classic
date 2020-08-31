@@ -25,6 +25,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 #include "SkyX.h"
 
+#include "gazebo/common/Profiler.hh"
+
 namespace SkyX
 {
   /// -------------- CloudLayer -----------------
@@ -365,10 +367,13 @@ namespace SkyX
 
   void CloudsManager::update()
   {
+    GZ_PROFILE("rendering::CloudsManager::Update");
+    GZ_PROFILE_BEGIN("Update");
     for (CloudLayersIt = mCloudLayers.begin();
         CloudLayersIt != mCloudLayers.end(); CloudLayersIt++)
     {
       (*CloudLayersIt)->_updateInternalPassParameters();
     }
+    GZ_PROFILE_END();
   }
 }

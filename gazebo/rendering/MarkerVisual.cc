@@ -15,6 +15,7 @@
  *
 */
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -188,6 +189,8 @@ common::Time MarkerVisual::Lifetime() const
 /////////////////////////////////////////////////
 void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
 {
+  GZ_PROFILE("MarkerVisual::DynamicRenderable");
+  GZ_PROFILE_BEGIN("Update");
   if (!this->dPtr->dynamicRenderable)
   {
     switch (_msg.type())
@@ -295,6 +298,7 @@ void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
                                  _msg.point(i).y(),
                                  _msg.point(i).z()));
   }
+  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

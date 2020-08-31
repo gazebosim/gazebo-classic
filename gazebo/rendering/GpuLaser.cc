@@ -34,6 +34,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Timer.hh"
@@ -412,6 +413,8 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
 //////////////////////////////////////////////////
 void GpuLaser::RenderImpl()
 {
+  GZ_PROFILE("rendering::GpuLaser::RenderImpl");
+  GZ_PROFILE_BEGIN("Update");
   common::Timer firstPassTimer, secondPassTimer;
 
   firstPassTimer.Start();
@@ -458,6 +461,7 @@ void GpuLaser::RenderImpl()
 
   double secondPassDur = secondPassTimer.GetElapsed().Double();
   this->dataPtr->lastRenderDuration = firstPassDur + secondPassDur;
+  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

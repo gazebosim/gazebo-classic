@@ -25,6 +25,7 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -530,9 +531,13 @@ void Visual::Load()
 //////////////////////////////////////////////////
 void Visual::Update()
 {
+  GZ_PROFILE("rendering::Visual::Update");
+  GZ_PROFILE_BEGIN("Update");
   if (!this->dataPtr->visible)
+  {
+    GZ_PROFILE_END();
     return;
-
+  }
   std::list<DynamicLines*>::iterator iter;
 
   // Update the lines
@@ -567,6 +572,7 @@ void Visual::Update()
       // event::Events::DisconnectPreRender(this->preRenderConnection);
     }
   }
+  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

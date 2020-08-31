@@ -24,6 +24,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 #include "VCloudsManager.h"
 
 #include "SkyX.h"
+#include "gazebo/common/Profiler.hh"
 
 namespace SkyX
 {
@@ -114,8 +115,11 @@ namespace SkyX
 
   void VCloudsManager::update(const Ogre::Real& timeSinceLastFrame)
   {
+    GZ_PROFILE("rendering::VCloudsManager::Update");
+    GZ_PROFILE_BEGIN("Update");
     if (!mCreated)
     {
+      GZ_PROFILE_END();
       return;
     }
 
@@ -124,6 +128,7 @@ namespace SkyX
     _setLightParameters();
 
     mVClouds->update(timeSinceLastFrame);
+    GZ_PROFILE_END();
   }
 
   void VCloudsManager::notifyCameraRender(Ogre::Camera* c)

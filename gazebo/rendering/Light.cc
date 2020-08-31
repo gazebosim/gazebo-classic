@@ -22,6 +22,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Profiler.hh"
 
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -114,6 +115,8 @@ void Light::Load()
 //////////////////////////////////////////////////
 void Light::Update()
 {
+  GZ_PROFILE("rendering::Light::Update");
+  GZ_PROFILE_BEGIN("Update");
   // shadow support is also affected by light type so set type first.
   this->SetLightType(this->dataPtr->sdf->Get<std::string>("type"));
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
@@ -142,6 +145,7 @@ void Light::Update()
     this->SetSpotOuterAngle(elem->Get<double>("outer_angle"));
     this->SetSpotFalloff(elem->Get<double>("falloff"));
   }
+  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

@@ -17,6 +17,7 @@
 
 #include <boost/bind.hpp>
 
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -127,13 +128,19 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
 /////////////////////////////////////////////////
 void CameraVisual::Update()
 {
+  GZ_PROFILE("rendering::CameraVisual::Update");
+  GZ_PROFILE_BEGIN("Update");
   CameraVisualPrivate *dPtr =
       reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
 
   if (!dPtr->camera)
+  {
+    GZ_PROFILE_END();
     return;
+  }
 
   dPtr->camera->Render();
+  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////
