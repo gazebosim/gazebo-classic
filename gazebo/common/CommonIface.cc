@@ -47,6 +47,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/FuelModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
 
 #include "ignition/fuel_tools/Interface.hh"
@@ -161,7 +162,7 @@ void common::add_search_path_suffix(const std::string &_suffix)
 /////////////////////////////////////////////////
 std::string common::find_file(const std::string &_file)
 {
-  std::string path = ignition::fuel_tools::fetchResource(_file);
+  std::string path = common::FuelModelDatabase::Instance()->ModelPath(_file);
   if (path.empty())
   {
     path = common::SystemPaths::Instance()->FindFile(_file, true);

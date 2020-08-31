@@ -213,26 +213,54 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
   }
 
   std::string path;
+  std::string fileUrl;
+  ignition::fuel_tools::ModelIdentifier model;
+  using namespace ignition::fuel_tools;
 
-  if (!_forceDownload)
+  if ((this->dataPtr->fuelClient->ParseModelUrl(fuelUri, model) &&
+       !this->dataPtr->fuelClient->CachedModel(fuelUri, path))
+      || _forceDownload)
   {
-    if (this->dataPtr->fuelClient->CachedModel(fuelUri, path))
+    Result result_download =
+      this->dataPtr->fuelClient->DownloadModel(fuelUri, path);
+    if (result_download != Result(ResultType::FETCH) ||
+      result_download != Result(ResultType::FETCH_ALREADY_EXISTS))
     {
-      return path;
+      gzerr << "Unable to download model[" << _uri << "]" << std::endl;
+      return std::string();
+    }
+    else
+    {
+        gzmsg << "Downloaded model URL: " << std::endl
+              << "          " << _uri << std::endl
+              << "      to: " << std::endl
+              << "          " << path << std::endl;
     }
   }
-
-  if (!this->dataPtr->fuelClient->DownloadModel(fuelUri, path))
-  {
-    gzerr << "Unable to download model[" << _uri << "]" << std::endl;
-    return std::string();
-  }
-  else
-  {
-      gzmsg << "Downloaded model URL: " << std::endl
-            << "          " << _uri << std::endl
-            << "      to: " << std::endl
-            << "          " << path << std::endl;
+  if (path.empty()) {
+    if ((this->dataPtr->fuelClient->ParseModelFileUrl(fuelUri, model, fileUrl) &&
+        !this->dataPtr->fuelClient->CachedModelFile(fuelUri, path))
+      || _forceDownload)
+    {
+      auto modelUri = _uri.substr(0,
+          _uri.find("files", model.UniqueName().size())-1);
+      Result result_download =
+        this->dataPtr->fuelClient->DownloadModel(ignition::common::URI(modelUri), path);
+      if (result_download != Result(ResultType::FETCH) ||
+        result_download != Result(ResultType::FETCH_ALREADY_EXISTS))
+      {
+        gzerr << "Unable to download model[" << _uri << "]" << std::endl;
+        return std::string();
+      }
+      else
+      {
+          gzmsg << "Downloaded model URL: " << std::endl
+                << "          " << _uri << std::endl
+                << "      to: " << std::endl
+                << "          " << path << std::endl;
+          path += "/" + fileUrl;
+      }
+    }
   }
 
   return path;
