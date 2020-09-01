@@ -70,6 +70,7 @@ set (msgs
   packet.proto
   physics.proto
   param.proto
+  performance_metrics.proto
   param_v.proto
   planegeom.proto
   pid.proto

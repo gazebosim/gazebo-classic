@@ -14,22 +14,26 @@
  * limitations under the License.
  *
 */
-#include "gazebo/common/Profiler.hh"
-
 #include <functional>
 #include <boost/bind.hpp>
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Time.hh"
 
 #include "gazebo/msgs/poses_stamped.pb.h"
 
-#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Profiler.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/sensors/SensorsIface.hh"
+#include "gazebo/transport/transport.hh"
 #include "gazebo/util/LogPlay.hh"
 
 using namespace gazebo;
@@ -130,6 +134,116 @@ void SensorManager::WaitForSensors(double _clk, double _dt)
     this->WaitForPrerendered(0.001);
     tnext = this->NextRequiredTimestamp();
   }
+}
+
+std::map<std::string, gazebo::common::Time> sensorsLastMeasurementTime;
+std::map<std::string, gazebo::common::Time> worldLastMeasurementTime;
+struct sensorPerformanceMetricsType
+{
+  double sensorRealUpdateRate;
+  double sensorSimUpdateRate;
+  double sensorFPS;
+};
+std::map<std::string, struct sensorPerformanceMetricsType> sensorPerformanceMetrics;
+/// \brief Publisher for run-time simulation performance metrics.
+transport::PublisherPtr performanceMetricsPub;
+transport::NodePtr node;
+
+void PublishPerformanceMetrics()
+{
+  if (!performanceMetricsPub || !performanceMetricsPub->HasConnections())
+  {
+    return;
+  }
+
+  physics::WorldPtr world = physics::get_world("default");
+
+  /// Outgoing run-time simulation performance metrics.
+  msgs::PerformanceMetrics performanceMetricsMsg;
+
+  // Real time factor
+  common::Time realTime = world->RealTime();
+  common::Time simTime = world->SimTime();
+  if (realTime == 0)
+    simTime = 0;
+  else
+    simTime = simTime / realTime;
+
+  if (simTime > 0)
+    performanceMetricsMsg.set_real_time_factor(simTime.Double());
+  else
+    performanceMetricsMsg.set_real_time_factor(0.0);
+
+  /// update sim time for sensors
+  for (auto model: world->Models())
+  {
+    for (auto link: model->GetLinks())
+    {
+      for (unsigned int i = 0; i < link->GetSensorCount(); i++)
+      {
+        std::string name = link->GetSensorName(i);
+        sensors::SensorPtr sensor = sensors::get_sensor(name);
+
+        auto ret = sensorsLastMeasurementTime.insert(
+            std::pair<std::string, gazebo::common::Time>(name, 0));
+        worldLastMeasurementTime.insert(
+                std::pair<std::string, gazebo::common::Time>(name, 0));
+        if (ret.second == false)
+        {
+          double updateSimRate =
+            (sensor->LastMeasurementTime() - sensorsLastMeasurementTime[name]).Double();
+          if (updateSimRate > 0.0)
+          {
+            sensorsLastMeasurementTime[name] = sensor->LastMeasurementTime();
+            double updateRealRate =
+              (world->RealTime() - worldLastMeasurementTime[name]).Double();
+
+            struct sensorPerformanceMetricsType emptySensorPerfomanceMetrics;
+            auto ret2 = sensorPerformanceMetrics.insert(
+                std::pair<std::string, struct sensorPerformanceMetricsType>
+                  (name, emptySensorPerfomanceMetrics));
+            if (ret2.second == false)
+            {
+              sensorPerformanceMetrics[name].sensorSimUpdateRate = 1.0/updateSimRate;
+              sensorPerformanceMetrics[name].sensorRealUpdateRate = 1.0/updateRealRate;
+              worldLastMeasurementTime[name] = world->RealTime();
+
+              // Special case for stereo cameras
+              sensors::CameraSensorPtr cameraSensor =
+                std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+              if (nullptr != cameraSensor)
+              {
+                sensorPerformanceMetrics[name].sensorFPS = cameraSensor->Camera()->AvgFPS();
+              }
+              else
+              {
+                sensorPerformanceMetrics[name].sensorFPS = -1;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  for (auto sensorPerformanceMetric: sensorPerformanceMetrics)
+  {
+    msgs::PerformanceMetrics::PerformanceSensorMetrics * performanceSensorMetricsMsg =
+      performanceMetricsMsg.add_sensor();
+    performanceSensorMetricsMsg->set_sensor_name(sensorPerformanceMetric.first);
+    performanceSensorMetricsMsg->set_real_sensor_update_rate(
+      sensorPerformanceMetric.second.sensorRealUpdateRate);
+    performanceSensorMetricsMsg->set_sim_sensor_update_rate(
+      sensorPerformanceMetric.second.sensorSimUpdateRate);
+    if (sensorPerformanceMetric.second.sensorFPS >= 0.0)
+    {
+      performanceSensorMetricsMsg->set_fps(
+        sensorPerformanceMetric.second.sensorFPS);
+    }
+  }
+
+  // Publish data
+  performanceMetricsPub->Publish(performanceMetricsMsg);
 }
 
 //////////////////////////////////////////////////
@@ -278,6 +392,13 @@ void SensorManager::Init()
       std::bind(&SensorManager::OnCreateSensor, this,
         std::placeholders::_1, std::placeholders::_2,
         std::placeholders::_3, std::placeholders::_4));
+
+  // Transport
+  node = transport::NodePtr(new transport::Node());
+  node->Init();
+  performanceMetricsPub =
+   node->Advertise<msgs::PerformanceMetrics>(
+       "/gazebo/performance_metrics", 10, 5);
 
   this->initialized = true;
 }
@@ -687,6 +808,8 @@ void SensorManager::SensorContainer::RunLoop()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Update(bool _force)
 {
+  PublishPerformanceMetrics();
+
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (this->sensors.empty())
