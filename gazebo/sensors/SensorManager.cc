@@ -147,32 +147,52 @@ struct sensorPerformanceMetricsType
 std::map<std::string, struct sensorPerformanceMetricsType> sensorPerformanceMetrics;
 /// \brief Publisher for run-time simulation performance metrics.
 transport::PublisherPtr performanceMetricsPub;
-transport::NodePtr node;
+transport::NodePtr node = nullptr;
+
+common::Time lastSimTime;
+common::Time lastRealTime;
 
 void PublishPerformanceMetrics()
 {
+  if (node == nullptr){
+    auto world = physics::get_world();
+    // Transport
+    node = transport::NodePtr(new transport::Node());
+    node->Init(world->Name());
+    performanceMetricsPub =
+     node->Advertise<msgs::PerformanceMetrics>(
+         "/gazebo/performance_metrics", 10, 5);
+  }
+
   if (!performanceMetricsPub || !performanceMetricsPub->HasConnections())
   {
     return;
   }
 
-  physics::WorldPtr world = physics::get_world("default");
+  physics::WorldPtr world = physics::get_world(
+    gazebo::physics::get_world()->Name());
 
   /// Outgoing run-time simulation performance metrics.
   msgs::PerformanceMetrics performanceMetricsMsg;
 
   // Real time factor
   common::Time realTime = world->RealTime();
+  common::Time diffRealtime = realTime - lastRealTime;
   common::Time simTime = world->SimTime();
+  common::Time diffSimTime = simTime - lastSimTime;
+  common::Time realTimeFactor;
   if (realTime == 0)
-    simTime = 0;
+    realTimeFactor = 0;
   else
-    simTime = simTime / realTime;
+    realTimeFactor = diffSimTime / diffRealtime;
 
-  if (simTime > 0)
-    performanceMetricsMsg.set_real_time_factor(simTime.Double());
+  if (realTimeFactor > 0)
+    performanceMetricsMsg.set_real_time_factor(realTimeFactor.Double());
   else
     performanceMetricsMsg.set_real_time_factor(0.0);
+
+  lastRealTime = realTime;
+  lastSimTime = simTime;
 
   /// update sim time for sensors
   for (auto model: world->Models())
@@ -392,13 +412,6 @@ void SensorManager::Init()
       std::bind(&SensorManager::OnCreateSensor, this,
         std::placeholders::_1, std::placeholders::_2,
         std::placeholders::_3, std::placeholders::_4));
-
-  // Transport
-  node = transport::NodePtr(new transport::Node());
-  node->Init();
-  performanceMetricsPub =
-   node->Advertise<msgs::PerformanceMetrics>(
-       "/gazebo/performance_metrics", 10, 5);
 
   this->initialized = true;
 }
