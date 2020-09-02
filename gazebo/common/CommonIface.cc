@@ -513,6 +513,9 @@ std::string common::asFullPath(const std::string &_uri,
 void common::convertToFullPaths(const sdf::ElementPtr &_elem,
     const std::string &_filePath)
 {
+  if (nullptr == _elem)
+    return;
+
   for (auto child = _elem->GetFirstElement(); child != nullptr;
       child = child->GetNextElement())
   {
@@ -520,11 +523,16 @@ void common::convertToFullPaths(const sdf::ElementPtr &_elem,
   }
 
   // * All <uri>
+  bool isUri = _elem->GetName() == "uri";
+
   // * All <filename> which are children of <animation> or <skin>
-  if (_elem->GetName() == "uri" ||
-      ((_elem->GetParent()->GetName() == "animation" ||
-        _elem->GetParent()->GetName() == "skin") &&
-      _elem->GetName() == "filename"))
+  bool isFilename =
+      _elem->GetName() == "filename" &&
+      _elem->GetParent() != nullptr &&
+      (_elem->GetParent()->GetName() == "animation" ||
+       _elem->GetParent()->GetName() == "skin");
+
+  if (isUri || isFilename)
   {
     auto filePath = _filePath.empty() ? _elem->FilePath() : _filePath;
     _elem->Set(common::asFullPath(_elem->Get<std::string>(),
@@ -539,7 +547,7 @@ void common::convertToFullPaths(std::string &_sdfString,
   sdf::SDFPtr sdf = std::make_shared<sdf::SDF>();
   sdf::initFile("root.sdf", sdf);
 
-  if (!sdf::readString(_sdfString, sdf))
+  if (!sdf::readString(_sdfString, sdf) || nullptr == sdf)
   {
     return;
   }
