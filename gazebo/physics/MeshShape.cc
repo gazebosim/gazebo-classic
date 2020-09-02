@@ -46,18 +46,22 @@ MeshShape::~MeshShape()
 //////////////////////////////////////////////////
 void MeshShape::Init()
 {
-  std::string meshStr = this->sdf->Get<std::string>("uri");
+  auto uri = common::asFullPath(this->sdf->Get<std::string>("uri"),
+      this->sdf->FilePath());
 
+  this->sdf->GetElement("uri")->Set(uri);
+
+  std::string meshStr = uri;
   common::MeshManager *meshManager = common::MeshManager::Instance();
   this->mesh = meshManager->GetMesh(meshStr);
 
   if (!this->mesh)
   {
-    meshStr = common::find_file(this->sdf->Get<std::string>("uri"));
+    meshStr = common::find_file(uri);
 
     if (meshStr == "__default__" || meshStr.empty())
     {
-      gzerr << "No mesh specified\n";
+      gzerr << "Failed to find mesh file [" << uri << "]" << std::endl;
       return;
     }
 

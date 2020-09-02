@@ -18,6 +18,7 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"
 
+#include "gazebo/physics/MeshShape.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/SensorsIface.hh"
@@ -1144,6 +1145,80 @@ TEST_F(FactoryTest, FilenameModelDatabase)
 
   // Check model was spawned
   ASSERT_NE(nullptr, world->ModelByName("cococan"));
+}
+
+//////////////////////////////////////////////////
+TEST_F(FactoryTest, FilenameModelDatabaseRelativePaths)
+{
+  // World with a rendering sensor
+  this->Load("worlds/camera.world", true);
+
+  // Test database
+  common::SystemPaths::Instance()->AddModelPaths(
+    PROJECT_SOURCE_PATH "/test/models/testdb");
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Publish factory msg
+  msgs::Factory msg;
+  msg.set_sdf_filename("model://relative_paths");
+
+  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  pub->Publish(msg);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("relative_paths") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  auto model = world->ModelByName("relative_paths");
+  ASSERT_NE(nullptr, model);
+
+  auto link = model->GetLink("link");
+  ASSERT_NE(nullptr, link);
+
+  auto collision = link->GetCollision("collision");
+  ASSERT_NE(nullptr, collision);
+
+  auto shape = collision->GetShape();
+  ASSERT_NE(nullptr, shape);
+
+  auto meshShape = boost::static_pointer_cast<physics::MeshShape>(shape);
+  ASSERT_NE(nullptr, meshShape);
+  EXPECT_EQ(PROJECT_SOURCE_PATH
+      "/test/models/testdb/relative_paths/meshes/test.dae",
+      meshShape->GetMeshURI());
+
+  // Make sure the render engine is available
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    FAIL() << "No rendering engine";
+  }
+
+  auto scene = rendering::get_scene();
+  ASSERT_NE(nullptr, scene);
+
+  auto modelVis = scene->GetVisual("relative_paths");
+  ASSERT_NE(nullptr, modelVis);
+
+  auto linkVis = modelVis->GetChild(0);
+  ASSERT_NE(nullptr, linkVis);
+  EXPECT_EQ("relative_paths::link", linkVis->Name());
+
+  auto visualVis = linkVis->GetChild(0);
+  ASSERT_NE(nullptr, visualVis);
+  EXPECT_EQ("relative_paths::link::visual", visualVis->Name());
+
+  EXPECT_EQ(PROJECT_SOURCE_PATH
+      "/test/models/testdb/relative_paths/meshes/test.dae",
+      visualVis->GetMeshName());
 }
 
 //////////////////////////////////////////////////
