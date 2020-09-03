@@ -1,6 +1,6 @@
 prefix=@CMAKE_INSTALL_PREFIX@
-libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
-includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+libdir=@pkgconfig_libdir@
+includedir=@pkgconfig_includedir@
 
 Name: gazebo_transport
 Description: Gazebo Transport Library
