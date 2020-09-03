@@ -32,8 +32,13 @@
 #endif
 
 #ifndef __APPLE__
-#include <filesystem>
+  #if __GNUC__ < 8
+    #include <experimental/filesystem>
+  #else
+    #include <filesystem>
+  #endif
 #endif
+
 #include <ignition/common/Filesystem.hh>
 
 #include <boost/filesystem/operations.hpp>

@@ -264,9 +264,6 @@ endif()
 if (UNIX AND NOT APPLE)
   # rt is used for clock_gettime, which is not available on apple or windows
   target_link_libraries(gazebo_common PRIVATE rt)
-endif()
-
-if (NOT APPLE)
   target_link_libraries(gazebo_common PRIVATE stdc++fs)
 endif()
 
