@@ -26,7 +26,9 @@
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/Filesystem.hh>
+#include <ignition/common/URI.hh>
 #include <ignition/fuel_tools/FuelClient.hh>
+#include <ignition/fuel_tools/WorldIdentifier.hh>
 #include <sdf/sdf.hh>
 
 #include "gazebo/gazebo_config.h"
@@ -208,13 +210,13 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
 
   if (fuelUri.Scheme() != "http" && fuelUri.Scheme() != "https")
   {
-    gzwarn << "URI not supported by Fuel [" << _uri << "]" << std::endl;
     return std::string();
   }
 
   std::string path;
   std::string fileUrl;
   ignition::fuel_tools::ModelIdentifier model;
+  ignition::fuel_tools::WorldIdentifier world;
   using namespace ignition::fuel_tools;
 
   if ((this->dataPtr->fuelClient->ParseModelUrl(fuelUri, model) &&
@@ -260,6 +262,24 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
                 << "          " << path << std::endl;
           path += "/" + fileUrl;
       }
+    }
+  }
+
+  // ig path is still empty then try to download a world
+  if (path.empty()) {
+    if (this->dataPtr->fuelClient->ParseWorldUrl(fuelUri, world) &&
+        !this->dataPtr->fuelClient->CachedWorld(fuelUri, path))
+    {
+      this->dataPtr->fuelClient->DownloadWorld(fuelUri, path);
+    }
+    // Download the world, if it's a world file URI
+    else if (this->dataPtr->fuelClient->ParseWorldFileUrl(fuelUri, world, fileUrl) &&
+        !this->dataPtr->fuelClient->CachedWorldFile(fuelUri, path))
+    {
+      auto worldUri = _uri.substr(0,
+          _uri.find("files", world.UniqueName().size())-1);
+      this->dataPtr->fuelClient->DownloadWorld(ignition::common::URI(worldUri), path);
+      path += "/" + fileUrl;
     }
   }
 

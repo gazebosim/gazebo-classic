@@ -410,7 +410,7 @@ bool Server::LoadFile(const std::string &_filename,
 
   if (filenameUri.Scheme() == "http" || filenameUri.Scheme() == "https")
   {
-    std::string downloadedDir = ignition::fuel_tools::fetchResource(filename);
+    std::string downloadedDir = common::FuelModelDatabase::Instance()->ModelPath(filename);
     // Find the first sdf file in the world path for now, the later intention is
     // to load an optional world config file first and if that does not exist,
     // continue to load the first sdf file found as done below

@@ -1222,7 +1222,6 @@ TEST_F(FactoryTest, FilenameModelDatabaseRelativePaths)
 }
 
 //////////////////////////////////////////////////
-#ifdef HAVE_IGNITION_FUEL_TOOLS
 TEST_F(FactoryTest, FilenameFuelURL)
 {
   this->Load("worlds/empty.world", true);
@@ -1233,7 +1232,7 @@ TEST_F(FactoryTest, FilenameFuelURL)
 
   msgs::Factory msg;
   msg.set_sdf_filename(
-      "https://api.ignitionfuel.org/1.0/chapulina/models/Test box");
+      "https://fuel.ignitionrobotics.org/1.0/chapulina/models/Test box");
 
   auto pub = this->node->Advertise<msgs::Factory>("~/factory");
   pub->Publish(msg);
@@ -1250,7 +1249,7 @@ TEST_F(FactoryTest, FilenameFuelURL)
   ASSERT_NE(nullptr, world->ModelByName("test_box"));
 }
 
-TEST_F(FactoryTest, worldWithFuelModels)
+TEST_F(FactoryTest, WorldWithFuelModels)
 {
   this->Load("worlds/fuel_models.world", true);
 
@@ -1270,10 +1269,13 @@ TEST_F(FactoryTest, worldWithFuelModels)
   ASSERT_NE(nullptr, world->ModelByName("Radio"));
 }
 
+//////////////////////////////////////////////////
 TEST_F(FactoryTest, FuelURIAsWorldArgument)
 {
+  // ServerFixture::LoadArgs will split whitespaces, so we use a world name
+  // without spaces
   this->Load(
-    "https://staging-fuel.ignitionrobotics.org/1.0/chapulina/worlds/Shapes",
+    "https://fuel.ignitionrobotics.org/1.0/OpenRobotics/worlds/Test_shapes",
     true);
 
   // World
@@ -1311,7 +1313,6 @@ TEST_F(FactoryTest, FuelURIAsWorldArgument)
   // Check model was spawned
   ASSERT_NE(nullptr, world->ModelByName("sphere"));
 }
-#endif
 
 //////////////////////////////////////////////////
 TEST_P(FactoryTest, InvalidMeshInsertion)
