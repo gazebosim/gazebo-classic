@@ -388,15 +388,6 @@ bool Server::GetInitialized() const
 bool Server::LoadFile(const std::string &_filename,
                       const std::string &_physics)
 {
-  // Quick test for a valid file
-  FILE *test = fopen(common::find_file(_filename).c_str(), "r");
-  if (!test)
-  {
-    gzerr << "Could not open file[" << _filename << "]\n";
-    return false;
-  }
-  fclose(test);
-
   // Load the world file
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
@@ -410,7 +401,7 @@ bool Server::LoadFile(const std::string &_filename,
 
   if (filenameUri.Scheme() == "http" || filenameUri.Scheme() == "https")
   {
-    std::string downloadedDir = common::FuelModelDatabase::Instance()->ModelPath(filename);
+    std::string downloadedDir = common::FuelModelDatabase::Instance()->WorldPath(filename);
     // Find the first sdf file in the world path for now, the later intention is
     // to load an optional world config file first and if that does not exist,
     // continue to load the first sdf file found as done below
@@ -427,15 +418,31 @@ bool Server::LoadFile(const std::string &_filename,
         if (fileExtension == "sdf" || fileExtension == "world")
         {
           filename = current.c_str();
+          if (!sdf::readFile(filename, sdf))
+          {
+            gzerr << "Unable to read SDF from URL[" << filename << "]\n";
+            return false;
+          }
         }
       }
     }
   }
-
-  if (!sdf::readFile(common::find_file(filename), sdf))
+  else
   {
-    gzerr << "Unable to read sdf file[" << filename << "]\n";
-    return false;
+    // Quick test for a valid file
+    FILE *test = fopen(common::find_file(filename).c_str(), "r");
+    if (!test)
+    {
+      gzerr << "Could not open file[" << filename << "]\n";
+      return false;
+    }
+    fclose(test);
+
+    if (!sdf::readFile(common::find_file(filename), sdf))
+    {
+      gzerr << "Unable to read sdf file[" << filename << "]\n";
+      return false;
+    }
   }
 
   return this->LoadImpl(sdf->Root(), _physics);
