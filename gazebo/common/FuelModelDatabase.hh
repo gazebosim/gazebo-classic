@@ -103,6 +103,16 @@ namespace gazebo
       public: std::string ModelPath(const std::string &_uri,
         const bool _forceDownload = false);
 
+      /// \brief Get the local path to a world.
+      ///
+      /// Get the path to a world based on a URI. If the world is on
+      /// a remote server, then the model fetched and installed locally.
+      /// \param[in] _uri the model uri
+      /// \param[in] _forceDownload True to skip searching local cache.
+      /// \return Local path to a world directory
+      public: std::string WorldPath(const std::string &_uri,
+        const bool _forceDownload = false);
+
       /// \brief Get the full local path to a cached file based on its URI.
       /// \param[in] _uri The file's URI
       /// \return Local path to the file

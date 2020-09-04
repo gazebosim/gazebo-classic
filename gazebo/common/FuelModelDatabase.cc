@@ -216,7 +216,6 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
   std::string path;
   std::string fileUrl;
   ignition::fuel_tools::ModelIdentifier model;
-  ignition::fuel_tools::WorldIdentifier world;
   using namespace ignition::fuel_tools;
 
   if ((this->dataPtr->fuelClient->ParseModelUrl(fuelUri, model) &&
@@ -265,22 +264,36 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
     }
   }
 
-  // ig path is still empty then try to download a world
-  if (path.empty()) {
-    if (this->dataPtr->fuelClient->ParseWorldUrl(fuelUri, world) &&
-        !this->dataPtr->fuelClient->CachedWorld(fuelUri, path))
-    {
-      this->dataPtr->fuelClient->DownloadWorld(fuelUri, path);
-    }
-    // Download the world, if it's a world file URI
-    else if (this->dataPtr->fuelClient->ParseWorldFileUrl(fuelUri, world, fileUrl) &&
-        !this->dataPtr->fuelClient->CachedWorldFile(fuelUri, path))
-    {
-      auto worldUri = _uri.substr(0,
-          _uri.find("files", world.UniqueName().size())-1);
-      this->dataPtr->fuelClient->DownloadWorld(ignition::common::URI(worldUri), path);
-      path += "/" + fileUrl;
-    }
+  return path;
+}
+
+/////////////////////////////////////////////////
+std::string FuelModelDatabase::WorldPath(const std::string &_uri, const bool _forceDownload)
+{
+  auto fuelUri = ignition::common::URI(_uri);
+
+  if (fuelUri.Scheme() != "http" && fuelUri.Scheme() != "https")
+  {
+    return std::string();
+  }
+
+  std::string path;
+  std::string fileUrl;
+  ignition::fuel_tools::WorldIdentifier world;
+
+  if ((this->dataPtr->fuelClient->ParseWorldUrl(fuelUri, world) &&
+      !this->dataPtr->fuelClient->CachedWorld(fuelUri, path)) || _forceDownload)
+  {
+    this->dataPtr->fuelClient->DownloadWorld(fuelUri, path);
+  }
+  // Download the world, if it's a world file URI
+  else if (this->dataPtr->fuelClient->ParseWorldFileUrl(fuelUri, world, fileUrl) &&
+      !this->dataPtr->fuelClient->CachedWorldFile(fuelUri, path))
+  {
+    auto worldUri = _uri.substr(0,
+        _uri.find("files", world.UniqueName().size())-1);
+    this->dataPtr->fuelClient->DownloadWorld(ignition::common::URI(worldUri), path);
+    path += "/" + fileUrl;
   }
 
   return path;
