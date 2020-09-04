@@ -31,14 +31,6 @@
 #include <sys/sendfile.h>
 #endif
 
-#ifndef __APPLE__
-  #if __GNUC__ < 8
-    #include <experimental/filesystem>
-  #else
-    #include <filesystem>
-  #endif
-#endif
-
 #include <ignition/common/Filesystem.hh>
 
 #include <boost/filesystem/operations.hpp>
@@ -470,7 +462,7 @@ std::string common::asFullPath(const std::string &_uri,
 #else
   // Not a relative path, return unmodified
   if (_uri.find("://") != std::string::npos ||
-      !std::filesystem::path(_uri).is_relative())
+      !boost::filesystem::path(_uri).is_relative())
   {
     return _uri;
   }
