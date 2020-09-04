@@ -173,7 +173,12 @@ std::string common::find_file(const std::string &_file)
 /////////////////////////////////////////////////
 std::string common::find_file(const std::string &_file, bool _searchLocalPath)
 {
-  return common::SystemPaths::Instance()->FindFile(_file, _searchLocalPath);
+  std::string path = common::FuelModelDatabase::Instance()->ModelPath(_file);
+  if (path.empty())
+  {
+    path = common::SystemPaths::Instance()->FindFile(_file, _searchLocalPath);
+  }
+  return path;
 }
 
 /////////////////////////////////////////////////
