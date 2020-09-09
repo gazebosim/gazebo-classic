@@ -85,10 +85,10 @@ void Model::Load(sdf::ElementPtr _sdf)
     BasePtr parentEntity = this->GetParent();
     if (nullptr != parentEntity && !modelName.empty())
     {
-      if (boost::dynamic_pointer_cast<Model>(parentEntity))
+      auto parentModelPtr = boost::dynamic_pointer_cast<Model>(parentEntity);
+      if (parentModelPtr)
       {
-        auto parentDom =
-            boost::dynamic_pointer_cast<Model>(parentEntity)->GetSDFDom();
+        auto parentDom = parentModelPtr->GetSDFDom();
         if (nullptr != parentDom)
         {
           this->modelSDFDom = parentDom->ModelByName(modelName);
