@@ -16,10 +16,10 @@ message PerformanceMetrics
     required string sensor_name             = 1;
 
     /// \brief The update rate of the sensor in real time.
-    required double real_sensor_update_rate = 2;
+    required double real_update_rate = 2;
 
     /// \brief The update rate of the sensor in simulation time.
-    required double sim_sensor_update_rate  = 3;
+    required double sim_update_rate  = 3;
 
     /// \brief If the sensor is a camera then this field should be filled
     /// with fps in real time.

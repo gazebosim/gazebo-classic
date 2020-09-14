@@ -142,7 +142,7 @@ struct sensorPerformanceMetricsType
 {
   double sensorRealUpdateRate;
   double sensorSimUpdateRate;
-  double sensorFPS;
+  double sensorAvgFPS;
 };
 std::map<std::string, struct sensorPerformanceMetricsType> sensorPerformanceMetrics;
 /// \brief Publisher for run-time simulation performance metrics.
@@ -186,10 +186,7 @@ void PublishPerformanceMetrics()
   else
     realTimeFactor = diffSimTime / diffRealtime;
 
-  if (realTimeFactor > 0)
-    performanceMetricsMsg.set_real_time_factor(realTimeFactor.Double());
-  else
-    performanceMetricsMsg.set_real_time_factor(0.0);
+  performanceMetricsMsg.set_real_time_factor(realTimeFactor.Double());
 
   lastRealTime = realTime;
   lastSimTime = simTime;
@@ -233,11 +230,11 @@ void PublishPerformanceMetrics()
                 std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
               if (nullptr != cameraSensor)
               {
-                sensorPerformanceMetrics[name].sensorFPS = cameraSensor->Camera()->AvgFPS();
+                sensorPerformanceMetrics[name].sensorAvgFPS = cameraSensor->Camera()->AvgFPS();
               }
               else
               {
-                sensorPerformanceMetrics[name].sensorFPS = -1;
+                sensorPerformanceMetrics[name].sensorAvgFPS = -1;
               }
             }
           }
@@ -251,14 +248,14 @@ void PublishPerformanceMetrics()
     msgs::PerformanceMetrics::PerformanceSensorMetrics * performanceSensorMetricsMsg =
       performanceMetricsMsg.add_sensor();
     performanceSensorMetricsMsg->set_sensor_name(sensorPerformanceMetric.first);
-    performanceSensorMetricsMsg->set_real_sensor_update_rate(
+    performanceSensorMetricsMsg->set_real_update_rate(
       sensorPerformanceMetric.second.sensorRealUpdateRate);
-    performanceSensorMetricsMsg->set_sim_sensor_update_rate(
+    performanceSensorMetricsMsg->set_sim_update_rate(
       sensorPerformanceMetric.second.sensorSimUpdateRate);
-    if (sensorPerformanceMetric.second.sensorFPS >= 0.0)
+    if (sensorPerformanceMetric.second.sensorAvgFPS >= 0.0)
     {
       performanceSensorMetricsMsg->set_fps(
-        sensorPerformanceMetric.second.sensorFPS);
+        sensorPerformanceMetric.second.sensorAvgFPS);
     }
   }
 
