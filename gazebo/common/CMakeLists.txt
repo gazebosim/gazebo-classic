@@ -266,10 +266,6 @@ if (UNIX AND NOT APPLE)
   target_link_libraries(gazebo_common PRIVATE rt)
 endif()
 
-if (NOT APPLE)
-  target_link_libraries(gazebo_common PRIVATE stdc++fs)
-endif()
-
 if (HAVE_GTS)
   target_link_libraries(gazebo_common PRIVATE ${gts_LIBRARIES})
 endif()
