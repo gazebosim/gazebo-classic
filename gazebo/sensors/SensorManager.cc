@@ -50,6 +50,42 @@ bool g_sensorsDirty = true;
 std::condition_variable
     SensorManager::ImageSensorContainer::conditionPrerendered;
 
+/// Performance metrics variables
+/// \brief last sensor measurement sim time
+std::map<std::string, gazebo::common::Time> sensorsLastMeasurementTime;
+
+/// \brief last sensor measurement real time
+std::map<std::string, gazebo::common::Time> worldLastMeasurementTime;
+
+/// \brief Data structure for storing metric data to be published
+struct sensorPerformanceMetricsType
+{
+  /// \brief sensor real time update rate
+  double sensorRealUpdateRate;
+
+  /// \brief sensor sim time update rate
+  double sensorSimUpdateRate;
+
+  /// \brief Rendering sensor average real time update rate
+  double sensorAvgFPS;
+};
+
+/// \brief A map of sensor name to its performance metrics data
+std::map<std::string, struct sensorPerformanceMetricsType>
+    sensorPerformanceMetrics;
+
+/// \brief Publisher for run-time simulation performance metrics.
+transport::PublisherPtr performanceMetricsPub;
+
+/// \brief Node for publishing performance metrics
+transport::NodePtr node = nullptr;
+
+/// \brief Last sim time measured for performance metrics
+common::Time lastSimTime;
+
+/// \brief Last real time measured for performance metrics
+common::Time lastRealTime;
+
 //////////////////////////////////////////////////
 SensorManager::SensorManager()
   : initialized(false), removeAllSensors(false)
@@ -136,25 +172,10 @@ void SensorManager::WaitForSensors(double _clk, double _dt)
   }
 }
 
-std::map<std::string, gazebo::common::Time> sensorsLastMeasurementTime;
-std::map<std::string, gazebo::common::Time> worldLastMeasurementTime;
-struct sensorPerformanceMetricsType
-{
-  double sensorRealUpdateRate;
-  double sensorSimUpdateRate;
-  double sensorAvgFPS;
-};
-std::map<std::string, struct sensorPerformanceMetricsType> sensorPerformanceMetrics;
-/// \brief Publisher for run-time simulation performance metrics.
-transport::PublisherPtr performanceMetricsPub;
-transport::NodePtr node = nullptr;
-
-common::Time lastSimTime;
-common::Time lastRealTime;
-
 void PublishPerformanceMetrics()
 {
-  if (node == nullptr){
+  if (node == nullptr)
+  {
     auto world = physics::get_world();
     // Transport
     node = transport::NodePtr(new transport::Node());
@@ -181,6 +202,10 @@ void PublishPerformanceMetrics()
   common::Time simTime = world->SimTime();
   common::Time diffSimTime = simTime - lastSimTime;
   common::Time realTimeFactor;
+
+  if (ignition::math::equal(diffSimTime.Double(), 0.0))
+    return;
+
   if (realTime == 0)
     realTimeFactor = 0;
   else
@@ -208,7 +233,8 @@ void PublishPerformanceMetrics()
         if (ret.second == false)
         {
           double updateSimRate =
-            (sensor->LastMeasurementTime() - sensorsLastMeasurementTime[name]).Double();
+            (sensor->LastMeasurementTime() - sensorsLastMeasurementTime[name])
+            .Double();
           if (updateSimRate > 0.0)
           {
             sensorsLastMeasurementTime[name] = sensor->LastMeasurementTime();
@@ -221,8 +247,10 @@ void PublishPerformanceMetrics()
                   (name, emptySensorPerfomanceMetrics));
             if (ret2.second == false)
             {
-              sensorPerformanceMetrics[name].sensorSimUpdateRate = 1.0/updateSimRate;
-              sensorPerformanceMetrics[name].sensorRealUpdateRate = 1.0/updateRealRate;
+              sensorPerformanceMetrics[name].sensorSimUpdateRate =
+                  1.0/updateSimRate;
+              sensorPerformanceMetrics[name].sensorRealUpdateRate =
+                  1.0/updateRealRate;
               worldLastMeasurementTime[name] = world->RealTime();
 
               // Special case for stereo cameras
@@ -230,7 +258,8 @@ void PublishPerformanceMetrics()
                 std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
               if (nullptr != cameraSensor)
               {
-                sensorPerformanceMetrics[name].sensorAvgFPS = cameraSensor->Camera()->AvgFPS();
+                sensorPerformanceMetrics[name].sensorAvgFPS =
+                    cameraSensor->Camera()->AvgFPS();
               }
               else
               {
@@ -245,8 +274,8 @@ void PublishPerformanceMetrics()
 
   for (auto sensorPerformanceMetric: sensorPerformanceMetrics)
   {
-    msgs::PerformanceMetrics::PerformanceSensorMetrics * performanceSensorMetricsMsg =
-      performanceMetricsMsg.add_sensor();
+    msgs::PerformanceMetrics::PerformanceSensorMetrics
+        *performanceSensorMetricsMsg = performanceMetricsMsg.add_sensor();
     performanceSensorMetricsMsg->set_sensor_name(sensorPerformanceMetric.first);
     performanceSensorMetricsMsg->set_real_update_rate(
       sensorPerformanceMetric.second.sensorRealUpdateRate);
@@ -818,9 +847,9 @@ void SensorManager::SensorContainer::RunLoop()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Update(bool _force)
 {
-  PublishPerformanceMetrics();
-
   boost::recursive_mutex::scoped_lock lock(this->mutex);
+
+  PublishPerformanceMetrics();
 
   if (this->sensors.empty())
     gzlog << "Updating a sensor container without any sensors.\n";
