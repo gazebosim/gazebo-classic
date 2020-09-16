@@ -27,6 +27,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 #include "SkyX.h"
 
+#include <ignition/common/Profiler.hh>
+
 namespace SkyX
 {
   SkyX::SkyX(Ogre::SceneManager* sm, Controller* c)
@@ -142,6 +144,7 @@ namespace SkyX
 
   void SkyX::update(const Ogre::Real& timeSinceLastFrame)
   {
+    IGN_PROFILE("rendering::SkyX::Update");
     if (!mCreated || !this->mEnabled)
     {
       return;

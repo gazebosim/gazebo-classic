@@ -319,6 +319,7 @@ void MultiCameraSensor::PrerenderEnded()
 //////////////////////////////////////////////////
 void MultiCameraSensor::Render()
 {
+  IGN_PROFILE("sensor::MultiCameraSensor::Render");
   if (this->useStrictRate)
   {
     if (!this->dataPtr->renderNeeded)

@@ -17,6 +17,7 @@
 
 #include <sstream>
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Pose3.hh>
@@ -412,6 +413,7 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
 //////////////////////////////////////////////////
 void GpuLaser::RenderImpl()
 {
+  IGN_PROFILE("rendering::GpuLaser::RenderImpl");
   common::Timer firstPassTimer, secondPassTimer;
 
   firstPassTimer.Start();

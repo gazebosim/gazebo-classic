@@ -17,6 +17,8 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
+
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -530,6 +532,7 @@ void Visual::Load()
 //////////////////////////////////////////////////
 void Visual::Update()
 {
+  IGN_PROFILE("rendering::Visual::Update");
   if (!this->dataPtr->visible)
     return;
 

@@ -673,6 +673,7 @@ void GpuRaySensor::PrerenderEnded()
 //////////////////////////////////////////////////
 void GpuRaySensor::Render()
 {
+  IGN_PROFILE("sensor::GpuRaySensor::Render");
   if (this->useStrictRate)
   {
     if (!this->dataPtr->renderNeeded)

@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -186,6 +188,7 @@ common::Time MarkerVisual::Lifetime() const
 /////////////////////////////////////////////////
 void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
 {
+  IGN_PROFILE("MarkerVisual::DynamicRenderable");
   if (!this->dPtr->dynamicRenderable)
   {
     switch (_msg.type())

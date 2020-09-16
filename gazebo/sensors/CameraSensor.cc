@@ -300,6 +300,7 @@ void CameraSensor::PrerenderEnded()
 //////////////////////////////////////////////////
 void CameraSensor::Render()
 {
+  IGN_PROFILE("sensor::CameraSensor::Render");
   if (this->useStrictRate)
   {
     if (!this->dataPtr->renderNeeded)

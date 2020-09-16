@@ -25,6 +25,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 #include "SkyX.h"
 
+#include <ignition/common/Profiler.hh>
+
 namespace SkyX
 {
   VCloudsManager::VCloudsManager(SkyX *s)
@@ -114,6 +116,7 @@ namespace SkyX
 
   void VCloudsManager::update(const Ogre::Real& timeSinceLastFrame)
   {
+    IGN_PROFILE("rendering::VCloudsManager::Update");
     if (!mCreated)
     {
       return;
