@@ -66,7 +66,11 @@ struct sensorPerformanceMetricsType
   /// \brief sensor sim time update rate
   double sensorSimUpdateRate;
 
-  /// \brief Rendering sensor average real time update rate
+  /// \brief Rendering sensor average real time update rate. The difference
+  /// between sensorAvgFps and sensorRealUpdateRte is that sensorAvgFps is
+  /// for rendering sensors only and the rate is averaged over a fixed
+  /// window size, whereas the sensorSimUpdateRate stores the instantaneous
+  /// update rate and it is filled by all sensors.
   double sensorAvgFPS;
 };
 
@@ -247,9 +251,9 @@ void PublishPerformanceMetrics()
                   (name, emptySensorPerfomanceMetrics));
             if (ret2.second == false)
             {
-              sensorPerformanceMetrics[name].sensorSimUpdateRate =
+              ret2.first->second.sensorSimUpdateRate =
                   1.0/updateSimRate;
-              sensorPerformanceMetrics[name].sensorRealUpdateRate =
+              ret2.first->second.sensorRealUpdateRate =
                   1.0/updateRealRate;
               worldLastMeasurementTime[name] = world->RealTime();
 
@@ -258,12 +262,12 @@ void PublishPerformanceMetrics()
                 std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
               if (nullptr != cameraSensor)
               {
-                sensorPerformanceMetrics[name].sensorAvgFPS =
+                ret2.first->second.sensorAvgFPS =
                     cameraSensor->Camera()->AvgFPS();
               }
               else
               {
-                sensorPerformanceMetrics[name].sensorAvgFPS = -1;
+                ret2.first->second.sensorAvgFPS = -1;
               }
             }
           }

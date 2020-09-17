@@ -22,7 +22,7 @@ message PerformanceMetrics
     required double sim_update_rate  = 3;
 
     /// \brief If the sensor is a camera then this field should be filled
-    /// with fps in real time.
+    /// with average fps in real time.
     optional double fps                     = 4;
   }
 
