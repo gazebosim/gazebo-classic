@@ -606,7 +606,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set(SDF_MIN_REQUIRED_VERSION 9.1)
+set(SDF_MIN_REQUIRED_VERSION 9.3)
 find_package(sdformat9 ${SDF_MIN_REQUIRED_VERSION} REQUIRED)
 if (sdformat9_FOUND)
   message (STATUS "Looking for SDFormat9  - found")

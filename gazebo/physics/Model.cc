@@ -77,26 +77,51 @@ void Model::Load(sdf::ElementPtr _sdf)
   // Only <model> is supported right now, <actor> is not supported.
   if (_sdf->GetName() == "model")
   {
-    // If the model is initialized without a containing world, we create an
-    // isolated/standalone DOM object for the world. Otherwise, we'd obtain
-    // the model DOM from the world DOM.
-    const auto *worldDom = this->GetWorld()->GetSDFDom();
-    const std::string modelName = _sdf->Get<std::string>("name");
-    if (nullptr != worldDom && !modelName.empty())
+    const auto modelName = _sdf->Get<std::string>("name");
+
+    // If the model is initialized without a containing parent model or world,
+    // we create an isolated/standalone DOM object for the model. Otherwise,
+    // we'd obtain the model DOM from the parent DOM.
+    BasePtr parentEntity = this->GetParent();
+    if (nullptr != parentEntity && !modelName.empty())
     {
-      this->modelSDFDom = worldDom->ModelByName(modelName);
+      auto parentModelPtr = boost::dynamic_pointer_cast<Model>(parentEntity);
+      if (parentModelPtr)
+      {
+        auto parentDom = parentModelPtr->GetSDFDom();
+        if (nullptr != parentDom)
+        {
+          this->modelSDFDom = parentDom->ModelByName(modelName);
+        }
+      }
+      else
+      {
+        // If the parent is not a model, we assume it's a world.
+        auto parentDom = this->GetWorld()->GetSDFDom();
+        if (nullptr != parentDom)
+        {
+          this->modelSDFDom = parentDom->ModelByName(modelName);
+        }
+      }
     }
 
     if (nullptr == this->modelSDFDom)
     {
       this->modelSDFDomIsolated = std::make_unique<sdf::Model>();
       sdf::Errors errors = this->modelSDFDomIsolated->Load(_sdf);
-      // Print errors and load the parts that worked.
-      for (const auto &error : errors)
+      auto sdfVersion =
+        ignition::math::SemanticVersion(_sdf->OriginalVersion());
+      // Only print out errors if the original SDFormat version does not support
+      // frame semantics
+      if (sdfVersion >= ignition::math::SemanticVersion(1, 7))
       {
-        if (common::isSdfFrameSemanticsError(error))
+        // Print errors and load the parts that worked.
+        for (const auto &error : errors)
         {
-          gzerr << error << "\n";
+          if (common::isSdfFrameSemanticsError(error))
+          {
+            gzerr << error << "\n";
+          }
         }
       }
       this->modelSDFDom = this->modelSDFDomIsolated.get();
