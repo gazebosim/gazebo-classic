@@ -27,6 +27,11 @@
 #include <ignition/common/Console.hh>
 #include <ignition/common/Filesystem.hh>
 #include <ignition/common/URI.hh>
+#ifdef _WIN32
+  // DELETE is defined in winnt.h and causes a problem with
+  // ignition::fuel_tools::REST::DELETE
+  #undef DELETE
+#endif
 #include <ignition/fuel_tools/FuelClient.hh>
 #include <ignition/fuel_tools/WorldIdentifier.hh>
 #include <sdf/sdf.hh>
@@ -317,4 +322,3 @@ std::string FuelModelDatabase::CachedFilePath(const std::string &_uri)
 
   return path;
 }
-
