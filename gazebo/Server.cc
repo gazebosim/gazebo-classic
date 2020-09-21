@@ -36,6 +36,11 @@
 #include <ignition/common/Profiler.hh>
 #include <ignition/common/Filesystem.hh>
 #include <ignition/common/URI.hh>
+#ifdef _WIN32
+  // DELETE is defined in winnt.h and causes a problem with
+  // ignition::fuel_tools::REST::DELETE
+  #undef DELETE
+#endif
 #include <ignition/fuel_tools/Interface.hh>
 
 #include "gazebo/gazebo.hh"

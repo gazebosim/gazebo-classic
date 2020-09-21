@@ -47,6 +47,11 @@
 #include "gazebo/common/FuelModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
 
+#ifdef _WIN32
+  // DELETE is defined in winnt.h and causes a problem with
+  // ignition::fuel_tools::REST::DELETE
+  #undef DELETE
+#endif
 #include "ignition/fuel_tools/Interface.hh"
 
 using namespace gazebo;

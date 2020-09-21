@@ -21,6 +21,11 @@
 #include <memory>
 #include <string>
 #include <vector>
+#ifdef _WIN32
+  // DELETE is defined in winnt.h and causes a problem with
+  // ignition::fuel_tools::REST::DELETE
+  #undef DELETE
+#endif
 #include <ignition/fuel_tools/ClientConfig.hh>
 #include <ignition/fuel_tools/ModelIdentifier.hh>
 
