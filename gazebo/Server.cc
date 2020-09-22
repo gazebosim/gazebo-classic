@@ -33,7 +33,15 @@
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Rand.hh>
-#include "ignition/common/Profiler.hh"
+#include <ignition/common/Profiler.hh>
+#include <ignition/common/Filesystem.hh>
+#include <ignition/common/URI.hh>
+#ifdef _WIN32
+  // DELETE is defined in winnt.h and causes a problem with
+  // ignition::fuel_tools::REST::DELETE
+  #undef DELETE
+#endif
+#include <ignition/fuel_tools/Interface.hh>
 
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
@@ -385,15 +393,6 @@ bool Server::GetInitialized() const
 bool Server::LoadFile(const std::string &_filename,
                       const std::string &_physics)
 {
-  // Quick test for a valid file
-  FILE *test = fopen(common::find_file(_filename).c_str(), "r");
-  if (!test)
-  {
-    gzerr << "Could not open file[" << _filename << "]\n";
-    return false;
-  }
-  fclose(test);
-
   // Load the world file
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
@@ -402,10 +401,53 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  if (!sdf::readFile(common::find_file(_filename), sdf))
+  std::string filename = _filename;
+  auto filenameUri = ignition::common::URI(filename);
+
+  if (filenameUri.Scheme() == "http" || filenameUri.Scheme() == "https")
   {
-    gzerr << "Unable to read sdf file[" << _filename << "]\n";
-    return false;
+    std::string downloadedDir = common::FuelModelDatabase::Instance()->WorldPath(filename);
+    // Find the first sdf file in the world path for now, the later intention is
+    // to load an optional world config file first and if that does not exist,
+    // continue to load the first sdf file found as done below
+    for (ignition::common::DirIter file(downloadedDir);
+         file != ignition::common::DirIter(); ++file)
+    {
+      std::string current(*file);
+      if (ignition::common::isFile(current))
+      {
+        std::string fileName = ignition::common::basename(current);
+        std::string::size_type fileExtensionIndex = fileName.rfind(".");
+        std::string fileExtension = fileName.substr(fileExtensionIndex + 1);
+
+        if (fileExtension == "sdf" || fileExtension == "world")
+        {
+          filename = current.c_str();
+          if (!sdf::readFile(filename, sdf))
+          {
+            gzerr << "Unable to read SDF from URL[" << filename << "]\n";
+            return false;
+          }
+        }
+      }
+    }
+  }
+  else
+  {
+    // Quick test for a valid file
+    FILE *test = fopen(common::find_file(filename).c_str(), "r");
+    if (!test)
+    {
+      gzerr << "Could not open file[" << filename << "]\n";
+      return false;
+    }
+    fclose(test);
+
+    if (!sdf::readFile(common::find_file(filename), sdf))
+    {
+      gzerr << "Unable to read sdf file[" << filename << "]\n";
+      return false;
+    }
   }
 
   return this->LoadImpl(sdf->Root(), _physics);

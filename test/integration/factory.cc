@@ -1222,7 +1222,6 @@ TEST_F(FactoryTest, FilenameModelDatabaseRelativePaths)
 }
 
 //////////////////////////////////////////////////
-#ifdef HAVE_IGNITION_FUEL_TOOLS
 TEST_F(FactoryTest, FilenameFuelURL)
 {
   this->Load("worlds/empty.world", true);
@@ -1233,7 +1232,7 @@ TEST_F(FactoryTest, FilenameFuelURL)
 
   msgs::Factory msg;
   msg.set_sdf_filename(
-      "https://api.ignitionfuel.org/1.0/chapulina/models/Test box");
+      "https://fuel.ignitionrobotics.org/1.0/chapulina/models/Test box");
 
   auto pub = this->node->Advertise<msgs::Factory>("~/factory");
   pub->Publish(msg);
@@ -1249,7 +1248,71 @@ TEST_F(FactoryTest, FilenameFuelURL)
   // Check model was spawned
   ASSERT_NE(nullptr, world->ModelByName("test_box"));
 }
-#endif
+
+TEST_F(FactoryTest, WorldWithFuelModels)
+{
+  this->Load("worlds/fuel_models.world", true);
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("Radio") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("Radio"));
+}
+
+//////////////////////////////////////////////////
+TEST_F(FactoryTest, FuelURIAsWorldArgument)
+{
+  // ServerFixture::LoadArgs will split whitespaces, so we use a world name
+  // without spaces
+  this->Load(
+    "https://fuel.ignitionrobotics.org/1.0/OpenRobotics/worlds/Test_shapes",
+    true);
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("box") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("box"));
+
+  sleep = 0;
+  maxSleep = 50;
+  while (!world->ModelByName("cylinder") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("cylinder"));
+
+  sleep = 0;
+  maxSleep = 50;
+  while (!world->ModelByName("sphere") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("sphere"));
+}
 
 //////////////////////////////////////////////////
 TEST_P(FactoryTest, InvalidMeshInsertion)

@@ -465,7 +465,7 @@ void RenderEngine::LoadPlugins()
 /////////////////////////////////////////////////
 void RenderEngine::AddResourcePath(const std::string &_uri)
 {
-  if (_uri == "__default__" || _uri.empty())
+  if (_uri.find("__default__") != std::string::npos || _uri.empty())
     return;
 
   std::string path = common::find_file_path(_uri);
