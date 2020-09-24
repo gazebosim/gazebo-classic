@@ -64,6 +64,8 @@ void DARTSurfaceParams::Load(sdf::ElementPtr _sdf)
           frictionOdeElem->Get<double>("mu"));
         this->dataPtr->frictionPyramid->SetMuSecondary(
           frictionOdeElem->Get<double>("mu2"));
+        this->dataPtr->frictionPyramid->direction1 =
+          frictionOdeElem->Get<ignition::math::Vector3d>("fdir1");
       }
     }
   }
