@@ -8,9 +8,9 @@ set (msgs
   axis.proto
   battery.proto
   boxgeom.proto
-  camerasensor.proto
   camera_cmd.proto
   camera_lens.proto
+  camerasensor.proto
   cessna.proto
   collision.proto
   color.proto
@@ -29,16 +29,16 @@ set (msgs
   geometry.proto
   gps.proto
   gps_sensor.proto
-  gui_camera.proto
   gui.proto
+  gui_camera.proto
   gz_string.proto
   gz_string_v.proto
   header.proto
   heightmapgeom.proto
   hydra.proto
-  imagegeom.proto
   image.proto
   image_stamped.proto
+  imagegeom.proto
   images_stamped.proto
   imu.proto
   imu_sensor.proto
@@ -68,11 +68,12 @@ set (msgs
   model_configuration.proto
   model_v.proto
   packet.proto
-  physics.proto
   param.proto
   param_v.proto
-  planegeom.proto
+  performance_metrics.proto
+  physics.proto
   pid.proto
+  planegeom.proto
   plugin.proto
   pointcloud.proto
   polylinegeom.proto
@@ -83,20 +84,18 @@ set (msgs
   pose_v.proto
   poses_stamped.proto
   projector.proto
-  propagation_particle.proto
   propagation_grid.proto
-  publishers.proto
+  propagation_particle.proto
   publish.proto
+  publishers.proto
   quaternion.proto
-  sonar.proto
-  sonar_stamped.proto
   raysensor.proto
   request.proto
   response.proto
-  rest_response.proto
   rest_login.proto
   rest_logout.proto
   rest_post.proto
+  rest_response.proto
   road.proto
   scene.proto
   selection.proto
@@ -106,6 +105,8 @@ set (msgs
   shadows.proto
   sim_event.proto
   sky.proto
+  sonar.proto
+  sonar_stamped.proto
   spheregeom.proto
   spherical_coordinates.proto
   subscribe.proto
@@ -126,9 +127,9 @@ set (msgs
   wireless_node.proto
   wireless_nodes.proto
   world_control.proto
+  world_modify.proto
   world_reset.proto
   world_stats.proto
-  world_modify.proto
   wrench.proto
   wrench_stamped.proto
 )

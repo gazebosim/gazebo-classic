@@ -1,0 +1,37 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PerformanceMetrics
+/// \brief A message for run-time simulation performance metrics
+
+message PerformanceMetrics
+{
+  /// \brief This message contains information about the performance of
+  /// each sensor in the world.
+  /// If the sensor is a camera then it will publish the frame per second (fps).
+  message PerformanceSensorMetrics
+  {
+    /// \brief Sensor name
+    required string name             = 1;
+
+    /// \brief The update rate of the sensor in real time.
+    required double real_update_rate = 2;
+
+    /// \brief The update rate of the sensor in simulation time.
+    required double sim_update_rate  = 3;
+
+    /// \brief If the sensor is a camera then this field should be filled
+    /// with average fps in real time.
+    optional double fps                     = 4;
+  }
+
+  /// max_step_size x real_time_update_rate sets an upper bound of
+  /// real_time_factor. If real_time_factor < 1 the simulation is
+  /// slower than real time.
+  required double real_time_factor         = 1[default=0.0];
+
+  /// Each sensor in the world will create a PerformanceSensorMetrics
+  /// message publishing information about the performance.
+  repeated PerformanceSensorMetrics sensor = 2;
+}
