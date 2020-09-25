@@ -13,7 +13,7 @@ message PerformanceMetrics
   message PerformanceSensorMetrics
   {
     /// \brief Sensor name
-    required string sensor_name             = 1;
+    required string name             = 1;
 
     /// \brief The update rate of the sensor in real time.
     required double real_update_rate = 2;

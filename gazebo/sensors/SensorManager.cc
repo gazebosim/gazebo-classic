@@ -276,7 +276,7 @@ void PublishPerformanceMetrics()
   {
     msgs::PerformanceMetrics::PerformanceSensorMetrics
         *performanceSensorMetricsMsg = performanceMetricsMsg.add_sensor();
-    performanceSensorMetricsMsg->set_sensor_name(sensorPerformanceMetric.first);
+    performanceSensorMetricsMsg->set_name(sensorPerformanceMetric.first);
     performanceSensorMetricsMsg->set_real_update_rate(
       sensorPerformanceMetric.second.sensorRealUpdateRate);
     performanceSensorMetricsMsg->set_sim_update_rate(
