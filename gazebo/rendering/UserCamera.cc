@@ -250,6 +250,7 @@ void UserCamera::AnimationComplete()
 //////////////////////////////////////////////////
 void UserCamera::Render(const bool /*_force*/)
 {
+  IGN_PROFILE("rendering::UserCamera::Render");
   if (this->initialized)
   {
     this->newData = true;
@@ -260,6 +261,7 @@ void UserCamera::Render(const bool /*_force*/)
 //////////////////////////////////////////////////
 void UserCamera::PostRender()
 {
+  IGN_PROFILE("rendering::UserCamera::PostRender");
   Camera::PostRender();
 }
 
