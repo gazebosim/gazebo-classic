@@ -188,7 +188,7 @@ common::Time MarkerVisual::Lifetime() const
 /////////////////////////////////////////////////
 void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
 {
-  IGN_PROFILE("MarkerVisual::DynamicRenderable");
+  IGN_PROFILE("rendering::MarkerVisual::DynamicRenderable");
   if (!this->dPtr->dynamicRenderable)
   {
     switch (_msg.type())

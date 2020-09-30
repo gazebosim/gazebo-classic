@@ -49,7 +49,7 @@
           <!-- We choose a high fps on purpose. The goal is to check the effect
             of lockstep. -->
           <update_rate>500</update_rate>
-          <visualize>false</visualize>
+          <visualize>true</visualize>
         </sensor>
       </link>
     </model>
