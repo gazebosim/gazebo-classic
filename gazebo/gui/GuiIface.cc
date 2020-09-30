@@ -25,6 +25,7 @@
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/SemanticVersion.hh>
 
 #include "gazebo/gui/qt.h"
@@ -382,7 +383,7 @@ unsigned int gui::get_entity_id(const std::string &_name)
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
-  IGN_PROFILE_THREAD_NAME("gzclient")
+  IGN_PROFILE_THREAD_NAME("gzclient");
 
   // Initialize the informational logger. This will log warnings, and errors.
   gzLogInit("client-", "gzclient.log");
