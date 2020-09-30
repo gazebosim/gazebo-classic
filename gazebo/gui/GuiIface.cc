@@ -382,6 +382,8 @@ unsigned int gui::get_entity_id(const std::string &_name)
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
+  IGN_PROFILE_THREAD_NAME("gzclient")
+
   // Initialize the informational logger. This will log warnings, and errors.
   gzLogInit("client-", "gzclient.log");
 
