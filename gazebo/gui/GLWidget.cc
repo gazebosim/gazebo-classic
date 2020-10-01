@@ -19,6 +19,7 @@
 #include <boost/lexical_cast.hpp>
 #include <math.h>
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 
@@ -279,16 +280,28 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->Initialized())
   {
-    event::Events::preRender();
+    {
+      IGN_PROFILE("gui::GLWidget::paintEvent pre-render");
+      event::Events::preRender();
+    }
 
     // Tell all the cameras to render
-    event::Events::render();
+    {
+      IGN_PROFILE("gui::GLWidget::paintEvent render");
+      event::Events::render();
+    }
 
-    event::Events::postRender();
+    {
+      IGN_PROFILE("gui::GLWidget::paintEvent post-render");
+      event::Events::postRender();
+    }
   }
   else
   {
-    event::Events::preRender();
+    {
+      IGN_PROFILE("gui::GLWidget::paintEvent pre-render");
+      event::Events::preRender();
+    }
   }
 
   _e->accept();
