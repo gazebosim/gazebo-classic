@@ -34,6 +34,7 @@
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/SplashScreen.hh"
 #include "gazebo/gui/MainWindow.hh"
@@ -382,6 +383,8 @@ unsigned int gui::get_entity_id(const std::string &_name)
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
+  GZ_PROFILE_THREAD_NAME("gzclient");
+
   // Initialize the informational logger. This will log warnings, and errors.
   gzLogInit("client-", "gzclient.log");
 

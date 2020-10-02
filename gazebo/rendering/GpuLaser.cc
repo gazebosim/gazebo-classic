@@ -414,7 +414,6 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
 void GpuLaser::RenderImpl()
 {
   GZ_PROFILE("rendering::GpuLaser::RenderImpl");
-  GZ_PROFILE_BEGIN("Update");
   common::Timer firstPassTimer, secondPassTimer;
 
   firstPassTimer.Start();
@@ -461,7 +460,6 @@ void GpuLaser::RenderImpl()
 
   double secondPassDur = secondPassTimer.GetElapsed().Double();
   this->dataPtr->lastRenderDuration = firstPassDur + secondPassDur;
-  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

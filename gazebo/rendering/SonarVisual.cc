@@ -98,7 +98,6 @@ void SonarVisual::OnMsg(ConstSonarStampedPtr &_msg)
 void SonarVisual::Update()
 {
   GZ_PROFILE("rendering::SonarVisual::Update");
-  GZ_PROFILE_BEGIN("Update");
   SonarVisualPrivate *dPtr =
       reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
 
@@ -106,7 +105,6 @@ void SonarVisual::Update()
 
   if (!dPtr->sonarMsg || !dPtr->receivedMsg)
   {
-    GZ_PROFILE_END();
     return;
   }
 
@@ -115,7 +113,6 @@ void SonarVisual::Update()
       this->GetRootVisual()->Name() ==
       this->GetScene()->SelectedVisual()->Name())
   {
-    GZ_PROFILE_END();
     return;
   }
 
@@ -148,5 +145,4 @@ void SonarVisual::Update()
           (rangeDelta * 0.5) - dPtr->sonarMsg->sonar().range()));
   }
   dPtr->receivedMsg = false;
-  GZ_PROFILE_END();
 }

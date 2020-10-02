@@ -71,7 +71,6 @@ ContactVisual::~ContactVisual()
 void ContactVisual::Update()
 {
   GZ_PROFILE("rendering::ContactVisual::Update");
-  GZ_PROFILE_BEGIN("Update");
   ContactVisualPrivate *dPtr =
       reinterpret_cast<ContactVisualPrivate *>(this->dataPtr);
 
@@ -79,7 +78,6 @@ void ContactVisual::Update()
 
   if (!dPtr->contactsMsg || !dPtr->receivedMsg)
   {
-    GZ_PROFILE_END();
     return;
   }
 
@@ -132,7 +130,6 @@ void ContactVisual::Update()
     dPtr->points[c]->contactPointVis->SetVisible(false);
 
   dPtr->receivedMsg = false;
-  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

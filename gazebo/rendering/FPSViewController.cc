@@ -54,7 +54,6 @@ void FPSViewController::Init()
 void FPSViewController::Update()
 {
   GZ_PROFILE("rendering::FPSViewController::Update");
-  GZ_PROFILE_BEGIN("Update");
   if (this->xVelocity != ignition::math::Vector3d::Zero ||
       this->yVelocity != ignition::math::Vector3d::Zero)
   {
@@ -67,7 +66,6 @@ void FPSViewController::Update()
     ignition::math::Vector3d trans = this->xVelocity + this->yVelocity;
     this->camera->Translate(trans * dt);
   }
-  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

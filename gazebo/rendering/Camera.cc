@@ -410,7 +410,6 @@ void Camera::SetScene(ScenePtr _scene)
 void Camera::Update()
 {
   GZ_PROFILE("rendering::Camera::Update");
-  GZ_PROFILE_BEGIN("Update");
   std::lock_guard<std::mutex> lock(this->dataPtr->receiveMutex);
 
   // Process all the command messages.
@@ -537,14 +536,12 @@ void Camera::Update()
 
     this->SetWorldPosition(pos);
   }
-  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////
 void Camera::Render(const bool _force)
 {
   GZ_PROFILE("rendering::Camera::Render");
-  GZ_PROFILE_BEGIN("Update");
   if (this->initialized && (_force ||
        common::Time::GetWallTime() - this->lastRenderWallTime >=
         this->dataPtr->renderPeriod))
@@ -552,7 +549,6 @@ void Camera::Render(const bool _force)
     this->newData = true;
     this->RenderImpl();
   }
-  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

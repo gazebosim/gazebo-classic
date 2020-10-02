@@ -112,7 +112,6 @@ VideoVisual::~VideoVisual()
 void VideoVisual::PreRender()
 {
   GZ_PROFILE("rendering::VideoVisual::PreRender");
-  GZ_PROFILE_BEGIN("prerender");
   VideoVisualPrivate *dPtr =
       reinterpret_cast<VideoVisualPrivate *>(this->dataPtr);
 
@@ -156,5 +155,4 @@ void VideoVisual::PreRender()
 
   // Unlock the pixel buffer
   pixelBuffer->unlock();
-  GZ_PROFILE_END();
 }

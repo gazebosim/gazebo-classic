@@ -603,13 +603,11 @@ void GpuRaySensor::PrerenderEnded()
 //////////////////////////////////////////////////
 void GpuRaySensor::Render()
 {
-  GZ_PROFILE("sensor::GpuRaySensor::Render");
-  GZ_PROFILE_BEGIN("Render");
+  GZ_PROFILE("sensors::GpuRaySensor::Render");
   if (this->useStrictRate)
   {
     if (!this->dataPtr->renderNeeded)
     {
-      GZ_PROFILE_END();
       return;
     }
 
@@ -620,7 +618,6 @@ void GpuRaySensor::Render()
   else
   {
     if (!this->dataPtr->laserCam || !this->IsActive() || !this->NeedsUpdate()){
-      GZ_PROFILE_END();
       return;
     }
 
@@ -629,7 +626,6 @@ void GpuRaySensor::Render()
     this->dataPtr->laserCam->Render();
     this->dataPtr->rendered = true;
   }
-  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

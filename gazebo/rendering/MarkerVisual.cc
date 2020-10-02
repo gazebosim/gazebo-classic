@@ -189,8 +189,7 @@ common::Time MarkerVisual::Lifetime() const
 /////////////////////////////////////////////////
 void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
 {
-  GZ_PROFILE("MarkerVisual::DynamicRenderable");
-  GZ_PROFILE_BEGIN("Update");
+  GZ_PROFILE("rendering::MarkerVisual::DynamicRenderable");
   if (!this->dPtr->dynamicRenderable)
   {
     switch (_msg.type())
@@ -298,7 +297,6 @@ void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
                                  _msg.point(i).y(),
                                  _msg.point(i).z()));
   }
-  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

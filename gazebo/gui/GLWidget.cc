@@ -24,6 +24,7 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -279,16 +280,27 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->Initialized())
   {
-    event::Events::preRender();
-
+    {
+      GZ_PROFILE("gui::GLWidget::paintEvent pre-render");
+      event::Events::preRender();
+    }
     // Tell all the cameras to render
-    event::Events::render();
+    {
+      GZ_PROFILE("gui::GLWidget::paintEvent render");
+      event::Events::render();
+    }
 
-    event::Events::postRender();
+    {
+      GZ_PROFILE("gui::GLWidget::paintEvent post-render");
+      event::Events::postRender();
+    }
   }
   else
   {
-    event::Events::preRender();
+    {
+      GZ_PROFILE("gui::GLWidget::paintEvent pre-render");
+      event::Events::preRender();
+    }
   }
 
   _e->accept();

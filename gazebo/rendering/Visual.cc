@@ -532,10 +532,8 @@ void Visual::Load()
 void Visual::Update()
 {
   GZ_PROFILE("rendering::Visual::Update");
-  GZ_PROFILE_BEGIN("Update");
   if (!this->dataPtr->visible)
   {
-    GZ_PROFILE_END();
     return;
   }
   std::list<DynamicLines*>::iterator iter;
@@ -572,7 +570,6 @@ void Visual::Update()
       // event::Events::DisconnectPreRender(this->preRenderConnection);
     }
   }
-  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

@@ -309,14 +309,12 @@ void ApplyWrenchVisual::SetTorque(const ignition::math::Vector3d &_torqueVector,
 void ApplyWrenchVisual::UpdateForceVisual()
 {
   GZ_PROFILE("ApplyWrenchVisual::UpdateForceVisual");
-  GZ_PROFILE_BEGIN("Update");
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   if (!dPtr->forceVisual || !dPtr->rotTool)
   {
     gzwarn << "No force visual" << std::endl;
-    GZ_PROFILE_END();
     return;
   }
 
@@ -341,21 +339,18 @@ void ApplyWrenchVisual::UpdateForceVisual()
   dPtr->rotTool->SetPosition(dPtr->forcePosVector);
   if (!dPtr->rotatedByMouse)
     dPtr->rotTool->SetRotation(quat);
-  GZ_PROFILE_END();
 }
 
 ///////////////////////////////////////////////////
 void ApplyWrenchVisual::UpdateTorqueVisual()
 {
   GZ_PROFILE("ApplyWrenchVisual::UpdateTorqueVisual");
-  GZ_PROFILE_BEGIN("Update");
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   if (!dPtr->torqueVisual || !dPtr->rotTool)
   {
     gzwarn << "No torque visual" << std::endl;
-    GZ_PROFILE_END();
     return;
   }
 
@@ -383,14 +378,12 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
   dPtr->rotTool->SetPosition(dPtr->comVector);
   if (!dPtr->rotatedByMouse)
     dPtr->rotTool->SetRotation(quat);
-  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchVisual::Resize()
 {
   GZ_PROFILE("ApplyWrenchVisual::Resize");
-  GZ_PROFILE_BEGIN("Update");
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
@@ -398,7 +391,6 @@ void ApplyWrenchVisual::Resize()
       !dPtr->rotTool)
   {
     gzwarn << "ApplyWrenchVisual is incomplete." << std::endl;
-    GZ_PROFILE_END();
     return;
   }
 
@@ -427,7 +419,6 @@ void ApplyWrenchVisual::Resize()
   dPtr->forceText.SetCharHeight(fontSize);
   dPtr->torqueText.SetCharHeight(fontSize);
   dPtr->forceText.SetBaseline(0.12*linkSize);
-  GZ_PROFILE_END();
 }
 
 ///////////////////////////////////////////////////

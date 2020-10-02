@@ -636,10 +636,8 @@ Ogre::PSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
 void RTShaderSystem::Update()
 {
   GZ_PROFILE("rendering::RTShaderSystem::Update");
-  GZ_PROFILE_BEGIN("Update");
   if (!this->dataPtr->initialized || !this->dataPtr->updateShaders)
   {
-    GZ_PROFILE_END();
     return;
   }
 
@@ -652,7 +650,6 @@ void RTShaderSystem::Update()
     }
   }
   this->dataPtr->updateShaders = false;
-  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

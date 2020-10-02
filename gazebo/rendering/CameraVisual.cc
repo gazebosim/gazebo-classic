@@ -129,18 +129,15 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
 void CameraVisual::Update()
 {
   GZ_PROFILE("rendering::CameraVisual::Update");
-  GZ_PROFILE_BEGIN("Update");
   CameraVisualPrivate *dPtr =
       reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
 
   if (!dPtr->camera)
   {
-    GZ_PROFILE_END();
     return;
   }
 
   dPtr->camera->Render();
-  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

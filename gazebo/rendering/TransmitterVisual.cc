@@ -90,7 +90,6 @@ void TransmitterVisual::OnNewPropagationGrid(ConstPropagationGridPtr &_msg)
 void TransmitterVisual::Update()
 {
   GZ_PROFILE("rendering::TransmitterVisual::Update");
-  GZ_PROFILE_BEGIN("Update");
   TransmitterVisualPrivate *dPtr =
       reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);
 
@@ -100,7 +99,6 @@ void TransmitterVisual::Update()
 
   if (!dPtr->gridMsg || !dPtr->receivedMsg)
   {
-    GZ_PROFILE_END();
     return;
   }
 
@@ -132,5 +130,4 @@ void TransmitterVisual::Update()
     ignition::math::Color color(strength, strength, strength);
     dPtr->points->SetColor(i, color);
   }
-  GZ_PROFILE_END();
 }

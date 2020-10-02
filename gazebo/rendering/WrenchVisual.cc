@@ -161,7 +161,6 @@ void WrenchVisual::Load(ConstJointPtr &_msg)
 void WrenchVisual::Update()
 {
   GZ_PROFILE("rendering::WrenchVisual::Update");
-  GZ_PROFILE_BEGIN("Update");
   WrenchVisualPrivate *dPtr =
       reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
 
@@ -169,7 +168,6 @@ void WrenchVisual::Update()
 
   if (!dPtr->wrenchMsg || !dPtr->receivedMsg)
   {
-    GZ_PROFILE_END();
     return;
   }
 
@@ -206,7 +204,6 @@ void WrenchVisual::Update()
 
   dPtr->coneZVis->SetScale(ignition::math::Vector3d(0.02, 0.02, zScale));
   dPtr->coneZVis->SetPosition(ignition::math::Vector3d(0, 0, zScale * 0.5));
-  GZ_PROFILE_END();
 }
 
 /////////////////////////////////////////////////

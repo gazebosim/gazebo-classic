@@ -237,10 +237,8 @@ void OculusCamera::RenderImpl()
 void OculusCamera::Update()
 {
   GZ_PROFILE("rendering::OculusCamera::Update");
-  GZ_PROFILE_BEGIN("Update");
   if (!this->Ready())
   {
-    GZ_PROFILE_END();
     return;
   }
 
@@ -279,7 +277,6 @@ void OculusCamera::Update()
   }
 
   this->sceneNode->needUpdate();
-  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////
