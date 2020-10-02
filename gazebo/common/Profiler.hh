@@ -27,7 +27,6 @@
 #include <string>
 
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/Remotery/lib/Remotery.h"
 #include "gazebo/util/system.hh"
 
 /// \brief Explicit instantiation for typed SingletonT.
