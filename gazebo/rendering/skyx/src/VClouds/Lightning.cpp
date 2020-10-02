@@ -21,7 +21,10 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <ignition/common/Profiler.hh>
+
 #include <vector>
+
 #include "VClouds/Lightning.h"
 
 namespace SkyX { namespace VClouds
@@ -200,6 +203,7 @@ namespace SkyX { namespace VClouds
 
   void Lightning::update(Ogre::Real timeSinceLastFrame)
   {
+    IGN_PROFILE("rendering::Lightning::Update");
     if (!mCreated)
     {
       return;

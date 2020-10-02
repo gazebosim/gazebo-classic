@@ -21,6 +21,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Helpers.hh>
 #include <sdf/sdf.hh>
 
@@ -421,6 +422,7 @@ void Camera::SetScene(ScenePtr _scene)
 //////////////////////////////////////////////////
 void Camera::Update()
 {
+  IGN_PROFILE("rendering::Camera::Update");
   std::lock_guard<std::mutex> lock(this->dataPtr->receiveMutex);
 
   // Process all the command messages.
@@ -552,6 +554,7 @@ void Camera::Update()
 //////////////////////////////////////////////////
 void Camera::Render(const bool _force)
 {
+  IGN_PROFILE("rendering::Camera::Render");
   if (this->initialized && (_force ||
        common::Time::GetWallTime() - this->lastRenderWallTime >=
         this->dataPtr->renderPeriod))
@@ -566,9 +569,18 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
-    Events::cameraPreRender(this->Name());
-    this->renderTarget->update();
-    Events::cameraPostRender(this->Name());
+    {
+      IGN_PROFILE("rendering::Camera::RenderImpl pre-render");
+      Events::cameraPreRender(this->Name());
+    }
+    {
+      IGN_PROFILE("rendering::Camera::RenderImpl update");
+      this->renderTarget->update();
+    }
+    {
+      IGN_PROFILE("rendering::Camera::RenderImpl post-render");
+      Events::cameraPostRender(this->Name());
+    }
   }
 }
 
@@ -651,6 +663,7 @@ common::Time Camera::LastRenderWallTime() const
 //////////////////////////////////////////////////
 void Camera::PostRender()
 {
+  IGN_PROFILE("rendering::Camera::PostRender");
   this->ReadPixelBuffer();
 
   // Only record last render time if data was actually generated

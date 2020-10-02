@@ -25,6 +25,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 #include "SkyX.h"
 
+#include <ignition/common/Profiler.hh>
+
 namespace SkyX
 {
   /// -------------- CloudLayer -----------------
@@ -365,6 +367,7 @@ namespace SkyX
 
   void CloudsManager::update()
   {
+    IGN_PROFILE("rendering::CloudsManager::Update");
     for (CloudLayersIt = mCloudLayers.begin();
         CloudLayersIt != mCloudLayers.end(); CloudLayersIt++)
     {
