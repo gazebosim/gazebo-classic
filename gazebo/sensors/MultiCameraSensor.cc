@@ -295,7 +295,6 @@ void MultiCameraSensor::Render()
     std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
     if (this->dataPtr->cameras.empty())
     {
-      GZ_PROFILE_END();
       return;
     }
 
@@ -308,7 +307,6 @@ void MultiCameraSensor::Render()
     this->dataPtr->rendered = true;
     this->lastMeasurementTime = this->scene->SimTime();
   }
-  GZ_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

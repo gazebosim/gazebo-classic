@@ -617,7 +617,8 @@ void GpuRaySensor::Render()
   }
   else
   {
-    if (!this->dataPtr->laserCam || !this->IsActive() || !this->NeedsUpdate()){
+    if (!this->dataPtr->laserCam || !this->IsActive() || !this->NeedsUpdate())
+    {
       return;
     }
 

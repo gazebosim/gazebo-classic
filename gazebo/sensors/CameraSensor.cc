@@ -251,7 +251,8 @@ void CameraSensor::Render()
   }
   else
   {
-    if (!this->camera || !this->IsActive() || !this->NeedsUpdate()){
+    if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
+    {
       return;
     }
 
