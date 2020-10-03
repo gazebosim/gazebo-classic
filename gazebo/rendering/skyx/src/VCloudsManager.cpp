@@ -3,7 +3,7 @@
 This source file is part of SkyX.
 Visit http://www.paradise-studios.net/products/skyx/
 
-Copyright (C) 2009-2012 Xavier VerguÌn Gonz·lez <xavyiy@gmail.com>
+Copyright (C) 2009-2012 Xavier Vergu√≠n Gonz√°lez <xavyiy@gmail.com>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License as published by the Free Software
@@ -24,6 +24,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 #include "VCloudsManager.h"
 
 #include "SkyX.h"
+#include "gazebo/common/Profiler.hh"
 
 namespace SkyX
 {
@@ -114,6 +115,7 @@ namespace SkyX
 
   void VCloudsManager::update(const Ogre::Real& timeSinceLastFrame)
   {
+    GZ_PROFILE("rendering::VCloudsManager::Update");
     if (!mCreated)
     {
       return;

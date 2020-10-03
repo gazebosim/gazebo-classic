@@ -19,6 +19,7 @@
 #include <ignition/math/Matrix4.hh>
 
 #include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/Profiler.hh"
 
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/MovableText.hh"
@@ -307,6 +308,7 @@ void ApplyWrenchVisual::SetTorque(const ignition::math::Vector3d &_torqueVector,
 ///////////////////////////////////////////////////
 void ApplyWrenchVisual::UpdateForceVisual()
 {
+  GZ_PROFILE("ApplyWrenchVisual::UpdateForceVisual");
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
@@ -342,6 +344,7 @@ void ApplyWrenchVisual::UpdateForceVisual()
 ///////////////////////////////////////////////////
 void ApplyWrenchVisual::UpdateTorqueVisual()
 {
+  GZ_PROFILE("ApplyWrenchVisual::UpdateTorqueVisual");
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
@@ -380,6 +383,7 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
 /////////////////////////////////////////////////
 void ApplyWrenchVisual::Resize()
 {
+  GZ_PROFILE("ApplyWrenchVisual::Resize");
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 

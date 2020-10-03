@@ -23,6 +23,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/Profiler.hh"
 
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -230,6 +231,7 @@ void UserCamera::SetWorldPose(const ignition::math::Pose3d &_pose)
 //////////////////////////////////////////////////
 void UserCamera::Update()
 {
+  GZ_PROFILE("rendering::UserCamera::Update");
   Camera::Update();
 
   if (this->dataPtr->viewController)

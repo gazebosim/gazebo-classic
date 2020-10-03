@@ -16,6 +16,7 @@
 */
 #include <boost/bind.hpp>
 
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -96,13 +97,16 @@ void SonarVisual::OnMsg(ConstSonarStampedPtr &_msg)
 /////////////////////////////////////////////////
 void SonarVisual::Update()
 {
+  GZ_PROFILE("rendering::SonarVisual::Update");
   SonarVisualPrivate *dPtr =
       reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
 
   boost::mutex::scoped_lock lock(dPtr->mutex);
 
   if (!dPtr->sonarMsg || !dPtr->receivedMsg)
+  {
     return;
+  }
 
   // Skip the update if the user is moving the sonar.
   if (this->GetScene()->SelectedVisual() &&

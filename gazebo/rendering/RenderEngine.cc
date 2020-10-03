@@ -39,6 +39,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/common/SystemPaths.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -261,17 +262,20 @@ unsigned int RenderEngine::SceneCount() const
 //////////////////////////////////////////////////
 void RenderEngine::PreRender()
 {
+  GZ_PROFILE("rendering::RenderEngine::PreRender");
   this->dataPtr->root->_fireFrameStarted();
 }
 
 //////////////////////////////////////////////////
 void RenderEngine::Render()
 {
+  GZ_PROFILE("rendering::RenderEngine::Render");
 }
 
 //////////////////////////////////////////////////
 void RenderEngine::PostRender()
 {
+  GZ_PROFILE("rendering::RenderEngine::PostRender");
   // _fireFrameRenderingQueued was here for CEGUI to work. Leaving because
   // it shouldn't harm anything, and we don't want to introduce
   // a regression.

@@ -23,6 +23,7 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 
 using namespace gazebo;
@@ -158,6 +159,7 @@ void DynamicLines::Clear()
 /////////////////////////////////////////////////
 void DynamicLines::Update()
 {
+  GZ_PROFILE("rendering::DynamicLines::Update");
   if (this->dirty && this->points.size() > 1)
     this->FillHardwareBuffers();
 }

@@ -235,10 +235,13 @@ void CameraSensor::PrerenderEnded()
 //////////////////////////////////////////////////
 void CameraSensor::Render()
 {
+  GZ_PROFILE("sensors::CameraSensor::Render");
   if (this->useStrictRate)
   {
     if (!this->dataPtr->renderNeeded)
+    {
       return;
+    }
 
     // Update all the cameras
     this->camera->Render();
@@ -249,7 +252,9 @@ void CameraSensor::Render()
   else
   {
     if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
+    {
       return;
+    }
 
     // Update all the cameras
     this->camera->Render();

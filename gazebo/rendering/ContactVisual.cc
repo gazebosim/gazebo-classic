@@ -19,6 +19,7 @@
  */
 #include <boost/bind.hpp>
 
+#include "gazebo/common/Profiler.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
@@ -69,13 +70,16 @@ ContactVisual::~ContactVisual()
 /////////////////////////////////////////////////
 void ContactVisual::Update()
 {
+  GZ_PROFILE("rendering::ContactVisual::Update");
   ContactVisualPrivate *dPtr =
       reinterpret_cast<ContactVisualPrivate *>(this->dataPtr);
 
   boost::mutex::scoped_lock lock(dPtr->mutex);
 
   if (!dPtr->contactsMsg || !dPtr->receivedMsg)
+  {
     return;
+  }
 
   // The following values are used to calculate normal scaling factor based
   // on force value.

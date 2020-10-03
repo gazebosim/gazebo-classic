@@ -25,6 +25,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/Profiler.hh"
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
@@ -235,8 +236,11 @@ void OculusCamera::RenderImpl()
 //////////////////////////////////////////////////
 void OculusCamera::Update()
 {
+  GZ_PROFILE("rendering::OculusCamera::Update");
   if (!this->Ready())
+  {
     return;
+  }
 
   Camera::Update();
 

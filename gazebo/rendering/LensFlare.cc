@@ -18,6 +18,7 @@
 #include <mutex>
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Profiler.hh"
 
 #include "gazebo/transport/Node.hh"
 
@@ -443,6 +444,7 @@ void LensFlare::SetScale(const double _scale)
 //////////////////////////////////////////////////
 void LensFlare::Update()
 {
+  GZ_PROFILE("rendering::LensFlare::Update");
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   // remove lens flare if we got a delete msg
   if (this->dataPtr->removeLensFlare)
@@ -468,7 +470,9 @@ void LensFlare::Update()
     }
   }
   if (!directionalLight)
+  {
     return;
+  }
 
   this->dataPtr->lightName = directionalLight->Name();
 

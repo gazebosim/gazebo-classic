@@ -260,6 +260,7 @@ void MultiCameraSensor::PrerenderEnded()
 //////////////////////////////////////////////////
 void MultiCameraSensor::Render()
 {
+  GZ_PROFILE("sensors::MultiCameraSensor::Render");
   if (this->useStrictRate)
   {
     if (!this->dataPtr->renderNeeded)

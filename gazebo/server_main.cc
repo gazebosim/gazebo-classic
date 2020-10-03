@@ -24,6 +24,9 @@
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+#ifndef _WIN32
+  ::setenv("RMT_PORT", "1500", true);
+#endif
   std::unique_ptr<gazebo::Server> server;
 
   try

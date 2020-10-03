@@ -603,10 +603,13 @@ void GpuRaySensor::PrerenderEnded()
 //////////////////////////////////////////////////
 void GpuRaySensor::Render()
 {
+  GZ_PROFILE("sensors::GpuRaySensor::Render");
   if (this->useStrictRate)
   {
     if (!this->dataPtr->renderNeeded)
+    {
       return;
+    }
 
     this->dataPtr->laserCam->Render();
     this->dataPtr->rendered = true;
@@ -615,7 +618,9 @@ void GpuRaySensor::Render()
   else
   {
     if (!this->dataPtr->laserCam || !this->IsActive() || !this->NeedsUpdate())
+    {
       return;
+    }
 
     this->lastMeasurementTime = this->scene->SimTime();
 
