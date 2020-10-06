@@ -9,9 +9,7 @@ varying vec4 point;
 
 void main()
 {
-  //vec3 color = 255 * texture2D(tex, vec2(gl_FragCoord.s / width , gl_FragCoord.t / height)).xyz;
-  vec3 color = vec3(80, 0, 0);
-  // int rgb = int(color.r) << 16 | int(color.g) << 8 | int(color.b);
-  int rgb = 1;
+  vec3 color = 255.0f * texture2D(tex, vec2(gl_FragCoord.s / width , gl_FragCoord.t / height)).xyz;
+  float rgb = (color.b + color.g * 256.0f + color.r * 256.0f * 256.0f);
   gl_FragColor = vec4(point.x, -point.y, -point.z, rgb);
 }
