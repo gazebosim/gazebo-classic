@@ -106,6 +106,17 @@ void ModelManipulator::Detach()
   this->dataPtr->selectionObj->SetMode(
       rendering::SelectionObj::SELECTION_NONE);
   this->dataPtr->selectionObj->Detach();
+
+  // if in the middle of mouse move, reset material transparency before
+  // detaching otherwise the object remains semi-transparent
+  if (this->dataPtr->mouseMoveVis && this->dataPtr->transparent)
+  {
+    this->dataPtr->mouseMoveVis->SetTransparency(
+        std::abs(this->dataPtr->mouseMoveVis->GetTransparency()*2.0-1.0));
+    this->dataPtr->transparent = false;
+  }
+  // reset mouse move visual
+  this->SetMouseMoveVisual(rendering::VisualPtr());
 }
 
 /////////////////////////////////////////////////
@@ -705,11 +716,11 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
     if (this->dataPtr->mouseMoveVis &&
         this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
     {
-      if (this->dataPtr->transparent)
+      if (!this->dataPtr->transparent)
       {
         this->dataPtr->mouseMoveVis->SetTransparency(
           (1.0 - this->dataPtr->mouseMoveVis->GetTransparency()) * 0.5);
-        this->dataPtr->transparent = false;
+        this->dataPtr->transparent = true;
       }
       ignition::math::Vector3d axis = ignition::math::Vector3d::Zero;
       if (this->dataPtr->keyEvent.key == Qt::Key_X)
@@ -848,8 +859,12 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
     // server
     if (this->dataPtr->mouseMoveVis)
     {
-      this->dataPtr->mouseMoveVis->SetTransparency(
-        std::abs(this->dataPtr->mouseMoveVis->GetTransparency()*2.0-1.0));
+      if (this->dataPtr->transparent)
+      {
+        this->dataPtr->mouseMoveVis->SetTransparency(
+          std::abs(this->dataPtr->mouseMoveVis->GetTransparency()*2.0-1.0));
+        this->dataPtr->transparent = false;
+      }
       if (this->dataPtr->manipMode == "scale")
       {
         this->dataPtr->selectionObj->UpdateSize();
@@ -916,7 +931,6 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
   this->dataPtr->mouseMoveVis = _vis;
   if (_vis)
   {
-    this->dataPtr->transparent = true;
     this->dataPtr->mouseVisualScale = _vis->Scale();
     this->dataPtr->mouseChildVisualScale.clear();
     // keep track of all child visual scale for scaling to work in
@@ -929,7 +943,9 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
     this->dataPtr->mouseVisualBbox = _vis->BoundingBox();
   }
   else
+  {
     this->dataPtr->mouseVisualScale = ignition::math::Vector3d::One;
+  }
 }
 
 //////////////////////////////////////////////////
