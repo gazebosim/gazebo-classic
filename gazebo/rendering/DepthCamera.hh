@@ -109,8 +109,10 @@ namespace gazebo
       /// RGB is packed into the 4th channel as a float.
       /// Unpacking can be performed as follows:
       ///   uint8_t red = floor(_pcd[4 * index + 3] / 256.0f / 256.0f);
-      ///   uint8_t green = floor((_pcd[4 * index + 3] - red * 256.0f * 256.0f) / 256.0f);
-      ///   uint8_t blue = floor(_pcd[4 * index + 3] - red * 256.0f * 256.0f - green * 256.0f);
+      ///   uint8_t green = floor((_pcd[4 * index + 3] - red * 256.0f * 256.0f)
+      ///       / 256.0f);
+      ///   uint8_t blue = floor(_pcd[4 * index + 3] - red * 256.0f * 256.0f -
+      ///       green * 256.0f);
       /// red, green and blue are within the range [0, 255].
       /// \param[in] _subscriber Subscriber callback function
       /// \return Pointer to the new Connection. This must be kept in scope
