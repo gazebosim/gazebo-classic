@@ -18,6 +18,8 @@
 #include <functional>
 #include <vector>
 
+#include <boost/version.hpp>
+
 #include <ignition/common/Profiler.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
@@ -30,6 +32,7 @@
 
 #include "plugins/SimpleTrackedVehiclePlugin.hh"
 
+#if BOOST_VERSION < 107400
 namespace std {
 template<class T>
 class hash<boost::shared_ptr<T>> {
@@ -38,6 +41,7 @@ class hash<boost::shared_ptr<T>> {
   }
 };
 }
+#endif
 
 namespace gazebo
 {
