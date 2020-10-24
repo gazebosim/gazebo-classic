@@ -174,8 +174,18 @@ void Sensor::Update(const bool _force)
   {
     if (this->useStrictRate)
     {
+      // rendering sensors (IMAGE category) has it's own mechanism
+      // for throttling and lockstepping with physics. So throttle just
+      // physics sensors
+      if (this->dataPtr->category != IMAGE && !this->NeedsUpdate() && !_force)
+        return;
+
       if (this->UpdateImpl(_force))
+      {
+        common::Time simTime = this->world->SimTime();
+        this->lastUpdateTime = simTime;
         this->dataPtr->updated();
+      }
     }
     else
     {
