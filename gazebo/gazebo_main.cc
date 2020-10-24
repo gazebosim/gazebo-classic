@@ -14,23 +14,19 @@
  * limitations under the License.
  *
 */
+
+#ifndef _WIN32
 #include <sys/wait.h>
 #include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
+#else
+#include <process.hpp>
+#endif
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/Server.hh"
 #include "gazebo/gui/GuiIface.hh"
-
-bool sig_killed = false;
-int status1, status2;
-// pid of server process
-pid_t pid1;
-// pid of client process
-pid_t pid2;
-bool killed1 = false;
-bool killed2 = false;
 
 /////////////////////////////////////////////////
 void help()
@@ -76,6 +72,16 @@ void help()
   <<                                  "rates are respected.\n"
   << "\n";
 }
+
+#ifndef _WIN32
+bool sig_killed = false;
+int status1, status2;
+// pid of server process
+pid_t pid1;
+// pid of client process
+pid_t pid2;
+bool killed1 = false;
+bool killed2 = false;
 
 /// \brief Try to kill a single process.
 /// \param[in] _pid Process ID.
@@ -216,3 +222,85 @@ int main(int _argc, char **_argv)
 
   return returnValue;
 }
+
+#else
+
+std::atomic<bool> g_shouldExit = false;
+
+int main(int _argc, char **_argv)
+{
+  if (_argc >= 2 &&
+      (strcmp(_argv[1], "-h") == 0 || strcmp(_argv[1], "--help") == 0)) {
+    help();
+    return 0;
+  }
+
+  std::vector<std::string> argvServer;
+  std::vector<std::string> argvClient;
+
+  argvServer.push_back("gzserver");
+  argvClient.push_back("gzclient");
+
+  for (int i = 1; i < _argc; ++i)
+  {
+    argvServer.push_back(std::string(_argv[i]));
+    argvClient.push_back(std::string(_argv[i]));
+  }
+
+  // Start server
+  TinyProcessLib::Process server(argvServer);
+
+  // Start client
+  TinyProcessLib::Process client(argvClient);
+
+  // Wait
+  bool serverClosed = false;
+  bool clientClosed = false;
+  int serverExitCode = 0;
+  int clientExitCode = 0;
+
+  while (!g_shouldExit)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+    // Check if server and gui are still open, if they are closed
+    // close this process as well
+    serverClosed = server.try_get_exit_status(serverExitCode);
+    clientClosed = client.try_get_exit_status(clientExitCode);
+
+    if (serverClosed || clientClosed)
+    {
+      g_shouldExit = true;
+    }
+
+  }
+
+  // Cleanup
+  serverClosed = server.try_get_exit_status(serverExitCode);
+
+  if (!serverClosed)
+  {
+    server.kill();
+  }
+
+  clientClosed = client.try_get_exit_status(clientExitCode);
+
+  if (!clientClosed)
+  {
+    client.kill();
+  }
+
+  // Get exit status
+  serverExitCode = server.get_exit_status();
+  clientExitCode = client.get_exit_status();
+
+  int exitCode = 0;
+  if (serverExitCode != 0 || clientExitCode != 0)
+  {
+    exitCode = 1;
+  }
+
+  return exitCode;
+}
+
+#endif
