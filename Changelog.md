@@ -2,6 +2,9 @@
 
 ## Gazebo 9.xx.x (202x-xx-xx)
 
+1. Fix physics based sensor update rate in lockstep mode
+    * [Pull request #2863](https://github.com/osrf/gazebo/pull/2863)
+
 ## Gazebo 9.15.0 (2020-09-30)
 
 1. More enhancement for Windows build

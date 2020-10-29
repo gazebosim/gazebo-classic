@@ -762,7 +762,7 @@ void SensorManager::SensorContainer::RunLoop()
       if (!g_sensorsDirty)
         return;
 
-      // Get the minimum update rate from the sensors.
+      // Get the maximum update rate from the sensors.
       for (Sensor_V::iterator iter = this->sensors.begin();
           iter != this->sensors.end() && !this->stop; ++iter)
       {
