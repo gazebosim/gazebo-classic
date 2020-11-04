@@ -223,9 +223,6 @@ namespace gazebo
       // Documentation inherited
       public: void SetClipDist() override;
 
-      // Documentation inherited
-      public: virtual void SetHFOV(math::Angle _angle);
-
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture
       protected: void CreateEnvRenderTexture(const std::string &_textureName);
