@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _LIGHT_HH_
-#define _LIGHT_HH_
+#ifndef _GAZEBO_RENDERING_LIGHT_HH_
+#define _GAZEBO_RENDERING_LIGHT_HH_
 
 #include <string>
 #include <iostream>
@@ -23,7 +23,6 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/Event.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/util/system.hh"
 
@@ -36,8 +35,8 @@ namespace gazebo
 {
   namespace rendering
   {
-    class Scene;
-    class DynamicLines;
+    // Forward declare private data.
+    class LightPrivate;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -81,43 +80,81 @@ namespace gazebo
 
       /// \brief Get the name of the visual.
       /// \return The light's name.
-      public: std::string GetName() const;
+      /// \deprecated See Name()
+      public: std::string GetName() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the name of the visual.
+      /// \return The light's name.
+      public: std::string Name() const;
 
       /// \brief Get the type of the light.
       /// \return The light type: "point", "spot", "directional".
-      public: std::string GetType() const;
+      /// \deprecated See Type()
+      public: std::string GetType() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the type of the light.
+      /// \return The light type: "point", "spot", "directional".
+      public: std::string Type() const;
 
       /// \brief Set the position of the light
       /// \param[in] _p New position for the light
-      public: void SetPosition(const math::Vector3 &_p);
+      /// \deprecated See SetPosition() that accepts an
+      /// ignition::math::Vector3d object.
+      public: void SetPosition(const math::Vector3 &_p) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the position of the light
+      /// \param[in] _p New position for the light
+      public: void SetPosition(const ignition::math::Vector3d &_p);
 
       /// \brief Get the position of the light
       /// \return The position of the light
-      public: math::Vector3 GetPosition() const;
+      /// \deprecated See Position()
+      public: math::Vector3 GetPosition() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the position of the light
+      /// \return The position of the light
+      public: ignition::math::Vector3d Position() const;
 
       /// \brief Set the rotation of the light
       /// \param[in] _q New rotation for the light
-      public: void SetRotation(const math::Quaternion &_q);
+      /// \deprecated See SetRotation() that accepts an
+      /// ignition::math::Quaterniond object.
+      public: void SetRotation(const math::Quaternion &_q)
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the rotation of the light
+      /// \param[in] _q New rotation for the light
+      public: void SetRotation(const ignition::math::Quaterniond &_q);
 
       /// \brief Get the rotation of the light
       /// \return The rotation of the light
-      public: math::Quaternion GetRotation() const;
+      /// \deprecated See Rotation()
+      public: math::Quaternion GetRotation() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the rotation of the light
+      /// \return The rotation of the light
+      public: ignition::math::Quaterniond Rotation() const;
 
       /// \brief Set whether this entity has been selected by the user through
       /// the gui.
       /// \param[in] _s Set to True when the light is selected by the user.
-      public: virtual bool SetSelected(bool _s);
+      public: virtual bool SetSelected(const bool _s);
 
       // \brief Toggle light visual visibility
       public: void ToggleShowVisual();
 
       /// \brief Set whether to show the visual
       /// \param[in] _s Set to true to draw a representation of the light.
-      public: void ShowVisual(bool _s);
+      public: void ShowVisual(const bool _s);
 
       /// \brief Get whether the light is visible.
       /// \return True if the light is visible.
-      public: bool GetVisible() const;
+      /// \deprecated See Visible()
+      public: bool GetVisible() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get whether the light is visible.
+      /// \return True if the light is visible.
+      public: bool Visible() const;
 
       /// \brief Set the light type.
       /// \param[in] _type The light type: "point", "spot", "directional"
@@ -129,7 +166,12 @@ namespace gazebo
 
       /// \brief Get the diffuse color
       /// \return The light's diffuse color.
-      public: common::Color GetDiffuseColor() const;
+      /// \deprecated See DiffuseColor()
+      public: common::Color GetDiffuseColor() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the diffuse color
+      /// \return The light's diffuse color.
+      public: common::Color DiffuseColor() const;
 
       /// \brief Set the specular color
       /// \param[in] _color The specular color
@@ -137,16 +179,34 @@ namespace gazebo
 
       /// \brief Get the specular color
       /// \return  The specular color
-      public: common::Color GetSpecularColor() const;
+      /// \deprecated See SpecularColor()
+      public: common::Color GetSpecularColor() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the specular color
+      /// \return  The specular color
+      public: common::Color SpecularColor() const;
 
       /// \brief Set the direction
       /// \param[in] _dir Set the light's direction. Only applicable to spot and
       /// directional lights.
-      public: void SetDirection(const math::Vector3 &_dir);
+      /// \deprecated See SetDirection() that accepts an
+      /// ignition::math::Vector3d object.
+      public: void SetDirection(const math::Vector3 &_dir)
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the direction
+      /// \param[in] _dir Set the light's direction. Only applicable to spot and
+      /// directional lights.
+      public: void SetDirection(const ignition::math::Vector3d &_dir);
 
       /// \brief Get the direction
       /// \return The light's direction.
-      public: math::Vector3 GetDirection() const;
+      /// \deprecated See Direction()
+      public: math::Vector3 GetDirection() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the direction
+      /// \return The light's direction.
+      public: ignition::math::Vector3d Direction() const;
 
       /// \brief Set the attenuation
       /// \param[in] _contant Constant attenuation
@@ -157,23 +217,23 @@ namespace gazebo
 
       /// \brief Set the spot light inner angle
       /// \param[in] _angle Inner angle in radians
-      public: void SetSpotInnerAngle(const double &_angle);
+      public: void SetSpotInnerAngle(const double _angle);
 
       /// \brief Set the spot light outer angle
       /// \param[in] _angle Outer angle in radians
-      public: void SetSpotOuterAngle(const double &_angle);
+      public: void SetSpotOuterAngle(const double _angle);
 
       /// \brief Set the spot light falloff
       /// \param[in] _value Falloff value
-      public: void SetSpotFalloff(const double &_value);
+      public: void SetSpotFalloff(const double _value);
 
       /// \brief Set the range
       /// \param[in] _range Rage of the light in meters.
-      public: void SetRange(const double &_range);
+      public: void SetRange(const double _range);
 
       /// \brief Set cast shadows
       /// \param[in] _cast Set to true to cast shadows.
-      public: void SetCastShadows(const bool &_cast);
+      public: void SetCastShadows(const bool _cast);
 
       /// \brief Fill the contents of a light message.
       /// \param[out] _msg Message to fill.
@@ -202,26 +262,9 @@ namespace gazebo
       /// \param[in] _msg The light message to update from.
       private: void UpdateSDFFromMsg(const msgs::Light &_msg);
 
-      /// \brief The ogre light source
-      private: Ogre::Light *light;
-
-      /// \brief The visual used to visualize the light.
-      private: VisualPtr visual;
-
-      /// \brief The lines used to visualize the light.
-      private: DynamicLines *line;
-
-      /// \brief SDF element data for the light.
-      private: sdf::ElementPtr sdf;
-
-      /// \brief Event connection to toggle visualization on/off.
-      private: event::ConnectionPtr showLightsConnection;
-
-      /// \brief Counter used to generate unique light names.
-      private: static unsigned int lightCounter;
-
-      /// \brief Pointer to the scene.
-      private: ScenePtr scene;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<LightPrivate> dataPtr;
     };
     /// \}
   }

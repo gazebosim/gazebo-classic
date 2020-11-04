@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,22 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_GUI_TERRAINEDITOR_PRIVATE_HH_
+#define _GAZEBO_GUI_TERRAINEDITOR_PRIVATE_HH_
 
-#include "gazebo/gui/building/BuildingItem.hh"
-
-using namespace gazebo;
-using namespace gui;
-
-/////////////////////////////////////////////////
-BuildingItem::BuildingItem()
+namespace gazebo
 {
-}
+  namespace gui
+  {
+    class TerrainEditorPalette;
 
-/////////////////////////////////////////////////
-BuildingItem::~BuildingItem()
-{
+    /// \class TerrainEditorPrivate TerrainEditorPrivate.hh
+    /// \brief Private data for the TerrainEditor class.
+    class TerrainEditorPrivate
+    {
+      /// \brief Contains all the terrain editor tools.
+      public: TerrainEditorPalette *terrainPalette;
+    };
+  }
 }
+#endif

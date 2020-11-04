@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <string>
 #include <boost/regex.hpp>
 
+#include <ignition/math/Vector3.hh>
 #include "gazebo/math/Pose.hh"
 
 #include "gazebo/physics/State.hh"
@@ -96,6 +97,10 @@ namespace gazebo
       /// \brief Get the stored model pose.
       /// \return The math::Pose of the Model.
       public: const math::Pose &GetPose() const;
+
+      /// \brief Get the stored model scale.
+      /// \return The scale of the Model.
+      public: const ignition::math::Vector3d &Scale() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -248,7 +253,10 @@ namespace gazebo
           << q.x << " "
           << q.y << " "
           << q.z << " "
-          << "</pose>";
+          << "</pose>"
+          << "<scale>"
+          << _state.scale
+          << "</scale>";
 
         for (LinkState_M::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();
@@ -277,6 +285,9 @@ namespace gazebo
 
       /// \brief Pose of the model.
       private: math::Pose pose;
+
+      /// \brief Scale of the model.
+      private: ignition::math::Vector3d scale;
 
       /// \brief All the link states.
       private: LinkState_M linkStates;

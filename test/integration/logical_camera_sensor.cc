@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ TEST_F(LogicalCameraSensor, GroundPlane)
   while (!sensors::SensorManager::Instance()->SensorsInitialized())
     common::Time::MSleep(1000);
 
-  sensors::LogicalCameraSensorPtr cam = boost::dynamic_pointer_cast<
+  sensors::LogicalCameraSensorPtr cam = std::dynamic_pointer_cast<
     sensors::LogicalCameraSensor>(sensors::get_sensor("logical_camera"));
   ASSERT_TRUE(cam != NULL);
 
@@ -75,7 +75,7 @@ TEST_F(LogicalCameraSensor, Box)
   ASSERT_TRUE(cameraModel != NULL);
 
   // Get the logical camera sensor
-  sensors::LogicalCameraSensorPtr cam = boost::dynamic_pointer_cast<
+  sensors::LogicalCameraSensorPtr cam = std::dynamic_pointer_cast<
     sensors::LogicalCameraSensor>(sensors::get_sensor("logical_camera"));
   ASSERT_TRUE(cam != NULL);
 

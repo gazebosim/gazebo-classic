@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,15 @@ class ModelPluginInspector_TEST : public QTestFixture
 
   /// \brief Test pressing remove button.
   private slots: void RemoveButton();
+
+  /// \brief Tests setting the inspector to be read-only.
+  private slots: void ReadOnly();
+
+  /// \brief Tests clearing the inspector.
+  private slots: void Clear();
+
+  /// \brief Tests getting plugin msg data.
+  private slots: void GetData();
 };
 
 #endif

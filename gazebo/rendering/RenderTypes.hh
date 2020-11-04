@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -228,6 +228,19 @@ namespace gazebo
 
       /// \brief N/A
       RENDERING_MESH_RESOURCE = 6
+    };
+
+    /// \brief Frame of reference
+    enum ReferenceFrame
+    {
+      /// \brief Local frame
+      RF_LOCAL,
+
+      /// \brief Parent frame
+      RF_PARENT,
+
+      /// \brief World frame
+      RF_WORLD
     };
   }
 }

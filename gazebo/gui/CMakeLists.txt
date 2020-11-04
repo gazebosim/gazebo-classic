@@ -25,6 +25,7 @@ set (sources
   ApplyWrenchDialog.cc
   CloneWindow.cc
   ConfigWidget.cc
+  Conversions.cc
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
@@ -43,7 +44,6 @@ set (sources
   ModelAlign.cc
   ModelManipulator.cc
   ModelSnap.cc
-  ModelEditWidget.cc
   ModelListWidget.cc
   ModelMaker.cc
   ModelRightMenu.cc
@@ -85,7 +85,6 @@ set (qt_headers
   LogPlayWidget.hh
   MainWindow.hh
   ModelListWidget.hh
-  ModelEditWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
   SaveDialog.hh
@@ -102,6 +101,7 @@ set (qt_headers
 set (headers
   qt.h
   qt_test.h
+  Conversions.hh
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
@@ -143,6 +143,7 @@ set (qt_tests
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
   ModelMaker_TEST.cc
+  ModelManipulator_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
   SplashScreen_TEST.cc
@@ -233,6 +234,13 @@ if (SPNAV_LIBRARY)
   target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
   target_link_libraries(gzclient ${SPNAV_LIBRARY})
 endif()
+
+set (gtest_sources
+  Conversions_TEST.cc
+)
+
+set (GZ_BUILD_TESTS_EXTRA_LIBS gazebo_gui)
+gz_build_tests(${gtest_sources})
 
 add_definitions(${QT_DEFINITIONS})
 

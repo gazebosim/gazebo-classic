@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,28 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_GUI_BUILDING_BASEINSPECTORDIALOG_PRIVATE_HH_
+#define _GAZEBO_GUI_BUILDING_BASEINSPECTORDIALOG_PRIVATE_HH_
 
-#ifndef _BUILDING_ITEM_HH_
-#define _BUILDING_ITEM_HH_
+#include <string>
+#include <vector>
 
-#include "gazebo/util/system.hh"
+#include "gazebo/common/Color.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    /// \addtogroup gazebo_gui
-    /// \{
-
-    /// \class BuildingItem BuildingItem.hh
-    /// \brief Base class of a items that have building level properties such as
-    /// the level number and level height.
-    class GZ_GUI_VISIBLE BuildingItem
+    /// \internal
+    /// \brief Private data for BaseInspectorDialog
+    class BaseInspectorDialogPrivate
     {
-        /// \brief Constructor
-        public: BuildingItem();
+      /// \brief Vector of color options.
+      public: std::vector<common::Color> colorList;
 
-        /// \brief Destructor
-        public: ~BuildingItem();
+      /// \brief Vector of texture options.
+      public: std::vector<std::string> textureList;
     };
-    /// \}
   }
 }
-
 #endif

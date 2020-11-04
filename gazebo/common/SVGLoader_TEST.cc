@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -208,6 +208,159 @@ TEST_F(SVGLoader, ClosedLoops)
   loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
   EXPECT_EQ(0u, openPolys.size());
   EXPECT_EQ(23u, closedPolys.size());
+}
+
+/////////////////////////////////////////////////
+TEST_F(SVGLoader, Transforms)
+{
+  // this tests the scale, matrix and rotation transforms
+  common::SVGLoader loader(3);
+  std::vector<common::SVGPath> paths;
+  std::string filePath = std::string(PROJECT_SOURCE_PATH);
+  filePath += "/test/data/svg/transform.svg";
+  bool success = loader.Parse(filePath, paths);
+  EXPECT_EQ(true, success);
+
+  // save for inspection
+  std::ofstream out("transform.html");
+  loader.DumpPaths(paths, out);
+  out.close();
+
+
+  std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
+  std::vector< std::vector<ignition::math::Vector2d> > openPolys;
+
+  loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
+
+  EXPECT_EQ(0u, openPolys.size());
+  EXPECT_EQ(2u, closedPolys.size());
+
+  // without transform, the first segment of the first polyline is
+  // about 132 units along y
+  auto p0 = closedPolys[0][0];
+  auto p1 = closedPolys[0][1];
+  double dy = fabs(p0.Y() - p1.Y());
+  EXPECT_LE(dy, 40.0);
+  // without transform, the first segment of the second poly is horizontal
+  // (y is constant, dy is 0)
+  dy = fabs(closedPolys[1][0].Y() - closedPolys[1][1].Y() );
+  EXPECT_GT(dy, 150.0);
+}
+
+/////////////////////////////////////////////////
+TEST_F(SVGLoader, Transforms2)
+{
+  // this tests the skewY and skewX transforms
+  common::SVGLoader loader(3);
+  std::vector<common::SVGPath> paths;
+  std::string filePath = std::string(PROJECT_SOURCE_PATH);
+  filePath += "/test/data/svg/transform2.svg";
+  bool success = loader.Parse(filePath, paths);
+  EXPECT_EQ(true, success);
+
+  // save for inspection
+  std::ofstream out("transform2.html");
+  loader.DumpPaths(paths, out);
+  out.close();
+
+
+  std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
+  std::vector< std::vector<ignition::math::Vector2d> > openPolys;
+
+  loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
+
+  EXPECT_EQ(0u, openPolys.size());
+  EXPECT_EQ(3u, closedPolys.size());
+
+  EXPECT_EQ("original", paths[0].id);
+  double dxOriginal = fabs(closedPolys[0][0].X() - closedPolys[0][1].X() );
+  double dyOriginal = fabs(closedPolys[0][0].Y() - closedPolys[0][1].Y() );
+  gzmsg << dxOriginal << " X original 0-1\n";
+  gzmsg << dyOriginal << " Y original 0-1\n";
+  // the sgment is vertical (dx = 0)
+  EXPECT_DOUBLE_EQ(dxOriginal, 0);
+
+  EXPECT_EQ("skewx", paths[1].id);
+  double dxSkewX = fabs(closedPolys[1][0].X() - closedPolys[1][1].X() );
+  double dySkewX = fabs(closedPolys[1][0].Y() - closedPolys[1][1].Y() );
+  gzmsg << dxSkewX << " X skewX 0-1\n";
+  gzmsg << dySkewX << " Y skewX 0-1\n";
+  // the segment is 45 degree, hence dx = dy
+  EXPECT_DOUBLE_EQ(dxSkewX, dySkewX);
+
+  EXPECT_EQ("skewy", paths[2].id);
+  double dxSkewY = fabs(closedPolys[2][0].X() - closedPolys[2][1].X() );
+  double dySkewY = fabs(closedPolys[2][0].Y() - closedPolys[2][1].Y() );
+  gzmsg << dxSkewY << " X skewY 0-1\n";
+  gzmsg << dySkewY << " Y skewY 0-1\n";
+  // the segment is vertical (dx = 0)
+  EXPECT_DOUBLE_EQ(dxOriginal, dxSkewY);
+
+  // segment is skewed 30 degrees
+  double dxSkewYb = fabs(closedPolys[2][5].X() - closedPolys[2][4].X() );
+  double dySkewYb = fabs(closedPolys[2][5].Y() - closedPolys[2][4].Y() );
+  gzmsg << dxSkewYb << " X skewY b\n";
+  gzmsg << dySkewYb << " Y skewY b\n";
+  EXPECT_GT(dxSkewYb, 131.0);
+  EXPECT_GT(dySkewYb, 35.0);
+}
+
+/////////////////////////////////////////////////
+TEST_F(SVGLoader, Transforms3)
+{
+  // this tests the skewY and skewX transforms
+  common::SVGLoader loader(3);
+  std::vector<common::SVGPath> paths;
+  std::string filePath = std::string(PROJECT_SOURCE_PATH);
+  filePath += "/test/data/svg/transform3.svg";
+  bool success = loader.Parse(filePath, paths);
+  EXPECT_EQ(true, success);
+
+  EXPECT_EQ(3u, paths.size());
+  EXPECT_EQ("outer_path", paths[0].id);
+  EXPECT_EQ("path_no_tx", paths[1].id);
+  EXPECT_EQ("path_tx", paths[2].id);
+
+  gzerr << paths[0].id << " tx: " << paths[0].transform << std::endl;
+  gzerr << paths[1].id << " tx: " << paths[1].transform << std::endl;
+  gzerr << paths[2].id << " tx: " << paths[2].transform << std::endl;
+
+  // save for inspection
+  std::ofstream out("transform3.html");
+  loader.DumpPaths(paths, out);
+  out.close();
+
+  std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
+  std::vector< std::vector<ignition::math::Vector2d> > openPolys;
+  loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
+
+  EXPECT_EQ(0u, openPolys.size());
+  EXPECT_EQ(3u, closedPolys.size());
+}
+
+/////////////////////////////////////////////////
+TEST_F(SVGLoader, MultipleFiles)
+{
+  // this test can load multiple svg files and
+  // save the html for inspection
+  std::vector<std::string> files;
+  files.push_back("issue_1489_5.svg");
+  for (auto file : files)
+  {
+    // this tests the skewY and skewX transforms
+    common::SVGLoader loader(3);
+    std::vector<common::SVGPath> paths;
+    std::string filePath = std::string(PROJECT_SOURCE_PATH);
+    filePath += "/test/data/svg/";
+    filePath += file;
+    bool success = loader.Parse(filePath, paths);
+    EXPECT_EQ(true, success);
+
+    // save for inspection
+    std::ofstream out(file + ".html");
+    loader.DumpPaths(paths, out);
+    out.close();
+  }
 }
 
 /////////////////////////////////////////////////

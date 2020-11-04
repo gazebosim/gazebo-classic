@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,3 +55,5 @@ event::EventT<void (std::string, bool)> model::Events::setSelectedModelPlugin;
 event::EventT<void (std::string)> model::Events::modelPluginInserted;
 event::EventT<void (std::string)> model::Events::modelPluginRemoved;
 event::EventT<void (std::string)> model::Events::requestModelPluginRemoval;
+event::EventT<void (std::string, std::string, std::string)>
+    model::Events::requestModelPluginInsertion;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ void MagnetometerSensor_TEST::BasicMagnetometerSensorCheck(
 
   // Get a pointer to the magnetometer sensor
   sensors::MagnetometerSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::MagnetometerSensor>
+    std::dynamic_pointer_cast<sensors::MagnetometerSensor>
       (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
@@ -110,7 +110,7 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
 
   sensors::SensorPtr sensor = sensors::get_sensor(magSensorName);
   sensors::MagnetometerSensorPtr magSensor =
-      boost::dynamic_pointer_cast<sensors::MagnetometerSensor>(sensor);
+      std::dynamic_pointer_cast<sensors::MagnetometerSensor>(sensor);
 
   ASSERT_TRUE(magSensor != NULL);
 

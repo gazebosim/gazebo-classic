@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,38 +30,41 @@ void SchematicViewWidget_TEST::AddRemove()
 
   // add nodes
   QCOMPARE(svWidget->GetNodeCount(), 0u);
-  svWidget->AddNode("node_a");
-  Q_ASSERT(svWidget->HasNode("node_a"));
+  svWidget->AddNode("model::node_a");
+  Q_ASSERT(svWidget->HasNode("model::node_a"));
   QCOMPARE(svWidget->GetNodeCount(), 1u);
-  svWidget->AddNode("node_b");
-  Q_ASSERT(svWidget->HasNode("node_b"));
+  svWidget->AddNode("model::node_b");
+  Q_ASSERT(svWidget->HasNode("model::node_b"));
   QCOMPARE(svWidget->GetNodeCount(), 2u);
-  svWidget->AddNode("node_c");
-  Q_ASSERT(svWidget->HasNode("node_c"));
+  svWidget->AddNode("model::node_c");
+  Q_ASSERT(svWidget->HasNode("model::node_c"));
   QCOMPARE(svWidget->GetNodeCount(), 3u);
-  svWidget->AddNode("node_d");
-  Q_ASSERT(svWidget->HasNode("node_d"));
+  svWidget->AddNode("model::node_d");
+  Q_ASSERT(svWidget->HasNode("model::node_d"));
   QCOMPARE(svWidget->GetNodeCount(), 4u);
   // remove node
-  svWidget->RemoveNode("node_d");
-  Q_ASSERT(!svWidget->HasNode("node_d"));
+  svWidget->RemoveNode("model::node_d");
+  Q_ASSERT(!svWidget->HasNode("model::node_d"));
   QCOMPARE(svWidget->GetNodeCount(), 3u);
   // removing a node that doesn't exist doesn't break anything
-  svWidget->RemoveNode("node_d");
+  svWidget->RemoveNode("model::node_d");
   QCOMPARE(svWidget->GetNodeCount(), 3u);
   // add it back
-  svWidget->AddNode("node_d");
-  Q_ASSERT(svWidget->HasNode("node_d"));
+  svWidget->AddNode("model::node_d");
+  Q_ASSERT(svWidget->HasNode("model::node_d"));
   QCOMPARE(svWidget->GetNodeCount(), 4u);
 
   // add edges
   QCOMPARE(svWidget->GetEdgeCount(), 0u);
-  svWidget->AddEdge("id_0", "edge_0", "revolute", "node_a", "node_b");
+  svWidget->AddEdge("id_0", "edge_0", "revolute", "model::node_a",
+      "model::node_b");
   QCOMPARE(svWidget->GetEdgeCount(), 1u);
-  svWidget->AddEdge("id_1", "edge_1", "revolute2", "node_b", "node_c");
+  svWidget->AddEdge("id_1", "edge_1", "revolute2", "model::node_b",
+      "model::node_c");
   QCOMPARE(svWidget->GetEdgeCount(), 2u);
-  svWidget->AddEdge("id_2", "edge_2", "ball", "node_a", "node_c");
+  svWidget->AddEdge("id_2", "edge_2", "ball", "model::node_a", "model::node_c");
   QCOMPARE(svWidget->GetEdgeCount(), 3u);
+
   // remove edge
   svWidget->RemoveEdge("id_2");
   QCOMPARE(svWidget->GetEdgeCount(), 2u);
@@ -73,13 +76,32 @@ void SchematicViewWidget_TEST::AddRemove()
   QCOMPARE(svWidget->GetEdgeCount(), 3u);
 
   // remove node and its edges
-  svWidget->RemoveNode("node_b");
+  svWidget->RemoveNode("model::node_b");
   QCOMPARE(svWidget->GetNodeCount(), 3u);
   QCOMPARE(svWidget->GetEdgeCount(), 1u);
 
   // update edge
   svWidget->UpdateEdge("id_2", "edge_2_update", "screw", "node_c", "node_a");
   QCOMPARE(svWidget->GetNodeCount(), 3u);
+  QCOMPARE(svWidget->GetEdgeCount(), 1u);
+
+  // add nested nodes
+  svWidget->AddNode("model::nested::node_a");
+  Q_ASSERT(svWidget->HasNode("model::nested::node_a"));
+  QCOMPARE(svWidget->GetNodeCount(), 4u);
+
+  svWidget->AddNode("model::nested::node_b");
+  Q_ASSERT(svWidget->HasNode("model::nested::node_b"));
+  QCOMPARE(svWidget->GetNodeCount(), 5u);
+
+  // add edge between nested nodes
+  svWidget->AddEdge("id_3", "nested_edge_0", "revolute",
+      "model::nested::node_a", "model::nested::node_b");
+  QCOMPARE(svWidget->GetEdgeCount(), 2u);
+
+  // remove nested node and edge
+  svWidget->RemoveNode("model::nested::node_b");
+  QCOMPARE(svWidget->GetNodeCount(), 4u);
   QCOMPARE(svWidget->GetEdgeCount(), 1u);
 
   delete svWidget;

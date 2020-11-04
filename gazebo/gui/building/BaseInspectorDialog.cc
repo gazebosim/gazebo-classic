@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,18 @@
 */
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Color.hh"
+
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
+#include "gazebo/gui/building/BaseInspectorDialogPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-BaseInspectorDialog::BaseInspectorDialog(QWidget *_parent):QDialog(_parent)
+BaseInspectorDialog::BaseInspectorDialog(QWidget *_parent)
+  : QDialog(_parent), dataPtr(new BaseInspectorDialogPrivate)
 {
 }
 
@@ -39,15 +44,21 @@ void BaseInspectorDialog::InitColorComboBox()
   this->colorComboBox->setMinimumWidth(50);
   this->colorComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   QPixmap colorIcon(15, 15);
-  this->colorList.push_back(QColor(255, 255, 255, 255));
-  this->colorList.push_back(QColor(194, 169, 160, 255));
-  this->colorList.push_back(QColor(235, 206, 157, 255));
-  this->colorList.push_back(QColor(254, 121,   5, 255));
-  this->colorList.push_back(QColor(255, 195,  78, 255));
-  this->colorList.push_back(QColor(111, 203, 172, 255));
-  for (unsigned int i = 0; i < this->colorList.size(); ++i)
+  this->dataPtr->colorList.push_back(Conversions::Convert(
+      QColor(255, 255, 255, 255)));
+  this->dataPtr->colorList.push_back(Conversions::Convert(
+      QColor(194, 169, 160, 255)));
+  this->dataPtr->colorList.push_back(Conversions::Convert(
+      QColor(235, 206, 157, 255)));
+  this->dataPtr->colorList.push_back(Conversions::Convert(
+      QColor(254, 121,   5, 255)));
+  this->dataPtr->colorList.push_back(Conversions::Convert(
+      QColor(255, 195,  78, 255)));
+  this->dataPtr->colorList.push_back(Conversions::Convert(
+      QColor(111, 203, 172, 255)));
+  for (unsigned int i = 0; i < this->dataPtr->colorList.size(); ++i)
   {
-    colorIcon.fill(this->colorList.at(i));
+    colorIcon.fill(Conversions::Convert(this->dataPtr->colorList.at(i)));
     this->colorComboBox->addItem(colorIcon, QString(""));
   }
 }
@@ -60,44 +71,45 @@ void BaseInspectorDialog::InitTextureComboBox()
   this->textureComboBox->setMinimumWidth(50);
   this->textureComboBox->setMinimumHeight(50);
   this->textureComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  this->textureList.push_back(":wood.jpg");
-  this->textureList.push_back(":tiles.jpg");
-  this->textureList.push_back(":bricks.png");
-  for (unsigned int i = 0; i < this->textureList.size(); ++i)
+  this->dataPtr->textureList.push_back(":wood.jpg");
+  this->dataPtr->textureList.push_back(":tiles.jpg");
+  this->dataPtr->textureList.push_back(":bricks.png");
+  for (unsigned int i = 0; i < this->dataPtr->textureList.size(); ++i)
   {
-    this->textureComboBox->addItem(QPixmap(this->textureList[i]).scaled(
-        QSize(90, 90), Qt::IgnoreAspectRatio), QString(""));
+    this->textureComboBox->addItem(QPixmap(QString::fromStdString(
+        this->dataPtr->textureList[i])).scaled(QSize(90, 90),
+        Qt::IgnoreAspectRatio), QString(""));
   }
   this->textureComboBox->addItem("X");
   this->textureComboBox->setCurrentIndex(this->textureComboBox->count()-1);
 }
 
 /////////////////////////////////////////////////
-QColor BaseInspectorDialog::GetColor() const
+common::Color BaseInspectorDialog::Color() const
 {
-  return this->colorList[this->colorComboBox->currentIndex()];
+  return this->dataPtr->colorList[this->colorComboBox->currentIndex()];
 }
 
 /////////////////////////////////////////////////
-QString BaseInspectorDialog::GetTexture() const
+std::string BaseInspectorDialog::Texture() const
 {
-  QString texture = QString("");
+  std::string texture("");
   if (this->textureComboBox->currentIndex() != -1 &&
       this->textureComboBox->currentIndex() <
       this->textureComboBox->count() - 1)
   {
-    texture = this->textureList[this->textureComboBox->currentIndex()];
+    texture = this->dataPtr->textureList[this->textureComboBox->currentIndex()];
   }
   return texture;
 }
 
 /////////////////////////////////////////////////
-void BaseInspectorDialog::SetColor(const QColor _color)
+void BaseInspectorDialog::SetColor(const common::Color &_color)
 {
   int index = -1;
-  for (unsigned int i = 0; i < this->colorList.size(); ++i)
+  for (unsigned int i = 0; i < this->dataPtr->colorList.size(); ++i)
   {
-    if (this->colorList[i] == _color)
+    if (this->dataPtr->colorList[i] == _color)
     {
       index = i;
       break;
@@ -107,9 +119,9 @@ void BaseInspectorDialog::SetColor(const QColor _color)
   if (index == -1)
   {
     // Add a new color
-    this->colorList.push_back(_color);
+    this->dataPtr->colorList.push_back(_color);
     QPixmap colorIcon(15, 15);
-    colorIcon.fill(this->colorList.back());
+    colorIcon.fill(Conversions::Convert(this->dataPtr->colorList.back()));
     this->colorComboBox->addItem(colorIcon, QString(""));
     index = this->colorComboBox->count()-1;
   }
@@ -118,17 +130,36 @@ void BaseInspectorDialog::SetColor(const QColor _color)
 }
 
 /////////////////////////////////////////////////
-void BaseInspectorDialog::SetTexture(QString _texture)
+void BaseInspectorDialog::SetTexture(const std::string &_texture)
 {
   // Find index corresponding to texture (only a few textures allowed so far)
   int index = this->textureComboBox->count()-1;
-  for (unsigned int i = 0; i < this->textureList.size(); ++i)
+  for (unsigned int i = 0; i < this->dataPtr->textureList.size(); ++i)
   {
-    if (this->textureList[i] == _texture)
+    if (this->dataPtr->textureList[i] == _texture)
     {
       index = i;
       break;
     }
   }
   this->textureComboBox->setCurrentIndex(index);
+}
+
+/////////////////////////////////////////////////
+void BaseInspectorDialog::OnCancel()
+{
+  this->close();
+}
+
+/////////////////////////////////////////////////
+void BaseInspectorDialog::OnApply()
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void BaseInspectorDialog::OnOK()
+{
+  emit Applied();
+  this->accept();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
-  dPtr->node->Init(dPtr->scene->GetName());
+  dPtr->node->Init(dPtr->scene->Name());
 
   dPtr->laserScanSub = dPtr->node->Subscribe(_topicName,
       &LaserVisual::OnScan, this);
@@ -97,9 +97,9 @@ void LaserVisual::Update()
   boost::mutex::scoped_lock lock(dPtr->mutex);
 
   // Skip the update if the user is moving the laser.
-  if ((this->GetScene()->GetSelectedVisual() &&
+  if ((this->GetScene()->SelectedVisual() &&
       this->GetRootVisual()->GetName() ==
-      this->GetScene()->GetSelectedVisual()->GetName()))
+      this->GetScene()->SelectedVisual()->GetName()))
   {
     return;
   }
@@ -124,13 +124,13 @@ void LaserVisual::Update()
       dPtr->rayFans.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
       dPtr->rayFans[j]->setMaterial("Gazebo/BlueLaser");
-      dPtr->rayFans[j]->AddPoint(math::Vector3(0, 0, 0));
+      dPtr->rayFans[j]->AddPoint(ignition::math::Vector3d(0, 0, 0));
 
       // No hit ray fans display rays that do not hit obstacles.
       dPtr->noHitRayFans.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
       dPtr->noHitRayFans[j]->setMaterial("Gazebo/LightBlueLaser");
-      dPtr->noHitRayFans[j]->AddPoint(math::Vector3(0, 0, 0));
+      dPtr->noHitRayFans[j]->AddPoint(ignition::math::Vector3d(0, 0, 0));
 
       dPtr->rayLines.push_back(
           this->CreateDynamicLine(rendering::RENDERING_LINE_LIST));

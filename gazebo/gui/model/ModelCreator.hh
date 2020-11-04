@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_CREATOR_HH_
-#define _MODEL_CREATOR_HH_
+#ifndef _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
+#define _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
 
 #include <sdf/sdf.hh>
 
@@ -23,6 +23,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/MouseEvent.hh"
@@ -33,11 +34,6 @@
 #include "gazebo/gui/qt.h"
 
 #include "gazebo/util/system.hh"
-
-namespace boost
-{
-  class recursive_mutex;
-}
 
 namespace gazebo
 {
@@ -126,43 +122,16 @@ namespace gazebo
       /// \param[in] _size Size of the link.
       /// \param[in] _pose Pose of the link.
       /// \param[in] _samples Number of samples for polyline.
-      /// \return Name of the link that has been added.
-      public: std::string AddShape(EntityType _type,
+      /// \return Link data.
+      public: LinkData *AddShape(EntityType _type,
           const math::Vector3 &_size = math::Vector3::One,
           const math::Pose &_pose = math::Pose::Zero,
           const std::string &_uri = "", unsigned int _samples = 5);
 
-      /// \brief Add a box to the model.
-      /// \param[in] _size Size of the box.
-      /// \param[in] _pose Pose of the box.
-      /// \return Name of the box that has been added.
-      public: std::string AddBox(
-          const math::Vector3 &_size = math::Vector3::One,
-          const math::Pose &_pose = math::Pose::Zero);
-
-      /// \brief Add a sphere to the model.
-      /// \param[in] _radius Radius of the sphere.
-      /// \param[in] _pose Pose of the sphere.
-      /// \return Name of the sphere that has been added.
-      public: std::string AddSphere(double _radius = 0.5,
-          const math::Pose &_pose = math::Pose::Zero);
-
-      /// \brief Add a cylinder to the model.
-      /// \param[in] _radius Radius of the cylinder.
-      /// \param[in] _length Length of the cylinder.
-      /// \param[in] _pose Pose of the cylinder.
-      /// \return Name of the cylinder that has been added.
-      public: std::string AddCylinder(double _radius = 0.5,
-          double _length = 1.0, const math::Pose &_pose = math::Pose::Zero);
-
-      /// \brief Add a custom link to the model
-      /// \param[in] _name Name of the custom link.
-      /// \param[in] _scale Scale of the custom link.
-      /// \param[in] _pose Pose of the custom link.
-      /// \return Name of the custom that has been added.
-      public: std::string AddCustom(const std::string &_name,
-          const math::Vector3 &_scale = math::Vector3::One,
-          const math::Pose &_pose = math::Pose::Zero);
+      /// \brief Add a nested model to the model
+      /// \param[in] _sdf SDF describing the model.
+      /// \return Nested model data.
+      public: NestedModelData *AddModel(const sdf::ElementPtr &_sdf);
 
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
@@ -194,14 +163,14 @@ namespace gazebo
       /// \return Joint maker
       public: JointMaker *GetJointMaker() const;
 
-      /// \brief Set the select state of a link.
+      /// \brief Set the select state of an entity.
       /// \param[in] _name Name of the link.
-      /// \param[in] _selected True to select the link.
+      /// \param[in] _selected True to select the entity.
       public: void SetSelected(const std::string &_name, const bool selected);
 
-      /// \brief Set the select state of a link visual.
-      /// \param[in] _linkVis Pointer to the link visual.
-      /// \param[in] _selected True to select the link.
+      /// \brief Set the select state of a entity visual.
+      /// \param[in] _linkVis Pointer to the entity visual.
+      /// \param[in] _selected True to select the entity.
       public: void SetSelected(rendering::VisualPtr _linkVis,
           const bool selected);
 
@@ -211,15 +180,27 @@ namespace gazebo
 
       /// \brief Add an entity to the model
       /// \param[in] _sdf SDF describing the entity.
-      public: void AddEntity(sdf::ElementPtr _sdf);
+      public: void AddEntity(const sdf::ElementPtr &_sdf);
 
       /// \brief Add a link to the model
       /// \param[in] _type Type of link to be added
       public: void AddLink(EntityType _type);
 
       /// \brief Add a model plugin to the model
+      /// \param[in] _name Name of plugin
+      /// \param[in] _filename Plugin filename
+      /// \param[in] _innerxml Plugin SDF elements in string
+      public: void OnAddModelPlugin(const std::string &_name,
+          const std::string &_filename, const std::string &_innerxml);
+
+      /// \brief Add a model plugin to the model
       /// \param[in] _pluginElem Pointer to plugin SDF element
-      public: void AddModelPlugin(const sdf::ElementPtr _pluginElem);
+      public: void AddModelPlugin(const sdf::ElementPtr &_pluginElem);
+
+      /// \brief Get a model plugin data by its name
+      /// \param[in] _name Name of model plugin
+      /// \return Model plugin data.
+      public: ModelPluginData *ModelPlugin(const std::string &_name);
 
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
@@ -316,9 +297,9 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
-      /// \brief Callback when a link is selected.
-      /// \param[in] _name Name of link.
-      /// \param[in] _selected True if the link is selected, false if
+      /// \brief Callback when a model editor entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _selected True if the entity is selected, false if
       /// deselected.
       private: void OnSetSelectedLink(const std::string &_name,
           const bool _selected);
@@ -335,18 +316,24 @@ namespace gazebo
       /// input visual. A collision visual with the same geometry as the input
       /// visual will also be added to the link.
       /// \param[in] _visual Visual used to create the link.
-      private: void CreateLink(const rendering::VisualPtr &_visual);
+      /// \return Link data.
+      private: LinkData * CreateLink(const rendering::VisualPtr &_visual);
+
+      /// \brief Clone an existing nested model.
+      /// \param[in] _modelName Name of nested model to be cloned.
+      /// \return Cloned nested model data.
+      private: NestedModelData *CloneNestedModel(const std::string &_modelName);
 
       /// \brief Clone an existing link.
       /// \param[in] _linkName Name of link to be cloned.
-      /// \return Cloned link.
+      /// \return Cloned link data.
       private: LinkData *CloneLink(const std::string &_linkName);
 
       /// \brief Create a link from an SDF with the specified parent visual.
       /// \param[in] _linkElem SDF element of the link that will be used to
       /// recreate its visual representation in the model editor.
       /// \param[in] _parentVis Parent visual that the link will be attached to.
-      /// \return Data describing this link.
+      /// \return Link data.
       private: LinkData *CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
           const rendering::VisualPtr &_parentVis);
 
@@ -384,11 +371,12 @@ namespace gazebo
       /// \param[in] _axis Axis of alignment: x, y, or z.
       /// \param[in] _config Configuration: min, center, or max.
       /// \param[in] _target Target of alignment: first or last.
-      /// \param[in] _bool True to preview alignment without publishing
+      /// \param[in] _preview True to preview alignment without publishing
       /// to server.
+      /// \param[in] _inverted True to invert alignment direction.
       private: void OnAlignMode(const std::string &_axis,
           const std::string &_config, const std::string &_target,
-          bool _preview);
+          const bool _preview, const bool _inverted = false);
 
       /// \brief Callback when an entity's scale has changed.
       /// \param[in] _name Name of entity.
@@ -402,6 +390,9 @@ namespace gazebo
 
       /// \brief Deselect all currently selected links.
       private: void DeselectAllLinks();
+
+      /// \brief Deselect all currently selected nested models.
+      private: void DeselectAllNestedModels();
 
       /// \brief Deselect all currently selected model plugins.
       private: void DeselectAllModelPlugins();
@@ -500,10 +491,10 @@ namespace gazebo
       /// \brief A map of nested model names to and their visuals.
       private: std::map<std::string, NestedModelData *> allNestedModels;
 
-      /// \brief A map of model link names to and their data.
+      /// \brief A map of model link names to their data.
       private: std::map<std::string, LinkData *> allLinks;
 
-      /// \brief A map of model plugin names to and their data.
+      /// \brief A map of model plugin names to their data.
       private: std::map<std::string, ModelPluginData *> allModelPlugins;
 
       /// \brief Transport node
@@ -523,14 +514,17 @@ namespace gazebo
       /// \brief origin of the model.
       private: math::Pose origin;
 
+      /// \brief A list of selected nested model visuals.
+      private: std::vector<rendering::VisualPtr> selectedNestedModels;
+
       /// \brief A list of selected link visuals.
       private: std::vector<rendering::VisualPtr> selectedLinks;
 
       /// \brief A list of selected model plugins.
       private: std::vector<std::string> selectedModelPlugins;
 
-      /// \brief Names of links copied through g_copyAct
-      private: std::vector<std::string> copiedLinkNames;
+      /// \brief Names of entities copied through g_copyAct
+      private: std::vector<std::string> copiedNames;
 
       /// \brief The last mouse event
       private: common::MouseEvent lastMouseEvent;
@@ -557,7 +551,7 @@ namespace gazebo
       private: enum SaveState currentSaveState;
 
       /// \brief Mutex to protect updates
-      private: boost::recursive_mutex *updateMutex;
+      private: std::recursive_mutex updateMutex;
 
       /// \brief A list of link names whose scale has changed externally.
       private: std::map<std::string, math::Vector3> linkScaleUpdate;
@@ -582,5 +576,4 @@ namespace gazebo
     /// \}
   }
 }
-
 #endif

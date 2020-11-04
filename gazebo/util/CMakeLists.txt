@@ -63,12 +63,11 @@ gz_add_library(gazebo_util ${sources})
 add_dependencies(gazebo_util
   gazebo_common
   gazebo_msgs
-  gazebo_math)
+)
 
 target_link_libraries(gazebo_util
   gazebo_common
   gazebo_transport
-  gazebo_math
   gazebo_msgs
   ${tinyxml2_LIBRARIES}
 )

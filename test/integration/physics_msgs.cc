@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,10 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
+
+#ifdef HAVE_BULLET
+#include "gazebo/physics/bullet/bullet_math_inc.h"
+#endif
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
@@ -101,7 +105,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // spawn a box
   std::string name = "test_box";
@@ -315,7 +319,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // advertise on "~/model/modify"
   transport::PublisherPtr modelPub =
@@ -498,7 +502,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     else
     {
       // Use physics API to resize
-      model->SetScale(scaleFactor * math::Vector3::One);
+      model->SetScale(scaleFactor * ignition::math::Vector3d::One);
     }
   }
 
@@ -534,8 +538,20 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       pose1 = model->GetWorldPose();
       x0 = modelPos[name].x;
       y0 = modelPos[name].y;
-      EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL);
+      double xTolerance = PHYSICS_TOL;
+      double yTolerance = PHYSICS_TOL;
+#ifdef HAVE_BULLET
+      if (_physicsEngine == "bullet" && sizeof(btScalar) == 4)
+      {
+        if (name.find("test_box") != std::string::npos)
+        {
+          xTolerance *= 1.6;
+          yTolerance *= 2.3;
+        }
+      }
+#endif
+      EXPECT_NEAR(pose1.pos.x, x0, xTolerance);
+      EXPECT_NEAR(pose1.pos.y, y0, yTolerance);
       EXPECT_NEAR(pose1.pos.z, 0.5*scaleFactor, PHYSICS_TOL);
     }
     else
@@ -913,7 +929,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(axis1Msg.damping(), 0.2);
     // only ode and bullet return correct hinge friction param value
     if (_physicsEngine == "ode" || _physicsEngine == "bullet")
-      EXPECT_DOUBLE_EQ(axis1Msg.friction(), 0.1);
+      EXPECT_FLOAT_EQ(axis1Msg.friction(), 0.1);
   }
 
   {

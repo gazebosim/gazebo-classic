@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,6 +129,26 @@ namespace gazebo
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.
       public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const;
+
+      /// \brief Return the gravity vector.
+      /// \return The gravity vector.
+      public: ignition::math::Vector3d Gravity() const;
+
+      /// \brief Set the gravity vector.
+      /// \param[in] _gravity New gravity vector.
+      public: void SetGravity(const ignition::math::Vector3d &_gravity);
+
+      /// \brief Set the gravity sdf value.
+      /// \param[in] _gravity New gravity vector.
+      public: void SetGravitySDF(const ignition::math::Vector3d &_gravity);
+
+      /// \brief Return the magnetic field vector.
+      /// \return The magnetic field vector.
+      public: virtual ignition::math::Vector3d MagneticField() const;
+
+      /// \brief Set the magnetic field vector.
+      /// \param[in] _mag New magnetic field vector.
+      public: void SetMagneticField(const ignition::math::Vector3d &_mag);
 
       /// \brief Get the number of models.
       /// \return The number of models in the World.
@@ -317,6 +337,12 @@ namespace gazebo
       /// \param[in] _model Pointer to the model to publish.
       public: void PublishModelPose(physics::ModelPtr _model);
 
+      /// \brief Publish scale updates for a model.
+      /// This list of models to publish is processed and cleared once every
+      /// iteration.
+      /// \param[in] _model Pointer to the model to publish.
+      public: void PublishModelScale(physics::ModelPtr _model);
+
       /// \brief Publish pose updates for a light.
       /// Adds light to a list of lights to publish, which is processed and
       /// cleared once every iteration.
@@ -360,6 +386,16 @@ namespace gazebo
       /// If you are unsure whether you should use this function, do not.
       /// \param[in] _entity Entity that has moved.
       public: void _AddDirty(Entity *_entity);
+
+      /// \brief Get whether sensors have been initialized.
+      /// \return True if sensors have been initialized.
+      public: bool SensorsInitialized() const;
+
+      /// \internal
+      /// \brief Set whether sensors have been initialized. This should only
+      /// be called by SensorManager.
+      /// \param[in] _init True if sensors have been initialized.
+      public: void _SetSensorsInitialized(const bool _init);
 
       /// \cond
       /// This is an internal function.

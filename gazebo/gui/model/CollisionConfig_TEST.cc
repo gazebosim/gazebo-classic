@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ void CollisionConfig_TEST::CollisionUpdates()
     if (it.second->name == "c1")
     {
       const CollisionConfigData *configData = it.second;
-      QCOMPARE(configData->configWidget->GetDoubleWidgetValue("laser_retro"),
+      QCOMPARE(configData->configWidget->DoubleWidgetValue("laser_retro"),
           0.0000789);
       foundConfig = true;
       break;
@@ -139,7 +139,7 @@ void CollisionConfig_TEST::AppliedSignal()
   // Get spins
   QList<QDoubleSpinBox *> spins =
       collisionConfig->findChildren<QDoubleSpinBox *>();
-  QVERIFY(spins.size() == 32);
+  QVERIFY(spins.size() == 33);
 
   // Get combo boxes
   QList<QComboBox *> combos =

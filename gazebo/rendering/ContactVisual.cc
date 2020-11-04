@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
-  dPtr->node->Init(dPtr->scene->GetName());
+  dPtr->node->Init(dPtr->scene->Name());
 
   dPtr->topicName = _topicName;
   dPtr->contactsSub = dPtr->node->Subscribe(dPtr->topicName,
@@ -125,8 +125,8 @@ void ContactVisual::Update()
       dPtr->points[c]->sceneNode->setVisible(true);
       dPtr->points[c]->sceneNode->setPosition(Conversions::Convert(pos));
 
-      dPtr->points[c]->normal->SetPoint(1, normal*normalScale);
-      dPtr->points[c]->depth->SetPoint(1, normal*-depth*10);
+      dPtr->points[c]->normal->SetPoint(1, (normal*normalScale).Ign());
+      dPtr->points[c]->depth->SetPoint(1, (normal*-depth*10).Ign());
 
       dPtr->points[c]->normal->setMaterial("Gazebo/LightOn");
       dPtr->points[c]->depth->setMaterial("Gazebo/LightOff");
@@ -193,7 +193,7 @@ void ContactVisual::CreateNewPoint()
     "_contactpoint_" + boost::lexical_cast<std::string>(dPtr->points.size());
 
   /// \todo We can improve this by using instanced geometry.
-  Ogre::Entity *obj = dPtr->scene->GetManager()->createEntity(
+  Ogre::Entity *obj = dPtr->scene->OgreSceneManager()->createEntity(
                       objName, "contact_sphere");
   obj->setMaterialName("Gazebo/BlueLaser");
 
@@ -205,11 +205,11 @@ void ContactVisual::CreateNewPoint()
   cp->normal = new DynamicLines(RENDERING_LINE_LIST);
   cp->depth = new DynamicLines(RENDERING_LINE_LIST);
 
-  cp->normal->AddPoint(math::Vector3(0, 0, 0));
-  cp->normal->AddPoint(math::Vector3(0, 0, 0.1));
+  cp->normal->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  cp->normal->AddPoint(ignition::math::Vector3d(0, 0, 0.1));
 
-  cp->depth->AddPoint(math::Vector3(0, 0, 0));
-  cp->depth->AddPoint(math::Vector3(0, 0, -1));
+  cp->depth->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  cp->depth->AddPoint(ignition::math::Vector3d(0, 0, -1));
 
   obj->setVisibilityFlags(GZ_VISIBILITY_GUI);
   cp->depth->setVisibilityFlags(GZ_VISIBILITY_GUI);

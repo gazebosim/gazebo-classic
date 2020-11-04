@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,7 +166,7 @@ void ViewAngleWidget::LookDirection(const ignition::math::Vector3d &_dir)
   }
 
   // Keep current distance to look target
-  ignition::math::Vector3d camPos = cam->GetWorldPose().pos.Ign();
+  ignition::math::Vector3d camPos = cam->WorldPose().Pos();
   double distance = std::fabs((camPos - lookAt).Length());
 
   // Calculate camera position

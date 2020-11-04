@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -310,7 +310,7 @@ msgs::Visual *VisualConfig::GetData(const std::string &_name) const
   for (auto const &it : this->configs)
   {
     if (it.second->name == _name)
-      return dynamic_cast<msgs::Visual *>(it.second->configWidget->GetMsg());
+      return dynamic_cast<msgs::Visual *>(it.second->configWidget->Msg());
   }
   return NULL;
 }
@@ -328,7 +328,7 @@ void VisualConfig::SetGeometry(const std::string &_name,
       std::string type = it.second->configWidget->GeometryWidgetValue(
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
-          _size, _uri);
+          _size.Ign(), _uri);
       break;
     }
   }

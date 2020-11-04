@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->linkButtonGroup->addButton(customButton);
 
   this->modelCreator = new ModelCreator();
-  connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
+  connect(this->modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
   this->otherItemsLayout = new QVBoxLayout();
   this->otherItemsLayout->setContentsMargins(0, 0, 0, 0);
@@ -132,7 +132,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->splitter = new QSplitter(Qt::Vertical, this);
   this->splitter->addWidget(paletteWidget);
-  splitter->setCollapsible(0, false);
+  this->splitter->setCollapsible(0, false);
 
   frameLayout->addWidget(this->splitter);
   frameLayout->setContentsMargins(0, 0, 0, 0);

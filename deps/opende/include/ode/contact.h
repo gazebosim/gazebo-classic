@@ -48,7 +48,8 @@ enum {
   dContactApprox1_1	= 0x1000,
   dContactApprox1_2	= 0x2000,
   dContactApprox1	= 0x3000,
-  dContactApprox3	= 0x4000
+  dContactApprox3	= 0x4000,
+  dContactEM            = 0x8000
 };
 
 
@@ -59,6 +60,7 @@ typedef struct dSurfaceParameters {
 
   /* only defined if the corresponding flag is set in mode */
   dReal mu2, mu3;
+  dReal elastic_modulus;
   dReal bounce;
   dReal bounce_vel;
   dReal soft_erp;

@@ -177,8 +177,6 @@
         <physics>
           <ode>
             <provide_feedback>true</provide_feedback>
-            <!-- cfm_damping is being deprecated by implicit_damping -->
-            <cfm_damping>true</cfm_damping>
             <implicit_damping>true</implicit_damping>
           </ode>
         </physics>
@@ -201,8 +199,6 @@
         <physics>
           <ode>
             <provide_feedback>true</provide_feedback>
-            <!-- cfm_damping is being deprecated by implicit_damping -->
-            <cfm_damping>true</cfm_damping>
             <implicit_damping>true</implicit_damping>
           </ode>
         </physics>

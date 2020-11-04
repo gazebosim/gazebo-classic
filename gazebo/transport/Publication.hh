@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,10 @@ namespace gazebo
       /// \return The number of callbacks
       public: unsigned int GetCallbackCount() const;
 
+      /// \brief Get the number of publishers.
+      /// \return The number of publishers.
+      public: unsigned int PublisherCount() const;
+
       /// \brief Get the number of nodes
       /// \return The number of nodes
       public: unsigned int GetNodeCount() const;
@@ -125,6 +129,11 @@ namespace gazebo
       /// \param[in] _pub Pointer to publisher object to remove.
       public: void RemovePublisher(PublisherPtr _pub);
 
+      /// \brief Remove a publisher, based on a publisher ID.
+      /// \param[in] _id ID of the publisher to remove.
+      /// \return True if successful.
+      public: bool RemovePublisher(const uint32_t id);
+
       /// \brief Set the previous message for a publisher.
       /// \param[in] _pubId ID of the publisher.
       /// \param[in] _msg The previous message.
@@ -135,6 +144,9 @@ namespace gazebo
       /// \return Pointer to the previous message. NULL if there is no
       /// previous message.
       public: MessagePtr GetPrevMsg(uint32_t _pubId);
+
+      /// \brief Clear all previous messages for a publisher.
+      public: void ClearPrevMsgs();
 
       /// \brief Add a transport
       /// \param[in] _publink Pointer to publication transport object to

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,10 +51,10 @@ void LayersWidget_TEST::ToggleLayers()
     mainWindow->repaint();
   }
 
-  const unsigned char *data = cam->GetImageData();
-  unsigned int width = cam->GetImageWidth();
-  unsigned int height = cam->GetImageHeight();
-  unsigned int depth = cam->GetImageDepth();
+  const unsigned char *data = cam->ImageData();
+  unsigned int width = cam->ImageWidth();
+  unsigned int height = cam->ImageHeight();
+  unsigned int depth = cam->ImageDepth();
 
   // Part 1 : Make sure the box is rendered. The white box should fill the
   // entire field of view.
@@ -91,7 +91,7 @@ void LayersWidget_TEST::ToggleLayers()
     }
 
     // Get the new image data
-    data = cam->GetImageData();
+    data = cam->ImageData();
 
     int whiteCount = 0;
 
@@ -125,7 +125,7 @@ void LayersWidget_TEST::ToggleLayers()
     }
 
     // Get the new image data
-    data = cam->GetImageData();
+    data = cam->ImageData();
 
     int blackCount = 0;
 

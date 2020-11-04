@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,43 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_GUI_BUILDING_WINDOWDOORINSPECTORDIALOG_HH_
+#define _GAZEBO_GUI_BUILDING_WINDOWDOORINSPECTORDIALOG_HH_
 
-#ifndef _WINDOW_DOOR_INSPECTOR_DIALOG_HH_
-#define _WINDOW_DOOR_INSPECTOR_DIALOG_HH_
-
+#include <memory>
 #include <string>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
+
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
+    class WindowDoorInspectorDialogPrivate;
+
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class WindowDoorInspectorDialog WindowDoorInspectorDialog.hh
+    /// \brief Dialog for configuring a window or door item.
     class GZ_GUI_VISIBLE WindowDoorInspectorDialog
       : public BaseInspectorDialog
     {
       Q_OBJECT
 
       /// \brief Dialog modes
-      public: enum mode {WINDOW, DOOR};
+      public: enum mode
+          {
+            /// \brief Window mode
+            WINDOW,
+
+            /// \brief Door mode
+            DOOR};
 
       /// \brief Constructor
       /// \param[in] _mode Dialog mode
@@ -46,27 +63,27 @@ namespace gazebo
 
       /// \brief Get the item width.
       /// \return Width in pixels.
-      public: double GetWidth() const;
+      public: double Width() const;
 
       /// \brief Get the item height.
       /// \return Height in pixels.
-      public: double GetHeight() const;
+      public: double Height() const;
 
       /// \brief Get the item depth.
       /// \return Depth in pixels.
-      public: double GetDepth() const;
+      public: double Depth() const;
 
       /// \brief Get the item position.
       /// \return Item position in pixel coordinates.
-      public: QPointF GetPosition() const;
+      public: ignition::math::Vector2d Position() const;
 
       /// \brief Get the item elevation.
       /// \return Item elevation in pixels.
-      public: double GetElevation() const;
+      public: double Elevation() const;
 
       /// \brief Get the item type.
       /// \return Item type.
-      public: std::string GetType() const;
+      public: std::string Type() const;
 
       /// \brief Set the item name.
       /// \param[in] _name Name to set to.
@@ -74,66 +91,33 @@ namespace gazebo
 
       /// \brief Set the item width.
       /// \param[in] _width Width in pixels.
-      public: void SetWidth(double _width);
+      public: void SetWidth(const double _width);
 
       /// \brief Set the item height.
       /// \param[in] _height Height in pixels.
-      public: void SetHeight(double _height);
+      public: void SetHeight(const double _height);
 
       /// \brief Set the item depth.
       /// \param[in] _depth Depth in pixels.
-      public: void SetDepth(double _depth);
+      public: void SetDepth(const double _depth);
 
       /// \brief Set the item scene position.
       /// \param[in] _pos Position in pixel coordinates.
-      public: void SetPosition(const QPointF &_pos);
+      public: void SetPosition(const ignition::math::Vector2d &_pos);
 
       /// \brief Set the item elevation.
       /// \param[in] _elevation Item elevation in pixels.
-      public: void SetElevation(double _elevation);
+      public: void SetElevation(const double _elevation);
 
       /// \brief Set the item type.
       /// \param[in] _type Item type.
       public: void SetType(const std::string &_type);
 
-      /// \brief Qt signal emitted to indicate that changes should be applied.
-      Q_SIGNALS: void Applied();
-
-      /// \brief Qt callback when the Cancel button is pressed.
-      private slots: void OnCancel();
-
-      /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
-
-      /// \brief Qt callback when the Ok button is pressed.
-      private slots: void OnOK();
-
-      /// \brief Label that displays the name of the item.
-      private: QLabel* itemNameLabel;
-
-      /// \brief Spin box for configuring the width of the item.
-      private: QDoubleSpinBox *widthSpinBox;
-
-      /// \brief Spin box for configuring the depth of the item.
-      private: QDoubleSpinBox *depthSpinBox;
-
-      /// \brief Spin box for configuring the height of the item.
-      private: QDoubleSpinBox *heightSpinBox;
-
-      /// \brief Spin box for configuring the X position of the item.
-      private: QDoubleSpinBox *positionXSpinBox;
-
-      /// \brief Spin box for configuring the Y position of the item.
-      private: QDoubleSpinBox *positionYSpinBox;
-
-      /// \brief Spin box for configuring the elevation of the item.
-      private: QDoubleSpinBox *elevationSpinBox;
-
-      /// \brief Combo box for selecting the type of the item to use.
-      private: QComboBox *typeComboBox;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<WindowDoorInspectorDialogPrivate> dataPtr;
     };
     /// \}
   }
 }
-
 #endif

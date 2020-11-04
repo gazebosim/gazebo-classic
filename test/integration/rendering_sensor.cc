@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   EXPECT_TRUE(sensor != NULL);
 
   sensors::CameraSensorPtr camSensor1 =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor1 != NULL);
 
   std::string modelName2 = "camera_model2";
@@ -98,7 +98,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   EXPECT_TRUE(sensor2 != NULL);
 
   sensors::CameraSensorPtr camSensor2 =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
   EXPECT_TRUE(camSensor2 != NULL);
 
   // spawn gpu ray sensor
@@ -121,7 +121,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   ASSERT_TRUE(sensor3 != NULL);
 
   sensors::GpuRaySensorPtr gpuRaySensor =
-    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor3);
+    std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor3);
   EXPECT_TRUE(gpuRaySensor != NULL);
 
   camSensor1->SetActive(true);
@@ -131,11 +131,11 @@ TEST_F(RenderingSensorTest, Timestamp)
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
 
-  transport::SubscriberPtr cam1Sub = node->Subscribe(camSensor1->GetTopic(),
+  transport::SubscriberPtr cam1Sub = node->Subscribe(camSensor1->Topic(),
       &OnReceiveCamera1Msg);
-  transport::SubscriberPtr cam2Sub = node->Subscribe(camSensor2->GetTopic(),
+  transport::SubscriberPtr cam2Sub = node->Subscribe(camSensor2->Topic(),
       &OnReceiveCamera2Msg);
-  transport::SubscriberPtr gpuRaySub = node->Subscribe(gpuRaySensor->GetTopic(),
+  transport::SubscriberPtr gpuRaySub = node->Subscribe(gpuRaySensor->Topic(),
       &OnReceiveGpuRayMsg);
 
   unsigned int numTimestamps = 100;

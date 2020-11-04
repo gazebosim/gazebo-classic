@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,19 @@
  *
 */
 
-#ifndef _GAZEBO_CONFIG_WIDGET_HH_
-#define _GAZEBO_CONFIG_WIDGET_HH_
+#ifndef _GAZEBO_GUI_CONFIGWIDGET_HH_
+#define _GAZEBO_GUI_CONFIGWIDGET_HH_
 
+#include <map>
+#include <memory>
 #include <string>
 #include <vector>
-#include <map>
 
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Color.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/gui/qt.h"
 
 namespace google
@@ -40,6 +44,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class ConfigWidgetPrivate;
     class GroupWidget;
 
     /// \addtogroup gazebo_gui
@@ -155,13 +160,26 @@ namespace gazebo
 
       /// \brief Get the updated message.
       /// \return Updated message.
-      public: google::protobuf::Message *GetMsg();
+      /// \deprecated See Msg().
+      public: google::protobuf::Message *GetMsg() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the updated message.
+      /// \return Updated message.
+      public: google::protobuf::Message *Msg();
 
       /// \brief Create a human readable key, capitalizing the first letter
       /// and removing characters like "_".
       /// \param[in] _key Non-human-readable key.
-      /// \return Human-redadable key.
-      public: std::string GetHumanReadableKey(const std::string &_key);
+      /// \return Human-readable key.
+      /// \deprecated See HumanReadableKey(const std::string &_key) const
+      public: std::string GetHumanReadableKey(const std::string &_key)
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Create a human readable key, capitalizing the first letter
+      /// and removing characters like "_".
+      /// \param[in] _key Non-human-readable key.
+      /// \return Human-readable key.
+      public: std::string HumanReadableKey(const std::string &_key) const;
 
       /// \brief Returns the unit for a given key. For example, the key "mass"
       /// returns "kg".
@@ -169,16 +187,38 @@ namespace gazebo
       /// \param[in] _jointType In case the field belongs to a joint, the
       /// joint's type.
       /// \return The unit.
+      /// \deprecated See UnitFromKey(const std::string &_key,
+      ///                             const std::string &_jointType = "") const
       public: std::string GetUnitFromKey(const std::string &_key,
-          const std::string &_jointType = "");
+          const std::string &_jointType = "") GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns the unit for a given key. For example, the key "mass"
+      /// returns "kg".
+      /// \param[in] _key The key.
+      /// \param[in] _jointType In case the field belongs to a joint, the
+      /// joint's type.
+      /// \return The unit.
+      public: std::string UnitFromKey(const std::string &_key,
+          const std::string &_jointType = "") const;
 
       /// \brief Returns the range for a given key. For example, the key
-      // "transparency" returns min == 0, max == 1.
+      /// "transparency" returns min == 0, max == 1.
       /// \param[in] _key The key.
       /// \param[out] _min The minimum value.
       /// \param[out] _max The maximum value.
+      /// \deprecated See RangeFromKey(const std::string &_key,
+      ///                              double &_min,
+      ///                              double &_max) const
       public: void GetRangeFromKey(const std::string &_key,
-          double &_min, double &_max);
+          double &_min, double &_max) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns the range for a given key. For example, the key
+      /// "transparency" returns min == 0, max == 1.
+      /// \param[in] _key The key.
+      /// \param[out] _min The minimum value.
+      /// \param[out] _max The maximum value.
+      public: void RangeFromKey(const std::string &_key,
+          double &_min, double &_max) const;
 
       /// \brief Set whether a child widget should be visible.
       /// \param[in] _name Name of the child widget.
@@ -188,7 +228,14 @@ namespace gazebo
       /// \brief Get whether a child widget is visible.
       /// \param[in] _name Name of the child widget.
       /// \return True if the widget is visible.
-      public: bool GetWidgetVisible(const std::string &_name) const;
+      /// \deprecated See WidgetVisible(const std::string &_name) const
+      public: bool GetWidgetVisible(const std::string &_name) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get whether a child widget is visible.
+      /// \param[in] _name Name of the child widget.
+      /// \return True if the widget is visible.
+      public: bool WidgetVisible(const std::string &_name) const;
 
       /// \brief Set whether a child widget should be read-only.
       /// \param[in] _name Name of the child widget.
@@ -198,7 +245,14 @@ namespace gazebo
       /// \brief Get whether a child widget is read-only.
       /// \param[in] _name Name of the child widget.
       /// \return True if the widget is read-only.
-      public: bool GetWidgetReadOnly(const std::string &_name) const;
+      /// \deprecated See WidgetReadOnly(const std::string &_name) const
+      public: bool GetWidgetReadOnly(const std::string &_name) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get whether a child widget is read-only.
+      /// \param[in] _name Name of the child widget.
+      /// \return True if the widget is read-only.
+      public: bool WidgetReadOnly(const std::string &_name) const;
 
       /// \brief Update the widgets from a message.
       /// \param[in] _msg Message used for updating the widgets.
@@ -240,8 +294,17 @@ namespace gazebo
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the value is set successfully.
+      /// \deprecated See SetVector3dWidgetValue(const std::string &_name,
+      ///                                 const ignition::math::Vector3 &_value)
       public: bool SetVector3WidgetValue(const std::string &_name,
-          const math::Vector3 &_value);
+          const math::Vector3 &_value) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set a vector3 value to a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _value Value to set to.
+      /// \return True if the value is set successfully.
+      public: bool SetVector3dWidgetValue(const std::string &_name,
+          const ignition::math::Vector3d &_value);
 
       /// \brief Set a color value to a child widget.
       /// \param[in] _name Name of the child widget.
@@ -254,8 +317,30 @@ namespace gazebo
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the value is set successfully.
+      /// \deprecated See SetPoseWidgetValue(const std::string &_name,
+      ///                                  const ignition::math::Pose3d &_value)
       public: bool SetPoseWidgetValue(const std::string &_name,
-          const math::Pose &_value);
+          const math::Pose &_value) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set a pose value to a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _value Value to set to.
+      /// \return True if the value is set successfully.
+      public: bool SetPoseWidgetValue(const std::string &_name,
+          const ignition::math::Pose3d &_value);
+
+      /// \brief Set a geometry value to a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _value Type of geometry.
+      /// \param[in] _dimensions Dimensions of geometry.
+      /// \return True if the value is set successfully.
+      /// \deprecated See SetGeometryWidgetValue(const std::string &_name,
+      ///                           const std::string &_value,
+      ///                           const ignition::math::Vector3d &_dimensions,
+      ///                           const std::string &_uri = "")
+      public: bool SetGeometryWidgetValue(const std::string &_name,
+          const std::string &_value, const math::Vector3 &_dimensions,
+          const std::string &_uri = "") GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set a geometry value to a child widget.
       /// \param[in] _name Name of the child widget.
@@ -263,7 +348,8 @@ namespace gazebo
       /// \param[in] _dimensions Dimensions of geometry.
       /// \return True if the value is set successfully.
       public: bool SetGeometryWidgetValue(const std::string &_name,
-          const std::string &_value, const math::Vector3 &_dimensions,
+          const std::string &_value,
+          const ignition::math::Vector3d &_dimensions,
           const std::string &_uri = "");
 
       /// \brief Set an enum value to a child widget.
@@ -295,47 +381,105 @@ namespace gazebo
       /// \brief Get an integer value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Integer value.
-      public: int GetIntWidgetValue(const std::string &_name) const;
+      /// \deprecated See IntWidgetValue(const std::string &_name) const
+      public: int GetIntWidgetValue(const std::string &_name) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get an integer value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return Integer value.
+      public: int IntWidgetValue(const std::string &_name) const;
 
       /// \brief Get an unsigned integer value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Unsigned integer value.
-      public: unsigned int GetUIntWidgetValue(const std::string &_name) const;
+      /// \deprecated See UIntWidgetValue(const std::string &_name) const
+      public: unsigned int GetUIntWidgetValue(const std::string &_name) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get an unsigned integer value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return Unsigned integer value.
+      public: unsigned int UIntWidgetValue(const std::string &_name) const;
 
       /// \brief Get a double value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Double value.
-      public: double GetDoubleWidgetValue(const std::string &_name) const;
+      /// \deprecated See DoubleWidgetValue(const std::string &_name) const
+      public: double GetDoubleWidgetValue(const std::string &_name) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a double value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return Double value.
+      public: double DoubleWidgetValue(const std::string &_name) const;
 
       /// \brief Get a bool value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Bool value.
-      public: bool GetBoolWidgetValue(const std::string &_name) const;
+      /// \deprecated See BoolWidgetValue(const std::string &_name) const
+      public: bool GetBoolWidgetValue(const std::string &_name) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a bool value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return Bool value.
+      public: bool BoolWidgetValue(const std::string &_name) const;
 
       /// \brief Get a string value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return String value.
-      public: std::string GetStringWidgetValue(const std::string &_name) const;
+      /// \deprecated See StringWidgetValue(const std::string &_name) const
+      public: std::string GetStringWidgetValue(const std::string &_name) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a string value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return String value.
+      public: std::string StringWidgetValue(const std::string &_name) const;
 
       /// \brief Get a vector3 value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Vector3 value.
+      /// \deprecated See Vector3dWidgetValue(const std::string &_name) const
       public: math::Vector3 GetVector3WidgetValue(const std::string &_name)
-          const;
+          const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a vector3 value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return Vector3 value.
+      public: ignition::math::Vector3d Vector3dWidgetValue(
+          const std::string &_name) const;
 
       /// \brief Get a color value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Color value.
-      public: common::Color GetColorWidgetValue(const std::string &_name) const;
+      /// \deprecated See ColorWidgetValue(const std::string &_name) const
+      public: common::Color GetColorWidgetValue(const std::string &_name) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a color value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return Color value.
+      public: common::Color ColorWidgetValue(const std::string &_name) const;
 
       /// \brief Get a pose value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Pose value.
-      public: math::Pose GetPoseWidgetValue(const std::string &_name) const;
+      /// \deprecated See PoseWidgetValue(const std::string &_name) const
+      public: math::Pose GetPoseWidgetValue(const std::string &_name) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a pose value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return Pose value.
+      public: ignition::math::Pose3d PoseWidgetValue(
+          const std::string &_name) const;
 
       /// \brief Get a geometry value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[out] _dimensions Dimensions of geometry.
+      /// \param[out] _uri URI of the geometry mesh, if any.
       /// \return Type of geometry.
       /// \deprecated See GeometryWidgetValue() function that accepts an
       /// ignition math object.
@@ -346,6 +490,7 @@ namespace gazebo
       /// \brief Get a geometry value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[out] _dimensions Dimensions of geometry.
+      /// \param[out] _uri URI of the geometry mesh, if any.
       /// \return Type of geometry.
       public: std::string GeometryWidgetValue(const std::string &_name,
           ignition::math::Vector3d &_dimensions, std::string &_uri) const;
@@ -353,7 +498,14 @@ namespace gazebo
       /// \brief Get an enum value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Enum value.
-      public: std::string GetEnumWidgetValue(const std::string &_name) const;
+      /// \deprecated See EnumWidgetValue(const std::string &_name)
+      public: std::string GetEnumWidgetValue(const std::string &_name) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get an enum value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return Enum value.
+      public: std::string EnumWidgetValue(const std::string &_name) const;
 
       /// \brief Create a widget which has a button header which collapses
       /// the field widget.
@@ -505,8 +657,8 @@ namespace gazebo
       /// \brief Parse a vector3 message.
       /// param[in] _msg Input vector3d message.
       /// return Parsed vector.
-      private: math::Vector3 ParseVector3(
-          const google::protobuf::Message *_msg);
+      private: ignition::math::Vector3d ParseVector3d(
+          const google::protobuf::Message *_msg) const;
 
       /// \brief Update the message field using values from the widgets.
       /// \param[in] _msg Message to be updated.
@@ -517,28 +669,29 @@ namespace gazebo
       /// \brief Update a vector3d message.
       /// \param[in] _msg Vector3d message to be updated.
       /// \param[in] _value Vector3 used for updating the message.
-      private: void UpdateVector3Msg(google::protobuf::Message *_msg,
-          const math::Vector3 &_value);
+      private: void UpdateVector3dMsg(google::protobuf::Message *_msg,
+          const ignition::math::Vector3d &_value);
 
       /// \brief Update a child widget with an unsigned integer value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the update completed successfully.
       private: bool UpdateUIntWidget(ConfigChildWidget *_widget,
-          unsigned int _value);
+          const unsigned int _value);
 
       /// \brief Update a child widget with an integer value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the update completed successfully.
-      private: bool UpdateIntWidget(ConfigChildWidget *_widget, int _value);
+      private: bool UpdateIntWidget(ConfigChildWidget *_widget,
+           const int _value);
 
       /// \brief Update a child widget with a double value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the update completed successfully.
       private: bool UpdateDoubleWidget(ConfigChildWidget *_widget,
-          double _value);
+          const double _value);
 
       /// \brief Update a child widget with a string value.
       /// \param[in] _widget Pointer to the child widget.
@@ -551,14 +704,15 @@ namespace gazebo
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the update completed successfully.
-      private: bool UpdateBoolWidget(ConfigChildWidget *_widget, bool _value);
+      private: bool UpdateBoolWidget(ConfigChildWidget *_widget,
+          const bool _value);
 
       /// \brief Update a child widget with a vector3 value.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the update completed successfully.
-      private: bool UpdateVector3Widget(ConfigChildWidget *_widget,
-          const math::Vector3 &_value);
+      private: bool UpdateVector3dWidget(ConfigChildWidget *_widget,
+          const ignition::math::Vector3d &_value);
 
       /// \brief Update a child widget with a color value.
       /// \param[in] _widget Pointer to the child widget.
@@ -572,7 +726,7 @@ namespace gazebo
       /// \param[in] _value Value to set to.
       /// \return True if the update completed successfully.
       private: bool UpdatePoseWidget(ConfigChildWidget *_widget,
-          const math::Pose &_value);
+          const ignition::math::Pose3d &_value);
 
       /// \brief Update a child widget with a geometry type and dimensions.
       /// \param[in] _widget Pointer to the child widget.
@@ -581,7 +735,8 @@ namespace gazebo
       /// \param[in] _uri URI of the geometry mesh, if any.
       /// \return True if the update completed successfully.
       private: bool UpdateGeometryWidget(ConfigChildWidget *_widget,
-          const std::string &_value, const math::Vector3 &_dimensions,
+          const std::string &_value,
+          const ignition::math::Vector3d &_dimensions,
           const std::string &_uri = "");
 
       /// \brief Update a child widget with an enum value.
@@ -594,64 +749,63 @@ namespace gazebo
       /// \brief Get an integer value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
-      private: int GetIntWidgetValue(ConfigChildWidget *_widget) const;
+      private: int IntWidgetValue(ConfigChildWidget *_widget) const;
 
       /// \brief Get an unsigned integer value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
-      private: unsigned int GetUIntWidgetValue(ConfigChildWidget *_widget)
-          const;
+      private: unsigned int UIntWidgetValue(ConfigChildWidget *_widget) const;
 
       /// \brief Get a double value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
-      private: double GetDoubleWidgetValue(ConfigChildWidget *_widget) const;
+      private: double DoubleWidgetValue(ConfigChildWidget *_widget) const;
 
       /// \brief Get a bool value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
-      private: bool GetBoolWidgetValue(ConfigChildWidget *_widget) const;
+      private: bool BoolWidgetValue(ConfigChildWidget *_widget) const;
 
       /// \brief Get a string value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
-      private: std::string GetStringWidgetValue(ConfigChildWidget *_widget)
-          const;
+      private: std::string StringWidgetValue(ConfigChildWidget *_widget) const;
 
       /// \brief Get a vector3 value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
-      private: math::Vector3 GetVector3WidgetValue(ConfigChildWidget *_widget)
-          const;
+      private: ignition::math::Vector3d Vector3dWidgetValue(
+          ConfigChildWidget *_widget) const;
 
       /// \brief Get a color value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
-      private: common::Color GetColorWidgetValue(ConfigChildWidget *_widget)
-          const;
+      private: common::Color ColorWidgetValue(ConfigChildWidget *_widget) const;
 
       /// \brief Get a pose value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
-      private: math::Pose GetPoseWidgetValue(ConfigChildWidget *_widget) const;
+      private: ignition::math::Pose3d PoseWidgetValue(
+          ConfigChildWidget *_widget) const;
 
       /// \brief Get a geometry value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \param[out] _dimensions Dimensions of geometry.
       /// \param[out] _uri URI of the geometry mesh, if any.
       /// \return Type of geometry.
-      private: std::string GetGeometryWidgetValue(ConfigChildWidget *_widget,
+      private: std::string GeometryWidgetValue(ConfigChildWidget *_widget,
           ignition::math::Vector3d &_dimensions, std::string &_uri) const;
 
       /// \brief Get an enum value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
-      private: std::string GetEnumWidgetValue(ConfigChildWidget *_widget) const;
+      private: std::string EnumWidgetValue(ConfigChildWidget *_widget) const;
 
       /// \brief Received item selection user input.
       /// \param[in] _item Item selected.
       /// \param[in] _column Column index.
-      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
+      private slots: void OnItemSelection(QTreeWidgetItem *_item,
+          const int _column);
 
       /// \brief Callback when a uint config widget's value has changed.
       private slots: void OnUIntValueChanged();
@@ -763,11 +917,9 @@ namespace gazebo
       /// \return True if the event is handled.
       private: bool eventFilter(QObject *_obj, QEvent *_event);
 
-      /// \brief A map of unique scoped names to correpsonding widgets.
-      private: std::map <std::string, ConfigChildWidget *> configWidgets;
-
-      /// \brief A copy of the message with fields to be configured by widgets.
-      private: google::protobuf::Message *configMsg;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ConfigWidgetPrivate> dataPtr;
     };
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,6 +78,10 @@ namespace gazebo
 
       /// \brief Internal init function.
       private: bool Init();
+
+      /// \brief Create the model visual from model SDF
+      /// \param[in] _modelElem Root model SDF element.
+      private: void CreateModelFromSDF(sdf::ElementPtr _modelElem);
 
       /// \brief Publish a factory message to create the entity.
       private: virtual void CreateTheEntity();

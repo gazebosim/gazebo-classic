@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
 #include "gazebo/transport/transport.hh"
@@ -116,6 +117,15 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->userCmdStatsPub =
     this->dataPtr->node->Advertise<msgs::UserCmdStats>("~/user_cmd_stats");
 
+  this->dataPtr->worldControlPub =
+      this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
+
+  this->dataPtr->modelModifyPub =
+      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
+
+  this->dataPtr->lightModifyPub =
+      this->dataPtr->node->Advertise<msgs::Light>("~/light/modify");
+
   this->dataPtr->idCounter = 0;
 }
 
@@ -135,6 +145,39 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   // Create command
   UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
       _msg->type()));
+
+  // Forward message after we've saved the current state
+  if (_msg->type() == msgs::UserCmd::MOVING)
+  {
+    for (int i = 0; i < _msg->model_size(); ++i)
+      this->dataPtr->modelModifyPub->Publish(_msg->model(i));
+
+    for (int i = 0; i < _msg->light_size(); ++i)
+      this->dataPtr->lightModifyPub->Publish(_msg->light(i));
+  }
+  else if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
+  {
+    if (_msg->has_world_control())
+    {
+      this->dataPtr->worldControlPub->Publish(_msg->world_control());
+    }
+    else
+    {
+      gzwarn << "World control command [" << _msg->description() <<
+          "] without a world control message. Command won't be executed."
+          << std::endl;
+    }
+  }
+  else if (_msg->type() == msgs::UserCmd::WRENCH)
+  {
+    // Set publisher
+    std::string topicName = "~/";
+    topicName += _msg->entity_name() + "/wrench";
+    boost::replace_all(topicName, "::", "/");
+
+    auto wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
+    wrenchPub->Publish(_msg->wrench());
+  }
 
   // Add it to undo list
   this->dataPtr->undoCmds.push_back(cmd);

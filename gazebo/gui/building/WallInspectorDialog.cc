@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,16 @@
 */
 
 #include "gazebo/common/Assert.hh"
+
 #include "gazebo/gui/building/WallInspectorDialog.hh"
+#include "gazebo/gui/building/WallInspectorDialogPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
-  : BaseInspectorDialog(_parent)
+  : BaseInspectorDialog(_parent), dataPtr(new WallInspectorDialogPrivate)
 {
   this->setObjectName("wallInspectorDialog");
 
@@ -32,11 +34,11 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QLabel *wallLabel = new QLabel(tr("Wall Name: "));
-  this->wallNameLabel = new QLabel(tr(""));
+  this->dataPtr->wallNameLabel = new QLabel(tr(""));
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
   nameLayout->addWidget(wallLabel);
-  nameLayout->addWidget(this->wallNameLabel);
+  nameLayout->addWidget(this->dataPtr->wallNameLabel);
 
   QLabel *startLabel = new QLabel(tr("Start Point"));
   QLabel *endLabel = new QLabel(tr("End Point"));
@@ -47,71 +49,70 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   QLabel *startXLabel = new QLabel(tr("x: "));
   QLabel *startYLabel = new QLabel(tr("y: "));
 
-  this->startXSpinBox = new QDoubleSpinBox;
-  this->startXSpinBox->setRange(-1000, 1000);
-  this->startXSpinBox->setSingleStep(0.001);
-  this->startXSpinBox->setDecimals(3);
-  this->startXSpinBox->setValue(0.000);
-  this->startXSpinBox->setAlignment(Qt::AlignRight);
+  this->dataPtr->startXSpinBox = new QDoubleSpinBox;
+  this->dataPtr->startXSpinBox->setRange(-1000, 1000);
+  this->dataPtr->startXSpinBox->setSingleStep(0.001);
+  this->dataPtr->startXSpinBox->setDecimals(3);
+  this->dataPtr->startXSpinBox->setValue(0.000);
+  this->dataPtr->startXSpinBox->setAlignment(Qt::AlignRight);
   QLabel *startXUnitLabel = new QLabel(tr("m "));
   startXUnitLabel->setMaximumWidth(40);
 
-  this->startYSpinBox = new QDoubleSpinBox;
-  this->startYSpinBox->setRange(-1000, 1000);
-  this->startYSpinBox->setSingleStep(0.001);
-  this->startYSpinBox->setDecimals(3);
-  this->startYSpinBox->setValue(0.000);
-  this->startYSpinBox->setAlignment(Qt::AlignRight);
+  this->dataPtr->startYSpinBox = new QDoubleSpinBox;
+  this->dataPtr->startYSpinBox->setRange(-1000, 1000);
+  this->dataPtr->startYSpinBox->setSingleStep(0.001);
+  this->dataPtr->startYSpinBox->setDecimals(3);
+  this->dataPtr->startYSpinBox->setValue(0.000);
+  this->dataPtr->startYSpinBox->setAlignment(Qt::AlignRight);
   QLabel *startYUnitLabel = new QLabel(tr("m "));
   startYUnitLabel->setMaximumWidth(40);
 
   QLabel *endXLabel = new QLabel(tr("x: "));
   QLabel *endYLabel = new QLabel(tr("y: "));
 
-  this->endXSpinBox = new QDoubleSpinBox;
-  this->endXSpinBox->setRange(-1000, 1000);
-  this->endXSpinBox->setSingleStep(0.001);
-  this->endXSpinBox->setDecimals(3);
-  this->endXSpinBox->setValue(0.000);
-  this->endXSpinBox->setAlignment(Qt::AlignRight);
+  this->dataPtr->endXSpinBox = new QDoubleSpinBox;
+  this->dataPtr->endXSpinBox->setRange(-1000, 1000);
+  this->dataPtr->endXSpinBox->setSingleStep(0.001);
+  this->dataPtr->endXSpinBox->setDecimals(3);
+  this->dataPtr->endXSpinBox->setValue(0.000);
+  this->dataPtr->endXSpinBox->setAlignment(Qt::AlignRight);
   QLabel *endXUnitLabel = new QLabel(tr("m"));
   endXUnitLabel->setMaximumWidth(40);
 
-  this->endYSpinBox = new QDoubleSpinBox;
-  this->endYSpinBox->setRange(-1000, 1000);
-  this->endYSpinBox->setSingleStep(0.001);
-  this->endYSpinBox->setDecimals(3);
-  this->endYSpinBox->setValue(0.000);
-  this->endYSpinBox->setAlignment(Qt::AlignRight);
+  this->dataPtr->endYSpinBox = new QDoubleSpinBox;
+  this->dataPtr->endYSpinBox->setRange(-1000, 1000);
+  this->dataPtr->endYSpinBox->setSingleStep(0.001);
+  this->dataPtr->endYSpinBox->setDecimals(3);
+  this->dataPtr->endYSpinBox->setValue(0.000);
+  this->dataPtr->endYSpinBox->setAlignment(Qt::AlignRight);
   QLabel *endYUnitLabel = new QLabel(tr("m"));
   endYUnitLabel->setMaximumWidth(40);
 
   QGridLayout *startXYLayout = new QGridLayout;
   startXYLayout->addWidget(startXLabel, 0, 0);
-  startXYLayout->addWidget(this->startXSpinBox, 0, 1);
+  startXYLayout->addWidget(this->dataPtr->startXSpinBox, 0, 1);
   startXYLayout->addWidget(startXUnitLabel, 0, 2);
   startXYLayout->addWidget(startYLabel, 1, 0);
-  startXYLayout->addWidget(this->startYSpinBox, 1, 1);
+  startXYLayout->addWidget(this->dataPtr->startYSpinBox, 1, 1);
   startXYLayout->addWidget(startYUnitLabel, 1, 2);
   startXYLayout->setColumnStretch(1, 1);
-  startXYLayout->setAlignment(this->startXSpinBox, Qt::AlignLeft);
-  startXYLayout->setAlignment(this->startYSpinBox, Qt::AlignLeft);
+  startXYLayout->setAlignment(this->dataPtr->startXSpinBox, Qt::AlignLeft);
+  startXYLayout->setAlignment(this->dataPtr->startYSpinBox, Qt::AlignLeft);
 
   QGridLayout *endXYLayout = new QGridLayout;
   endXYLayout->addWidget(endXLabel, 0, 0);
-  endXYLayout->addWidget(this->endXSpinBox, 0, 1);
+  endXYLayout->addWidget(this->dataPtr->endXSpinBox, 0, 1);
   endXYLayout->addWidget(endXUnitLabel, 0, 2);
   endXYLayout->addWidget(endYLabel, 1, 0);
-  endXYLayout->addWidget(this->endYSpinBox, 1, 1);
+  endXYLayout->addWidget(this->dataPtr->endYSpinBox, 1, 1);
   endXYLayout->addWidget(endYUnitLabel, 1, 2);
   endXYLayout->setColumnStretch(1, 1);
-  endXYLayout->setAlignment(this->endXSpinBox, Qt::AlignLeft);
-  endXYLayout->setAlignment(this->endYSpinBox, Qt::AlignLeft);
+  endXYLayout->setAlignment(this->dataPtr->endXSpinBox, Qt::AlignLeft);
+  endXYLayout->setAlignment(this->dataPtr->endYSpinBox, Qt::AlignLeft);
 
   QHBoxLayout *xyLayout = new QHBoxLayout;
   xyLayout->addLayout(startXYLayout);
   xyLayout->addLayout(endXYLayout);
-
 
   QVBoxLayout *positionGroupLayout = new QVBoxLayout;
   positionGroupLayout->addLayout(startEndLayout);
@@ -121,49 +122,49 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   positionGroupBox->setLayout(positionGroupLayout);
 
   QLabel *lengthLabel = new QLabel(tr("Length: "));
-  this->lengthSpinBox = new QDoubleSpinBox;
-  this->lengthSpinBox->setRange(0, 1000);
-  this->lengthSpinBox->setSingleStep(0.001);
-  this->lengthSpinBox->setDecimals(3);
-  this->lengthSpinBox->setValue(0.000);
-  this->lengthSpinBox->setAlignment(Qt::AlignRight);
+  this->dataPtr->lengthSpinBox = new QDoubleSpinBox;
+  this->dataPtr->lengthSpinBox->setRange(0, 1000);
+  this->dataPtr->lengthSpinBox->setSingleStep(0.001);
+  this->dataPtr->lengthSpinBox->setDecimals(3);
+  this->dataPtr->lengthSpinBox->setValue(0.000);
+  this->dataPtr->lengthSpinBox->setAlignment(Qt::AlignRight);
 
   QLabel *lengthUnitLabel = new QLabel(tr("m"));
   lengthUnitLabel->setMaximumWidth(40);
 
   QHBoxLayout *lengthLayout = new QHBoxLayout;
   lengthLayout->addWidget(lengthLabel);
-  lengthLayout->addWidget(this->lengthSpinBox);
+  lengthLayout->addWidget(this->dataPtr->lengthSpinBox);
   lengthLayout->addWidget(lengthUnitLabel);
 
   QLabel *heightLabel = new QLabel(tr("Height: "));
-  this->heightSpinBox = new QDoubleSpinBox;
-  this->heightSpinBox->setRange(0, 1000);
-  this->heightSpinBox->setSingleStep(0.001);
-  this->heightSpinBox->setDecimals(3);
-  this->heightSpinBox->setValue(0.000);
-  this->heightSpinBox->setAlignment(Qt::AlignRight);
+  this->dataPtr->heightSpinBox = new QDoubleSpinBox;
+  this->dataPtr->heightSpinBox->setRange(0, 1000);
+  this->dataPtr->heightSpinBox->setSingleStep(0.001);
+  this->dataPtr->heightSpinBox->setDecimals(3);
+  this->dataPtr->heightSpinBox->setValue(0.000);
+  this->dataPtr->heightSpinBox->setAlignment(Qt::AlignRight);
 
   QLabel *heightUnitLabel = new QLabel(tr("m"));
   heightUnitLabel->setMaximumWidth(40);
 
   QLabel *thicknessLabel = new QLabel(tr("Thickness "));
-  this->thicknessSpinBox = new QDoubleSpinBox;
-  this->thicknessSpinBox->setRange(0, 1000);
-  this->thicknessSpinBox->setSingleStep(0.001);
-  this->thicknessSpinBox->setDecimals(3);
-  this->thicknessSpinBox->setValue(0.000);
-  this->thicknessSpinBox->setAlignment(Qt::AlignRight);
+  this->dataPtr->thicknessSpinBox = new QDoubleSpinBox;
+  this->dataPtr->thicknessSpinBox->setRange(0, 1000);
+  this->dataPtr->thicknessSpinBox->setSingleStep(0.001);
+  this->dataPtr->thicknessSpinBox->setDecimals(3);
+  this->dataPtr->thicknessSpinBox->setValue(0.000);
+  this->dataPtr->thicknessSpinBox->setAlignment(Qt::AlignRight);
 
   QLabel *thicknessUnitLabel = new QLabel(tr("m"));
   thicknessUnitLabel->setMaximumWidth(40);
 
   QGridLayout *heightThicknessLayout = new QGridLayout;
   heightThicknessLayout->addWidget(heightLabel, 0, 0);
-  heightThicknessLayout->addWidget(this->heightSpinBox, 0, 1);
+  heightThicknessLayout->addWidget(this->dataPtr->heightSpinBox, 0, 1);
   heightThicknessLayout->addWidget(heightUnitLabel, 0, 2);
   heightThicknessLayout->addWidget(thicknessLabel, 1, 0);
-  heightThicknessLayout->addWidget(this->thicknessSpinBox, 1, 1);
+  heightThicknessLayout->addWidget(this->dataPtr->thicknessSpinBox, 1, 1);
   heightThicknessLayout->addWidget(thicknessUnitLabel, 1, 2);
 
   // TODO Color and texture code is repeated on all dialogs.
@@ -218,90 +219,71 @@ WallInspectorDialog::~WallInspectorDialog()
 }
 
 /////////////////////////////////////////////////
-double WallInspectorDialog::GetLength() const
+double WallInspectorDialog::Length() const
 {
-  return this->lengthSpinBox->value();
+  return this->dataPtr->lengthSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-QPointF WallInspectorDialog::GetStartPosition() const
+ignition::math::Vector2d WallInspectorDialog::StartPosition() const
 {
-  return QPointF(this->startXSpinBox->value(),
-      this->startYSpinBox->value());
+  return ignition::math::Vector2d(this->dataPtr->startXSpinBox->value(),
+      this->dataPtr->startYSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-QPointF WallInspectorDialog::GetEndPosition() const
+ignition::math::Vector2d WallInspectorDialog::EndPosition() const
 {
-  return QPointF(this->endXSpinBox->value(),
-      this->endYSpinBox->value());
+  return ignition::math::Vector2d(this->dataPtr->endXSpinBox->value(),
+      this->dataPtr->endYSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-double WallInspectorDialog::GetHeight() const
+double WallInspectorDialog::Height() const
 {
-  return this->heightSpinBox->value();
+  return this->dataPtr->heightSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double WallInspectorDialog::GetThickness() const
+double WallInspectorDialog::Thickness() const
 {
-  return this->thicknessSpinBox->value();
+  return this->dataPtr->thicknessSpinBox->value();
 }
 
 /////////////////////////////////////////////////
 void WallInspectorDialog::SetName(const std::string &_name)
 {
-  this->wallNameLabel->setText(tr(_name.c_str()));
+  this->dataPtr->wallNameLabel->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetLength(double _length)
+void WallInspectorDialog::SetLength(const double _length)
 {
-  this->lengthSpinBox->setValue(_length);
+  this->dataPtr->lengthSpinBox->setValue(_length);
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetStartPosition(const QPointF &_pos)
+void WallInspectorDialog::SetStartPosition(const ignition::math::Vector2d &_pos)
 {
-  this->startXSpinBox->setValue(_pos.x());
-  this->startYSpinBox->setValue(_pos.y());
+  this->dataPtr->startXSpinBox->setValue(_pos.X());
+  this->dataPtr->startYSpinBox->setValue(_pos.Y());
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetEndPosition(const QPointF &_pos)
+void WallInspectorDialog::SetEndPosition(const ignition::math::Vector2d &_pos)
 {
-  this->endXSpinBox->setValue(_pos.x());
-  this->endYSpinBox->setValue(_pos.y());
+  this->dataPtr->endXSpinBox->setValue(_pos.X());
+  this->dataPtr->endYSpinBox->setValue(_pos.Y());
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetHeight(double _height)
+void WallInspectorDialog::SetHeight(const double _height)
 {
-  this->heightSpinBox->setValue(_height);
+  this->dataPtr->heightSpinBox->setValue(_height);
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetThickness(double _thickness)
+void WallInspectorDialog::SetThickness(const double _thickness)
 {
-  this->thicknessSpinBox->setValue(_thickness);
-}
-
-/////////////////////////////////////////////////
-void WallInspectorDialog::OnCancel()
-{
-  this->close();
-}
-
-/////////////////////////////////////////////////
-void WallInspectorDialog::OnApply()
-{
-  emit Applied();
-}
-
-/////////////////////////////////////////////////
-void WallInspectorDialog::OnOK()
-{
-  emit Applied();
-  this->accept();
+  this->dataPtr->thicknessSpinBox->setValue(_thickness);
 }

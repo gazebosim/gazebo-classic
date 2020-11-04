@@ -552,6 +552,11 @@ QWidget#toolsWidget > QFrame
   background-color: #808080;
 }
 
+QWidget#buildingEditorPaletteScroll
+{
+  background-color: #808080;
+}
+
 QWidget#renderWidget > QWidget
 {
   padding: 0px;
@@ -747,22 +752,6 @@ QAbstractSpinBox::down-arrow:hover
   image: url(:/images/down_spin_arrow.png);
   width: 10px;
   height: 10px;
-}
-
-QAbstractSpinBox:disabled
-{
-  color: #909090;
-}
-
-QLineEdit#logPlayCurrentTime
-{
-  background-color: #808080;
-        color: #cfcfcf;
-        font-size: 15px;
-}
-QLineEdit#logPlayCurrentTime:focus
-{
-  background-color: #707070;
 }
 
 QTextEdit#splashVersionTextEdit

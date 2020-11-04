@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,12 +42,14 @@ std::string CallbackHelper::GetMsgType() const
 /////////////////////////////////////////////////
 bool CallbackHelper::GetLatching() const
 {
+  std::lock_guard<std::mutex> lock(this->latchingMutex);
   return this->latching;
 }
 
 /////////////////////////////////////////////////
 void CallbackHelper::SetLatching(bool _latch)
 {
+  std::lock_guard<std::mutex> lock(this->latchingMutex);
   this->latching = _latch;
 }
 

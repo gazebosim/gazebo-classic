@@ -1552,3 +1552,31 @@ material Gazebo/Grass
     }
   }
 }
+
+material Gazebo/Editor
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1
+      specular .1 .1 .1 128
+    }
+  }
+}
+
+material Gazebo/EditorPlane
+{
+  technique
+  {
+    pass
+    {
+      scene_blend colour_blend
+
+      ambient .3 .3 .3  1.0
+      diffuse .7 .7 .7  1.0
+      specular 0.01 0.01 0.01 1.000000 1.500000
+    }
+  }
+}

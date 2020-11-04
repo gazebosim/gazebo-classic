@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,14 @@ class ModelMaker_TEST : public QTestFixture
   /// \brief Test creating a model from a file.
   private slots: void FromFile();
 
-  /// \brief Test creating a model copying another model.
+  /// \brief Test creating a nested model from a file
+  private slots: void FromNestedModelFile();
+
+  /// \brief Test creating a model by copying another model.
   private slots: void FromModel();
+
+  /// \brief Test creating a nested model by copying another nested model.
+  private slots: void FromNestedModel();
 };
 
 #endif

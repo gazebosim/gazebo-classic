@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -789,6 +789,8 @@ bool CameraCommand::RunImpl()
 
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
+
+  boost::replace_all(cameraName, "::", "/");
 
   transport::PublisherPtr pub =
     node->Advertise<msgs::CameraCmd>(

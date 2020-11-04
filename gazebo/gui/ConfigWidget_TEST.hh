@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,9 @@ class ConfigWidget_TEST : public QTestFixture
 
   /// \brief Test setting visibility of a field in config widget.
   private slots: void ConfigWidgetVisible();
+
+  /// \brief Test setting a field to be read-only in custom config widget.
+  private slots: void CustomConfigWidgetReadOnly();
 
   /// \brief Test setting a field to be read-only in config widget.
   private slots: void ConfigWidgetReadOnly();

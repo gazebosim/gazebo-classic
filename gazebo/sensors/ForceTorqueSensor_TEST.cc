@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ void ForceTorqueSensor_TEST::ForceTorqueTest(const std::string &_physicsEngine)
 
   // Get a pointer to the force torque sensor
   sensors::ForceTorqueSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
+    std::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
         mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
