@@ -41,6 +41,9 @@ namespace gazebo
       /// \brief Mutex to protect resetting lastUpdateTime.
       public: std::mutex mutexLastUpdateTime;
 
+      /// \brief Mutex to protect active variable
+      public: std::mutex mutexActive;
+
       /// \brief Event triggered when a sensor is updated.
       public: event::EventT<void()> updated;
 
