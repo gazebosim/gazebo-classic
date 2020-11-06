@@ -810,7 +810,11 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
 
   // Check links
   physics::Link_V links = model->GetLinks();
+  EXPECT_EQ(48u, links.size());
+
   physics::Link_V linkClones = modelClone->GetLinks();
+  EXPECT_EQ(48u, linkClones.size());
+
   for (unsigned int i = 0; i < links.size(); ++i)
   {
     physics::LinkPtr link = links[i];
@@ -1144,6 +1148,137 @@ TEST_F(FactoryTest, FilenameModelDatabase)
 
   // Check model was spawned
   ASSERT_NE(nullptr, world->ModelByName("cococan"));
+}
+
+//////////////////////////////////////////////////
+TEST_F(FactoryTest, FilenameModelDatabaseSpaces)
+{
+  // World with a rendering sensor
+  this->Load("worlds/camera.world", true);
+
+  // Test database
+  common::SystemPaths::Instance()->AddModelPaths(
+    PROJECT_SOURCE_PATH "/test/models/testdb");
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Scene
+  auto scene = rendering::get_scene();
+  ASSERT_NE(nullptr, scene);
+
+  // Publish factory msg
+  msgs::Factory msg;
+  msg.set_sdf_filename("model://model with spaces");
+
+  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  pub->Publish(msg);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("model with spaces") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+  EXPECT_LT(sleep, maxSleep);
+
+  EXPECT_EQ(4u, world->ModelCount());
+
+  // Top-level model
+  auto model = world->ModelByName("model with spaces");
+  ASSERT_NE(nullptr, model);
+
+  auto modelVis = scene->GetVisual("model with spaces");
+  ASSERT_NE(nullptr, modelVis);
+
+  // Joints
+  EXPECT_EQ(3u, model->GetJoints().size());
+  EXPECT_NE(nullptr, model->GetJoint("joint with spaces"));
+  EXPECT_NE(nullptr, model->GetJoint(
+      "joint between top link and link in nested model"));
+  EXPECT_NE(nullptr, model->GetJoint(
+      "joint between links nested at different depths"));
+
+  // Top-level link
+  EXPECT_EQ(1u, model->GetLinks().size());
+  auto link = model->GetLink("link with spaces");
+  ASSERT_NE(nullptr, link);
+
+  auto linkVis = modelVis->GetChild(0);
+  ASSERT_NE(nullptr, linkVis);
+  EXPECT_EQ("model with spaces::link with spaces", linkVis->Name());
+
+  EXPECT_EQ(1u, link->GetCollisions().size());
+  auto collision = link->GetCollision("collision with spaces");
+  ASSERT_NE(nullptr, collision);
+
+  auto shape = collision->GetShape();
+  ASSERT_NE(nullptr, shape);
+
+  auto meshShape = boost::static_pointer_cast<physics::MeshShape>(shape);
+  ASSERT_NE(nullptr, meshShape);
+  EXPECT_EQ("model://model with spaces/meshes/mesh with spaces.dae",
+      meshShape->GetMeshURI());
+
+  auto visualVis = linkVis->GetChild(0);
+  ASSERT_NE(nullptr, visualVis);
+  EXPECT_EQ("model with spaces::link with spaces::visual with spaces",
+      visualVis->Name());
+
+  EXPECT_EQ(PROJECT_SOURCE_PATH
+      "/test/models/testdb/model with spaces/meshes/mesh with spaces.dae",
+      visualVis->GetMeshName());
+
+  // Nested
+  EXPECT_EQ(1u, model->NestedModels().size());
+  auto nestedModel = model->NestedModel("nested model with spaces");
+  ASSERT_NE(nullptr, nestedModel);
+
+  EXPECT_EQ(1u, nestedModel->GetLinks().size());
+  auto nestedLink = nestedModel->GetLink("nested link with spaces");
+  ASSERT_NE(nullptr, nestedLink);
+
+  EXPECT_EQ(1u, nestedLink->GetCollisions().size());
+  ASSERT_NE(nullptr, nestedLink->GetCollision("nested collision with spaces"));
+
+  // Nested deeper
+  EXPECT_EQ(1u, nestedModel->NestedModels().size());
+  auto deeperNestedModel = nestedModel->NestedModel(
+      "deeper nested model with spaces");
+  ASSERT_NE(nullptr, deeperNestedModel);
+
+  EXPECT_EQ(1u, deeperNestedModel->GetLinks().size());
+  auto deeperNestedLink = deeperNestedModel->GetLink(
+      "deeper nested link with spaces");
+  ASSERT_NE(nullptr, deeperNestedLink);
+
+  EXPECT_EQ(1u, deeperNestedLink->GetCollisions().size());
+  ASSERT_NE(nullptr, deeperNestedLink->GetCollision(
+      "deeper nested collision with spaces"));
+
+  // Nested even deeper
+  EXPECT_EQ(1u, deeperNestedModel->NestedModels().size());
+  auto evenDeeperNestedModel = deeperNestedModel->NestedModel(
+      "even deeper nested model with spaces");
+  ASSERT_NE(nullptr, evenDeeperNestedModel);
+
+  EXPECT_EQ(1u, evenDeeperNestedModel->GetLinks().size());
+  auto evenDeeperNestedLink = evenDeeperNestedModel->GetLink(
+      "even deeper nested link with spaces");
+  ASSERT_NE(nullptr, evenDeeperNestedLink);
+
+  EXPECT_EQ(1u, evenDeeperNestedLink->GetCollisions().size());
+  ASSERT_NE(nullptr, evenDeeperNestedLink->GetCollision(
+      "even deeper nested collision with spaces"));
+
+  // Make sure the render engine is available
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    FAIL() << "No rendering engine";
+  }
 }
 
 //////////////////////////////////////////////////

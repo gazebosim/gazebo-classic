@@ -15,6 +15,7 @@
  *
 */
 #include <boost/algorithm/string.hpp>
+#include <regex>
 #include <stdio.h>
 #include <string>
 #include <cmath>
@@ -163,7 +164,10 @@ void ServerFixture::Load(const std::string &_worldFilename,
                          bool _paused, const std::string &_physics,
                          const std::vector<std::string> &_systemPlugins)
 {
-  std::string params = _worldFilename;
+  // Substitute spaces in file name with a placeholder to prevent the name
+  // from being split later
+  auto params = std::regex_replace(_worldFilename, std::regex("\\s"), "%20");
+
   if (!_physics.empty())
     params += " -e " + _physics;
   if (_paused)
@@ -185,6 +189,10 @@ void ServerFixture::LoadArgs(const std::string &_args)
   std::string args = _args;
   boost::trim_if(args, boost::is_any_of("\t "));
   boost::split(params, args, boost::is_any_of("\t "), boost::token_compress_on);
+
+  // Add spaces back
+  for (auto &param : params)
+    param = std::regex_replace(param, std::regex("%20"), " ");
 
   bool paused = false;
   if (std::find(params.begin(), params.end(), "-u") != params.end())

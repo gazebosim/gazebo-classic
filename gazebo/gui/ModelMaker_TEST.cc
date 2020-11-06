@@ -549,5 +549,127 @@ void ModelMaker_TEST::FromNestedModel()
   delete mainWindow;
 }
 
+/////////////////////////////////////////////////
+void ModelMaker_TEST::FromModelWithSpaces()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Check there's no model in the left panel yet
+  bool hasModel = mainWindow->HasEntityName("model with spaces");
+  QVERIFY(!hasModel);
+
+  // Get scene
+  auto scene = gazebo::rendering::get_scene();
+  QVERIFY(scene != nullptr);
+
+  // Check there's no model in the scene yet
+  auto vis = scene->GetVisual("model with spaces");
+  QVERIFY(vis == nullptr);
+
+  // Create a model maker
+  auto modelMaker = new gazebo::gui::ModelMaker();
+  QVERIFY(modelMaker != nullptr);
+
+  // Model data
+  boost::filesystem::path path;
+  path = path / TEST_PATH / "models" / "testdb" / "model with spaces" /
+      "model.sdf";
+
+  // Start the maker to make a model
+  modelMaker->InitFromFile(path.string());
+  modelMaker->Start();
+
+  // Check there's still no model in the left panel
+  hasModel = mainWindow->HasEntityName("model with spaces");
+  QVERIFY(!hasModel);
+
+  // Check there's a model in the scene -- this is the preview
+  vis = scene->GetVisual("model with spaces");
+  QVERIFY(vis != nullptr);
+
+  // check all preview visuals are loaded
+  vis = scene->GetVisual("model with spaces::nested model with spaces");
+  QVERIFY(vis != nullptr);
+  vis = scene->GetVisual("model with spaces::nested model with spaces::"
+      "deeper nested model with spaces");
+  QVERIFY(vis != nullptr);
+  vis = scene->GetVisual(
+      "model with spaces::nested model with spaces::"
+      "deeper nested model with spaces::even deeper nested model with spaces");
+  QVERIFY(vis != nullptr);
+
+  // Check that the model appeared in the center of the screen
+  ignition::math::Vector3d startPos = modelMaker->EntityPosition();
+  QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
+  vis = scene->GetVisual("model with spaces");
+  QVERIFY(vis->WorldPose().Pos() == startPos);
+
+  // Mouse move
+  gazebo::common::MouseEvent mouseEvent;
+  mouseEvent.SetType(gazebo::common::MouseEvent::MOVE);
+  modelMaker->OnMouseMove(mouseEvent);
+
+  // Check that entity moved
+  ignition::math::Vector3d pos = modelMaker->EntityPosition();
+  QVERIFY(pos != startPos);
+  QVERIFY(vis->WorldPose().Pos() == pos);
+
+  // Mouse release
+  mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
+  mouseEvent.SetButton(gazebo::common::MouseEvent::LEFT);
+  mouseEvent.SetDragging(false);
+  mouseEvent.SetPressPos(0, 0);
+  mouseEvent.SetPos(0, 0);
+  modelMaker->OnMouseRelease(mouseEvent);
+
+  // Check there's no model in the scene -- the preview is gone
+  vis = scene->GetVisual("model with spaces");
+  QVERIFY(vis == nullptr);
+  vis = scene->GetVisual("model with spaces::nested model with spaces");
+  QVERIFY(vis == nullptr);
+  vis = scene->GetVisual("model with spaces::nested model with spaces::"
+      "deeper nested model with spaces");
+  QVERIFY(vis == nullptr);
+  vis = scene->GetVisual("model with spaces::nested model with spaces::"
+      "deeper nested model with spaces::even deeper nested model with spaces");
+  QVERIFY(vis == nullptr);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Check there's a model in the scene -- this is the final model
+  vis = scene->GetVisual("model with spaces");
+  QVERIFY(vis != nullptr);
+  vis = scene->GetVisual("model with spaces::nested model with spaces");
+  QVERIFY(vis != nullptr);
+  vis = scene->GetVisual("model with spaces::nested model with spaces::"
+      "deeper nested model with spaces");
+  QVERIFY(vis != nullptr);
+  vis = scene->GetVisual("model with spaces::nested model with spaces::"
+      "deeper nested model with spaces::even deeper nested model with spaces");
+  QVERIFY(vis != nullptr);
+
+  // Check the model is in the left panel
+  hasModel = mainWindow->HasEntityName("model with spaces");
+  QVERIFY(hasModel);
+
+  delete modelMaker;
+
+  // Terminate
+  mainWindow->close();
+  delete mainWindow;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ModelMaker_TEST)

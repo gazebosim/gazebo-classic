@@ -141,6 +141,29 @@ TEST_F(WorldTest, Clear)
 }
 
 /////////////////////////////////////////////////
+TEST_F(WorldTest, NameWithSpaces)
+{
+  this->Load("test/worlds/world with spaces.world");
+  auto world = physics::get_world("world with spaces");
+  ASSERT_NE(nullptr, world);
+
+  EXPECT_EQ(world->ModelCount(), 1u);
+
+  auto model = world->ModelByName("model with spaces");
+  ASSERT_NE(nullptr, model);
+
+  EXPECT_EQ(model->GetLinks().size(), 1u);
+
+  auto link = model->GetLink("link with spaces");
+  ASSERT_NE(nullptr, link);
+
+  EXPECT_EQ(link->GetCollisions().size(), 1u);
+
+  auto collision = link->GetCollision("collision with spaces");
+  ASSERT_NE(nullptr, collision);
+}
+
+/////////////////////////////////////////////////
 void WorldTest::Gravity(const std::string &_physicsEngine)
 {
   this->Load("worlds/friction_demo.world", true, _physicsEngine);
