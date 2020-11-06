@@ -12,7 +12,8 @@
   </asset>
   <library_images>
     <image id="checker_png" name="checker_png">
-      <init_from>texture with spaces.png</init_from>
+      <!-- xsd::anyURI schema allows escaped and non-escaped spaces -->
+      <init_from>texture with%20spaces.png</init_from>
     </image>
   </library_images>
   <library_effects>

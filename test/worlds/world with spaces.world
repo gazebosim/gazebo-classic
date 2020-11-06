@@ -19,5 +19,10 @@
         </visual>
       </link>
     </model>
+    <include>
+      <pose>5 5 0 0 0 0</pose>
+      <name>included model</name>
+      <uri>model://model with spaces</uri>
+    </include>
  </world>
 </sdf>
