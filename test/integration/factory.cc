@@ -15,6 +15,7 @@
  *
 */
 #include <string.h>
+#include "gazebo/common/Skeleton.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"
 
@@ -56,6 +57,9 @@ class FactoryTest : public ServerFixture,
 
   /// \brief Test spawning an actor with a plugin.
   public: void ActorPlugin();
+
+  /// \brief Test spawning an actor with spaces in the file name.
+  public: void ActorSpaces();
 
   /// \brief Test spawning an actor with skin, animation and trajectory.
   /// \param[in] _physicsEngine Physics engine name
@@ -765,6 +769,64 @@ TEST_P(FactoryTest, ActorAll)
   ActorAll(GetParam());
 }
 
+//////////////////////////////////////////////////
+TEST_F(FactoryTest, ActorSpaces)
+{
+  // World with a rendering sensor
+  this->Load("worlds/camera.world", true);
+
+  // Test database
+  common::SystemPaths::Instance()->AddModelPaths(
+    PROJECT_SOURCE_PATH "/test/models/testdb");
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Scene
+  auto scene = rendering::get_scene();
+  ASSERT_NE(nullptr, scene);
+
+  // Publish factory msg
+  msgs::Factory msg;
+  msg.set_sdf_filename("model://actor with spaces");
+
+  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  pub->Publish(msg);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("actor with spaces") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+  EXPECT_LT(sleep, maxSleep);
+
+  EXPECT_EQ(4u, world->ModelCount());
+
+  auto model = world->ModelByName("actor with spaces");
+  ASSERT_NE(nullptr, model);
+
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(model);
+  ASSERT_NE(nullptr, actor);
+
+  auto mesh = actor->Mesh();
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ("model://actor with spaces/meshes/skin with spaces.dae",
+      mesh->GetName());
+  EXPECT_TRUE(mesh->HasSkeleton());
+
+  auto skeleton = mesh->GetSkeleton();
+  ASSERT_NE(nullptr, skeleton);
+  EXPECT_EQ(31u, skeleton->GetNumNodes());
+  EXPECT_EQ(31u, skeleton->GetNumJoints());
+
+  auto skelAnims = actor->SkeletonAnimations();
+  EXPECT_EQ(skelAnims.size(), 1u);
+  EXPECT_NE(nullptr, skelAnims["animation with spaces"]);
+}
+
 /////////////////////////////////////////////////
 void FactoryTest::Clone(const std::string &_physicsEngine)
 {
@@ -1272,13 +1334,6 @@ TEST_F(FactoryTest, FilenameModelDatabaseSpaces)
   EXPECT_EQ(1u, evenDeeperNestedLink->GetCollisions().size());
   ASSERT_NE(nullptr, evenDeeperNestedLink->GetCollision(
       "even deeper nested collision with spaces"));
-
-  // Make sure the render engine is available
-  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
-      rendering::RenderEngine::NONE)
-  {
-    FAIL() << "No rendering engine";
-  }
 }
 
 //////////////////////////////////////////////////
