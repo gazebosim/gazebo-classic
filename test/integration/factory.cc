@@ -1312,6 +1312,10 @@ TEST_F(FactoryTest, FilenameModelDatabaseSpaces)
       "visual with material_MATERIAL_material with spaces",
       visualVisMaterial->GetMaterialName());
 
+  EXPECT_EQ(PROJECT_SOURCE_PATH
+      "/test/models/testdb/model with spaces/materials/textures/"
+      "normal with spaces.png", visualVisMaterial->GetNormalMap());
+
   // Nested
   EXPECT_EQ(1u, model->NestedModels().size());
   auto nestedModel = model->NestedModel("nested model with spaces");

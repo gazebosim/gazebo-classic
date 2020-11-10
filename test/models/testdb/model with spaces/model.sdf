@@ -35,6 +35,9 @@
             <uri>model://model with spaces/materials/textures/</uri>
             <name>material with spaces</name>
           </script>
+          <shader type="normal_map_tangent_space">
+            <normal_map>model://model with spaces/materials/textures/normal with spaces.png</normal_map>
+          </shader>
         </material>
       </visual>
     </link>
