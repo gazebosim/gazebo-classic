@@ -3,7 +3,6 @@
   <model name="model with spaces">
     <pose>0 0 0.5 0 0 0</pose>
     <link name="link with spaces">
-      <pose>0.25 0 0 0 0 0</pose>
       <collision name="collision with spaces">
         <geometry>
           <mesh>
@@ -15,9 +14,28 @@
         <geometry>
           <mesh>
             <uri>model://model with spaces/meshes/mesh with spaces.dae</uri>
+            <submesh>
+              <name>Plane1</name>
+            </submesh>
           </mesh>
         </geometry>
-        <!-- TODO(louise) Material with spaces -->
+      </visual>
+      <visual name="visual with material">
+        <geometry>
+          <mesh>
+            <uri>model://model with spaces/meshes/mesh with spaces.dae</uri>
+            <submesh>
+              <name>Plane2</name>
+            </submesh>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://model with spaces/materials/scripts/</uri>
+            <uri>model://model with spaces/materials/textures/</uri>
+            <name>material with spaces</name>
+          </script>
+        </material>
       </visual>
     </link>
 

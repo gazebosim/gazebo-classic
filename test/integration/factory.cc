@@ -21,6 +21,7 @@
 
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/test/ServerFixture.hh"
@@ -1240,7 +1241,9 @@ TEST_F(FactoryTest, FilenameModelDatabaseSpaces)
   // Wait for it to be spawned
   int sleep = 0;
   int maxSleep = 50;
-  while (!world->ModelByName("model with spaces") && sleep++ < maxSleep)
+  while ((!world->ModelByName("model with spaces") ||
+         scene->VisualCount() < 26) &&
+         sleep++ < maxSleep)
   {
     common::Time::MSleep(100);
   }
@@ -1292,6 +1295,22 @@ TEST_F(FactoryTest, FilenameModelDatabaseSpaces)
   EXPECT_EQ(PROJECT_SOURCE_PATH
       "/test/models/testdb/model with spaces/meshes/mesh with spaces.dae",
       visualVis->GetMeshName());
+
+  auto visualVisMaterial = linkVis->GetChild(1);
+  ASSERT_NE(nullptr, visualVisMaterial);
+  EXPECT_EQ("model with spaces::link with spaces::visual with material",
+      visualVisMaterial->Name());
+
+  EXPECT_FALSE(Ogre::MaterialManager::getSingleton().getByName(
+      "material with spaces").isNull());
+
+  EXPECT_EQ(PROJECT_SOURCE_PATH
+      "/test/models/testdb/model with spaces/meshes/mesh with spaces.dae",
+      visualVisMaterial->GetMeshName());
+
+  EXPECT_EQ("model with spaces::link with spaces::"
+      "visual with material_MATERIAL_material with spaces",
+      visualVisMaterial->GetMaterialName());
 
   // Nested
   EXPECT_EQ(1u, model->NestedModels().size());

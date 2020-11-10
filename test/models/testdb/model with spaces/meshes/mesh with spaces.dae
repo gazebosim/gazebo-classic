@@ -60,44 +60,87 @@
     </material>
   </library_materials>
   <library_geometries>
-    <geometry id="Plane-mesh" name="Plane">
+    <geometry id="Plane1-mesh" name="Plane1">
       <mesh>
-        <source id="Plane-mesh-positions">
-          <float_array id="Plane-mesh-positions-array" count="12">-1 -1 0 1 -1 0 -1 1 0 1 1 0</float_array>
+        <source id="Plane1-mesh-positions">
+          <float_array id="Plane1-mesh-positions-array" count="12">-1 -1 0 1 -1 0 -1 1 0 1 1 0</float_array>
           <technique_common>
-            <accessor source="#Plane-mesh-positions-array" count="4" stride="3">
+            <accessor source="#Plane1-mesh-positions-array" count="4" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="Plane-mesh-normals">
-          <float_array id="Plane-mesh-normals-array" count="3">0 0 1</float_array>
+        <source id="Plane1-mesh-normals">
+          <float_array id="Plane1-mesh-normals-array" count="3">0 0 1</float_array>
           <technique_common>
-            <accessor source="#Plane-mesh-normals-array" count="1" stride="3">
+            <accessor source="#Plane1-mesh-normals-array" count="1" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="Plane-mesh-map-0">
-          <float_array id="Plane-mesh-map-0-array" count="12">0.9999001 9.998e-5 9.998e-5 0.9999001 1.0004e-4 9.998e-5 0.9999001 9.998e-5 0.9999001 0.9999001 9.998e-5 0.9999001</float_array>
+        <source id="Plane1-mesh-map-0">
+          <float_array id="Plane1-mesh-map-0-array" count="12">0.9999001 9.998e-5 9.998e-5 0.9999001 1.0004e-4 9.998e-5 0.9999001 9.998e-5 0.9999001 0.9999001 9.998e-5 0.9999001</float_array>
           <technique_common>
-            <accessor source="#Plane-mesh-map-0-array" count="6" stride="2">
+            <accessor source="#Plane1-mesh-map-0-array" count="6" stride="2">
               <param name="S" type="float"/>
               <param name="T" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <vertices id="Plane-mesh-vertices">
-          <input semantic="POSITION" source="#Plane-mesh-positions"/>
+        <vertices id="Plane1-mesh-vertices">
+          <input semantic="POSITION" source="#Plane1-mesh-positions"/>
         </vertices>
         <polylist material="Material-material" count="2">
-          <input semantic="VERTEX" source="#Plane-mesh-vertices" offset="0"/>
-          <input semantic="NORMAL" source="#Plane-mesh-normals" offset="1"/>
-          <input semantic="TEXCOORD" source="#Plane-mesh-map-0" offset="2" set="0"/>
+          <input semantic="VERTEX" source="#Plane1-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Plane1-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Plane1-mesh-map-0" offset="2" set="0"/>
+          <vcount>3 3 </vcount>
+          <p>1 0 0 2 0 1 0 0 2 1 0 3 3 0 4 2 0 5</p>
+        </polylist>
+      </mesh>
+    </geometry>
+    <geometry id="Plane2-mesh" name="Plane2">
+      <mesh>
+        <source id="Plane2-mesh-positions">
+          <float_array id="Plane2-mesh-positions-array" count="12">-1 -1 0 1 -1 0 -1 1 0 1 1 0</float_array>
+          <technique_common>
+            <accessor source="#Plane2-mesh-positions-array" count="4" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Plane2-mesh-normals">
+          <float_array id="Plane2-mesh-normals-array" count="3">0 0 1</float_array>
+          <technique_common>
+            <accessor source="#Plane2-mesh-normals-array" count="1" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Plane2-mesh-map-0">
+          <float_array id="Plane2-mesh-map-0-array" count="12">0.9999001 9.998e-5 9.998e-5 0.9999001 1.0004e-4 9.998e-5 0.9999001 9.998e-5 0.9999001 0.9999001 9.998e-5 0.9999001</float_array>
+          <technique_common>
+            <accessor source="#Plane2-mesh-map-0-array" count="6" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Plane2-mesh-vertices">
+          <input semantic="POSITION" source="#Plane2-mesh-positions"/>
+        </vertices>
+        <polylist material="Material-material" count="2">
+          <input semantic="VERTEX" source="#Plane2-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Plane2-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Plane2-mesh-map-0" offset="2" set="0"/>
           <vcount>3 3 </vcount>
           <p>1 0 0 2 0 1 0 0 2 1 0 3 3 0 4 2 0 5</p>
         </polylist>
@@ -107,9 +150,9 @@
   <library_controllers/>
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
-      <node id="Plane" name="Plane" type="NODE">
+      <node id="Plane1" name="Plane1" type="NODE">
         <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
-        <instance_geometry url="#Plane-mesh" name="Plane">
+        <instance_geometry url="#Plane1-mesh" name="Plane1">
           <bind_material>
             <technique_common>
               <instance_material symbol="Material-material" target="#Material-material">
@@ -117,6 +160,11 @@
               </instance_material>
             </technique_common>
           </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Plane2" name="Plane2" type="NODE">
+        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 1</matrix>
+        <instance_geometry url="#Plane2-mesh" name="Plane2">
         </instance_geometry>
       </node>
     </visual_scene>
