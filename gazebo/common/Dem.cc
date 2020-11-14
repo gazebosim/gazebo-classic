@@ -211,7 +211,7 @@ void Dem::GetGeoReference(double _x, double _y,
     double xGeoDeg, yGeoDeg;
 
     // Transform the terrain's coordinate system to WGS84
-    char *importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
+    auto importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
     sourceCs.importFromWkt(&importString);
     targetCs.SetWellKnownGeogCS("WGS84");
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
