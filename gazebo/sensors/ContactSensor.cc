@@ -323,7 +323,7 @@ void ContactSensor::OnContacts(ConstContactsPtr &_msg)
 //////////////////////////////////////////////////
 bool ContactSensor::IsActive() const
 {
-  return this->active ||
+  return Sensor::IsActive() ||
     (this->dataPtr->contactsPub &&
      this->dataPtr->contactsPub->HasConnections());
 }

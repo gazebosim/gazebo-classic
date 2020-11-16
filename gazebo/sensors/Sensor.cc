@@ -244,7 +244,11 @@ void Sensor::Fini()
     it.second->Fini();
   this->noises.clear();
 
-  this->active = false;
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutexActive);
+    this->active = false;
+  }
+
   this->plugins.clear();
 
   if (this->sdf)
@@ -304,6 +308,7 @@ void Sensor::SetActive(const bool _value)
 //////////////////////////////////////////////////
 bool Sensor::IsActive() const
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutexActive);
   return this->active;
 }
 
@@ -497,6 +502,7 @@ SensorExt::SensorExt(Sensor *_sensor)
 //////////////////////////////////////////////////
 void SensorExt::SetActive(bool _value)
 {
+  std::lock_guard<std::mutex> lock(this->sensor->dataPtr->mutexActive);
   this->sensor->active = _value;
 }
 
