@@ -106,25 +106,34 @@ int Dem::Load(const std::string &_filename)
   ySize = this->dataPtr->dataSet->GetRasterYSize();
 
   // Corner coordinates
-  upLeftX = 0.0;
-  upLeftY = 0.0;
-  upRightX = xSize;
-  upRightY = 0.0;
-  lowLeftX = 0.0;
-  lowLeftY = ySize;
+  try
+  {
+    upLeftX = 0.0;
+    upLeftY = 0.0;
+    upRightX = xSize;
+    upRightY = 0.0;
+    lowLeftX = 0.0;
+    lowLeftY = ySize;
 
-  // Calculate the georeferenced coordinates of the terrain corners
-  this->GetGeoReference(upLeftX, upLeftY, upLeftLat, upLeftLong);
-  this->GetGeoReference(upRightX, upRightY, upRightLat, upRightLong);
-  this->GetGeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong);
+    // Calculate the georeferenced coordinates of the terrain corners
+    this->GetGeoReference(upLeftX, upLeftY, upLeftLat, upLeftLong);
+    this->GetGeoReference(upRightX, upRightY, upRightLat, upRightLong);
+    this->GetGeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong);
 
-  // Set the world width and height
-  this->dataPtr->worldWidth =
-     common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                            upRightLat, upRightLong);
-  this->dataPtr->worldHeight =
-     common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                            lowLeftLat, lowLeftLong);
+    // Set the world width and height
+    this->dataPtr->worldWidth =
+       common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                              upRightLat, upRightLong);
+    this->dataPtr->worldHeight =
+       common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                              lowLeftLat, lowLeftLong);
+  }
+  catch(const common::Exception &)
+  {
+    gzerr << "Failed to automatically compute DEM size. "
+          << "Please use the <size> element to manually set DEM size."
+          << std::endl;
+  }
 
   // Set the terrain's side (the terrain will be squared after the padding)
   if (ignition::math::isPowerOfTwo(ySize - 1))
