@@ -30,6 +30,7 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <ignition/math/Rand.hh>
+#include <ignition/math/SemanticVersion.hh>
 
 #include <gazebo/gazebo_config.h>
 
@@ -37,7 +38,7 @@
 #include <ignition/msgs/stringmsg.pb.h>
 
 #include "ignition/common/Profiler.hh"
-#include <ignition/common/URI.hh>
+#include "ignition/common/URI.hh"
 #include "gazebo/common/FuelModelDatabase.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -179,6 +180,7 @@ void World::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->loaded = false;
   this->dataPtr->sdf = _sdf;
+  common::convertToFullPaths(this->dataPtr->sdf);
 
   // Create a DOM object to compute the resolved initial pose (with frame
   // semantics)
@@ -186,11 +188,18 @@ void World::Load(sdf::ElementPtr _sdf)
   sdf::Errors errors = this->dataPtr->worldSDFDom->Load(_sdf);
 
   // Print errors and load the parts that worked.
-  for (const auto &error : errors)
+  auto sdfVersion =
+    ignition::math::SemanticVersion(_sdf->OriginalVersion());
+  // Only print out errors if the original SDFormat version does not support
+  // frame semantics
+  if (sdfVersion >= ignition::math::SemanticVersion(1, 7))
   {
-    if (common::isSdfFrameSemanticsError(error))
+    for (const auto &error : errors)
     {
-      gzerr << error << "\n";
+      if (common::isSdfFrameSemanticsError(error))
+      {
+        gzerr << error << "\n";
+      }
     }
   }
 
@@ -2091,6 +2100,7 @@ void World::ProcessFactoryMsgs()
 
   for (auto const &factoryMsg : factoryMsgsCopy)
   {
+
     this->dataPtr->factorySDF->Clear();
 
     if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
@@ -2122,9 +2132,11 @@ void World::ProcessFactoryMsgs()
 
       if (!sdf::readFile(filename, this->dataPtr->factorySDF))
       {
-        gzerr << "Unable to read sdf file.\n";
+        gzerr << "Unable to read sdf file [" << filename << "]\n";
         continue;
       }
+
+      common::convertToFullPaths(this->dataPtr->factorySDF->Root());
     }
     else if (factoryMsg.has_clone_model_name())
     {

@@ -1,6 +1,40 @@
 ## Gazebo 11
 
+## Gazebo 11.x.x (202x-xx-xx)
+
+## Gazebo 11.2.0 (2020-09-30)
+
+1. Fix assumptions that CMAKE\_INSTALL\_\*DIR paths are relative
+    * [Issue #2778](https://github.com/osrf/gazebo/issues/2778)
+
+1. Accept relative paths in SDF files
+    * [Issue #2765](https://github.com/osrf/gazebo/issues/2765)
+    * [Issue #2839](https://github.com/osrf/gazebo/issues/2839)
+
+1. Add support for frame semantics with nested models in SDFormat 1.7
+    * [Issue #2824](https://github.com/osrf/gazebo/issues/2824)
+
+1. Fix Actor collision if loop / auto_start false
+    * [Issue #2773](https://github.com/osrf/gazebo/issues/2773)
+
+1. Allow gazebo to download models from Fuel in the sdf files, and worlds from command line
+    * [Issue #2822](https://github.com/osrf/gazebo/issues/2822)
+
+1. Publish performance metrics
+    * [Issue #2819](https://github.com/osrf/gazebo/issues/2819)
+
+1. Find OGRE correctly in a system with pkg-config but without OGRE .pc files
+    * [Issue #2719](https://github.com/osrf/gazebo/issues/2719)
+
 ## Gazebo 11.1.0 (2020-08-12)
+
+1. Synchronize time stepping of physics and sensors with `--lockstep`
+    * [Issue #2736](https://github.com/osrf/gazebo/issues/2736)
+    * [Pull request #2791](https://github.com/osrf/gazebo/issues/2791)
+    * [Pull request #2799](https://github.com/osrf/gazebo/issues/2799)
+    * [Pull request #2802](https://github.com/osrf/gazebo/issues/2802)
+    * [Pull request #2761](https://github.com/osrf/gazebo/issues/2761)
+    * [Pull request #2746](https://github.com/osrf/gazebo/issues/2746)
 
 1. Enable DART support in gazebo11 .deb packages
     * [Issue #2752](https://github.com/osrf/gazebo/issues/2752)

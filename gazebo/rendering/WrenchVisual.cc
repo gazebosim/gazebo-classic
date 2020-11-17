@@ -16,6 +16,8 @@
 */
 #include <boost/bind.hpp>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -160,6 +162,7 @@ void WrenchVisual::Load(ConstJointPtr &_msg)
 /////////////////////////////////////////////////
 void WrenchVisual::Update()
 {
+  IGN_PROFILE("rendering::WrenchVisual::Update");
   WrenchVisualPrivate *dPtr =
       reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
 

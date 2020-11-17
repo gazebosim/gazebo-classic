@@ -17,6 +17,8 @@
 
 #include <mutex>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/common/Assert.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -443,6 +445,7 @@ void LensFlare::SetScale(const double _scale)
 //////////////////////////////////////////////////
 void LensFlare::Update()
 {
+  IGN_PROFILE("rendering::LensFlare::Update");
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   // remove lens flare if we got a delete msg
   if (this->dataPtr->removeLensFlare)

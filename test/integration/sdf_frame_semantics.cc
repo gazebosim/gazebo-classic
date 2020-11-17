@@ -606,6 +606,135 @@ TEST_P(SdfFrameSemanticsTest, IncludedModel)
   EXPECT_EQ(expM2WorldPose, model2->WorldPose());
 }
 
+/////////////////////////////////////////////////
+/// Helper function to check poses in Nested model with frame semantics tests.
+void checkPoses(physics::WorldPtr _world)
+{
+  using ignition::math::Pose3d;
+
+  physics::ModelPtr parentModel = _world->ModelByName("parent_model");
+  ASSERT_TRUE(nullptr != parentModel);
+  EXPECT_EQ(Pose3d::Zero, parentModel->WorldPose());
+
+  auto checkPose = [&](const std::string &_name, const Pose3d &_pose)
+  {
+    auto entity = boost::dynamic_pointer_cast<physics::Entity>(
+        parentModel->GetByName(_name));
+    ASSERT_TRUE(nullptr != entity) << "Entity [" << _name << "] not found";
+    EXPECT_EQ(_pose, entity->WorldPose());
+  };
+
+  checkPose("parent_model::M1", {1, 0, 0, 0, IGN_PI_2, 0});
+  checkPose("parent_model::M1::L", {2, 0, 0, 0, IGN_PI_2, 0});
+  checkPose("parent_model::M2", {2, 0, 0, 0, 0, 0});
+  checkPose("parent_model::M2::L", {2, 0, 1, 0, 0, 0});
+  checkPose("parent_model::M3", {1, 0, -3, 0, IGN_PI_2, 0});
+  checkPose("parent_model::M3::L", {2, 0, -3, 0, IGN_PI_2, 0});
+
+  // Joints are not "Entity"s
+  auto j1 = parentModel->GetJoint("J1");
+  ASSERT_FALSE(nullptr == j1);
+  // World pose of F1 = 1, 1, -3, 0, IGN_PI_2, 0
+  EXPECT_EQ(Pose3d(1, 1, -4, 0, IGN_PI_2, 0), j1->WorldPose());
+}
+
+/////////////////////////////////////////////////
+TEST_P(SdfFrameSemanticsTest, LoadNestedModelWithFrameSemantics)
+{
+  const std::string physicsEngine = GetParam();
+  if (physicsEngine == "simbody")
+  {
+    gzerr << "Nested models are not working in simbody yet, issue #1718"
+          << std::endl;
+    return;
+  }
+  else if (physicsEngine == "dart")
+  {
+    gzerr << "Nested models are not working in dart yet, issue #1833"
+          << std::endl;
+    return;
+  }
+
+  // load a world with a nested model
+  this->LoadWorld("test/worlds/nested_model_with_frame_semantics.sdf");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(nullptr != world);
+
+  // take a step to verify that simulation won't crash
+  world->Step(1);
+
+  checkPoses(world);
+}
+
+////////////////////////////////////////////////////////////////////////
+TEST_P(SdfFrameSemanticsTest, SpawnNestedModelWithFrameSemantics)
+{
+  const std::string physicsEngine = GetParam();
+  if (physicsEngine == "simbody")
+  {
+    gzerr << "Nested models are not working in simbody yet, issue #1718"
+          << std::endl;
+    return;
+  }
+
+  if (physicsEngine == "dart")
+  {
+    gzerr << "Nested models are not working in dart yet, issue #1833"
+          << std::endl;
+    return;
+  }
+
+  this->LoadWorld();
+
+  const std::string inputSdf = R"(
+  <sdf version="1.7">
+    <model name="parent_model">
+      <link name="L1"/>
+      <link name="L2">
+        <pose>0 1 0 0 0 0</pose>
+      </link>
+      <model name="M1">
+        <pose>1 0 0 0 1.5707963267948966 0</pose>
+        <link name="L">
+          <pose>0 0 1 0 0 0</pose>
+        </link>
+      </model>
+      <model name="M2">
+        <pose relative_to="">2 0 0 0 0 0</pose>
+        <link name="L">
+          <pose>0 0 1 0 0 0</pose>
+        </link>
+      </model>
+      <model name="M3">
+        <pose relative_to="M1">3 0 0 0 0 0</pose>
+        <link name="L">
+          <pose>0 0 1 0 0 0</pose>
+        </link>
+      </model>
+
+      <frame name="F1">
+        <pose relative_to="M3">0 1 0 0 0 0</pose>
+      </frame>
+
+      <joint name="J1" type="revolute">
+        <pose relative_to="F1">1 0 0 0 0 0</pose>
+        <parent>L1</parent>
+        <child>L2</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+    </model>
+  </sdf>)";
+
+  this->SpawnSDF(inputSdf);
+
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(nullptr != world);
+  world->Step(1);
+  checkPoses(world);
+}
+
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, SdfFrameSemanticsTest,
                         PHYSICS_ENGINE_VALUES,); // NOLINT
 

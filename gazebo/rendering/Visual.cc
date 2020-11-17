@@ -17,6 +17,8 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
+
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -469,7 +471,8 @@ void Visual::Load()
       // Add all the URI paths to the render engine
       while (uriElem)
       {
-        std::string matUri = uriElem->Get<std::string>();
+        auto matUri = common::asFullPath(uriElem->Get<std::string>(),
+            scriptElem->FilePath());
         if (!matUri.empty())
           RenderEngine::Instance()->AddResourcePath(matUri);
         uriElem = uriElem->GetNextElement("uri");
@@ -530,6 +533,7 @@ void Visual::Load()
 //////////////////////////////////////////////////
 void Visual::Update()
 {
+  IGN_PROFILE("rendering::Visual::Update");
   if (!this->dataPtr->visible)
     return;
 
@@ -2935,17 +2939,18 @@ std::string Visual::GetMeshName() const
     }
     else if (geomElem->HasElement("mesh"))
     {
-      sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
-      std::string filename;
+      sdf::ElementPtr meshElem = geomElem->GetElement("mesh");
 
-      std::string uri = tmpElem->Get<std::string>("uri");
-      if (uri.empty())
+      if (!meshElem->HasElement("uri"))
       {
-        gzerr << "<uri> element missing for geometry element:\n";
+        gzerr << "<uri> element missing for geometry element\n";
         return std::string();
       }
 
-      filename = common::find_file(uri);
+      auto uri = common::asFullPath(meshElem->Get<std::string>("uri"),
+          meshElem->FilePath());
+
+      auto filename = common::find_file(uri);
 
       if (filename == "__default__" || filename.empty())
         gzerr << "No mesh specified\n";

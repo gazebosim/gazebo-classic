@@ -15,6 +15,8 @@
  *
  */
 
+#include <ignition/math/SemanticVersion.hh>
+
 #include "gazebo/common/SdfFrameSemantics.hh"
 #include "gazebo/common/Console.hh"
 
@@ -84,11 +86,18 @@ void convertPosesToSdf16(const sdf::ElementPtr &_modelElem)
   sdf::Model modelSDFDom;
   sdf::Errors errors = modelSDFDom.Load(_modelElem);
 
-  for (const auto &error : errors)
+  auto sdfVersion =
+      ignition::math::SemanticVersion(_modelElem->OriginalVersion());
+  // Only print out errors if the original SDFormat version does not support
+  // frame semantics
+  if (sdfVersion >= ignition::math::SemanticVersion(1, 7))
   {
-    if (isSdfFrameSemanticsError(error))
+    for (const auto &error : errors)
     {
-      gzerr << error << "\n";
+      if (isSdfFrameSemanticsError(error))
+      {
+        gzerr << error << "\n";
+      }
     }
   }
 
@@ -163,9 +172,15 @@ void convertPosesToSdf16(const sdf::ElementPtr &_modelElem)
       }
     }
   }
-  // TODO (addisu) Revisit when composition with frame semantics is
-  // supported in sdformat
-  // Models
+
+  for (std::size_t modelInd = 0; modelInd < modelSDFDom.ModelCount();
+       ++modelInd)
+  {
+    auto *nestedModelDom = modelSDFDom.ModelByIndex(modelInd);
+    updateIfRelativeTo(nestedModelDom->Element(),
+                       nestedModelDom->SemanticPose());
+    convertPosesToSdf16(nestedModelDom->Element());
+  }
 }
 }
 }

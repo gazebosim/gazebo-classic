@@ -103,6 +103,37 @@ TEST_F(ActorTest, TrajectoryFromSDF)
 }
 
 //////////////////////////////////////////////////
+TEST_F(ActorTest, ActorCollision)
+{
+  // Load a world with an actor
+  this->Load("test/worlds/actor_collisions.world", true);
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Get model
+  auto model = world->ModelByName("actor");
+  ASSERT_TRUE(model != nullptr);
+
+  // Convert to actor
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(model);
+  ASSERT_TRUE(actor != nullptr);
+
+  // Step until the animation ends and check actor is inactive
+  world->Step(5000);
+  EXPECT_FALSE(actor->IsActive());
+
+  // Change the actor pose to simulate collision
+  ignition::math::Pose3d poseCollision(3.0, 0.0, 1.0, 0.0, 0.0, 3.14);
+  actor->SetWorldPose(poseCollision);
+
+  // Pass some time and check actor went back to the final pose
+  world->Step(6000);
+  ignition::math::Vector3d poseTarget(2.0, 0.0, 1.0);
+  EXPECT_FALSE(actor->IsActive());
+  EXPECT_LT((poseTarget - actor->WorldPose().Pos()).Length(), 0.1);
+}
+
+//////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

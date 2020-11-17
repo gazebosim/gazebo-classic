@@ -31,8 +31,12 @@
 #include <sys/sendfile.h>
 #endif
 
+#include <ignition/common/Filesystem.hh>
+
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
+
+#include <sdf/sdf.hh>
 
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/ffmpeg_inc.h>
@@ -40,7 +44,15 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/FuelModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
+
+#ifdef _WIN32
+  // DELETE is defined in winnt.h and causes a problem with
+  // ignition::fuel_tools::REST::DELETE
+  #undef DELETE
+#endif
+#include "ignition/fuel_tools/Interface.hh"
 
 using namespace gazebo;
 
@@ -152,13 +164,23 @@ void common::add_search_path_suffix(const std::string &_suffix)
 /////////////////////////////////////////////////
 std::string common::find_file(const std::string &_file)
 {
-  return common::SystemPaths::Instance()->FindFile(_file, true);
+  std::string path = common::FuelModelDatabase::Instance()->ModelPath(_file);
+  if (path.empty())
+  {
+    path = common::SystemPaths::Instance()->FindFile(_file, true);
+  }
+  return path;
 }
 
 /////////////////////////////////////////////////
 std::string common::find_file(const std::string &_file, bool _searchLocalPath)
 {
-  return common::SystemPaths::Instance()->FindFile(_file, _searchLocalPath);
+  std::string path = common::FuelModelDatabase::Instance()->ModelPath(_file);
+  if (path.empty())
+  {
+    path = common::SystemPaths::Instance()->FindFile(_file, _searchLocalPath);
+  }
+  return path;
 }
 
 /////////////////////////////////////////////////
@@ -434,4 +456,112 @@ bool common::copyDir(const boost::filesystem::path &_source,
     }
   }
   return true;
+}
+
+//////////////////////////////////////////////////
+// Copied from ignition/gazebo/Util.hh
+std::string common::asFullPath(const std::string &_uri,
+    const std::string &_filePath)
+{
+  // No path, return unmodified
+  if (_filePath.empty())
+  {
+    return _uri;
+  }
+
+#ifdef __APPLE__
+  const std::string absPrefix = "/";
+  // Not a relative path, return unmodified
+  if (_uri.find("://") != std::string::npos ||
+      _uri.compare(0, absPrefix.size(), absPrefix) == 0)
+  {
+    return _uri;
+  }
+#else
+  // Not a relative path, return unmodified
+  if (_uri.find("://") != std::string::npos ||
+      !boost::filesystem::path(_uri).is_relative())
+  {
+    return _uri;
+  }
+#endif
+
+  // When SDF is loaded from a string instead of a file
+  if ("data-string" == _filePath)
+  {
+    gzwarn << "Can't resolve full path for relative path ["
+           << _uri << "]. Loaded from a data-string." << std::endl;
+    return _uri;
+  }
+
+  // Remove file name from path
+  auto path = ignition::common::parentPath(_filePath);
+  auto uri = _uri;
+
+  // If path is URI, use "/" separator for all platforms
+  if (path.find("://") != std::string::npos)
+  {
+    std::replace(uri.begin(), uri.end(), '\\', '/');
+    return path + "/" + uri;
+  }
+
+  // In case relative path doesn't match platform
+#ifdef _WIN32
+  std::replace(uri.begin(), uri.end(), '/', '\\');
+#else
+  std::replace(uri.begin(), uri.end(), '\\', '/');
+#endif
+
+  // Use platform-specific separator
+  return ignition::common::joinPaths(path,  uri);
+}
+
+//////////////////////////////////////////////////
+void common::convertToFullPaths(const sdf::ElementPtr &_elem,
+    const std::string &_filePath)
+{
+  if (nullptr == _elem)
+    return;
+
+  for (auto child = _elem->GetFirstElement(); child != nullptr;
+      child = child->GetNextElement())
+  {
+    common::convertToFullPaths(child, _filePath);
+  }
+
+  // * All <uri>
+  bool isUri = _elem->GetName() == "uri";
+
+  // * All <filename> which are children of <animation> or <skin>
+  bool isFilename =
+      _elem->GetName() == "filename" &&
+      _elem->GetParent() != nullptr &&
+      (_elem->GetParent()->GetName() == "animation" ||
+       _elem->GetParent()->GetName() == "skin");
+
+  if (isUri || isFilename)
+  {
+    auto filePath = _filePath.empty() ? _elem->FilePath() : _filePath;
+    _elem->Set(common::asFullPath(_elem->Get<std::string>(),
+        filePath));
+  }
+}
+
+//////////////////////////////////////////////////
+void common::convertToFullPaths(std::string &_sdfString,
+    const std::string &_filePath)
+{
+  sdf::SDFPtr sdf = std::make_shared<sdf::SDF>();
+  sdf::initFile("root.sdf", sdf);
+
+  if (!sdf::readString(_sdfString, sdf) || nullptr == sdf)
+  {
+    return;
+  }
+
+  sdf->Root()->SetFilePath(_filePath);
+
+  convertToFullPaths(sdf->Root(), _filePath);
+
+  _sdfString = sdf->Root()->ToString("");
 }
