@@ -460,9 +460,15 @@ else (build_errors)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
   endif()
 
+  include(CMakePackageConfigHelpers)
   set(cmake_conf_file "cmake/gazebo-config.cmake")
   set(cmake_conf_version_file "cmake/gazebo-config-version.cmake")
-  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)
+  set(DATAROOT_INSTALL_DIR ${CMAKE_INSTALL_DATAROOTDIR})
+  set(BASE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR})
+  configure_package_config_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}"
+          INSTALL_DESTINATION ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}/
+          PATH_VARS BASE_INSTALL_INCLUDEDIR LIB_INSTALL_DIR DATAROOT_INSTALL_DIR
+          )
   # Use write_basic_package_version_file to generate a ConfigVersion file that
   # allow users of gazebo to specify the API or version to depend on
   # TODO: keep this instruction until deprecate Ubuntu/Precise and update with

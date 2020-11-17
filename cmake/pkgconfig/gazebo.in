@@ -1,4 +1,4 @@
-prefix=@CMAKE_INSTALL_PREFIX@
+prefix=${pcfiledir}/../..
 libdir=@pkgconfig_libdir@
 includedir=@pkgconfig_includedir@
 
