@@ -174,7 +174,7 @@ TEST_F(WorldTest, NameWithSpaces)
     auto model = world->ModelByName("included model");
     ASSERT_NE(nullptr, model);
 
-    EXPECT_EQ(model->GetLinks().size(), 1u);
+    EXPECT_EQ(model->GetLinks().size(), 2u);
 
     auto link = model->GetLink("link with spaces");
     ASSERT_NE(nullptr, link);
@@ -182,6 +182,14 @@ TEST_F(WorldTest, NameWithSpaces)
     EXPECT_EQ(link->GetCollisions().size(), 1u);
 
     auto collision = link->GetCollision("collision with spaces");
+    ASSERT_NE(nullptr, collision);
+
+    link = model->GetLink("link with spaces in obj");
+    ASSERT_NE(nullptr, link);
+
+    EXPECT_EQ(link->GetCollisions().size(), 1u);
+
+    collision = link->GetCollision("collision with spaces in obj");
     ASSERT_NE(nullptr, collision);
   }
 }

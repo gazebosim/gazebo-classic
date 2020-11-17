@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/SystemPaths.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -554,6 +555,10 @@ void ModelMaker_TEST::FromModelWithSpaces()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
+
+  // Test database
+  gazebo::common::SystemPaths::Instance()->AddModelPaths(
+    PROJECT_SOURCE_PATH "/test/models/testdb");
 
   this->Load("worlds/empty.world", false, false, false);
 

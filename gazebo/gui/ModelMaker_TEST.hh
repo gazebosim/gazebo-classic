@@ -40,7 +40,7 @@ class ModelMaker_TEST : public QTestFixture
   /// \brief Test creating a nested model by copying another nested model.
   private slots: void FromNestedModel();
 
-  /// \brief Test creating a nmodel with spaces in the file name and entity
+  /// \brief Test creating a model with spaces in the file name and entity
   /// names.
   private slots: void FromModelWithSpaces();
 };

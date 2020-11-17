@@ -42,6 +42,24 @@
       </visual>
     </link>
 
+    <link name="link with spaces in obj">
+      <pose>-2.0 0 0.5 0 0 0</pose>
+      <collision name="collision with spaces in obj">
+        <geometry>
+          <mesh>
+            <uri>model://model with spaces/meshes/mesh with spaces.obj</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual with spaces in obj">
+        <geometry>
+          <mesh>
+            <uri>model://model with spaces/meshes/mesh with spaces.obj</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
     <model name="nested model with spaces">
       <pose>1.25 0 0.0 0 0 0</pose>
       <link name="nested link with spaces">

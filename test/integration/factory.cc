@@ -1266,8 +1266,10 @@ TEST_F(FactoryTest, FilenameModelDatabaseSpaces)
   EXPECT_NE(nullptr, model->GetJoint(
       "joint between links nested at different depths"));
 
-  // Top-level link
-  EXPECT_EQ(1u, model->GetLinks().size());
+  // Top-level links
+  EXPECT_EQ(2u, model->GetLinks().size());
+
+  // Link with COLLADA meshes
   auto link = model->GetLink("link with spaces");
   ASSERT_NE(nullptr, link);
 
@@ -1315,6 +1317,35 @@ TEST_F(FactoryTest, FilenameModelDatabaseSpaces)
   EXPECT_EQ(PROJECT_SOURCE_PATH
       "/test/models/testdb/model with spaces/materials/textures/"
       "normal with spaces.png", visualVisMaterial->GetNormalMap());
+
+  // Link with OBJ meshes
+  link = model->GetLink("link with spaces in obj");
+  ASSERT_NE(nullptr, link);
+
+  linkVis = modelVis->GetChild(1);
+  ASSERT_NE(nullptr, linkVis);
+  EXPECT_EQ("model with spaces::link with spaces in obj", linkVis->Name());
+
+  EXPECT_EQ(1u, link->GetCollisions().size());
+  collision = link->GetCollision("collision with spaces in obj");
+  ASSERT_NE(nullptr, collision);
+
+  shape = collision->GetShape();
+  ASSERT_NE(nullptr, shape);
+
+  meshShape = boost::static_pointer_cast<physics::MeshShape>(shape);
+  ASSERT_NE(nullptr, meshShape);
+  EXPECT_EQ("model://model with spaces/meshes/mesh with spaces.obj",
+      meshShape->GetMeshURI());
+
+  visualVis = linkVis->GetChild(0);
+  ASSERT_NE(nullptr, visualVis);
+  EXPECT_EQ("model with spaces::link with spaces in obj::"
+      "visual with spaces in obj", visualVis->Name());
+
+  EXPECT_EQ(PROJECT_SOURCE_PATH
+      "/test/models/testdb/model with spaces/meshes/mesh with spaces.obj",
+      visualVis->GetMeshName());
 
   // Nested
   EXPECT_EQ(1u, model->NestedModels().size());
