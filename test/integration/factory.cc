@@ -798,7 +798,8 @@ TEST_F(FactoryTest, ActorSpaces)
   // Wait for it to be spawned
   int sleep = 0;
   int maxSleep = 50;
-  while (!world->ModelByName("actor with spaces") && sleep++ < maxSleep)
+  while ((!world->ModelByName("actor with spaces") ||
+         world->ModelCount() < 4) && sleep++ < maxSleep)
   {
     common::Time::MSleep(100);
   }
@@ -1257,6 +1258,7 @@ TEST_F(FactoryTest, FilenameModelDatabaseSpaces)
 
   auto modelVis = scene->GetVisual("model with spaces");
   ASSERT_NE(nullptr, modelVis);
+  EXPECT_EQ(3u, modelVis->GetChildCount());
 
   // Joints
   EXPECT_EQ(3u, model->GetJoints().size());
@@ -1352,12 +1354,27 @@ TEST_F(FactoryTest, FilenameModelDatabaseSpaces)
   auto nestedModel = model->NestedModel("nested model with spaces");
   ASSERT_NE(nullptr, nestedModel);
 
+  auto nestedModelVis = modelVis->GetChild(2);
+  ASSERT_NE(nullptr, nestedModelVis);
+  EXPECT_EQ("model with spaces::nested model with spaces", nestedModelVis->Name());
+
   EXPECT_EQ(1u, nestedModel->GetLinks().size());
   auto nestedLink = nestedModel->GetLink("nested link with spaces");
   ASSERT_NE(nullptr, nestedLink);
 
+  auto nestedLinkVis = nestedModelVis->GetChild(0);
+  ASSERT_NE(nullptr, nestedLinkVis);
+  EXPECT_EQ("model with spaces::nested model with spaces::"
+      "nested link with spaces", nestedLinkVis->Name());
+
   EXPECT_EQ(1u, nestedLink->GetCollisions().size());
   ASSERT_NE(nullptr, nestedLink->GetCollision("nested collision with spaces"));
+
+  auto nestedVisualVis = nestedLinkVis->GetChild(0);
+  ASSERT_NE(nullptr, nestedVisualVis);
+  EXPECT_EQ("model with spaces::nested model with spaces::"
+      "nested link with spaces::nested visual with spaces",
+      nestedVisualVis->Name());
 
   // Nested deeper
   EXPECT_EQ(1u, nestedModel->NestedModels().size());

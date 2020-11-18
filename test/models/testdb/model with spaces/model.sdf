@@ -71,7 +71,7 @@
             </box>
           </geometry>
         </collision>
-        <visual name="neste visual with spaces">
+        <visual name="nested visual with spaces">
           <geometry>
             <box>
               <size>1 1 1</size>
