@@ -122,9 +122,9 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
       }
       catch(const common::Exception &_e)
       {
-        gzerr << "DEM coordinate transformation error. "
-              << "SphericalCoordiantes and GpsSensor may not function properly."
-              << std::endl;
+        gzwarn << "DEM coordinate transformation error. "
+               << "SphericalCoordiantes and GpsSensor may not function properly."
+               << std::endl;
       }
       elevation = this->dem.GetElevation(0.0, 0.0);
 
@@ -134,7 +134,9 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
       sphericalCoordinates.reset();
     }
     else
+    {
       gzerr << "Unable to get a valid SphericalCoordinates pointer\n";
+    }
 
     return 0;
   }

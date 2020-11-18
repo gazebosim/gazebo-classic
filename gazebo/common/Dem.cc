@@ -130,9 +130,9 @@ int Dem::Load(const std::string &_filename)
   }
   catch(const common::Exception &)
   {
-    gzerr << "Failed to automatically compute DEM size. "
-          << "Please use the <size> element to manually set DEM size."
-          << std::endl;
+    gzwarn << "Failed to automatically compute DEM size. "
+           << "Please use the <size> element to manually set DEM size."
+           << std::endl;
   }
 
   // Set the terrain's side (the terrain will be squared after the padding)
