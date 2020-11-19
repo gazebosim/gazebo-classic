@@ -1356,7 +1356,8 @@ TEST_F(FactoryTest, FilenameModelDatabaseSpaces)
 
   auto nestedModelVis = modelVis->GetChild(2);
   ASSERT_NE(nullptr, nestedModelVis);
-  EXPECT_EQ("model with spaces::nested model with spaces", nestedModelVis->Name());
+  EXPECT_EQ("model with spaces::nested model with spaces",
+      nestedModelVis->Name());
 
   EXPECT_EQ(1u, nestedModel->GetLinks().size());
   auto nestedLink = nestedModel->GetLink("nested link with spaces");
@@ -1419,7 +1420,7 @@ TEST_F(FactoryTest, FilenameFuelURL)
 
   msgs::Factory msg;
   msg.set_sdf_filename(
-      "https://api.ignitionfuel.org/1.0/chapulina/models/Test box");
+      "https://fuel.ignitionfuel.org/1.0/chapulina/models/Test box/1");
 
   auto pub = this->node->Advertise<msgs::Factory>("~/factory");
   pub->Publish(msg);
