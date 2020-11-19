@@ -174,7 +174,9 @@ int Dem::Load(const std::string &_filename)
   }
   if (ignition::math::equal(min, ignition::math::MAX_D) ||
       ignition::math::equal(max, -ignition::math::MAX_D))
+  {
     gzwarn << "Dem is composed of 'nodata' values!" << std::endl;
+  }
 
   this->dataPtr->minElevation = min;
   this->dataPtr->maxElevation = max;
@@ -220,14 +222,19 @@ void Dem::GetGeoReference(double _x, double _y,
     double xGeoDeg, yGeoDeg;
 
     // Transform the terrain's coordinate system to WGS84
-    auto importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
+    #if GDAL_VERSION_NUM >= 2030000
+    const char *importString;
+    #else
+    char *importString;
+    #endif
+    importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
     sourceCs.importFromWkt(&importString);
     targetCs.SetWellKnownGeogCS("WGS84");
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
     if (nullptr == cT)
     {
       gzthrow("Unable to transform terrain coordinate system to WGS84 for "
-          << "coordinates (" << _x << "," << _y << ")\n");
+          << "coordinates (" << _x << "," << _y << ")");
     }
 
     xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
@@ -241,8 +248,10 @@ void Dem::GetGeoReference(double _x, double _y,
     OCTDestroyCoordinateTransformation(cT);
   }
   else
+  {
     gzthrow("Unable to obtain the georeferenced values for coordinates ("
-            << _x << "," << _y << ")\n");
+            << _x << "," << _y << ")");
+  }
 }
 
 //////////////////////////////////////////////////
