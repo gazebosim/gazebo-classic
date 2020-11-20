@@ -1420,7 +1420,7 @@ TEST_F(FactoryTest, FilenameFuelURL)
 
   msgs::Factory msg;
   msg.set_sdf_filename(
-      "https://fuel.ignitionfuel.org/1.0/chapulina/models/Test box/1");
+      "https://fuel.ignitionrobotics.org/1.0/chapulina/models/Test box/1");
 
   auto pub = this->node->Advertise<msgs::Factory>("~/factory");
   pub->Publish(msg);
