@@ -5,6 +5,13 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 11.1.0 to 11.2.0
+
+### Modifications
+
+Updated the version of TinyOBJLoader from 1.0.0 to 2.0.0rc8.
+See the changelog at https://github.com/osrf/gazebo/blob/gazebo9/deps/tinyobjloader/tiny_obj_loader.h
+
 ## Gazebo 10.x to 11.0
 
 ### Build system

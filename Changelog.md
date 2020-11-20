@@ -2,6 +2,12 @@
 
 ## Gazebo 11.x.x (202x-xx-xx)
 
+1. Updated the version of TinyOBJLoader from 1.0.0 to 2.0.0rc8.
+    * [Pull request #2885](https://github.com/osrf/gazebo/pull/2885)
+
+1. Support resource files with spaces
+    * [Pull request #2877](https://github.com/osrf/gazebo/pull/2877)
+
 1. Fix problem with automoc in CMake 3.17
     * [Pull request 3201](https://bitbucket.org/osrf/gazebo/pull-requests/3201/)
 
