@@ -1,8 +1,7 @@
-newmtl everything is ignored after first space
+newmtl MaterialNameWithoutSpaces
   Ns 10.0
   Ni 1.5
   d 1.0
-  Tr 0.0
   Tf 1.0 1.0 1.0
   illum 2
   Ka 1.0 1.0 1.0
