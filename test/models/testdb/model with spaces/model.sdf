@@ -1,0 +1,153 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="model with spaces">
+    <pose>0 0 0.5 0 0 0</pose>
+    <link name="link with spaces">
+      <collision name="collision with spaces">
+        <geometry>
+          <mesh>
+            <uri>model://model with spaces/meshes/mesh with spaces.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual with spaces">
+        <geometry>
+          <mesh>
+            <uri>model://model with spaces/meshes/mesh with spaces.dae</uri>
+            <submesh>
+              <name>Plane1</name>
+            </submesh>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name="visual with material">
+        <geometry>
+          <mesh>
+            <uri>model://model with spaces/meshes/mesh with spaces.dae</uri>
+            <submesh>
+              <name>Plane2</name>
+            </submesh>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://model with spaces/materials/scripts/</uri>
+            <uri>model://model with spaces/materials/textures/</uri>
+            <name>material with spaces</name>
+          </script>
+          <shader type="normal_map_tangent_space">
+            <normal_map>model://model with spaces/materials/textures/normal with spaces.png</normal_map>
+          </shader>
+        </material>
+      </visual>
+    </link>
+
+    <link name="link with spaces in obj">
+      <pose>-2.0 0 0.5 0 0 0</pose>
+      <collision name="collision with spaces in obj">
+        <geometry>
+          <mesh>
+            <uri>model://model with spaces/meshes/mesh with spaces.obj</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual with spaces in obj">
+        <geometry>
+          <mesh>
+            <uri>model://model with spaces/meshes/mesh with spaces.obj</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+    <model name="nested model with spaces">
+      <pose>1.25 0 0.0 0 0 0</pose>
+      <link name="nested link with spaces">
+        <pose>0.25 0 0.0 0 0 0</pose>
+        <collision name="nested collision with spaces">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="nested visual with spaces">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <model name="deeper nested model with spaces">
+        <pose>1.25 0 0.0 0 0 0</pose>
+        <link name="deeper nested link with spaces">
+          <pose>0.25 0 0.0 0 0 0</pose>
+          <collision name="deeper nested collision with spaces">
+            <geometry>
+              <cylinder>
+                <radius>0.5</radius>
+                <length>1</length>
+              </cylinder>
+            </geometry>
+          </collision>
+          <visual name="deeper nested visual with spaces">
+            <geometry>
+              <cylinder>
+                <radius>0.5</radius>
+                <length>1</length>
+              </cylinder>
+            </geometry>
+          </visual>
+        </link>
+        <model name="even deeper nested model with spaces">
+          <pose>1.25 0 0.0 0 0 0</pose>
+          <link name="even deeper nested link with spaces">
+            <pose>0.25 0 0.0 0 0 0</pose>
+            <collision name="even deeper nested collision with spaces">
+              <geometry>
+                <box>
+                  <size>1 1 1</size>
+                </box>
+              </geometry>
+            </collision>
+            <visual name="even deeper nested visual with spaces">
+              <geometry>
+                <box>
+                  <size>1 1 1</size>
+                </box>
+              </geometry>
+            </visual>
+          </link>
+        </model>
+      </model>
+    </model>
+
+    <joint name="joint with spaces" type="revolute">
+      <parent>link with spaces</parent>
+      <child>nested model with spaces::nested link with spaces</child>
+      <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+      <axis>
+        <xyz>1.0 0.0 0.0</xyz>
+      </axis>
+    </joint>
+
+    <joint name="joint between top link and link in nested model" type="revolute">
+      <parent>nested model with spaces::nested link with spaces</parent>
+      <child>nested model with spaces::deeper nested model with spaces::deeper nested link with spaces</child>
+      <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+      <axis>
+        <xyz>1.0 0.0 0.0</xyz>
+      </axis>
+    </joint>
+
+    <joint name="joint between links nested at different depths" type="revolute">
+      <parent>nested model with spaces::deeper nested model with spaces::deeper nested link with spaces</parent>
+      <child>nested model with spaces::deeper nested model with spaces::even deeper nested model with spaces::even deeper nested link with spaces</child>
+      <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+      <axis>
+        <xyz>1.0 0.0 0.0</xyz>
+      </axis>
+    </joint>
+  </model>
+</sdf>

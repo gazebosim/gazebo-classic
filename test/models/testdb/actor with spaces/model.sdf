@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <actor name='actor with spaces'>
+    <skin>
+      <filename>model://actor with spaces/meshes/skin with spaces.dae</filename>
+    </skin>
+    <animation name='animation with spaces'>
+      <filename>model://actor with spaces/meshes/skin with spaces.dae</filename>
+      <interpolate_x>true</interpolate_x>
+    </animation>
+    <script>
+      <loop>true</loop>
+      <delay_start>0.000000</delay_start>
+      <auto_start>true</auto_start>
+      <trajectory id='0' type='animation with spaces'>
+        <waypoint>
+          <time>0.0</time>
+          <pose>1 1 0 0 0 0</pose>
+        </waypoint>
+        <waypoint>
+          <time>2.0</time>
+          <pose>2 2 0 0 0 0</pose>
+        </waypoint>
+        <waypoint>
+          <time>4.0</time>
+          <pose>1 1 0 0 0 0</pose>
+        </waypoint>
+      </trajectory>
+    </script>
+  </actor>
+</sdf>

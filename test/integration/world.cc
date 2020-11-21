@@ -141,6 +141,60 @@ TEST_F(WorldTest, Clear)
 }
 
 /////////////////////////////////////////////////
+TEST_F(WorldTest, NameWithSpaces)
+{
+  common::SystemPaths::Instance()->AddModelPaths(
+    PROJECT_SOURCE_PATH "/test/models/testdb");
+
+  this->Load("test/worlds/world with spaces.world");
+
+  auto world = physics::get_world("world with spaces");
+  ASSERT_NE(nullptr, world);
+
+  EXPECT_EQ(world->ModelCount(), 2u);
+
+  // Model expanded in SDF
+  {
+    auto model = world->ModelByName("model with spaces");
+    ASSERT_NE(nullptr, model);
+
+    EXPECT_EQ(model->GetLinks().size(), 1u);
+
+    auto link = model->GetLink("link with spaces");
+    ASSERT_NE(nullptr, link);
+
+    EXPECT_EQ(link->GetCollisions().size(), 1u);
+
+    auto collision = link->GetCollision("collision with spaces");
+    ASSERT_NE(nullptr, collision);
+  }
+
+  // Model included in SDF
+  {
+    auto model = world->ModelByName("included model");
+    ASSERT_NE(nullptr, model);
+
+    EXPECT_EQ(model->GetLinks().size(), 2u);
+
+    auto link = model->GetLink("link with spaces");
+    ASSERT_NE(nullptr, link);
+
+    EXPECT_EQ(link->GetCollisions().size(), 1u);
+
+    auto collision = link->GetCollision("collision with spaces");
+    ASSERT_NE(nullptr, collision);
+
+    link = model->GetLink("link with spaces in obj");
+    ASSERT_NE(nullptr, link);
+
+    EXPECT_EQ(link->GetCollisions().size(), 1u);
+
+    collision = link->GetCollision("collision with spaces in obj");
+    ASSERT_NE(nullptr, collision);
+  }
+}
+
+/////////////////////////////////////////////////
 void WorldTest::Gravity(const std::string &_physicsEngine)
 {
   this->Load("worlds/friction_demo.world", true, _physicsEngine);
