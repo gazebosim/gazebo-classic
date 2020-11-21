@@ -1,0 +1,13 @@
+newmtl everything is ignored after first space
+  Ns 10.0
+  Ni 1.5
+  d 1.0
+  Tr 0.0
+  Tf 1.0 1.0 1.0
+  illum 2
+  Ka 1.0 1.0 1.0
+  Kd 0.5882 0.5882 0.5882
+  Ks 0.0 0.0 0.0
+  Ke 0.5 0.5 0.5
+  map_Ka texture with spaces.png
+  map_Kd texture with spaces.png
