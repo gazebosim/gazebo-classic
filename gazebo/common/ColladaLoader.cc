@@ -15,6 +15,7 @@
  *
  */
 
+#include <curl/curl.h>
 #include <tinyxml.h>
 #include <math.h>
 #include <sstream>
@@ -1484,6 +1485,18 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
     {
       std::string imgFile =
         imageXml->FirstChildElement("init_from")->GetText();
+
+      auto curl = curl_easy_init();
+      if (curl)
+      {
+        imgFile = std::string(curl_easy_unescape(curl, imgFile.c_str(), 0,
+            nullptr));
+      }
+      else
+      {
+        gzerr << "Can't unescape file, failed to initialize curl" << std::endl;
+      }
+
       _mat->SetTextureImage(imgFile, this->dataPtr->path);
     }
   }
