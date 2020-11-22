@@ -23,24 +23,51 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wfloat-equal"
 
-#include <qwt/qwt_curve_fitter.h>
-#include <qwt/qwt_legend.h>
-#include <qwt/qwt_painter.h>
-#include <qwt/qwt_picker_machine.h>
-#include <qwt/qwt_plot.h>
-#include <qwt/qwt_plot_canvas.h>
-#include <qwt/qwt_plot_curve.h>
-#include <qwt/qwt_plot_directpainter.h>
-#include <qwt/qwt_plot_grid.h>
-#include <qwt/qwt_plot_layout.h>
-#include <qwt/qwt_plot_magnifier.h>
-#include <qwt/qwt_plot_marker.h>
-#include <qwt/qwt_plot_panner.h>
-#include <qwt/qwt_plot_zoomer.h>
-#include <qwt/qwt_scale_engine.h>
-#include <qwt/qwt_scale_widget.h>
-#include <qwt/qwt_symbol.h>
-#include <qwt/qwt_plot_renderer.h>
+#if defined __has_include
+  #if __has_include (<qwt.h>)
+    #include <qwt_curve_fitter.h>
+    #include <qwt_legend.h>
+    #include <qwt_painter.h>
+    #include <qwt_picker_machine.h>
+    #include <qwt_plot.h>
+    #include <qwt_plot_canvas.h>
+    #include <qwt_plot_curve.h>
+    #include <qwt_plot_directpainter.h>
+    #include <qwt_plot_grid.h>
+    #include <qwt_plot_layout.h>
+    #include <qwt_plot_magnifier.h>
+    #include <qwt_plot_marker.h>
+    #include <qwt_plot_panner.h>
+    #include <qwt_plot_zoomer.h>
+    #include <qwt_scale_engine.h>
+    #include <qwt_scale_widget.h>
+    #include <qwt_symbol.h>
+    #include <qwt_plot_renderer.h>
+    #define GAZEBO_GUI_QWT_IS_INCLUDED
+  #endif
+#endif
+
+#ifndef GAZEBO_GUI_QWT_IS_INCLUDED
+  #include <qwt/qwt_curve_fitter.h>
+  #include <qwt/qwt_legend.h>
+  #include <qwt/qwt_painter.h>
+  #include <qwt/qwt_picker_machine.h>
+  #include <qwt/qwt_plot.h>
+  #include <qwt/qwt_plot_canvas.h>
+  #include <qwt/qwt_plot_curve.h>
+  #include <qwt/qwt_plot_directpainter.h>
+  #include <qwt/qwt_plot_grid.h>
+  #include <qwt/qwt_plot_layout.h>
+  #include <qwt/qwt_plot_magnifier.h>
+  #include <qwt/qwt_plot_marker.h>
+  #include <qwt/qwt_plot_panner.h>
+  #include <qwt/qwt_plot_zoomer.h>
+  #include <qwt/qwt_scale_engine.h>
+  #include <qwt/qwt_scale_widget.h>
+  #include <qwt/qwt_symbol.h>
+  #include <qwt/qwt_plot_renderer.h>
+  #define GAZEBO_GUI_QWT_IS_INCLUDED
+#endif
 
 #pragma clang diagnostic pop
 
