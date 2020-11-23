@@ -161,6 +161,13 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
     + ***Removed:*** The whole header file. Note that it also won't be included into `gazebo/gui/gui.hh`.
     + ***Replacement:*** Include `<QtTest/QtTest>` instead.
 
+## Gazebo 9.15 to 9.16
+
+### Modifications
+
+Updated the version of TinyOBJLoader from 1.0.0 to 2.0.0rc8.
+See the changelog at https://github.com/osrf/gazebo/blob/gazebo9/deps/tinyobjloader/tiny_obj_loader.h
+
 ## Gazebo 8.4 to 9.x
 
 ### Models with duplicate names will not be inserted
