@@ -428,7 +428,53 @@
 
 ## Gazebo 9.xx.x (202x-xx-xx)
 
-## Gazebo 9.13.2 (202x-xx-xx)
+1. Updated the version of TinyOBJLoader from 1.0.0 to 2.0.0rc8.
+    * [Pull request #2885](https://github.com/osrf/gazebo/pull/2885)
+
+1. Support resource files with spaces
+    * [Pull request #2877](https://github.com/osrf/gazebo/pull/2877)
+
+1. Fix physics based sensor update rate in lockstep mode
+    * [Pull request #2863](https://github.com/osrf/gazebo/pull/2863)
+
+## Gazebo 9.15.0 (2020-09-30)
+
+1. More enhancement for Windows build
+    * [Pull request #2789](https://github.com/osrf/gazebo/pull/2789)
+
+1. Fixed fails for OSX: Added using namespace boost::placeholders
+    * [Pull request #2809](https://github.com/osrf/gazebo/pull/2809)
+
+1. Add profiler
+    * [Pull request #2813](https://github.com/osrf/gazebo/pull/2813)
+
+1. ColladaLoader: fix cases where VERTEX and NORMAL share same polylist <p>
+    * [Pull request #2825](https://github.com/osrf/gazebo/pull/2825)
+
+1. Fix assumptions that CMAKE\_INSTALL\_\*DIR paths are relative
+    * [Pull request #2779](https://github.com/osrf/gazebo/pull/2779)
+
+1. Fix reflectance values for objects without a reflectance map
+    * [Pull request #2833](https://github.com/osrf/gazebo/pull/2833)
+
+1. Remove lighting param
+    * [Pull request #2840](https://github.com/osrf/gazebo/pull/2840)
+
+1. Publish performance metrics
+    * [Pull request #2819](https://github.com/osrf/gazebo/pull/2819)
+
+1. Improve transport::Publisher reliability
+    * [Pull request #2725](https://github.com/osrf/gazebo/pull/2725)
+
+## Gazebo 9.14.0 (2020-08-07)
+
+1. Lockstep between sensors and physics
+    * [Pull request #2793](https://github.com/osrf/gazebo/pull/2793)
+
+1. Fix race condition on Publisher shutdown
+    * [Pull request #2812](https://github.com/osrf/gazebo/pull/2812)
+
+## Gazebo 9.13.2 (2020-07-20)
 
 1. Fix sensor update rate throttling when new sensors are spawned
     * [Pull request #2784](https://github.com/osrf/gazebo/pull/2784)
