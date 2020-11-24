@@ -865,3 +865,18 @@ else()
   message (STATUS "Looking for qwt >= 6.1.0 - not found")
   BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
 endif ()
+
+########################################
+# On Windows, find tiny-process-library
+if (WIN32)
+  option(USE_EXTERNAL_TINY_PROCESS_LIBRARY "Use external tiny-process-library." OFF)
+  if (USE_EXTERNAL_TINY_PROCESS_LIBRARY)
+    find_package(tiny-process-library QUIET)
+    if (NOT tiny-process-library_FOUND)
+      message (STATUS "Looking for tiny-process-library - not found")
+      BUILD_ERROR ("Missing: tiny-process-library, even if USE_EXTERNAL_TINY_PROCESS_LIBRARY was enabled.")
+    else()
+      message (STATUS "Looking for tiny-process-library - found")
+    endif()
+  endif()
+endif()

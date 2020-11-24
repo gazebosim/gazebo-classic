@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
+if(WIN32)
+  cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
+else()
+  cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
+endif()
 
 if(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
