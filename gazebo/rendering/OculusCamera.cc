@@ -17,6 +17,7 @@
 
 #include <sstream>
 #include <string>
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -235,6 +236,7 @@ void OculusCamera::RenderImpl()
 //////////////////////////////////////////////////
 void OculusCamera::Update()
 {
+  IGN_PROFILE("rendering::OculusCamera::Update");
   if (!this->Ready())
     return;
 

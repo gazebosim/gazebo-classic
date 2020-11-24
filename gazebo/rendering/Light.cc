@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
@@ -114,6 +116,7 @@ void Light::Load()
 //////////////////////////////////////////////////
 void Light::Update()
 {
+  IGN_PROFILE("rendering::Light::Update");
   // shadow support is also affected by light type so set type first.
   this->SetLightType(this->dataPtr->sdf->Get<std::string>("type"));
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));

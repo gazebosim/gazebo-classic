@@ -15,10 +15,12 @@
  *
 */
 
+#include <memory>
 #include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
+#include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -667,5 +669,142 @@ void ModelMaker_TEST::FromNestedModel()
   delete mainWindow;
 }
 
+/////////////////////////////////////////////////
+void ModelMaker_TEST::FromNestedModelFileWithFrameSemantics()
+{
+  using ignition::math::Pose3d;
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", true, false, false);
+
+  // Create the main window.
+  auto mainWindow = std::make_unique<gazebo::gui::MainWindow>();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow.get());
+
+  // Check there's no model in the left panel of the main window yet
+  QVERIFY(!mainWindow->HasEntityName("model_00"));
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  QVERIFY(scene != nullptr);
+
+  // Check there's no model in the scene yet
+  {
+    gazebo::rendering::VisualPtr model00Vis = scene->GetVisual("model_00");
+    QVERIFY(model00Vis == nullptr);
+  }
+
+  // Create a model maker
+  auto modelMaker = std::make_unique<gazebo::gui::ModelMaker>();
+  QVERIFY(modelMaker != nullptr);
+
+  // Model data
+  boost::filesystem::path path;
+  path = path / TEST_PATH / "models" / "testdb" /
+         "deeply_nested_model_with_frame_semantics" / "model.sdf";
+
+  // Start the maker to make a model
+  modelMaker->InitFromFile(path.string());
+  modelMaker->Start();
+
+  // Check there's still no model in the left panel of the main window
+  QVERIFY(!mainWindow->HasEntityName("model_00"));
+
+  ignition::math::Vector3d startPos = modelMaker->EntityPosition();
+
+  // Check there's a model in the scene -- this is the preview
+  {
+    auto model00 = scene->GetVisual("model_00");
+    QVERIFY(model00 != nullptr);
+    // Check that the model appeared in the center of the screen
+    QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
+  }
+
+  // check all preview visuals are loaded
+  {
+    auto model01 = scene->GetVisual("model_00::model_01");
+    QVERIFY(model01 != nullptr);
+    QVERIFY(Pose3d(1.25, 0, 1.5, 0, 0, 0) == model01->WorldPose());
+  }
+  {
+    auto model02 = scene->GetVisual("model_00::model_01::model_02");
+    QVERIFY(model02 != nullptr);
+    QVERIFY(Pose3d(1.5, 2, 2.5, 0, 0, 0) == model02->WorldPose());
+  }
+  {
+    auto model03 = scene->GetVisual("model_00::model_01::model_02::model_03");
+    QVERIFY(model03 != nullptr);
+    QVERIFY(Pose3d(1.75, 2, 6.5, 0, 0, 0) == model03->WorldPose());
+  }
+
+  // Mouse move
+  gazebo::common::MouseEvent mouseEvent;
+  mouseEvent.SetType(gazebo::common::MouseEvent::MOVE);
+  modelMaker->OnMouseMove(mouseEvent);
+
+  // Check that entity moved
+  Pose3d newPose;
+  newPose.Pos() = modelMaker->EntityPosition();
+  {
+    auto model00 = scene->GetVisual("model_00");
+    QVERIFY(model00 != nullptr);
+    QVERIFY(newPose.Pos() != startPos);
+    QVERIFY(model00->WorldPose() == newPose);
+  }
+
+  // Mouse release
+  mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
+  mouseEvent.SetButton(gazebo::common::MouseEvent::LEFT);
+  mouseEvent.SetDragging(false);
+  mouseEvent.SetPressPos(0, 0);
+  mouseEvent.SetPos(0, 0);
+  modelMaker->OnMouseRelease(mouseEvent);
+
+  // Check there's no model in the scene -- the preview is gone
+  QVERIFY(nullptr == scene->GetVisual("model_00"));
+  QVERIFY(nullptr == scene->GetVisual("model_00::model_01"));
+  QVERIFY(nullptr == scene->GetVisual("model_00::model_01::model_02"));
+  QVERIFY(nullptr ==
+          scene->GetVisual("model_00::model_01::model_02::model_03"));
+
+  this->ProcessEventsAndDraw(mainWindow.get(), 30);
+  // Check the model is in the left panel
+  QVERIFY(mainWindow->HasEntityName("model_00"));
+
+  // Check there's a model in the scene -- this is the final model
+  // Also check the new poses of the created visuals
+  {
+    auto model00 = scene->GetVisual("model_00");
+    QVERIFY(model00 != nullptr);
+    QVERIFY(newPose == model00->WorldPose());
+  }
+
+  // The expected poses are calculated as offset from newPose. However,
+  // since newPose already includes the [0 0 0.5] position of model_00, the
+  // that translation is removed from the offsets.
+  {
+    auto model01 = scene->GetVisual("model_00::model_01");
+    QVERIFY(model01 != nullptr);
+    QVERIFY(newPose * Pose3d(1.25, 0, 1.0, 0, 0, 0) == model01->WorldPose());
+  }
+  {
+    auto model02 = scene->GetVisual("model_00::model_01::model_02");
+    QVERIFY(model02 != nullptr);
+    QVERIFY(newPose * Pose3d(1.5, 2, 2.0, 0, 0, 0) == model02->WorldPose());
+  }
+  {
+    auto model03 = scene->GetVisual("model_00::model_01::model_02::model_03");
+    QVERIFY(model03 != nullptr);
+    QVERIFY(newPose * Pose3d(1.75, 2, 6.0, 0, 0, 0) == model03->WorldPose());
+  }
+  // Terminate
+  mainWindow->close();
+}
 // Generate a main function for the test
 QTEST_MAIN(ModelMaker_TEST)

@@ -82,28 +82,35 @@ endif()
 gz_install_executable(gzserver)
 manpage(gzserver 1)
 
-# gazebo executable doesn't yet work on Windows
-if (NOT WIN32)
-  gz_add_executable(gazebo gazebo_main.cc)
-  target_link_libraries(gazebo
-    libgazebo
-    libgazebo_client
-    gazebo_common
-    gazebo_util
-    gazebo_transport
-    gazebo_physics
-    gazebo_sensors
-    gazebo_rendering
-    gazebo_msgs
-    gazebo_gui
-  )
 
-  gz_install_executable(gazebo)
-  manpage(gazebo 1)
+gz_add_executable(gazebo gazebo_main.cc)
+target_link_libraries(gazebo
+  libgazebo
+  libgazebo_client
+  gazebo_common
+  gazebo_util
+  gazebo_transport
+  gazebo_physics
+  gazebo_sensors
+  gazebo_rendering
+  gazebo_msgs
+  gazebo_gui
+)
+
+if(WIN32)
+  target_link_libraries(gazebo tiny-process-library::tiny-process-library)
 endif()
 
+gz_install_executable(gazebo)
+manpage(gazebo 1)
+
+
 gz_add_library(libgazebo Server.cc Master.cc gazebo.cc gazebo_shared.cc)
-set_target_properties(libgazebo PROPERTIES OUTPUT_NAME "gazebo")
+
+# On Windows calling libgazebo "gazebo" will conflict with the Gazebo executable
+if (NOT WIN32)
+  set_target_properties(libgazebo PROPERTIES OUTPUT_NAME "gazebo")
+endif()
 
 target_link_libraries(libgazebo
   gazebo_common

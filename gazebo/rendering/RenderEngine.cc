@@ -35,6 +35,8 @@
 
 #include "gazebo/gazebo_config.h"
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -261,17 +263,20 @@ unsigned int RenderEngine::SceneCount() const
 //////////////////////////////////////////////////
 void RenderEngine::PreRender()
 {
+  IGN_PROFILE("rendering::RenderEngine::PreRender");
   this->dataPtr->root->_fireFrameStarted();
 }
 
 //////////////////////////////////////////////////
 void RenderEngine::Render()
 {
+  IGN_PROFILE("rendering::RenderEngine::Render");
 }
 
 //////////////////////////////////////////////////
 void RenderEngine::PostRender()
 {
+  IGN_PROFILE("rendering::RenderEngine::PostRender");
   // _fireFrameRenderingQueued was here for CEGUI to work. Leaving because
   // it shouldn't harm anything, and we don't want to introduce
   // a regression.
@@ -465,7 +470,7 @@ void RenderEngine::LoadPlugins()
 /////////////////////////////////////////////////
 void RenderEngine::AddResourcePath(const std::string &_uri)
 {
-  if (_uri == "__default__" || _uri.empty())
+  if (_uri.find("__default__") != std::string::npos || _uri.empty())
     return;
 
   std::string path = common::find_file_path(_uri);

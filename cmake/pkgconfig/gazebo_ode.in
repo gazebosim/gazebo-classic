@@ -1,10 +1,10 @@
 prefix=@CMAKE_INSTALL_PREFIX@
-libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
-includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+libdir=@pkgconfig_libdir@
+includedir=@pkgconfig_includedir@
 
 Name: gazebo
 Description: Gazebo Exported ODE Libraries
 Version: @GAZEBO_VERSION_FULL@
 Requires:
-Libs: -Wl,-rpath,${prefix}/@CMAKE_INSTALL_LIBDIR@ -L${prefix}/@CMAKE_INSTALL_LIBDIR@ -lgazebo_ode
+Libs: -Wl,-rpath,${libdir} -L${libdir} -lgazebo_ode
 CFlags: -I${includedir}/gazebo-@GAZEBO_MAJOR_VERSION@

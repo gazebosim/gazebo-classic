@@ -22,6 +22,9 @@
 //////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
+#ifndef _WIN32
+  ::setenv("RMT_PORT", "1501", true);
+#endif
   Q_INIT_RESOURCE(resources);
   int result = 0;
   try

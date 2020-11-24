@@ -19,6 +19,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/make_shared.hpp>
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 
@@ -1761,6 +1762,7 @@ void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 //////////////////////////////////////////////////
 void Scene::PreRender()
 {
+  IGN_PROFILE("rendering::Scene::PreRender");
   /* Deferred shading debug code. Delete me soon (July 17, 2012)
   static bool first = true;
 

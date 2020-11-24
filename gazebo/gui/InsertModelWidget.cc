@@ -49,21 +49,6 @@ using namespace gui;
 static bool gInsertModelWidgetDeleted = false;
 
 /////////////////////////////////////////////////
-// TODO: Remove this once Fuel support is fully functional
-bool usingFuel()
-{
-  auto useFuel = std::getenv("USE_IGNITION_FUEL");
-  if (!useFuel || *useFuel == '\0')
-    return false;
-
-  std::string useFuelStr(useFuel);
-  std::transform(useFuelStr.begin(), useFuelStr.end(),
-                 useFuelStr.begin(), ::tolower);
-
-  return useFuelStr != "false" && useFuelStr != "0";
-}
-
-/////////////////////////////////////////////////
 InsertModelWidget::InsertModelWidget(QWidget *_parent)
 : QWidget(_parent), dataPtr(new InsertModelWidgetPrivate)
 {
@@ -523,9 +508,6 @@ bool InsertModelWidget::IsPathAccessible(const boost::filesystem::path &_path)
 /////////////////////////////////////////////////
 void InsertModelWidget::InitializeFuelServers()
 {
-  if (!usingFuel())
-    return;
-
   // Get the list of Ignition Fuel servers.
   auto servers = common::FuelModelDatabase::Instance()->Servers();
 
@@ -550,9 +532,6 @@ void InsertModelWidget::InitializeFuelServers()
 /////////////////////////////////////////////////
 void InsertModelWidget::PopulateFuelServers()
 {
-  if (!usingFuel())
-    return;
-
   // Get the list of Ignition Fuel servers.
   auto servers = common::FuelModelDatabase::Instance()->Servers();
 

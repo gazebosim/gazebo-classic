@@ -26,7 +26,14 @@
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/Filesystem.hh>
+#include <ignition/common/URI.hh>
+#ifdef _WIN32
+  // DELETE is defined in winnt.h and causes a problem with
+  // ignition::fuel_tools::REST::DELETE
+  #undef DELETE
+#endif
 #include <ignition/fuel_tools/FuelClient.hh>
+#include <ignition/fuel_tools/WorldIdentifier.hh>
 #include <sdf/sdf.hh>
 
 #include "gazebo/gazebo_config.h"
@@ -208,31 +215,90 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
 
   if (fuelUri.Scheme() != "http" && fuelUri.Scheme() != "https")
   {
-    gzwarn << "URI not supported by Fuel [" << _uri << "]" << std::endl;
     return std::string();
   }
 
   std::string path;
+  std::string fileUrl;
+  ignition::fuel_tools::ModelIdentifier model;
+  using namespace ignition::fuel_tools;
 
-  if (!_forceDownload)
+  if ((this->dataPtr->fuelClient->ParseModelUrl(fuelUri, model) &&
+       !this->dataPtr->fuelClient->CachedModel(fuelUri, path))
+      || _forceDownload)
   {
-    if (this->dataPtr->fuelClient->CachedModel(fuelUri, path))
+    Result result_download =
+      this->dataPtr->fuelClient->DownloadModel(fuelUri, path);
+    if (result_download != Result(ResultType::FETCH) ||
+      result_download != Result(ResultType::FETCH_ALREADY_EXISTS))
     {
-      return path;
+      gzerr << "Unable to download model[" << _uri << "]" << std::endl;
+      return std::string();
+    }
+    else
+    {
+        gzmsg << "Downloaded model URL: " << std::endl
+              << "          " << _uri << std::endl
+              << "      to: " << std::endl
+              << "          " << path << std::endl;
+    }
+  }
+  if (path.empty()) {
+    if ((this->dataPtr->fuelClient->ParseModelFileUrl(fuelUri, model, fileUrl) &&
+        !this->dataPtr->fuelClient->CachedModelFile(fuelUri, path))
+      || _forceDownload)
+    {
+      auto modelUri = _uri.substr(0,
+          _uri.find("files", model.UniqueName().size())-1);
+      Result result_download =
+        this->dataPtr->fuelClient->DownloadModel(ignition::common::URI(modelUri), path);
+      if (result_download != Result(ResultType::FETCH) ||
+        result_download != Result(ResultType::FETCH_ALREADY_EXISTS))
+      {
+        gzerr << "Unable to download model[" << _uri << "]" << std::endl;
+        return std::string();
+      }
+      else
+      {
+          gzmsg << "Downloaded model URL: " << std::endl
+                << "          " << _uri << std::endl
+                << "      to: " << std::endl
+                << "          " << path << std::endl;
+          path += "/" + fileUrl;
+      }
     }
   }
 
-  if (!this->dataPtr->fuelClient->DownloadModel(fuelUri, path))
+  return path;
+}
+
+/////////////////////////////////////////////////
+std::string FuelModelDatabase::WorldPath(const std::string &_uri, const bool _forceDownload)
+{
+  auto fuelUri = ignition::common::URI(_uri);
+
+  if (fuelUri.Scheme() != "http" && fuelUri.Scheme() != "https")
   {
-    gzerr << "Unable to download model[" << _uri << "]" << std::endl;
     return std::string();
   }
-  else
+
+  std::string path;
+  std::string fileUrl;
+  ignition::fuel_tools::WorldIdentifier world;
+
+  if ((this->dataPtr->fuelClient->ParseWorldUrl(fuelUri, world) &&
+      !this->dataPtr->fuelClient->CachedWorld(fuelUri, path)) || _forceDownload)
   {
-      gzmsg << "Downloaded model URL: " << std::endl
-            << "          " << _uri << std::endl
-            << "      to: " << std::endl
-            << "          " << path << std::endl;
+    this->dataPtr->fuelClient->DownloadWorld(fuelUri, path);
+  }
+  // Download the world, if it's a world file URI
+  else if (this->dataPtr->fuelClient->ParseWorldFileUrl(fuelUri, world, fileUrl) &&
+      !this->dataPtr->fuelClient->CachedWorldFile(fuelUri, path))
+  {
+    auto worldUri = _uri.substr(0,
+        _uri.find("files", world.UniqueName().size())-1);
+    this->dataPtr->fuelClient->DownloadWorld(ignition::common::URI(worldUri), path);
+    path += "/" + fileUrl;
   }
 
   return path;
@@ -256,4 +322,3 @@ std::string FuelModelDatabase::CachedFilePath(const std::string &_uri)
 
   return path;
 }
-
