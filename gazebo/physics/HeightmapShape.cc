@@ -120,7 +120,7 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
       {
         this->dem.GetGeoReferenceOrigin(latitude, longitude);
       }
-      catch(const common::Exception &_e)
+      catch(const common::Exception &)
       {
         gzwarn << "DEM coordinate transformation error. "
                << "SphericalCoordiantes and GpsSensor may not function properly."
