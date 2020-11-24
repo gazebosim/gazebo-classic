@@ -25,6 +25,7 @@
 #include <ignition/common/Filesystem.hh>
 #include <sdf/parser.hh>
 
+#include "test_config.h"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "test/util.hh"
@@ -259,20 +260,19 @@ TEST_F(CommonIface_TEST, directoryOps)
 /////////////////////////////////////////////////
 TEST_F(CommonIface_TEST, asFullPath)
 {
-  const std::string relativeUriUnix{"meshes/collision.dae"};
-  const std::string relativeUriWindows{"meshes\\collision.dae"};
-  const std::string absoluteUriUnix{"/path/to/collision.dae"};
-  const std::string absoluteUriWindows{"C:\\path\\to\\collision.dae"};
-  const std::string schemeUri{"https://website.com/collision.dae"};
+  auto src = std::string(PROJECT_SOURCE_PATH);
+
+  const auto relativeUri = ignition::common::joinPaths("data", "box.dae");
+  const auto absoluteUri = ignition::common::joinPaths(src, "test", "data",
+      "box.dae");
+  const auto schemeUri{"https://website.com/collision.dae"};
 
   // Empty path
   {
     const std::string path{""};
 
-    EXPECT_EQ(relativeUriUnix, common::asFullPath(relativeUriUnix, path));
-    EXPECT_EQ(relativeUriWindows, common::asFullPath(relativeUriWindows, path));
-    EXPECT_EQ(absoluteUriUnix, common::asFullPath(absoluteUriUnix, path));
-    EXPECT_EQ(absoluteUriWindows, common::asFullPath(absoluteUriWindows, path));
+    EXPECT_EQ(relativeUri, common::asFullPath(relativeUri, path));
+    EXPECT_EQ(absoluteUri, common::asFullPath(absoluteUri, path));
     EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
   }
 
@@ -280,72 +280,38 @@ TEST_F(CommonIface_TEST, asFullPath)
   {
     const std::string path{"data-string"};
 
-    EXPECT_EQ(relativeUriUnix, common::asFullPath(relativeUriUnix, path));
-    EXPECT_EQ(relativeUriWindows, common::asFullPath(relativeUriWindows, path));
-    EXPECT_EQ(absoluteUriUnix, common::asFullPath(absoluteUriUnix, path));
-    EXPECT_EQ(absoluteUriWindows, common::asFullPath(absoluteUriWindows, path));
+    EXPECT_EQ(relativeUri, common::asFullPath(relativeUri, path));
+    EXPECT_EQ(absoluteUri, common::asFullPath(absoluteUri, path));
     EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
   }
 
-#ifdef _WIN32
   {
-    // Absolute Windows path
-    const std::string path{"C:\\abs\\path\\file"};
+    // Absolute path
+    const auto path = ignition::common::joinPaths(src, "test", "path");
 
     // Directory
-    EXPECT_EQ("C:\\abs\\path\\meshes\\collision.dae",
-        common::asFullPath(relativeUriUnix, path));
-    EXPECT_EQ("C:\\abs\\path\\meshes\\collision.dae",
-        common::asFullPath(relativeUriWindows, path));
-    // TODO(anyone) Support absolute Unix-style URIs on Windows
-    EXPECT_EQ(absoluteUriWindows, common::asFullPath(absoluteUriWindows, path));
+    EXPECT_EQ(ignition::common::joinPaths(src, "test", "data", "box.dae"),
+        common::asFullPath(relativeUri, path));
+    EXPECT_EQ(absoluteUri, common::asFullPath(absoluteUri, path));
     EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
 
     // File
-    auto filePath = ignition::common::joinPaths(path, "file.sdf");
-
-    EXPECT_EQ("C:\\abs\\path\\file\\meshes\\collision.dae",
-        common::asFullPath(relativeUriUnix, filePath));
-    EXPECT_EQ("C:\\abs\\path\\file\\meshes\\collision.dae",
-        common::asFullPath(relativeUriWindows, filePath));
-    // TODO(anyone) Support absolute Unix-style URIs on Windows
-    EXPECT_EQ(absoluteUriWindows, common::asFullPath(absoluteUriWindows,
-        filePath));
+    const auto filePath = ignition::common::joinPaths(src, "test", "file.sdf");
+    EXPECT_EQ(ignition::common::joinPaths(src, "test", "data", "box.dae"),
+        common::asFullPath(relativeUri, filePath));
+    EXPECT_EQ(absoluteUri, common::asFullPath(absoluteUri, filePath));
     EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, filePath));
   }
-#else
-  {
-    // Absolute Unix path
-    const std::string path{"/abs/path/file"};
-
-    // Directory
-    EXPECT_EQ("/abs/path/meshes/collision.dae",
-        common::asFullPath(relativeUriUnix, path));
-    EXPECT_EQ("/abs/path/meshes/collision.dae",
-        common::asFullPath(relativeUriWindows, path));
-    EXPECT_EQ(absoluteUriUnix, common::asFullPath(absoluteUriUnix, path));
-    // TODO(anyone) Support absolute Windows paths on Unix
-    EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
-
-    // File
-    auto filePath = ignition::common::joinPaths(path, "file.sdf");
-
-    EXPECT_EQ("/abs/path/file/meshes/collision.dae",
-        common::asFullPath(relativeUriUnix, filePath));
-    EXPECT_EQ("/abs/path/file/meshes/collision.dae",
-        common::asFullPath(relativeUriWindows, filePath));
-    EXPECT_EQ(absoluteUriUnix, common::asFullPath(absoluteUriUnix, filePath));
-    // TODO(anyone) Support absolute Windows paths on Unix
-    EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, filePath));
-  }
-#endif
 }
 
 /////////////////////////////////////////////////
 TEST_F(CommonIface_TEST, fullPathsMesh)
 {
-  std::string filePath{"/tmp/model.sdf"};
-  std::string relativePath{"meshes/collision.dae"};
+  auto path = ignition::common::joinPaths(std::string(PROJECT_SOURCE_PATH),
+      "test");
+
+  std::string filePath = ignition::common::joinPaths(path, "model.sdf");
+  std::string relativePath = ignition::common::joinPaths("data", "box.dae");
 
   std::stringstream ss;
   ss << "<sdf version='" << SDF_VERSION << "'>"
@@ -419,7 +385,7 @@ TEST_F(CommonIface_TEST, fullPathsMesh)
     auto uriElem = meshElem->GetElement("uri");
     ASSERT_NE(nullptr, uriElem);
 
-    EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
+    EXPECT_EQ(ignition::common::joinPaths(path, relativePath),
         uriElem->Get<std::string>());
   }
 
@@ -447,7 +413,7 @@ TEST_F(CommonIface_TEST, fullPathsMesh)
     auto uriElem = meshElem->GetElement("uri");
     ASSERT_NE(nullptr, uriElem);
 
-    EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
+    EXPECT_EQ(ignition::common::joinPaths(path, relativePath),
         uriElem->Get<std::string>());
   }
 }
@@ -455,8 +421,11 @@ TEST_F(CommonIface_TEST, fullPathsMesh)
 /////////////////////////////////////////////////
 TEST_F(CommonIface_TEST, fullPathsActor)
 {
-  std::string filePath{"/tmp/actor.sdf"};
-  std::string relativePath{"meshes/walk.dae"};
+  auto path = ignition::common::joinPaths(std::string(PROJECT_SOURCE_PATH),
+      "test");
+
+  std::string filePath = ignition::common::joinPaths(path, "model.sdf");
+  std::string relativePath = ignition::common::joinPaths("data", "box.dae");
 
   std::stringstream ss;
   ss << "<sdf version='" << SDF_VERSION << "'>"
@@ -499,14 +468,14 @@ TEST_F(CommonIface_TEST, fullPathsActor)
   ASSERT_NE(nullptr, skinElem);
   skinFilenameElem = skinElem->GetElement("filename");
   ASSERT_NE(nullptr, skinFilenameElem);
-  EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
+  EXPECT_EQ(ignition::common::joinPaths(path, relativePath),
       skinFilenameElem->Get<std::string>());
 
   animationElem = actorElem->GetElement("animation");
   ASSERT_NE(nullptr, animationElem);
   animationFilenameElem = animationElem->GetElement("filename");
   ASSERT_NE(nullptr, animationFilenameElem);
-  EXPECT_EQ(ignition::common::joinPaths("/tmp", relativePath),
+  EXPECT_EQ(ignition::common::joinPaths(path, relativePath),
       animationFilenameElem->Get<std::string>());
 }
 
