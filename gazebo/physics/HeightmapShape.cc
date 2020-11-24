@@ -116,7 +116,16 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
       ignition::math::Angle latitude, longitude;
       double elevation;
 
-      this->dem.GetGeoReferenceOrigin(latitude, longitude);
+      try
+      {
+        this->dem.GetGeoReferenceOrigin(latitude, longitude);
+      }
+      catch(const common::Exception &)
+      {
+        gzwarn << "DEM coordinate transformation error. "
+               << "SphericalCoordiantes and GpsSensor may not function properly."
+               << std::endl;
+      }
       elevation = this->dem.GetElevation(0.0, 0.0);
 
       sphericalCoordinates->SetLatitudeReference(latitude);
@@ -125,7 +134,9 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
       sphericalCoordinates.reset();
     }
     else
+    {
       gzerr << "Unable to get a valid SphericalCoordinates pointer\n";
+    }
 
     return 0;
   }
