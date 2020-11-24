@@ -2,6 +2,8 @@
 
 ## Gazebo 9.xx.x (202x-xx-xx)
 
+## Gazebo 9.16.0 (2020-11-24)
+
 1. Updated the version of TinyOBJLoader from 1.0.0 to 2.0.0rc8.
     * [Pull request #2885](https://github.com/osrf/gazebo/pull/2885)
 
@@ -10,6 +12,18 @@
 
 1. Fix physics based sensor update rate in lockstep mode
     * [Pull request #2863](https://github.com/osrf/gazebo/pull/2863)
+
+1. Added Profiler to gazebo::rendering and gzclient
+    * [Pull request #2836](https://github.com/osrf/gazebo/pull/2836)
+
+1. Fix segfault when deleting an model that's being manipulated
+    * [Pull request #2856](https://github.com/osrf/gazebo/pull/2856)
+
+1. SimpleTrackedVehiclePlugin: fix for boost 1.74
+    * [Pull request #2865](https://github.com/osrf/gazebo/pull/2865)
+
+1. Add mutex to make Sensor::SetActive threadsafe
+    * [Pull request #2871](https://github.com/osrf/gazebo/pull/2871)
 
 ## Gazebo 9.15.0 (2020-09-30)
 
