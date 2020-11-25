@@ -14,7 +14,7 @@
     <actor name="actor">
       <pose>2 2 2 0 0 0</pose>
       <skin>
-        <filename>walk.dae</filename>
+        <filename>file://media/models/walk.dae</filename>
       </skin>
       <animation name="anim">
         <filename>cmu-13_26.bvh</filename>

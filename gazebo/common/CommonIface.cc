@@ -513,7 +513,13 @@ std::string common::asFullPath(const std::string &_uri,
 #endif
 
   // Use platform-specific separator
-  return ignition::common::joinPaths(path,  uri);
+  auto result = ignition::common::joinPaths(path,  uri);
+
+  // If result doesn't exist, return it unchanged
+  if (!exists(result))
+    return _uri;
+
+  return result;
 }
 
 //////////////////////////////////////////////////

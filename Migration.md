@@ -5,6 +5,14 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 11.1 to 11.3
+
+The way Gazebo handles relative paths in SDF files has changed:
+
+* Until `11.1.0`: relative paths could only be resolved against environment variables `GAZEBO_MODEL_PATH` / `GAZEBO_RESOURCE_PATH`.
+* On `11.2.0`: relative paths loaded from SDF files can only be resolved against the SDF file - the previous use case was broken by mistake.
+* From `11.3.0`: relative paths are first resolved against the SDF file, and if that fails, fallback to the environment variables.
+
 ## Gazebo 10.x to 11.0
 
 ### Build system
