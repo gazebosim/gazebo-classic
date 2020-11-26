@@ -2,39 +2,69 @@
 
 ## Gazebo 11.x.x (202x-xx-xx)
 
+## Gazebo 11.3.0 (2020-11-26)
+
+1. Added profiler to gazebo::rendering and gzclient
+    * [Pull request #2837](https://github.com/osrf/gazebo/pull/2837)
+
+1. SimpleTrackedVehiclePlugin: fix for boost 1.74
+    * [Pull request #2862](https://github.com/osrf/gazebo/pull/2862)
+
+1. Add support to compile the gazebo executable on Windows
+    * [Pull request #2864](https://github.com/osrf/gazebo/pull/2864)
+
+1. Support platforms in which qwt headers are not installed in a qwt directory
+    * [Issue #2886](https://github.com/osrf/gazebo/issues/2886)
+    * [Pull request #2887](https://github.com/osrf/gazebo/pull/2887)
+
+1. Warn instead of fail for non-Earth Dem's on 20.04
+    * [Pull request #2882](https://github.com/osrf/gazebo/pull/2882)
+
+1. SearchForStuff: On Apple platforms do not search for uuid library
+    * [Pull request #2878](https://github.com/osrf/gazebo/pull/2878)
+
+1. Fix usage of relative paths with environment variables
+    * [Pull request #2890](https://github.com/osrf/gazebo/pull/2890)
+
+1. Support resource files with spaces
+    * [Pull request #2877](https://github.com/osrf/gazebo/pull/2877)
+
+1. Update TinyOBJLoader to v2.0.0rc8
+    * [Pull request #2885](https://github.com/osrf/gazebo/pull/2885)
+
 ## Gazebo 11.2.0 (2020-09-30)
 
 1. Fix assumptions that CMAKE\_INSTALL\_\*DIR paths are relative
-    * [Issue #2778](https://github.com/osrf/gazebo/issues/2778)
+    * [Pull request #2778](https://github.com/osrf/gazebo/pull/2778)
 
 1. Accept relative paths in SDF files
-    * [Issue #2765](https://github.com/osrf/gazebo/issues/2765)
-    * [Issue #2839](https://github.com/osrf/gazebo/issues/2839)
+    * [Pull request #2765](https://github.com/osrf/gazebo/pull/2765)
+    * [Pull request #2839](https://github.com/osrf/gazebo/pull/2839)
 
 1. Add support for frame semantics with nested models in SDFormat 1.7
-    * [Issue #2824](https://github.com/osrf/gazebo/issues/2824)
+    * [Pull request #2824](https://github.com/osrf/gazebo/pull/2824)
 
 1. Fix Actor collision if loop / auto_start false
-    * [Issue #2773](https://github.com/osrf/gazebo/issues/2773)
+    * [Pull request #2773](https://github.com/osrf/gazebo/pull/2773)
 
 1. Allow gazebo to download models from Fuel in the sdf files, and worlds from command line
-    * [Issue #2822](https://github.com/osrf/gazebo/issues/2822)
+    * [Pull request #2822](https://github.com/osrf/gazebo/pull/2822)
 
 1. Publish performance metrics
-    * [Issue #2819](https://github.com/osrf/gazebo/issues/2819)
+    * [Pull request #2819](https://github.com/osrf/gazebo/pull/2819)
 
 1. Find OGRE correctly in a system with pkg-config but without OGRE .pc files
-    * [Issue #2719](https://github.com/osrf/gazebo/issues/2719)
+    * [Pull request #2719](https://github.com/osrf/gazebo/pull/2719)
 
 ## Gazebo 11.1.0 (2020-08-12)
 
 1. Synchronize time stepping of physics and sensors with `--lockstep`
     * [Issue #2736](https://github.com/osrf/gazebo/issues/2736)
-    * [Pull request #2791](https://github.com/osrf/gazebo/issues/2791)
-    * [Pull request #2799](https://github.com/osrf/gazebo/issues/2799)
-    * [Pull request #2802](https://github.com/osrf/gazebo/issues/2802)
-    * [Pull request #2761](https://github.com/osrf/gazebo/issues/2761)
-    * [Pull request #2746](https://github.com/osrf/gazebo/issues/2746)
+    * [Pull request #2791](https://github.com/osrf/gazebo/pull/2791)
+    * [Pull request #2799](https://github.com/osrf/gazebo/pull/2799)
+    * [Pull request #2802](https://github.com/osrf/gazebo/pull/2802)
+    * [Pull request #2761](https://github.com/osrf/gazebo/pull/2761)
+    * [Pull request #2746](https://github.com/osrf/gazebo/pull/2746)
 
 1. Enable DART support in gazebo11 .deb packages
     * [Issue #2752](https://github.com/osrf/gazebo/issues/2752)
