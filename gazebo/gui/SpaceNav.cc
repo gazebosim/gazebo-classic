@@ -147,8 +147,8 @@ void SpaceNav::Run()
   {
     msgs::Joystick joystickMsg;
 
-    // add button state
-    for (unsigned int i = 0; i < 2; ++i)
+    // add button state (26 bouttons)
+    for (unsigned int i = 0; i < 26; ++i)
       joystickMsg.add_buttons(this->dataPtr->buttons[i]);
 
     // bool joyStale = false;
@@ -163,9 +163,16 @@ void SpaceNav::Run()
 
       case SPNAV_EVENT_BUTTON:
         // update button press
-        this->dataPtr->buttons[sev.button.bnum] = sev.button.press;
-        joystickMsg.mutable_buttons()->Set(sev.button.bnum, sev.button.press);
-        this->dataPtr->joyPub->Publish(joystickMsg);
+         if (sev.button.bnum < 26)
+        {
+            this->dataPtr->buttons[sev.button.bnum] = sev.button.press;
+            joystickMsg.mutable_buttons()->Set(sev.button.bnum, sev.button.press);
+            this->dataPtr->joyPub->Publish(joystickMsg);
+        }
+        else
+        {
+            gzlog << "Spacenav bouton unknown id \n";
+        }
         break;
 
       case SPNAV_EVENT_MOTION:
