@@ -19,6 +19,8 @@
  */
 #include <boost/bind.hpp>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
@@ -69,6 +71,7 @@ ContactVisual::~ContactVisual()
 /////////////////////////////////////////////////
 void ContactVisual::Update()
 {
+  IGN_PROFILE("rendering::ContactVisual::Update");
   ContactVisualPrivate *dPtr =
       reinterpret_cast<ContactVisualPrivate *>(this->dataPtr);
 

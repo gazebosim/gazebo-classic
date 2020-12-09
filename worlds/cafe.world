@@ -80,11 +80,11 @@
     <actor name="actor1">
       <pose>0 1 1.25 0 0 0</pose>
       <skin>
-        <filename>walk.dae</filename>
+        <filename>file://media/models/walk.dae</filename>
         <scale>1.0</scale>
       </skin>
       <animation name="walking">
-        <filename>walk.dae</filename>
+        <filename>file://media/models/walk.dae</filename>
         <scale>1.000000</scale>
         <interpolate_x>true</interpolate_x>
       </animation>
@@ -106,11 +106,11 @@
     <actor name="actor2">
       <pose>-2 -2 1.25 0 0 0</pose>
       <skin>
-        <filename>walk.dae</filename>
+        <filename>file://media/models/walk.dae</filename>
         <scale>1.0</scale>
       </skin>
       <animation name="walking">
-        <filename>walk.dae</filename>
+        <filename>file://media/models/walk.dae</filename>
         <scale>1.000000</scale>
         <interpolate_x>true</interpolate_x>
       </animation>

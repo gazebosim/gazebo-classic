@@ -22,6 +22,10 @@
 #include <sstream>
 #include <boost/filesystem.hpp>
 
+#include <ignition/common/Filesystem.hh>
+#include <sdf/parser.hh>
+
+#include "test_config.h"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "test/util.hh"
@@ -251,6 +255,228 @@ TEST_F(CommonIface_TEST, directoryOps)
   EXPECT_TRUE(common::copyDir(src, dest));
   EXPECT_TRUE(common::exists(destFile2Path.string()));
   EXPECT_FALSE(common::exists(destFilePath.string()));
+}
+
+/////////////////////////////////////////////////
+TEST_F(CommonIface_TEST, asFullPath)
+{
+  auto src = std::string(PROJECT_SOURCE_PATH);
+
+  const auto relativeUri = ignition::common::joinPaths("data", "box.dae");
+  const auto absoluteUri = ignition::common::joinPaths(src, "test", "data",
+      "box.dae");
+  const auto schemeUri{"https://website.com/collision.dae"};
+
+  // Empty path
+  {
+    const std::string path{""};
+
+    EXPECT_EQ(relativeUri, common::asFullPath(relativeUri, path));
+    EXPECT_EQ(absoluteUri, common::asFullPath(absoluteUri, path));
+    EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
+  }
+
+  // Data string
+  {
+    const std::string path{"data-string"};
+
+    EXPECT_EQ(relativeUri, common::asFullPath(relativeUri, path));
+    EXPECT_EQ(absoluteUri, common::asFullPath(absoluteUri, path));
+    EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
+  }
+
+  {
+    // Absolute path
+    const auto path = ignition::common::joinPaths(src, "test", "path");
+
+    // Directory
+    EXPECT_EQ(ignition::common::joinPaths(src, "test", "data", "box.dae"),
+        common::asFullPath(relativeUri, path));
+    EXPECT_EQ(absoluteUri, common::asFullPath(absoluteUri, path));
+    EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, path));
+
+    // File
+    const auto filePath = ignition::common::joinPaths(src, "test", "file.sdf");
+    EXPECT_EQ(ignition::common::joinPaths(src, "test", "data", "box.dae"),
+        common::asFullPath(relativeUri, filePath));
+    EXPECT_EQ(absoluteUri, common::asFullPath(absoluteUri, filePath));
+    EXPECT_EQ(schemeUri, common::asFullPath(schemeUri, filePath));
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(CommonIface_TEST, fullPathsMesh)
+{
+  auto path = ignition::common::joinPaths(std::string(PROJECT_SOURCE_PATH),
+      "test");
+
+  std::string filePath = ignition::common::joinPaths(path, "model.sdf");
+  std::string relativePath = ignition::common::joinPaths("data", "box.dae");
+
+  std::stringstream ss;
+  ss << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='mesh_model'>"
+    << "<link name ='link'>"
+    << "  <collision name ='collision'>"
+    << "    <geometry>"
+    << "      <mesh>"
+    << "        <uri>" << relativePath << "</uri>"
+    << "      </mesh>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << "      <mesh><uri>" << relativePath << "</uri></mesh>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  auto modelElem = std::make_shared<sdf::Element>();
+  sdf::initFile("model.sdf", modelElem);
+  sdf::readString(ss.str(), modelElem);
+
+  // Before conversion
+  ASSERT_NE(nullptr, modelElem);
+
+  auto linkElem = modelElem->GetElement("link");
+  ASSERT_NE(nullptr, linkElem);
+
+  for (auto elemStr : {"collision", "visual"})
+  {
+    auto elem = linkElem->GetElement(elemStr);
+    ASSERT_NE(nullptr, elem);
+
+    auto geometryElem = elem->GetElement("geometry");
+    ASSERT_NE(nullptr, geometryElem);
+
+    auto meshElem = geometryElem->GetElement("mesh");
+    ASSERT_NE(nullptr, meshElem);
+
+    auto uriElem = meshElem->GetElement("uri");
+    ASSERT_NE(nullptr, uriElem);
+
+    EXPECT_EQ(relativePath, uriElem->Get<std::string>());
+    uriElem->SetFilePath(filePath);
+  }
+
+  auto sdfString = modelElem->ToString("");
+
+  // SDF element conversion
+  common::convertToFullPaths(modelElem);
+
+  ASSERT_NE(nullptr, modelElem);
+
+  linkElem = modelElem->GetElement("link");
+  ASSERT_NE(nullptr, linkElem);
+
+  for (auto elemStr : {"collision", "visual"})
+  {
+    auto elem = linkElem->GetElement(elemStr);
+    ASSERT_NE(nullptr, elem);
+
+    auto geometryElem = elem->GetElement("geometry");
+    ASSERT_NE(nullptr, geometryElem);
+
+    auto meshElem = geometryElem->GetElement("mesh");
+    ASSERT_NE(nullptr, meshElem);
+
+    auto uriElem = meshElem->GetElement("uri");
+    ASSERT_NE(nullptr, uriElem);
+
+    EXPECT_EQ(ignition::common::joinPaths(path, relativePath),
+        uriElem->Get<std::string>());
+  }
+
+
+  // SDF string conversion
+  sdfString = "<sdf version='" + std::string(SDF_VERSION) + "'>\n" + sdfString +
+      "\n</sdf>";
+  common::convertToFullPaths(sdfString, modelElem->FilePath());
+  sdf::readString(sdfString, modelElem);
+
+  linkElem = modelElem->GetElement("link");
+  ASSERT_NE(nullptr, linkElem);
+
+  for (auto elemStr : {"collision", "visual"})
+  {
+    auto elem = linkElem->GetElement(elemStr);
+    ASSERT_NE(nullptr, elem);
+
+    auto geometryElem = elem->GetElement("geometry");
+    ASSERT_NE(nullptr, geometryElem);
+
+    auto meshElem = geometryElem->GetElement("mesh");
+    ASSERT_NE(nullptr, meshElem);
+
+    auto uriElem = meshElem->GetElement("uri");
+    ASSERT_NE(nullptr, uriElem);
+
+    EXPECT_EQ(ignition::common::joinPaths(path, relativePath),
+        uriElem->Get<std::string>());
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(CommonIface_TEST, fullPathsActor)
+{
+  auto path = ignition::common::joinPaths(std::string(PROJECT_SOURCE_PATH),
+      "test");
+
+  std::string filePath = ignition::common::joinPaths(path, "model.sdf");
+  std::string relativePath = ignition::common::joinPaths("data", "box.dae");
+
+  std::stringstream ss;
+  ss << "<sdf version='" << SDF_VERSION << "'>"
+    << "<actor name='actor_test'>"
+    << "  <skin>"
+    << "    <filename>" << relativePath << "</filename>"
+    << "  </skin>"
+    << "  <animation name='walk'>"
+    << "    <filename>" << relativePath << "</filename>"
+    << "  </animation>"
+    << "</actor>"
+    << "</sdf>";
+
+  auto actorElem = std::make_shared<sdf::Element>();
+  sdf::initFile("actor.sdf", actorElem);
+  sdf::readString(ss.str(), actorElem);
+
+  // Before conversion
+  ASSERT_NE(nullptr, actorElem);
+
+  auto skinElem = actorElem->GetElement("skin");
+  ASSERT_NE(nullptr, skinElem);
+  auto skinFilenameElem = skinElem->GetElement("filename");
+  ASSERT_NE(nullptr, skinFilenameElem);
+  EXPECT_EQ(relativePath, skinFilenameElem->Get<std::string>());
+  skinFilenameElem->SetFilePath(filePath);
+
+  auto animationElem = actorElem->GetElement("animation");
+  ASSERT_NE(nullptr, animationElem);
+  auto animationFilenameElem = animationElem->GetElement("filename");
+  ASSERT_NE(nullptr, animationFilenameElem);
+  EXPECT_EQ(relativePath, animationFilenameElem->Get<std::string>());
+  animationFilenameElem->SetFilePath(filePath);
+
+  // SDF element conversion
+  common::convertToFullPaths(actorElem);
+  ASSERT_NE(nullptr, actorElem);
+
+  skinElem = actorElem->GetElement("skin");
+  ASSERT_NE(nullptr, skinElem);
+  skinFilenameElem = skinElem->GetElement("filename");
+  ASSERT_NE(nullptr, skinFilenameElem);
+  EXPECT_EQ(ignition::common::joinPaths(path, relativePath),
+      skinFilenameElem->Get<std::string>());
+
+  animationElem = actorElem->GetElement("animation");
+  ASSERT_NE(nullptr, animationElem);
+  animationFilenameElem = animationElem->GetElement("filename");
+  ASSERT_NE(nullptr, animationFilenameElem);
+  EXPECT_EQ(ignition::common::joinPaths(path, relativePath),
+      animationFilenameElem->Get<std::string>());
 }
 
 /////////////////////////////////////////////////

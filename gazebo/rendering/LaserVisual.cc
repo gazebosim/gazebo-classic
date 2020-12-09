@@ -16,6 +16,7 @@
 */
 
 #include <boost/bind.hpp>
+#include <ignition/common/Profiler.hh>
 
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
@@ -89,6 +90,7 @@ void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
 /////////////////////////////////////////////////
 void LaserVisual::Update()
 {
+  IGN_PROFILE("rendering::LaserVisual::Update");
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
 

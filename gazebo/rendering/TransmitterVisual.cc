@@ -16,6 +16,8 @@
 */
 #include <boost/bind.hpp>
 
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -88,6 +90,7 @@ void TransmitterVisual::OnNewPropagationGrid(ConstPropagationGridPtr &_msg)
 ////////////////////////////////////////////////
 void TransmitterVisual::Update()
 {
+  IGN_PROFILE("rendering::TransmitterVisual::Update");
   TransmitterVisualPrivate *dPtr =
       reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);
 

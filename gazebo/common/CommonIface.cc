@@ -36,13 +36,23 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
+#include <sdf/sdf.hh>
+
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/ffmpeg_inc.h>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/FuelModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
+
+#ifdef _WIN32
+  // DELETE is defined in winnt.h and causes a problem with
+  // ignition::fuel_tools::REST::DELETE
+  #undef DELETE
+#endif
+#include "ignition/fuel_tools/Interface.hh"
 
 using namespace gazebo;
 
@@ -154,13 +164,23 @@ void common::add_search_path_suffix(const std::string &_suffix)
 /////////////////////////////////////////////////
 std::string common::find_file(const std::string &_file)
 {
-  return common::SystemPaths::Instance()->FindFile(_file, true);
+  std::string path = common::FuelModelDatabase::Instance()->ModelPath(_file);
+  if (path.empty())
+  {
+    path = common::SystemPaths::Instance()->FindFile(_file, true);
+  }
+  return path;
 }
 
 /////////////////////////////////////////////////
 std::string common::find_file(const std::string &_file, bool _searchLocalPath)
 {
-  return common::SystemPaths::Instance()->FindFile(_file, _searchLocalPath);
+  std::string path = common::FuelModelDatabase::Instance()->ModelPath(_file);
+  if (path.empty())
+  {
+    path = common::SystemPaths::Instance()->FindFile(_file, _searchLocalPath);
+  }
+  return path;
 }
 
 /////////////////////////////////////////////////
@@ -493,7 +513,13 @@ std::string common::asFullPath(const std::string &_uri,
 #endif
 
   // Use platform-specific separator
-  return ignition::common::joinPaths(path,  uri);
+  auto result = ignition::common::joinPaths(path,  uri);
+
+  // If result doesn't exist, return it unchanged
+  if (!exists(result))
+    return _uri;
+
+  return result;
 }
 
 //////////////////////////////////////////////////

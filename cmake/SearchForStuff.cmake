@@ -333,21 +333,6 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find OGRE
-  if (PKG_CONFIG_EXECUTABLE AND NOT DEFINED OGRE_VERSION)
-    execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --modversion OGRE
-                    OUTPUT_VARIABLE OGRE_VERSION)
-    string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
-
-    string (REGEX REPLACE "^([0-9]+).*" "\\1"
-      OGRE_MAJOR_VERSION "${OGRE_VERSION}")
-    string (REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1"
-      OGRE_MINOR_VERSION "${OGRE_VERSION}")
-    string (REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1"
-      OGRE_PATCH_VERSION ${OGRE_VERSION})
-
-    set(OGRE_VERSION
-      ${OGRE_MAJOR_VERSION}.${OGRE_MINOR_VERSION}.${OGRE_PATCH_VERSION})
-  endif()
 
   pkg_check_modules(OGRE-RTShaderSystem
                     OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
@@ -365,6 +350,36 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
+  
+  if (PKG_CONFIG_EXECUTABLE AND OGRE_FOUND AND NOT DEFINED OGRE_VERSION)
+    execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --modversion OGRE
+                    OUTPUT_VARIABLE OGRE_VERSION)
+    string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
+
+    string (REGEX REPLACE "^([0-9]+).*" "\\1"
+      OGRE_MAJOR_VERSION "${OGRE_VERSION}")
+    string (REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1"
+      OGRE_MINOR_VERSION "${OGRE_VERSION}")
+    string (REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1"
+      OGRE_PATCH_VERSION ${OGRE_VERSION})
+
+    set(OGRE_VERSION
+      ${OGRE_MAJOR_VERSION}.${OGRE_MINOR_VERSION}.${OGRE_PATCH_VERSION})
+  endif()
+  
+  # Also find OGRE's plugin directory, which is provided in its .pc file as the
+  # `plugindir` variable.  We have to call pkg-config manually to get it.
+  if (PKG_CONFIG_EXECUTABLE AND OGRE_FOUND)
+    execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=plugindir OGRE
+                    OUTPUT_VARIABLE _pkgconfig_invoke_result
+                    RESULT_VARIABLE _pkgconfig_failed)
+    if(_pkgconfig_failed)
+      BUILD_WARNING ("Failed to find OGRE's plugin directory.  The build will succeed, but gazebo will likely fail to run.")
+    else()
+      # This variable will be substituted into cmake/setup.sh.in
+      set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
+    endif()
+  endif()
 
   if (NOT OGRE_FOUND)
     # Workaround for CMake bug https://gitlab.kitware.com/cmake/cmake/issues/17135,
@@ -426,20 +441,6 @@ if (PKG_CONFIG_FOUND)
 
   set (OGRE_INCLUDE_DIRS ${ogre_include_dirs}
        CACHE INTERNAL "Ogre include path")
-
-  # Also find OGRE's plugin directory, which is provided in its .pc file as the
-  # `plugindir` variable.  We have to call pkg-config manually to get it.
-  if (PKG_CONFIG_EXECUTABLE)
-    execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=plugindir OGRE
-                    OUTPUT_VARIABLE _pkgconfig_invoke_result
-                    RESULT_VARIABLE _pkgconfig_failed)
-    if(_pkgconfig_failed)
-      BUILD_WARNING ("Failed to find OGRE's plugin directory.  The build will succeed, but gazebo will likely fail to run.")
-    else()
-      # This variable will be substituted into cmake/setup.sh.in
-      set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
-    endif()
-  endif()
 
   ########################################
   # Check and find libccd (if needed)
@@ -606,7 +607,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set(SDF_MIN_REQUIRED_VERSION 9.1)
+set(SDF_MIN_REQUIRED_VERSION 9.3)
 find_package(sdformat9 ${SDF_MIN_REQUIRED_VERSION} REQUIRED)
 if (sdformat9_FOUND)
   message (STATUS "Looking for SDFormat9  - found")
@@ -699,9 +700,10 @@ endif()
 
 ########################################
 # Find uuid
-#  - In UNIX we use uuid library.
+#  - In UNIX if not APPLE we use uuid library.
+#  - On APPLE we use the uuid library provided by the OS's SDK.
 #  - In Windows the native RPC call, no dependency needed.
-if (UNIX)
+if (UNIX AND NOT APPLE)
   pkg_check_modules(uuid uuid)
   if (uuid_FOUND)
     message (STATUS "Looking for uuid - found")
@@ -710,6 +712,9 @@ if (UNIX)
     set (HAVE_UUID FALSE)
     BUILD_WARNING ("uuid-dev library not found - Gazebo will not have uuid support.")
   endif ()
+elseif(APPLE)
+  message (STATUS "Using macOS-provided uuid library")
+  set (HAVE_UUID TRUE)
 else()
   message (STATUS "Using Windows RPC UuidCreate function")
   set (HAVE_UUID TRUE)
@@ -864,3 +869,18 @@ else()
   message (STATUS "Looking for qwt >= 6.1.0 - not found")
   BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
 endif ()
+
+########################################
+# On Windows, find tiny-process-library
+if (WIN32)
+  option(USE_EXTERNAL_TINY_PROCESS_LIBRARY "Use external tiny-process-library." OFF)
+  if (USE_EXTERNAL_TINY_PROCESS_LIBRARY)
+    find_package(tiny-process-library QUIET)
+    if (NOT tiny-process-library_FOUND)
+      message (STATUS "Looking for tiny-process-library - not found")
+      BUILD_ERROR ("Missing: tiny-process-library, even if USE_EXTERNAL_TINY_PROCESS_LIBRARY was enabled.")
+    else()
+      message (STATUS "Looking for tiny-process-library - found")
+    endif()
+  endif()
+endif()

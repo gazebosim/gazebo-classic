@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <world name="default">
+    <model name="parent_model">
+      <link name="L1"/>
+      <link name="L2">
+        <pose>0 1 0 0 0 0</pose>
+      </link>
+      <model name="M1">
+        <pose>1 0 0 0 1.5707963267948966 0</pose>
+        <link name="L">
+          <pose>0 0 1 0 0 0</pose>
+        </link>
+      </model>
+      <model name="M2">
+        <pose relative_to="">2 0 0 0 0 0</pose>
+        <link name="L">
+          <pose>0 0 1 0 0 0</pose>
+        </link>
+      </model>
+      <model name="M3">
+        <pose relative_to="M1">3 0 0 0 0 0</pose>
+        <link name="L">
+          <pose>0 0 1 0 0 0</pose>
+        </link>
+      </model>
+
+      <frame name="F1">
+        <pose relative_to="M3">0 1 0 0 0 0</pose>
+      </frame>
+
+      <joint name="J1" type="revolute">
+        <pose relative_to="F1">1 0 0 0 0 0</pose>
+        <parent>L1</parent>
+        <child>L2</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+    </model>
+  </world>
+</sdf>
+

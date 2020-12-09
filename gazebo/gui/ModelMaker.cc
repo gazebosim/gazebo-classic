@@ -19,6 +19,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SdfFrameSemantics.hh"
@@ -126,11 +127,15 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
       std::string(std::istreambuf_iterator<char>(inputFile),
                   std::istreambuf_iterator<char>());
 
+  common::convertToFullPaths(this->dataPtr->modelSDFString,
+      this->dataPtr->modelSDF->FilePath());
+
   if (this->dataPtr->modelSDF->Root()->HasElement("model"))
   {
     common::convertPosesToSdf16(
         this->dataPtr->modelSDF->Root()->GetElement("model"));
   }
+  common::convertToFullPaths(this->dataPtr->modelSDF->Root());
 
   return this->Init();
 }

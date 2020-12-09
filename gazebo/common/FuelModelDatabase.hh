@@ -21,6 +21,11 @@
 #include <memory>
 #include <string>
 #include <vector>
+#ifdef _WIN32
+  // DELETE is defined in winnt.h and causes a problem with
+  // ignition::fuel_tools::REST::DELETE
+  #undef DELETE
+#endif
 #include <ignition/fuel_tools/ClientConfig.hh>
 #include <ignition/fuel_tools/ModelIdentifier.hh>
 
@@ -101,6 +106,16 @@ namespace gazebo
       /// \param[in] _forceDownload True to skip searching local cache.
       /// \return Local path to a model directory
       public: std::string ModelPath(const std::string &_uri,
+        const bool _forceDownload = false);
+
+      /// \brief Get the local path to a world.
+      ///
+      /// Get the path to a world based on a URI. If the world is on
+      /// a remote server, then the model fetched and installed locally.
+      /// \param[in] _uri the model uri
+      /// \param[in] _forceDownload True to skip searching local cache.
+      /// \return Local path to a world directory
+      public: std::string WorldPath(const std::string &_uri,
         const bool _forceDownload = false);
 
       /// \brief Get the full local path to a cached file based on its URI.

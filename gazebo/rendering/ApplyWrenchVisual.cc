@@ -15,6 +15,7 @@
  *
 */
 
+#include <ignition/common/Profiler.hh>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Matrix4.hh>
 
@@ -307,6 +308,7 @@ void ApplyWrenchVisual::SetTorque(const ignition::math::Vector3d &_torqueVector,
 ///////////////////////////////////////////////////
 void ApplyWrenchVisual::UpdateForceVisual()
 {
+  IGN_PROFILE("ApplyWrenchVisual::UpdateForceVisual");
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
@@ -342,6 +344,7 @@ void ApplyWrenchVisual::UpdateForceVisual()
 ///////////////////////////////////////////////////
 void ApplyWrenchVisual::UpdateTorqueVisual()
 {
+  IGN_PROFILE("ApplyWrenchVisual::UpdateTorqueVisual");
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
@@ -380,6 +383,7 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
 /////////////////////////////////////////////////
 void ApplyWrenchVisual::Resize()
 {
+  IGN_PROFILE("ApplyWrenchVisual::Resize");
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 

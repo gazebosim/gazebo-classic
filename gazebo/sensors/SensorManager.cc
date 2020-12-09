@@ -14,21 +14,26 @@
  * limitations under the License.
  *
 */
-#include "ignition/common/Profiler.hh"
 
 #include <functional>
 #include <boost/bind.hpp>
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Time.hh"
 
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/sensors/SensorsIface.hh"
+#include "gazebo/transport/transport.hh"
 #include "gazebo/util/LogPlay.hh"
+
+#include "ignition/common/Profiler.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -40,6 +45,46 @@ boost::mutex g_sensorTimingMutex;
 /// \brief Flag to indicate if number of sensors has changed and that the
 /// max update rate needs to be recalculated
 bool g_sensorsDirty = true;
+
+/// Performance metrics variables
+/// \brief last sensor measurement sim time
+std::map<std::string, gazebo::common::Time> sensorsLastMeasurementTime;
+
+/// \brief last sensor measurement real time
+std::map<std::string, gazebo::common::Time> worldLastMeasurementTime;
+
+/// \brief Data structure for storing metric data to be published
+struct sensorPerformanceMetricsType
+{
+  /// \brief sensor real time update rate
+  double sensorRealUpdateRate;
+
+  /// \brief sensor sim time update rate
+  double sensorSimUpdateRate;
+
+  /// \brief Rendering sensor average real time update rate. The difference
+  /// between sensorAvgFps and sensorRealUpdateRte is that sensorAvgFps is
+  /// for rendering sensors only and the rate is averaged over a fixed
+  /// window size, whereas the sensorSimUpdateRate stores the instantaneous
+  /// update rate and it is filled by all sensors.
+  double sensorAvgFPS;
+};
+
+/// \brief A map of sensor name to its performance metrics data
+std::map<std::string, struct sensorPerformanceMetricsType>
+    sensorPerformanceMetrics;
+
+/// \brief Publisher for run-time simulation performance metrics.
+transport::PublisherPtr performanceMetricsPub;
+
+/// \brief Node for publishing performance metrics
+transport::NodePtr node = nullptr;
+
+/// \brief Last sim time measured for performance metrics
+common::Time lastSimTime;
+
+/// \brief Last real time measured for performance metrics
+common::Time lastRealTime;
 
 //////////////////////////////////////////////////
 SensorManager::SensorManager()
@@ -126,6 +171,126 @@ void SensorManager::WaitForSensors(double _clk, double _dt)
     this->WaitForPrerendered(0.001);
     tnext = this->NextRequiredTimestamp();
   }
+}
+
+void PublishPerformanceMetrics()
+{
+  if (node == nullptr)
+  {
+    auto world = physics::get_world();
+    // Transport
+    node = transport::NodePtr(new transport::Node());
+    node->Init(world->Name());
+    performanceMetricsPub =
+     node->Advertise<msgs::PerformanceMetrics>(
+         "/gazebo/performance_metrics", 10, 5);
+  }
+
+  if (!performanceMetricsPub || !performanceMetricsPub->HasConnections())
+  {
+    return;
+  }
+
+  physics::WorldPtr world = physics::get_world(
+    gazebo::physics::get_world()->Name());
+
+  /// Outgoing run-time simulation performance metrics.
+  msgs::PerformanceMetrics performanceMetricsMsg;
+
+  // Real time factor
+  common::Time realTime = world->RealTime();
+  common::Time diffRealtime = realTime - lastRealTime;
+  common::Time simTime = world->SimTime();
+  common::Time diffSimTime = simTime - lastSimTime;
+  common::Time realTimeFactor;
+
+  if (ignition::math::equal(diffSimTime.Double(), 0.0))
+    return;
+
+  if (realTime == 0)
+    realTimeFactor = 0;
+  else
+    realTimeFactor = diffSimTime / diffRealtime;
+
+  performanceMetricsMsg.set_real_time_factor(realTimeFactor.Double());
+
+  lastRealTime = realTime;
+  lastSimTime = simTime;
+
+  /// update sim time for sensors
+  for (auto model: world->Models())
+  {
+    for (auto link: model->GetLinks())
+    {
+      for (unsigned int i = 0; i < link->GetSensorCount(); i++)
+      {
+        std::string name = link->GetSensorName(i);
+        sensors::SensorPtr sensor = sensors::get_sensor(name);
+
+        auto ret = sensorsLastMeasurementTime.insert(
+            std::pair<std::string, gazebo::common::Time>(name, 0));
+        worldLastMeasurementTime.insert(
+                std::pair<std::string, gazebo::common::Time>(name, 0));
+        if (ret.second == false)
+        {
+          double updateSimRate =
+            (sensor->LastMeasurementTime() - sensorsLastMeasurementTime[name])
+            .Double();
+          if (updateSimRate > 0.0)
+          {
+            sensorsLastMeasurementTime[name] = sensor->LastMeasurementTime();
+            double updateRealRate =
+              (world->RealTime() - worldLastMeasurementTime[name]).Double();
+
+            struct sensorPerformanceMetricsType emptySensorPerfomanceMetrics;
+            auto ret2 = sensorPerformanceMetrics.insert(
+                std::pair<std::string, struct sensorPerformanceMetricsType>
+                  (name, emptySensorPerfomanceMetrics));
+            if (ret2.second == false)
+            {
+              ret2.first->second.sensorSimUpdateRate =
+                  1.0/updateSimRate;
+              ret2.first->second.sensorRealUpdateRate =
+                  1.0/updateRealRate;
+              worldLastMeasurementTime[name] = world->RealTime();
+
+              // Special case for stereo cameras
+              sensors::CameraSensorPtr cameraSensor =
+                std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+              if (nullptr != cameraSensor)
+              {
+                ret2.first->second.sensorAvgFPS =
+                    cameraSensor->Camera()->AvgFPS();
+              }
+              else
+              {
+                ret2.first->second.sensorAvgFPS = -1;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  for (auto sensorPerformanceMetric: sensorPerformanceMetrics)
+  {
+    msgs::PerformanceMetrics::PerformanceSensorMetrics
+        *performanceSensorMetricsMsg = performanceMetricsMsg.add_sensor();
+    performanceSensorMetricsMsg->set_name(sensorPerformanceMetric.first);
+    performanceSensorMetricsMsg->set_real_update_rate(
+      sensorPerformanceMetric.second.sensorRealUpdateRate);
+    performanceSensorMetricsMsg->set_sim_update_rate(
+      sensorPerformanceMetric.second.sensorSimUpdateRate);
+    if (sensorPerformanceMetric.second.sensorAvgFPS >= 0.0)
+    {
+      performanceSensorMetricsMsg->set_fps(
+        sensorPerformanceMetric.second.sensorAvgFPS);
+    }
+  }
+
+  // Publish data
+  performanceMetricsPub->Publish(performanceMetricsMsg);
 }
 
 //////////////////////////////////////////////////
@@ -684,6 +849,8 @@ void SensorManager::SensorContainer::RunLoop()
 void SensorManager::SensorContainer::Update(bool _force)
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
+
+  PublishPerformanceMetrics();
 
   if (this->sensors.empty())
     gzlog << "Updating a sensor container without any sensors.\n";

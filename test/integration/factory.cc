@@ -15,11 +15,14 @@
  *
 */
 #include <string.h>
+#include "gazebo/common/Skeleton.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"
 
+#include "gazebo/physics/MeshShape.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/test/ServerFixture.hh"
@@ -56,6 +59,9 @@ class FactoryTest : public ServerFixture,
 
   /// \brief Test spawning an actor with a plugin.
   public: void ActorPlugin();
+
+  /// \brief Test spawning an actor with spaces in the file name.
+  public: void ActorSpaces();
 
   /// \brief Test spawning an actor with skin, animation and trajectory.
   /// \param[in] _physicsEngine Physics engine name
@@ -765,6 +771,65 @@ TEST_P(FactoryTest, ActorAll)
   ActorAll(GetParam());
 }
 
+//////////////////////////////////////////////////
+TEST_F(FactoryTest, ActorSpaces)
+{
+  // World with a rendering sensor
+  this->Load("worlds/camera.world", true);
+
+  // Test database
+  common::SystemPaths::Instance()->AddModelPaths(
+    PROJECT_SOURCE_PATH "/test/models/testdb");
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Scene
+  auto scene = rendering::get_scene();
+  ASSERT_NE(nullptr, scene);
+
+  // Publish factory msg
+  msgs::Factory msg;
+  msg.set_sdf_filename("model://actor with spaces");
+
+  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  pub->Publish(msg);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while ((!world->ModelByName("actor with spaces") ||
+         world->ModelCount() < 4) && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+  EXPECT_LT(sleep, maxSleep);
+
+  EXPECT_EQ(4u, world->ModelCount());
+
+  auto model = world->ModelByName("actor with spaces");
+  ASSERT_NE(nullptr, model);
+
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(model);
+  ASSERT_NE(nullptr, actor);
+
+  auto mesh = actor->Mesh();
+  ASSERT_NE(nullptr, mesh);
+  EXPECT_EQ("model://actor with spaces/meshes/skin with spaces.dae",
+      mesh->GetName());
+  EXPECT_TRUE(mesh->HasSkeleton());
+
+  auto skeleton = mesh->GetSkeleton();
+  ASSERT_NE(nullptr, skeleton);
+  EXPECT_EQ(31u, skeleton->GetNumNodes());
+  EXPECT_EQ(31u, skeleton->GetNumJoints());
+
+  auto skelAnims = actor->SkeletonAnimations();
+  EXPECT_EQ(skelAnims.size(), 1u);
+  EXPECT_NE(nullptr, skelAnims["animation with spaces"]);
+}
+
 /////////////////////////////////////////////////
 void FactoryTest::Clone(const std::string &_physicsEngine)
 {
@@ -810,7 +875,11 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
 
   // Check links
   physics::Link_V links = model->GetLinks();
+  EXPECT_EQ(48u, links.size());
+
   physics::Link_V linkClones = modelClone->GetLinks();
+  EXPECT_EQ(48u, linkClones.size());
+
   for (unsigned int i = 0; i < links.size(); ++i)
   {
     physics::LinkPtr link = links[i];
@@ -1147,7 +1216,275 @@ TEST_F(FactoryTest, FilenameModelDatabase)
 }
 
 //////////////////////////////////////////////////
-#ifdef HAVE_IGNITION_FUEL_TOOLS
+TEST_F(FactoryTest, FilenameModelDatabaseSpaces)
+{
+  // World with a rendering sensor
+  this->Load("worlds/camera.world", true);
+
+  // Test database
+  common::SystemPaths::Instance()->AddModelPaths(
+    PROJECT_SOURCE_PATH "/test/models/testdb");
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Scene
+  auto scene = rendering::get_scene();
+  ASSERT_NE(nullptr, scene);
+
+  // Publish factory msg
+  msgs::Factory msg;
+  msg.set_sdf_filename("model://model with spaces");
+
+  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  pub->Publish(msg);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while ((!world->ModelByName("model with spaces") ||
+         scene->VisualCount() < 26) &&
+         sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+  EXPECT_LT(sleep, maxSleep);
+
+  EXPECT_EQ(4u, world->ModelCount());
+
+  // Top-level model
+  auto model = world->ModelByName("model with spaces");
+  ASSERT_NE(nullptr, model);
+
+  auto modelVis = scene->GetVisual("model with spaces");
+  ASSERT_NE(nullptr, modelVis);
+  EXPECT_EQ(3u, modelVis->GetChildCount());
+
+  // Joints
+  EXPECT_EQ(3u, model->GetJoints().size());
+  EXPECT_NE(nullptr, model->GetJoint("joint with spaces"));
+  EXPECT_NE(nullptr, model->GetJoint(
+      "joint between top link and link in nested model"));
+  EXPECT_NE(nullptr, model->GetJoint(
+      "joint between links nested at different depths"));
+
+  // Top-level links
+  EXPECT_EQ(2u, model->GetLinks().size());
+
+  // Link with COLLADA meshes
+  auto link = model->GetLink("link with spaces");
+  ASSERT_NE(nullptr, link);
+
+  auto linkVis = modelVis->GetChild(0);
+  ASSERT_NE(nullptr, linkVis);
+  EXPECT_EQ("model with spaces::link with spaces", linkVis->Name());
+
+  EXPECT_EQ(1u, link->GetCollisions().size());
+  auto collision = link->GetCollision("collision with spaces");
+  ASSERT_NE(nullptr, collision);
+
+  auto shape = collision->GetShape();
+  ASSERT_NE(nullptr, shape);
+
+  auto meshShape = boost::static_pointer_cast<physics::MeshShape>(shape);
+  ASSERT_NE(nullptr, meshShape);
+  EXPECT_EQ("model://model with spaces/meshes/mesh with spaces.dae",
+      meshShape->GetMeshURI());
+
+  auto visualVis = linkVis->GetChild(0);
+  ASSERT_NE(nullptr, visualVis);
+  EXPECT_EQ("model with spaces::link with spaces::visual with spaces",
+      visualVis->Name());
+
+  EXPECT_EQ(PROJECT_SOURCE_PATH
+      "/test/models/testdb/model with spaces/meshes/mesh with spaces.dae",
+      visualVis->GetMeshName());
+
+  auto visualVisMaterial = linkVis->GetChild(1);
+  ASSERT_NE(nullptr, visualVisMaterial);
+  EXPECT_EQ("model with spaces::link with spaces::visual with material",
+      visualVisMaterial->Name());
+
+  EXPECT_FALSE(Ogre::MaterialManager::getSingleton().getByName(
+      "material with spaces").isNull());
+
+  EXPECT_EQ(PROJECT_SOURCE_PATH
+      "/test/models/testdb/model with spaces/meshes/mesh with spaces.dae",
+      visualVisMaterial->GetMeshName());
+
+  EXPECT_EQ("model with spaces::link with spaces::"
+      "visual with material_MATERIAL_material with spaces",
+      visualVisMaterial->GetMaterialName());
+
+  EXPECT_EQ(PROJECT_SOURCE_PATH
+      "/test/models/testdb/model with spaces/materials/textures/"
+      "normal with spaces.png", visualVisMaterial->GetNormalMap());
+
+  // Link with OBJ meshes
+  link = model->GetLink("link with spaces in obj");
+  ASSERT_NE(nullptr, link);
+
+  linkVis = modelVis->GetChild(1);
+  ASSERT_NE(nullptr, linkVis);
+  EXPECT_EQ("model with spaces::link with spaces in obj", linkVis->Name());
+
+  EXPECT_EQ(1u, link->GetCollisions().size());
+  collision = link->GetCollision("collision with spaces in obj");
+  ASSERT_NE(nullptr, collision);
+
+  shape = collision->GetShape();
+  ASSERT_NE(nullptr, shape);
+
+  meshShape = boost::static_pointer_cast<physics::MeshShape>(shape);
+  ASSERT_NE(nullptr, meshShape);
+  EXPECT_EQ("model://model with spaces/meshes/mesh with spaces.obj",
+      meshShape->GetMeshURI());
+
+  visualVis = linkVis->GetChild(0);
+  ASSERT_NE(nullptr, visualVis);
+  EXPECT_EQ("model with spaces::link with spaces in obj::"
+      "visual with spaces in obj", visualVis->Name());
+
+  EXPECT_EQ(PROJECT_SOURCE_PATH
+      "/test/models/testdb/model with spaces/meshes/mesh with spaces.obj",
+      visualVis->GetMeshName());
+
+  // Nested
+  EXPECT_EQ(1u, model->NestedModels().size());
+  auto nestedModel = model->NestedModel("nested model with spaces");
+  ASSERT_NE(nullptr, nestedModel);
+
+  auto nestedModelVis = modelVis->GetChild(2);
+  ASSERT_NE(nullptr, nestedModelVis);
+  EXPECT_EQ("model with spaces::nested model with spaces",
+      nestedModelVis->Name());
+
+  EXPECT_EQ(1u, nestedModel->GetLinks().size());
+  auto nestedLink = nestedModel->GetLink("nested link with spaces");
+  ASSERT_NE(nullptr, nestedLink);
+
+  auto nestedLinkVis = nestedModelVis->GetChild(0);
+  ASSERT_NE(nullptr, nestedLinkVis);
+  EXPECT_EQ("model with spaces::nested model with spaces::"
+      "nested link with spaces", nestedLinkVis->Name());
+
+  EXPECT_EQ(1u, nestedLink->GetCollisions().size());
+  ASSERT_NE(nullptr, nestedLink->GetCollision("nested collision with spaces"));
+
+  auto nestedVisualVis = nestedLinkVis->GetChild(0);
+  ASSERT_NE(nullptr, nestedVisualVis);
+  EXPECT_EQ("model with spaces::nested model with spaces::"
+      "nested link with spaces::nested visual with spaces",
+      nestedVisualVis->Name());
+
+  // Nested deeper
+  EXPECT_EQ(1u, nestedModel->NestedModels().size());
+  auto deeperNestedModel = nestedModel->NestedModel(
+      "deeper nested model with spaces");
+  ASSERT_NE(nullptr, deeperNestedModel);
+
+  EXPECT_EQ(1u, deeperNestedModel->GetLinks().size());
+  auto deeperNestedLink = deeperNestedModel->GetLink(
+      "deeper nested link with spaces");
+  ASSERT_NE(nullptr, deeperNestedLink);
+
+  EXPECT_EQ(1u, deeperNestedLink->GetCollisions().size());
+  ASSERT_NE(nullptr, deeperNestedLink->GetCollision(
+      "deeper nested collision with spaces"));
+
+  // Nested even deeper
+  EXPECT_EQ(1u, deeperNestedModel->NestedModels().size());
+  auto evenDeeperNestedModel = deeperNestedModel->NestedModel(
+      "even deeper nested model with spaces");
+  ASSERT_NE(nullptr, evenDeeperNestedModel);
+
+  EXPECT_EQ(1u, evenDeeperNestedModel->GetLinks().size());
+  auto evenDeeperNestedLink = evenDeeperNestedModel->GetLink(
+      "even deeper nested link with spaces");
+  ASSERT_NE(nullptr, evenDeeperNestedLink);
+
+  EXPECT_EQ(1u, evenDeeperNestedLink->GetCollisions().size());
+  ASSERT_NE(nullptr, evenDeeperNestedLink->GetCollision(
+      "even deeper nested collision with spaces"));
+}
+
+
+//////////////////////////////////////////////////
+TEST_F(FactoryTest, FilenameModelDatabaseRelativePaths)
+{
+  // World with a rendering sensor
+  this->Load("worlds/camera.world", true);
+
+  // Test database
+  common::SystemPaths::Instance()->AddModelPaths(
+    PROJECT_SOURCE_PATH "/test/models/testdb");
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Publish factory msg
+  msgs::Factory msg;
+  msg.set_sdf_filename("model://relative_paths");
+
+  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  pub->Publish(msg);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("relative_paths") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  auto model = world->ModelByName("relative_paths");
+  ASSERT_NE(nullptr, model);
+
+  auto link = model->GetLink("link");
+  ASSERT_NE(nullptr, link);
+
+  auto collision = link->GetCollision("collision");
+  ASSERT_NE(nullptr, collision);
+
+  auto shape = collision->GetShape();
+  ASSERT_NE(nullptr, shape);
+
+  auto meshShape = boost::static_pointer_cast<physics::MeshShape>(shape);
+  ASSERT_NE(nullptr, meshShape);
+  EXPECT_EQ(PROJECT_SOURCE_PATH
+      "/test/models/testdb/relative_paths/meshes/test.dae",
+      meshShape->GetMeshURI());
+
+  // Make sure the render engine is available
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    FAIL() << "No rendering engine";
+  }
+
+  auto scene = rendering::get_scene();
+  ASSERT_NE(nullptr, scene);
+
+  auto modelVis = scene->GetVisual("relative_paths");
+  ASSERT_NE(nullptr, modelVis);
+
+  auto linkVis = modelVis->GetChild(0);
+  ASSERT_NE(nullptr, linkVis);
+  EXPECT_EQ("relative_paths::link", linkVis->Name());
+
+  auto visualVis = linkVis->GetChild(0);
+  ASSERT_NE(nullptr, visualVis);
+  EXPECT_EQ("relative_paths::link::visual", visualVis->Name());
+
+  EXPECT_EQ(PROJECT_SOURCE_PATH
+      "/test/models/testdb/relative_paths/meshes/test.dae",
+      visualVis->GetMeshName());
+}
+
+//////////////////////////////////////////////////
 TEST_F(FactoryTest, FilenameFuelURL)
 {
   this->Load("worlds/empty.world", true);
@@ -1158,7 +1495,7 @@ TEST_F(FactoryTest, FilenameFuelURL)
 
   msgs::Factory msg;
   msg.set_sdf_filename(
-      "https://api.ignitionfuel.org/1.0/chapulina/models/Test box");
+      "https://fuel.ignitionrobotics.org/1.0/chapulina/models/Test box");
 
   auto pub = this->node->Advertise<msgs::Factory>("~/factory");
   pub->Publish(msg);
@@ -1174,7 +1511,71 @@ TEST_F(FactoryTest, FilenameFuelURL)
   // Check model was spawned
   ASSERT_NE(nullptr, world->ModelByName("test_box"));
 }
-#endif
+
+TEST_F(FactoryTest, WorldWithFuelModels)
+{
+  this->Load("worlds/fuel_models.world", true);
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("Radio") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("Radio"));
+}
+
+//////////////////////////////////////////////////
+TEST_F(FactoryTest, FuelURIAsWorldArgument)
+{
+  // ServerFixture::LoadArgs will split whitespaces, so we use a world name
+  // without spaces
+  this->Load(
+    "https://fuel.ignitionrobotics.org/1.0/OpenRobotics/worlds/Test_shapes",
+    true);
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("box") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("box"));
+
+  sleep = 0;
+  maxSleep = 50;
+  while (!world->ModelByName("cylinder") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("cylinder"));
+
+  sleep = 0;
+  maxSleep = 50;
+  while (!world->ModelByName("sphere") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("sphere"));
+}
 
 //////////////////////////////////////////////////
 TEST_P(FactoryTest, InvalidMeshInsertion)

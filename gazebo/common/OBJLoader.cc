@@ -70,9 +70,15 @@ Mesh *OBJLoader::Load(const std::string &_filename)
   // convert polygons to triangles
   bool triangulate = true;
 
+  std::string warn;
   std::string err;
-  bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err,
+  bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err,
       _filename.c_str(), path.c_str(), triangulate);
+
+  if (!warn.empty())
+  {
+    gzwarn << warn << std::endl;
+  }
 
   if (!err.empty())
   {

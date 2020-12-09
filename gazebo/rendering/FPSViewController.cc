@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <ignition/common/Profiler.hh>
+
 #include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
@@ -52,6 +54,7 @@ void FPSViewController::Init()
 //////////////////////////////////////////////////
 void FPSViewController::Update()
 {
+  IGN_PROFILE("rendering::FPSViewController::Update");
   if (this->xVelocity != ignition::math::Vector3d::Zero ||
       this->yVelocity != ignition::math::Vector3d::Zero)
   {
