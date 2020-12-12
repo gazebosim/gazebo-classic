@@ -434,8 +434,19 @@ else (build_errors)
   # Order is important, if A depends on B, please add B after A.
   # The list should have at the very end the libraries
   # without internal interdependencies
-  set(PKG_LIBRARIES
-    gazebo
+  
+  # The gazebo library on Windows is called libgazebo to avoid 
+  # conflicts with the gazebo executable
+  if(NOT WIN32)
+    set(PKG_LIBRARIES
+      gazebo
+    )
+  else()
+    set(PKG_LIBRARIES
+      libgazebo
+    )
+  endif()  
+  set(PKG_LIBRARIES ${PKG_LIBRARIES}
     gazebo_client
     gazebo_gui
     gazebo_sensors
