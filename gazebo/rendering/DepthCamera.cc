@@ -380,6 +380,7 @@ void DepthCamera::CreateNormalsTexture(const std::string &_textureName)
     this->dataPtr->normalsViewport->setBackgroundColour(
         Conversions::Convert(ignBG));
     this->dataPtr->normalsViewport->setOverlaysEnabled(false);
+    this->dataPtr->normalsViewport->setShadowsEnabled(false);
     this->dataPtr->normalsViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
