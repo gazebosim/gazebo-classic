@@ -1,6 +1,8 @@
 add_subdirectory(deferred_rendering)
 
 set (files
+spotlight_shadow_test_vp.glsl
+spotlight_shadow_test_fp.glsl
 ambient_one_texture_vp.glsl
 blur.glsl
 camera_distortion_map_fs.glsl

@@ -516,9 +516,9 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
 
   // 3 textures per directional light
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
-  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
-  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
-  sceneMgr->setShadowTextureCount(3);
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 1);
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 1);
+  sceneMgr->setShadowTextureCount(5);
 
   unsigned int texSize = this->dataPtr->shadowTextureSize;
 #if defined(__APPLE__)
@@ -532,22 +532,29 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   sceneMgr->setShadowTextureConfig(1, texSize, texSize, Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(2, texSize, texSize, Ogre::PF_FLOAT32_R);
 
+  // spot and point
+  sceneMgr->setShadowTextureConfig(3, texSize, texSize, Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureConfig(4, texSize, texSize, Ogre::PF_FLOAT32_R);
+
 #if defined(HAVE_OPENGL)
   // Enable shadow map comparison, so shader can use
   // float texture(sampler2DShadow, vec3, [float]) instead of
   // vec4 texture(sampler2D, vec2, [float]).
   // NVidia, AMD, and Intel all take this as a cue to provide "hardware PCF",
   // a driver hack that softens shadow edges with 4-sample interpolation.
-  for (size_t i = 0; i < sceneMgr->getShadowTextureCount(); ++i)
-  {
-    const Ogre::TexturePtr tex = sceneMgr->getShadowTexture(i);
-    // This will fail if not using OpenGL as the rendering backend.
-    GLuint texId;
-    tex->getCustomAttribute("GLID", &texId);
-    glBindTexture(GL_TEXTURE_2D, texId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
-        GL_COMPARE_R_TO_TEXTURE);
-  }
+  // for (size_t i = 0; i < sceneMgr->getShadowTextureCount(); ++i)
+  // TODO set this only for the 3 PSSM shadow textures for directional light
+
+//  for (size_t i = 0u; i < 3u; ++i)
+//  {
+//    const Ogre::TexturePtr tex = sceneMgr->getShadowTexture(i);
+//    // This will fail if not using OpenGL as the rendering backend.
+//    GLuint texId;
+//    tex->getCustomAttribute("GLID", &texId);
+//    glBindTexture(GL_TEXTURE_2D, texId);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
+//        GL_COMPARE_R_TO_TEXTURE);
+//  }
 #endif
 
   sceneMgr->setShadowTextureSelfShadow(false);
@@ -558,6 +565,8 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // Set up caster material - this is just a standard depth/shadow map caster
   // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
   sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
+
+  return;
 
   // Disable fog on the caster pass.
   //  Ogre::MaterialPtr passCaterMaterial =
