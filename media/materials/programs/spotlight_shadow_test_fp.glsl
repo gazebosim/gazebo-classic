@@ -1,19 +1,19 @@
 #version 130
 
 uniform sampler2D shadowMap0;
-//uniform sampler2D shadowMap1;
-//uniform sampler2D shadowMap2;
-//uniform sampler2D shadowMap3;
+uniform sampler2D shadowMap1;
+uniform sampler2D shadowMap2;
+uniform sampler2D shadowMap3;
 
 uniform float inverseShadowmapSize0;
-//uniform float inverseShadowmapSize1;
-//uniform float inverseShadowmapSize2;
-//uniform float inverseShadowmapSize3;
+uniform float inverseShadowmapSize1;
+uniform float inverseShadowmapSize2;
+uniform float inverseShadowmapSize3;
 
 in vec4 lightSpacePos0;
-//in vec4 lightSpacePos1;
-//in vec4 lightSpacePos2;
-//in vec4 lightSpacePos3;
+in vec4 lightSpacePos1;
+in vec4 lightSpacePos2;
+in vec4 lightSpacePos3;
 
 in vec4 worldPos;
 in vec4 worldViewPos;
@@ -95,8 +95,8 @@ void main()
   // float shadowFactor = ShadowPCF(shadowMap3, lightSpacePos3, vec2(inverseShadowmapSize3));
 
 
-  // float shadowFactor = ShadowSimple(shadowMap3, lightSpacePos3, vec2(inverseShadowmapSize3));
-  float shadowFactor = ShadowSimple(shadowMap0, lightSpacePos0, vec2(inverseShadowmapSize0));
+  float shadowFactor = ShadowSimple(shadowMap3, lightSpacePos3, vec2(inverseShadowmapSize3));
+  // float shadowFactor = ShadowSimple(shadowMap0, lightSpacePos0, vec2(inverseShadowmapSize0));
 
   outputCol = color * (1.0-shadowFactor);
 

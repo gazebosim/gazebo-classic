@@ -1,15 +1,14 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
-<!--
+
     <include>
       <uri>model://ground_plane</uri>
     </include>
--->
+
     <include>
       <uri>model://sun</uri>
     </include>
-
 
     <light type="spot" name="spot">
       <cast_shadows>true</cast_shadows>
@@ -22,18 +21,19 @@
         <linear>0.01</linear>
         <quadratic>0.001</quadratic>
       </attenuation>
-      <direction>0.5 0. -0.3</direction>
+      <direction>0.5 0.0 -0.3</direction>
     </light>
 
 
-  <model name="ground_shadow_receiver">
+   <model name="ground_shadow_receiver">
+    <pose>0 0 0.1 0 0 0</pose>
     <static>true</static>
     <link name="link">
       <collision name="collision">
         <geometry>
           <plane>
             <normal>0 0 1</normal>
-            <size>100 100</size>
+            <size>10 10</size>
           </plane>
         </geometry>
         <surface>
@@ -53,20 +53,18 @@
         <geometry>
           <plane>
             <normal>0 0 1</normal>
-            <size>100 100</size>
+            <size>10 10</size>
           </plane>
         </geometry>
         <material>
           <script>
             <uri>file://media/materials/scripts/spotlight_shadow_test.material</uri>
             <name>Gazebo/SpotLightShadowTest</name>
-          <!--  <name>Gazebo/Grey</name> -->
           </script>
         </material>
       </visual>
     </link>
   </model>
-
 
 
     <model name="box">

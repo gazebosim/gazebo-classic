@@ -520,6 +520,11 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 1);
   sceneMgr->setShadowTextureCount(5);
 
+//  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
+//  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
+//  sceneMgr->setShadowTextureCount(3);
+
+
   unsigned int texSize = this->dataPtr->shadowTextureSize;
 #if defined(__APPLE__)
   // workaround a weird but on OSX if texture size at 2 and 3 splits are not
@@ -545,16 +550,16 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // for (size_t i = 0; i < sceneMgr->getShadowTextureCount(); ++i)
   // TODO set this only for the 3 PSSM shadow textures for directional light
 
-//  for (size_t i = 0u; i < 3u; ++i)
-//  {
-//    const Ogre::TexturePtr tex = sceneMgr->getShadowTexture(i);
-//    // This will fail if not using OpenGL as the rendering backend.
-//    GLuint texId;
-//    tex->getCustomAttribute("GLID", &texId);
-//    glBindTexture(GL_TEXTURE_2D, texId);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
-//        GL_COMPARE_R_TO_TEXTURE);
-//  }
+  for (size_t i = 0u; i < 3u; ++i)
+  {
+    const Ogre::TexturePtr tex = sceneMgr->getShadowTexture(i);
+    // This will fail if not using OpenGL as the rendering backend.
+    GLuint texId;
+    tex->getCustomAttribute("GLID", &texId);
+    glBindTexture(GL_TEXTURE_2D, texId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
+        GL_COMPARE_R_TO_TEXTURE);
+  }
 #endif
 
   sceneMgr->setShadowTextureSelfShadow(false);
@@ -565,8 +570,6 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // Set up caster material - this is just a standard depth/shadow map caster
   // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
   sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
-
-  return;
 
   // Disable fog on the caster pass.
   //  Ogre::MaterialPtr passCaterMaterial =
