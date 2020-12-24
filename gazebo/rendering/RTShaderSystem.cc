@@ -709,7 +709,6 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   // point: not working yet
   unsigned int dirLightCount = 1u;
   unsigned int spotLightCount = 0u;
-  std::cerr << " light count " << _scene->LightCount() << std::endl;
   for (unsigned int i = 0; i < _scene->LightCount(); ++i)
   {
     LightPtr light = _scene->LightByIndex(i);
@@ -726,7 +725,6 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
 
   // spot light shadow count
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 1);
-  std::cerr << "setting spot light shadows: " << spotLightCount << std::endl;
 
   // \todo(anyone) make point light shadows work
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
@@ -767,22 +765,6 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
         GL_COMPARE_R_TO_TEXTURE);
   }
-  GLint maxTexUnits = 0u;
-  GLint maxCombinedTexUnits = 0u;
-  glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTexUnits);
-  glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxCombinedTexUnits);
-
-  unsigned int totalShadowCount = spotShadowCount + dirShadowCount;
-  if ((totalShadowCount) > static_cast<unsigned int>(maxTexUnits))
-  {
-    gzwarn << "The number of shadow textures exceed the max texture unit limit "
-           << "defined by GL_MAX_TEXTURE_IMAGE_UNITS: "
-           << totalShadowCount << " shadows vs "
-           << maxTexUnits << " texture units. Shadows may not work properly"
-           << std::endl;
-  }
-  std::cerr << "max units " << maxTexUnits << " " << maxCombinedTexUnits << std::endl;
-
 #endif
 
   sceneMgr->setShadowTextureSelfShadow(false);

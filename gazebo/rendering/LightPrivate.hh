@@ -64,6 +64,7 @@ namespace gazebo
       /// \brief Counter used to generate unique light names.
       public: static unsigned int lightCounter;
 
+      /// \brief Custom shadow camera setup for non-directional lights
       public: Ogre::ShadowCameraSetupPtr shadowCameraSetup;
     };
   }

@@ -1,6 +1,4 @@
 set (files
-spotlight_shadow_test.material
-multiple_spotlight_shadow_test.material
 blur.compositor
 blur.material
 CreaseShading.compositor
