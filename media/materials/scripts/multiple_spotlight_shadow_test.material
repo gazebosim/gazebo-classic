@@ -1,0 +1,117 @@
+vertex_program Gazebo/MultipleSpotLightShadowVS glsl
+{
+  source multiple_spotlight_shadow_test_vp.glsl
+
+  default_params
+  {
+    param_named_auto worldViewMatrix worldview_matrix
+    param_named_auto viewProjMatrix viewproj_matrix
+    param_named_auto worldMatrix world_matrix
+
+    param_named_auto texViewProjMatrix0 texture_viewproj_matrix 0
+    param_named_auto texViewProjMatrix1 texture_viewproj_matrix 1
+    param_named_auto texViewProjMatrix2 texture_viewproj_matrix 2
+
+    param_named_auto texViewProjMatrix3 texture_viewproj_matrix 3
+    param_named_auto texViewProjMatrix4 texture_viewproj_matrix 4
+    param_named_auto texViewProjMatrix5 texture_viewproj_matrix 5
+    param_named_auto texViewProjMatrix6 texture_viewproj_matrix 6
+    param_named_auto texViewProjMatrix7 texture_viewproj_matrix 7
+    param_named_auto texViewProjMatrix8 texture_viewproj_matrix 8
+  }
+}
+
+fragment_program Gazebo/MultipleSpotLightShadowFS glsl
+{
+  source multiple_spotlight_shadow_test_fp.glsl
+
+  default_params
+  {
+    param_named shadowMap0 int 0
+    param_named shadowMap1 int 1
+    param_named shadowMap2 int 2
+
+    param_named_auto inverseShadowmapSize0  inverse_texture_size 0
+    param_named_auto inverseShadowmapSize1  inverse_texture_size 1
+    param_named_auto inverseShadowmapSize2  inverse_texture_size 2
+
+    param_named shadowMap3 int 3
+    param_named_auto inverseShadowmapSize3  inverse_texture_size 3
+    param_named shadowMap4 int 4
+    param_named_auto inverseShadowmapSize4  inverse_texture_size 4
+    param_named shadowMap5 int 5
+    param_named_auto inverseShadowmapSize5  inverse_texture_size 5
+    param_named shadowMap6 int 6
+    param_named_auto inverseShadowmapSize6  inverse_texture_size 6
+    param_named shadowMap7 int 7
+    param_named_auto inverseShadowmapSize7  inverse_texture_size 7
+    param_named shadowMap8 int 8
+    param_named_auto inverseShadowmapSize8  inverse_texture_size 8
+  }
+}
+
+material Gazebo/MultipleSpotLightShadowTest
+{
+  technique
+  {
+    pass
+    {
+      // iteration once_per_light
+      // scene_blend add
+      // start_light 6
+
+      vertex_program_ref Gazebo/MultipleSpotLightShadowVS
+      {
+      }
+
+      fragment_program_ref Gazebo/MultipleSpotLightShadowFS
+      {
+      }
+      texture_unit shadowMap0
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap1
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap2
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap3
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap4
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap5
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap6
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap7
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap8
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+    }
+  }
+}

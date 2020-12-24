@@ -26,6 +26,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/util/system.hh"
 

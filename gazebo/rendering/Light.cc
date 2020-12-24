@@ -466,13 +466,6 @@ void Light::SetLightType(const std::string &_type)
   this->CreateVisual();
 }
 
-// //////////////////////////////////////////////////
-// void Light::CreateShadowCameraSetup()
-// {
-//   Ogre::LiSPSMShadowCameraSetup setup = new Ogre::LiSPSMShadowCameraSetup();
-//   this->dataPtr->shadowCameraSetup = Ogre::ShadowCameraSetupPtr(setup);
-// }
-
 //////////////////////////////////////////////////
 std::string Light::LightType() const
 {
@@ -593,25 +586,17 @@ void Light::SetCastShadows(const bool _cast)
 {
   this->dataPtr->light->setCastShadows(_cast);
 
-//  if (this->dataPtr->light->getType() == Ogre::Light::LT_DIRECTIONAL)
-//  {
-//    this->dataPtr->light->setCastShadows(_cast);
-//  }
-//  else
-//  {
-//    this->dataPtr->light->setCastShadows(false);
-//  }
-
-
   if (_cast && this->dataPtr->light->getType() !=
-      Ogre::Light::LT_DIRECTIONAL && this->dataPtr->shadowCameraSetup.isNull())
+      Ogre::Light::LT_DIRECTIONAL)
   {
-    // this->CreateShadowCameraSetup();
-    auto *setup = new Ogre::FocusedShadowCameraSetup();
-    // auto *setup = new Ogre::DefaultShadowCameraSetup();
-    this->dataPtr->shadowCameraSetup = Ogre::ShadowCameraSetupPtr(setup);
-    this->dataPtr->light->setCustomShadowCameraSetup(
-        this->dataPtr->shadowCameraSetup);
+    if (this->dataPtr->shadowCameraSetup.isNull())
+    {
+      auto *setup = new Ogre::FocusedShadowCameraSetup();
+      this->dataPtr->shadowCameraSetup = Ogre::ShadowCameraSetupPtr(setup);
+      this->dataPtr->light->setCustomShadowCameraSetup(
+          this->dataPtr->shadowCameraSetup);
+    }
+    RTShaderSystem::Instance()->UpdateShadows();
     std::cerr << " using custom shadow camera setup " << std::endl;
   }
 }

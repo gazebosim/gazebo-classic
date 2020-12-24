@@ -1,0 +1,75 @@
+#version 130
+
+uniform sampler2D shadowMap0;
+uniform sampler2D shadowMap1;
+uniform sampler2D shadowMap2;
+
+uniform float inverseShadowmapSize0;
+uniform float inverseShadowmapSize1;
+uniform float inverseShadowmapSize2;
+
+in vec4 lightSpacePos0;
+in vec4 lightSpacePos1;
+in vec4 lightSpacePos2;
+
+<%
+  # number of shadows
+  $n = 6
+  for l in (3..$n+2)
+%>
+uniform sampler2D shadowMap<%= l.to_s %>;
+uniform float inverseShadowmapSize<%= l.to_s %>;
+in vec4 lightSpacePos<%= l.to_s %>;
+
+<%
+ end
+%>
+
+in vec4 worldPos;
+in vec4 worldViewPos;
+
+out vec4 outputCol;
+
+
+//------------------------------------------------------------------------------
+float ShadowSimple(in sampler2D shadowMap, in vec4 shadowMapPos,
+                const in vec2 offset)
+{
+  // perform perspective divide
+  vec3 shadowMapUV = shadowMapPos.xyz / shadowMapPos.w;
+
+  if (shadowMapUV.z < 0.0 || shadowMapUV.z > 1.0)
+    return 0.0;
+
+  // get closest depth value from light's perspective
+  float closestDepth = texture2D(shadowMap, shadowMapUV.xy).r;
+
+  // get depth of current fragment from light's perspective
+  float currentDepth = shadowMapUV.z;
+
+  // check whether current frag pos is in shadow
+  float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+
+  return shadow;
+}
+
+
+void main()
+{
+  // plane color - red
+  vec4 color = vec4(1.0, 0.0, 0.0, 1.0);
+
+  float f = 0.0f;
+<%
+  # number of shadows
+  for l in (3..$n+2)
+%>
+  f += ShadowSimple(shadowMap<%= l.to_s %>, lightSpacePos<%= l.to_s %>, vec2(inverseShadowmapSize<%= l.to_s %>));
+  f = clamp(f, 0.0f, 1.0f);
+<%
+ end
+%>
+
+  float shadowFactor = f;
+  outputCol = color * (1.0-shadowFactor);
+}

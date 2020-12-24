@@ -40,6 +40,7 @@
 #include "gazebo/common/Profiler.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/CustomPSSMShadowCameraSetup.hh"
+#include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -512,64 +513,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
     this->dataPtr->shaderGenerator->getRenderState(_scene->Name() +
         Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-
-  // 3 textures per directional light
-  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
-  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 1);
-  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 1);
-  sceneMgr->setShadowTextureCount(5);
-
-//  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
-//  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
-//  sceneMgr->setShadowTextureCount(3);
-
-
-  unsigned int texSize = this->dataPtr->shadowTextureSize;
-#if defined(__APPLE__)
-  // workaround a weird but on OSX if texture size at 2 and 3 splits are not
-  // halved
-  texSize = this->dataPtr->shadowTextureSize/2;
-#endif
-  sceneMgr->setShadowTextureConfig(0,
-      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
-      Ogre::PF_FLOAT32_R);
-  sceneMgr->setShadowTextureConfig(1, texSize, texSize, Ogre::PF_FLOAT32_R);
-  sceneMgr->setShadowTextureConfig(2, texSize, texSize, Ogre::PF_FLOAT32_R);
-
-  // spot and point
-  sceneMgr->setShadowTextureConfig(3, texSize, texSize, Ogre::PF_FLOAT32_R);
-  sceneMgr->setShadowTextureConfig(4, texSize, texSize, Ogre::PF_FLOAT32_R);
-
-#if defined(HAVE_OPENGL)
-  // Enable shadow map comparison, so shader can use
-  // float texture(sampler2DShadow, vec3, [float]) instead of
-  // vec4 texture(sampler2D, vec2, [float]).
-  // NVidia, AMD, and Intel all take this as a cue to provide "hardware PCF",
-  // a driver hack that softens shadow edges with 4-sample interpolation.
-  // for (size_t i = 0; i < sceneMgr->getShadowTextureCount(); ++i)
-  // TODO set this only for the 3 PSSM shadow textures for directional light
-
-  for (size_t i = 0u; i < 3u; ++i)
-  {
-    const Ogre::TexturePtr tex = sceneMgr->getShadowTexture(i);
-    // This will fail if not using OpenGL as the rendering backend.
-    GLuint texId;
-    tex->getCustomAttribute("GLID", &texId);
-    glBindTexture(GL_TEXTURE_2D, texId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
-        GL_COMPARE_R_TO_TEXTURE);
-  }
-#endif
-
-  sceneMgr->setShadowTextureSelfShadow(false);
-  sceneMgr->setShadowCasterRenderBackFaces(true);
-
-  // TODO: We have two different shadow caster materials, both taken from
-  // OGRE samples. They should be compared and tested.
-  // Set up caster material - this is just a standard depth/shadow map caster
-  // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
-  sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
+  this->UpdateShadows(_scene);
 
   // Disable fog on the caster pass.
   //  Ogre::MaterialPtr passCaterMaterial =
@@ -648,20 +592,32 @@ Ogre::PSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
 void RTShaderSystem::Update()
 {
   GZ_PROFILE("rendering::RTShaderSystem::Update");
-  if (!this->dataPtr->initialized || !this->dataPtr->updateShaders)
+  if (!this->dataPtr->initialized)
   {
     return;
   }
 
-  for (const auto &scene : this->dataPtr->scenes)
+  if (this->dataPtr->updateShadows)
   {
-    VisualPtr vis = scene->WorldVisual();
-    if (vis)
+    for (const auto &scene : this->dataPtr->scenes)
     {
-      this->UpdateShaders(vis);
+      this->UpdateShadows(scene);
     }
+    this->dataPtr->updateShadows = false;
   }
-  this->dataPtr->updateShaders = false;
+
+  if (this->dataPtr->updateShaders)
+  {
+    for (const auto &scene : this->dataPtr->scenes)
+    {
+      VisualPtr vis = scene->WorldVisual();
+      if (vis)
+      {
+        this->UpdateShaders(vis);
+      }
+    }
+    this->dataPtr->updateShaders = false;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -728,4 +684,113 @@ void RTShaderSystem::SetShadowSplitPadding(const double _padding)
 double RTShaderSystem::ShadowSplitPadding() const
 {
   return this->dataPtr->shadowSplitPadding;
+}
+
+/////////////////////////////////////////////////
+void RTShaderSystem::UpdateShadows()
+{
+  this->dataPtr->updateShadows = true;
+}
+
+/////////////////////////////////////////////////
+void RTShaderSystem::UpdateShadows(ScenePtr _scene)
+{
+  if (!this->dataPtr->initialized)
+    return;
+
+  Ogre::SceneManager *sceneMgr = _scene->OgreSceneManager();
+
+  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+
+  // directional: assume there can only be one dir light and we always create
+  //              the shadow map for the dir light
+  // spot: update number of shadow textures based on number of shadow casting
+  //       spot lights
+  // point: not working yet
+  unsigned int dirLightCount = 1u;
+  unsigned int spotLightCount = 0u;
+  std::cerr << " light count " << _scene->LightCount() << std::endl;
+  for (unsigned int i = 0; i < _scene->LightCount(); ++i)
+  {
+    LightPtr light = _scene->LightByIndex(i);
+
+    if (!light->CastShadows())
+      continue;
+
+    if (light->Type() == "spot")
+      spotLightCount++;
+  }
+
+  // 3 textures per directional light
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
+
+  // spot light shadow count
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 1);
+  std::cerr << "setting spot light shadows: " << spotLightCount << std::endl;
+
+  // \todo(anyone) make point light shadows work
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
+
+  // \todo(anyone) include point light shadows when it is working
+  unsigned int dirShadowCount = 3 * dirLightCount;
+  unsigned int spotShadowCount = spotLightCount;
+  sceneMgr->setShadowTextureCount(dirShadowCount + spotShadowCount);
+
+  unsigned int texSize = this->dataPtr->shadowTextureSize;
+#if defined(__APPLE__)
+  // workaround a weird but on OSX if texture size at 2 and 3 splits are not
+  // halved
+  texSize = this->dataPtr->shadowTextureSize/2;
+#endif
+  sceneMgr->setShadowTextureConfig(0,
+      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
+      Ogre::PF_FLOAT32_R, 1);
+  sceneMgr->setShadowTextureConfig(1, texSize, texSize, Ogre::PF_FLOAT32_R, 2);
+  sceneMgr->setShadowTextureConfig(2, texSize, texSize, Ogre::PF_FLOAT32_R, 3);
+
+#if defined(HAVE_OPENGL)
+  // Enable shadow map comparison, so shader can use
+  // float texture(sampler2DShadow, vec3, [float]) instead of
+  // vec4 texture(sampler2D, vec2, [float]).
+  // NVidia, AMD, and Intel all take this as a cue to provide "hardware PCF",
+  // a driver hack that softens shadow edges with 4-sample interpolation.
+  // for (size_t i = 0; i < sceneMgr->getShadowTextureCount(); ++i)
+  // TODO set this only for the 3 PSSM shadow textures for directional light
+
+  for (size_t i = 0u; i < dirShadowCount; ++i)
+  {
+    const Ogre::TexturePtr tex = sceneMgr->getShadowTexture(i);
+    // This will fail if not using OpenGL as the rendering backend.
+    GLuint texId;
+    tex->getCustomAttribute("GLID", &texId);
+    glBindTexture(GL_TEXTURE_2D, texId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
+        GL_COMPARE_R_TO_TEXTURE);
+  }
+  GLint maxTexUnits = 0u;
+  GLint maxCombinedTexUnits = 0u;
+  glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTexUnits);
+  glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxCombinedTexUnits);
+
+  unsigned int totalShadowCount = spotShadowCount + dirShadowCount;
+  if ((totalShadowCount) > static_cast<unsigned int>(maxTexUnits))
+  {
+    gzwarn << "The number of shadow textures exceed the max texture unit limit "
+           << "defined by GL_MAX_TEXTURE_IMAGE_UNITS: "
+           << totalShadowCount << " shadows vs "
+           << maxTexUnits << " texture units. Shadows may not work properly"
+           << std::endl;
+  }
+  std::cerr << "max units " << maxTexUnits << " " << maxCombinedTexUnits << std::endl;
+
+#endif
+
+  sceneMgr->setShadowTextureSelfShadow(false);
+  sceneMgr->setShadowCasterRenderBackFaces(true);
+
+  // TODO: We have two different shadow caster materials, both taken from
+  // OGRE samples. They should be compared and tested.
+  // Set up caster material - this is just a standard depth/shadow map caster
+  // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
+  sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
 }
