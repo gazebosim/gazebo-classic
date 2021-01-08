@@ -1350,14 +1350,14 @@ void Model::SetState(const ModelState &_state)
       gzerr << "Unable to find model[" << ms.first << "]\n";
   }
 
-  // For now we don't use the joint state values to set the state of
-  // simulation.
-  // for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
-  // {
-  //   JointState jointState = _state.GetJointState(i);
-  //   this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
-  //                          jointState.GetAngle(0).Radian());
-  // }
+  for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
+  {
+    JointState const jointState = _state.GetJointState(i);
+    for (unsigned int k = 0; k < jointState.GetAngleCount(); ++k) {
+      this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
+                            jointState.Position(k), k);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
