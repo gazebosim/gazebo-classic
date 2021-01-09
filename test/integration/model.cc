@@ -65,6 +65,20 @@ TEST_F(ModelTest, LoadJointState)
   EXPECT_NEAR(joint_2->Position(), 0.7854, 0.0001);
 }
 
+TEST_F(ModelTest, JointInitialPosition)
+{
+  Load("worlds/joint_test.world");
+  physics::ModelPtr const model = GetModel("model_3");
+
+  ASSERT_EQ(model->GetJointCount(), 2u);
+
+  physics::JointPtr const joint_1 = model->GetJoint("joint_1");
+  EXPECT_NEAR(joint_1->Position(), 0.7854, 0.0001);
+
+  physics::JointPtr const joint_2 = model->GetJoint("joint_2");
+  EXPECT_NEAR(joint_2->Position(), 1.5707, 0.0001);
+}
+
 /////////////////////////////////////////////////
 // This tests getting the scoped name of a model.
 TEST_F(ModelTest, GetScopedName)

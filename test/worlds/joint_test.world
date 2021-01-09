@@ -141,5 +141,45 @@
             </joint>
             <static>0</static>
         </model>
+        <model name="model_3">
+            <pose>0 2 0 0 0 0</pose>
+            <link name="link_1">
+                <visual name="link_1_box">
+                    <pose>0 0.5 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.125 0.95 0.125</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+            <link name="link_2">
+                <visual name="link_2_visual">
+                    <pose>0 1.5 0 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>0.125 0.95 0.125</size>
+                        </box>
+                    </geometry>
+                </visual>
+            </link>
+            <joint name="joint_1" type="revolute">
+                <parent>world</parent>
+                <child>link_1</child>
+                <axis>
+                    <xyz>0 0 1</xyz>
+                    <initial_position>0.7854</initial_position>
+                </axis>
+            </joint>
+            <joint name="joint_2" type="revolute">
+                <parent>link_1</parent>
+                <child>link_2</child>
+                <axis>
+                    <xyz>0 0 1</xyz>
+                    <initial_position>1.5707</initial_position>
+                </axis>
+                <pose>0 1 0 0 0 0</pose>
+            </joint>
+        </model>
     </world>
 </sdf>
