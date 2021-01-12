@@ -597,7 +597,6 @@ void Light::SetCastShadows(const bool _cast)
           this->dataPtr->shadowCameraSetup);
     }
     RTShaderSystem::Instance()->UpdateShadows();
-    std::cerr << " using custom shadow camera setup " << std::endl;
   }
 }
 
