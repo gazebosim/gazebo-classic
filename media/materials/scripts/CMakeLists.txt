@@ -21,6 +21,7 @@ picker.material
 ShadowCaster.material
 shadow_caster.program
 ShadowCaster.program
+spotlight_shadow_demo.material
 ssao.compositor
 ssao.material
 SSAOPost.compositor
