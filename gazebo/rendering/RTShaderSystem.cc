@@ -752,9 +752,6 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   // vec4 texture(sampler2D, vec2, [float]).
   // NVidia, AMD, and Intel all take this as a cue to provide "hardware PCF",
   // a driver hack that softens shadow edges with 4-sample interpolation.
-  // for (size_t i = 0; i < sceneMgr->getShadowTextureCount(); ++i)
-  // TODO set this only for the 3 PSSM shadow textures for directional light
-
   for (size_t i = 0u; i < dirShadowCount; ++i)
   {
     const Ogre::TexturePtr tex = sceneMgr->getShadowTexture(i);
