@@ -242,6 +242,7 @@ void RTShaderSystem::DetachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 void RTShaderSystem::UpdateShaders()
 {
   // shaders will be updated in the Update call on pre-render event.
+  std::lock_guard<std::mutex> lock(this->dataPtr->updateMutex);
   this->dataPtr->updateShaders = true;
 }
 
@@ -597,6 +598,7 @@ void RTShaderSystem::Update()
     return;
   }
 
+  std::lock_guard<std::mutex> lock(this->dataPtr->updateMutex);
   if (this->dataPtr->updateShadows)
   {
     for (const auto &scene : this->dataPtr->scenes)
@@ -689,6 +691,7 @@ double RTShaderSystem::ShadowSplitPadding() const
 /////////////////////////////////////////////////
 void RTShaderSystem::UpdateShadows()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->updateMutex);
   this->dataPtr->updateShadows = true;
 }
 
@@ -742,9 +745,9 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
 #endif
   sceneMgr->setShadowTextureConfig(0,
       this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
-      Ogre::PF_FLOAT32_R, 1);
-  sceneMgr->setShadowTextureConfig(1, texSize, texSize, Ogre::PF_FLOAT32_R, 2);
-  sceneMgr->setShadowTextureConfig(2, texSize, texSize, Ogre::PF_FLOAT32_R, 3);
+      Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureConfig(1, texSize, texSize, Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureConfig(2, texSize, texSize, Ogre::PF_FLOAT32_R);
 
 #if defined(HAVE_OPENGL)
   // Enable shadow map comparison, so shader can use

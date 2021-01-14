@@ -585,19 +585,30 @@ void Light::SetRange(const double _range)
 //////////////////////////////////////////////////
 void Light::SetCastShadows(const bool _cast)
 {
-  this->dataPtr->light->setCastShadows(_cast);
 
-  if (_cast && this->dataPtr->light->getType() !=
-      Ogre::Light::LT_DIRECTIONAL)
+  if (this->dataPtr->light->getType() == Ogre::Light::LT_DIRECTIONAL)
   {
-    if (this->dataPtr->shadowCameraSetup.isNull())
+    // directional light uses PSSM shadow camera and should already be
+    // configured in RTShaderSystem
+    this->dataPtr->light->setCastShadows(_cast);
+  }
+  else if (this->dataPtr->light->getType() == Ogre::Light::LT_SPOTLIGHT)
+  {
+    // use different shadow camera for spot light
+    this->dataPtr->light->setCastShadows(_cast);
+    if (_cast && this->dataPtr->shadowCameraSetup.isNull())
     {
-      auto *setup = new Ogre::FocusedShadowCameraSetup();
-      this->dataPtr->shadowCameraSetup = Ogre::ShadowCameraSetupPtr(setup);
+      this->dataPtr->shadowCameraSetup =
+          Ogre::ShadowCameraSetupPtr(new Ogre::FocusedShadowCameraSetup());
       this->dataPtr->light->setCustomShadowCameraSetup(
           this->dataPtr->shadowCameraSetup);
+      RTShaderSystem::Instance()->UpdateShadows();
     }
-    RTShaderSystem::Instance()->UpdateShadows();
+  }
+  else
+  {
+    // todo(anyone) make point light casts shadows
+    this->dataPtr->light->setCastShadows(false);
   }
 }
 
