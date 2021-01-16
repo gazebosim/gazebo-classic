@@ -1,12 +1,10 @@
-#version 130
+#version 120
 
 uniform sampler2D shadowMap0;
-in vec4 lightSpacePos0;
+varying vec4 lightSpacePos0;
 
-in vec4 worldPos;
-in vec4 worldViewPos;
-
-out vec4 outputCol;
+varying vec4 worldPos;
+varying vec4 worldViewPos;
 
 //------------------------------------------------------------------------------
 float ShadowSimple(in sampler2D shadowMap, in vec4 shadowMapPos)
@@ -34,11 +32,13 @@ void main()
   float f = 0.0f;
 
   // flat red color - no lighting
-  outputCol = vec4(1.0, 0.0, 0.0, 1.0);
+  vec4 outputCol = vec4(1.0, 0.0, 0.0, 1.0);
 
   // grey shadows
   f += ShadowSimple(shadowMap0, lightSpacePos0);
   f = clamp(f, 0.0f, 1.0f);
   if (f > 0.0f)
     outputCol = vec4(0.2, 0.2, 0.2, 1.0);
+
+  gl_FragColor = outputCol;
 }
