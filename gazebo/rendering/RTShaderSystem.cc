@@ -598,17 +598,24 @@ void RTShaderSystem::Update()
     return;
   }
 
-  std::lock_guard<std::mutex> lock(this->dataPtr->updateMutex);
-  if (this->dataPtr->updateShadows)
+  bool updateShaders, updateShadows = false;
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->updateMutex);
+    updateShaders = this->dataPtr->updateShaders;
+    updateShadows = this->dataPtr->updateShadows;
+    this->dataPtr->updateShaders = false;
+    this->dataPtr->updateShadows = false;
+  }
+
+  if (updateShadows)
   {
     for (const auto &scene : this->dataPtr->scenes)
     {
       this->UpdateShadows(scene);
     }
-    this->dataPtr->updateShadows = false;
   }
 
-  if (this->dataPtr->updateShaders)
+  if (updateShaders)
   {
     for (const auto &scene : this->dataPtr->scenes)
     {
@@ -618,7 +625,6 @@ void RTShaderSystem::Update()
         this->UpdateShaders(vis);
       }
     }
-    this->dataPtr->updateShaders = false;
   }
 }
 
