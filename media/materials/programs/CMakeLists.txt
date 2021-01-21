@@ -45,6 +45,8 @@ projector.vert
 shadow_caster_fp.glsl
 shadow_caster_vp.glsl
 StdQuad_vp.glsl
+spotlight_shadow_demo_fp.glsl
+spotlight_shadow_demo_vp.glsl
 spot_shadow_receiver_fp.glsl
 spot_shadow_receiver_vp.glsl
 wide_lens_map_fp.glsl
