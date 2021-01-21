@@ -666,9 +666,6 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
           false,
           fsaa).getPointer();
 
-  std::cerr << " env this->imageformat " << int(this->imageFormat) << " vs " <<
-     static_cast<int>(Ogre::PF_SHORT_RGB) << std::endl;
-
   for (int i = 0; i < 6; ++i)
   {
     Ogre::RenderTarget *rtt;
