@@ -17,7 +17,7 @@
     </include>
 
     <!-- camera model with lens flare plugin -->
-    <model name="camera_lensflare">
+<!--    <model name="camera_lensflare">
       <static>true</static>
       <pose>0 0 0.05 0 0 0</pose>
       <link name="link">
@@ -47,9 +47,10 @@
         </sensor>
       </link>
     </model>
+-->
 
     <!-- camera model with lens flare plugin and scale applied -->
-    <model name="camera_lensflare_scaled">
+ <!--   <model name="camera_lensflare_scaled">
       <static>true</static>
       <pose>0 0 0.05 0 0 0</pose>
       <link name="link">
@@ -81,6 +82,7 @@
         </sensor>
       </link>
     </model>
+-->
 
     <!-- wide-angle camera model with lens flare plugin -->
     <model name="wide_angle_camera_lensflare">
@@ -100,6 +102,7 @@
             <image>
               <width>320</width>
               <height>240</height>
+              <format>RGB_INT16</format>
             </image>
             <clip>
               <near>0.1</near>
@@ -121,7 +124,7 @@
     </model>
 
     <!-- multi-camera model with lens flare plugin -->
-    <model name="multi_camera_lensflare">
+<!--    <model name="multi_camera_lensflare">
       <static>true</static>
       <pose>0 4 0.05 0 0 0</pose>
       <link name="link">
@@ -164,6 +167,7 @@
         </sensor>
       </link>
     </model>
+-->
 
   </world>
 </sdf>

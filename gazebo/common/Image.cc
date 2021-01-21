@@ -482,6 +482,10 @@ Image::PixelFormat Image::ConvertPixelFormat(const std::string &_format)
     // better to add a RGB_UINT16 format to distinguish between the two
     return RGB_INT16;
   }
+  else if (_format == "FLOAT32")
+    return R_FLOAT32;
+  else if (_format == "FLOAT16")
+    return R_FLOAT16;
 
   for (unsigned int i = 0; i < PIXEL_FORMAT_COUNT; ++i)
     if (PixelFormatNames[i] == _format)
