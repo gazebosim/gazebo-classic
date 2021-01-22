@@ -132,7 +132,7 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
 
       for (unsigned int i = 0u; i < depthSamples; ++i)
       {
-        // convert 16 bit halft float to 32 bit float
+        // convert 16 bit half float to 32 bit float
         // https://stackoverflow.com/questions/1659440
         uint16_t h = this->dataPtr->imageBufferHalf[i];
         uint32_t f32 = ((h&0x8000)<<16) | (((h&0x7c00)+0x1C000)<<13) |
