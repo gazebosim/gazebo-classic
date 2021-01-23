@@ -470,6 +470,11 @@
 
 ## Gazebo 9.xx.x (202x-xx-xx)
 
+## Gazebo 9.16.0 (2020-11-24)
+
+1. Fix support for camera with single channel floating point image format
+    * [Pull request #2918](https://github.com/osrf/gazebo/pull/2918)
+
 1. Updated the version of TinyOBJLoader from 1.0.0 to 2.0.0rc8.
     * [Pull request #2885](https://github.com/osrf/gazebo/pull/2885)
 
@@ -478,6 +483,18 @@
 
 1. Fix physics based sensor update rate in lockstep mode
     * [Pull request #2863](https://github.com/osrf/gazebo/pull/2863)
+
+1. Added Profiler to gazebo::rendering and gzclient
+    * [Pull request #2836](https://github.com/osrf/gazebo/pull/2836)
+
+1. Fix segfault when deleting an model that's being manipulated
+    * [Pull request #2856](https://github.com/osrf/gazebo/pull/2856)
+
+1. SimpleTrackedVehiclePlugin: fix for boost 1.74
+    * [Pull request #2865](https://github.com/osrf/gazebo/pull/2865)
+
+1. Add mutex to make Sensor::SetActive threadsafe
+    * [Pull request #2871](https://github.com/osrf/gazebo/pull/2871)
 
 ## Gazebo 9.15.0 (2020-09-30)
 
@@ -1930,6 +1947,17 @@
 ## Gazebo 7
 
 ## Gazebo 7.X.X (2019-XX-XX)
+
+## Gazebo 7.16.1 (2019-07-28)
+
+1. Remove X11 call from Gazebo 7
+    * [BitBucket pull request 3195](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3195)
+
+1. Update BitBucket links
+    * [Pull request 2715](https://github.com/osrf/gazebo/pull/2715)
+
+1. [backport Gazebo7] Fixed crash when collision size is zero
+    * [Pull request 2769](https://github.com/osrf/gazebo/pull/2769)
 
 ## Gazebo 7.16.0 (2019-09-04)
 
