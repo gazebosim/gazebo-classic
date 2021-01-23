@@ -36,6 +36,8 @@ ImageFrame::~ImageFrame()
     delete [] this->dataPtr->depthBuffer;
   if (this->dataPtr->imageBuffer)
     delete [] this->dataPtr->imageBuffer;
+  if (this->dataPtr->imageBufferHalf)
+    delete [] this->dataPtr->imageBufferHalf;
 }
 
 /////////////////////////////////////////////////
@@ -101,6 +103,8 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
     this->dataPtr->imageBuffer = nullptr;
     delete [] this->dataPtr->depthBuffer;
     this->dataPtr->depthBuffer = nullptr;
+    delete [] this->dataPtr->imageBufferHalf;
+    this->dataPtr->imageBufferHalf = nullptr;
   }
 
   // Convert the image data to RGB
@@ -113,7 +117,31 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
 
     if (!this->dataPtr->depthBuffer)
       this->dataPtr->depthBuffer = new float[depthSamples];
-    memcpy(this->dataPtr->depthBuffer, _msg.data().c_str(), depthBufferSize);
+
+    if (_msg.pixel_format() == common::Image::PixelFormat::R_FLOAT32)
+    {
+      memcpy(this->dataPtr->depthBuffer, _msg.data().c_str(), depthBufferSize);
+    }
+    else if (_msg.pixel_format() == common::Image::PixelFormat::R_FLOAT16)
+    {
+      if (!this->dataPtr->imageBufferHalf)
+        this->dataPtr->imageBufferHalf = new uint16_t[depthSamples];
+
+      memcpy(this->dataPtr->imageBufferHalf, _msg.data().c_str(),
+          depthBufferSize / 2.0);
+
+      for (unsigned int i = 0u; i < depthSamples; ++i)
+      {
+        // convert 16 bit half float to 32 bit float
+        // https://stackoverflow.com/a/26779139
+        uint16_t h = this->dataPtr->imageBufferHalf[i];
+        uint32_t f32 = ((h&0x8000)<<16) | (((h&0x7c00)+0x1C000)<<13) |
+            ((h&0x03FF)<<13);
+        float ret;
+        std::memcpy(&ret, &f32, sizeof(float));
+        this->dataPtr->depthBuffer[i] = ret;
+      }
+    }
 
     float maxDepth = 0;
     for (unsigned int i = 0; i < _msg.height() * _msg.width(); ++i)
