@@ -2,6 +2,16 @@
 
 ## Gazebo 11.x.x (202x-xx-xx)
 
+1. Fix support for camera with single channel floating point image format
+    * [Pull request #2918](https://github.com/osrf/gazebo/pull/2918)
+
+1. Fix performance metrics deadlock with multiple types of sensors
+    * [Pull request #2917](https://github.com/osrf/gazebo/pull/2917)
+    * [Issue #2902](https://github.com/osrf/gazebo/issues/2902)
+
+1. Generate spot light shadow maps
+    * [Pull request #2914](https://github.com/osrf/gazebo/pull/2914)
+
 1. DARTHeightmapShape: correctly load asymmetric terrains
     * [Pull request #2818](https://github.com/osrf/gazebo/pull/2818)
 
@@ -470,10 +480,17 @@
 
 ## Gazebo 9.xx.x (202x-xx-xx)
 
-## Gazebo 9.16.0 (2020-11-24)
-
 1. Fix support for camera with single channel floating point image format
     * [Pull request #2918](https://github.com/osrf/gazebo/pull/2918)
+
+1. Fix performance metrics deadlock with multiple types of sensors
+    * [Pull request #2917](https://github.com/osrf/gazebo/pull/2917)
+    * [Issue #2902](https://github.com/osrf/gazebo/issues/2902)
+
+1. Generate spot light shadow maps
+    * [Pull request #2914](https://github.com/osrf/gazebo/pull/2914)
+
+## Gazebo 9.16.0 (2020-11-24)
 
 1. Updated the version of TinyOBJLoader from 1.0.0 to 2.0.0rc8.
     * [Pull request #2885](https://github.com/osrf/gazebo/pull/2885)
