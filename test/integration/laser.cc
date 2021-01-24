@@ -37,7 +37,15 @@ class LaserTest : public ServerFixture,
   public: void LaserUnitNoise(const std::string &_physicsEngine);
   public: void LaserVertical(const std::string &_physicsEngine);
   public: void LaserScanResolution(const std::string &_physicsEngine);
+  public: void LaserStrictUpdateRate(const std::string &_physicsEngine);
+
+  private: void OnNewUpdate(int* _msgCounter);
 };
+
+void LaserTest::OnNewUpdate(int* _msgCounter)
+{
+  *_msgCounter += 1;
+}
 
 void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 {
@@ -606,6 +614,59 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
 TEST_P(LaserTest, LaserNoise)
 {
   LaserUnitNoise(GetParam());
+}
+
+void LaserTest::LaserStrictUpdateRate(const std::string &)
+{
+  LoadArgs(" --lockstep worlds/laser_hit_strict_rate_test.world");
+
+  // Wait until the sensors have been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
+  std::string rayName = "laser";
+  sensors::SensorPtr sensor = sensors::get_sensor(rayName);
+  sensors::RaySensorPtr raySensor =
+      std::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+  ASSERT_TRUE(raySensor != NULL);
+
+  int msgCount = 0;
+  event::ConnectionPtr c = raySensor->ConnectUpdated(
+      std::bind(&LaserTest::OnNewUpdate, this, &msgCount));
+  common::Timer timer;
+  timer.Start();
+
+  // how many msgs produced for 5 seconds (in simulated clock domain)
+  double updateRate = raySensor->UpdateRate();
+  int totalMsgs = 5 * updateRate;
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  double simT0 = 0.0;
+
+  while (msgCount < totalMsgs)
+  {
+    // An approximation of when we receive the first image. In reality one
+    // iteration before we receive the second image.
+    if (msgCount == 0)
+    {
+      simT0 = world->SimTime().Double();
+    }
+    common::Time::MSleep(1);
+  }
+
+  // check that the obtained rate is the one expected
+  double dt = world->SimTime().Double() - simT0;
+  double rate = static_cast<double>(totalMsgs) / dt;
+  gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
+  const double tolerance = 0.02;
+  EXPECT_GT(rate, updateRate * (1 - tolerance));
+  EXPECT_LT(rate, updateRate * (1 + tolerance));
+  c.reset();
+}
+
+TEST_P(LaserTest, LaserStrictUpdateRate)
+{
+  LaserStrictUpdateRate(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, LaserTest, PHYSICS_ENGINE_VALUES);

@@ -56,6 +56,8 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
+#include "gazebo/rendering/RenderingIface.hh"
+
 #include "gazebo/Master.hh"
 #include "gazebo/Server.hh"
 
@@ -98,6 +100,9 @@ namespace gazebo
 
     /// \brief Save argv for access by system plugins.
     char **systemPluginsArgv;
+
+    /// \brief Set whether to lockstep physics and rendering
+    bool lockstep = false;
   };
 }
 
@@ -147,6 +152,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("verbose", "Increase the messages written to the terminal.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
+    ("lockstep", "Lockstep simulation so sensor update rates are respected.")
     ("physics,e", po::value<std::string>(),
      "Specify a physics engine (ode|bullet|dart|simbody).")
     ("play,p", po::value<std::string>(), "Play a log file.")
@@ -279,6 +285,12 @@ bool Server::ParseArgs(int _argc, char **_argv)
         this->dataPtr->vm["iters"].as<unsigned int>() << "]\n";
     }
   }
+
+  if (this->dataPtr->vm.count("lockstep"))
+  {
+    this->dataPtr->lockstep = true;
+  }
+  rendering::set_lockstep_enabled(this->dataPtr->lockstep);
 
   if (!this->PreLoad())
   {
@@ -495,7 +507,11 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
       << " seconds for namespaces. Giving up.\n";
   }
 
-  physics::init_worlds();
+  if (this->dataPtr->lockstep)
+    physics::init_worlds(rendering::update_scene_poses);
+  else
+    physics::init_worlds(nullptr);
+
   this->dataPtr->stop = false;
 
   return true;
@@ -584,6 +600,9 @@ void Server::Run()
   // The server and sensor manager outlive worlds
   while (!this->dataPtr->stop)
   {
+    if (this->dataPtr->lockstep)
+      rendering::wait_for_render_request("", 0.100);
+
     this->ProcessControlMsgs();
 
     if (physics::worlds_running())
@@ -591,7 +610,8 @@ void Server::Run()
     else if (sensors::running())
       sensors::stop();
 
-    common::Time::MSleep(1);
+    if (!this->dataPtr->lockstep)
+      common::Time::MSleep(1);
   }
 
   // Shutdown gazebo

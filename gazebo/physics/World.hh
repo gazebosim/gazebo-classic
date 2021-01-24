@@ -100,6 +100,12 @@ namespace gazebo
       /// This is called after Load.
       public: void Init();
 
+      /// \brief Initialize the world.
+      /// This is called after Load.
+      /// \param[in] _func function to be called when Poses are available.
+      public: void Init(std::function<
+         void(const std::string &, const msgs::PosesStamped &)> _func);
+
       /// \brief Run the world in a thread.
       /// Run the update loop.
       /// \param[in] _iterations Run for this many iterations, then stop.
@@ -448,6 +454,10 @@ namespace gazebo
       /// \param[in] _name Desired model name.
       /// \return Unique model name.
       public: std::string UniqueModelName(const std::string &_name);
+
+      /// \brief Set callback 'waitForSensors'
+      /// \param[in] function to be called
+      public: void SetSensorWaitFunc(std::function<void(double, double)> _func);
 
       /// \cond
       /// This is an internal function.

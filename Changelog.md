@@ -272,7 +272,15 @@
 
 ## Gazebo 9.xx.x (202x-xx-xx)
 
-## Gazebo 9.13.2 (202x-xx-xx)
+## Gazebo 9.14.0 (2020-08-07)
+
+1. Lockstep between sensors and physics
+    * [Pull request #2793](https://github.com/osrf/gazebo/pull/2793)
+
+1. Fix race condition on Publisher shutdown
+    * [Pull request #2812](https://github.com/osrf/gazebo/pull/2812)
+
+## Gazebo 9.13.2 (2020-07-20)
 
 1. Fix sensor update rate throttling when new sensors are spawned
     * [Pull request #2784](https://github.com/osrf/gazebo/pull/2784)
@@ -1686,6 +1694,17 @@
 ## Gazebo 7
 
 ## Gazebo 7.X.X (2019-XX-XX)
+
+## Gazebo 7.16.1 (2019-07-28)
+
+1. Remove X11 call from Gazebo 7
+    * [BitBucket pull request 3195](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3195)
+
+1. Update BitBucket links
+    * [Pull request 2715](https://github.com/osrf/gazebo/pull/2715)
+
+1. [backport Gazebo7] Fixed crash when collision size is zero
+    * [Pull request 2769](https://github.com/osrf/gazebo/pull/2769)
 
 ## Gazebo 7.16.0 (2019-09-04)
 

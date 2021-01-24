@@ -59,23 +59,23 @@ namespace gazebo
       /// \param[in] _sdf SDF Sensor parameters
       /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName,
-                                sdf::ElementPtr _sdf);
+                                sdf::ElementPtr _sdf) override;
 
       /// \brief Load the sensor with default parameters
       /// \param[in] _worldName Name of world to load from
-      public: virtual void Load(const std::string &_worldName);
+      public: virtual void Load(const std::string &_worldName) override;
 
       /// \brief Initialize the ray
-      public: virtual void Init();
+      public: virtual void Init() override;
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(const bool _force);
+      protected: virtual bool UpdateImpl(const bool _force) override;
 
       /// \brief Finalize the ray
       protected: virtual void Fini();
 
       // Documentation inherited
-      public: virtual std::string Topic() const;
+      public: virtual std::string Topic() const override;
 
       /// \brief Returns a pointer to the internally kept rendering::GpuLaser
       /// \return Pointer to GpuLaser
@@ -246,10 +246,13 @@ namespace gazebo
         unsigned int, const std::string &)> _subscriber);
 
       // Documentation inherited
-      public: virtual bool IsActive() const;
+      public: virtual bool IsActive() const override;
 
       /// brief Render the camera.
       private: void Render();
+
+      /// \brief Handle the prerenderEnded event.
+      private: void PrerenderEnded();
 
       /// \internal
       /// \brief Private data pointer.
