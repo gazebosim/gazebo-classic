@@ -110,8 +110,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
 
   this->dataPtr->deleteCanvasAct = new QAction("Delete canvas", settingsMenu);
   this->dataPtr->deleteCanvasAct->setStatusTip(tr("Delete entire canvas"));
-  connect(this->dataPtr->deleteCanvasAct, SIGNAL(triggered()), this,
-      SLOT(OnDeleteCanvas()));
+  connect(this->dataPtr->deleteCanvasAct, SIGNAL(triggered()), this, SLOT(OnDeleteCanvas()));
 
   QAction *showGridAct = new QAction("Show grid", settingsMenu);
   showGridAct->setStatusTip(tr("Show/hide grid lines on plot"));
@@ -167,17 +166,17 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   this->dataPtr->yVariableContainer->setContentsMargins(0, 0, 0, 0);
 
   connect(this->dataPtr->yVariableContainer,
-      SIGNAL(VariableAdded(unsigned int, std::string, unsigned int)),
-      this, SLOT(OnAddVariable(unsigned int, std::string, unsigned int)));
+          SIGNAL(VariableAdded(unsigned int, std::string, unsigned int)),
+          this, SLOT(OnAddVariable(unsigned int, std::string, unsigned int)));
   connect(this->dataPtr->yVariableContainer,
-      SIGNAL(VariableRemoved(unsigned int, unsigned int)),
-      this, SLOT(OnRemoveVariable(unsigned int, unsigned int)));
+          SIGNAL(VariableRemoved(unsigned int, unsigned int)),
+          this, SLOT(OnRemoveVariable(unsigned int, unsigned int)));
   connect(this->dataPtr->yVariableContainer,
-      SIGNAL(VariableMoved(unsigned int, unsigned int)),
-      this, SLOT(OnMoveVariable(unsigned int, unsigned int)));
+          SIGNAL(VariableMoved(unsigned int, unsigned int)),
+          this, SLOT(OnMoveVariable(unsigned int, unsigned int)));
   connect(this->dataPtr->yVariableContainer,
-      SIGNAL(VariableLabelChanged(unsigned int, std::string)),
-      this, SLOT(OnSetVariableLabel(unsigned int, std::string)));
+          SIGNAL(VariableLabelChanged(unsigned int, std::string)),
+          this, SLOT(OnSetVariableLabel(unsigned int, std::string)));
 
   QVBoxLayout *variableContainerLayout = new QVBoxLayout;
   variableContainerLayout->addWidget(xVariableContainer);
@@ -211,8 +210,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
 
   // empty plot
   this->dataPtr->emptyPlot = new IncrementalPlot(this);
-  connect(this->dataPtr->emptyPlot, SIGNAL(VariableAdded(std::string)),
-      this, SLOT(OnAddVariable(std::string)));
+  connect(this->dataPtr->emptyPlot, SIGNAL(VariableAdded(std::string)), this, SLOT(OnAddVariable(std::string)));
   plotLayout->addWidget(this->dataPtr->emptyPlot);
 
   // set initial show grid state
@@ -250,8 +248,7 @@ void PlotCanvas::SetVariableLabel(const unsigned int _id,
 }
 
 /////////////////////////////////////////////////
-unsigned int PlotCanvas::AddVariable(const std::string &_variable,
-    const unsigned int _plotId)
+unsigned int PlotCanvas::AddVariable(const std::string &_variable, const unsigned int _plotId)
 {
   unsigned int targetId = VariablePill::EmptyVariable;
   if (_plotId != EmptyPlot)
@@ -259,8 +256,7 @@ unsigned int PlotCanvas::AddVariable(const std::string &_variable,
     // find a variable that belongs to the specified plotId and make that the
     // the target variable that the new variable will be added to
     auto it = this->dataPtr->plotData.find(_plotId);
-    if (it != this->dataPtr->plotData.end() &&
-        !it->second->variableCurves.empty())
+    if (it != this->dataPtr->plotData.end() && !it->second->variableCurves.empty())
     {
       targetId = it->second->variableCurves.begin()->first;
     }
@@ -268,13 +264,13 @@ unsigned int PlotCanvas::AddVariable(const std::string &_variable,
 
   // add to container and let the signals/slots do the work on adding the
   // a new plot with the curve in the overloaded AddVariable function
-  return this->dataPtr->yVariableContainer->AddVariablePill(_variable,
-      targetId);
+  unsigned int _retVal = this->dataPtr->yVariableContainer->AddVariablePill(_variable, targetId);
+
+  return _retVal;
 }
 
 /////////////////////////////////////////////////
-void PlotCanvas::AddVariable(const unsigned int _id,
-    const std::string &_variable, const unsigned int _plotId)
+void PlotCanvas::AddVariable(const unsigned int _id, const std::string &_variable, const unsigned int _plotId)
 {
   unsigned int plotId;
   if (_plotId == EmptyPlot)
@@ -330,16 +326,41 @@ void PlotCanvas::AddVariable(const unsigned int _id,
   }
 }
 
+
 /////////////////////////////////////////////////
-void PlotCanvas::RemoveVariable(const unsigned int _id,
-    const unsigned int _plotId)
+void PlotCanvas::AddVariable(const std::string &_variable, IncrementalPlot *plot_in)
+{
+  if (!plot_in)
+    return;
+
+  if (plot_in == this->dataPtr->emptyPlot)
+  {
+    // add new variable to new plot
+    this->AddVariable(_variable);
+  }
+  else
+  {
+    for (const auto &it : this->dataPtr->plotData)
+    {
+      if (plot_in == it.second->plot)
+      {
+        // add to existing plot
+        this->AddVariable(_variable, it.second->id);
+        return;
+      }
+    }
+  }
+}
+
+
+/////////////////////////////////////////////////
+void PlotCanvas::RemoveVariable(const unsigned int _id, const unsigned int _plotId)
 {
   auto it = this->dataPtr->plotData.end();
   if (_plotId == EmptyPlot)
   {
     // find which plot the variable belongs to
-    for (auto pIt = this->dataPtr->plotData.begin();
-        pIt != this->dataPtr->plotData.end(); ++pIt)
+    for (auto pIt = this->dataPtr->plotData.begin(); pIt != this->dataPtr->plotData.end(); ++pIt)
     {
       auto v = pIt->second->variableCurves.find(_id);
       if (v != pIt->second->variableCurves.end())
@@ -414,8 +435,7 @@ unsigned int PlotCanvas::AddPlot()
   plot->setAutoDelete(false);
   plot->ShowGrid(this->dataPtr->emptyPlot->IsShowGrid());
   plot->ShowHoverLine(this->dataPtr->emptyPlot->IsShowHoverLine());
-  connect(plot, SIGNAL(VariableAdded(std::string)), this,
-      SLOT(OnAddVariable(std::string)));
+  connect(plot, SIGNAL(VariableAdded(std::string)), this, SLOT(OnAddVariable(std::string)));
   this->dataPtr->plotSplitter->addWidget(plot);
 
   PlotData *p = new PlotData;
@@ -487,8 +507,7 @@ unsigned int PlotCanvas::PlotByVariable(const unsigned int _variableId) const
 /////////////////////////////////////////////////
 void PlotCanvas::OnAddVariable(const std::string &_variable)
 {
-  IncrementalPlot *plot =
-      qobject_cast<IncrementalPlot *>(QObject::sender());
+  IncrementalPlot *plot = qobject_cast<IncrementalPlot *>(QObject::sender());
 
   if (!plot)
     return;
@@ -513,8 +532,7 @@ void PlotCanvas::OnAddVariable(const std::string &_variable)
 }
 
 /////////////////////////////////////////////////
-void PlotCanvas::OnAddVariable(const unsigned int _id,
-    const std::string &_variable, const unsigned int _targetId)
+void PlotCanvas::OnAddVariable(const unsigned int _id, const std::string &_variable, const unsigned int _targetId)
 {
   if (_targetId != VariablePill::EmptyVariable)
   {
@@ -544,9 +562,9 @@ void PlotCanvas::OnRemoveVariable(const unsigned int _id,
 }
 
 /////////////////////////////////////////////////
-void PlotCanvas::OnMoveVariable(const unsigned int _id,
-    const unsigned int _targetId)
+void PlotCanvas::OnMoveVariable(const unsigned int _id, const unsigned int _targetId)
 {
+  printf("OnMoveVariable\n");
   auto plotIt = this->dataPtr->plotData.end();
   auto targetPlotIt = this->dataPtr->plotData.end();
   unsigned int curveId = 0;
@@ -677,8 +695,7 @@ void PlotCanvas::Restart()
       unsigned int curveId = v.second;
 
       // get variable pill
-      VariablePill *variablePill =
-          this->dataPtr->yVariableContainer->GetVariablePill(variableId);
+      VariablePill *variablePill = this->dataPtr->yVariableContainer->GetVariablePill(variableId);
 
       if (!variablePill)
         continue;
@@ -908,8 +925,7 @@ std::string PlotCanvas::Title() const
 }
 
 /////////////////////////////////////////////////
-void PlotCanvas::Export(const std::string &_dirName,
-    const FileType _type) const
+void PlotCanvas::Export(const std::string &_dirName, const FileType _type) const
 {
   std::string title = this->Title();
 
@@ -940,8 +956,7 @@ void PlotCanvas::ExportPDF(const std::string &_filePrefix) const
 
     IncrementalPlot *plot = it.second->plot;
 
-    QSizeF docSize(plot->canvas()->width() + plot->legend()->width(),
-                   plot->canvas()->height());
+    QSizeF docSize(plot->canvas()->width() + plot->legend()->width(), plot->canvas()->height());
 
     QwtPlotRenderer renderer;
     renderer.renderDocument(plot, QString(filename.c_str()), docSize, 20);
@@ -969,8 +984,7 @@ void PlotCanvas::ExportCSV(const std::string &_filePrefix) const
       std::replace(label.begin(), label.end(), '/', '_');
       std::replace(label.begin(), label.end(), '?', ':');
 
-      std::string filename =
-          common::unique_file_path(_filePrefix + "-" + label, "csv");
+      std::string filename = common::unique_file_path(_filePrefix + "-" + label, "csv");
 
       std::ofstream out(filename);
       // \todo: fix hardcoded sim_time

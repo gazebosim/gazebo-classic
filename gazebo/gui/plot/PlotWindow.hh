@@ -47,6 +47,12 @@ namespace gazebo
       /// \brief Add a new canvas.
       public: PlotCanvas *AddCanvas();
 
+      /// \brief Save canvas layout
+      public: void SavePlotLayout();
+
+      /// \brief Load canvas layout
+      public: void LoadPlotLayout();
+
       /// \brief Get a list of all the plots
       /// \return A list of all the plots.
       public: std::list<PlotCanvas *> Plots();
@@ -79,6 +85,12 @@ namespace gazebo
 
       /// \brief Qt Callback when a new plot canvas should be added.
       private slots: void OnAddCanvas();
+
+      /// \brief Qt Callback when the canvas setup should be saved.
+      private slots: void OnSaveCanvas();
+
+      /// \brief Qt Callback when the canvas setup should be loaded.
+      private slots: void OnLoadCanvas();
 
       /// \brief Qt Callback when a plot canvas should be removed.
       private slots: void OnRemoveCanvas();

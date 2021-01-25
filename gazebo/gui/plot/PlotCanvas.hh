@@ -51,23 +51,25 @@ namespace gazebo
       /// \brief Set the label of a variable.
       /// \param[in] _id Unique id of the variable
       /// \param[in] _label New variable label.
-      public: void SetVariableLabel(const unsigned int _id,
-          const std::string &_label);
+      public: void SetVariableLabel(const unsigned int _id, const std::string &_label);
 
       /// \brief Add a new variable to a plot.
       /// \param[in] _variable Name of the variable.
       /// \param[in] _plotId Unique id of the plot to add the variable to.
       /// \return Unique id of the variable
-      public: unsigned int AddVariable(const std::string &_variable,
-          const unsigned int _plotId = EmptyPlot);
+      public: unsigned int AddVariable(const std::string &_variable, const unsigned int _plotId = EmptyPlot);
+
+      /// \brief Add a new variable to a plot.
+      /// \param[in] _variable Name of the variable.
+      /// \param[in] _plot pointer to the plot to add the variable to.
+      public: void AddVariable(const std::string &_variable, IncrementalPlot *plot);
 
       /// \brief Remove a variable from a plot.
       /// \param[in] _id Unique id of the variable
       /// \param[in] _plotId Unique id of plot to remove the variable from.
       /// If EmptyPlot is specified, the function will search through all
       /// plots for the variable and remove it from the plot if found.
-      public: void RemoveVariable(const unsigned int _id,
-          const unsigned int _plotId = EmptyPlot);
+      public: void RemoveVariable(const unsigned int _id, const unsigned int _plotId = EmptyPlot);
 
       /// \brief Add a new plot to the canvas.
       /// \return Unique id of the plot
@@ -147,9 +149,7 @@ namespace gazebo
       /// \param[in] _variable Name of the variable
       /// \param[in] _plotId Unique id of the plot to add the variable to.
       /// EmptyPlot means add to a new plot.
-      private: void AddVariable(const unsigned int _id,
-          const std::string &_variable,
-          const unsigned int _plotId = EmptyPlot);
+      private: void AddVariable(const unsigned int _id, const std::string &_variable, const unsigned int _plotId = EmptyPlot);
 
       /// \brief Update the axis label for plots in the canvas.
       /// Currently used to determine which plot will display the x-axis label
