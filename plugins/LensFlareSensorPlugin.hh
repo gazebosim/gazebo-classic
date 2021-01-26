@@ -30,6 +30,8 @@ namespace gazebo
   /// The plugin has the following optional parameter:
   /// <scale>       Scale of lens flare. Must be greater than 0
   /// <color>       Color of lens flare.
+  /// \todo A potentially useful feature would be an option for contantly
+  /// updating the flare color to match the light source color.
   class GAZEBO_VISIBLE LensFlareSensorPlugin : public SensorPlugin
   {
     /// \brief Constructor.
@@ -44,11 +46,11 @@ namespace gazebo
 
     /// \brief Set the scale of lens flare.
     /// \param[in] _scale Scale of lens flare
-    public: void SetScale(double _scale);
+    public: void SetScale(const double _scale);
 
     /// \brief Set the color of lens flare.
     /// \param[in] _color Color of lens flare
-    public: void SetColor(ignition::math::Vector3d _color);
+    public: void SetColor(const ignition::math::Vector3d& _color);
 
     /// \brief Add lens flare effect to a camera
     /// \param[in] _camera Camera to add the lens flare effect to.

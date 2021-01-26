@@ -457,7 +457,7 @@ void LensFlare::SetScale(const double _scale)
 }
 
 //////////////////////////////////////////////////
-void LensFlare::SetColor(const ignition::math::Vector3d _color)
+void LensFlare::SetColor(const ignition::math::Vector3d& _color)
 {
   // lensFlareColor is intentionally not clamped so the user can work in
   // HDR color spaces or be artistic.
