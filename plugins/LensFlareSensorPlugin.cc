@@ -35,6 +35,10 @@ namespace gazebo
 
     /// \brief Lens flare scale
     public: double scale = 1.0;
+
+    /// \brief Lens flare color
+    public: ignition::math::Vector3d color
+        = ignition::math::Vector3d(1.4, 1.2, 1.0);
   };
 }
 
@@ -75,6 +79,11 @@ void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor,
       gzerr << "Lens flare scale must be greater than 0" << std::endl;
   }
 
+  if (_sdf->HasElement("color"))
+  {
+    this->dataPtr->color = _sdf->Get<ignition::math::Vector3d>("color");
+  }
+
   sensors::CameraSensorPtr cameraSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
 
@@ -102,6 +111,28 @@ void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor,
 }
 
 /////////////////////////////////////////////////
+void LensFlareSensorPlugin::SetScale(double _scale)
+{
+  this->dataPtr->scale = _scale;
+
+  for (auto flare : this->dataPtr->lensFlares)
+  {
+    flare->SetScale(_scale);
+  }
+}
+
+/////////////////////////////////////////////////
+void LensFlareSensorPlugin::SetColor(ignition::math::Vector3d _color)
+{
+  this->dataPtr->color = _color;
+
+  for (auto flare : this->dataPtr->lensFlares)
+  {
+    flare->SetColor(_color);
+  }
+}
+
+/////////////////////////////////////////////////
 void LensFlareSensorPlugin::AddLensFlare(rendering::CameraPtr _camera)
 {
   if (!_camera)
@@ -111,5 +142,6 @@ void LensFlareSensorPlugin::AddLensFlare(rendering::CameraPtr _camera)
   lensFlare.reset(new rendering::LensFlare);
   lensFlare->SetCamera(_camera);
   lensFlare->SetScale(this->dataPtr->scale);
+  lensFlare->SetColor(this->dataPtr->color);
   this->dataPtr->lensFlares.push_back(lensFlare);
 }

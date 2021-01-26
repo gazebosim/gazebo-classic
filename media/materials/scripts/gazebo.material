@@ -1545,12 +1545,12 @@ material Gazebo/WideLensMap
 }
 
 
-vertex_program Gazebo/CameraLesnFlareVS glsl
+vertex_program Gazebo/CameraLensFlareVS glsl
 {
   source camera_lens_flare_vs.glsl
 }
 
-fragment_program Gazebo/CameraLesnFlareFS glsl
+fragment_program Gazebo/CameraLensFlareFS glsl
 {
   source camera_lens_flare_fs.glsl
 
@@ -1562,6 +1562,7 @@ fragment_program Gazebo/CameraLesnFlareFS glsl
     param_named viewport float3 0.0 0.0 0.0
     param_named lightPos float3 0 0 0
     param_named scale float 1.0
+    param_named color float3 1.4 1.2 1.0
   }
 }
 
@@ -1571,8 +1572,8 @@ material Gazebo/CameraLensFlare
   {
     pass
     {
-      vertex_program_ref Gazebo/CameraLesnFlareVS { }
-      fragment_program_ref Gazebo/CameraLesnFlareFS { }
+      vertex_program_ref Gazebo/CameraLensFlareVS { }
+      fragment_program_ref Gazebo/CameraLensFlareFS { }
 
       texture_unit RT
       {

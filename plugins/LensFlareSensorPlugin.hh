@@ -28,7 +28,8 @@ namespace gazebo
   /// \brief Plugin that adds lens flare effect to a camera or multicamera
   /// sensor
   /// The plugin has the following optional parameter:
-  /// <scale>     Scale of lens flare. Must be greater than 0
+  /// <scale>       Scale of lens flare. Must be greater than 0
+  /// <color>       Color of lens flare.
   class GAZEBO_VISIBLE LensFlareSensorPlugin : public SensorPlugin
   {
     /// \brief Constructor.
@@ -40,6 +41,14 @@ namespace gazebo
     // Documentation inherited
     public: virtual void Load(sensors::SensorPtr _sensor,
         sdf::ElementPtr _sdf);
+
+    /// \brief Set the scale of lens flare.
+    /// \param[in] _scale Scale of lens flare
+    public: void SetScale(double _scale);
+
+    /// \brief Set the color of lens flare.
+    /// \param[in] _color Color of lens flare
+    public: void SetColor(ignition::math::Vector3d _color);
 
     /// \brief Add lens flare effect to a camera
     /// \param[in] _camera Camera to add the lens flare effect to.

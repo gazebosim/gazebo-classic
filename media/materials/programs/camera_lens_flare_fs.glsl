@@ -11,6 +11,9 @@ uniform vec3 lightPos;
 // lens flare scale
 uniform float scale;
 
+// lens flare color
+uniform vec3 color;
+
 float noise(float t)
 {
   // 256 is the size of noiseRGBA texture
@@ -97,9 +100,9 @@ void main()
   pos.x *= aspect;
 
   // compute lens flare
-  vec3 color = vec3(1.4,1.2,1.0)*lensflare(uv, pos.xy);
-  color = cc(color,.5,.1);
+  vec3 finalColor = color * lensflare(uv, pos.xy);
+  finalColor = cc(finalColor,.5,.1);
 
   // apply lens flare
-  gl_FragColor = texture2D(RT, gl_TexCoord[0].xy) + vec4(color, 1.0);
+  gl_FragColor = texture2D(RT, gl_TexCoord[0].xy) + vec4(finalColor, 1.0);
 }

@@ -58,6 +58,10 @@ namespace gazebo
       /// \param[in] _scale Scale of lens flare
       public: void SetScale(const double _scale);
 
+      /// \brief Set the color of lens flare.
+      /// \param[in] _color Color of lens flare
+      public: void SetColor(const ignition::math::Vector3d _color);
+
       /// \brief Update function to search light source
       private: void Update();
 
