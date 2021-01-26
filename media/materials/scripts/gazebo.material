@@ -1557,8 +1557,6 @@ fragment_program Gazebo/CameraLensFlareFS glsl
   default_params
   {
     param_named RT int 0
-    param_named noiseRGBA int 1
-    param_named time float 0.0
     param_named viewport float3 0.0 0.0 0.0
     param_named lightPos float3 0 0 0
     param_named scale float 1.0
@@ -1580,10 +1578,6 @@ material Gazebo/CameraLensFlare
         tex_coord_set 0
         tex_address_mode border
         filtering linear linear linear
-      }
-      texture_unit noiseRGBA
-      {
-        texture noise_rgba.png
       }
     }
   }

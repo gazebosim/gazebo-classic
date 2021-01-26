@@ -35,8 +35,7 @@ namespace gazebo
   namespace rendering
   {
     /// \brief We'll create an instance of this class for each camera, to be
-    /// used to inject lens flare uniforms and time (for animating flare)
-    /// in each render call.
+    /// used to inject lens flare uniforms in each render call.
     class LensFlareCompositorListener
       : public Ogre::CompositorInstance::Listener
     {
@@ -103,9 +102,6 @@ namespace gazebo
             pass->getFragmentProgramParameters();
         GZ_ASSERT(!params.isNull(), "Null OGRE material GPU parameters");
 
-        // used for animating flare
-        params->setNamedConstant("time", static_cast<Ogre::Real>(
-            common::Time::GetWallTime().Double()));
         // for adjusting aspect ratio of flare
         params->setNamedConstant("viewport",
             Ogre::Vector3(static_cast<double>(this->camera->ViewportWidth()),
