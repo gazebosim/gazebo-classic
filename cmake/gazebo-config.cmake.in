@@ -7,7 +7,7 @@ set(@PKG_NAME@_MAJOR_VERSION @GAZEBO_MAJOR_VERSION@)
 
 @PACKAGE_INIT@
 
-# Includeing Dartsim will overwrite the PACKAGE_PREFIX_DIR, therefore make gazebo-specific vars
+# Including Dartsim will overwrite the PACKAGE_PREFIX_DIR, therefore make gazebo-specific vars
 set(GAZEBO_INSTALL_DATAROOT_DIR @PACKAGE_DATAROOT_INSTALL_DIR@)
 set(GAZEBO_INSTALL_LIB_DIR @PACKAGE_LIB_INSTALL_DIR@)
 set(GAZEBO_INSTALL_INCLUDE_DIR @PACKAGE_BASE_INSTALL_INCLUDEDIR@)
