@@ -18,7 +18,6 @@ set (files
   hardwood_floor.jpg
   heightmap_bowl.png
   motorway.jpg
-  noise_rgba.png
   paintedWall.jpg
   pioneerBody.jpg
   primary.jpg

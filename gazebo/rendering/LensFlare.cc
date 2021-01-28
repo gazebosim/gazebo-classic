@@ -72,7 +72,7 @@ namespace gazebo
 
       /// \brief Set the color of lens flare.
       /// \param[in] _color Color of lens flare
-      public: void SetColor(const ignition::math::Vector3d _color)
+      public: void SetColor(const ignition::math::Vector3d& _color)
       {
         this->color = _color;
       }
