@@ -1,0 +1,14 @@
+material "material with spaces"
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture "texture with spaces.png"
+      }
+    }
+  }
+}
+

@@ -700,9 +700,10 @@ endif()
 
 ########################################
 # Find uuid
-#  - In UNIX we use uuid library.
+#  - In UNIX if not APPLE we use uuid library.
+#  - On APPLE we use the uuid library provided by the OS's SDK.
 #  - In Windows the native RPC call, no dependency needed.
-if (UNIX)
+if (UNIX AND NOT APPLE)
   pkg_check_modules(uuid uuid)
   if (uuid_FOUND)
     message (STATUS "Looking for uuid - found")
@@ -711,6 +712,9 @@ if (UNIX)
     set (HAVE_UUID FALSE)
     BUILD_WARNING ("uuid-dev library not found - Gazebo will not have uuid support.")
   endif ()
+elseif(APPLE)
+  message (STATUS "Using macOS-provided uuid library")
+  set (HAVE_UUID TRUE)
 else()
   message (STATUS "Using Windows RPC UuidCreate function")
   set (HAVE_UUID TRUE)
@@ -865,3 +869,18 @@ else()
   message (STATUS "Looking for qwt >= 6.1.0 - not found")
   BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
 endif ()
+
+########################################
+# On Windows, find tiny-process-library
+if (WIN32)
+  option(USE_EXTERNAL_TINY_PROCESS_LIBRARY "Use external tiny-process-library." OFF)
+  if (USE_EXTERNAL_TINY_PROCESS_LIBRARY)
+    find_package(tiny-process-library QUIET)
+    if (NOT tiny-process-library_FOUND)
+      message (STATUS "Looking for tiny-process-library - not found")
+      BUILD_ERROR ("Missing: tiny-process-library, even if USE_EXTERNAL_TINY_PROCESS_LIBRARY was enabled.")
+    else()
+      message (STATUS "Looking for tiny-process-library - found")
+    endif()
+  endif()
+endif()

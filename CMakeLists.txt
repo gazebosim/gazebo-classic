@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
+if(WIN32)
+  cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
+else()
+  cmake_minimum_required(VERSION 3.10.2 FATAL_ERROR)
+endif()
 
 if(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
@@ -14,7 +18,7 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_MAJOR_VERSION 11)
-set (GAZEBO_MINOR_VERSION 2)
+set (GAZEBO_MINOR_VERSION 3)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
@@ -435,8 +439,19 @@ else (build_errors)
   # Order is important, if A depends on B, please add B after A.
   # The list should have at the very end the libraries
   # without internal interdependencies
-  set(PKG_LIBRARIES
-    gazebo
+  
+  # The gazebo library on Windows is called libgazebo to avoid 
+  # conflicts with the gazebo executable
+  if(NOT WIN32)
+    set(PKG_LIBRARIES
+      gazebo
+    )
+  else()
+    set(PKG_LIBRARIES
+      libgazebo
+    )
+  endif()  
+  set(PKG_LIBRARIES ${PKG_LIBRARIES}
     gazebo_client
     gazebo_gui
     gazebo_sensors

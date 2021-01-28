@@ -91,6 +91,9 @@ namespace gazebo
       /// \brief Queue a call to update the shaders.
       public: void UpdateShaders();
 
+      /// \brief Queue a call to update the shadows.
+      public: void UpdateShadows();
+
       /// \brief Set a viewport to use shaders.
       /// \param[in] _viewport The viewport to add.
       /// \param[in] _scene The scene that the viewport uses.
@@ -176,6 +179,10 @@ namespace gazebo
       /// \brief Update the shaders for a visual.
       /// \param[in] _vis Pointer to the visual to update.
       private: void UpdateShaders(VisualPtr _vis);
+
+      /// \brief Update the shadows for a scene
+      /// \param[in] _scene Pointer to the scene to update
+      private: void UpdateShadows(ScenePtr _scene);
 
       /// \brief Re-apply shadows. Call this if a shadow paramenter is changed.
       private: void ReapplyShadows();

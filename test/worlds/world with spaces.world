@@ -1,0 +1,28 @@
+<?xml version='1.0' ?>
+<sdf version='1.6'>
+  <world name='world with spaces'>
+    <model name='model with spaces'>
+      <link name='link with spaces'>
+        <collision name='collision with spaces'>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual with spaces'>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <include>
+      <pose>5 5 0 0 0 0</pose>
+      <name>included model</name>
+      <uri>model://model with spaces</uri>
+    </include>
+  </world>
+</sdf>

@@ -12,11 +12,11 @@
 
   <actor name="actor">
     <skin>
-      <filename>walk.dae</filename>
+      <filename>file://media/models/walk.dae</filename>
       <scale>1.0</scale>
     </skin>
     <animation name="walking">
-      <filename>walk.dae</filename>
+      <filename>file://media/models/walk.dae</filename>
       <scale>1.000000</scale>
       <interpolate_x>true</interpolate_x>
     </animation>

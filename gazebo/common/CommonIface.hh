@@ -188,6 +188,7 @@ namespace gazebo
     /// If the URI is already a full path or contains a scheme, it won't be
     /// modified.
     /// If the URI is a relative path, the file path will be prepended.
+    /// If the URI and path combination doesn't exist, the URI won't be changed.
     /// \param[in] _uri URI, which can have a scheme, or be full or relative
     /// paths.
     /// \param[in] _filePath The path to a file in disk.

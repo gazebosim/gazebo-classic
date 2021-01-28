@@ -38,19 +38,19 @@ namespace gazebo
     /// \{
 
     /// \brief Output a message
-    #define gzmsg (gazebo::common::Console::msg())
+    #define gzmsg (::gazebo::common::Console::msg())
 
     /// \brief Output a debug message
-    #define gzdbg (gazebo::common::Console::dbg(__FILE__, __LINE__))
+    #define gzdbg (::gazebo::common::Console::dbg(__FILE__, __LINE__))
 
     /// \brief Output a warning message
-    #define gzwarn (gazebo::common::Console::warn(__FILE__, __LINE__))
+    #define gzwarn (::gazebo::common::Console::warn(__FILE__, __LINE__))
 
     /// \brief Output an error message
-    #define gzerr (gazebo::common::Console::err(__FILE__, __LINE__))
+    #define gzerr (::gazebo::common::Console::err(__FILE__, __LINE__))
 
     /// \brief Output a message to a log file
-    #define gzlog (gazebo::common::Console::log())
+    #define gzlog (::gazebo::common::Console::log())
 
     /// \brief Initialize log file with filename given by _str.
     /// If called twice, it will close currently in use and open a new
@@ -59,11 +59,11 @@ namespace gazebo
     /// will be created.
     /// \param[in] _str Name of log file for gzlog messages.
     #define gzLogInit(_prefix, _str) \
-        (gazebo::common::Console::log.Init(_prefix, _str))
+        (::gazebo::common::Console::log.Init(_prefix, _str))
 
     /// \brief Get the full path of the directory where the log files are stored
     /// \return Full path of the directory
-    #define gzLogDirectory() (gazebo::common::Console::log.GetLogDirectory())
+    #define gzLogDirectory() (::gazebo::common::Console::log.GetLogDirectory())
 
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.

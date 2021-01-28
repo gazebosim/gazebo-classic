@@ -5,6 +5,23 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 11.2 to 11.3
+
+### Modifications
+
+Updated the version of TinyOBJLoader from 1.0.0 to 2.0.0rc8.
+See the changelog at https://github.com/osrf/gazebo/blob/gazebo11/deps/tinyobjloader/tiny_obj_loader.h
+
+## Gazebo 11.1 to 11.3
+
+### Modifications
+
+The way Gazebo handles relative paths in SDF files has changed:
+
+* Until `11.1.0`: relative paths could only be resolved against environment variables `GAZEBO_MODEL_PATH` / `GAZEBO_RESOURCE_PATH`.
+* On `11.2.0`: relative paths loaded from SDF files can only be resolved against the SDF file - the previous use case was broken by mistake.
+* From `11.3.0`: relative paths are first resolved against the SDF file, and if that fails, fallback to the environment variables.
+
 ## Gazebo 10.x to 11.0
 
 ### Build system
@@ -152,6 +169,13 @@ New mandatory dependencies: `ign-fuel-tools4`, `ign-common3`, `ign-common3-graph
 1. **gazebo/gui/qt_test.h**
     + ***Removed:*** The whole header file. Note that it also won't be included into `gazebo/gui/gui.hh`.
     + ***Replacement:*** Include `<QtTest/QtTest>` instead.
+
+## Gazebo 9.15 to 9.16
+
+### Modifications
+
+Updated the version of TinyOBJLoader from 1.0.0 to 2.0.0rc8.
+See the changelog at https://github.com/osrf/gazebo/blob/gazebo9/deps/tinyobjloader/tiny_obj_loader.h
 
 ## Gazebo 8.4 to 9.x
 

@@ -106,25 +106,34 @@ int Dem::Load(const std::string &_filename)
   ySize = this->dataPtr->dataSet->GetRasterYSize();
 
   // Corner coordinates
-  upLeftX = 0.0;
-  upLeftY = 0.0;
-  upRightX = xSize;
-  upRightY = 0.0;
-  lowLeftX = 0.0;
-  lowLeftY = ySize;
+  try
+  {
+    upLeftX = 0.0;
+    upLeftY = 0.0;
+    upRightX = xSize;
+    upRightY = 0.0;
+    lowLeftX = 0.0;
+    lowLeftY = ySize;
 
-  // Calculate the georeferenced coordinates of the terrain corners
-  this->GetGeoReference(upLeftX, upLeftY, upLeftLat, upLeftLong);
-  this->GetGeoReference(upRightX, upRightY, upRightLat, upRightLong);
-  this->GetGeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong);
+    // Calculate the georeferenced coordinates of the terrain corners
+    this->GetGeoReference(upLeftX, upLeftY, upLeftLat, upLeftLong);
+    this->GetGeoReference(upRightX, upRightY, upRightLat, upRightLong);
+    this->GetGeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong);
 
-  // Set the world width and height
-  this->dataPtr->worldWidth =
-     common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                            upRightLat, upRightLong);
-  this->dataPtr->worldHeight =
-     common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                            lowLeftLat, lowLeftLong);
+    // Set the world width and height
+    this->dataPtr->worldWidth =
+       common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                              upRightLat, upRightLong);
+    this->dataPtr->worldHeight =
+       common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                              lowLeftLat, lowLeftLong);
+  }
+  catch(const common::Exception &)
+  {
+    gzwarn << "Failed to automatically compute DEM size. "
+           << "Please use the <size> element to manually set DEM size."
+           << std::endl;
+  }
 
   // Set the terrain's side (the terrain will be squared after the padding)
   if (ignition::math::isPowerOfTwo(ySize - 1))
@@ -165,7 +174,9 @@ int Dem::Load(const std::string &_filename)
   }
   if (ignition::math::equal(min, ignition::math::MAX_D) ||
       ignition::math::equal(max, -ignition::math::MAX_D))
+  {
     gzwarn << "Dem is composed of 'nodata' values!" << std::endl;
+  }
 
   this->dataPtr->minElevation = min;
   this->dataPtr->maxElevation = max;
@@ -211,10 +222,20 @@ void Dem::GetGeoReference(double _x, double _y,
     double xGeoDeg, yGeoDeg;
 
     // Transform the terrain's coordinate system to WGS84
-    char *importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
+    #if GDAL_VERSION_NUM >= 2030000
+    const char *importString;
+    #else
+    char *importString;
+    #endif
+    importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
     sourceCs.importFromWkt(&importString);
     targetCs.SetWellKnownGeogCS("WGS84");
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
+    if (nullptr == cT)
+    {
+      gzthrow("Unable to transform terrain coordinate system to WGS84 for "
+          << "coordinates (" << _x << "," << _y << ")");
+    }
 
     xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
     yGeoDeg = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
@@ -223,10 +244,14 @@ void Dem::GetGeoReference(double _x, double _y,
 
     _latitude.Degree(yGeoDeg);
     _longitude.Degree(xGeoDeg);
+
+    OCTDestroyCoordinateTransformation(cT);
   }
   else
+  {
     gzthrow("Unable to obtain the georeferenced values for coordinates ("
-            << _x << "," << _y << ")\n");
+            << _x << "," << _y << ")");
+  }
 }
 
 //////////////////////////////////////////////////
