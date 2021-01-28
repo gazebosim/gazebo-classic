@@ -122,7 +122,7 @@ void LensFlareSensorPlugin::SetScale(const double _scale)
 }
 
 /////////////////////////////////////////////////
-void LensFlareSensorPlugin::SetColor(const ignition::math::Vector3d& _color)
+void LensFlareSensorPlugin::SetColor(const ignition::math::Vector3d &_color)
 {
   this->dataPtr->color = _color;
 
