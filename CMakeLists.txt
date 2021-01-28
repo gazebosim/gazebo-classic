@@ -418,6 +418,11 @@ else (build_errors)
   join_paths(pkgconfig_libdir "\${prefix}" "${CMAKE_INSTALL_LIBDIR}")
   join_paths(pkgconfig_includedir "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
 
+  file(RELATIVE_PATH
+    PC_CONFIG_RELATIVE_PATH_TO_PREFIX
+    ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/pkgconfig
+    ${CMAKE_INSTALL_PREFIX}
+  )
   foreach (pkgconfig ${pkgconfig_files})
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
