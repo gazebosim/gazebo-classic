@@ -457,6 +457,10 @@ void WideAngleCamera::Load()
 {
   Camera::Load();
 
+  // Cube map texture format defaults to matching image pixel format
+  this->dataPtr->envCubeMapTextureFormat =
+    static_cast<Ogre::PixelFormat>(this->imageFormat);
+
   this->CreateEnvCameras();
 
   if (this->sdf->HasElement("lens"))
@@ -467,6 +471,13 @@ void WideAngleCamera::Load()
 
     if (sdfLens->HasElement("env_texture_size"))
       this->dataPtr->envTextureSize = sdfLens->Get<int>("env_texture_size");
+
+    const std::string envTextureFormat = "gazebo:env_texture_format";
+    if (sdfLens->HasElement(envTextureFormat))
+    {
+      this->dataPtr->envCubeMapTextureFormat = static_cast<Ogre::PixelFormat>(
+        this->OgrePixelFormat(sdfLens->Get<std::string>(envTextureFormat)));
+    }
   }
   else
     this->dataPtr->lens->Load();
@@ -660,7 +671,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
           this->dataPtr->envTextureSize,
           this->dataPtr->envTextureSize,
           0,
-          static_cast<Ogre::PixelFormat>(this->imageFormat),
+          this->dataPtr->envCubeMapTextureFormat,
           Ogre::TU_RENDERTARGET,
           0,
           false,
