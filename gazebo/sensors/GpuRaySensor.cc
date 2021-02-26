@@ -161,6 +161,11 @@ void GpuRaySensor::Init()
     if (!this->scene)
       this->scene = rendering::create_scene(worldName, false, true);
 
+    if (!this->scene)
+    {
+      gzerr << "Unable to create gpu laser sensor: no scene\n";
+      return;
+    }
     this->dataPtr->laserCam = this->scene->CreateGpuLaser(
         this->sdf->Get<std::string>("name"), false);
 
