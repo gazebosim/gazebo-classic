@@ -85,6 +85,10 @@ target_link_libraries(gazebo_util
   ${IGNITION-MSGS_LIBRARIES}
 )
 
+if (HAVE_OPENAL)
+  target_link_libraries(gazebo_util PRIVATE ${OPENAL_LIBRARY})
+endif()
+
 # define if tinxml2 major version >= 6
 # https://github.com/ignitionrobotics/ign-common/issues/28
 if (NOT tinyxml2_VERSION VERSION_LESS "6.0.0")
