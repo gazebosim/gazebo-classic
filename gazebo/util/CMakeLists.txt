@@ -86,7 +86,7 @@ target_link_libraries(gazebo_util
 )
 
 if (HAVE_OPENAL)
-  target_link_libraries(gazebo_util PRIVATE ${OPENAL_LIBRARY})
+  target_link_libraries(gazebo_util ${OPENAL_LIBRARY})
 endif()
 
 # define if tinxml2 major version >= 6
