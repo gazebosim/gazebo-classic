@@ -74,9 +74,9 @@ endif ()
 include (FindOpenAL)
 if (NOT OPENAL_FOUND)
   BUILD_WARNING ("OpenAL not found, audio support will be disabled.")
-  set (HAVE_OPENAL OFF CACHE BOOL "HAVE OpenAL" FORCE)
+  set (HAVE_OPENAL OFF CACHE BOOL "HAVE OpenAL")
 else ()
-  set (HAVE_OPENAL ON CACHE BOOL "HAVE OpenAL" FORCE)
+  set (HAVE_OPENAL ON CACHE BOOL "HAVE OpenAL")
 endif ()
 
 ########################################
