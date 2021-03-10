@@ -21,7 +21,7 @@ vec3 lensflare(vec2 uv,vec2 pos)
   float ang = atan(main.y, main.x);
   float dist = length(main); dist = pow(dist,.1);
 
-  float f0 = 2.0/(length(uv-pos)*16.0/scale+1.0);
+  float f0 = 1.0/(length(uv-pos)*16.0/scale+1.0);
 
   float f2 = max(1.0/(1.0+32.0*pow(length(uvd+0.8*pos),2.0)),.0)*00.25;
   float f22 = max(1.0/(1.0+32.0*pow(length(uvd+0.85*pos),2.0)),.0)*00.23;
