@@ -144,10 +144,9 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     if (softGeomElem->HasElement("box"))
     {
       sdf::ElementPtr boxEle = softGeomElem->GetElement("box");
-      Eigen::Vector3d size =
-          DARTTypes::ConvVec3(boxEle->Get<ignition::math::Vector3d>("size"));
+      Eigen::Vector3d boxSize = DARTTypes::ConvVec3(boxEle->Get<ignition::math::Vector3d>("size"));
       softProperties = dart::dynamics::SoftBodyNodeHelper::makeBoxProperties(
-            size, T, fleshMassFraction, boneAttachment, stiffness, damping);
+            boxSize, T, Eigen::Vector3i(4, 4, 4), fleshMassFraction, boneAttachment, stiffness, damping);
     }
 //    else if (geomElem->HasElement("ellipsoid"))
 //    {
@@ -167,13 +166,18 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
       gzerr << "Unknown soft shape" << std::endl;
     }
 
+    softProperties.mKv = boneAttachment;
+    softProperties.mKe = stiffness;
+    softProperties.mDampCoeff = damping;
+
     // Create DART SoftBodyNode properties
     dart::dynamics::BodyNode::AspectProperties properties(bodyName);
     this->dataPtr->dtProperties.reset(
           new dart::dynamics::SoftBodyNode::Properties(
             properties, softProperties));
 
-    this->dataPtr->isSoftBody;
+    this->dataPtr->isSoftBody = true;
+    this->dataPtr->fleshMass = fleshMassFraction;
   }
   else
   {
@@ -268,8 +272,14 @@ void DARTLink::UpdateMass()
   {
     double nFragments = 1.0 + this->dataPtr->dtSlaveNodes.size();
     double mass = this->inertial->Mass()/nFragments;
-    this->dataPtr->dtBodyNode->setMass(mass);
 
+    // Update mass of the underlying BodyNode
+    if(this->dataPtr->isSoftBody)
+    {
+      mass -= this->dataPtr->fleshMass;
+    }
+
+    this->dataPtr->dtBodyNode->setMass(mass);
     const ignition::math::Quaterniond R_inertial = this->inertial->Pose().Rot();
 
     const ignition::math::Matrix3d I_link =
@@ -278,6 +288,8 @@ void DARTLink::UpdateMass()
         *ignition::math::Matrix3d(R_inertial.Inverse())
         *(1.0/nFragments);
 
+    // Need to potentially update the objects inertia 
+    // (as for box shape the body node is 0.6 times smaller)
     this->dataPtr->dtBodyNode->setMomentOfInertia(
         I_link(0, 0), I_link(1, 1), I_link(2, 2),
         I_link(0, 1), I_link(0, 2), I_link(1, 2));

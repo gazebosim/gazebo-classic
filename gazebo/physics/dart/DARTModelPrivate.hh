@@ -210,6 +210,11 @@ namespace gazebo
               _skeleton, _parent, jointType, jointProperties,
               static_cast<const dart::dynamics::SoftBodyNode::Properties&>(
               *(dartLink->DARTProperties())));
+
+          dart::dynamics::Inertia inertia;
+          inertia.setMoment(1e-8*Eigen::Matrix3d::Identity());
+          inertia.setMass(1e-8);
+          pair.second->setInertia(inertia);
         }
         else
         {

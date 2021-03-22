@@ -252,6 +252,12 @@ dart::dynamics::BodyNode *DARTCollision::DARTBodyNode() const
 }
 
 //////////////////////////////////////////////////
+bool DARTCollision::IsSoftBody() const
+{
+  return boost::static_pointer_cast<DARTLink>(this->link)->IsSoftBody();
+}
+
+//////////////////////////////////////////////////
 void DARTCollision::SetDARTCollisionShapeNode(
                                           dart::dynamics::ShapeNodePtr _shape,
                                           bool _placeable)

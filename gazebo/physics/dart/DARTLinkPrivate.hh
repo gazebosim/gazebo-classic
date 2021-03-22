@@ -175,6 +175,9 @@ namespace gazebo
       /// \brief True if this link is soft body.
       public: bool isSoftBody;
 
+      /// \brief Mass of the softBody that envelopes the rigid bone.
+      public: double fleshMass;
+
       /// \brief If true, freeze link to world (inertial) frame.
       public: bool staticLink;
 
