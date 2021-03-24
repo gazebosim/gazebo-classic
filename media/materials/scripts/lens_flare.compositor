@@ -3,7 +3,7 @@ compositor CameraLensFlare/Default
   technique
   {
     // Temporary textures
-    texture rt0 target_width target_height PF_FLOAT32_RGB
+    texture rt0 target_width target_height PF_A8R8G8B8
 
     target rt0
     {
