@@ -30,7 +30,7 @@ namespace gazebo
   /// The plugin has the following optional parameter:
   /// <scale>       Scale of lens flare. Must be greater than 0
   /// <color>       Color of lens flare.
-  /// \todo A potentially useful feature would be an option for contantly
+  /// \todo A potentially useful feature would be an option for constantly
   /// updating the flare color to match the light source color.
   class GAZEBO_VISIBLE LensFlareSensorPlugin : public SensorPlugin
   {
