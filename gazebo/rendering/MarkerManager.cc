@@ -211,7 +211,7 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 
   // If an id is given
   size_t id;
-  if (_msg.id() != 0)
+  if (_msg.id() = 0)
   {
     id = _msg.id();
   }
