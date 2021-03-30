@@ -65,9 +65,9 @@ TEST_F(OgreLog, LogError)
     if (line.find(" GL_EXTENSIONS =") < 12)
       continue;
 
-    EXPECT_EQ(line.find("Error"), std::string::npos);
-    EXPECT_EQ(line.find("error"), std::string::npos);
-    EXPECT_EQ(line.find("ERROR"), std::string::npos);
+    EXPECT_EQ(line.find("Error"), std::string::npos) << line;
+    EXPECT_EQ(line.find("error"), std::string::npos) << line;
+    EXPECT_EQ(line.find("ERROR"), std::string::npos) << line;
   }
 }
 
