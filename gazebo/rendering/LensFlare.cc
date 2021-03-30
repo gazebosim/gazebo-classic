@@ -36,8 +36,7 @@ namespace gazebo
   namespace rendering
   {
     /// \brief We'll create an instance of this class for each camera, to be
-    /// used to inject lens flare uniforms and time (for animating flare)
-    /// in each render call.
+    /// used to inject lens flare uniforms in each render call.
     class LensFlareCompositorListener
       : public Ogre::CompositorInstance::Listener
     {
@@ -72,6 +71,13 @@ namespace gazebo
         this->scale = _scale;
       }
 
+      /// \brief Set the color of lens flare.
+      /// \param[in] _color Color of lens flare
+      public: void SetColor(const ignition::math::Vector3d &_color)
+      {
+        this->color = _color;
+      }
+
       /// \brief Callback that OGRE will invoke for us on each render call
       /// \param[in] _passID OGRE material pass ID.
       /// \param[in] _mat Pointer to OGRE material.
@@ -97,9 +103,6 @@ namespace gazebo
             pass->getFragmentProgramParameters();
         GZ_ASSERT(!params.isNull(), "Null OGRE material GPU parameters");
 
-        // used for animating flare
-        params->setNamedConstant("time", static_cast<Ogre::Real>(
-            common::Time::GetWallTime().Double()));
         // for adjusting aspect ratio of flare
         params->setNamedConstant("viewport",
             Ogre::Vector3(static_cast<double>(this->camera->ViewportWidth()),
@@ -133,6 +136,8 @@ namespace gazebo
         params->setNamedConstant("lightPos", Conversions::Convert(pos));
         params->setNamedConstant("scale",
             static_cast<Ogre::Real>(lensFlareScale));
+        params->setNamedConstant("color",
+            Ogre::Vector3(this->color.X(), this->color.Y(), this->color.Z()));
       }
 
       /// \brief Get the lens flare position and scale for a normal camera
@@ -338,6 +343,10 @@ namespace gazebo
 
       /// \brief Scale of lens flare.
       private: double scale = 1.0;
+
+      /// \brief Color of lens flare.
+      private: ignition::math::Vector3d color
+          = ignition::math::Vector3d(1.0, 1.0, 1.0);
     };
 
     /// \brief Private data class for LensFlare
@@ -373,6 +382,10 @@ namespace gazebo
 
       /// \brief Scale of lens flare.
       public: double lensFlareScale = 1.0;
+
+      /// \brief Color of lens flare.
+      public: ignition::math::Vector3d lensFlareColor
+          = ignition::math::Vector3d(1.0, 1.0, 1.0);
     };
   }
 }
@@ -415,6 +428,8 @@ void LensFlare::SetCamera(CameraPtr _camera)
           LensFlareCompositorListener(this->dataPtr->camera, nullptr));
     this->dataPtr->lensFlareCompositorListener->SetScale(
         this->dataPtr->lensFlareScale);
+    this->dataPtr->lensFlareCompositorListener->SetColor(
+        this->dataPtr->lensFlareColor);
 
     this->dataPtr->lensFlareInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(
@@ -439,6 +454,19 @@ void LensFlare::SetScale(const double _scale)
   {
     this->dataPtr->lensFlareCompositorListener->SetScale(
         this->dataPtr->lensFlareScale);
+  }
+}
+
+//////////////////////////////////////////////////
+void LensFlare::SetColor(const ignition::math::Vector3d &_color)
+{
+  // lensFlareColor is intentionally not clamped so the user can work in
+  // HDR color spaces or be artistic.
+  this->dataPtr->lensFlareColor = _color;
+  if (this->dataPtr->lensFlareCompositorListener)
+  {
+    this->dataPtr->lensFlareCompositorListener->SetColor(
+        this->dataPtr->lensFlareColor);
   }
 }
 

@@ -19,7 +19,6 @@ set (files
   heightmap_bowl.png
   heightmap_valley.png
   motorway.jpg
-  noise_rgba.png
   paintedWall.jpg
   pioneerBody.jpg
   primary.jpg
