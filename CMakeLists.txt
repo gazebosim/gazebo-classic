@@ -285,9 +285,8 @@ if (MSVC)
   set(UNFILTERED_FLAGS "/EHsc")
 endif()
 
-# Visual Studio enables c++11 support by default
 if (NOT MSVC)
-  set(UNFILTERED_FLAGS "-std=c++11")
+  set(UNFILTERED_FLAGS "")
 endif()
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS} ${UNFILTERED_FLAGS}")
@@ -422,6 +421,11 @@ else (build_errors)
   join_paths(pkgconfig_libdir "\${prefix}" "${CMAKE_INSTALL_LIBDIR}")
   join_paths(pkgconfig_includedir "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
 
+  file(RELATIVE_PATH
+    PC_CONFIG_RELATIVE_PATH_TO_PREFIX
+    ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/pkgconfig
+    ${CMAKE_INSTALL_PREFIX}
+  )
   foreach (pkgconfig ${pkgconfig_files})
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
@@ -475,9 +479,15 @@ else (build_errors)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
   endif()
 
+  include(CMakePackageConfigHelpers)
   set(cmake_conf_file "cmake/gazebo-config.cmake")
   set(cmake_conf_version_file "cmake/gazebo-config-version.cmake")
-  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)
+  set(DATAROOT_INSTALL_DIR ${CMAKE_INSTALL_DATAROOTDIR})
+  set(BASE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR})
+  configure_package_config_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}"
+          INSTALL_DESTINATION ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}/
+          PATH_VARS BASE_INSTALL_INCLUDEDIR LIB_INSTALL_DIR DATAROOT_INSTALL_DIR
+          )
   # Use write_basic_package_version_file to generate a ConfigVersion file that
   # allow users of gazebo to specify the API or version to depend on
   # TODO: keep this instruction until deprecate Ubuntu/Precise and update with
