@@ -19,7 +19,7 @@
     <scene>
       <shadows>0</shadows>
     </scene>
-    <model name='wide_angle_camera_default'>
+    <model name='wide_angle_camera_with_default_texture'>
       <static>1</static>
       <pose>0.3 0 0.15 0 0 3.14159265</pose>
       <link name='link'>
@@ -30,7 +30,7 @@
             </box>
           </geometry>
         </visual>
-        <sensor name='camera_sensor_no_plugin' type='wideanglecamera'>
+        <sensor name='wide_angle_camera_sensor_with_default_texture' type='wideanglecamera'>
           <camera>
             <horizontal_fov>1.047</horizontal_fov>
             <image>
@@ -54,7 +54,7 @@
         </sensor>
       </link>
     </model>
-    <model name='wide_angle_camera_r_float16'>
+    <model name='wide_angle_camera_with_grayscale_texture'>
       <static>1</static>
       <pose>0.3 2 0.15 0 0 3.14159265</pose>
       <link name='link'>
@@ -65,7 +65,7 @@
             </box>
           </geometry>
         </visual>
-        <sensor name='camera_sensor_plugin' type='wideanglecamera'>
+        <sensor name='wide_angle_camera_sensor_with_grayscale_texture' type='wideanglecamera'>
           <camera>
             <horizontal_fov>1.047</horizontal_fov>
             <image>

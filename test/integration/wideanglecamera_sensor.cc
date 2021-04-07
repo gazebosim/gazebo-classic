@@ -227,10 +227,10 @@ TEST_F(WideAngleCameraSensor, Projection)
 }
 
 /////////////////////////////////////////////////
-TEST_F(WideAngleCameraSensor, TexturePlugin)
+TEST_F(WideAngleCameraSensor, TextureFormat)
 {
 #if not defined(__APPLE__)
-  Load("worlds/wide_angle_camera_test.world");
+  Load("worlds/test/issue_2928_wide_angle_camera_texture_format.world");
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -240,26 +240,19 @@ TEST_F(WideAngleCameraSensor, TexturePlugin)
     return;
   }
 
-  unsigned int width  = 12;
-  unsigned int height = 12;
+  const unsigned int width  = 12;
+  const unsigned int height = 12;
 
-  // Access a wide angle camera
-  std::string cameraWithNoPluginName = "camera_sensor_no_plugin";
-  sensors::SensorPtr sensorWithNoPlugin = sensors::get_sensor(cameraWithNoPluginName);
-  sensors::WideAngleCameraSensorPtr cameraSensorWithNoPlugin =
-      std::dynamic_pointer_cast<sensors::WideAngleCameraSensor>(sensorWithNoPlugin);
+  {  // check camera with default texture format
+    sensors::SensorPtr sensor = sensors::get_sensor(
+      "wide_angle_camera_sensor_with_default_texture");
+    sensors::WideAngleCameraSensorPtr cameraSensor =
+        std::dynamic_pointer_cast<sensors::WideAngleCameraSensor>(sensor);
 
-  // Access a wide angle camera with env_texture_format set to R_FLOAT16
-  std::string cameraWithPluginName = "camera_sensor_plugin";
-  sensors::SensorPtr sensorWithPlugin = sensors::get_sensor(cameraWithPluginName);
-  sensors::WideAngleCameraSensorPtr cameraSensorWithPlugin =
-      std::dynamic_pointer_cast<sensors::WideAngleCameraSensor>(sensorWithPlugin);
-
-  { // check camera with no plugin
     imageCount = 0;
     img = new unsigned char[width * height * 3];
     event::ConnectionPtr c =
-      cameraSensorWithNoPlugin->Camera()->ConnectNewImageFrame(
+      cameraSensor->Camera()->ConnectNewImageFrame(
           std::bind(&::OnNewCameraFrame, &imageCount, img,
             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
             std::placeholders::_4, std::placeholders::_5));
@@ -273,7 +266,6 @@ TEST_F(WideAngleCameraSensor, TexturePlugin)
       sleep++;
     }
 
-    // check image bg color. It should be black instead of the default grey
     unsigned int rSum = 0;
     unsigned int gSum = 0;
     unsigned int bSum = 0;
@@ -288,16 +280,25 @@ TEST_F(WideAngleCameraSensor, TexturePlugin)
     }
 
     EXPECT_NE(rSum, gSum);
+    EXPECT_NE(rSum, bSum);
     EXPECT_NE(gSum, bSum);
+
+    EXPECT_GT(rSum - bSum, 30000.0);
+    EXPECT_GT(rSum - gSum, 20000.0);
 
     delete [] img;
   }
 
-  { // check camera with plugin
+  {  // check camera with grayscale texture format
+    sensors::SensorPtr sensor = sensors::get_sensor(
+      "wide_angle_camera_sensor_with_grayscale_texture");
+    sensors::WideAngleCameraSensorPtr cameraSensor =
+        std::dynamic_pointer_cast<sensors::WideAngleCameraSensor>(sensor);
+
     imageCount = 0;
     img = new unsigned char[width * height * 3];
     event::ConnectionPtr c =
-      cameraSensorWithPlugin->Camera()->ConnectNewImageFrame(
+      cameraSensor->Camera()->ConnectNewImageFrame(
           std::bind(&::OnNewCameraFrame, &imageCount, img,
             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
             std::placeholders::_4, std::placeholders::_5));
@@ -311,7 +312,6 @@ TEST_F(WideAngleCameraSensor, TexturePlugin)
       sleep++;
     }
 
-    // check image bg color. It should be black instead of the default grey
     unsigned int rSum = 0;
     unsigned int gSum = 0;
     unsigned int bSum = 0;
