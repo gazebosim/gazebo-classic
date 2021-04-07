@@ -225,3 +225,111 @@ TEST_F(WideAngleCameraSensor, Projection)
   EXPECT_LT(screenPt.Z(), 1.0);
 #endif
 }
+
+/////////////////////////////////////////////////
+TEST_F(WideAngleCameraSensor, TexturePlugin)
+{
+#if not defined(__APPLE__)
+  Load("worlds/wide_angle_camera_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run wide angle camera test\n";
+    return;
+  }
+
+  unsigned int width  = 12;
+  unsigned int height = 12;
+
+  // Access a wide angle camera
+  std::string cameraWithNoPluginName = "camera_sensor_no_plugin";
+  sensors::SensorPtr sensorWithNoPlugin = sensors::get_sensor(cameraWithNoPluginName);
+  sensors::WideAngleCameraSensorPtr cameraSensorWithNoPlugin =
+      std::dynamic_pointer_cast<sensors::WideAngleCameraSensor>(sensorWithNoPlugin);
+
+  // Access a wide angle camera with env_texture_format set to R_FLOAT16
+  std::string cameraWithPluginName = "camera_sensor_plugin";
+  sensors::SensorPtr sensorWithPlugin = sensors::get_sensor(cameraWithPluginName);
+  sensors::WideAngleCameraSensorPtr cameraSensorWithPlugin =
+      std::dynamic_pointer_cast<sensors::WideAngleCameraSensor>(sensorWithPlugin);
+
+  { // check camera with no plugin
+    imageCount = 0;
+    img = new unsigned char[width * height * 3];
+    event::ConnectionPtr c =
+      cameraSensorWithNoPlugin->Camera()->ConnectNewImageFrame(
+          std::bind(&::OnNewCameraFrame, &imageCount, img,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
+
+    // Get some images
+    int sleep = 0;
+    int maxSleep = 30;
+    while (imageCount < 10 && sleep < maxSleep)
+    {
+      common::Time::MSleep(50);
+      sleep++;
+    }
+
+    // check image bg color. It should be black instead of the default grey
+    unsigned int rSum = 0;
+    unsigned int gSum = 0;
+    unsigned int bSum = 0;
+    for (unsigned int i = 0; i < height*width*3; i+=3)
+    {
+      unsigned int r = img[i];
+      unsigned int g = img[i+1];
+      unsigned int b = img[i+2];
+      rSum += r;
+      gSum += g;
+      bSum += b;
+    }
+
+    EXPECT_NE(rSum, gSum);
+    EXPECT_NE(gSum, bSum);
+
+    delete [] img;
+  }
+
+  { // check camera with plugin
+    imageCount = 0;
+    img = new unsigned char[width * height * 3];
+    event::ConnectionPtr c =
+      cameraSensorWithPlugin->Camera()->ConnectNewImageFrame(
+          std::bind(&::OnNewCameraFrame, &imageCount, img,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
+
+    // Get some images
+    int sleep = 0;
+    int maxSleep = 30;
+    while (imageCount < 10 && sleep < maxSleep)
+    {
+      common::Time::MSleep(50);
+      sleep++;
+    }
+
+    // check image bg color. It should be black instead of the default grey
+    unsigned int rSum = 0;
+    unsigned int gSum = 0;
+    unsigned int bSum = 0;
+    for (unsigned int i = 0; i < height*width*3; i+=3)
+    {
+      unsigned int r = img[i];
+      unsigned int g = img[i+1];
+      unsigned int b = img[i+2];
+      rSum += r;
+      gSum += g;
+      bSum += b;
+    }
+
+    // For grayscale, all RGB channels should have the same value
+    EXPECT_DOUBLE_EQ(rSum, gSum);
+    EXPECT_DOUBLE_EQ(gSum, bSum);
+
+    delete [] img;
+  }
+#endif
+}
