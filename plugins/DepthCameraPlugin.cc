@@ -16,16 +16,20 @@
 */
 
 #include <functional>
+#include <mutex>
+#include <unordered_map>
 
 #include "plugins/DepthCameraPlugin.hh"
 
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(DepthCameraPlugin)
 
+std::mutex global_maps_mutex;
+
 // Added this map to avoid breaking the ABI
-static std::map<DepthCameraPlugin*, event::ConnectionPtr>
+static std::unordered_map<DepthCameraPlugin*, event::ConnectionPtr>
                                                 connection_reflectance_map;
-static std::map<DepthCameraPlugin*, event::ConnectionPtr>
+static std::unordered_map<DepthCameraPlugin*, event::ConnectionPtr>
                                                 connection_normals_map;
 /////////////////////////////////////////////////
 DepthCameraPlugin::DepthCameraPlugin()
@@ -40,13 +44,9 @@ DepthCameraPlugin::~DepthCameraPlugin()
   this->newRGBPointCloudConnection.reset();
   this->newImageFrameConnection.reset();
 
-  std::map<DepthCameraPlugin*, event::ConnectionPtr>::iterator it;
-  it = connection_reflectance_map.find(this);
-  it->second.reset();
-  connection_reflectance_map.erase(it);
-  it = connection_normals_map.find(this);
-  it->second.reset();
-  connection_normals_map.erase(it);
+  std::lock_guard<std::mutex> guard{global_maps_mutex};
+  connection_reflectance_map.erase(this);
+  connection_normals_map.erase(this);
 
   this->parentSensor.reset();
   this->depthCamera.reset();
@@ -93,6 +93,7 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
             std::placeholders::_3, std::placeholders::_4,
             std::placeholders::_5));
 
+  std::lock_guard<std::mutex> guard{global_maps_mutex};
   connection_reflectance_map.
         insert(std::pair<DepthCameraPlugin*, event::ConnectionPtr>
                (this, newReflectanceFrameConnection));
