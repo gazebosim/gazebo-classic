@@ -1,6 +1,24 @@
 ## Gazebo 11
 
-## Gazebo 11.x.x (202x-xx-xx)
+## Gazebo 11.4.0 (2021-04-01)
+
+1. Restore HeightmapShape::SetHeight implementation (#2955)
+    * [Pull request #2955](https://github.com/osrf/gazebo/pull/2955)
+    * [BitBucket pull request 3210](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3210)
+
+1. Lens flare cleanup and colorization
+    * [Pull request #2927](https://github.com/osrf/gazebo/pull/2927)
+    * [Pull request #2954](https://github.com/osrf/gazebo/pull/2954)
+
+1. Fix build on Linux with conda-forge dependencies
+    * [Pull request #2944](https://github.com/osrf/gazebo/pull/2944)
+
+1. Fix build issues with OpenAL
+    * [Pull request #2941](https://github.com/osrf/gazebo/pull/2941)
+    * [Pull request #2943](https://github.com/osrf/gazebo/pull/2943)
+
+1. Do not overwrite default linker flags
+    * [Pull request #2922](https://github.com/osrf/gazebo/pull/2922)
 
 1. Fix support for camera with single channel floating point image format
     * [Pull request #2918](https://github.com/osrf/gazebo/pull/2918)
@@ -11,6 +29,19 @@
 
 1. Generate spot light shadow maps
     * [Pull request #2914](https://github.com/osrf/gazebo/pull/2914)
+
+1. Fix `find_package(gazebo)` on Windows
+    * [Pull request #2906](https://github.com/osrf/gazebo/pull/2906)
+    * [Issue #2905](https://github.com/osrf/gazebo/issues/2905)
+
+1. Fix namespace usage in console macros
+    * [Pull request #2892](https://github.com/osrf/gazebo/pull/2892)
+    * [Issue #2896](https://github.com/osrf/gazebo/issues/2896)
+
+1. Ensure relocatable package config files
+    * [Pull request #2879](https://github.com/osrf/gazebo/pull/2879)
+    * [Issue #2755](https://github.com/osrf/gazebo/issues/2755)
+    * [Issue #2782](https://github.com/osrf/gazebo/issues/2782)
 
 1. DARTHeightmapShape: correctly load asymmetric terrains
     * [Pull request #2818](https://github.com/osrf/gazebo/pull/2818)
@@ -97,7 +128,7 @@
 1. Fix corruption when a URDF file is included from a SDFormat 1.6 model
     * [Pull request 2734](https://github.com/osrf/gazebo/pull/2734)
 
-1. Preserve GAZEBO_MASTER_URI if set before setup.sh
+1. Preserve `GAZEBO_MASTER_URI` if set before setup.sh
     * [GitHub pull request 2737](https://github.com/osrf/gazebo/pull/2737)
 
 1. Fix sensor update rate throttling when new sensors are spawned
@@ -479,6 +510,9 @@
 ## Gazebo 9
 
 ## Gazebo 9.xx.x (202x-xx-xx)
+
+1. Lens flare cleanup and colorization
+    * [Pull request #2927](https://github.com/osrf/gazebo/pull/2927)
 
 1. Fix support for camera with single channel floating point image format
     * [Pull request #2918](https://github.com/osrf/gazebo/pull/2918)
