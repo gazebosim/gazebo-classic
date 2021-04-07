@@ -328,7 +328,7 @@ TEST_F(WideAngleCameraSensor, TexturePlugin)
     // For grayscale, all RGB channels should have the same value
     EXPECT_DOUBLE_EQ(rSum, gSum);
     EXPECT_DOUBLE_EQ(gSum, bSum);
-    EXPECT_NE(gSum, 0.0); // check that image isn't black
+    EXPECT_NE(gSum, 0.0);  // check that image isn't black
 
     delete [] img;
   }
