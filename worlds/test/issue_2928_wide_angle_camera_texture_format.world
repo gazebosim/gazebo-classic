@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version='1.7'>
-  <world name='default'>
+  <world name='default' xmlns:ignition="http://ignitionrobotics.org/schema">
     <light name='sun' type='directional'>
       <cast_shadows>1</cast_shadows>
       <pose>0 0 0 0 -0 0</pose>
@@ -81,7 +81,7 @@
               <scale_to_hfov>1</scale_to_hfov>
               <cutoff_angle>1.5707</cutoff_angle>
               <env_texture_size>512</env_texture_size>
-              <gazebo:env_texture_format>R_FLOAT16</gazebo:env_texture_format>
+              <ignition:env_texture_format>R_FLOAT16</ignition:env_texture_format>
             </lens>
           </camera>
           <always_on>1</always_on>

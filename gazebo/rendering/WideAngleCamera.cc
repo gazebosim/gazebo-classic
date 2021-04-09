@@ -472,7 +472,7 @@ void WideAngleCamera::Load()
     if (sdfLens->HasElement("env_texture_size"))
       this->dataPtr->envTextureSize = sdfLens->Get<int>("env_texture_size");
 
-    const std::string envTextureFormat = "gazebo:env_texture_format";
+    const std::string envTextureFormat = "ignition:env_texture_format";
     if (sdfLens->HasElement(envTextureFormat))
     {
       this->dataPtr->envCubeMapTextureFormat = static_cast<Ogre::PixelFormat>(
