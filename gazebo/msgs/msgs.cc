@@ -1812,7 +1812,7 @@ namespace gazebo
         result.mutable_camera()->CopyFrom(
             msgs::CameraSensorFromSDF(_sdf->GetElement("camera")));
       }
-      else if (type == "ray")
+      else if (type == "ray" || type == "gpu_ray")
       {
         result.mutable_ray()->CopyFrom(msgs::RaySensorFromSDF(
             _sdf->GetElement("ray")));
