@@ -129,10 +129,11 @@ void DepthCameraSensor::Init()
     ignition::transport::AdvertiseMessageOptions opts;
     opts.SetMsgsPerSec(50);
 
-    this->dataPtr->imageReflectancePub = this->node->Advertise<msgs::ImageStamped>(
-        this->Topic() + "_reflectance", 50);
+    this->dataPtr->imageReflectancePub =
+        this->node->Advertise<msgs::ImageStamped>(
+            this->Topic() + "_reflectance", 50);
 
-    this->dataPtr->imageReflectancePubIgn = 
+    this->dataPtr->imageReflectancePubIgn =
         this->nodeIgn.Advertise<ignition::msgs::Image>(
             this->TopicIgn() + "_reflectance", opts);
   }
@@ -201,7 +202,8 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
     this->imagePub->Publish(msg);
   }
 
-  if (this->dataPtr->imageReflectancePub && this->dataPtr->imageReflectancePub->HasConnections() &&
+  if (this->dataPtr->imageReflectancePub &&
+      this->dataPtr->imageReflectancePub->HasConnections() &&
       // check if reflectance data is available.
       this->dataPtr->depthCamera->ReflectanceData())
   {
@@ -215,7 +217,9 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
     msg.mutable_image()->set_step(this->camera->ImageWidth() *
         this->camera->ImageDepth());
 
-    unsigned int reflectanceSamples = msg.image().width() * msg.image().height();
+    unsigned int reflectanceSamples =
+        msg.image().width() * msg.image().height();
+
     float f;
     // cppchecker recommends using sizeof(varname)
     unsigned int reflectanceBufferSize = reflectanceSamples * sizeof(f);
@@ -223,10 +227,12 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
     if (!this->dataPtr->reflectanceBuffer)
       this->dataPtr->reflectanceBuffer = new float[reflectanceSamples];
 
-    memcpy(this->dataPtr->reflectanceBuffer, this->dataPtr->depthCamera->ReflectanceData(),
+    memcpy(this->dataPtr->reflectanceBuffer,
+        this->dataPtr->depthCamera->ReflectanceData(), reflectanceBufferSize);
+
+    msg.mutable_image()->set_data(this->dataPtr->reflectanceBuffer,
         reflectanceBufferSize);
 
-    msg.mutable_image()->set_data(this->dataPtr->reflectanceBuffer, reflectanceBufferSize);
     this->dataPtr->imageReflectancePub->Publish(msg);
   }
 
