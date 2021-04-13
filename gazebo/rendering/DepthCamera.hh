@@ -98,7 +98,7 @@ namespace gazebo
 
       /// \brief All things needed to get reflectance data
       /// \return The reflectance buffer as a float array
-      public: virtual const float *ReflectanceData() const;
+      public: const float *ReflectanceData() const;
 
       /// \brief Set the render target, which renders the depth data
       /// \param[in] _target Pointer to the render target
