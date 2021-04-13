@@ -51,6 +51,7 @@ namespace gazebo
 {
   namespace rendering
   {
+    class CustomSceneManagerFactory;
     class Projector;
     class Visual;
     class Grid;
@@ -144,6 +145,9 @@ namespace gazebo
       /// \brief All the oculus cameras.
       public: std::vector<OculusCameraPtr> oculusCameras;
 #endif
+
+      /// \brief The ogre scene manager factory.
+      public: CustomSceneManagerFactory *managerFactory = nullptr;
 
       /// \brief The ogre scene manager.
       public: Ogre::SceneManager *manager = nullptr;

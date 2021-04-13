@@ -23,6 +23,7 @@ set (sources
   COMVisual.cc
   ContactVisual.cc
   Conversions.cc
+  CustomAutoParamDataSource.cc
   CustomPSSMShadowCameraSetup.cc
   DepthCamera.cc
   Distortion.cc
@@ -87,6 +88,7 @@ set (headers
   COMVisual.hh
   ContactVisual.hh
   Conversions.hh
+  CustomAutoParamDataSource.hh
   CustomPSSMShadowCameraSetup.hh
   DepthCamera.hh
   Distortion.hh

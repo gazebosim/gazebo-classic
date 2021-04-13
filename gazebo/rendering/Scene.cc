@@ -31,6 +31,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/CustomSceneManager.hh"
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -339,7 +340,9 @@ void Scene::Load()
   if (this->dataPtr->manager)
     root->destroySceneManager(this->dataPtr->manager);
 
-  this->dataPtr->manager = root->createSceneManager(Ogre::ST_GENERIC);
+  this->dataPtr->managerFactory = OGRE_NEW CustomSceneManagerFactory();
+  root->addSceneManagerFactory(this->dataPtr->managerFactory);
+  this->dataPtr->manager = root->createSceneManager("CustomSceneManager");
   this->dataPtr->manager->setAmbientLight(
       Ogre::ColourValue(0.1, 0.1, 0.1, 0.1));
 
