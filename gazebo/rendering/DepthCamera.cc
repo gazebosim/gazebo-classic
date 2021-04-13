@@ -660,6 +660,18 @@ const float* DepthCamera::DepthData() const
 }
 
 //////////////////////////////////////////////////
+bool DepthCamera::GetOutputReflectance() const
+{
+  return this->dataPtr->outputReflectance;
+}
+
+//////////////////////////////////////////////////
+const float* DepthCamera::ReflectanceData() const
+{
+  return this->dataPtr->reflectanceBuffer;
+}
+
+//////////////////////////////////////////////////
 void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
 {
   this->depthTarget = _target;

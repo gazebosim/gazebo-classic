@@ -30,8 +30,17 @@ namespace gazebo
       /// \brief Depth data buffer.
       public: float *depthBuffer = nullptr;
 
+      /// \brief Reflectance data buffer.
+      public: float *reflectanceBuffer = nullptr;
+
       /// \brief Local pointer to the depthCamera.
       public: rendering::DepthCameraPtr depthCamera;
+
+      /// \brief Publisher of reflectance image messages.
+      public: transport::PublisherPtr imageReflectancePub;
+
+      /// \brief Publisher of reflectance image messages.
+      public: ignition::transport::Node::Publisher imageReflectancePubIgn;
     };
   }
 }

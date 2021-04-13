@@ -92,6 +92,14 @@ namespace gazebo
       /// \return The z-buffer as a float array
       public: virtual const float *DepthData() const;
 
+      /// \brief Get whether reflectance has been generated.
+      /// \return True if reflectance is set to generate.
+      public: bool GetOutputReflectance() const;
+
+      /// \brief All things needed to get reflectance data
+      /// \return The reflectance buffer as a float array
+      public: virtual const float *ReflectanceData() const;
+
       /// \brief Set the render target, which renders the depth data
       /// \param[in] _target Pointer to the render target
       public: virtual void SetDepthTarget(Ogre::RenderTarget *_target);

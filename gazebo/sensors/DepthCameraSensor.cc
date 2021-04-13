@@ -124,6 +124,19 @@ void DepthCameraSensor::Init()
     gzerr << "No world name" << std::endl;
   }
 
+  if (this->dataPtr->depthCamera->GetOutputReflectance())
+  {
+    ignition::transport::AdvertiseMessageOptions opts;
+    opts.SetMsgsPerSec(50);
+
+    this->dataPtr->imageReflectancePub = this->node->Advertise<msgs::ImageStamped>(
+        this->Topic() + "_reflectance", 50);
+
+    this->dataPtr->imageReflectancePubIgn = 
+        this->nodeIgn.Advertise<ignition::msgs::Image>(
+            this->TopicIgn() + "_reflectance", opts);
+  }
+
   // Disable clouds and moon on server side until fixed and also to improve
   // performance
   this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
@@ -186,6 +199,35 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
     }
     msg.mutable_image()->set_data(this->dataPtr->depthBuffer, depthBufferSize);
     this->imagePub->Publish(msg);
+  }
+
+  if (this->dataPtr->imageReflectancePub && this->dataPtr->imageReflectancePub->HasConnections() &&
+      // check if reflectance data is available.
+      this->dataPtr->depthCamera->ReflectanceData())
+  {
+    msgs::ImageStamped msg;
+    msgs::Set(msg.mutable_time(), this->scene->SimTime());
+    msg.mutable_image()->set_width(this->camera->ImageWidth());
+    msg.mutable_image()->set_height(this->camera->ImageHeight());
+    msg.mutable_image()->set_pixel_format(common::Image::R_FLOAT32);
+
+
+    msg.mutable_image()->set_step(this->camera->ImageWidth() *
+        this->camera->ImageDepth());
+
+    unsigned int reflectanceSamples = msg.image().width() * msg.image().height();
+    float f;
+    // cppchecker recommends using sizeof(varname)
+    unsigned int reflectanceBufferSize = reflectanceSamples * sizeof(f);
+
+    if (!this->dataPtr->reflectanceBuffer)
+      this->dataPtr->reflectanceBuffer = new float[reflectanceSamples];
+
+    memcpy(this->dataPtr->reflectanceBuffer, this->dataPtr->depthCamera->ReflectanceData(),
+        reflectanceBufferSize);
+
+    msg.mutable_image()->set_data(this->dataPtr->reflectanceBuffer, reflectanceBufferSize);
+    this->dataPtr->imageReflectancePub->Publish(msg);
   }
 
   this->SetRendered(false);
