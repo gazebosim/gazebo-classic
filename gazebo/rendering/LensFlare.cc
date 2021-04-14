@@ -59,6 +59,7 @@ namespace gazebo
 
     //////////////////////////////////////////////////
     LensFlareCompositorListener::LensFlareCompositorListener(CameraPtr _camera, LightPtr _light)
+      : dataPtr(new LensFlareCompositorListenerPrivate)
     {
       this->dataPtr->camera = _camera;
       this->SetLight(_light);
