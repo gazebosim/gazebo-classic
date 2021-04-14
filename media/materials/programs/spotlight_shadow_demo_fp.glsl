@@ -11,7 +11,6 @@ uniform sampler2D shadowMap7;
 uniform sampler2D shadowMap8;
 uniform sampler2D shadowMap9;
 uniform sampler2D shadowMap10;
-uniform sampler2D shadowMap11;
 
 varying vec4 lightSpacePos0;
 varying vec4 lightSpacePos1;
@@ -24,7 +23,6 @@ varying vec4 lightSpacePos7;
 varying vec4 lightSpacePos8;
 varying vec4 lightSpacePos9;
 varying vec4 lightSpacePos10;
-varying vec4 lightSpacePos11;
 
 varying vec4 worldPos;
 varying vec4 worldViewPos;
