@@ -23,10 +23,9 @@
       <uri>model://sun</uri>
     </include>
 
-
-    <light type="spot" name="spot_0">
+    <light type="spot" name="spot_1">
       <cast_shadows>true</cast_shadows>
-      <pose>-3.0 0.0 3.0 0 0 0</pose>
+      <pose>-3.0 -8 3.0 0 0 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
       <specular>0.2 0.2 0.2 1</specular>
       <attenuation>
@@ -43,7 +42,140 @@
       <direction>1 0 -1</direction>
     </light>
 
-     <model name="ground_shadow_receiver">
+    <light type="spot" name="spot_2">
+      <cast_shadows>true</cast_shadows>
+      <pose>-3.0 -6 3.0 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_3">
+      <cast_shadows>true</cast_shadows>
+      <pose>-3.0 -4 3.0 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_4">
+      <cast_shadows>true</cast_shadows>
+      <pose>-3.0 -2 3.0 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_5">
+      <cast_shadows>true</cast_shadows>
+      <pose>-3.0 0 3.0 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_6">
+      <cast_shadows>true</cast_shadows>
+      <pose>-3.0 2 3.0 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_7">
+      <cast_shadows>true</cast_shadows>
+      <pose>-3.0 4 3.0 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_8">
+      <cast_shadows>true</cast_shadows>
+      <pose>-3.0 6 3.0 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <model name="ground_shadow_receiver">
       <pose>0 0 0.1 0 0 0</pose>
       <static>true</static>
       <link name="link">
@@ -51,7 +183,7 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>10 10</size>
+              <size>40 40</size>
             </plane>
           </geometry>
           <surface>
@@ -71,7 +203,7 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>10 10</size>
+              <size>40 40</size>
             </plane>
           </geometry>
           <material>
@@ -84,9 +216,169 @@
       </link>
     </model>
 
+    <model name="box_1">
+      <pose>0 -8 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+      </link>
+    </model>
 
-    <model name="box">
+    <model name="box_2">
+      <pose>0 -6 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box_3">
+      <pose>0 -4 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box_4">
+      <pose>0 -2 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box_5">
       <pose>0 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box_6">
+      <pose>0 2 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box_7">
+      <pose>0 4 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box_8">
+      <pose>0 6 0.5 0 0 0</pose>
       <link name="link">
         <collision name="collision">
           <geometry>
