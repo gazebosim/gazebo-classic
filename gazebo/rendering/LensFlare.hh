@@ -33,6 +33,8 @@ namespace gazebo
   namespace rendering
   {
     class LensFlarePrivate;
+
+    class LensFlareCompositorListenerPrivate;
     
     /// \brief We'll create an instance of this class for each camera, to be
     /// used to inject lens flare uniforms in each render call.
@@ -87,24 +89,9 @@ namespace gazebo
                                      const ignition::math::Vector3d &_imgPos,
                                      const ignition::math::Vector3d &_worldPos);
 
-      /// \brief Pointer to light
-      private: LightPtr light;
-
-      /// \brief Pointer to camera
-      private: CameraPtr camera;
-
-      /// \brief Dummy camera used by wide angle camera for occlusion checking
-      private: CameraPtr wideAngleDummyCamera;
-
-      /// \brief Position of light in world frame
-      private: ignition::math::Vector3d lightWorldPos;
-
-      /// \brief Scale of lens flare.
-      private: double scale = 1.0;
-
-      /// \brief Color of lens flare.
-      private: ignition::math::Vector3d color
-          = ignition::math::Vector3d(1.0, 1.0, 1.0);
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<LensFlareCompositorListenerPrivate> dataPtr;
     };
 
     /// \addtogroup gazebo_rendering Rendering
