@@ -23,7 +23,6 @@ set (sources
   COMVisual.cc
   ContactVisual.cc
   Conversions.cc
-  CustomAutoParamDataSource.cc
   CustomPSSMShadowCameraSetup.cc
   DepthCamera.cc
   Distortion.cc
@@ -69,6 +68,9 @@ set (sources
   WindowManager.cc
   WrenchVisual.cc
 )
+if (${OGRE_VERSION} VERSION_LESS 1.10)
+  list(APPEND sources "CustomAutoParamDataSource.cc")
+endif()
 
 if (NOT USE_EXTERNAL_TINYXML)
   include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
@@ -88,7 +90,6 @@ set (headers
   COMVisual.hh
   ContactVisual.hh
   Conversions.hh
-  CustomAutoParamDataSource.hh
   CustomPSSMShadowCameraSetup.hh
   DepthCamera.hh
   Distortion.hh
@@ -136,6 +137,9 @@ set (headers
   WrenchVisual.hh
   ogre_gazebo.h
 )
+if (${OGRE_VERSION} VERSION_LESS 1.10)
+  list(APPEND headers "CustomAutoParamDataSource.hh")
+endif()
 
 # This captures headers that should not be installed.
 set (internal_headers

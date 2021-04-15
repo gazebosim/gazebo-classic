@@ -51,7 +51,9 @@ namespace gazebo
 {
   namespace rendering
   {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR <= 9
     class CustomSceneManagerFactory;
+#endif
     class Projector;
     class Visual;
     class Grid;
