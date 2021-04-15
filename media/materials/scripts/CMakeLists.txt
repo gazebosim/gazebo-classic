@@ -11,6 +11,7 @@ distortion.compositor
 gazebo.material
 GBuffer.material
 grid.material
+heightmap_shadows.material
 kitchen.material
 lens_flare.compositor
 Modulate.material

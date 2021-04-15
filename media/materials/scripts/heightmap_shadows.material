@@ -1,0 +1,183 @@
+vertex_program Gazebo/HeightmapShadowsVS glsl
+{
+  source heightmap_shadows_vp.glsl
+
+  default_params
+  {
+    param_named_auto worldMatrix world_matrix
+    param_named_auto worldViewMatrix worldview_matrix
+    param_named_auto viewProjMatrix viewproj_matrix
+
+    // param_named_auto lodMorph custom 1001
+
+    param_named_auto texViewProjMatrix0 texture_viewproj_matrix 0
+    param_named_auto texViewProjMatrix1 texture_viewproj_matrix 1
+    param_named_auto texViewProjMatrix2 texture_viewproj_matrix 2
+
+    //param_named_auto passNumber pass_iteration_number
+
+    // spot light params
+    param_named_auto texViewProjMatrix3 texture_viewproj_matrix 3
+    param_named_auto texViewProjMatrix4 texture_viewproj_matrix 4
+    param_named_auto texViewProjMatrix5 texture_viewproj_matrix 5
+    param_named_auto texViewProjMatrix6 texture_viewproj_matrix 6
+    param_named_auto texViewProjMatrix7 texture_viewproj_matrix 7
+    param_named_auto texViewProjMatrix8 texture_viewproj_matrix 8
+    param_named_auto texViewProjMatrix9 texture_viewproj_matrix 9
+    param_named_auto texViewProjMatrix10 texture_viewproj_matrix 10
+    param_named_auto texViewProjMatrix11 texture_viewproj_matrix 11
+    param_named_auto texViewProjMatrix12 texture_viewproj_matrix 12
+    param_named_auto texViewProjMatrix13 texture_viewproj_matrix 13
+  }
+}
+
+fragment_program Gazebo/HeightmapShadowsFS glsl
+{
+  source heightmap_shadows_fp.glsl
+
+  default_params
+  {
+    param_named shadowMap0 int 0
+    param_named shadowMap1 int 1
+    param_named shadowMap2 int 2
+
+    param_named_auto ambient ambient_light_colour
+    // param_named_auto lightDiffuseColour light_diffuse_colour
+    // param_named_auto lightSpecularColour light_specular_colour
+
+    param_named_auto inverseShadowmapSize0  inverse_texture_size 0
+    param_named_auto inverseShadowmapSize1  inverse_texture_size 1
+    param_named_auto inverseShadowmapSize2  inverse_texture_size 2
+
+    param_named pssmSplitPoints float4 8.68365 29.5603 500 0
+
+    param_named_auto vsSpotLightPos0  light_position_view_space 1
+    param_named_auto vsSpotLightPos1  light_position_view_space 2
+    param_named_auto vsSpotLightPos2  light_position_view_space 3
+    param_named_auto vsSpotLightPos3  light_position_view_space 4
+    param_named_auto vsSpotLightPos4  light_position_view_space 5
+    param_named_auto vsSpotLightPos5  light_position_view_space 6
+    param_named_auto vsSpotLightPos6  light_position_view_space 7
+    param_named_auto vsSpotLightPos7  light_position_view_space 8
+    param_named_auto vsSpotLightPos8  light_position_view_space 9
+    param_named_auto vsSpotLightPos9  light_position_view_space 10
+    param_named_auto vsSpotLightPos10  light_position_view_space 11
+    param_named_auto vsSpotLightDir0  light_direction_view_space 1
+    param_named_auto vsSpotLightDir1  light_direction_view_space 2
+    param_named_auto vsSpotLightDir2  light_direction_view_space 3
+    param_named_auto vsSpotLightDir3  light_direction_view_space 4
+    param_named_auto vsSpotLightDir4  light_direction_view_space 5
+    param_named_auto vsSpotLightDir5  light_direction_view_space 6
+    param_named_auto vsSpotLightDir6  light_direction_view_space 7
+    param_named_auto vsSpotLightDir7  light_direction_view_space 8
+    param_named_auto vsSpotLightDir8  light_direction_view_space 9
+    param_named_auto vsSpotLightDir9  light_direction_view_space 10
+    param_named_auto vsSpotLightDir10  light_direction_view_space 11
+    // Assuming these navlights are the same, these parameters can be reused for each.
+    param_named_auto spotLightColor0  light_diffuse_colour 1
+    param_named_auto spotLightAtten0  light_attenuation 1
+    param_named_auto spotLightParams0 spotlight_params 1
+
+    // spot light params
+    param_named shadowMap3 int 3
+    param_named shadowMap4 int 4
+    param_named shadowMap5 int 5
+    param_named shadowMap6 int 6
+    param_named shadowMap7 int 7
+    param_named shadowMap8 int 8
+    param_named shadowMap9 int 9
+    param_named shadowMap10 int 10
+    param_named shadowMap11 int 11
+    param_named shadowMap12 int 12
+    param_named shadowMap13 int 13
+  }
+}
+
+material Gazebo/HeightmapShadows
+{
+  technique
+  {
+    pass
+    {
+      max_lights 40
+      iteration 1 per_n_lights 32
+
+      vertex_program_ref Gazebo/HeightmapShadowsVS { }
+      fragment_program_ref Gazebo/HeightmapShadowsFS { }
+
+      texture_unit shadowMap0
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap1
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap2
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+
+      // spot light params
+      texture_unit shadowMap3
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap4
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+
+      texture_unit shadowMap5
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap6
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap7
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+     texture_unit shadowMap8
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap9
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap10
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap11
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap12
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap13
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+    }
+  }
+}

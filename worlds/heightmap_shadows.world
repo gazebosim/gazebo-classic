@@ -1,0 +1,478 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>62 54 32 0 1.57 0.36</pose>
+      </camera>
+    </gui>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <light type="spot" name="spot_0">
+      <cast_shadows>true</cast_shadows>
+      <pose>61.0 63.0 12.8 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_1">
+      <cast_shadows>true</cast_shadows>
+      <pose>61.0 61.0 12.8 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_2">
+      <cast_shadows>true</cast_shadows>
+      <pose>61.0 59.0 12.8 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_3">
+      <cast_shadows>true</cast_shadows>
+      <pose>61.0 57.0 12.8 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_4">
+      <cast_shadows>true</cast_shadows>
+      <pose>61.0 55.0 12.8 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_5">
+      <cast_shadows>true</cast_shadows>
+      <pose>61.0 53.0 12.8 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_6">
+      <cast_shadows>true</cast_shadows>
+      <pose>61.0 51.0 12.8 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_7">
+      <cast_shadows>true</cast_shadows>
+      <pose>61.0 49.0 12.8 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_8">
+      <cast_shadows>true</cast_shadows>
+      <pose>61.0 47.0 12.8 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_9">
+      <cast_shadows>true</cast_shadows>
+      <pose>61.0 45.0 12.8 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <light type="spot" name="spot_10">
+      <cast_shadows>true</cast_shadows>
+      <pose>61.0 43.0 12.8 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.05</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <direction>1 0 -1</direction>
+    </light>
+
+    <model name="sphere">
+      <static>true</static>
+      <pose>63 63.0 10 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sphere_1">
+      <static>true</static>
+      <pose>63 61.0 10 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+
+    <model name="sphere_2">
+      <static>true</static>
+      <pose>63 59.0 10 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.25</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sphere_3">
+      <static>true</static>
+      <pose>63 57.0 10 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.5</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sphere_4">
+      <static>true</static>
+      <pose>63 55.0 10 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.5 1.5 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sphere_5">
+      <static>true</static>
+      <pose>63 53.0 10 0.5 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.25 0.25 0.25</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+
+    <model name="sphere_6">
+      <static>true</static>
+      <pose>63 51.0 10 -0.3 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.25 0.25 3.0</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sphere_7">
+      <static>true</static>
+      <pose>63 49.0 10 0.5 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.7</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sphere_8">
+      <static>true</static>
+      <pose>63 47.0 10 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.25 0.25 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sphere_9">
+      <static>true</static>
+      <pose>63 45.0 10 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sphere_10">
+      <static>true</static>
+      <pose>63 43.0 10 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0 0 1 1</ambient>
+            <diffuse>0 0 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="heightmap_shadows">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <heightmap>
+              <uri>file://media/materials/textures/heightmap_bowl.png</uri>
+              <size>129 129 10</size>
+              <pos>0 0 0</pos>
+            </heightmap>
+          </geometry>
+        </collision>
+        <visual name="visual_abcedf">
+          <geometry>
+            <heightmap>
+              <use_terrain_paging>false</use_terrain_paging>
+              <uri>file://media/materials/textures/heightmap_bowl.png</uri>
+              <size>129 129 10</size>
+              <pos>0 0 0</pos>
+            </heightmap>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/heightmap_shadows.material</uri>
+              <name>Gazebo/HeightmapShadows</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>
