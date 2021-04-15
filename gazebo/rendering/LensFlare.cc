@@ -33,7 +33,6 @@ namespace gazebo
 {
   namespace rendering
   {
-
     /// \brief Private data class for LensFlareCompositorListener
     class LensFlareCompositorListenerPrivate
     {
@@ -58,7 +57,8 @@ namespace gazebo
     };
 
     //////////////////////////////////////////////////
-    LensFlareCompositorListener::LensFlareCompositorListener(CameraPtr _camera, LightPtr _light)
+    LensFlareCompositorListener::LensFlareCompositorListener(CameraPtr _camera,
+                                                             LightPtr _light)
       : dataPtr(new LensFlareCompositorListenerPrivate)
     {
       this->dataPtr->camera = _camera;
@@ -88,7 +88,8 @@ namespace gazebo
     }
 
     //////////////////////////////////////////////////
-    void LensFlareCompositorListener::SetColor(const ignition::math::Vector3d &_color)
+    void LensFlareCompositorListener::SetColor(
+        const ignition::math::Vector3d &_color)
     {
       this->dataPtr->color = _color;
     }
@@ -118,8 +119,10 @@ namespace gazebo
 
       // for adjusting aspect ratio of flare
       params->setNamedConstant("viewport",
-          Ogre::Vector3(static_cast<double>(this->dataPtr->camera->ViewportWidth()),
-          static_cast<double>(this->dataPtr->camera->ViewportHeight()), 1.0));
+          Ogre::Vector3(
+              static_cast<double>(this->dataPtr->camera->ViewportWidth()),
+              static_cast<double>(this->dataPtr->camera->ViewportHeight()),
+              1.0));
 
       // use light's world position for lens flare position
       if (this->dataPtr->light->Type() == "directional")
@@ -128,8 +131,9 @@ namespace gazebo
         // The large multiplier is for occlusion testing and assumes the light
         // is very far away. Larger values cause the light to disappear on
         // some frames for some unknown reason.
-        this->dataPtr->lightWorldPos = -(this->dataPtr->light->WorldPose().Rot() *
-                                this->dataPtr->light->Direction()) * 100000.0;
+        this->dataPtr->lightWorldPos =
+            -(this->dataPtr->light->WorldPose().Rot() *
+              this->dataPtr->light->Direction()) * 100000.0;
       }
       else
         this->dataPtr->lightWorldPos = this->dataPtr->light->WorldPose().Pos();
@@ -150,7 +154,8 @@ namespace gazebo
       params->setNamedConstant("scale",
           static_cast<Ogre::Real>(lensFlareScale));
       params->setNamedConstant("color",
-          Ogre::Vector3(this->dataPtr->color.X(), this->dataPtr->color.Y(), this->dataPtr->color.Z()));
+          Ogre::Vector3(this->dataPtr->color.X(), this->dataPtr->color.Y(),
+                        this->dataPtr->color.Z()));
     }
 
     //////////////////////////////////////////////////
@@ -263,9 +268,10 @@ namespace gazebo
           if (std::fabs(pos.x) <= 1 && std::fabs(pos.y) <= 1 && pos.z > 0)
           {
             // check occlusion using this env camera
-            this->dataPtr->wideAngleDummyCamera->SetWorldPose(ignition::math::Pose3d(
-                Conversions::ConvertIgn(cam->getDerivedPosition()),
-                Conversions::ConvertIgn(cam->getDerivedOrientation())));
+            this->dataPtr->wideAngleDummyCamera->SetWorldPose(
+                ignition::math::Pose3d(
+                  Conversions::ConvertIgn(cam->getDerivedPosition()),
+                  Conversions::ConvertIgn(cam->getDerivedOrientation())));
 
             occlusionScale = this->OcclusionScale(
                 this->dataPtr->wideAngleDummyCamera,
@@ -331,7 +337,7 @@ namespace gazebo
           static_cast<double>(rays);
       return s;
     }
-    
+
     /// \brief Private data class for LensFlare
     class LensFlarePrivate
     {
@@ -525,13 +531,14 @@ void LensFlare::SetCameraSensor(CameraPtr _camera)
 }
 
 //////////////////////////////////////////////////
-void LensFlare::SetLensFlareCompositorListener(std::shared_ptr<LensFlareCompositorListener> _lensFlareCompositorListener)
+void LensFlare::SetLensFlareCompositorListener(
+    std::shared_ptr<LensFlareCompositorListener> _listener)
 {
-    this->dataPtr->lensFlareCompositorListener = _lensFlareCompositorListener;
+    this->dataPtr->lensFlareCompositorListener = _listener;
 }
 
 //////////////////////////////////////////////////
-void LensFlare::SetLensFlareInstance(Ogre::CompositorInstance *_lensFlareInstance)
+void LensFlare::SetLensFlareInstance(Ogre::CompositorInstance *_instance)
 {
-    this->dataPtr->lensFlareInstance = _lensFlareInstance;
+    this->dataPtr->lensFlareInstance = _instance;
 }

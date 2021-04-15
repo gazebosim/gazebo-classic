@@ -35,7 +35,7 @@ namespace gazebo
     class LensFlarePrivate;
 
     class LensFlareCompositorListenerPrivate;
-    
+
     /// \brief We'll create an instance of this class for each camera, to be
     /// used to inject lens flare uniforms in each render call.
     class GZ_RENDERING_VISIBLE LensFlareCompositorListener
@@ -127,13 +127,17 @@ namespace gazebo
       protected: void Update();
 
       /// \brief Set camera stored in LensFlarePrivate
+      /// \param[in] _camera Camera to use in sensor.
       protected: void SetCameraSensor(CameraPtr _camera);
 
       /// \brief Set lensFlareCompositorListener stored in LensFlarePrivate
-      protected: void SetLensFlareCompositorListener(std::shared_ptr<LensFlareCompositorListener> _lensFlareCompositorListener);
+      /// \param[in] _listener Shared pointer to object to be set.
+      protected: void SetLensFlareCompositorListener(
+          std::shared_ptr<LensFlareCompositorListener> _listener);
 
       /// \brief Set lensFlareInstance stored in LensFlarePrivate
-      protected: void SetLensFlareInstance(Ogre::CompositorInstance *_lensFlareInstance);
+      /// \param[in] _instance CompositorInstance to set
+      protected: void SetLensFlareInstance(Ogre::CompositorInstance *_instance);
 
       /// \brief Request callback
       /// \param[in] _msg The message data.
