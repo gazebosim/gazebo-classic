@@ -99,7 +99,10 @@ material Gazebo/HeightmapShadows
   {
     pass
     {
-      max_lights 40
+      // for some reason this line causes dynamic lines to be rendered
+      // incorrectly
+      // max_lights 40
+
       iteration 1 per_n_lights 32
 
       vertex_program_ref Gazebo/HeightmapShadowsVS { }
