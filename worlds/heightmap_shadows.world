@@ -1,4 +1,11 @@
 <?xml version="1.0" ?>
+
+<!--
+  An example world to show how to apply a custom material to a heightmap
+  and render lights (spot and directional) and shadows on the heightmap using
+  shaders.
+-->
+
 <sdf version="1.5">
   <world name="default">
     <gui>
@@ -10,7 +17,6 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
-
 
     <!-- A global light source -->
     <include>

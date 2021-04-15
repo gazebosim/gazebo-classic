@@ -9,6 +9,8 @@
   on the sides which need to be manually filtered out in a full shader with
   lighting and proper spotlight FOV and attenuation.
   Note: The shaders also do not render shadows from the sun on the ground plane.
+  See heightmap_shadows.world for a complete example of material and shaders for
+  rendering light and shadows
 -->
 
 

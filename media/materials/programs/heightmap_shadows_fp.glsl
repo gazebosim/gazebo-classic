@@ -177,7 +177,7 @@ vec3 spotlight(in vec3 vsVecToLight,
   float rho = dot(vsNegLightDirNorm, vsVecToLightNorm);
   float spotT = clamp((rho - spotParams.y) / (spotParams.x - spotParams.y), 0.0, 1.0);
   // We don't need a falloff exponent for this simulation
-  //float spotT = pow(spotT, spotParams.z);
+  // float spotT = pow(spotT, spotParams.z);
 
   float shadow = ShadowSimple(shadowMap, shadowMapPos);
 
