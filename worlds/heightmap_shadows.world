@@ -26,7 +26,7 @@
         <range>10</range>
         <constant>0.05</constant>
         <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
+        <quadratic>0.1</quadratic>
       </attenuation>
       <spot>
         <inner_angle>0.1</inner_angle>
@@ -45,7 +45,7 @@
         <range>10</range>
         <constant>0.05</constant>
         <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
+        <quadratic>0.1</quadratic>
       </attenuation>
       <spot>
         <inner_angle>0.1</inner_angle>
@@ -64,7 +64,7 @@
         <range>10</range>
         <constant>0.05</constant>
         <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
+        <quadratic>0.1</quadratic>
       </attenuation>
       <spot>
         <inner_angle>0.1</inner_angle>
@@ -83,7 +83,7 @@
         <range>10</range>
         <constant>0.05</constant>
         <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
+        <quadratic>0.1</quadratic>
       </attenuation>
       <spot>
         <inner_angle>0.1</inner_angle>
@@ -102,7 +102,7 @@
         <range>10</range>
         <constant>0.05</constant>
         <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
+        <quadratic>0.1</quadratic>
       </attenuation>
       <spot>
         <inner_angle>0.1</inner_angle>
@@ -121,7 +121,7 @@
         <range>10</range>
         <constant>0.05</constant>
         <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
+        <quadratic>0.1</quadratic>
       </attenuation>
       <spot>
         <inner_angle>0.1</inner_angle>
@@ -140,7 +140,7 @@
         <range>10</range>
         <constant>0.05</constant>
         <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
+        <quadratic>0.1</quadratic>
       </attenuation>
       <spot>
         <inner_angle>0.1</inner_angle>
@@ -159,7 +159,7 @@
         <range>10</range>
         <constant>0.05</constant>
         <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
+        <quadratic>0.1</quadratic>
       </attenuation>
       <spot>
         <inner_angle>0.1</inner_angle>
@@ -178,7 +178,7 @@
         <range>10</range>
         <constant>0.05</constant>
         <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
+        <quadratic>0.1</quadratic>
       </attenuation>
       <spot>
         <inner_angle>0.1</inner_angle>
@@ -197,7 +197,7 @@
         <range>10</range>
         <constant>0.05</constant>
         <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
+        <quadratic>0.1</quadratic>
       </attenuation>
       <spot>
         <inner_angle>0.1</inner_angle>
@@ -216,7 +216,7 @@
         <range>10</range>
         <constant>0.05</constant>
         <linear>0.01</linear>
-        <quadratic>0.001</quadratic>
+        <quadratic>0.1</quadratic>
       </attenuation>
       <spot>
         <inner_angle>0.1</inner_angle>

@@ -172,10 +172,8 @@ vec3 spotlight(in vec3 vsVecToLight,
   vec3 vsNegLightDirNorm = normalize(vsNegLightDir);
 
   // For realism, we are only using squared component in attenuation.
-  float atten = 1.0 / (/*attenParams.y + attenParams.z * lightD +*/ attenParams.w * lightD * lightD);
+  float atten = 1.0 / (attenParams.y + attenParams.z * lightD + attenParams.w * lightD * lightD);
 
-  // Even though we are projecting textures, we use this spot cone calculation
-  // to avoid artifacts to the side of the light
   float rho = dot(vsNegLightDirNorm, vsVecToLightNorm);
   float spotT = clamp((rho - spotParams.y) / (spotParams.x - spotParams.y), 0.0, 1.0);
   // We don't need a falloff exponent for this simulation
@@ -183,9 +181,7 @@ vec3 spotlight(in vec3 vsVecToLight,
 
   float shadow = ShadowSimple(shadowMap, shadowMapPos);
 
-  // Attenuation and spot cone get baked into final light color. This is how
-  // spotlights get generalized so they can be stored in lights array.
-  return max(color * /*atten * */spotT * shadow, vec3(0.0, 0.0, 0.0));
+  return max(color * atten * spotT * shadow, vec3(0.0, 0.0, 0.0));
 }
 
 void main()
@@ -199,7 +195,6 @@ void main()
   // light
   vec3 diffuse = vec3(0.5 * rtshadow);
 
-  //f += ShadowSimple(shadowMap0, lightSpacePos3);
   diffuse += spotlight(vsSpotLightPos0.xyz - vsPos, -vsSpotLightDir0.xyz, spotLightAtten0,
                     spotLightParams0.xyz, spotLightColor0.rgb, shadowMap3, lightSpacePos3);
   diffuse += spotlight(vsSpotLightPos1.xyz - vsPos, -vsSpotLightDir1.xyz, spotLightAtten0,

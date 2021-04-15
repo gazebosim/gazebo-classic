@@ -73,7 +73,8 @@ fragment_program Gazebo/HeightmapShadowsFS glsl
     param_named_auto vsSpotLightDir8  light_direction_view_space 9
     param_named_auto vsSpotLightDir9  light_direction_view_space 10
     param_named_auto vsSpotLightDir10  light_direction_view_space 11
-    // Assuming these navlights are the same, these parameters can be reused for each.
+
+    // Assuming these lights are the same, these parameters can be reused for each.
     param_named_auto spotLightColor0  light_diffuse_colour 1
     param_named_auto spotLightAtten0  light_attenuation 1
     param_named_auto spotLightParams0 spotlight_params 1
