@@ -196,25 +196,27 @@ TEST_F(DepthCameraReflectanceSensor_TEST, CreateDepthCamera)
 using namespace gazebo;
 class DepthCameraSensor_reflectance_topic_TEST : public ServerFixture
 {
-};
+  public: void TestReflectanceTopic();
+  private: void TxMsg(const ConstPropagationGridPtr &_msg);
 
-std::mutex g_reflectanceTopicMutex;
-bool g_reflectanceTopicReceivedMsg;
-boost::shared_ptr<msgs::PropagationGrid const> g_reflectanceTopicGridMsg;
+  private: std::mutex mutex;
+  private: bool receivedMsg;
+  private: boost::shared_ptr<msgs::PropagationGrid const> gridMsg;
+};
 
 /////////////////////////////////////////////////
 /// \brief Callback executed for every propagation grid message received
-void TxMsg(const ConstPropagationGridPtr &_msg)
+void DepthCameraSensor_reflectance_topic_TEST::TxMsg(const ConstPropagationGridPtr &_msg)
 {
-  std::lock_guard<std::mutex> lock(g_reflectanceTopicMutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   // Just copy the message
-  g_reflectanceTopicGridMsg = _msg;
-  g_reflectanceTopicReceivedMsg = true;
+  this->gridMsg = _msg;
+  this->receivedMsg = true;
 }
 
 /////////////////////////////////////////////////
 /// \brief Test the publication of the reflectance image used for visualization
-TEST_F(DepthCameraSensor_reflectance_topic_TEST, CreateDepthCamera)
+void DepthCameraSensor_reflectance_topic_TEST::TestReflectanceTopic()
 {
   {
     Load("worlds/reflectance.world");
@@ -225,7 +227,8 @@ TEST_F(DepthCameraSensor_reflectance_topic_TEST, CreateDepthCamera)
 
     std::string txTopic =
         "/gazebo/default/camera_model/my_link/camera/image_reflectance";
-    transport::SubscriberPtr sub = node->Subscribe(txTopic, &TxMsg);
+    transport::SubscriberPtr sub = node->Subscribe(txTopic,
+        &DepthCameraSensor_reflectance_topic_TEST::TxMsg, this);
 
     // Make sure that the sensor is updated and some messages are published
     for (int i = 0; i < 10; ++i)
@@ -233,11 +236,11 @@ TEST_F(DepthCameraSensor_reflectance_topic_TEST, CreateDepthCamera)
       common::Time::MSleep(100);
     }
 
-    std::lock_guard<std::mutex> lock(g_reflectanceTopicMutex);
-    EXPECT_TRUE(g_reflectanceTopicReceivedMsg);
+    std::lock_guard<std::mutex> lock(this->mutex);
+    EXPECT_TRUE(this->receivedMsg);
   }
 
-  g_reflectanceTopicReceivedMsg = false;
+  this->receivedMsg = false;
   Unload();
 
   {
@@ -249,7 +252,8 @@ TEST_F(DepthCameraSensor_reflectance_topic_TEST, CreateDepthCamera)
 
     std::string txTopic =
         "/gazebo/default/camera_model/my_link/camera/image_reflectance";
-    transport::SubscriberPtr sub = node->Subscribe(txTopic, &TxMsg);
+    transport::SubscriberPtr sub = node->Subscribe(txTopic,
+        &DepthCameraSensor_reflectance_topic_TEST::TxMsg, this);
 
     // Make sure that the sensor is updated and some messages are published
     for (int i = 0; i < 10; ++i)
@@ -257,9 +261,15 @@ TEST_F(DepthCameraSensor_reflectance_topic_TEST, CreateDepthCamera)
       common::Time::MSleep(100);
     }
 
-    std::lock_guard<std::mutex> lock(g_reflectanceTopicMutex);
-    EXPECT_FALSE(g_reflectanceTopicReceivedMsg);
+    std::lock_guard<std::mutex> lock(this->mutex);
+    EXPECT_FALSE(this->receivedMsg);
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(DepthCameraSensor_reflectance_topic_TEST, CreateDepthCamera)
+{
+  TestReflectanceTopic();
 }
 
 using namespace gazebo;
