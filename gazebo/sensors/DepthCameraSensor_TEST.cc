@@ -194,6 +194,75 @@ TEST_F(DepthCameraReflectanceSensor_TEST, CreateDepthCamera)
 }
 
 using namespace gazebo;
+class DepthCameraSensor_reflectance_topic_TEST : public ServerFixture
+{
+};
+
+std::mutex g_reflectanceTopicMutex;
+bool g_reflectanceTopicReceivedMsg;
+boost::shared_ptr<msgs::PropagationGrid const> g_reflectanceTopicGridMsg;
+
+/////////////////////////////////////////////////
+/// \brief Callback executed for every propagation grid message received
+void TxMsg(const ConstPropagationGridPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(g_reflectanceTopicMutex);
+  // Just copy the message
+  g_reflectanceTopicGridMsg = _msg;
+  g_reflectanceTopicReceivedMsg = true;
+}
+
+/////////////////////////////////////////////////
+/// \brief Test the publication of the reflectance image used for visualization
+TEST_F(DepthCameraSensor_reflectance_topic_TEST, CreateDepthCamera)
+{
+  {
+    Load("worlds/reflectance.world");
+
+    // Initialize gazebo transport layer
+    transport::NodePtr node(new transport::Node());
+    node->Init("default");
+
+    std::string txTopic =
+        "/gazebo/default/camera_model/my_link/camera/image_reflectance";
+    transport::SubscriberPtr sub = node->Subscribe(txTopic, &TxMsg);
+
+    // Make sure that the sensor is updated and some messages are published
+    for (int i = 0; i < 10; ++i)
+    {
+      common::Time::MSleep(100);
+    }
+
+    std::lock_guard<std::mutex> lock(g_reflectanceTopicMutex);
+    EXPECT_TRUE(g_reflectanceTopicReceivedMsg);
+  }
+
+  g_reflectanceTopicReceivedMsg = false;
+  Unload();
+
+  {
+    Load("worlds/depth_camera.world");
+
+    // Initialize gazebo transport layer
+    transport::NodePtr node(new transport::Node());
+    node->Init("default");
+
+    std::string txTopic =
+        "/gazebo/default/camera_model/my_link/camera/image_reflectance";
+    transport::SubscriberPtr sub = node->Subscribe(txTopic, &TxMsg);
+
+    // Make sure that the sensor is updated and some messages are published
+    for (int i = 0; i < 10; ++i)
+    {
+      common::Time::MSleep(100);
+    }
+
+    std::lock_guard<std::mutex> lock(g_reflectanceTopicMutex);
+    EXPECT_FALSE(g_reflectanceTopicReceivedMsg);
+  }
+}
+
+using namespace gazebo;
 class DepthCameraSensor_normals_TEST : public ServerFixture
 {
 };
