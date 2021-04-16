@@ -25,6 +25,7 @@
 using namespace gazebo;
 class DepthCameraSensor_TEST : public ServerFixture
 {
+  public: DepthCameraSensor_TEST();
   public: void TestCreateDepthCameraSensor();
   public: void TestDepthCameraReflectance();
   public: void TestDepthCameraNormals();
@@ -43,16 +44,27 @@ class DepthCameraSensor_TEST : public ServerFixture
   private: void TxMsg(const ConstPropagationGridPtr &_msg);
 
   private: std::mutex depthMutex;
-  private: unsigned int depthCounter = 0;
-  private: float *depthBuffer = nullptr;
+  private: unsigned int depthCounter;
+  private: float *depthBuffer;
   private: std::mutex reflectanceMutex;
-  private: unsigned int reflectanceCounter = 0;
-  private: float *reflectanceBuffer = nullptr;
-  private: unsigned int normalsCounter = 0;
+  private: unsigned int reflectanceCounter;
+  private: float *reflectanceBuffer;
+  private: unsigned int normalsCounter;
   private: std::mutex reflectanceTopicMutex;
   private: bool reflectanceTopicReceivedMsg;
-  private: boost::shared_ptr<msgs::PropagationGrid const> reflectanceTopicGridMsg;
+  private: boost::shared_ptr<msgs::PropagationGrid const>
+      reflectanceTopicGridMsg;
 };
+
+DepthCameraSensor_TEST::DepthCameraSensor_TEST()
+{
+  this->depthCounter = 0;
+  this->depthBuffer = nullptr;
+  this->reflectanceCounter = 0;
+  this->reflectanceBuffer = nullptr;
+  this->normalsCounter = 0;
+  this->reflectanceTopicReceivedMsg = false;
+}
 
 /////////////////////////////////////////////////
 void DepthCameraSensor_TEST::OnNewDepthFrame(const float * _image,
@@ -94,9 +106,9 @@ void DepthCameraSensor_TEST::TestCreateDepthCameraSensor()
   ASSERT_NE(nullptr, depthCamera);
 
   event::ConnectionPtr c = depthCamera->ConnectNewDepthFrame(
-      std::bind(&DepthCameraSensor_TEST::OnNewDepthFrame, this, std::placeholders::_1,
-      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
-      std::placeholders::_5));
+      std::bind(&DepthCameraSensor_TEST::OnNewDepthFrame, this,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
 
   // wait for a few depth camera frames
   unsigned int framesToWait = 10;
@@ -146,7 +158,8 @@ void DepthCameraSensor_TEST::OnNewReflectanceFrame(const float * _image,
   std::lock_guard<std::mutex> lock(this->reflectanceMutex);
   if (!this->reflectanceBuffer)
     this->reflectanceBuffer = new float[_width * _height];
-  memcpy(this->reflectanceBuffer,  _image, _width * _height * sizeof(_image[0]));
+  memcpy(this->reflectanceBuffer,
+      _image, _width * _height * sizeof(_image[0]));
   this->reflectanceCounter++;
 }
 
@@ -176,9 +189,9 @@ void DepthCameraSensor_TEST::TestDepthCameraReflectance()
   ASSERT_NE(nullptr, depthCamera);
 
   event::ConnectionPtr c = depthCamera->ConnectNewReflectanceFrame(
-      std::bind(&DepthCameraSensor_TEST::OnNewReflectanceFrame, this, std::placeholders::_1,
-      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
-      std::placeholders::_5));
+      std::bind(&DepthCameraSensor_TEST::OnNewReflectanceFrame, this,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
 
   // wait for a few depth camera frames
   unsigned int framesToWait = 10;
@@ -263,9 +276,9 @@ void DepthCameraSensor_TEST::TestDepthCameraNormals()
   ASSERT_NE(nullptr, depthCamera);
 
   event::ConnectionPtr c2 = depthCamera->ConnectNewNormalsPointCloud(
-      std::bind(&DepthCameraSensor_TEST::OnNewNormalsFrame, this, std::placeholders::_1,
-      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
-      std::placeholders::_5));
+      std::bind(&DepthCameraSensor_TEST::OnNewNormalsFrame, this,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
 
   unsigned int framesToWait = 10;
   // wait for a few normals callbacks
