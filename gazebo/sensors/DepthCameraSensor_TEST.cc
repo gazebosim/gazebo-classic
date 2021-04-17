@@ -30,17 +30,17 @@ class DepthCameraSensor_TEST : public ServerFixture
   public: void TestDepthCameraReflectance();
   public: void TestDepthCameraNormals();
   public: void TestReflectanceTopic();
-  private: void OnNewDepthFrame(const float * _image,
+  private: void OnNewDepthFrame(const float *_image,
     unsigned int _width, unsigned int _height,
-    unsigned int _depth, const std::string & _format);
-  private: void OnNewReflectanceFrame(const float * _image,
+    unsigned int _depth, const std::string &_format);
+  private: void OnNewReflectanceFrame(const float *_image,
     unsigned int _width, unsigned int _height,
-    unsigned int _depth, const std::string & _format);
-  private: void OnNewNormalsFrame(const float * _normals,
+    unsigned int _depth, const std::string &_format);
+  private: void OnNewNormalsFrame(const float *_normals,
                        unsigned int _width,
                        unsigned int _height,
                        unsigned int _depth,
-                       const std::string & _format);
+                       const std::string &_format);
   private: void TxMsg(const ConstPropagationGridPtr &_msg);
 
   private: std::mutex depthMutex;
@@ -67,9 +67,9 @@ DepthCameraSensor_TEST::DepthCameraSensor_TEST()
 }
 
 /////////////////////////////////////////////////
-void DepthCameraSensor_TEST::OnNewDepthFrame(const float * _image,
+void DepthCameraSensor_TEST::OnNewDepthFrame(const float *_image,
     unsigned int _width, unsigned int _height,
-    unsigned int _depth, const std::string & _format)
+    unsigned int _depth, const std::string &_format)
 {
   EXPECT_EQ(_depth, 1u);
   EXPECT_EQ(_format, std::string("FLOAT32"));
@@ -148,9 +148,9 @@ void DepthCameraSensor_TEST::TestCreateDepthCameraSensor()
 }
 
 /////////////////////////////////////////////////
-void DepthCameraSensor_TEST::OnNewReflectanceFrame(const float * _image,
+void DepthCameraSensor_TEST::OnNewReflectanceFrame(const float *_image,
     unsigned int _width, unsigned int _height,
-    unsigned int _depth, const std::string & _format)
+    unsigned int _depth, const std::string &_format)
 {
   EXPECT_EQ(_depth, 1u);
   EXPECT_EQ(_format, std::string("REFLECTANCE"));
@@ -221,11 +221,11 @@ void DepthCameraSensor_TEST::TestDepthCameraReflectance()
 }
 
 /////////////////////////////////////////////////
-void DepthCameraSensor_TEST::OnNewNormalsFrame(const float * _normals,
+void DepthCameraSensor_TEST::OnNewNormalsFrame(const float *_normals,
                        unsigned int _width,
                        unsigned int _height,
                        unsigned int _depth,
-                       const std::string & _format)
+                       const std::string &_format)
 {
   EXPECT_EQ(_depth, 1u);
   EXPECT_EQ(_format, std::string("NORMALS"));
