@@ -524,7 +524,7 @@ void LensFlare::OnRequest(ConstRequestPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void LensFlare::SetCameraSensor(CameraPtr _camera)
+void LensFlare::SetCameraImpl(CameraPtr _camera)
 {
   this->dataPtr->camera = _camera;
 }
