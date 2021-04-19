@@ -128,7 +128,7 @@ namespace gazebo
 
       /// \brief Set camera stored in LensFlarePrivate
       /// \param[in] _camera Camera to use in sensor.
-      protected: void SetCameraSensor(CameraPtr _camera);
+      protected: void SetCameraImpl(CameraPtr _camera);
 
       /// \brief Set lensFlareCompositorListener stored in LensFlarePrivate
       /// \param[in] _listener Shared pointer to object to be set.
