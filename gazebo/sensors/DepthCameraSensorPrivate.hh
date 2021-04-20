@@ -38,9 +38,6 @@ namespace gazebo
 
       /// \brief Publisher of reflectance image messages.
       public: transport::PublisherPtr imageReflectancePub;
-
-      /// \brief Publisher of reflectance image messages.
-      public: ignition::transport::Node::Publisher imageReflectancePubIgn;
     };
   }
 }

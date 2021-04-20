@@ -126,16 +126,9 @@ void DepthCameraSensor::Init()
 
   if (this->dataPtr->depthCamera->GetOutputReflectance())
   {
-    ignition::transport::AdvertiseMessageOptions opts;
-    opts.SetMsgsPerSec(50);
-
     this->dataPtr->imageReflectancePub =
         this->node->Advertise<msgs::ImageStamped>(
             this->Topic() + "_reflectance", 50);
-
-    this->dataPtr->imageReflectancePubIgn =
-        this->nodeIgn.Advertise<ignition::msgs::Image>(
-            this->TopicIgn() + "_reflectance", opts);
   }
 
   // Disable clouds and moon on server side until fixed and also to improve
