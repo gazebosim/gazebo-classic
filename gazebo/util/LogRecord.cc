@@ -56,7 +56,7 @@
 #include "gazebo/util/LogRecord.hh"
 
 using namespace gazebo;
-using namespace util;
+using namespace gazebo::util;
 
 //////////////////////////////////////////////////
 LogRecord::LogRecord()

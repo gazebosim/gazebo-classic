@@ -26,7 +26,7 @@
 #include "gazebo/util/Diagnostics.hh"
 
 using namespace gazebo;
-using namespace util;
+using namespace gazebo::util;
 
 //////////////////////////////////////////////////
 DiagnosticManager::DiagnosticManager()
