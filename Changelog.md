@@ -1,16 +1,44 @@
 ## Gazebo 9
 
-## Gazebo 9.xx.x (202x-xx-xx)
+## Gazebo 9.17.0 (2021-04-21)
 
-1. Fix support for camera with single channel floating point image format
-    * [Pull request #2918](https://github.com/osrf/gazebo/pull/2918)
+1. Generate spot light shadow maps
+    * [Pull request #2914](https://github.com/osrf/gazebo/pull/2914)
 
 1. Fix performance metrics deadlock with multiple types of sensors
     * [Pull request #2917](https://github.com/osrf/gazebo/pull/2917)
     * [Issue #2902](https://github.com/osrf/gazebo/issues/2902)
 
-1. Generate spot light shadow maps
-    * [Pull request #2914](https://github.com/osrf/gazebo/pull/2914)
+1. Fix support for camera with single channel floating point image format
+    * [Pull request #2918](https://github.com/osrf/gazebo/pull/2918)
+
+1. Optimize collision checking in ODE
+    * [Pull request #2945](https://github.com/osrf/gazebo/pull/2945)
+
+1. Lens flare cleanup and colorization
+    * [Pull request #2927](https://github.com/osrf/gazebo/pull/2927)
+
+1. Fix size of light visual
+    * [Pull request #2947](https://github.com/osrf/gazebo/pull/2947)
+
+1. LensFlare - allow inheritance
+    * [Pull request #2965](https://github.com/osrf/gazebo/pull/2965)
+    * [Pull request #2975](https://github.com/osrf/gazebo/pull/2975)
+
+1. Silence message conversion warning messages
+    * [Pull request #2972](https://github.com/osrf/gazebo/pull/2972)
+
+1. Fix depth camera breaking shadows
+    * [Pull request #2907](https://github.com/osrf/gazebo/pull/2907)
+
+1. Protect DepthCameraPlugin globals with a mutex
+    * [Pull request #2949](https://github.com/osrf/gazebo/pull/2949)
+
+1. Avoid deadlock in ConnectionManager::Stop
+    * [Pull request #2950](https://github.com/osrf/gazebo/pull/2950)
+
+1. Fix `ogre_log` test
+    * [Pull request #2954](https://github.com/osrf/gazebo/pull/2954)
 
 ## Gazebo 9.16.0 (2020-11-24)
 
