@@ -214,6 +214,10 @@ namespace gazebo
       /// \param[in] _msg Light message to update from
       public: void UpdateFromMsg(ConstLightPtr &_msg);
 
+      /// \brief Update a light source from a message.
+      /// \param[in] _msg Light message to update from
+      public: void UpdateFromMsg(const msgs::Light &_msg);
+
       /// \brief Clone the light with a new name
       /// \param[in] _name Name of the cloned light.
       /// \param[in] _scene Scene to contain the light.

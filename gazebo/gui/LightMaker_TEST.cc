@@ -62,6 +62,7 @@ void LightMaker_TEST::PointLight()
   // Check there's a light in the scene -- this is the preview
   light = scene->LightByName("__default__");
   QVERIFY(light != NULL);
+  const auto previewLight = light;
 
   // Check that the light appeared in the center of the screen
   ignition::math::Vector3d startPos = pointLightMaker->EntityPosition();
@@ -97,6 +98,11 @@ void LightMaker_TEST::PointLight()
   // Check there's a light in the scene -- this is the final pointLight
   light = scene->LightByName("user_point_light_0");
   QVERIFY(light != NULL);
+
+  QVERIFY(light->LightType() == previewLight->LightType());
+  QVERIFY(light->DiffuseColor() == previewLight->DiffuseColor());
+  QVERIFY(light->SpecularColor() == previewLight->SpecularColor());
+  QVERIFY(light->Direction() == previewLight->Direction());
 
   // Terminate
   mainWindow->close();

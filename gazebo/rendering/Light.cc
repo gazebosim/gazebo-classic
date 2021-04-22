@@ -156,14 +156,20 @@ void Light::UpdateSDFFromMsg(const msgs::Light &_msg)
 //////////////////////////////////////////////////
 void Light::UpdateFromMsg(ConstLightPtr &_msg)
 {
-  this->UpdateSDFFromMsg(*_msg);
+  this->UpdateFromMsg(*_msg);
+}
+
+//////////////////////////////////////////////////
+void Light::UpdateFromMsg(const msgs::Light &_msg)
+{
+  this->UpdateSDFFromMsg(_msg);
 
   this->Update();
 
-  if (_msg->has_pose())
+  if (_msg.has_pose())
   {
-    this->SetPosition(msgs::ConvertIgn(_msg->pose().position()));
-    this->SetRotation(msgs::ConvertIgn(_msg->pose().orientation()));
+    this->SetPosition(msgs::ConvertIgn(_msg.pose().position()));
+    this->SetRotation(msgs::ConvertIgn(_msg.pose().orientation()));
   }
 }
 
