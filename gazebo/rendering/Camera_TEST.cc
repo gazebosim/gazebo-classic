@@ -182,6 +182,102 @@ TEST_F(Camera_TEST, Create)
 
     scene->RemoveCamera(camera->Name());
   }
+
+  // test creating camera with 16 bit float point format
+  {
+    rendering::CameraPtr camera =
+        scene->CreateCamera("test_camera_16", false);
+    ASSERT_TRUE(camera != nullptr);
+
+    unsigned int width = 500;
+    unsigned int height = 300;
+    std::string format = "R_FLOAT16";
+    double hfov = 1.05;
+    double near = 0.001;
+    double far = 200.0;
+    std::stringstream ss;
+    ss << "<sdf version='" << SDF_VERSION << "'>"
+       << "  <camera>"
+       << "    <horizontal_fov>" << hfov << "</horizontal_fov>"
+       << "    <image>"
+       << "      <width>" << width << "</width>"
+       << "      <height>" << height << "</height>"
+       << "      <format>" << format << "</format>"
+       << "    </image>"
+       << "    <clip>"
+       << "      <near>" << near << "</near>" << "<far>" << far << "</far>"
+       << "    </clip>"
+       << "  </camera>"
+       << "</sdf>";
+    sdf::ElementPtr cameraSDF(new sdf::Element);
+    sdf::initFile("camera.sdf", cameraSDF);
+    sdf::readString(ss.str(), cameraSDF);
+    camera->Load(cameraSDF);
+    camera->Init();
+
+    EXPECT_EQ(width, camera->ImageWidth());
+    EXPECT_EQ(height, camera->ImageHeight());
+    unsigned int channels = 1u;
+    unsigned int bytesPerChannel = 2u;
+    unsigned int bytesPerPixel = channels * bytesPerChannel;
+    unsigned int imageMemSize = width * height * bytesPerPixel;
+    EXPECT_EQ(bytesPerPixel, camera->ImageDepth());
+    EXPECT_EQ(imageMemSize, camera->ImageMemorySize());
+    EXPECT_EQ(format, camera->ImageFormat());
+    EXPECT_DOUBLE_EQ(hfov, camera->HFOV().Radian());
+    EXPECT_NEAR(near, camera->NearClip(), 1e-3);
+    EXPECT_DOUBLE_EQ(far, camera->FarClip());
+
+    scene->RemoveCamera(camera->Name());
+  }
+
+  // test creating camera with 32 bit floating point format
+  {
+    rendering::CameraPtr camera =
+        scene->CreateCamera("test_camera_32", false);
+    ASSERT_TRUE(camera != nullptr);
+
+    unsigned int width = 500;
+    unsigned int height = 300;
+    std::string format = "R_FLOAT32";
+    double hfov = 1.05;
+    double near = 0.001;
+    double far = 200.0;
+    std::stringstream ss;
+    ss << "<sdf version='" << SDF_VERSION << "'>"
+       << "  <camera>"
+       << "    <horizontal_fov>" << hfov << "</horizontal_fov>"
+       << "    <image>"
+       << "      <width>" << width << "</width>"
+       << "      <height>" << height << "</height>"
+       << "      <format>" << format << "</format>"
+       << "    </image>"
+       << "    <clip>"
+       << "      <near>" << near << "</near>" << "<far>" << far << "</far>"
+       << "    </clip>"
+       << "  </camera>"
+       << "</sdf>";
+    sdf::ElementPtr cameraSDF(new sdf::Element);
+    sdf::initFile("camera.sdf", cameraSDF);
+    sdf::readString(ss.str(), cameraSDF);
+    camera->Load(cameraSDF);
+    camera->Init();
+
+    EXPECT_EQ(width, camera->ImageWidth());
+    EXPECT_EQ(height, camera->ImageHeight());
+    unsigned int channels = 1u;
+    unsigned int bytesPerChannel = 4u;
+    unsigned int bytesPerPixel = channels * bytesPerChannel;
+    unsigned int imageMemSize = width * height * bytesPerPixel;
+    EXPECT_EQ(bytesPerPixel, camera->ImageDepth());
+    EXPECT_EQ(imageMemSize, camera->ImageMemorySize());
+    EXPECT_EQ(format, camera->ImageFormat());
+    EXPECT_DOUBLE_EQ(hfov, camera->HFOV().Radian());
+    EXPECT_NEAR(near, camera->NearClip(), 1e-3);
+    EXPECT_DOUBLE_EQ(far, camera->FarClip());
+
+    scene->RemoveCamera(camera->Name());
+  }
 }
 
 /////////////////////////////////////////////////

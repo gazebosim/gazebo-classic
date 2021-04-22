@@ -869,6 +869,11 @@ namespace gazebo
       /// \return Integer representation of the Ogre image format
       private: static int OgrePixelFormat(const std::string &_format);
 
+      /// \brief Allow WideAngleCamera::Load to call OgrePixelFormat.
+      /// To avoid needing to include WideAngleCamera.hh, just befriend
+      /// the entire class.
+      friend class WideAngleCamera;
+
       /// \brief Receive command message.
       /// \param[in] _msg Camera Command message.
       private: void OnCmdMsg(ConstCameraCmdPtr &_msg);

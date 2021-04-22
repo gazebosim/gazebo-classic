@@ -30,6 +30,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/LightPrivate.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -318,8 +319,8 @@ void Light::CreateVisual()
 
     double angles[2];
     double range = 0.2;
-    angles[0] = range * tan(outerAngle);
-    angles[1] = range * tan(innerAngle);
+    angles[0] = range * tan(outerAngle / 2);
+    angles[1] = range * tan(innerAngle / 2);
 
     unsigned int i = 0;
     this->dataPtr->line->AddPoint(ignition::math::Vector3d(0, 0, 0));
@@ -573,12 +574,29 @@ void Light::SetRange(const double _range)
 //////////////////////////////////////////////////
 void Light::SetCastShadows(const bool _cast)
 {
+
   if (this->dataPtr->light->getType() == Ogre::Light::LT_DIRECTIONAL)
   {
+    // directional light uses PSSM shadow camera and should already be
+    // configured in RTShaderSystem
     this->dataPtr->light->setCastShadows(_cast);
+  }
+  else if (this->dataPtr->light->getType() == Ogre::Light::LT_SPOTLIGHT)
+  {
+    // use different shadow camera for spot light
+    this->dataPtr->light->setCastShadows(_cast);
+    if (_cast && this->dataPtr->shadowCameraSetup.isNull())
+    {
+      this->dataPtr->shadowCameraSetup =
+          Ogre::ShadowCameraSetupPtr(new Ogre::FocusedShadowCameraSetup());
+      this->dataPtr->light->setCustomShadowCameraSetup(
+          this->dataPtr->shadowCameraSetup);
+      RTShaderSystem::Instance()->UpdateShadows();
+    }
   }
   else
   {
+    // todo(anyone) make point light casts shadows
     this->dataPtr->light->setCastShadows(false);
   }
 }

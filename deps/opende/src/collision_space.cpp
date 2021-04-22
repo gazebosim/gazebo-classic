@@ -452,6 +452,13 @@ void dxHashSpace::collide (void *_data, dNearCallback *callback)
     if (!GEOM_ENABLED(geom)){
       continue;
     }
+
+    // skip geoms that have zero or negative/invalid aabb
+    if (geom->aabb[1] - geom->aabb[0] <= 0.0 &&
+        geom->aabb[3] - geom->aabb[2] <= 0.0 &&
+        geom->aabb[5] - geom->aabb[4] <= 0.0)
+      continue;
+
     dxAABB *aabb3 = (dxAABB*) ALLOCA (sizeof(dxAABB));
     aabb3->geom = geom;
     // compute level, but prevent cells from getting too small

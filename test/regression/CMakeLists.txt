@@ -44,6 +44,8 @@ set(tests
   2430_revolute_joint_SetPosition.cc
   2505_revolute_joint_SetAxis.cc
   2728_nested_urdf.cc
+  2896_gazebo_subnamespace.cc
+  2902_performance_metrics_deadlock.cc
 )
 gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
