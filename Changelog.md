@@ -15,11 +15,21 @@
 1. Optimize collision checking in ODE
     * [Pull request #2945](https://github.com/osrf/gazebo/pull/2945)
 
+1. Fix size of spotlight visual
+    * [Pull request #2947](https://github.com/osrf/gazebo/pull/2947)
+
+1. Fix depth camera breaking shadows
+    * [Pull request #2907](https://github.com/osrf/gazebo/pull/2907)
+
 1. Fix color channel of point clouds from DepthCamera
     * [Pull request #2853](https://github.com/osrf/gazebo/pull/2853)
 
 1. GpuRaySensor: validate scene existence
     * [Pull request #2937](https://github.com/osrf/gazebo/pull/2937)
+
+1. LensFlare: allow inheritance
+    * [Pull request #2965](https://github.com/osrf/gazebo/pull/2965)
+    * [Pull request #2975](https://github.com/osrf/gazebo/pull/2975)
 
 1. Silence message conversion warning messages
     * [Pull request #2963](https://github.com/osrf/gazebo/pull/2963)
