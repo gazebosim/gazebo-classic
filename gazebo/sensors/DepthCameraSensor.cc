@@ -222,6 +222,12 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
     memcpy(this->dataPtr->reflectanceBuffer,
         this->dataPtr->depthCamera->ReflectanceData(), reflectanceBufferSize);
 
+    for (unsigned int i = 0; i < reflectanceSamples; ++i)
+    {
+      this->dataPtr->reflectanceBuffer[i] =
+        1.0 - this->dataPtr->reflectanceBuffer[i];
+    }
+
     msg.mutable_image()->set_data(this->dataPtr->reflectanceBuffer,
         reflectanceBufferSize);
 
