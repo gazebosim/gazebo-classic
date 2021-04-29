@@ -1,5 +1,31 @@
 ## Gazebo 11
 
+## Gazebo 11.5.0 (2021-04-20)
+
+1. Specify wide angle camera cube map texture format
+    * [Pull request #2960](https://github.com/osrf/gazebo/pull/2960)
+    * [Issue #2928](https://github.com/osrf/gazebo/issues/2928)
+
+1. Protect DepthCameraPlugin globals with a mutex
+    * [Pull request #2949](https://github.com/osrf/gazebo/pull/2949)
+
+1. Avoid deadlock in ConnectionManager::Stop
+    * [Pull request #2950](https://github.com/osrf/gazebo/pull/2950)
+
+1. Optimize collision checking in ODE
+    * [Pull request #2945](https://github.com/osrf/gazebo/pull/2945)
+
+1. Fix color channel of point clouds from DepthCamera
+    * [Pull request #2853](https://github.com/osrf/gazebo/pull/2853)
+
+1. GpuRaySensor: validate scene existence
+    * [Pull request #2937](https://github.com/osrf/gazebo/pull/2937)
+
+1. Silence message conversion warning messages
+    * [Pull request #2963](https://github.com/osrf/gazebo/pull/2963)
+    * [Pull request #2973](https://github.com/osrf/gazebo/pull/2973)
+
+
 ## Gazebo 11.4.0 (2021-04-01)
 
 1. Restore HeightmapShape::SetHeight implementation (#2955)

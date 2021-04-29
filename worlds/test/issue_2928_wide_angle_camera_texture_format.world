@@ -1,0 +1,140 @@
+<?xml version="1.0" ?>
+<sdf version='1.7'>
+  <world name='default' xmlns:ignition="http://ignitionrobotics.org/schema">
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 0 0 -0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-1 0 -0.2</direction>
+      <attenuation>
+        <range>10</range>
+      </attenuation>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+    <scene>
+      <shadows>0</shadows>
+    </scene>
+    <model name='wide_angle_camera_with_default_texture'>
+      <static>1</static>
+      <pose>0.3 0 0.15 0 0 3.14159265</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name='wide_angle_camera_sensor_with_default_texture' type='wideanglecamera'>
+          <camera>
+            <horizontal_fov>1.047</horizontal_fov>
+            <image>
+              <width>12</width>
+              <height>12</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+            <lens>
+              <type>gnomonical</type>
+              <scale_to_hfov>1</scale_to_hfov>
+              <cutoff_angle>1.5707</cutoff_angle>
+              <env_texture_size>512</env_texture_size>
+            </lens>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>10</update_rate>
+          <visualize>1</visualize>
+        </sensor>
+      </link>
+    </model>
+    <model name='wide_angle_camera_with_grayscale_texture'>
+      <static>1</static>
+      <pose>0.3 2 0.15 0 0 3.14159265</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name='wide_angle_camera_sensor_with_grayscale_texture' type='wideanglecamera'>
+          <camera>
+            <horizontal_fov>1.047</horizontal_fov>
+            <image>
+              <width>12</width>
+              <height>12</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+            <lens>
+              <type>gnomonical</type>
+              <scale_to_hfov>1</scale_to_hfov>
+              <cutoff_angle>1.5707</cutoff_angle>
+              <env_texture_size>512</env_texture_size>
+              <ignition:env_texture_format>R_FLOAT16</ignition:env_texture_format>
+            </lens>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>10</update_rate>
+          <visualize>1</visualize>
+        </sensor>
+      </link>
+    </model>
+    <model name='Construction Cone 1'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <scale>10 10 10</scale>
+              <uri>model://construction_cone/meshes/construction_cone.dae</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <scale>10 10 10</scale>
+              <uri>model://construction_cone/meshes/construction_cone.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>0 0 0 0 0 0</pose>
+    </model>
+    <model name='Construction Cone 2'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <scale>10 10 10</scale>
+              <uri>model://construction_cone/meshes/construction_cone.dae</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <scale>10 10 10</scale>
+              <uri>model://construction_cone/meshes/construction_cone.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>0 2 0 0 0 0</pose>
+    </model>
+  </world>
+</sdf>

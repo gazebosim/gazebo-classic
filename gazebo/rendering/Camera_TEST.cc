@@ -191,7 +191,7 @@ TEST_F(Camera_TEST, Create)
 
     unsigned int width = 500;
     unsigned int height = 300;
-    std::string format = "FLOAT16";
+    std::string format = "R_FLOAT16";
     double hfov = 1.05;
     double near = 0.001;
     double far = 200.0;
@@ -239,7 +239,7 @@ TEST_F(Camera_TEST, Create)
 
     unsigned int width = 500;
     unsigned int height = 300;
-    std::string format = "FLOAT32";
+    std::string format = "R_FLOAT32";
     double hfov = 1.05;
     double near = 0.001;
     double far = 200.0;
