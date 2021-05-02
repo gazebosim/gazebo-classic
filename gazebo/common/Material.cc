@@ -93,6 +93,10 @@ void Material::SetTextureImage(const std::string &_tex,
       }
     }
   }
+  
+  // normalize the path
+  this->texImage = boost::filesystem::path(this->texImage)
+    .make_preferred().string();
 }
 
 //////////////////////////////////////////////////
