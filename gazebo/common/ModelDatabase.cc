@@ -503,19 +503,28 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
         continue;
       }
 
+      std::string outputPath = getenv("HOME");
+      outputPath += "/.gazebo/models";
+      
 #ifndef _WIN32
       TAR *tar;
       tar_open(&tar, const_cast<char*>(tarfilename.c_str()),
           nullptr, O_RDONLY, 0644, TAR_GNU);
 
-      std::string outputPath = getenv("HOME");
-      outputPath += "/.gazebo/models";
-
       tar_extract_all(tar, const_cast<char*>(outputPath.c_str()));
-      path = outputPath + "/" + modelName;
-
-      ModelDatabase::DownloadDependencies(path);
+#else
+      // Tar now is a built-in tool since Windows 10 build 17063.
+      std::string cmdline = "tar xzf \"";
+      cmdline += tarfilename + "\" -C \"";
+      cmdline += outputPath + "\"";
+      auto ret = system(cmdline.c_str());
+      if (ret != 0)
+      {
+        gzerr << "tar extract ret = " << ret << ", cmdline = " << cmdline << std::endl;
+      }
 #endif
+      path = outputPath + "/" + modelName;
+      ModelDatabase::DownloadDependencies(path);
     }
 
     curl_easy_cleanup(curl);
