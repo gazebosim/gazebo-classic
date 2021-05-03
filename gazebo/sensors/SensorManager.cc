@@ -371,6 +371,8 @@ void SensorManager::Update(bool _force)
   // Only update if there are sensors
   if (this->sensorContainers[sensors::IMAGE]->sensors.size() > 0)
     this->sensorContainers[sensors::IMAGE]->Update(_force);
+
+  PublishPerformanceMetrics();
 }
 
 //////////////////////////////////////////////////
@@ -852,8 +854,6 @@ void SensorManager::SensorContainer::RunLoop()
 void SensorManager::SensorContainer::Update(bool _force)
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
-
-  PublishPerformanceMetrics();
 
   if (this->sensors.empty())
     gzlog << "Updating a sensor container without any sensors.\n";

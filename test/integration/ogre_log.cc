@@ -65,9 +65,20 @@ TEST_F(OgreLog, LogError)
     if (line.find(" GL_EXTENSIONS =") < 12)
       continue;
 
-    EXPECT_EQ(line.find("Error"), std::string::npos);
-    EXPECT_EQ(line.find("error"), std::string::npos);
-    EXPECT_EQ(line.find("ERROR"), std::string::npos);
+    // A GLX extension may have the word "error" in its name. For example:
+    // GLX_ARB_create_context_no_error.
+    // We will skip the line that lists all the extensions. This line starts
+    // with a date, so we just check that "Supported GLX extensions:" is
+    // toward the beginning.
+    // False positive cppcheck
+    // https://sourceforge.net/p/cppcheck/discussion/general/thread/0c113d65/
+    // cppcheck-suppress stlIfStrFind
+    if (line.find(" Supported GLX extensions: ") < 12)
+      continue;
+
+    EXPECT_EQ(line.find("Error"), std::string::npos) << line;
+    EXPECT_EQ(line.find("error"), std::string::npos) << line;
+    EXPECT_EQ(line.find("ERROR"), std::string::npos) << line;
   }
 }
 

@@ -909,6 +909,10 @@ unsigned int Camera::ImageDepth() const
   else if ((imgFmt == "BAYER_RGGB8") || (imgFmt == "BAYER_BGGR8") ||
             (imgFmt == "BAYER_GBRG8") || (imgFmt == "BAYER_GRBG8"))
     return 1;
+  else if (imgFmt == "FLOAT32")
+    return 4;
+  else if (imgFmt == "FLOAT16")
+    return 2;
   else
   {
     gzerr << "Error parsing image format ("

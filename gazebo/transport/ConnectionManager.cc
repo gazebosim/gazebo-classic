@@ -215,6 +215,9 @@ void ConnectionManager::Fini()
     return;
 
   this->Stop();
+  if (this->initialized)
+    while (this->stopped == false)
+      common::Time::MSleep(100);
 
   if (this->masterConn)
   {
@@ -244,10 +247,6 @@ void ConnectionManager::Fini()
 void ConnectionManager::Stop()
 {
   this->stop = true;
-  this->updateCondition.notify_all();
-  if (this->initialized)
-    while (this->stopped == false)
-      common::Time::MSleep(100);
 }
 
 //////////////////////////////////////////////////
