@@ -26,6 +26,9 @@ configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
 # Build gtest
 add_library(gtest gtest/src/gtest-all.cc)
 add_library(gtest_main gtest/src/gtest_main.cc)
+if(UNIX)
+  target_link_libraries(gtest pthread)
+endif()
 target_link_libraries(gtest_main gtest)
 
 execute_process(COMMAND cmake -E remove_directory ${CMAKE_BINARY_DIR}/test_results)
