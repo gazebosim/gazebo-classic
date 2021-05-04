@@ -34,7 +34,7 @@ TEST_F(Issue2875Test, ConnectPubToSubDoesNotCrashForMissingPublication)
   const std::string topic = "/chatter";
   // Add a topic to the advertised topics list so that the search in FindPublication isn't
   // against an empty container.
-  auto Publisher = transport::TopicManager::Instance()->Advertise("/other", "some_type", 1, 1);
+  auto Publisher = transport::TopicManager::Instance()->Advertise<gazebo::msgs::GzString>("/other", 1, 1);
 
   transport::ConnectionPtr conn(new transport::Connection());
   transport::SubscriptionTransportPtr subLink(new transport::SubscriptionTransport());
