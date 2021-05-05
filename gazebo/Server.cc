@@ -359,10 +359,10 @@ bool Server::ParseArgs(int _argc, char **_argv)
       gzwarn << "Falling back on worlds/empty.world\n";
       if (!this->LoadFile("worlds/empty.world", physics))
       {
-        gzwarn << "worlds/empty.world could not be opened, "
-               << "probably because it was not found. "
-               << "Make sure the environment variable "
-               << "GAZEBO_RESOURCE_PATH is set correctly.\n";
+        gzerr << "worlds/empty.world could not be opened, "
+              << "probably because it was not found. "
+              << "Your GAZEBO_RESOURCE_PATH is probably improperly set. "
+              << "Have you sourced <prefix>/share/gazebo/setup.sh?\n";
         return false;
       }
     }
