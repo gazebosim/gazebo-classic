@@ -139,6 +139,7 @@ set (headers
 )
 if (${OGRE_VERSION} VERSION_LESS 1.10)
   list(APPEND headers "CustomAutoParamDataSource.hh")
+  list(APPEND headers "CustomSceneManager.hh")
 endif()
 
 # This captures headers that should not be installed.
