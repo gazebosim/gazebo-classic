@@ -1,5 +1,15 @@
 ## Gazebo 11
 
+## Gazebo 11.5.1 (2021-05-05)
+
+1. Avoid range-loop-construct in TopicManager
+    * [Pull request #2983](https://github.com/osrf/gazebo/pull/2983)
+
+1. Check for nullptr in TopicManager::ConnectPubToSub
+    * A contribution from Emerson Knapp <emerson.b.knapp@gmail.com> (Amazon)
+    * [Pull request #2978](https://github.com/osrf/gazebo/pull/2978)
+    * [Issue #2875](https://github.com/osrf/gazebo/issues/2875)
+
 ## Gazebo 11.5.0 (2021-04-20)
 
 1. Specify wide angle camera cube map texture format
