@@ -50,6 +50,9 @@ namespace gazebo
       /// \brief Lens center used for distortion
       public: ignition::math::Vector2d lensCenter = {0.5, 0.5};
 
+      /// \brief Compositor name to be used for distortion
+      public: std::string compositorName = "CameraDistortionMap/Default";
+
       /// \brief Scale applied to distorted image.
       public: ignition::math::Vector2d distortionScale = {1.0, 1.0};
 
@@ -113,6 +116,12 @@ void Distortion::Load(sdf::ElementPtr _sdf)
   this->dataPtr->lensCenter = _sdf->Get<ignition::math::Vector2d>("center");
 
   this->dataPtr->distortionCrop = this->dataPtr->k1 < 0;
+
+  const std::string compositorName = "ignition:compositor";
+  if (_sdf->HasElement(compositorName))
+  {
+    this->dataPtr->compositorName = _sdf->Get<std::string>(compositorName);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -330,7 +339,7 @@ void Distortion::SetCamera(CameraPtr _camera)
 
   this->dataPtr->lensDistortionInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(
-      _camera->OgreViewport(), "CameraDistortionMap/Default");
+      _camera->OgreViewport(), this->dataPtr->compositorName);
   this->dataPtr->lensDistortionInstance->getTechnique()->getOutputTargetPass()->
       getPass(0)->setMaterial(this->dataPtr->distortionMaterial);
 
