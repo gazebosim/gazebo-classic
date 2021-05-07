@@ -349,6 +349,13 @@ namespace gazebo
       public: std::shared_ptr<LensFlareCompositorListener>
           lensFlareCompositorListener;
 
+      /// \brief Scale of lens flare.
+      public: double lensFlareScale = 1.0;
+
+      /// \brief Color of lens flare.
+      public: ignition::math::Vector3d lensFlareColor
+          = ignition::math::Vector3d(1.0, 1.0, 1.0);
+
       /// \brief Pointer to camera
       public: CameraPtr camera;
 
@@ -369,13 +376,6 @@ namespace gazebo
 
       /// \brief Connection for the pre render event.
       public: event::ConnectionPtr preRenderConnection;
-
-      /// \brief Scale of lens flare.
-      public: double lensFlareScale = 1.0;
-
-      /// \brief Color of lens flare.
-      public: ignition::math::Vector3d lensFlareColor
-          = ignition::math::Vector3d(1.0, 1.0, 1.0);
     };
   }
 }
