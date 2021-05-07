@@ -39,6 +39,9 @@ namespace gazebo
     /// \brief Lens flare color
     public: ignition::math::Vector3d color
         = ignition::math::Vector3d(1.4, 1.2, 1.0);
+
+    /// \brief Lens flare compositor name
+    public: std::string compositorName;
   };
 }
 
@@ -82,6 +85,11 @@ void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor,
   if (_sdf->HasElement("color"))
   {
     this->dataPtr->color = _sdf->Get<ignition::math::Vector3d>("color");
+  }
+
+  if (_sdf->HasElement("compositor"))
+  {
+    this->dataPtr->compositorName = _sdf->Get<std::string>("compositor");
   }
 
   sensors::CameraSensorPtr cameraSensor =
@@ -140,6 +148,10 @@ void LensFlareSensorPlugin::AddLensFlare(rendering::CameraPtr _camera)
 
   rendering::LensFlarePtr lensFlare;
   lensFlare.reset(new rendering::LensFlare);
+  if (!this->dataPtr->compositorName.empty())
+  {
+    lensFlare->SetCompositorName(this->dataPtr->compositorName);
+  }
   lensFlare->SetCamera(_camera);
   lensFlare->SetScale(this->dataPtr->scale);
   lensFlare->SetColor(this->dataPtr->color);
