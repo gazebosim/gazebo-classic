@@ -1,5 +1,12 @@
 ## Gazebo 9
 
+## Gazebo 9.18.0 (2021-05-07)
+
+1. Check for nullptr in TopicManager::ConnectPubToSub
+    * A contribution from Emerson Knapp <emerson.b.knapp@gmail.com> (Amazon)
+    * [Pull request #2988](https://github.com/osrf/gazebo/pull/2988)
+    * [Issue #2875](https://github.com/osrf/gazebo/issues/2875)
+
 ## Gazebo 9.17.0 (2021-04-21)
 
 1. Generate spot light shadow maps
