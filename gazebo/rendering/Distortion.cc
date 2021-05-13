@@ -160,6 +160,10 @@ void Distortion::SetCamera(CameraPtr _camera)
   // seems to work best with a square distortion map texture
   unsigned int texSide = _camera->ImageHeight() > _camera->ImageWidth() ?
       _camera->ImageHeight() : _camera->ImageWidth();
+  // calculate focal length from largest fov
+  double fov = _camera->ImageHeight() > _camera->ImageWidth() ?
+      _camera->VFOV().Radian() : _camera->HFOV().Radian();
+  double focalLength = texSide/(2*tan(fov/2));
   this->dataPtr->distortionTexWidth = texSide - 1;
   this->dataPtr->distortionTexHeight = texSide - 1;
   unsigned int imageSize =
@@ -183,9 +187,9 @@ void Distortion::SetCamera(CameraPtr _camera)
       double u = j*incrU;
       ignition::math::Vector2d uv(u, v);
       ignition::math::Vector2d out =
-        this->Distort(uv, this->dataPtr->lensCenter,
+      this->Distort(uv, this->dataPtr->lensCenter,
             this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
-            this->dataPtr->p1, this->dataPtr->p2);
+            this->dataPtr->p1, this->dataPtr->p2, this->dataPtr->distortionTexWidth, focalLength);
 
       // compute the index in the distortion map
       unsigned int idxU = out.X() * this->dataPtr->distortionTexWidth;
@@ -417,6 +421,35 @@ ignition::math::Vector2d Distortion::Distort(
       2 * _p2 * normalized.X() * normalized.Y();
 
   return _center + ignition::math::Vector2d(dist.X(), dist.Y());
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector2d Distortion::Distort(
+    const ignition::math::Vector2d &_in,
+    const ignition::math::Vector2d &_center, double _k1, double _k2, double _k3,
+    double _p1, double _p2, unsigned int _width, double _f)
+{
+  // apply Brown's distortion model, see
+  // http://en.wikipedia.org/wiki/Distortion_%28optics%29#Software_correction
+
+  ignition::math::Vector2d normalized2d = (_in - _center)*(_width/_f);
+  ignition::math::Vector3d normalized(normalized2d.X(), normalized2d.Y(), 0);
+  double rSq = normalized.X() * normalized.X() +
+               normalized.Y() * normalized.Y();
+
+  // radial
+  ignition::math::Vector3d dist = normalized * (1.0 +
+      _k1 * rSq +
+      _k2 * rSq * rSq +
+      _k3 * rSq * rSq * rSq);
+
+  // tangential
+  dist.X() += _p2 * (rSq + 2 * (normalized.X()*normalized.X())) +
+      2 * _p1 * normalized.X() * normalized.Y();
+  dist.Y() += _p1 * (rSq + 2 * (normalized.Y()*normalized.Y())) +
+      2 * _p2 * normalized.X() * normalized.Y();
+
+  return ((_center*_width) + ignition::math::Vector2d(dist.X(), dist.Y())*_f)/_width;
 }
 
 //////////////////////////////////////////////////
