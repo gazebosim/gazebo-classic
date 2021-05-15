@@ -77,6 +77,9 @@ namespace gazebo
       /// only used in ogre versions <= 1.8
       public: CustomGLSLProgramWriterFactory *programWriterFactory = nullptr;
 
+      /// \brief Flag to indicate if normal map should be enabled
+      public: bool enableNormalMap = true;
+
       /// \brief A list of viewports to init after the first RTShaderSystem
       /// update. This makes sure the shadows and visual visibility are correct.
       public: static std::set<Ogre::Viewport *> initOgreViewports;
