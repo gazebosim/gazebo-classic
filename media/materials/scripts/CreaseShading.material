@@ -1,0 +1,92 @@
+// This code in this file is adapted from OGRE Samples. The OGRE's license and
+// copyright header is copied below.
+
+/*
+-----------------------------------------------------------------------------
+OGRE (www.ogre3d.org) is made available under the MIT License.
+
+Copyright (c) 2000-2013 Torus Knot Software Ltd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
+*/
+
+
+fragment_program SSAO/CreaseShading_fp_glsl glsl
+{
+  source CreaseShadingFP.glsl
+  default_params
+  {
+    param_named sNormal int 0
+    param_named sPosition int 1
+    param_named sRandom int 2
+
+    param_named cMinimumCrease float 0.2
+    param_named cRange float 1.0
+    param_named cBias float 1.0
+    param_named cAverager float 24.0
+    param_named cKernelSize float 3.0
+  }
+}
+
+fragment_program SSAO/CreaseShading_fp unified
+{
+  delegate SSAO/CreaseShading_fp_glsl
+}
+
+material SSAO/CreaseShading
+{
+  technique
+  {
+    pass
+    {
+      depth_check off
+
+      vertex_program_ref Ogre/Compositor/StdQuad_vp {}
+      fragment_program_ref SSAO/CreaseShading_fp
+      {
+        param_named_auto cViewportSize viewport_size
+      }
+
+      // normals
+      texture_unit
+      {
+        content_type compositor SSAO/GBuffer mrt 0
+        tex_address_mode clamp
+        filtering none
+      }
+
+      // view space position
+      texture_unit
+      {
+        content_type compositor SSAO/GBuffer mrt 1
+        tex_address_mode clamp
+        filtering none
+      }
+
+      // random texture will be replace by 11x11 stipple
+      texture_unit
+      {
+        texture rand1x32.png
+        tex_address_mode clamp
+        filtering none
+      }
+    }
+  }
+}
