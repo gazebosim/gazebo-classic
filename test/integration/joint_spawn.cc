@@ -137,7 +137,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     gzerr << "Skip tests for child world link cases "
           << "since DART does not allow joint with world as child. "
           << "Please see issue #914. "
-          << "(https://bitbucket.org/osrf/gazebo/issue/914)"
+          << "(https://github.com/osrf/gazebo/issues/914)"
           << std::endl;
   }
   else
@@ -236,12 +236,12 @@ void JointSpawningTest::SpawnJointRotationalWorld(
         && worldChild)
     {
       // These physics engines don't support world as a child link.
-      // simbody https://bitbucket.org/osrf/gazebo/issue/861
-      // dart https://bitbucket.org/osrf/gazebo/issue/914
+      // simbody https://github.com/osrf/gazebo/issues/861
+      // dart https://github.com/osrf/gazebo/issues/914
       gzerr << "Skip tests for child world link cases since "
             << _physicsEngine
             << " does not allow joint with world as child. "
-            << "Please see bitbucket issues #861, #914."
+            << "Please see github issues #861, #914."
             << std::endl;
       continue;
     }
@@ -278,8 +278,30 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   bool isSimbody = physics->GetType().compare("simbody") == 0;
   double dt = physics->GetMaxStepSize();
 
+  if (_joint->HasType(physics::Base::GEARBOX_JOINT))
+  {
+    // Test setting gear ratio and reference angles
+    EXPECT_TRUE(_joint->SetParam("reference_angle1", 0, 1.0));
+    EXPECT_TRUE(_joint->SetParam("reference_angle2", 0, 2.0));
+    EXPECT_TRUE(_joint->SetParam("ratio", 0, 3.0));
+
+    EXPECT_DOUBLE_EQ(1.0, _joint->GetParam("reference_angle1", 0));
+    EXPECT_DOUBLE_EQ(2.0, _joint->GetParam("reference_angle2", 0));
+    EXPECT_DOUBLE_EQ(3.0, _joint->GetParam("ratio", 0));
+
+    EXPECT_TRUE(_joint->SetParam("reference_angle1", 0, 4.0));
+    EXPECT_TRUE(_joint->SetParam("reference_angle2", 0, 5.0));
+    EXPECT_TRUE(_joint->SetParam("ratio", 0, 6.0));
+
+    EXPECT_DOUBLE_EQ(4.0, _joint->GetParam("reference_angle1", 0));
+    EXPECT_DOUBLE_EQ(5.0, _joint->GetParam("reference_angle2", 0));
+    EXPECT_DOUBLE_EQ(6.0, _joint->GetParam("ratio", 0));
+
+    gzerr << "This portion of the test fails for this joint type" << std::endl;
+    return;
+  }
+
   if (_joint->HasType(physics::Base::HINGE2_JOINT) ||
-      _joint->HasType(physics::Base::GEARBOX_JOINT) ||
       _joint->HasType(physics::Base::SCREW_JOINT))
   {
     gzerr << "This portion of the test fails for this joint type" << std::endl;

@@ -162,10 +162,57 @@ double ODEGearboxJoint::GetParam(unsigned int /*_parameter*/) const
 }
 
 //////////////////////////////////////////////////
+double ODEGearboxJoint::GetParam(const std::string &_key, unsigned int _index)
+{
+  if (_key  == "ratio")
+    return dJointGetGearboxRatio(this->jointId);
+  else if (_key  == "reference_angle1")
+    return dJointGetGearboxReferenceAngle1(this->jointId);
+  else if (_key  == "reference_angle2")
+    return dJointGetGearboxReferenceAngle2(this->jointId);
+  else
+    return ODEJoint::GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
 void ODEGearboxJoint::SetParam(unsigned int /*_parameter*/, double /*_value*/)
 {
   gzlog << "SetParam not implemented for gearbox\n";
   return;
+}
+
+//////////////////////////////////////////////////
+bool ODEGearboxJoint::SetParam(const std::string &_key,
+  unsigned int _index, const boost::any &_value)
+{
+  try
+  {
+    if (_key  == "ratio")
+    {
+      this->SetGearboxRatio(boost::any_cast<double>(_value));
+    }
+    else if (_key  == "reference_angle1")
+    {
+      dJointSetGearboxReferenceAngle1(this->jointId,
+          boost::any_cast<double>(_value));
+    }
+    else if (_key  == "reference_angle2")
+    {
+      dJointSetGearboxReferenceAngle2(this->jointId,
+          boost::any_cast<double>(_value));
+    }
+    else
+    {
+      return ODEJoint::SetParam(_key, _index, _value);
+    }
+  }
+  catch(const boost::bad_any_cast &e)
+  {
+    gzerr << "boost any_cast error:" << e.what() << "\n";
+    return false;
+  }
+
+  return true;
 }
 
 //////////////////////////////////////////////////

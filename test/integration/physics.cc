@@ -45,6 +45,7 @@ class PhysicsTest : public ServerFixture,
   public: void CollisionFiltering(const std::string &_physicsEngine);
   public: void JointDampingTest(const std::string &_physicsEngine);
   public: void DropStuff(const std::string &_physicsEngine);
+  public: void SpawnFixedJoint(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -1121,7 +1122,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
           box_model->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
           // The following has been failing since pull request #1284,
           // so it has been disabled.
-          // See bitbucket.org/osrf/gazebo/issue/1394
+          // See github.com/osrf/gazebo/issues/1394
           // EXPECT_EQ(box_model->GetLink("link")->GetWorldForce(),
           //   math::Vector3(f, 0, 0));
         }
@@ -1496,7 +1497,7 @@ TEST_P(PhysicsTest, CollisionFiltering)
 /////////////////////////////////////////////////
 // This test verifies that gazebo doesn't crash when collisions occur
 // and the <world><physics><ode><max_contacts> value is zero.
-// The crash was reported in issue #593 on bitbucket
+// The crash was reported in issue #593 on github
 TEST_F(PhysicsTest, ZeroMaxContactsODE)
 {
   // Load an empty world
@@ -1506,6 +1507,34 @@ TEST_F(PhysicsTest, ZeroMaxContactsODE)
 
   physics::ModelPtr model = world->GetModel("ground_plane");
   ASSERT_TRUE(model != NULL);
+}
+
+/////////////////////////////////////////////////
+// This test verifies that gazebo spawns fixed joints properly for links with
+// nonzero off-diagonal inertia values.
+void PhysicsTest::SpawnFixedJoint(const std::string &_physicsEngine)
+{
+  Load("worlds/fixed_joint.world", true, _physicsEngine);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  physics::ModelPtr model = world->GetModel("fixed_joint_test");
+  math::Pose pose1, pose2;
+  pose1 = model->GetWorldPose();
+  world->Step(100);
+  pose2 = model->GetWorldPose();
+  EXPECT_EQ(pose1, pose2);
+}
+
+TEST_P(PhysicsTest, SpawnFixedJoint)
+{
+  SpawnFixedJoint(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);

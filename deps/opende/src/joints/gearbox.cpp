@@ -35,6 +35,8 @@ dxJointGearbox::dxJointGearbox(dxWorld* w) :
     dxJoint(w)
 {
     ratio = 1.0;
+    refAngle1 = 0.0;
+    refAngle2 = 0.0;
     flags |= dJOINT_TWOBODIES;
     dSetZero( qrel1, 4 );
     dSetZero( qrel2, 4 );
@@ -66,11 +68,8 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     dBodyVectorToWorld(node[0].body, axis1[0], axis1[1], axis1[2], globalAxis1);
     dBodyVectorToWorld(node[1].body, axis2[0], axis2[1], axis2[2], globalAxis2);
 
-    dJointSetGearboxReferenceBody1(this, refBody1);
-    dJointSetGearboxReferenceBody2(this, refBody2);
-
-    double ang1 = getHingeAngle(refBody1,node[0].body,globalAxis1,qrel1);
-    double ang2 = getHingeAngle(refBody2,node[1].body,globalAxis2,qrel2);
+    double ang1 = getHingeAngle(node[0].body,refBody1,axis1,qrel1);
+    double ang2 = getHingeAngle(node[1].body,refBody2,axis2,qrel2);
     // printf("a1(%f) a10(%f) a2(%f) a20(%f)\n",
     //   ang1, cumulative_angle1, ang2, cumulative_angle2);
 
@@ -78,7 +77,9 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     cumulative_angle2 = dShortestAngularDistanceUpdate(cumulative_angle2,ang2);
 
     double err = dShortestAngularDistance(
-     cumulative_angle1, -ratio * cumulative_angle2);
+      -ratio * (cumulative_angle2 - refAngle2), cumulative_angle1 - refAngle1);
+    // printf("  a2(%f) , %f : %f : %f , a1(%f), e(%f)\n",
+    //   cumulative_angle2, refAngle2, ratio, refAngle1, cumulative_angle1, err);
 
     // FIXME: error calculation is not amenable to reset of poses,
     // cumulative angles might snap to wrong angular value.
@@ -158,25 +159,25 @@ void dJointSetGearboxReferenceBody1( dJointID j, dBodyID b )
     if ( joint->node[0].body )
     {
       if ( b )
-        dQMultiply1( joint->qrel1, joint->refBody1->q, joint->node[0].body->q );
+        dQMultiply1( joint->qrel1, joint->node[0].body->q, joint->refBody1->q );
       else
       {
         // set qrel1 to the transpose of the first body q
-        joint->qrel1[0] = joint->node[0].body->q[0];
-        joint->qrel1[1] = joint->node[0].body->q[1];
-        joint->qrel1[2] = joint->node[0].body->q[2];
-        joint->qrel1[3] = joint->node[0].body->q[3];
+        joint->qrel1[0] =  joint->node[0].body->q[0];
+        joint->qrel1[1] = -joint->node[0].body->q[1];
+        joint->qrel1[2] = -joint->node[0].body->q[2];
+        joint->qrel1[3] = -joint->node[0].body->q[3];
       }
     }
     else
     {
       if ( b )
       {
-        // set qrel1 to the transpose of the first body q
-        joint->qrel1[0] =   joint->refBody1->q[0];
-        joint->qrel1[1] = - joint->refBody1->q[1];
-        joint->qrel1[2] = - joint->refBody1->q[2];
-        joint->qrel1[3] = - joint->refBody1->q[3];
+        // set qrel1 to the q of the reference body
+        joint->qrel1[0] = joint->refBody1->q[0];
+        joint->qrel1[1] = joint->refBody1->q[1];
+        joint->qrel1[2] = joint->refBody1->q[2];
+        joint->qrel1[3] = joint->refBody1->q[3];
       }
       else
       {
@@ -196,25 +197,25 @@ void dJointSetGearboxReferenceBody2( dJointID j, dBodyID b )
     if ( joint->node[1].body )
     {
       if ( b )
-        dQMultiply1( joint->qrel2, joint->refBody2->q, joint->node[1].body->q );
+        dQMultiply1( joint->qrel2, joint->node[1].body->q, joint->refBody2->q );
       else
       {
-        // set qrel1 to the transpose of the first body q
-        joint->qrel2[0] = joint->node[1].body->q[0];
-        joint->qrel2[1] = joint->node[1].body->q[1];
-        joint->qrel2[2] = joint->node[1].body->q[2];
-        joint->qrel2[3] = joint->node[1].body->q[3];
+        // set qrel2 to the transpose of the second body q
+        joint->qrel2[0] =  joint->node[1].body->q[0];
+        joint->qrel2[1] = -joint->node[1].body->q[1];
+        joint->qrel2[2] = -joint->node[1].body->q[2];
+        joint->qrel2[3] = -joint->node[1].body->q[3];
       }
     }
     else
     {
       if ( b )
       {
-        // set qrel2 to the transpose of the second body q
-        joint->qrel2[0] =   joint->refBody2->q[0];
-        joint->qrel2[1] = - joint->refBody2->q[1];
-        joint->qrel2[2] = - joint->refBody2->q[2];
-        joint->qrel2[3] = - joint->refBody2->q[3];
+        // set qrel2 to the q of the reference body
+        joint->qrel2[0] = joint->refBody2->q[0];
+        joint->qrel2[1] = joint->refBody2->q[1];
+        joint->qrel2[2] = joint->refBody2->q[2];
+        joint->qrel2[3] = joint->refBody2->q[3];
       }
       else
       {
@@ -231,12 +232,44 @@ void dJointSetGearboxRatio( dJointID j, dReal value )
     joint->ratio = value;
 }
 
+void dJointSetGearboxReferenceAngle1( dJointID j, dReal value )
+{
+    dxJointGearbox* joint = dynamic_cast<dxJointGearbox*>(j);
+    dUASSERT( joint, "bad joint argument" );
+
+    joint->refAngle1 = value;
+}
+
+void dJointSetGearboxReferenceAngle2( dJointID j, dReal value )
+{
+    dxJointGearbox* joint = dynamic_cast<dxJointGearbox*>(j);
+    dUASSERT( joint, "bad joint argument" );
+
+    joint->refAngle2 = value;
+}
+
 dReal dJointGetGearboxRatio( dJointID j )
 {
     dxJointGearbox* joint = dynamic_cast<dxJointGearbox*>(j);
     dUASSERT( joint, "bad joint argument" );
 
     return joint->ratio;
+}
+
+dReal dJointGetGearboxReferenceAngle1( dJointID j )
+{
+    dxJointGearbox* joint = dynamic_cast<dxJointGearbox*>(j);
+    dUASSERT( joint, "bad joint argument" );
+
+    return joint->refAngle1;
+}
+
+dReal dJointGetGearboxReferenceAngle2( dJointID j )
+{
+    dxJointGearbox* joint = dynamic_cast<dxJointGearbox*>(j);
+    dUASSERT( joint, "bad joint argument" );
+
+    return joint->refAngle2;
 }
 
 void dJointSetGearboxParam( dJointID j, int parameter, dReal value )

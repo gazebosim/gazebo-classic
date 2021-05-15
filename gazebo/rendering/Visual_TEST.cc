@@ -1428,6 +1428,53 @@ TEST_F(Visual_TEST, GetAncestors)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, EntityDepths)
+{
+  this->Load("worlds/shapes.world");
+
+  auto scene = gazebo::rendering::get_scene();
+  ASSERT_NE(scene, nullptr);
+
+  // Wait until all models are inserted
+  int sleep = 0;
+  int maxSleep = 30;
+  rendering::VisualPtr box, sphere, cylinder, sun;
+  while ((!box || !sphere || !cylinder || !sun) && sleep < maxSleep)
+  {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
+    box = scene->GetVisual("box");
+    cylinder = scene->GetVisual("cylinder");
+    sphere = scene->GetVisual("sphere");
+    sun = scene->GetVisual("sun");
+
+    common::Time::MSleep(100);
+    sleep++;
+  }
+
+  // World
+  auto world = scene->WorldVisual();
+  ASSERT_NE(nullptr, world);
+  EXPECT_EQ(0u, world->GetDepth());
+
+  // Models
+  ASSERT_NE(nullptr, box);
+  EXPECT_EQ(1u, box->GetDepth());
+
+  ASSERT_NE(nullptr, cylinder);
+  EXPECT_EQ(1u, cylinder->GetDepth());
+
+  ASSERT_NE(nullptr, sphere);
+  EXPECT_EQ(1u, sphere->GetDepth());
+
+  // Lights
+  ASSERT_NE(nullptr, sun);
+  EXPECT_EQ(1u, sun->GetDepth());
+}
+
+/////////////////////////////////////////////////
 TEST_F(Visual_TEST, ConvertVisualType)
 {
   // convert from msgs::Visual::Type to Visual::VisualType
@@ -1467,6 +1514,42 @@ TEST_F(Visual_TEST, ConvertVisualType)
       rendering::Visual::ConvertVisualType(msgs::Visual::PHYSICS));
 }
 
+TEST_F(Visual_TEST, CollisionZero)
+{
+  // This test checks that there isn't a segmentation fault when inserting
+  // zero collision geometries.
+  // Load a world containing 3 simple shapes with collision geometry equals
+  // to zero.
+  Load("worlds/collision_zero.world");
+
+  // Get the scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_NE(scene, nullptr);
+
+  // Wait until all models are inserted
+  int sleep = 0;
+  int maxSleep = 10;
+  rendering::VisualPtr box, sphere, cylinder;
+  while ((!box || !sphere || !cylinder) && sleep < maxSleep)
+  {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
+    box = scene->GetVisual("box");
+    cylinder = scene->GetVisual("cylinder");
+    sphere = scene->GetVisual("sphere");
+    common::Time::MSleep(1000);
+    sleep++;
+  }
+  scene->ShowCollisions(true);
+  // box
+  ASSERT_NE(box, nullptr);
+  // cylinder
+  ASSERT_NE(cylinder, nullptr);
+  // sphere
+  ASSERT_NE(sphere, nullptr);
+}
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, Scale)
 {

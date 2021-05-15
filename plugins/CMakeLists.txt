@@ -64,6 +64,7 @@ set (plugins_single_header
   LiftDragPlugin
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin
+  MisalignmentPlugin
   ModelPropShop
   MudPlugin
   PressurePlugin
@@ -76,12 +77,16 @@ set (plugins_single_header
   SonarPlugin
   SphereAtlasDemoPlugin
   TouchPlugin
-  VehiclePlugin)
+  VariableGearboxPlugin
+  VehiclePlugin
+  WheelSlipPlugin
+)
 
 set (plugins_private_header
   ElevatorPlugin
   RandomVelocityPlugin
-  TransporterPlugin)
+  TransporterPlugin
+)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins ${plugins}

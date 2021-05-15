@@ -72,7 +72,7 @@ void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
           this->dataPtr->dtJoint);
 
     // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference
+    // See: https://github.com/osrf/gazebo/issues/494/
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
@@ -86,7 +86,7 @@ void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
           this->dataPtr->dtJoint);
 
     // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference
+    // See: https://github.com/osrf/gazebo/issues/494/
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
@@ -135,7 +135,7 @@ math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
   }
 
   // TODO: Issue #494
-  // See: https://bitbucket.org/osrf/gazebo/issue/494/
+  // See: https://github.com/osrf/gazebo/issues/494/
   // joint-axis-reference-frame-doesnt-match
   return DARTTypes::ConvVec3(globalAxis);
 }

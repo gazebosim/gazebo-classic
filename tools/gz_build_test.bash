@@ -20,7 +20,7 @@ rm -rf /tmp/gazebo_build
 mkdir /tmp/gazebo_build
 
 # Clone
-hg clone https://bitbucket.org/osrf/gazebo /tmp/gazebo_build/source
+git clone https://github.com/osrf/gazebo /tmp/gazebo_build/source
 
 start_time=`eval date +%s`
 
@@ -32,7 +32,7 @@ for branch in $branches
 do
   # Get the correct branch
   cd /tmp/gazebo_build/source
-  hg up $branch
+  git checkout $branch
 
   # Build
   rm -rf build

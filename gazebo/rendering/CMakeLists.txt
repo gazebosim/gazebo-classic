@@ -165,6 +165,7 @@ set (gtest_sources_dri
   LinkFrameVisual_TEST.cc
   OriginVisual_TEST.cc
   RenderEngine_TEST.cc
+  RenderEvents_TEST.cc
   RTShaderSystem_TEST.cc
   Scene_TEST.cc
   SelectionObj_TEST.cc
