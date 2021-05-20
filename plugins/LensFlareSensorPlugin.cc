@@ -87,7 +87,7 @@ void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor,
     this->dataPtr->color = _sdf->Get<ignition::math::Vector3d>("color");
   }
 
-  const std::string compositorName = "ignition:compositor";
+  const std::string compositorName = "compositor";
   if (_sdf->HasElement(compositorName))
   {
     this->dataPtr->compositorName = _sdf->Get<std::string>(compositorName);
