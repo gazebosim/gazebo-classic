@@ -169,7 +169,7 @@ void JointInspector_TEST::Swap()
   // Get swap button
   QList<QToolButton *> toolButtons =
       jointInspector->findChildren<QToolButton *>();
-  QVERIFY(toolButtons.size() == 2);
+  QCOMPARE(toolButtons.size(), 2);
 
   // Trigger swap
   toolButtons[1]->click();
@@ -201,7 +201,7 @@ void JointInspector_TEST::RemoveButton()
   // Get buttons
   QList<QToolButton *> toolButtons =
       jointInspector->findChildren<QToolButton *>();
-  QVERIFY(toolButtons.size() == 2);
+  QCOMPARE(toolButtons.size(), 2);
   QVERIFY(toolButtons[0]->text() == "");
 
   // Trigger remove
@@ -242,22 +242,22 @@ void JointInspector_TEST::AppliedSignal()
   // Get spins
   QList<QDoubleSpinBox *> spins =
       jointInspector->findChildren<QDoubleSpinBox *>();
-  QVERIFY(spins.size() == 34);
+  QCOMPARE(spins.size(), 34);
 
   // Get combo boxes
   QList<QComboBox *> combos =
       jointInspector->findChildren<QComboBox *>();
-  QVERIFY(combos.size() == 5);
+  QCOMPARE(combos.size(), 5);
 
   // Get line edits
   QList<QLineEdit *> lineEdits =
       jointInspector->findChildren<QLineEdit *>();
-  QVERIFY(lineEdits.size() == 41);
+  QCOMPARE(lineEdits.size(), 41);
 
   // Get push buttons
   QList<QPushButton *> pushButtons =
       jointInspector->findChildren<QPushButton *>();
-  QVERIFY(pushButtons.size() == 3);
+  QCOMPARE(pushButtons.size(), 3);
 
   // Edit link (1~2)
   combos[combos.size()-1]->setCurrentIndex(1);
