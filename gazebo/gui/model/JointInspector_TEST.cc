@@ -252,7 +252,7 @@ void JointInspector_TEST::AppliedSignal()
   // Get line edits
   QList<QLineEdit *> lineEdits =
       jointInspector->findChildren<QLineEdit *>();
-  QCOMPARE(lineEdits.size(), 41);
+  QCOMPARE(lineEdits.size(), 43);
 
   // Get push buttons
   QList<QPushButton *> pushButtons =
