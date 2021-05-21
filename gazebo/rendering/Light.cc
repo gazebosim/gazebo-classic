@@ -588,7 +588,7 @@ void Light::SetCastShadows(const bool _cast)
     if (_cast && this->dataPtr->shadowCameraSetup.isNull())
     {
       this->dataPtr->shadowCameraSetup =
-          Ogre::ShadowCameraSetupPtr(new Ogre::FocusedShadowCameraSetup());
+          Ogre::ShadowCameraSetupPtr(new Ogre::DefaultShadowCameraSetup());
       this->dataPtr->light->setCustomShadowCameraSetup(
           this->dataPtr->shadowCameraSetup);
       RTShaderSystem::Instance()->UpdateShadows();
