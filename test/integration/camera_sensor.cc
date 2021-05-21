@@ -1929,3 +1929,112 @@ TEST_F(CameraSensor, Light)
   }
   EXPECT_EQ(newColor, sun->DiffuseColor());
 }
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, SetCompositorNames)
+{
+#if not defined(__APPLE__)
+  Load("worlds/test/issue_3005_set_compositor_names.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run wide angle camera test\n";
+    return;
+  }
+
+  const unsigned int width  = 12;
+  const unsigned int height = 12;
+
+  for (auto camera_name : {"camera_distortion_default", "camera_lens_flare_default"})
+  {  // check camera with default texture format
+    sensors::SensorPtr sensor = sensors::get_sensor(camera_name);
+    sensors::CameraSensorPtr cameraSensor =
+        std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+    imageCount = 0;
+    img = new unsigned char[width * height * 3];
+    event::ConnectionPtr c =
+      cameraSensor->Camera()->ConnectNewImageFrame(
+          std::bind(&::OnNewCameraFrame, &imageCount, img,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
+
+    // Get some images
+    int sleep = 0;
+    int maxSleep = 30;
+    while (imageCount < 10 && sleep < maxSleep)
+    {
+      common::Time::MSleep(50);
+      sleep++;
+    }
+
+    unsigned int rSum = 0;
+    unsigned int gSum = 0;
+    unsigned int bSum = 0;
+    for (unsigned int i = 0; i < height*width*3; i+=3)
+    {
+      unsigned int r = img[i];
+      unsigned int g = img[i+1];
+      unsigned int b = img[i+2];
+      rSum += r;
+      gSum += g;
+      bSum += b;
+    }
+
+    EXPECT_NE(rSum, gSum);
+    EXPECT_NE(rSum, bSum);
+    EXPECT_NE(gSum, bSum);
+
+    EXPECT_GT(rSum - bSum, 25000.0);
+    EXPECT_GT(rSum - gSum, 20000.0);
+
+    delete [] img;
+  }
+
+  for (auto camera_name : {"camera_distortion_test", "camera_lens_flare_test"})
+  {  // check camera with grayscale texture format
+    sensors::SensorPtr sensor = sensors::get_sensor(camera_name);
+    sensors::CameraSensorPtr cameraSensor =
+        std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+    imageCount = 0;
+    img = new unsigned char[width * height * 3];
+    event::ConnectionPtr c =
+      cameraSensor->Camera()->ConnectNewImageFrame(
+          std::bind(&::OnNewCameraFrame, &imageCount, img,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
+
+    // Get some images
+    int sleep = 0;
+    int maxSleep = 30;
+    while (imageCount < 10 && sleep < maxSleep)
+    {
+      common::Time::MSleep(50);
+      sleep++;
+    }
+
+    unsigned int rSum = 0;
+    unsigned int gSum = 0;
+    unsigned int bSum = 0;
+    for (unsigned int i = 0; i < height*width*3; i+=3)
+    {
+      unsigned int r = img[i];
+      unsigned int g = img[i+1];
+      unsigned int b = img[i+2];
+      rSum += r;
+      gSum += g;
+      bSum += b;
+    }
+
+    // For grayscale, all RGB channels should have the same value
+    EXPECT_EQ(rSum, gSum);
+    EXPECT_EQ(gSum, bSum);
+    EXPECT_GT(gSum, 10000u);
+
+    delete [] img;
+  }
+#endif
+}
