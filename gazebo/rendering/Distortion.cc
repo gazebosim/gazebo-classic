@@ -199,7 +199,31 @@ void Distortion::SetCamera(CameraPtr _camera)
           idxV < this->dataPtr->distortionTexHeight)
       {
         unsigned int mapIdx = idxV * this->dataPtr->distortionTexWidth + idxU;
-        this->dataPtr->distortionMap[mapIdx] = uv;
+
+        // if the destination pixel has been mapped previously,
+        // need to avoid the distorted image "overlapping" itself
+        ignition::math::Vector2d n1; // a bit of a hack since vector2d overloads operator= but not operator!=
+        n1 = -1;
+        if (this->dataPtr->distortionMap[mapIdx] != n1)
+        {
+         // grab original coordinates that map to this destination
+         ignition::math::Vector2d ij_ = this->dataPtr->distortionMap[mapIdx] * this->dataPtr->distortionTexWidth;
+         // grab new coordinates that want to map to this destination
+         ignition::math::Vector2d ij(i, j);
+         // grab center of the distortion
+         ignition::math::Vector2d uv_(this->dataPtr->lensCenter.X() * this->dataPtr->distortionTexWidth, 
+                                      this->dataPtr->lensCenter.Y() * this->dataPtr->distortionTexWidth);
+
+         // if new mapping is less extreme than former, use it instead
+         if (ij.Distance(uv_) < ij_.Distance(uv_))
+         {
+            this->dataPtr->distortionMap[mapIdx] = uv;
+         }
+        }
+        else
+        {
+          this->dataPtr->distortionMap[mapIdx] = uv;
+        }
       }
       // else: pixel maps outside the image bounds.
       // This is expected and normal to ensure
