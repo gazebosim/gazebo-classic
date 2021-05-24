@@ -1940,15 +1940,17 @@ TEST_F(CameraSensor, SetCompositorNames)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run wide angle camera test\n";
+    gzerr << "No rendering engine, unable to run camera test\n";
     return;
   }
 
   const unsigned int width  = 12;
   const unsigned int height = 12;
 
-  for (auto camera_name : {"camera_distortion_default", "camera_lens_flare_default"})
-  {  // check camera with default texture format
+  for (auto camera_name : {
+    "camera_distortion_default", "camera_lens_flare_default"})
+  {
+    // check camera with default texture format
     sensors::SensorPtr sensor = sensors::get_sensor(camera_name);
     sensors::CameraSensorPtr cameraSensor =
         std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
@@ -1994,7 +1996,8 @@ TEST_F(CameraSensor, SetCompositorNames)
   }
 
   for (auto camera_name : {"camera_distortion_test", "camera_lens_flare_test"})
-  {  // check camera with grayscale texture format
+  {
+    // check camera with grayscale texture format
     sensors::SensorPtr sensor = sensors::get_sensor(camera_name);
     sensors::CameraSensorPtr cameraSensor =
         std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
