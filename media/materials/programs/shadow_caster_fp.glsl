@@ -1,3 +1,5 @@
+uniform vec4 camera_position;
+
 // uniform vec4 depth_range;
 varying vec4 vertex_depth;
 
@@ -7,6 +9,10 @@ void main()
 
   // Linear
   // float depth = (vertex_depth.z - depth_range.x) / depth_range.w;
+
+  if (length(camera_position.xyz) == 0) {
+    depth = 1.0;
+  }
 
   gl_FragColor = vec4(depth, depth, depth, 1.0);
 }

@@ -15,6 +15,7 @@ fragment_program shadow_caster_fp_glsl glsl
 
   default_params
   {
+    param_named_auto camera_position camera_position
     // param_named_auto depth_range shadow_scene_depth_range
   }
 }

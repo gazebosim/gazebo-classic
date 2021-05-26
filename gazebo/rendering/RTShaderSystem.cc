@@ -730,6 +730,10 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   {
     LightPtr light = _scene->LightByIndex(i);
 
+    if (light->Type() == "directional") {
+      std::cout << light->WorldPose() << std::endl;
+    }
+
     if (!light->CastShadows())
       continue;
 
