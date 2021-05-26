@@ -8,3 +8,5 @@ gz_install_includes("test"
   ServerFixture.hh
   ${PROJECT_BINARY_DIR}/test_config.h
 )
+
+set_target_properties(gazebo_test_fixture PROPERTIES DEPENDS ALL)
