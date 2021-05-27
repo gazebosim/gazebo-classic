@@ -168,8 +168,8 @@ void Distortion::SetCamera(CameraPtr _camera)
   this->dataPtr->distortionTexHeight = texSide - 1;
   unsigned int imageSize =
       this->dataPtr->distortionTexWidth * this->dataPtr->distortionTexHeight;
-  double incrU = 1.0 / this->dataPtr->distortionTexWidth;
-  double incrV = 1.0 / this->dataPtr->distortionTexHeight;
+  double colStepSize = 1.0 / this->dataPtr->distortionTexWidth;
+  double rowStepSize = 1.0 / this->dataPtr->distortionTexHeight;
 
   // initialize distortion map
   this->dataPtr->distortionMap.resize(imageSize);
@@ -178,54 +178,74 @@ void Distortion::SetCamera(CameraPtr _camera)
     this->dataPtr->distortionMap[i] = -1;
   }
 
+  ignition::math::Vector2d distortionCenterCoordinates(
+      this->dataPtr->lensCenter.X() * this->dataPtr->distortionTexWidth,
+      this->dataPtr->lensCenter.Y() * this->dataPtr->distortionTexWidth);
+
+  // declare variables before the loop
+  static auto unsetPixelVector =  ignition::math::Vector2d(-1, -1);
+  ignition::math::Vector2d normalizedLocation,
+      distortedLocation,
+      newDistortedCoordinates,
+      currDistortedCoordinates;
+  unsigned int distortedIdx,
+      distortedCol,
+      distortedRow;
+  double normalizedColLocation, normalizedRowLocation;
+
   // fill the distortion map
-  for (unsigned int i = 0; i < this->dataPtr->distortionTexHeight; ++i)
+  for (unsigned int mapRow = 0; mapRow < this->dataPtr->distortionTexHeight; ++mapRow)
   {
-    double v = i*incrV;
-    for (unsigned int j = 0; j < this->dataPtr->distortionTexWidth; ++j)
+    normalizedRowLocation = mapRow*rowStepSize;
+    for (unsigned int mapCol = 0; mapCol < this->dataPtr->distortionTexWidth; ++mapCol)
     {
-      double u = j*incrU;
-      ignition::math::Vector2d uv(u, v);
-      ignition::math::Vector2d out =
-      this->Distort(uv, this->dataPtr->lensCenter,
-            this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
-            this->dataPtr->p1, this->dataPtr->p2, this->dataPtr->distortionTexWidth, focalLength);
+      normalizedColLocation = mapCol*colStepSize;
+
+      normalizedLocation[0] = normalizedColLocation;
+      normalizedLocation[1] = normalizedRowLocation;
+
+      distortedLocation = this->Distort(
+          normalizedLocation,
+          this->dataPtr->lensCenter,
+          this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
+          this->dataPtr->p1, this->dataPtr->p2,
+          this->dataPtr->distortionTexWidth,
+          focalLength);
 
       // compute the index in the distortion map
-      unsigned int idxU = out.X() * this->dataPtr->distortionTexWidth;
-      unsigned int idxV = out.Y() * this->dataPtr->distortionTexHeight;
+      distortedCol = distortedLocation.X() * this->dataPtr->distortionTexWidth;
+      distortedRow = distortedLocation.Y() * this->dataPtr->distortionTexHeight;
 
-      if (idxU < this->dataPtr->distortionTexWidth &&
-          idxV < this->dataPtr->distortionTexHeight)
+      // Make sure the distorted pixel is within the texture dimensions
+      if (distortedCol < this->dataPtr->distortionTexWidth &&
+          distortedRow < this->dataPtr->distortionTexHeight)
       {
-        unsigned int mapIdx = idxV * this->dataPtr->distortionTexWidth + idxU;
+        distortedIdx = distortedRow * this->dataPtr->distortionTexWidth + distortedCol;
 
-        // if the destination pixel has been mapped previously,
-        // need to avoid the distorted image "overlapping" itself
-        ignition::math::Vector2d n1; // a bit of a hack since vector2d overloads operator= but not operator!=
-        n1 = -1;
-        if (this->dataPtr->distortionMap[mapIdx] != n1)
+        // check if the index has already been set
+        if (this->dataPtr->distortionMap[distortedIdx] != unsetPixelVector)
         {
-         // grab original coordinates that map to this destination
-         ignition::math::Vector2d ij_ = this->dataPtr->distortionMap[mapIdx] * this->dataPtr->distortionTexWidth;
-         // grab new coordinates that want to map to this destination
-         ignition::math::Vector2d ij(i, j);
-         // grab center of the distortion
-         ignition::math::Vector2d uv_(this->dataPtr->lensCenter.X() * this->dataPtr->distortionTexWidth, 
-                                      this->dataPtr->lensCenter.Y() * this->dataPtr->distortionTexWidth);
+          // grab current coordinates that map to this destination
+          currDistortedCoordinates = this->dataPtr->distortionMap[distortedIdx] *
+                                     this->dataPtr->distortionTexWidth;
 
-         // if new mapping is less extreme than former, use it instead
-         if (ij.Distance(uv_) < ij_.Distance(uv_))
-         {
-            this->dataPtr->distortionMap[mapIdx] = uv;
-         }
+          // grab new coordinates to map to
+          newDistortedCoordinates[0] = mapCol;
+          newDistortedCoordinates[1] = mapRow;
+
+          // use the new mapping if it is closer to the center of the distortion
+          if (newDistortedCoordinates.Distance(distortionCenterCoordinates) <
+              currDistortedCoordinates.Distance(distortionCenterCoordinates))
+          {
+            this->dataPtr->distortionMap[distortedIdx] = normalizedLocation;
+          }
         }
         else
         {
-          this->dataPtr->distortionMap[mapIdx] = uv;
+          this->dataPtr->distortionMap[distortedIdx] = normalizedLocation;
         }
       }
-      // else: pixel maps outside the image bounds.
+      // else: mapping is outside of the image bounds.
       // This is expected and normal to ensure
       // no black borders; carry on
     }
