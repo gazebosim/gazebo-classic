@@ -6,8 +6,8 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
-find_package(ignition-msgs1 REQUIRED)
-find_package(ignition-transport4 REQUIRED)
+find_package(ignition-msgs5 REQUIRED)
+find_package(ignition-transport8 REQUIRED)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
 include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
