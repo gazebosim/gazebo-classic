@@ -30,6 +30,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 
+#include <sdf/parser.hh>
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Rand.hh>
@@ -69,6 +70,13 @@ namespace gazebo
 {
   struct ServerPrivate
   {
+    void InspectSDFElement(const sdf::ElementPtr _elem) {
+      if (! sdf::recursiveSameTypeUniqueNames(_elem)) {
+        gzerr << "SDF is not valid, see errors above. "
+              << "This can lead to an unexpected behaviour." << "\n";
+      }
+    }
+
     /// \brief Boolean used to stop the server.
     static bool stop;
 
@@ -446,6 +454,8 @@ bool Server::PreLoad()
 bool Server::LoadImpl(sdf::ElementPtr _elem,
                       const std::string &_physics)
 {
+  this->dataPtr->InspectSDFElement(_elem);
+
   // If a physics engine is specified,
   if (_physics.length())
   {
