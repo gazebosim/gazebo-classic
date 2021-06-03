@@ -1,5 +1,13 @@
 ## Gazebo 9
 
+## Gazebo 9.18.0 (2021-06-xx)
+
+1. Enable output of gzerr for SDF sibling elements of same type with same name,
+   following the SDF 1.6 specification.
+   Environment variable GAZEBO9_BACKWARDS_COMPAT_WARNINGS_ERRORS can be set to
+   use the previous behaviour and do not report these problems.
+    * []()
+
 ## Gazebo 9.17.0 (2021-04-21)
 
 1. Generate spot light shadow maps
