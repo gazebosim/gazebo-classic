@@ -70,11 +70,14 @@ namespace gazebo
 {
   struct ServerPrivate
   {
-    void InspectSDFElement(const sdf::ElementPtr _elem) {
-      if (! sdf::recursiveSameTypeUniqueNames(_elem)) {
+    void InspectSDFElement(const sdf::ElementPtr _elem)
+    {
+      if (common::getEnv("GAZEBO9_BACKWARDS_COMPAT_WARNINGS_ERRORS"))
+        return;
+
+      if (not sdf::recursiveSameTypeUniqueNames(_elem))
         gzerr << "SDF is not valid, see errors above. "
               << "This can lead to an unexpected behaviour." << "\n";
-      }
     }
 
     /// \brief Boolean used to stop the server.

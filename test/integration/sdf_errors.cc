@@ -22,6 +22,20 @@
 
 using namespace gazebo;
 
+/////////////////////////////////////////////////
+#ifdef _WIN32
+static int setenv(const char *envname, const char *envval, int overwrite)
+{
+  char *original = getenv(envname);
+  if (!original || !!overwrite)
+  {
+    std::string envstring = std::string(envname) + "=" + envval;
+    return _putenv(envstring.c_str());
+  }
+  return 0;
+}
+#endif
+
 class SDFLogsTest : public ServerFixture
 {
   public: void SetUp()
@@ -88,7 +102,7 @@ TEST_F(SDFLogsTest, EmptyWorldNoErrors)
 /////////////////////////////////////////////////
 TEST_F(SDFLogsTest, DuplicateSiblingSameType)
 {
-  Load("worlds/test_sdf_err_sibling_same_type.world");
+  Load("worlds/test_sdf16_err_sibling_same_type.world");
 
   EXPECT_ERR_IN_LOG();
   std::string sdfErrorString = "SDF is not valid";
@@ -96,10 +110,18 @@ TEST_F(SDFLogsTest, DuplicateSiblingSameType)
 }
 
 /////////////////////////////////////////////////
+TEST_F(SDFLogsTest, DuplicateSiblingSameTypeDisabled)
+{
+  setenv("GAZEBO9_BACKWARDS_COMPAT_WARNINGS_ERRORS", "", 1);
+  Load("worlds/test_sdf16_err_sibling_same_type.world");
+  EXPECT_NO_ERR_IN_LOG();
+}
+
+/////////////////////////////////////////////////
 TEST_F(SDFLogsTest, DuplicateSiblingDifferentType)
 {
   // 1.6 SDF does not enforce different names for different types
-  Load("worlds/test_sdf_err_sibling_different_type.world");
+  Load("worlds/test_sdf16_err_sibling_different_type.world");
   EXPECT_NO_ERR_IN_LOG();
 }
 
