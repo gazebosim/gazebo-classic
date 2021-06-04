@@ -115,6 +115,7 @@ TEST_F(SDFLogsTest, DuplicateSiblingSameTypeDisabled)
   setenv("GAZEBO9_BACKWARDS_COMPAT_WARNINGS_ERRORS", "", 1);
   Load("worlds/test_sdf16_err_sibling_same_type.world");
   EXPECT_NO_ERR_IN_LOG();
+  unsetenv("GAZEBO9_BACKWARDS_COMPAT_WARNINGS_ERRORS");
 }
 
 /////////////////////////////////////////////////
