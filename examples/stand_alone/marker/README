@@ -3,6 +3,13 @@ Gazebo Visualization Marker Example
 This example demonstrates how to create, modify, and delete visualization
 markers in Gazebo.
 
+ * Dependencies:
+  
+  ignition-msgs0 or above
+  ignition-transport3 or above
+  
+The current CMakeLists.txt looks for ignition-msgs1 and ignition-transport4 config file. Please update the CMakeLists.txt according to the version of ignition-msgs and ignition-transport packages that you are using.
+
 ===================
 Build Instructions
 ===================
