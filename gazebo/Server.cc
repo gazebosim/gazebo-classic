@@ -34,6 +34,7 @@
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Rand.hh>
+#include <ignition/math/SemanticVersion.hh>
 #include <ignition/common/Profiler.hh>
 #include <ignition/common/Filesystem.hh>
 #include <ignition/common/URI.hh>
@@ -83,7 +84,17 @@ namespace gazebo
       if (common::getEnv("GAZEBO11_BACKWARDS_COMPAT_WARNINGS_ERRORS"))
         return;
 
-      if (not sdf::recursiveSiblingUniqueNames(_elem))
+      // SDF 1.7 and above consider invalid sibling elements of ANY type with
+      // repeated names while SDF 1.6 and lower only elements of the SAME type
+      auto sdfVersion =
+        ignition::math::SemanticVersion(_elem->OriginalVersion());
+      bool result;
+      if (sdfVersion >= ignition::math::SemanticVersion(1, 7))
+        result = sdf::recursiveSiblingUniqueNames(_elem);
+      else
+        result = sdf::recursiveSameTypeUniqueNames(_elem);
+
+      if (not result)
         gzerr << "SDF is not valid, see errors above. "
               << "This can lead to an unexpected behaviour." << "\n";
     }
