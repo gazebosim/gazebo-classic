@@ -124,8 +124,8 @@ TEST_F(SDFLogsTest, DuplicateSiblingSameTypeDisabled)
 /////////////////////////////////////////////////
 TEST_F(SDFLogsTest, DuplicateSiblingDifferentType)
 {
-  // 1.6 SDF does not enforce different names for different types
   Load("worlds/test_sdf16_err_sibling_different_type.world");
+  // 1.6 SDF does not enforce different names for different types
   EXPECT_NO_ERR_IN_LOG();
 }
 
