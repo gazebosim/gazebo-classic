@@ -8,6 +8,20 @@
    use the previous behaviour and do not report these problems.
     * [Pull request #3017](https://github.com/osrf/gazebo/pull/3017)
 
+1. Allow specifying lens flare and camera distortion texture format
+    * [Issue #3005](https://github.com/osrf/gazebo/issues/3005)
+    * [Pull request #3007](https://github.com/osrf/gazebo/pull/3007)
+
+1.  Initialize the worldPoseDirty flag in Collision.cc
+    * A contribution from Zachary Michaels zmichaels11@gmail.com>
+    * [Pull request #2999](https://github.com/osrf/gazebo/pull/2999)
+
+1.  Compile test plugins as MODULE instead of STATIC
+    * [Pull request #2897](https://github.com/osrf/gazebo/pull/2897)
+
+1.  Add warning if GAZEBO_RESOURCE_PATH may not be set correctly
+    * [Pull request #2991](https://github.com/osrf/gazebo/pull/2991)
+
 ## Gazebo 11.5.1 (2021-05-05)
 
 1. Avoid range-loop-construct in TopicManager
