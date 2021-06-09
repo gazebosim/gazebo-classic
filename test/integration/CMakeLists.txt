@@ -95,6 +95,7 @@ set(tests
   rest_web.cc
   saving_and_loading.cc
   sdf.cc
+  sdf_errors.cc
   sensor.cc
   sdf_frame_semantics.cc
   server_fixture.cc

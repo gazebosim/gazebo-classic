@@ -1,5 +1,13 @@
 ## Gazebo 11
 
+## Gazebo 11.6.0 (2021-06-xx)
+
+1. Enable output of gzerr for SDF sibling elements of any type with same name,
+   following the SDF 1.7 specification.
+   Environment variable GAZEBO11_BACKWARDS_COMPAT_WARNINGS_ERRORS can be set to
+   use the previous behaviour and do not report these problems.
+    * [Pull request #3017](https://github.com/osrf/gazebo/pull/3017)
+
 ## Gazebo 11.5.1 (2021-05-05)
 
 1. Avoid range-loop-construct in TopicManager
