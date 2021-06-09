@@ -68,9 +68,11 @@ class SDFLogsTest : public ServerFixture
       " was found in the log. The test does not expect it be there";
   }
 
-  public: void EXPECT_ERR_IN_LOG()
+  public: void EXPECT_SDF_ERR_IN_LOG()
   {
     EXPECT_LOG_STRING("[Err] ");
+    std::string sdfErrorString = "SDF is not valid";
+    EXPECT_LOG_STRING(sdfErrorString);
   }
 
   private: bool log_string_search(const std::string expected_text)
@@ -103,10 +105,7 @@ TEST_F(SDFLogsTest, EmptyWorldNoErrors)
 TEST_F(SDFLogsTest, DuplicateSiblingSameType)
 {
   Load("worlds/test_sdf16_err_sibling_same_type.world");
-
-  EXPECT_ERR_IN_LOG();
-  std::string sdfErrorString = "SDF is not valid";
-  EXPECT_LOG_STRING(sdfErrorString);
+  EXPECT_SDF_ERR_IN_LOG();
 }
 
 /////////////////////////////////////////////////
