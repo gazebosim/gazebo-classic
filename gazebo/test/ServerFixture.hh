@@ -254,6 +254,7 @@ namespace gazebo
     /// \param[in] _distortionP2 Distortion coefficient p2.
     /// \param[in] _cx Normalized optical center x, used for distortion.
     /// \param[in] _cy Normalized optical center y, used for distortion.
+    /// \param[in] _useRealDistortion Use real distortion
     protected: void SpawnCamera(const std::string &_modelName,
                    const std::string &_cameraName,
                    const ignition::math::Vector3d &_pos =
@@ -267,7 +268,8 @@ namespace gazebo
                    bool _distortion = false, double _distortionK1 = 0.0,
                    double _distortionK2 = 0.0, double _distortionK3 = 0.0,
                    double _distortionP1 = 0.0, double _distortionP2 = 0.0,
-                   double _cx = 0.5, double _cy = 0.5);
+                   double _cx = 0.5, double _cy = 0.5,
+                   bool _useRealDistortion = false);
 
     /// \brief Spawn a wide angle camera.
     /// \param[in] _modelName Name of the model.

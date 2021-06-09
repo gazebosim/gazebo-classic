@@ -578,7 +578,8 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     const std::string &_noiseType, double _noiseMean, double _noiseStdDev,
     bool _distortion, double _distortionK1, double _distortionK2,
     double _distortionK3, double _distortionP1, double _distortionP2,
-    double _cx, double _cy)
+    double _cx, double _cy,
+    bool _useRealDistortion)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -623,6 +624,9 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "        <p1>" << _distortionP1 << "</p1>"
     << "        <p2>" << _distortionP2 << "</p2>"
     << "        <center>" << _cx << " " << _cy << "</center>"
+    << "        <ignition:use_real_distortion>"
+      << (_useRealDistortion ? "true" : "false")
+      << "</ignition:use_real_distortion>"
     << "      </distortion>";
   }
 
