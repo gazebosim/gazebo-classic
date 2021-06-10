@@ -1,12 +1,15 @@
 ## Gazebo 9
 
-## Gazebo 9.19.0 (2021-06-xx)
+## Gazebo 9.19.0 (2021-06-10)
 
 1. Enable output of gzerr for SDF sibling elements of same type with same name,
    following the SDF 1.6 specification.
    Environment variable GAZEBO9_BACKWARDS_COMPAT_WARNINGS_ERRORS can be set to
    use the previous behaviour and do not report these problems.
     * [Pull request #3016](https://github.com/osrf/gazebo/pull/3016)
+
+1.  Add warning if GAZEBO_RESOURCE_PATH may not be set correctly
+    * [Pull request #2991](https://github.com/osrf/gazebo/pull/2991)
 
 ## Gazebo 9.18.0 (2021-05-07)
 
