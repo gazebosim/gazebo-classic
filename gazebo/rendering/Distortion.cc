@@ -60,11 +60,13 @@ namespace gazebo
       /// black pixels at the corners of the image.
       public: bool distortionCrop = true;
 
-      /// \brief Modifies how Brown's distortion equations are applied to
-      /// better reflect real distortion. Image is projected from image plane
-      /// to camera plane to apply distortion equations, then projected back
-      /// to image plane. Note that this sets distortionCrop to false.
-      public: bool useRealDistortion = false;
+      /// \brief Use the legacy distortion mode. If this is set to false, the
+      /// new mode modifies how Brown's distortion equations are applied to
+      /// better reflect real distortion. The image is projected from image
+      /// plane to camera plane to apply distortion equations, then projected
+      /// back to image plane. Note that the new distortion doesn't allow
+      /// the image to be cropped.
+      public: bool legacyMode = true;
 
       /// \brief Lens distortion compositor
       public: Ogre::CompositorInstance *lensDistortionInstance;
@@ -121,20 +123,17 @@ void Distortion::Load(sdf::ElementPtr _sdf)
   this->dataPtr->p2 = _sdf->Get<double>("p2");
   this->dataPtr->lensCenter = _sdf->Get<ignition::math::Vector2d>("center");
 
+  this->dataPtr->distortionCrop = this->dataPtr->k1 < 0;
+
   const std::string compositorName = "ignition:compositor";
   if (_sdf->HasElement(compositorName))
   {
     this->dataPtr->compositorName = _sdf->Get<std::string>(compositorName);
   }
-  const std::string useRealDistortion = "ignition:use_real_distortion";
-  if (_sdf->HasElement(useRealDistortion))
+  const std::string legacyMode = "ignition:legacy_mode";
+  if (_sdf->HasElement(legacyMode))
   {
-    this->dataPtr->useRealDistortion = _sdf->Get<bool>(useRealDistortion);
-  }
-  if (this->dataPtr->useRealDistortion) {
-    this->dataPtr->distortionCrop = false;
-  } else {
-    this->dataPtr->distortionCrop = this->dataPtr->k1 < 0;
+    this->dataPtr->legacyMode = _sdf->Get<bool>(legacyMode);
   }
 }
 
@@ -218,7 +217,13 @@ void Distortion::SetCamera(CameraPtr _camera)
       normalizedLocation[0] = normalizedColLocation;
       normalizedLocation[1] = normalizedRowLocation;
 
-      if (this->dataPtr->useRealDistortion) {
+      if (this->dataPtr->legacyMode) {
+        distortedLocation = this->Distort(
+            normalizedLocation,
+            this->dataPtr->lensCenter,
+            this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
+            this->dataPtr->p1, this->dataPtr->p2);
+      } else {
         distortedLocation = this->Distort(
             normalizedLocation,
             this->dataPtr->lensCenter,
@@ -226,12 +231,6 @@ void Distortion::SetCamera(CameraPtr _camera)
             this->dataPtr->p1, this->dataPtr->p2,
             this->dataPtr->distortionTexWidth,
             focalLength);
-      } else {
-        distortedLocation = this->Distort(
-            normalizedLocation,
-            this->dataPtr->lensCenter,
-            this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
-            this->dataPtr->p1, this->dataPtr->p2);
       }
 
       // compute the index in the distortion map
@@ -522,7 +521,7 @@ ignition::math::Vector2d Distortion::Distort(
 void Distortion::SetCrop(const bool _crop)
 {
   // Only update the distortion scale if the crop value is going to flip.
-  if (this->dataPtr->distortionCrop != _crop)
+  if (this->dataPtr->distortionCrop != _crop && this->dataPtr->legacyMode)
   {
     this->dataPtr->distortionCrop = _crop;
     this->CalculateAndApplyDistortionScale();

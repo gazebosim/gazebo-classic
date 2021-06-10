@@ -54,7 +54,8 @@ namespace gazebo
       public: void SetCamera(CameraPtr _camera);
 
       /// \brief Set whether to crop the black border around the distorted
-      /// image points.
+      /// image points. Note that cropping only occurs for the legacy mode
+      /// distortion implementation.
       /// \param[in] _crop True to crop the black border
       /// \sa Crop
       public: void SetCrop(const bool _crop);
