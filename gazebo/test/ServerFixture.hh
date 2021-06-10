@@ -269,7 +269,8 @@ namespace gazebo
                    double _distortionK2 = 0.0, double _distortionK3 = 0.0,
                    double _distortionP1 = 0.0, double _distortionP2 = 0.0,
                    double _cx = 0.5, double _cy = 0.5,
-                   bool _useRealDistortion = false);
+                   bool _legacyMode = true,
+                   double _horizontalFov = 0.78539816339744828);
 
     /// \brief Spawn a wide angle camera.
     /// \param[in] _modelName Name of the model.

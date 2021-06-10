@@ -579,7 +579,8 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     bool _distortion, double _distortionK1, double _distortionK2,
     double _distortionK3, double _distortionP1, double _distortionP2,
     double _cx, double _cy,
-    bool _useRealDistortion)
+    bool _legacyMode,
+    double _horizontalFov)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -595,7 +596,7 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "    <update_rate>" << _rate << "</update_rate>"
     << "    <visualize>true</visualize>"
     << "    <camera>"
-    << "      <horizontal_fov>0.78539816339744828</horizontal_fov>"
+    << "      <horizontal_fov>" << _horizontalFov << "</horizontal_fov>"
     << "      <image>"
     << "        <width>" << _width << "</width>"
     << "        <height>" << _height << "</height>"
@@ -624,9 +625,9 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "        <p1>" << _distortionP1 << "</p1>"
     << "        <p2>" << _distortionP2 << "</p2>"
     << "        <center>" << _cx << " " << _cy << "</center>"
-    << "        <ignition:use_real_distortion>"
-      << (_useRealDistortion ? "true" : "false")
-      << "</ignition:use_real_distortion>"
+    << "        <ignition:legacy_mode>"
+      << (_legacyMode ? "true" : "false")
+      << "</ignition:legacy_mode>"
     << "      </distortion>";
   }
 

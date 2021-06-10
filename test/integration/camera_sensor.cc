@@ -733,30 +733,30 @@ TEST_F(CameraSensor, CheckDistortion)
       ignition::math::Vector3d(-5, 0, 5),
       ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
 
-  for (auto isUseRealDistortion: {true, false}) {
+  for (auto isUseLegacyDistortionMode: {true, false}) {
     // spawn an undistorted camera
     SpawnCamera(modelNameUndistorted, cameraNameUndistorted, setPose.Pos(),
         setPose.Rot().Euler(), width, height, updateRate);
     // spawn a flat camera
     SpawnCamera(modelNameFlat, cameraNameFlat, setPose.Pos(),
         setPose.Rot().Euler(), width, height, updateRate,
-        "", 0, 0, true, 0, 0, 0, 0, 0, 0.5, 0.5, isUseRealDistortion);
+        "", 0, 0, true, 0, 0, 0, 0, 0, 0.5, 0.5, isUseLegacyDistortionMode);
     // spawn a camera with barrel distortion
     SpawnCamera(modelNameBarrel, cameraNameBarrel, setPose.Pos(),
         setPose.Rot().Euler(), width, height, updateRate,
-        "", 0, 0, true, -0.1349, -0.51868, -0.001, 0, 0, 0.5, 0.5, isUseRealDistortion);
+        "", 0, 0, true, -0.1349, -0.51868, -0.001, 0, 0, 0.5, 0.5, isUseLegacyDistortionMode);
     // spawn a camera with pincushion distortion
     SpawnCamera(modelNamePincushion, cameraNamePincushion, setPose.Pos(),
         setPose.Rot().Euler(), width, height, updateRate,
-        "", 0, 0, true, 0.1349, 0.51868, 0.001, 0, 0, 0.5, 0.5, isUseRealDistortion);
+        "", 0, 0, true, 0.1349, 0.51868, 0.001, 0, 0, 0.5, 0.5, isUseLegacyDistortionMode);
     // spawn a camera with extreme barrel distortion
     SpawnCamera(modelNameExtremeBarrel, cameraNameExtremeBarrel, setPose.Pos(),
         setPose.Rot().Euler(), width, height, updateRate,
-        "", 0, 0, true, -0.5, -0.51868, -0.001, 0, 0, 0.5, 0.5, isUseRealDistortion);
+        "", 0, 0, true, -0.5, -0.51868, -0.001, 0, 0, 0.5, 0.5, isUseLegacyDistortionMode);
     // spawn a camera with extreme pincushion distortion
     SpawnCamera(modelNameExtremePincushion, cameraNameExtremePincushion,
         setPose.Pos(), setPose.Rot().Euler(), width, height, updateRate,
-        "", 0, 0, true, 0.5, 0.51868, 0.001, 0, 0, 0.5, 0.5, isUseRealDistortion);
+        "", 0, 0, true, 0.5, 0.51868, 0.001, 0, 0, 0.5, 0.5, isUseLegacyDistortionMode);
 
     sensors::SensorPtr sensorUndistorted =
       sensors::get_sensor(cameraNameUndistorted);
@@ -781,7 +781,7 @@ TEST_F(CameraSensor, CheckDistortion)
     sensors::SensorPtr sensorExtremeBarrel =
       sensors::get_sensor(cameraNameExtremeBarrel);
     sensors::CameraSensorPtr camSensorExtremeBarrel =
-      std::dynamic_pointer_cast<sensors::CameraSensor>(sensorBarrel);
+      std::dynamic_pointer_cast<sensors::CameraSensor>(sensorExtremeBarrel);
 
     sensors::SensorPtr sensorExtremePincushion =
       sensors::get_sensor(cameraNameExtremePincushion);
@@ -2110,4 +2110,231 @@ TEST_F(CameraSensor, SetCompositorNames)
     delete [] img;
   }
 #endif
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
+{
+  Load("worlds/test/issue_3003_distortion_implementation_correction.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Spawn cameras.
+  std::string modelNameBarrelLegacy = "camera_model_barrel_legacy";
+  std::string cameraNameBarrelLegacy = "camera_sensor_barrel_legacy";
+  std::string modelNameBarrelNew = "camera_model_barrel_new";
+  std::string cameraNameBarrelNew = "camera_sensor_barrel_new";
+
+  std::string modelNamePincushionLegacy = "camera_model_pincushion_legacy";
+  std::string cameraNamePincushionLegacy = "camera_sensor_pincushion_legacy";
+  std::string modelNamePincushionNew = "camera_model_pincushion_new";
+  std::string cameraNamePincushionNew = "camera_sensor_pincushion_new";
+  unsigned int width  = 160;
+  unsigned int height = 120;
+  double updateRate = 10;
+  ignition::math::Pose3d setPose(
+      ignition::math::Vector3d(0.5, 0, 0),
+      ignition::math::Quaterniond(0, 0, 0));
+
+  double horizontalFov = 1.6;
+
+  // spawn a camera with  pincushion distortion
+  SpawnCamera(modelNamePincushionLegacy, cameraNamePincushionLegacy,
+      setPose.Pos(), setPose.Rot().Euler(), width, height, updateRate,
+      "", 0, 0, true, 0.5, 0, 0, 0, 0, 0.5, 0.5,
+      true, horizontalFov);
+  SpawnCamera(modelNamePincushionNew, cameraNamePincushionNew,
+      setPose.Pos(), setPose.Rot().Euler(), width, height, updateRate,
+      "", 0, 0, true, 0.5, 0, 0, 0, 0, 0.5, 0.5,
+      false, horizontalFov);
+  // spawn a camera with barrel distortion
+  SpawnCamera(modelNameBarrelLegacy, cameraNameBarrelLegacy, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate,
+      "", 0, 0, true, -0.5, 0, 0, 0, 0, 0.5, 0.5,
+      true, horizontalFov);
+  SpawnCamera(modelNameBarrelNew, cameraNameBarrelNew, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate,
+      "", 0, 0, true, -0.5, 0, 0, 0, 0, 0.5, 0.5,
+      false, horizontalFov);
+
+  sensors::SensorPtr sensorPincushionLegacy =
+    sensors::get_sensor(cameraNamePincushionLegacy);
+  sensors::CameraSensorPtr camSensorPincushionLegacy =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorPincushionLegacy);
+  sensors::SensorPtr sensorPincushionNew =
+    sensors::get_sensor(cameraNamePincushionNew);
+  sensors::CameraSensorPtr camSensorPincushionNew =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorPincushionNew);
+
+  sensors::SensorPtr sensorBarrelLegacy =
+    sensors::get_sensor(cameraNameBarrelLegacy);
+  sensors::CameraSensorPtr camSensorBarrelLegacy =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorBarrelLegacy);
+  sensors::SensorPtr sensorBarrelNew =
+    sensors::get_sensor(cameraNameBarrelNew);
+  sensors::CameraSensorPtr camSensorBarrelNew =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorBarrelNew);
+
+  imageCount = 0;
+  imageCount2 = 0;
+  imageCount3 = 0;
+  imageCount4 = 0;
+
+  img = new unsigned char[width * height*3];
+  img2 = new unsigned char[width * height*3];
+  img3 = new unsigned char[width * height*3];
+  img4 = new unsigned char[width * height*3];
+
+
+  event::ConnectionPtr c1 =
+    camSensorPincushionLegacy->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c2 =
+    camSensorPincushionNew->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c3 =
+    camSensorBarrelLegacy->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount3, img3,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c4 =
+    camSensorBarrelNew->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount4, img4,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // Get some images
+  while (
+    imageCount < 10 || imageCount2 < 10 ||
+    imageCount3 < 10 || imageCount4 < 10)
+  {
+    common::Time::MSleep(10);
+  }
+
+  // Compare colors. Barrel distorted image should have more darker pixels than
+  // the original as the ground plane has been warped to occupy more of the
+  // image. The same should be true for pincushion distortion, because the
+  // ground plane is still distorted to be larger - just different parts
+  // of the image are distorted.
+  unsigned int colorSum1 = 0;
+  unsigned int colorSum2 = 0;
+  unsigned int colorSum3 = 0;
+  unsigned int colorSum4 = 0;
+  unsigned int dumpsterRow = height / 2;
+  for (unsigned int x = 0; x < width*3; x+=3)
+  {
+    unsigned int r1 = img[(dumpsterRow*width*3) + x];
+    unsigned int g1 = img[(dumpsterRow*width*3) + x + 1];
+    unsigned int b1 = img[(dumpsterRow*width*3) + x + 2];
+    colorSum1 += r1 + g1 + b1;
+    unsigned int r2 = img2[(dumpsterRow*width*3) + x];
+    unsigned int g2 = img2[(dumpsterRow*width*3) + x + 1];
+    unsigned int b2 = img2[(dumpsterRow*width*3) + x + 2];
+    colorSum2 += r2 + g2 + b2;
+    unsigned int r3 = img3[(dumpsterRow*width*3) + x];
+    unsigned int g3 = img3[(dumpsterRow*width*3) + x + 1];
+    unsigned int b3 = img3[(dumpsterRow*width*3) + x + 2];
+    colorSum3 += r3 + g3 + b3;
+    unsigned int r4 = img4[(dumpsterRow*width*3) + x];
+    unsigned int g4 = img4[(dumpsterRow*width*3) + x + 1];
+    unsigned int b4 = img4[(dumpsterRow*width*3) + x + 2];
+    colorSum4 += r4 + g4 + b4;
+  }
+
+  // Check that the legacy mode distorts the pincuchin images less
+  EXPECT_GT(colorSum1, colorSum2+800);
+  // Check that there is a good difference in the barrel images
+  // this difference is largely caused by the edges of the new
+  // distortion model which appear gray when they have no value
+  // and gray (192) has a much lower value than white (765)
+  EXPECT_GT(colorSum3, colorSum4+20000);
+
+  // Check that no cropping occurs - specifically the corners
+  // in both image should be white and have a value of 765=255*3
+  // since the background of the environment is white
+  unsigned int cornerColorSumImg1 = img[0] + img[1] + img[2];
+  unsigned int cornerColorSumImg2 = img2[0] + img2[1] + img2[2];
+  unsigned int cornerColorSumImg3 = img3[0] + img3[1] + img3[2];
+  EXPECT_EQ(cornerColorSumImg1, 765u);
+  EXPECT_EQ(cornerColorSumImg2, 765u);
+  EXPECT_EQ(cornerColorSumImg3, 765u);
+  // Check that cropping occurs - specifically the corners
+  // in both image should be white and have a value of 192,
+  // which is the gray for pixels that haven't been assigned
+  unsigned int cornerColorSumImg4 = img4[0] + img4[1] + img4[2];
+  EXPECT_EQ(cornerColorSumImg4, 192u);
+
+  // Check dumpster location meets expectations
+  unsigned int idxOfFirstDumpsterPixelImg1 = 0;
+  unsigned int idxOfFirstDumpsterPixelImg2 = 0;
+  unsigned int idxOfFirstDumpsterPixelImg3 = 0;
+  unsigned int idxOfFirstDumpsterPixelImg4 = 0;
+  for (unsigned int x = 0; x < width*3; x+=3)
+  {
+    unsigned int r1 = img[(dumpsterRow*width*3) + x];
+    unsigned int g1 = img[(dumpsterRow*width*3) + x + 1];
+    unsigned int b1 = img[(dumpsterRow*width*3) + x + 2];
+    unsigned int pixelSum = r1 + g1 + b1;
+    if (pixelSum != 765u && pixelSum != 192u) {
+      idxOfFirstDumpsterPixelImg1 = x;
+      break;
+    }
+  }
+  for (unsigned int x = 0; x < width*3; x+=3)
+  {
+    unsigned int r2 = img2[(dumpsterRow*width*3) + x];
+    unsigned int g2 = img2[(dumpsterRow*width*3) + x + 1];
+    unsigned int b2 = img2[(dumpsterRow*width*3) + x + 2];
+    unsigned int pixelSum = r2 + g2 + b2;
+    if (pixelSum != 765u && pixelSum != 192u) {
+      idxOfFirstDumpsterPixelImg2 = x;
+      break;
+    }
+  }
+  for (unsigned int x = 0; x < width*3; x+=3)
+  {
+    unsigned int r3 = img3[(dumpsterRow*width*3) + x];
+    unsigned int g3 = img3[(dumpsterRow*width*3) + x + 1];
+    unsigned int b3 = img3[(dumpsterRow*width*3) + x + 2];
+    unsigned int pixelSum = r3 + g3 + b3;
+    if (pixelSum != 765u && pixelSum != 192u) {
+      idxOfFirstDumpsterPixelImg3 = x;
+      break;
+    }
+  }
+  for (unsigned int x = 0; x < width*3; x+=3)
+  {
+    unsigned int r4 = img4[(dumpsterRow*width*3) + x];
+    unsigned int g4 = img4[(dumpsterRow*width*3) + x + 1];
+    unsigned int b4 = img4[(dumpsterRow*width*3) + x + 2];
+    unsigned int pixelSum = r4 + g4 + b4;
+    if (pixelSum != 765u && pixelSum != 192u) {
+      idxOfFirstDumpsterPixelImg4 = x;
+      break;
+    }
+  }
+  // Check that, in the pin cushion case, the dumpster is seen closer to the
+  // left in the new version. This makes sense as the new distortion mode
+  // should have more significant distortion than the legacy mode.
+  ASSERT_GT(idxOfFirstDumpsterPixelImg1, idxOfFirstDumpsterPixelImg2+15);
+  // Check that, in the barrel case, the dumpster is seen closer to the left
+  // in the legacy distortion mode than in the new mode. This makes sense
+  // because the legacy mode crops the image removing the edges where there
+  // is no image information.
+  ASSERT_LT(idxOfFirstDumpsterPixelImg3, idxOfFirstDumpsterPixelImg4-25);
+
+  delete[] img;
+  delete[] img2;
+  delete[] img3;
+  delete[] img4;
 }
