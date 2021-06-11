@@ -2191,7 +2191,6 @@ TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
   img3 = new unsigned char[width * height*3];
   img4 = new unsigned char[width * height*3];
 
-
   event::ConnectionPtr c1 =
     camSensorPincushionLegacy->Camera()->ConnectNewImageFrame(
         std::bind(&::OnNewCameraFrame, &imageCount, img,
