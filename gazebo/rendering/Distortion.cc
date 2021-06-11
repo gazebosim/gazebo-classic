@@ -470,27 +470,7 @@ ignition::math::Vector2d Distortion::Distort(
     const ignition::math::Vector2d &_center, double _k1, double _k2, double _k3,
     double _p1, double _p2)
 {
-  // apply Brown's distortion model, see
-  // http://en.wikipedia.org/wiki/Distortion_%28optics%29#Software_correction
-
-  ignition::math::Vector2d normalized2d = _in - _center;
-  ignition::math::Vector3d normalized(normalized2d.X(), normalized2d.Y(), 0);
-  double rSq = normalized.X() * normalized.X() +
-               normalized.Y() * normalized.Y();
-
-  // radial
-  ignition::math::Vector3d dist = normalized * (1.0 +
-      _k1 * rSq +
-      _k2 * rSq * rSq +
-      _k3 * rSq * rSq * rSq);
-
-  // tangential
-  dist.X() += _p2 * (rSq + 2 * (normalized.X()*normalized.X())) +
-      2 * _p1 * normalized.X() * normalized.Y();
-  dist.Y() += _p1 * (rSq + 2 * (normalized.Y()*normalized.Y())) +
-      2 * _p2 * normalized.X() * normalized.Y();
-
-  return _center + ignition::math::Vector2d(dist.X(), dist.Y());
+  return Distort(_in, _center, _k1, _k2, _k3, _p1, _p2, 1u, 1.0);
 }
 
 //////////////////////////////////////////////////
