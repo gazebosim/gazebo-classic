@@ -237,6 +237,11 @@ void Distortion::SetCamera(CameraPtr _camera)
       distortedCol = distortedLocation.X() * this->dataPtr->distortionTexWidth;
       distortedRow = distortedLocation.Y() * this->dataPtr->distortionTexHeight;
 
+      // Note that the following makes sure that, for significant distortions,
+      // there is not a problem where the distorted image seems to fold over itself.
+      // This is accomplished by favoring pixels closer to the center of distortion,
+      // and this change applies to both the legacy and nonlegacy distortion modes.
+
       // Make sure the distorted pixel is within the texture dimensions
       if (distortedCol < this->dataPtr->distortionTexWidth &&
           distortedRow < this->dataPtr->distortionTexHeight)
