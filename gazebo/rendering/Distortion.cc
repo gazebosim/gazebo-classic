@@ -174,9 +174,9 @@ void Distortion::SetCamera(CameraPtr _camera)
   unsigned int texSide = _camera->ImageHeight() > _camera->ImageWidth() ?
       _camera->ImageHeight() : _camera->ImageWidth();
   // calculate focal length from largest fov
-  double fov = _camera->ImageHeight() > _camera->ImageWidth() ?
+  const double fov = _camera->ImageHeight() > _camera->ImageWidth() ?
       _camera->VFOV().Radian() : _camera->HFOV().Radian();
-  double focalLength = texSide/(2*tan(fov/2));
+  const double focalLength = texSide/(2*tan(fov/2));
   this->dataPtr->distortionTexWidth = texSide - 1;
   this->dataPtr->distortionTexHeight = texSide - 1;
   unsigned int imageSize =
