@@ -135,7 +135,9 @@ void Distortion::Load(sdf::ElementPtr _sdf)
   {
     this->dataPtr->legacyMode = _sdf->Get<bool>(legacyMode);
   }
-  if (!this->dataPtr->legacyMode) {
+  if (!this->dataPtr->legacyMode && this->dataPtr->distortionCrop)
+  {
+    gzwarn << "Enable legacy mode to use distortion cropping" << std::endl;
     this->dataPtr->distortionCrop = false;
   }
 }
