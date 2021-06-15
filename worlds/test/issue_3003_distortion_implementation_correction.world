@@ -11,7 +11,8 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/mine cart/4/meshes/minecart.dae</uri>
+              <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/mine cart/4/files/meshes/minecart.dae
+</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -31,7 +32,7 @@
         <visual name='polySurface1278_visual'>
           <geometry>
             <mesh>
-              <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/mine cart/4/meshes/minecart.dae</uri>
+              <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/mine cart/4/files/meshes/minecart.dae</uri>
               <submesh>
                 <name>polySurface1278</name>
                 <center>0</center>
@@ -49,8 +50,8 @@
               </metal>
             </pbr>
             <script>
-              <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/mine cart/4/materials/scripts/</uri>
-              <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/mine cart/4/materials/textures/</uri>
+              <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/mine cart/4/files/materials/scripts/</uri>
+              <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/mine cart/4/files/materials/textures/</uri>
               <name>UrbanTile/MineCart_Diffuse</name>
             </script>
           </material>
