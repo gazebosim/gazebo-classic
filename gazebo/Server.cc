@@ -94,7 +94,7 @@ namespace gazebo
       else
         result = sdf::recursiveSameTypeUniqueNames(_elem);
 
-      if (not result)
+      if (!result)
         gzerr << "SDF is not valid, see errors above. "
               << "This can lead to an unexpected behaviour." << "\n";
     }
