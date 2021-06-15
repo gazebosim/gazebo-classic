@@ -135,6 +135,9 @@ void Distortion::Load(sdf::ElementPtr _sdf)
   {
     this->dataPtr->legacyMode = _sdf->Get<bool>(legacyMode);
   }
+  if (!this->dataPtr->legacyMode) {
+    this->dataPtr->distortionCrop = false;
+  }
 }
 
 //////////////////////////////////////////////////
