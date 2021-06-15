@@ -104,7 +104,7 @@ namespace gazebo
                   const ignition::math::Vector2d &_center,
                   double _k1, double _k2, double _k3,
                   double _p1, double _p2);
-                  
+
       /// \brief Apply distortion model using camera coordinates projection
       /// \param[in] _in Input uv coordinate.
       /// \param[in] _center Normalized distortion center.
@@ -118,9 +118,9 @@ namespace gazebo
       /// \return Distorted coordinate.
       public: static ignition::math::Vector2d Distort(
                   const ignition::math::Vector2d &_in,
-                  const ignition::math::Vector2d &_center, 
+                  const ignition::math::Vector2d &_center,
                   double _k1, double _k2, double _k3,
-                  double _p1, double _p2, 
+                  double _p1, double _p2,
                   unsigned int _width, double _f);
 
       /// \brief get the distortion map value.
