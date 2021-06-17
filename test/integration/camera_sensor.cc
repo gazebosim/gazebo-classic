@@ -2199,7 +2199,7 @@ TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
   unsigned int cornerColorSumImg4 = img4[0] + img4[1] + img4[2];
   EXPECT_EQ(cornerColorSumImg4, 192u);
 
-  auto getFirstColIdxOfMineCart = [middleRow, width](const unsigned char* img)
+  auto getFirstColIdxOfMineCart = [](const unsigned char* img)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
     {
