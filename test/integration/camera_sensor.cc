@@ -2209,7 +2209,7 @@ TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
         return x;
       }
     }
-    return width-1;
+    return (width-1) * 3;
   };
 
   // Check mine cart location meets expectations
