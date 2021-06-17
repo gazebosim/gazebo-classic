@@ -2061,8 +2061,10 @@ TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
   const std::string modelNameBarrelNew = "camera_model_barrel_new";
   const std::string cameraNameBarrelNew = "camera_sensor_barrel_new";
 
-  const std::string modelNamePincushionLegacy = "camera_model_pincushion_legacy";
-  const std::string cameraNamePincushionLegacy = "camera_sensor_pincushion_legacy";
+  const std::string modelNamePincushionLegacy =
+    "camera_model_pincushion_legacy";
+  const std::string cameraNamePincushionLegacy =
+    "camera_sensor_pincushion_legacy";
   const std::string modelNamePincushionNew = "camera_model_pincushion_new";
   const std::string cameraNamePincushionNew = "camera_sensor_pincushion_new";
   const unsigned int width  = 160;
@@ -2213,20 +2215,20 @@ TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
   };
 
   // Check mine cart location meets expectations
-  const unsigned int idxOfFirstMineCartPixelImg1 = getFirstColIdxOfMineCart(img);
-  const unsigned int idxOfFirstMineCartPixelImg2 = getFirstColIdxOfMineCart(img2);
-  const unsigned int idxOfFirstMineCartPixelImg3 = getFirstColIdxOfMineCart(img3);
-  const unsigned int idxOfFirstMineCartPixelImg4 = getFirstColIdxOfMineCart(img4);
+  const unsigned int mineCartColIdx1 = getFirstColIdxOfMineCart(img);
+  const unsigned int mineCartColIdx2 = getFirstColIdxOfMineCart(img2);
+  const unsigned int mineCartColIdx3 = getFirstColIdxOfMineCart(img3);
+  const unsigned int mineCartColIdx4 = getFirstColIdxOfMineCart(img4);
 
   // Check that, in the pin cushion case, the mine cart is seen closer to the
   // left in the new version. This makes sense as the new distortion mode
   // should have more significant distortion than the legacy mode.
-  EXPECT_GT(idxOfFirstMineCartPixelImg1, idxOfFirstMineCartPixelImg2+15);
+  EXPECT_GT(mineCartColIdx1, mineCartColIdx2+15);
   // Check that, in the barrel case, the mine cart is seen closer to the left
   // in the legacy distortion mode than in the new mode. This makes sense
   // because the legacy mode crops the image removing the edges where there
   // is no image information.
-  EXPECT_LT(idxOfFirstMineCartPixelImg3, idxOfFirstMineCartPixelImg4-25);
+  EXPECT_LT(mineCartColIdx3, mineCartColIdx4-25);
 
   delete[] img;
   delete[] img2;

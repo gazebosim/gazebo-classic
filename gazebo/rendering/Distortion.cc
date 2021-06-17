@@ -212,10 +212,12 @@ void Distortion::SetCamera(CameraPtr _camera)
   double normalizedColLocation, normalizedRowLocation;
 
   // fill the distortion map
-  for (unsigned int mapRow = 0; mapRow < this->dataPtr->distortionTexHeight; ++mapRow)
+  for (unsigned int mapRow = 0; mapRow < this->dataPtr->distortionTexHeight;
+    ++mapRow)
   {
     normalizedRowLocation = mapRow*rowStepSize;
-    for (unsigned int mapCol = 0; mapCol < this->dataPtr->distortionTexWidth; ++mapCol)
+    for (unsigned int mapCol = 0; mapCol < this->dataPtr->distortionTexWidth;
+      ++mapCol)
     {
       normalizedColLocation = mapCol*colStepSize;
 
@@ -240,25 +242,29 @@ void Distortion::SetCamera(CameraPtr _camera)
 
       // compute the index in the distortion map
       distortedCol = distortedLocation.X() * this->dataPtr->distortionTexWidth;
-      distortedRow = distortedLocation.Y() * this->dataPtr->distortionTexHeight;
+      distortedRow = distortedLocation.Y() *
+        this->dataPtr->distortionTexHeight;
 
       // Note that the following makes sure that, for significant distortions,
-      // there is not a problem where the distorted image seems to fold over itself.
-      // This is accomplished by favoring pixels closer to the center of distortion,
-      // and this change applies to both the legacy and nonlegacy distortion modes.
+      // there is not a problem where the distorted image seems to fold over
+      // itself. This is accomplished by favoring pixels closer to the center
+      // of distortion, and this change applies to both the legacy and
+      // nonlegacy distortion modes.
 
       // Make sure the distorted pixel is within the texture dimensions
       if (distortedCol < this->dataPtr->distortionTexWidth &&
           distortedRow < this->dataPtr->distortionTexHeight)
       {
-        distortedIdx = distortedRow * this->dataPtr->distortionTexWidth + distortedCol;
+        distortedIdx = distortedRow * this->dataPtr->distortionTexWidth +
+          distortedCol;
 
         // check if the index has already been set
         if (this->dataPtr->distortionMap[distortedIdx] != unsetPixelVector)
         {
           // grab current coordinates that map to this destination
-          currDistortedCoordinates = this->dataPtr->distortionMap[distortedIdx] *
-                                     this->dataPtr->distortionTexWidth;
+          currDistortedCoordinates =
+            this->dataPtr->distortionMap[distortedIdx] *
+            this->dataPtr->distortionTexWidth;
 
           // grab new coordinates to map to
           newDistortedCoordinates[0] = mapCol;
@@ -504,7 +510,8 @@ ignition::math::Vector2d Distortion::Distort(
   dist.Y() += _p1 * (rSq + 2 * (normalized.Y()*normalized.Y())) +
       2 * _p2 * normalized.X() * normalized.Y();
 
-  return ((_center*_width) + ignition::math::Vector2d(dist.X(), dist.Y())*_f)/_width;
+  return ((_center*_width) +
+    ignition::math::Vector2d(dist.X(), dist.Y())*_f)/_width;
 }
 
 //////////////////////////////////////////////////
