@@ -255,6 +255,7 @@ namespace gazebo
     /// \param[in] _cx Normalized optical center x, used for distortion.
     /// \param[in] _cy Normalized optical center y, used for distortion.
     /// \param[in] _legacyMode Use the legacy distortion model.
+    /// \param[in] _horizontalFov The horizontal field of view.
     protected: void SpawnCamera(const std::string &_modelName,
                    const std::string &_cameraName,
                    const ignition::math::Vector3d &_pos =
