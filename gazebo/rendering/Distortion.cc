@@ -201,7 +201,7 @@ void Distortion::SetCamera(CameraPtr _camera)
       this->dataPtr->lensCenter.Y() * this->dataPtr->distortionTexWidth);
 
   // declare variables before the loop
-  static auto unsetPixelVector =  ignition::math::Vector2d(-1, -1);
+  const auto unsetPixelVector =  ignition::math::Vector2d(-1, -1);
   ignition::math::Vector2d normalizedLocation,
       distortedLocation,
       newDistortedCoordinates,
