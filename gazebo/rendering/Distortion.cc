@@ -224,13 +224,16 @@ void Distortion::SetCamera(CameraPtr _camera)
       normalizedLocation[0] = normalizedColLocation;
       normalizedLocation[1] = normalizedRowLocation;
 
-      if (this->dataPtr->legacyMode) {
+      if (this->dataPtr->legacyMode)
+      {
         distortedLocation = this->Distort(
             normalizedLocation,
             this->dataPtr->lensCenter,
             this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
             this->dataPtr->p1, this->dataPtr->p2);
-      } else {
+      }
+      else
+      {
         distortedLocation = this->Distort(
             normalizedLocation,
             this->dataPtr->lensCenter,
