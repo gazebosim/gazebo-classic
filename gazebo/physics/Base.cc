@@ -293,6 +293,25 @@ BasePtr Base::GetById(unsigned int _id) const
 }
 
 //////////////////////////////////////////////////
+BasePtr Base::GetByIdRecursive(unsigned int _id)
+{
+  if (this->GetId() == _id) {
+    return shared_from_this();
+  }
+
+  BasePtr result;
+  Base_V::const_iterator biter;
+
+  for (biter = this->children.begin();
+      biter != this->children.end() && result == NULL; ++biter)
+  {
+    result = (*biter)->GetByIdRecursive(_id);
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 BasePtr Base::GetByName(const std::string &_name)
 {
   if (this->GetScopedName() == _name || this->GetName() == _name)
