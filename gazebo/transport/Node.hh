@@ -18,7 +18,7 @@
 #ifndef GAZEBO_TRANSPORT_NODE_HH_
 #define GAZEBO_TRANSPORT_NODE_HH_
 
-#include <tbb/task.h>
+#include <tbb/task_group.h>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <map>
@@ -36,7 +36,7 @@ namespace gazebo
   {
     /// \cond
     /// \brief Task used by Node::Publish to publish on a one-time publisher
-    class GZ_TRANSPORT_VISIBLE PublishTask : public tbb::task
+    class GZ_TRANSPORT_VISIBLE PublishTask
     {
       /// \brief Constructor
       /// \param[in] _pub Publisher to publish the message on.
@@ -49,16 +49,14 @@ namespace gazebo
         this->msg->CopyFrom(_message);
       }
 
-      /// \brief Overridden function from tbb::task that exectues the
-      /// publish task.
-      public: tbb::task *execute()
+      /// \brief Functor function that executes the publish task.
+      public: void operator()() const
               {
                 this->pub->WaitForConnection();
                 this->pub->Publish(*this->msg, true);
                 this->pub->SendMessage();
                 delete this->msg;
                 this->pub.reset();
-                return NULL;
               }
 
       /// \brief Pointer to the publisher.
@@ -159,10 +157,8 @@ namespace gazebo
                   const google::protobuf::Message &_message)
               {
                 transport::PublisherPtr pub = this->Advertise<M>(_topic);
-                PublishTask *task = new(tbb::task::allocate_root())
-                  PublishTask(pub, _message);
-
-                tbb::task::enqueue(*task);
+                tbb::task_group tg;
+                tg.run(PublishTask(pub, _message));
                 return;
               }
 

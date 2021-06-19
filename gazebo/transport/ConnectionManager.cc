@@ -28,28 +28,26 @@ using namespace gazebo;
 using namespace transport;
 
 /// TBB task to process nodes.
-class TopicManagerProcessTask : public tbb::task
+class TopicManagerProcessTask
 {
-  /// Implements the necessary execute function
-  public: tbb::task *execute()
+  /// Implements the necessary operator function
+  public: void operator()() const
           {
             TopicManager::Instance()->ProcessNodes();
-            return NULL;
           }
 };
 
 /// TBB task to establish subscriber to publisher connection.
-class TopicManagerConnectionTask : public tbb::task
+class TopicManagerConnectionTask
 {
   /// \brief Constructor.
   /// \param[in] _pub Publish message
   public: explicit TopicManagerConnectionTask(msgs::Publish _pub) : pub(_pub) {}
 
-  /// Implements the necessary execute function
-  public: tbb::task *execute()
+  /// Implements the necessary operator function
+  public: void operator()() const
           {
             TopicManager::Instance()->ConnectSubToPub(pub);
-            return NULL;
           }
 
   /// \brief Publish message
@@ -274,9 +272,8 @@ void ConnectionManager::RunUpdate()
 
   // Use TBB to process nodes. Need more testing to see if this makes
   // a difference.
-  // TopicManagerProcessTask *task = new(tbb::task::allocate_root())
-  //   TopicManagerProcessTask();
-  // tbb::task::enqueue(*task);
+  // tbb::task_group tg;
+  // tg.run(TopicManagerProcessTask());
   boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
 
   TopicManager::Instance()->ProcessNodes();
@@ -401,9 +398,8 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
-      TopicManagerConnectionTask *task = new(tbb::task::allocate_root())
-      TopicManagerConnectionTask(pub);
-      tbb::task::enqueue(*task);
+      tbb::task_group tg;
+      tg.run(TopicManagerConnectionTask(pub));
     }
   }
   // publisher_subscribe. This occurs when we try to subscribe to a topic, and
