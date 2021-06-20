@@ -1119,9 +1119,6 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
     msgs::Link *linkMsg = msg.add_link();
     linkMsg->set_id(this->dataPtr->linkMsg.id());
     std::string linkName = this->dataPtr->linkMsg.name();
-    size_t index = linkName.find_last_of("::");
-    if (index != std::string::npos)
-      linkName = linkName.substr(index+1);
     linkMsg->set_name(linkName);
     fillMsg = linkMsg;
   }

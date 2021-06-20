@@ -284,6 +284,18 @@ namespace gazebo
       /// \return The scoped name.
       public: std::string GetScopedName(bool _prependWorldName = false) const;
 
+      /// \brief Return a short version of the name with "ScopedName::" removed
+      /// \param[in] _scoped name - Usually the scoped name of a new
+      /// name a child entity is to be set to.
+      /// \return The stripped name.
+      public: std::string StripScopedName(const std::string &_name) const;
+
+      /// \brief Return a short version of the name with "ParentScopedName::" removed
+      /// \param[in] _scoped name - Usually the scoped name of a new
+      /// name this entity is to be set to.
+      /// \return The stripped name.
+      public: std::string StripParentScopedName(const std::string &_name) const;
+
       /// \brief Return the common::URI of this entity.
       /// The URI includes the world where the entity is contained and all the
       /// hierarchy of sub-entities that can compose this entity.
