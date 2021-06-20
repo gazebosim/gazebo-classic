@@ -1065,7 +1065,7 @@ void Link::ProcessMsg(const msgs::Link &_msg)
     return;
   }
 
-  this->SetName(_msg.name());
+  this->SetName(this->StripParentScopedName(_msg.name()));
 
   if (_msg.has_self_collide())
     this->SetSelfCollide(_msg.self_collide());

@@ -336,6 +336,34 @@ std::string Base::GetScopedName(bool _prependWorldName) const
     return this->scopedName;
 }
 
+std::string Base::StripScopedName(const std::string &_name) const
+{
+  if (_name.find(this->GetScopedName() + "::") == 0){
+    return _name.substr(this->GetScopedName().size() + 2);
+  } else {
+    // it's okay if current element IS the world, otherwise logerr
+    if ((this->GetName() != this->world->Name()))
+    {
+      gzerr << "Cannot strip scoped name " << this->GetScopedName()
+            << " from the beginning of given _name " << _name
+            << ". returning _name without stripping."
+            << std::endl;
+    }
+    return _name;
+  }
+}
+
+std::string Base::StripParentScopedName(const std::string &_name) const
+{
+  if (!this->GetParent()){
+    return _name;
+  } else {
+    return this->GetParent()->StripScopedName(_name);
+  }
+}
+
+
+
 //////////////////////////////////////////////////
 common::URI Base::URI() const
 {
