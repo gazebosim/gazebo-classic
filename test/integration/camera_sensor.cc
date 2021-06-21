@@ -2041,3 +2041,197 @@ TEST_F(CameraSensor, SetCompositorNames)
   }
 #endif
 }
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
+{
+  Load("worlds/test/issue_3003_distortion_implementation_correction.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Spawn cameras.
+  const std::string modelNameBarrelLegacy = "camera_model_barrel_legacy";
+  const std::string cameraNameBarrelLegacy = "camera_sensor_barrel_legacy";
+  const std::string modelNameBarrelNew = "camera_model_barrel_new";
+  const std::string cameraNameBarrelNew = "camera_sensor_barrel_new";
+
+  const std::string modelNamePincushionLegacy =
+    "camera_model_pincushion_legacy";
+  const std::string cameraNamePincushionLegacy =
+    "camera_sensor_pincushion_legacy";
+  const std::string modelNamePincushionNew = "camera_model_pincushion_new";
+  const std::string cameraNamePincushionNew = "camera_sensor_pincushion_new";
+  const unsigned int width  = 160;
+  const unsigned int height = 120;
+  const double updateRate = 10;
+  const ignition::math::Pose3d setPose(
+      ignition::math::Vector3d(0.5, 0, 0),
+      ignition::math::Quaterniond(0, 0, 0));
+  const double horizontalFov = 1.6;
+
+  // spawn a camera with  pincushion distortion
+  SpawnCamera(modelNamePincushionLegacy, cameraNamePincushionLegacy,
+      setPose.Pos(), setPose.Rot().Euler(), width, height, updateRate,
+      "", 0, 0, true, 0.5, 0, 0, 0, 0, 0.5, 0.5,
+      true, horizontalFov);
+  SpawnCamera(modelNamePincushionNew, cameraNamePincushionNew,
+      setPose.Pos(), setPose.Rot().Euler(), width, height, updateRate,
+      "", 0, 0, true, 0.5, 0, 0, 0, 0, 0.5, 0.5,
+      false, horizontalFov);
+  // spawn a camera with barrel distortion
+  SpawnCamera(modelNameBarrelLegacy, cameraNameBarrelLegacy, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate,
+      "", 0, 0, true, -0.5, 0, 0, 0, 0, 0.5, 0.5,
+      true, horizontalFov);
+  SpawnCamera(modelNameBarrelNew, cameraNameBarrelNew, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate,
+      "", 0, 0, true, -0.5, 0, 0, 0, 0, 0.5, 0.5,
+      false, horizontalFov);
+
+  sensors::SensorPtr sensorPincushionLegacy =
+    sensors::get_sensor(cameraNamePincushionLegacy);
+  sensors::CameraSensorPtr camSensorPincushionLegacy =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorPincushionLegacy);
+  sensors::SensorPtr sensorPincushionNew =
+    sensors::get_sensor(cameraNamePincushionNew);
+  sensors::CameraSensorPtr camSensorPincushionNew =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorPincushionNew);
+
+  sensors::SensorPtr sensorBarrelLegacy =
+    sensors::get_sensor(cameraNameBarrelLegacy);
+  sensors::CameraSensorPtr camSensorBarrelLegacy =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorBarrelLegacy);
+  sensors::SensorPtr sensorBarrelNew =
+    sensors::get_sensor(cameraNameBarrelNew);
+  sensors::CameraSensorPtr camSensorBarrelNew =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorBarrelNew);
+
+  imageCount = 0;
+  imageCount2 = 0;
+  imageCount3 = 0;
+  imageCount4 = 0;
+
+  img = new unsigned char[width * height*3];
+  img2 = new unsigned char[width * height*3];
+  img3 = new unsigned char[width * height*3];
+  img4 = new unsigned char[width * height*3];
+
+  event::ConnectionPtr c1 =
+    camSensorPincushionLegacy->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c2 =
+    camSensorPincushionNew->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c3 =
+    camSensorBarrelLegacy->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount3, img3,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c4 =
+    camSensorBarrelNew->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount4, img4,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // Get some images
+  while (
+    imageCount < 10 || imageCount2 < 10 ||
+    imageCount3 < 10 || imageCount4 < 10)
+  {
+    common::Time::MSleep(10);
+  }
+
+  unsigned int colorSum1 = 0;
+  unsigned int colorSum2 = 0;
+  unsigned int colorSum3 = 0;
+  unsigned int colorSum4 = 0;
+  const unsigned int middleRow = height / 2;
+  for (unsigned int x = 0; x < width*3; x+=3)
+  {
+    unsigned int r1 = img[(middleRow*width*3) + x];
+    unsigned int g1 = img[(middleRow*width*3) + x + 1];
+    unsigned int b1 = img[(middleRow*width*3) + x + 2];
+    colorSum1 += r1 + g1 + b1;
+    unsigned int r2 = img2[(middleRow*width*3) + x];
+    unsigned int g2 = img2[(middleRow*width*3) + x + 1];
+    unsigned int b2 = img2[(middleRow*width*3) + x + 2];
+    colorSum2 += r2 + g2 + b2;
+    unsigned int r3 = img3[(middleRow*width*3) + x];
+    unsigned int g3 = img3[(middleRow*width*3) + x + 1];
+    unsigned int b3 = img3[(middleRow*width*3) + x + 2];
+    colorSum3 += r3 + g3 + b3;
+    unsigned int r4 = img4[(middleRow*width*3) + x];
+    unsigned int g4 = img4[(middleRow*width*3) + x + 1];
+    unsigned int b4 = img4[(middleRow*width*3) + x + 2];
+    colorSum4 += r4 + g4 + b4;
+  }
+
+  // Check that the legacy mode distorts the pincushion images less
+  EXPECT_GT(colorSum1, colorSum2+800);
+  // Check that there is a good difference in the barrel images
+  // this difference is largely caused by the edges of the new
+  // distortion model which appear gray when they have no value
+  // and gray (192) has a much lower value than white (765)
+  EXPECT_GT(colorSum3, colorSum4+20000);
+
+  // Check that the corners contain rendered pixels.
+  // Specifically, the corners in each image should be white and
+  // have a value of 765=255*3 since the background of the environment
+  // is white
+  unsigned int cornerColorSumImg1 = img[0] + img[1] + img[2];
+  unsigned int cornerColorSumImg2 = img2[0] + img2[1] + img2[2];
+  unsigned int cornerColorSumImg3 = img3[0] + img3[1] + img3[2];
+  EXPECT_EQ(cornerColorSumImg1, 765u);
+  EXPECT_EQ(cornerColorSumImg2, 765u);
+  EXPECT_EQ(cornerColorSumImg3, 765u);
+  // Check that this image is not cropped and that the corner pixel
+  // has the gray value assigned to unrendered pixels
+  unsigned int cornerColorSumImg4 = img4[0] + img4[1] + img4[2];
+  EXPECT_EQ(cornerColorSumImg4, 192u);
+
+  auto getFirstColIdxOfMineCart = [](const unsigned char* img)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      const unsigned int r = img[(middleRow*width*3) + x];
+      const unsigned int g = img[(middleRow*width*3) + x + 1];
+      const unsigned int b = img[(middleRow*width*3) + x + 2];
+      const unsigned int pixelSum = r + g + b;
+      if (pixelSum != 765u && pixelSum != 192u) {
+        return x;
+      }
+    }
+    return (width-1) * 3;
+  };
+
+  // Check mine cart location meets expectations
+  const unsigned int mineCartColIdx1 = getFirstColIdxOfMineCart(img);
+  const unsigned int mineCartColIdx2 = getFirstColIdxOfMineCart(img2);
+  const unsigned int mineCartColIdx3 = getFirstColIdxOfMineCart(img3);
+  const unsigned int mineCartColIdx4 = getFirstColIdxOfMineCart(img4);
+
+  // Check that, in the pin cushion case, the mine cart is seen closer to the
+  // left in the new version. This makes sense as the new distortion mode
+  // should have more significant distortion than the legacy mode.
+  EXPECT_GT(mineCartColIdx1, mineCartColIdx2+15);
+  // Check that, in the barrel case, the mine cart is seen closer to the left
+  // in the legacy distortion mode than in the new mode. This makes sense
+  // because the legacy mode crops the image removing the edges where there
+  // is no image information.
+  EXPECT_LT(mineCartColIdx3, mineCartColIdx4-25);
+
+  delete[] img;
+  delete[] img2;
+  delete[] img3;
+  delete[] img4;
+}

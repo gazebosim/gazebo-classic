@@ -60,6 +60,14 @@ namespace gazebo
       /// black pixels at the corners of the image.
       public: bool distortionCrop = true;
 
+      /// \brief Use the legacy distortion mode. If this is set to false, the
+      /// new mode modifies how Brown's distortion equations are applied to
+      /// better reflect real distortion. The image is projected from image
+      /// plane to camera plane to apply distortion equations, then projected
+      /// back to image plane. Note that the new distortion doesn't allow
+      /// the image to be cropped.
+      public: bool legacyMode = true;
+
       /// \brief Lens distortion compositor
       public: Ogre::CompositorInstance *lensDistortionInstance;
 
@@ -122,6 +130,16 @@ void Distortion::Load(sdf::ElementPtr _sdf)
   {
     this->dataPtr->compositorName = _sdf->Get<std::string>(compositorName);
   }
+  const std::string legacyMode = "ignition:legacy_mode";
+  if (_sdf->HasElement(legacyMode))
+  {
+    this->dataPtr->legacyMode = _sdf->Get<bool>(legacyMode);
+  }
+  if (!this->dataPtr->legacyMode && this->dataPtr->distortionCrop)
+  {
+    gzwarn << "Enable legacy mode to use distortion cropping" << std::endl;
+    this->dataPtr->distortionCrop = false;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -160,12 +178,16 @@ void Distortion::SetCamera(CameraPtr _camera)
   // seems to work best with a square distortion map texture
   unsigned int texSide = _camera->ImageHeight() > _camera->ImageWidth() ?
       _camera->ImageHeight() : _camera->ImageWidth();
+  // calculate focal length from largest fov
+  const double fov = _camera->ImageHeight() > _camera->ImageWidth() ?
+      _camera->VFOV().Radian() : _camera->HFOV().Radian();
+  const double focalLength = texSide/(2*tan(fov/2));
   this->dataPtr->distortionTexWidth = texSide - 1;
   this->dataPtr->distortionTexHeight = texSide - 1;
   unsigned int imageSize =
       this->dataPtr->distortionTexWidth * this->dataPtr->distortionTexHeight;
-  double incrU = 1.0 / this->dataPtr->distortionTexWidth;
-  double incrV = 1.0 / this->dataPtr->distortionTexHeight;
+  double colStepSize = 1.0 / this->dataPtr->distortionTexWidth;
+  double rowStepSize = 1.0 / this->dataPtr->distortionTexHeight;
 
   // initialize distortion map
   this->dataPtr->distortionMap.resize(imageSize);
@@ -174,30 +196,96 @@ void Distortion::SetCamera(CameraPtr _camera)
     this->dataPtr->distortionMap[i] = -1;
   }
 
+  ignition::math::Vector2d distortionCenterCoordinates(
+      this->dataPtr->lensCenter.X() * this->dataPtr->distortionTexWidth,
+      this->dataPtr->lensCenter.Y() * this->dataPtr->distortionTexWidth);
+
+  // declare variables before the loop
+  const auto unsetPixelVector =  ignition::math::Vector2d(-1, -1);
+  ignition::math::Vector2d normalizedLocation,
+      distortedLocation,
+      newDistortedCoordinates,
+      currDistortedCoordinates;
+  unsigned int distortedIdx,
+      distortedCol,
+      distortedRow;
+  double normalizedColLocation, normalizedRowLocation;
+
   // fill the distortion map
-  for (unsigned int i = 0; i < this->dataPtr->distortionTexHeight; ++i)
+  for (unsigned int mapRow = 0; mapRow < this->dataPtr->distortionTexHeight;
+    ++mapRow)
   {
-    double v = i*incrV;
-    for (unsigned int j = 0; j < this->dataPtr->distortionTexWidth; ++j)
+    normalizedRowLocation = mapRow*rowStepSize;
+    for (unsigned int mapCol = 0; mapCol < this->dataPtr->distortionTexWidth;
+      ++mapCol)
     {
-      double u = j*incrU;
-      ignition::math::Vector2d uv(u, v);
-      ignition::math::Vector2d out =
-        this->Distort(uv, this->dataPtr->lensCenter,
+      normalizedColLocation = mapCol*colStepSize;
+
+      normalizedLocation[0] = normalizedColLocation;
+      normalizedLocation[1] = normalizedRowLocation;
+
+      if (this->dataPtr->legacyMode)
+      {
+        distortedLocation = this->Distort(
+            normalizedLocation,
+            this->dataPtr->lensCenter,
             this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
             this->dataPtr->p1, this->dataPtr->p2);
+      }
+      else
+      {
+        distortedLocation = this->Distort(
+            normalizedLocation,
+            this->dataPtr->lensCenter,
+            this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
+            this->dataPtr->p1, this->dataPtr->p2,
+            this->dataPtr->distortionTexWidth,
+            focalLength);
+      }
 
       // compute the index in the distortion map
-      unsigned int idxU = out.X() * this->dataPtr->distortionTexWidth;
-      unsigned int idxV = out.Y() * this->dataPtr->distortionTexHeight;
+      distortedCol = distortedLocation.X() * this->dataPtr->distortionTexWidth;
+      distortedRow = distortedLocation.Y() *
+        this->dataPtr->distortionTexHeight;
 
-      if (idxU < this->dataPtr->distortionTexWidth &&
-          idxV < this->dataPtr->distortionTexHeight)
+      // Note that the following makes sure that, for significant distortions,
+      // there is not a problem where the distorted image seems to fold over
+      // itself. This is accomplished by favoring pixels closer to the center
+      // of distortion, and this change applies to both the legacy and
+      // nonlegacy distortion modes.
+
+      // Make sure the distorted pixel is within the texture dimensions
+      if (distortedCol < this->dataPtr->distortionTexWidth &&
+          distortedRow < this->dataPtr->distortionTexHeight)
       {
-        unsigned int mapIdx = idxV * this->dataPtr->distortionTexWidth + idxU;
-        this->dataPtr->distortionMap[mapIdx] = uv;
+        distortedIdx = distortedRow * this->dataPtr->distortionTexWidth +
+          distortedCol;
+
+        // check if the index has already been set
+        if (this->dataPtr->distortionMap[distortedIdx] != unsetPixelVector)
+        {
+          // grab current coordinates that map to this destination
+          currDistortedCoordinates =
+            this->dataPtr->distortionMap[distortedIdx] *
+            this->dataPtr->distortionTexWidth;
+
+          // grab new coordinates to map to
+          newDistortedCoordinates[0] = mapCol;
+          newDistortedCoordinates[1] = mapRow;
+
+          // use the new mapping if it is closer to the center of the distortion
+          if (newDistortedCoordinates.Distance(distortionCenterCoordinates) <
+              currDistortedCoordinates.Distance(distortionCenterCoordinates))
+          {
+            this->dataPtr->distortionMap[distortedIdx] = normalizedLocation;
+          }
+        }
+        else
+        {
+          this->dataPtr->distortionMap[distortedIdx] = normalizedLocation;
+        }
       }
-      // else: pixel maps outside the image bounds.
+      // else: mapping is outside of the image bounds.
       // This is expected and normal to ensure
       // no black borders; carry on
     }
@@ -396,10 +484,19 @@ ignition::math::Vector2d Distortion::Distort(
     const ignition::math::Vector2d &_center, double _k1, double _k2, double _k3,
     double _p1, double _p2)
 {
+  return Distort(_in, _center, _k1, _k2, _k3, _p1, _p2, 1u, 1.0);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector2d Distortion::Distort(
+    const ignition::math::Vector2d &_in,
+    const ignition::math::Vector2d &_center, double _k1, double _k2, double _k3,
+    double _p1, double _p2, unsigned int _width, double _f)
+{
   // apply Brown's distortion model, see
   // http://en.wikipedia.org/wiki/Distortion_%28optics%29#Software_correction
 
-  ignition::math::Vector2d normalized2d = _in - _center;
+  ignition::math::Vector2d normalized2d = (_in - _center)*(_width/_f);
   ignition::math::Vector3d normalized(normalized2d.X(), normalized2d.Y(), 0);
   double rSq = normalized.X() * normalized.X() +
                normalized.Y() * normalized.Y();
@@ -416,14 +513,15 @@ ignition::math::Vector2d Distortion::Distort(
   dist.Y() += _p1 * (rSq + 2 * (normalized.Y()*normalized.Y())) +
       2 * _p2 * normalized.X() * normalized.Y();
 
-  return _center + ignition::math::Vector2d(dist.X(), dist.Y());
+  return ((_center*_width) +
+    ignition::math::Vector2d(dist.X(), dist.Y())*_f)/_width;
 }
 
 //////////////////////////////////////////////////
 void Distortion::SetCrop(const bool _crop)
 {
   // Only update the distortion scale if the crop value is going to flip.
-  if (this->dataPtr->distortionCrop != _crop)
+  if (this->dataPtr->distortionCrop != _crop && this->dataPtr->legacyMode)
   {
     this->dataPtr->distortionCrop = _crop;
     this->CalculateAndApplyDistortionScale();
