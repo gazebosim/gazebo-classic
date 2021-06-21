@@ -17,10 +17,6 @@ if (HAVE_GDAL)
   include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
-if (CURL_FOUND AND WIN32)
-  add_definitions(-DCURL_STATICLIB)
-endif()
-
 include_directories(${tinyxml_INCLUDE_DIRS})
 link_directories(${tinyxml_LIBRARY_DIRS})
 

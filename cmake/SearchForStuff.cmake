@@ -93,14 +93,15 @@ endif ()
 
 find_package(CURL)
 if (CURL_FOUND)
-  # FindCURL.cmake distributed with CMake exports
-  # the CURL_INCLUDE_DIRS variable, while the pkg_check_modules
-  # function exports the CURL_INCLUDEDIR variable.
-  # TODO: once the configure.bat VS2013 based script has been removed,
-  #       remove the call pkg_check_modules(CURL libcurl) and all the uses of
-  #       CURL_LIBDIR and CURL_INCLUDEDIR and use directly the variables
-  #       CURL_INCLUDE_DIRS and CURL_LIBRARIES provided by FindCURL.cmake
-  set(CURL_INCLUDEDIR ${CURL_INCLUDE_DIRS})
+  if (NOT TARGET CURL::libcurl)
+    # Make a target on Bionic because FindCURL.cmake only sets old-style CMake variables
+    add_library(CURL::libcurl INTERFACE)
+    target_include_directories(CURL::libcurl INTERFACE "${CURL_INCLUDE_DIRS}")
+    target_link_libraries(CURL::libcurl INTERFACE "${CURL_LIBRARIES}")
+    if (WIN32)
+      target_compile_definitions(CURL::libcurl INTERFACE "CURL_STATICLIB")
+    endif()
+  endif()
 endif ()
 
 # In Visual Studio we use configure.bat to trick all path cmake
@@ -110,13 +111,6 @@ if (MSVC)
 endif()
 
 if (PKG_CONFIG_FOUND)
-  if (NOT CURL_FOUND)
-    pkg_check_modules(CURL libcurl)
-  endif ()
-  if (NOT CURL_FOUND)
-    BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
-  endif()
-
   pkg_check_modules(PROFILER libprofiler)
   if (PROFILER_FOUND)
     set (CMAKE_LINK_FLAGS_PROFILE "-Wl,--no-as-needed -lprofiler -Wl,--as-needed ${CMAKE_LINK_FLAGS_PROFILE}" CACHE INTERNAL "Link flags for profile")

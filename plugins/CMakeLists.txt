@@ -28,7 +28,6 @@ if(WIN32 AND NOT UNIX)
 endif()
 
 include_directories(SYSTEM
-  ${CURL_INCLUDEDIR}
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
@@ -53,15 +52,11 @@ include_directories(SYSTEM
 # failures in clang.
 link_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${CURL_LIBDIR}
   ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
 )
 
-if (WIN32)
-  add_definitions(-DCURL_STATICLIB)
-endif()
 add_definitions(${Qt5Core_DEFINITIONS})
 set (CMAKE_AUTOMOC ON)
 
@@ -168,6 +163,7 @@ set (DARTplugins
 
 add_library(TrackedVehiclePlugin SHARED TrackedVehiclePlugin.cc)
 target_link_libraries(TrackedVehiclePlugin
+        CURL::libcurl
         libgazebo
         ${ogre_libraries}
         ${IGNITION-TRANSPORT_LIBRARIES}
@@ -181,6 +177,7 @@ gz_install_includes("plugins" TrackedVehiclePlugin.hh)
 foreach (src ${plugins_single_header})
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src}
+    CURL::libcurl
     libgazebo
     ${ogre_libraries}
     ${IGNITION-TRANSPORT_LIBRARIES}
@@ -203,6 +200,7 @@ add_dependencies(WheelTrackedVehiclePlugin TrackedVehiclePlugin)
 foreach (src ${plugins_private_header})
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src}
+    CURL::libcurl
     libgazebo
     ${ogre_libraries}
     ${IGNITION-TRANSPORT_LIBRARIES}
@@ -218,6 +216,7 @@ endforeach ()
 foreach (src ${GUIplugins})
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
   target_link_libraries(${src}
+                        CURL::libcurl
                         libgazebo
                         gazebo_gui
                         ${ogre_libraries}
@@ -237,6 +236,7 @@ if (HAVE_DART_URDF)
   foreach (src ${DARTplugins})
     add_library(${src} SHARED ${src}.cc)
     target_link_libraries(${src}
+      CURL::libcurl
       libgazebo
       ${DART_LIBRARIES}
     )
