@@ -92,18 +92,17 @@ endif ()
 # Find packages
 
 find_package(CURL)
-if (CURL_FOUND)
-  if (NOT TARGET CURL::libcurl)
-    # Make a target on Bionic because FindCURL.cmake only sets old-style CMake variables
-    add_library(CURL::libcurl SHARED IMPORTED)
+if (CURL_FOUND AND NOT TARGET CURL::libcurl AND CURL_LIBRARY)
+  message(STATUS "XXX CURL include dirs: ${CURL_INCLUDE_DIRS} libraries: ${CURL_LIBRARIES} curl library: ${CURL_LIBRARY} XXX")
+  # Make a target on Bionic because FindCURL.cmake only sets old-style CMake variables
+  add_library(CURL::libcurl SHARED IMPORTED)
+  set_target_properties(CURL::libcurl PROPERTIES
+    IMPORTED_LOCATION "${CURL_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${CURL_INCLUDE_DIRS}"
+    INTERFACE_LINK_LIBRARIES "${CURL_LIBRARIES}")
+  if (WIN32)
     set_target_properties(CURL::libcurl PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${CURL_INCLUDE_DIRS}"
-      INTERFACE_LINK_LIBRARIES "${CURL_LIBRARIES}")
-    message(STATUS "XXX CURL include dirs: ${CURL_INCLUDE_DIRS} libraries: ${CURL_LIBRARIES} XXX")
-    if (WIN32)
-      set_target_properties(CURL::libcurl PROPERTIES
-        INTERFACE_COMPILE_DEFINITIONS "CURL_STATICLIB")
-    endif()
+      INTERFACE_COMPILE_DEFINITIONS "CURL_STATICLIB")
   endif()
 endif ()
 
