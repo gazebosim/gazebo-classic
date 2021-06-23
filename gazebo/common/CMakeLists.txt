@@ -229,7 +229,6 @@ target_compile_definitions(gazebo_common
 target_link_libraries(gazebo_common
   PUBLIC
     ${Boost_LIBRARIES}
-    CURL::libcurl
     ${freeimage_LIBRARIES}
     ignition-common3::graphics
     ${IGNITION-FUEL_TOOLS_LIBRARIES}
@@ -240,6 +239,7 @@ target_link_libraries(gazebo_common
     ${SDFormat_LIBRARIES}
     ${tinyxml_LIBRARIES}
   PRIVATE
+    CURL::libcurl
     ${libtool_library}
     ${libavcodec_LIBRARIES}
     ${libavformat_LIBRARIES}
