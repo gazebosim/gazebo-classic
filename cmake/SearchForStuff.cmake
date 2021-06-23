@@ -93,7 +93,6 @@ endif ()
 
 find_package(CURL)
 if (CURL_FOUND AND NOT TARGET CURL::libcurl AND CURL_LIBRARY)
-  message(STATUS "XXX CURL include dirs: ${CURL_INCLUDE_DIRS} libraries: ${CURL_LIBRARIES} curl library: ${CURL_LIBRARY} XXX")
   # Make a target on Bionic because FindCURL.cmake only sets old-style CMake variables
   add_library(CURL::libcurl SHARED IMPORTED)
   set_target_properties(CURL::libcurl PROPERTIES
