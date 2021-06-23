@@ -176,7 +176,6 @@ gz_install_includes("plugins" TrackedVehiclePlugin.hh)
 foreach (src ${plugins_single_header})
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src}
-    CURL::libcurl
     libgazebo
     ${ogre_libraries}
     ${IGNITION-TRANSPORT_LIBRARIES}
@@ -192,6 +191,8 @@ target_include_directories(SimpleTrackedVehiclePlugin SYSTEM PRIVATE
         ${CMAKE_SOURCE_DIR}/deps/opende/include)
 target_link_libraries(SimpleTrackedVehiclePlugin TrackedVehiclePlugin)
 add_dependencies(SimpleTrackedVehiclePlugin TrackedVehiclePlugin)
+
+target_link_libraries(StaticMapPlugin CURL::libcurl)
 
 target_link_libraries(WheelTrackedVehiclePlugin TrackedVehiclePlugin)
 add_dependencies(WheelTrackedVehiclePlugin TrackedVehiclePlugin)
