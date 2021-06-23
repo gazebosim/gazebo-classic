@@ -163,7 +163,6 @@ set (DARTplugins
 
 add_library(TrackedVehiclePlugin SHARED TrackedVehiclePlugin.cc)
 target_link_libraries(TrackedVehiclePlugin
-        CURL::libcurl
         libgazebo
         ${ogre_libraries}
         ${IGNITION-TRANSPORT_LIBRARIES}
@@ -200,7 +199,6 @@ add_dependencies(WheelTrackedVehiclePlugin TrackedVehiclePlugin)
 foreach (src ${plugins_private_header})
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src}
-    CURL::libcurl
     libgazebo
     ${ogre_libraries}
     ${IGNITION-TRANSPORT_LIBRARIES}
@@ -216,7 +214,6 @@ endforeach ()
 foreach (src ${GUIplugins})
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
   target_link_libraries(${src}
-                        CURL::libcurl
                         libgazebo
                         gazebo_gui
                         ${ogre_libraries}
@@ -236,7 +233,6 @@ if (HAVE_DART_URDF)
   foreach (src ${DARTplugins})
     add_library(${src} SHARED ${src}.cc)
     target_link_libraries(${src}
-      CURL::libcurl
       libgazebo
       ${DART_LIBRARIES}
     )
