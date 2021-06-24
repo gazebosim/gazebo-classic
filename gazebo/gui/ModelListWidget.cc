@@ -407,7 +407,9 @@ void ModelListWidget::ProcessModelMsgs()
         for (int i = 0; i < (*iter).link_size(); ++i)
         {
           std::string linkName = (*iter).link(i).name();
-          int index = linkName.rfind("::") + 2;
+
+          // get unscoped name by stripping parent
+          int index = linkName.find(name) + name.length() + 2;
           std::string linkNameShort = linkName.substr(index,
                                                       linkName.size() - index);
 
@@ -436,7 +438,8 @@ void ModelListWidget::ProcessModelMsgs()
         {
           std::string jointName = (*iter).joint(i).name();
 
-          int index = jointName.rfind("::") + 2;
+          // get unscoped name by stripping parent
+          int index = jointName.find(name) + name.length() + 2;
           std::string jointNameShort = jointName.substr(
               index, jointName.size() - index);
 
