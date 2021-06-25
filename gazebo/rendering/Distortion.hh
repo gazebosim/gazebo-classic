@@ -54,7 +54,8 @@ namespace gazebo
       public: void SetCamera(CameraPtr _camera);
 
       /// \brief Set whether to crop the black border around the distorted
-      /// image points.
+      /// image points. Note that cropping only occurs for the legacy mode
+      /// distortion implementation.
       /// \param[in] _crop True to crop the black border
       /// \sa Crop
       public: void SetCrop(const bool _crop);
@@ -103,6 +104,24 @@ namespace gazebo
                   const ignition::math::Vector2d &_center,
                   double _k1, double _k2, double _k3,
                   double _p1, double _p2);
+
+      /// \brief Apply distortion model using camera coordinates projection
+      /// \param[in] _in Input uv coordinate.
+      /// \param[in] _center Normalized distortion center.
+      /// \param[in] _k1 Radial distortion coefficient k1.
+      /// \param[in] _k2 Radial distortion coefficient k2.
+      /// \param[in] _k3 Radial distortion coefficient k3.
+      /// \param[in] _p1 Tangential distortion coefficient p1.
+      /// \param[in] _p2 Tangential distortion coefficient p2.
+      /// \param[in] _width Width of the image texture in pixels.
+      /// \param[in] _f Focal length in pixels.
+      /// \return Distorted coordinate.
+      public: static ignition::math::Vector2d Distort(
+                  const ignition::math::Vector2d &_in,
+                  const ignition::math::Vector2d &_center,
+                  double _k1, double _k2, double _k3,
+                  double _p1, double _p2,
+                  unsigned int _width, double _f);
 
       /// \brief get the distortion map value.
       /// \return the distortion map value at the specified index,
