@@ -72,6 +72,7 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   QImage::Format qFormat;
   bool isDepthImage = false;
+  bool isReflectanceImage = false;
   switch (_msg.pixel_format())
   {
     case common::Image::PixelFormat::L_INT8:
@@ -84,6 +85,12 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
     {
       qFormat = QImage::Format_RGB888;
       isDepthImage = true;
+      break;
+    }
+    case common::Image::PixelFormat::UNKNOWN_PIXEL_FORMAT:
+    {
+      qFormat = QImage::Format_RGB888;
+      isReflectanceImage = true;
       break;
     }
     default:
@@ -108,7 +115,7 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   }
 
   // Convert the image data to RGB
-  if (isDepthImage)
+  if (isDepthImage || isReflectanceImage)
   {
     unsigned int depthSamples = _msg.width() * _msg.height();
     float f;
@@ -118,7 +125,8 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
     if (!this->dataPtr->depthBuffer)
       this->dataPtr->depthBuffer = new float[depthSamples];
 
-    if (_msg.pixel_format() == common::Image::PixelFormat::R_FLOAT32)
+    if (_msg.pixel_format() == common::Image::PixelFormat::R_FLOAT32 ||
+        _msg.pixel_format() == common::Image::PixelFormat::UNKNOWN_PIXEL_FORMAT)
     {
       memcpy(this->dataPtr->depthBuffer, _msg.data().c_str(), depthBufferSize);
     }
@@ -159,7 +167,12 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
       for (unsigned int i = 0; i < _msg.width(); ++i)
       {
         float d = this->dataPtr->depthBuffer[idx++];
-        d = 255 - (d * factor);
+        if (isDepthImage) {
+          d = 255 - (d * factor);
+        }
+        else if (isReflectanceImage) {
+          d *= factor;
+        }
         QRgb value = qRgb(d, d, d);
         this->dataPtr->image.setPixel(i, j, value);
       }

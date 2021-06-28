@@ -204,7 +204,7 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
     msgs::Set(msg.mutable_time(), this->scene->SimTime());
     msg.mutable_image()->set_width(this->camera->ImageWidth());
     msg.mutable_image()->set_height(this->camera->ImageHeight());
-    msg.mutable_image()->set_pixel_format(common::Image::R_FLOAT32);
+    msg.mutable_image()->set_pixel_format(common::Image::UNKNOWN_PIXEL_FORMAT);
 
     msg.mutable_image()->set_step(this->camera->ImageWidth() *
         this->camera->ImageDepth());
