@@ -28,6 +28,7 @@ namespace gazebo
   /// \brief Plugin that adds lens flare effect to a camera or multicamera
   /// sensor
   /// The plugin has the following optional parameter:
+  /// <compositor>  Name of the lens flare compositor to use.
   /// <scale>       Scale of lens flare. Must be greater than 0
   /// <color>       Color of lens flare.
   /// \todo A potentially useful feature would be an option for constantly

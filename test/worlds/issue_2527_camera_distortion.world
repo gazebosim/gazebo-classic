@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <pose>1.5 0 0 0 -1.57 0</pose>
+      <uri>model://checkerboard_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://cameras_with_distortion</uri>
+    </include>
+
+    <include>
+      <pose>0 0.2 0 0 0 0</pose>
+      <uri>model://camera_barrel</uri>
+    </include>
+
+    <include>
+      <pose>0 -0.2 0 0 0 0</pose>
+      <uri>model://camera_pincushion</uri>
+    </include>
+
+    <gui>
+      <camera name="user">
+        <pose>-2 -2 1 0 0.25 0.50</pose>
+      </camera>
+    </gui>
+  </world>
+</sdf>

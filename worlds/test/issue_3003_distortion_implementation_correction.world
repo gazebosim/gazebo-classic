@@ -1,0 +1,66 @@
+<sdf version='1.7'>
+  <world name='default' xmlns:ignition='http://ignitionrobotics.org/schema'>
+    <scene>
+      <shadows>0</shadows>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>1 1 1 1</background>
+    </scene>
+    <model name='minecart'>
+      <static>1</static>
+      <link name='base_link'>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/mine cart/4/files/meshes/minecart.dae
+</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='polySurface1278_visual'>
+          <geometry>
+            <mesh>
+              <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/mine cart/4/files/meshes/minecart.dae</uri>
+              <submesh>
+                <name>polySurface1278</name>
+                <center>0</center>
+              </submesh>
+            </mesh>
+          </geometry>
+          <material>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>1 1 1 1</specular>
+            <pbr>
+              <metal>
+                <albedo_map>materials/textures/MineCart_Albedo.png</albedo_map>
+                <metalness_map>materials/textures/MineCart_Metalness.png</metalness_map>
+                <roughness_map>materials/textures/MineCart_Roughness.png</roughness_map>
+              </metal>
+            </pbr>
+            <script>
+              <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/mine cart/4/files/materials/scripts/</uri>
+              <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/mine cart/4/files/materials/textures/</uri>
+              <name>UrbanTile/MineCart_Diffuse</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>3 1 0 0 -0 0</pose>
+    </model>
+  </world>
+</sdf>
