@@ -28,6 +28,9 @@ class LightMaker_TEST : public QTestFixture
   /// \brief Test creating a point light.
   private slots: void PointLight();
 
+  /// \brief Test creating a spot light.
+  private slots: void SpotLight();
+
   /// \brief Test creating a point light as a copy.
   private slots: void CopyLight();
 };

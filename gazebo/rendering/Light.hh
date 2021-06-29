@@ -182,13 +182,25 @@ namespace gazebo
       public: void SetAttenuation(double _constant, double _linear,
                                   double _quadratic);
 
+      /// \brief Get the spot light inner angle
+      /// \return The inner angle in radians (or NaN if the light is not spot).
+      public: double SpotInnerAngle() const;
+
       /// \brief Set the spot light inner angle
       /// \param[in] _angle Inner angle in radians
       public: void SetSpotInnerAngle(const double _angle);
 
+      /// \brief Get the spot light outer angle
+      /// \return The outer angle in radians (or NaN if the light is not spot).
+      public: double SpotOuterAngle() const;
+
       /// \brief Set the spot light outer angle
       /// \param[in] _angle Outer angle in radians
       public: void SetSpotOuterAngle(const double _angle);
+
+      /// \brief Get the spot light falloff
+      /// \return The falloff value (or NaN if the light is not spot).
+      public: double SpotFalloff() const;
 
       /// \brief Set the spot light falloff
       /// \param[in] _value Falloff value
