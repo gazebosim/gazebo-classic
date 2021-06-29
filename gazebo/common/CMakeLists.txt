@@ -17,14 +17,6 @@ if (HAVE_GDAL)
   include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
-if (CURL_FOUND)
-  include_directories(${CURL_INCLUDEDIR})
-  link_directories(${CURL_LIBDIR})
-  if (WIN32)
-    add_definitions(-DCURL_STATICLIB)
-  endif()
-endif()
-
 include_directories(${tinyxml_INCLUDE_DIRS})
 link_directories(${tinyxml_LIBRARY_DIRS})
 
@@ -237,7 +229,6 @@ target_compile_definitions(gazebo_common
 target_link_libraries(gazebo_common
   PUBLIC
     ${Boost_LIBRARIES}
-    ${CURL_LIBRARIES}
     ${freeimage_LIBRARIES}
     ignition-common3::graphics
     ${IGNITION-FUEL_TOOLS_LIBRARIES}
@@ -248,6 +239,7 @@ target_link_libraries(gazebo_common
     ${SDFormat_LIBRARIES}
     ${tinyxml_LIBRARIES}
   PRIVATE
+    CURL::libcurl
     ${libtool_library}
     ${libavcodec_LIBRARIES}
     ${libavformat_LIBRARIES}
