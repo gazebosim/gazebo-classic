@@ -169,14 +169,15 @@ ModelRightMenu::~ModelRightMenu()
 void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     EntityTypes _type)
 {
+
   // Find out the entity type
-  if (_type == EntityTypes::MODEL)
-  {
-    this->entityName = _entityName.substr(0, _entityName.find("::"));
-  }
-  else if (_type == EntityTypes::LINK || _type == EntityTypes::LIGHT)
+  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
   {
     this->entityName = _entityName;
+  }
+  else if (_type == EntityTypes::LINK)
+  {
+    this->entityName = _entityName.substr(0, _entityName.rfind("::"));
   }
 
   QMenu menu;
@@ -287,12 +288,26 @@ void ModelRightMenu::OnApplyWrench()
   {
     modelName = this->entityName;
     // If model selected just take the first link
-    linkName = vis->GetChild(0)->Name();
+    for(unsigned int i = 0; i < vis->GetChildCount(); i++){
+      rendering::VisualPtr currentChild = vis->GetChild(i);
+      if(currentChild->GetType() == rendering::Visual::VT_LINK){
+        linkName = currentChild->Name();
+        break;
+      }
+    }
+
+    //TODO: Determine what to do with model without any links
   }
   else
   {
-    modelName = vis->GetRootVisual()->Name();
-    linkName = this->entityName;
+    modelName = this->entityName;
+    for(unsigned int i = 0; i < vis->GetChildCount(); i++){
+      rendering::VisualPtr currentChild = vis->GetChild(i);
+      if(currentChild->GetType() == rendering::Visual::VT_LINK){
+        linkName = currentChild->Name();
+        break;
+      }
+    }
   }
 
   applyWrenchDialog->Init(modelName, linkName);
