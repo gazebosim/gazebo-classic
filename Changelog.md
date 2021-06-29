@@ -2,6 +2,9 @@
 
 ## Gazebo 11.7.0 (2021-06-xx)
 
+1. Qualify `gazebo::util` in `using namespace` declarations.
+    * [Pull request #2979](https://github.com/osrf/gazebo/pull/2979)
+
 1. Distortion camera initialization fix
     * [Issue #2527](https://github.com/osrf/gazebo/issues/2527)
     * [Pull request #3033](https://github.com/osrf/gazebo/pull/3033)
