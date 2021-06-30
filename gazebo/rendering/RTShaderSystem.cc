@@ -477,7 +477,9 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
   // Core shader lib not found -> shader generating will fail.
   if (coreLibsPath.empty())
   {
-    gzerr << "Unable to find shader lib. Shader generating will fail.";
+    gzerr << "Unable to find shader lib. Shader generating will fail. "
+          << "Your GAZEBO_RESOURCE_PATH is probably improperly set. "
+          << "Have you sourced <prefix>/share/gazebo/setup.sh?\n";
     return false;
   }
 

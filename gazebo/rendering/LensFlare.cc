@@ -349,6 +349,16 @@ namespace gazebo
       public: std::shared_ptr<LensFlareCompositorListener>
           lensFlareCompositorListener;
 
+      /// \brief Scale of lens flare.
+      public: double lensFlareScale = 1.0;
+
+      /// \brief Color of lens flare.
+      public: ignition::math::Vector3d lensFlareColor
+          = ignition::math::Vector3d(1.0, 1.0, 1.0);
+
+      /// \brief Compositor name to be used for lens flare
+      public: std::string compositorName = "CameraLensFlare/Default";
+
       /// \brief Pointer to camera
       public: CameraPtr camera;
 
@@ -369,13 +379,6 @@ namespace gazebo
 
       /// \brief Connection for the pre render event.
       public: event::ConnectionPtr preRenderConnection;
-
-      /// \brief Scale of lens flare.
-      public: double lensFlareScale = 1.0;
-
-      /// \brief Color of lens flare.
-      public: ignition::math::Vector3d lensFlareColor
-          = ignition::math::Vector3d(1.0, 1.0, 1.0);
     };
   }
 }
@@ -423,7 +426,7 @@ void LensFlare::SetCamera(CameraPtr _camera)
 
     this->dataPtr->lensFlareInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(
-        this->dataPtr->camera->OgreViewport(), "CameraLensFlare/Default");
+        this->dataPtr->camera->OgreViewport(), this->dataPtr->compositorName);
     this->dataPtr->lensFlareInstance->getTechnique()->getOutputTargetPass()->
         getPass(0)->setMaterial(lensFlareMaterial);
 
@@ -458,6 +461,12 @@ void LensFlare::SetColor(const ignition::math::Vector3d &_color)
     this->dataPtr->lensFlareCompositorListener->SetColor(
         this->dataPtr->lensFlareColor);
   }
+}
+
+//////////////////////////////////////////////////
+void LensFlare::SetCompositorName(const std::string &_name)
+{
+  this->dataPtr->compositorName = _name;
 }
 
 //////////////////////////////////////////////////
