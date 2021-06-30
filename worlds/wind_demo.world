@@ -320,6 +320,7 @@
 
     <!-- Load the plugin for the wind -->
     <plugin name="wind" filename="libWindPlugin.so">
+      <force_approximation_scaling_factor>1</force_approximation_scaling_factor>
       <horizontal>
         <magnitude>
           <time_for_rise>10</time_for_rise>
