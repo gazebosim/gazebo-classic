@@ -281,15 +281,15 @@ void ModelRightMenu::OnApplyWrench()
   {
     modelName = this->entityName;
     // If model selected just take the first link
-    for(unsigned int i = 0; i < vis->GetChildCount(); i++){
+    for(unsigned int i = 0; i < vis->GetChildCount(); ++i)
+    {
       rendering::VisualPtr currentChild = vis->GetChild(i);
-      if(currentChild->GetType() == rendering::Visual::VT_LINK){
+      if(currentChild->GetType() == rendering::Visual::VT_LINK)
+      {
         linkName = currentChild->Name();
         break;
       }
     }
-
-    //TODO: Determine what to do with model without any links
   }
   else
   {
