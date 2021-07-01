@@ -29,11 +29,11 @@ int main(int _argc, char **_argv)
   // Create the marker message
   ignition::msgs::Marker markerMsg;
   markerMsg.set_ns("default");
-  markerMsg.set_id(1);
-  // id 0 has a special meaning of representing an is which hasn't been set
+  // 0 has a special meaning of representing an id which hasn't been set
   // Thus, when 0 is given as an argument to set_id, it generates a random (but unique) id,
   // and sets the marker's id value to that randomly generated id.
   // A new marker is created at every invocation of set_id(0).
+  markerMsg.set_id(1);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::SPHERE);
 
