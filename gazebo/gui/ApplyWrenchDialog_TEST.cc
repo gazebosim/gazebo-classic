@@ -32,7 +32,7 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   this->shareMaxPercentChange = 2.0;
 
   // World with one model which has 2 links, no ground plane and gravity is off
-  this->Load("worlds/multilink_shape.world", false, false, false);
+  this->Load("worlds/nested_multilink_shape.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
