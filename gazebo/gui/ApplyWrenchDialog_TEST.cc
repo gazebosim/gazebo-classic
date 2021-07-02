@@ -49,200 +49,219 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   gazebo::rendering::ScenePtr scene = cam->GetScene();
   QVERIFY(scene != nullptr);
 
-  // Get the model
-  gazebo::rendering::VisualPtr modelVis = scene->GetVisual("multilink");
-  QVERIFY(modelVis != nullptr);
+  //Test parameters for regular and nested models
+  const unsigned int testCount = 2;
+  std::string modelNameList[testCount] = {"multilink", "nested_outer::nested_inner"};
+  std::string boxLinkList[testCount] = {"box_link", "nested_box_link"};
+  std::string sphereLinkList[testCount] = {"sphere_link", "nested_sphere_link"};
 
-  // Get the box link
-  gazebo::rendering::VisualPtr boxLinkVis =
-      scene->GetVisual("multilink::box_link");
-  QVERIFY(boxLinkVis != nullptr);
-  auto boxLinkPose = boxLinkVis->WorldPose();
-  QVERIFY(boxLinkPose == boxLinkVis->WorldPose());
-
-  // Get the sphere link
-  gazebo::rendering::VisualPtr sphereLinkVis =
-      scene->GetVisual("multilink::sphere_link");
-  QVERIFY(sphereLinkVis != nullptr);
-  auto sphereLinkPose = sphereLinkVis->WorldPose();
-  QVERIFY(sphereLinkPose == sphereLinkVis->WorldPose());
-
-  // Check that an inexistent model doesn't break anything
-  gazebo::gui::ApplyWrenchDialog *applyWrenchDialogFakeModel =
-      new gazebo::gui::ApplyWrenchDialog();
-  applyWrenchDialogFakeModel->Init("fake_model", "fake_link");
-
-  // Check that an inexistent link doesn't break anything
-  gazebo::gui::ApplyWrenchDialog *applyWrenchDialogFakeLink =
-      new gazebo::gui::ApplyWrenchDialog();
-  applyWrenchDialogFakeLink->Init("multilink", "fake_link");
-
-  // Initialize dialog with the box link
-  gazebo::gui::ApplyWrenchDialog *applyWrenchDialog =
-      new gazebo::gui::ApplyWrenchDialog();
-  applyWrenchDialog->Init("multilink", "multilink::box_link");
-
-  // Get combo box
-  QList<QComboBox *> comboBoxes =
-      applyWrenchDialog->findChildren<QComboBox *>();
-  QVERIFY(comboBoxes.size() == 1u);
-
-  // Check the combo box's items
-  QVERIFY(comboBoxes[0]->count() == 2u);
-  QVERIFY(comboBoxes[0]->itemText(0) == "box_link");
-  QVERIFY(comboBoxes[0]->itemText(1) == "sphere_link");
-  QVERIFY(comboBoxes[0]->currentIndex() == 0u);
-
-  // Get radio buttons
-  QList<QRadioButton *> radioButtons =
-      applyWrenchDialog->findChildren<QRadioButton *>();
-  QVERIFY(radioButtons.size() == 2u);
-
-  // Get spins
-  QList<QDoubleSpinBox *> spins =
-      applyWrenchDialog->findChildren<QDoubleSpinBox *>();
-  QVERIFY(spins.size() == 11u);
-
-  // Get buttons
-  QList<QPushButton *> buttons =
-      applyWrenchDialog->findChildren<QPushButton *>();
-  QVERIFY(buttons.size() == 6u);
-
-  QPushButton *applyForceButton = nullptr;
-  QPushButton *applyTorqueButton = nullptr;
-  QPushButton *applyAllButton = nullptr;
-  QPushButton *clearForceButton = nullptr;
-  QPushButton *clearTorqueButton = nullptr;
-  QPushButton *cancelButton = nullptr;
-  for (auto it : buttons)
+  for (unsigned int i = 0; i < testCount; ++i)
   {
-    QVERIFY(it);
-    if (it->text().toLower().toStdString() == "apply force")
-      applyForceButton = it;
-    else if (it->text().toLower().toStdString() == "apply torque")
-      applyTorqueButton = it;
-    else if (it->text().toLower().toStdString() == "apply all")
-      applyAllButton = it;
-    else if (it->text().toLower().toStdString() == "clear" && !clearForceButton)
-      clearForceButton = it;
-    else if (it->text().toLower().toStdString() == "clear")
-      clearTorqueButton = it;
-    else if (it->text().toLower().toStdString() == "cancel")
-      cancelButton = it;
+    //QString defines operator== for c-strings, but not std::string
+    const char *currentModel = modelNameList[i].c_str();
+    const char *currentUnscopedBoxLink = boxLinkList[i].c_str();
+    const char *currentUnscopedSphereLink = sphereLinkList[i].c_str();
+    std::string _scopedBoxLink = modelNameList[i] + "::" + boxLinkList[i];
+    std::string _scopedSphereLink = modelNameList[i] + "::" + sphereLinkList[i];
+    const char *currentScopedBoxLink = _scopedBoxLink.c_str();
+    const char *currentScopedSphereLink = _scopedSphereLink.c_str();
+
+    // Get the model
+    gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNameList[i]);
+    QVERIFY(modelVis != nullptr);
+
+    // Get the box link
+    gazebo::rendering::VisualPtr boxLinkVis =
+        scene->GetVisual(currentScopedBoxLink);
+    QVERIFY(boxLinkVis != nullptr);
+    auto boxLinkPose = boxLinkVis->WorldPose();
+    QVERIFY(boxLinkPose == boxLinkVis->WorldPose());
+
+    // Get the sphere link
+    gazebo::rendering::VisualPtr sphereLinkVis =
+        scene->GetVisual(currentScopedSphereLink);
+    QVERIFY(sphereLinkVis != nullptr);
+    auto sphereLinkPose = sphereLinkVis->WorldPose();
+    QVERIFY(sphereLinkPose == sphereLinkVis->WorldPose());
+
+    // Check that an inexistent model doesn't break anything
+    gazebo::gui::ApplyWrenchDialog *applyWrenchDialogFakeModel =
+        new gazebo::gui::ApplyWrenchDialog();
+    applyWrenchDialogFakeModel->Init("fake_model", "fake_link");
+
+    // Check that an inexistent link doesn't break anything
+    gazebo::gui::ApplyWrenchDialog *applyWrenchDialogFakeLink =
+        new gazebo::gui::ApplyWrenchDialog();
+    applyWrenchDialogFakeLink->Init(currentModel, "fake_link");
+
+    // Initialize dialog with the box link
+    gazebo::gui::ApplyWrenchDialog *applyWrenchDialog =
+        new gazebo::gui::ApplyWrenchDialog();
+    applyWrenchDialog->Init(currentModel, currentScopedBoxLink);
+
+    // Get combo box
+    QList<QComboBox *> comboBoxes =
+        applyWrenchDialog->findChildren<QComboBox *>();
+    QVERIFY(comboBoxes.size() == 1u);
+
+    // Check the combo box's items
+    QVERIFY(comboBoxes[0]->count() == 2u);
+    QVERIFY(comboBoxes[0]->itemText(0) == currentUnscopedBoxLink);
+    QVERIFY(comboBoxes[0]->itemText(1) == currentUnscopedSphereLink);
+    QVERIFY(comboBoxes[0]->currentIndex() == 0u);
+
+    // Get radio buttons
+    QList<QRadioButton *> radioButtons =
+        applyWrenchDialog->findChildren<QRadioButton *>();
+    QVERIFY(radioButtons.size() == 2u);
+
+    // Get spins
+    QList<QDoubleSpinBox *> spins =
+        applyWrenchDialog->findChildren<QDoubleSpinBox *>();
+    QVERIFY(spins.size() == 11u);
+
+    // Get buttons
+    QList<QPushButton *> buttons =
+        applyWrenchDialog->findChildren<QPushButton *>();
+    QVERIFY(buttons.size() == 6u);
+
+    QPushButton *applyForceButton = nullptr;
+    QPushButton *applyTorqueButton = nullptr;
+    QPushButton *applyAllButton = nullptr;
+    QPushButton *clearForceButton = nullptr;
+    QPushButton *clearTorqueButton = nullptr;
+    QPushButton *cancelButton = nullptr;
+    for (auto it : buttons)
+    {
+      QVERIFY(it);
+      if (it->text().toLower().toStdString() == "apply force")
+        applyForceButton = it;
+      else if (it->text().toLower().toStdString() == "apply torque")
+        applyTorqueButton = it;
+      else if (it->text().toLower().toStdString() == "apply all")
+        applyAllButton = it;
+      else if (it->text().toLower().toStdString() == "clear" && !clearForceButton)
+        clearForceButton = it;
+      else if (it->text().toLower().toStdString() == "clear")
+        clearTorqueButton = it;
+      else if (it->text().toLower().toStdString() == "cancel")
+        cancelButton = it;
+    }
+    QVERIFY(applyForceButton);
+    QVERIFY(applyTorqueButton);
+    QVERIFY(applyAllButton);
+    QVERIFY(clearForceButton);
+    QVERIFY(clearTorqueButton);
+    QVERIFY(cancelButton);
+
+    // Set and apply force on X axis, magnitude 1000
+    spins[0]->setValue(1.0);
+    spins[3]->setValue(1000.0);
+    applyForceButton->click();
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // Check that force spin was updated according to magnitude
+    QCOMPARE(spins[0]->value(), 1000.0);
+
+    // Check that link moved on X axis
+    QVERIFY(boxLinkPose.Pos().X() < boxLinkVis->WorldPose().Pos().X());
+    QVERIFY(boxLinkPose.Pos().Y() -
+        boxLinkVis->WorldPose().Pos().Y() < 1e-6);
+    QVERIFY(boxLinkPose.Pos().Z() -
+        boxLinkVis->WorldPose().Pos().Z() < 1e-6);
+    QCOMPARE(boxLinkPose.Rot(), boxLinkVis->WorldPose().Rot());
+
+    // Save current pose
+    boxLinkPose = boxLinkVis->WorldPose();
+
+    // Set and apply torque about -Z axis, magnitude 1000
+    spins[9]->setValue(-1.0);
+    spins[10]->setValue(1000.0);
+    applyTorqueButton->click();
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // Check that torque spin was updated according to magnitude
+    QCOMPARE(spins[9]->value(), -1000.0);
+
+    // Check that link rotated
+    QVERIFY(boxLinkPose.Pos().X() < boxLinkVis->WorldPose().Pos().X());
+    QVERIFY(boxLinkPose.Pos().Y() -
+        boxLinkVis->WorldPose().Pos().Y() < 1e-6);
+    QVERIFY(boxLinkPose.Pos().Z() -
+        boxLinkVis->WorldPose().Pos().Z() < 1e-6);
+    QVERIFY(boxLinkPose.Rot() != boxLinkVis->WorldPose().Rot());
+
+    // Save current pose
+    boxLinkPose = boxLinkVis->WorldPose();
+
+    // Apply force and torque
+    applyAllButton->click();
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // Check that link translated and rotated
+    QVERIFY(boxLinkPose.Pos() != boxLinkVis->WorldPose().Pos());
+    QVERIFY(boxLinkPose.Rot() != boxLinkVis->WorldPose().Rot());
+
+    // Change link
+    comboBoxes[0]->setCurrentIndex(1);
+    QVERIFY(comboBoxes[0]->currentText() == currentUnscopedSphereLink);
+
+    // Clear force
+    clearForceButton->click();
+    QCOMPARE(spins[0]->value(), 0.0);
+    QCOMPARE(spins[1]->value(), 0.0);
+    QCOMPARE(spins[2]->value(), 0.0);
+    QCOMPARE(spins[3]->value(), 0.0);
+
+    // Clear torque
+    clearTorqueButton->click();
+    QCOMPARE(spins[7]->value(), 0.0);
+    QCOMPARE(spins[8]->value(), 0.0);
+    QCOMPARE(spins[9]->value(), 0.0);
+    QCOMPARE(spins[10]->value(), 0.0);
+
+    // Apply zero force and torque
+    applyAllButton->click();
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // Check that link didn't move
+    QVERIFY(sphereLinkPose.Pos() == sphereLinkVis->WorldPose().Pos());
+    QVERIFY(sphereLinkPose.Rot() == sphereLinkVis->WorldPose().Rot());
+
+    // Set and apply force on Y axis with an offset on X
+    spins[1]->setValue(1000.0);
+    spins[4]->setValue(1.0);
+    applyForceButton->click();
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // Check that link translated and rotated
+    QVERIFY(sphereLinkPose.Pos() != sphereLinkVis->WorldPose().Pos());
+    QVERIFY(sphereLinkPose.Rot() != sphereLinkVis->WorldPose().Rot());
+
+    // Select CoM as application point
+    radioButtons[0]->click();
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // Check that force offset spins were updated
+    QCOMPARE(spins[4]->value(), 0.0);
+    QCOMPARE(spins[5]->value(), 0.0);
+    QCOMPARE(spins[6]->value(), 0.0);
+
+    // Close dialog
+    cancelButton->click();
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    delete applyWrenchDialog;
   }
-  QVERIFY(applyForceButton);
-  QVERIFY(applyTorqueButton);
-  QVERIFY(applyAllButton);
-  QVERIFY(clearForceButton);
-  QVERIFY(clearTorqueButton);
-  QVERIFY(cancelButton);
 
-  // Set and apply force on X axis, magnitude 1000
-  spins[0]->setValue(1.0);
-  spins[3]->setValue(1000.0);
-  applyForceButton->click();
-
-  this->ProcessEventsAndDraw(mainWindow);
-
-  // Check that force spin was updated according to magnitude
-  QCOMPARE(spins[0]->value(), 1000.0);
-
-  // Check that link moved on X axis
-  QVERIFY(boxLinkPose.Pos().X() < boxLinkVis->WorldPose().Pos().X());
-  QVERIFY(boxLinkPose.Pos().Y() -
-      boxLinkVis->WorldPose().Pos().Y() < 1e-6);
-  QVERIFY(boxLinkPose.Pos().Z() -
-      boxLinkVis->WorldPose().Pos().Z() < 1e-6);
-  QCOMPARE(boxLinkPose.Rot(), boxLinkVis->WorldPose().Rot());
-
-  // Save current pose
-  boxLinkPose = boxLinkVis->WorldPose();
-
-  // Set and apply torque about -Z axis, magnitude 1000
-  spins[9]->setValue(-1.0);
-  spins[10]->setValue(1000.0);
-  applyTorqueButton->click();
-
-  this->ProcessEventsAndDraw(mainWindow);
-
-  // Check that torque spin was updated according to magnitude
-  QCOMPARE(spins[9]->value(), -1000.0);
-
-  // Check that link rotated
-  QVERIFY(boxLinkPose.Pos().X() < boxLinkVis->WorldPose().Pos().X());
-  QVERIFY(boxLinkPose.Pos().Y() -
-      boxLinkVis->WorldPose().Pos().Y() < 1e-6);
-  QVERIFY(boxLinkPose.Pos().Z() -
-      boxLinkVis->WorldPose().Pos().Z() < 1e-6);
-  QVERIFY(boxLinkPose.Rot() != boxLinkVis->WorldPose().Rot());
-
-  // Save current pose
-  boxLinkPose = boxLinkVis->WorldPose();
-
-  // Apply force and torque
-  applyAllButton->click();
-
-  this->ProcessEventsAndDraw(mainWindow);
-
-  // Check that link translated and rotated
-  QVERIFY(boxLinkPose.Pos() != boxLinkVis->WorldPose().Pos());
-  QVERIFY(boxLinkPose.Rot() != boxLinkVis->WorldPose().Rot());
-
-  // Change link
-  comboBoxes[0]->setCurrentIndex(1);
-  QVERIFY(comboBoxes[0]->currentText() == "sphere_link");
-
-  // Clear force
-  clearForceButton->click();
-  QCOMPARE(spins[0]->value(), 0.0);
-  QCOMPARE(spins[1]->value(), 0.0);
-  QCOMPARE(spins[2]->value(), 0.0);
-  QCOMPARE(spins[3]->value(), 0.0);
-
-  // Clear torque
-  clearTorqueButton->click();
-  QCOMPARE(spins[7]->value(), 0.0);
-  QCOMPARE(spins[8]->value(), 0.0);
-  QCOMPARE(spins[9]->value(), 0.0);
-  QCOMPARE(spins[10]->value(), 0.0);
-
-  // Apply zero force and torque
-  applyAllButton->click();
-
-  this->ProcessEventsAndDraw(mainWindow);
-
-  // Check that link didn't move
-  QVERIFY(sphereLinkPose.Pos() == sphereLinkVis->WorldPose().Pos());
-  QVERIFY(sphereLinkPose.Rot() == sphereLinkVis->WorldPose().Rot());
-
-  // Set and apply force on Y axis with an offset on X
-  spins[1]->setValue(1000.0);
-  spins[4]->setValue(1.0);
-  applyForceButton->click();
-
-  this->ProcessEventsAndDraw(mainWindow);
-
-  // Check that link translated and rotated
-  QVERIFY(sphereLinkPose.Pos() != sphereLinkVis->WorldPose().Pos());
-  QVERIFY(sphereLinkPose.Rot() != sphereLinkVis->WorldPose().Rot());
-
-  // Select CoM as application point
-  radioButtons[0]->click();
-
-  this->ProcessEventsAndDraw(mainWindow);
-
-  // Check that force offset spins were updated
-  QCOMPARE(spins[4]->value(), 0.0);
-  QCOMPARE(spins[5]->value(), 0.0);
-  QCOMPARE(spins[6]->value(), 0.0);
-
-  // Close dialog
-  cancelButton->click();
-
-  this->ProcessEventsAndDraw(mainWindow);
-
-  delete applyWrenchDialog;
-
+  //Cleanup
   cam->Fini();
   mainWindow->close();
   delete mainWindow;
