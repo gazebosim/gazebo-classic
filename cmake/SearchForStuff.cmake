@@ -303,7 +303,7 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find TBB
-  pkg_check_modules(TBB tbb)
+  pkg_check_modules(TBB tbb<2021)
   set (TBB_PKG_CONFIG "tbb")
   if (NOT TBB_FOUND)
     message(STATUS "TBB not found, attempting to detect manually")
