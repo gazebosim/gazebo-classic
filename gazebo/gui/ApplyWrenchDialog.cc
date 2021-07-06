@@ -488,7 +488,8 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
     rendering::VisualPtr childVis = vis->GetChild(i);
 
     // Skip all children that aren't links
-    if(childVis->GetType() != rendering::Visual::VT_LINK){
+    if (childVis->GetType() != rendering::Visual::VT_LINK)
+    {
       continue;
     }
 

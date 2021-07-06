@@ -169,7 +169,6 @@ ModelRightMenu::~ModelRightMenu()
 void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     EntityTypes _type)
 {
-
   // Set to scoped name
   this->entityName = _entityName;
 
@@ -281,10 +280,10 @@ void ModelRightMenu::OnApplyWrench()
   {
     modelName = this->entityName;
     // If model selected just take the first link
-    for(unsigned int i = 0; i < vis->GetChildCount(); ++i)
+    for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
     {
       rendering::VisualPtr currentChild = vis->GetChild(i);
-      if(currentChild->GetType() == rendering::Visual::VT_LINK)
+      if (currentChild->GetType() == rendering::Visual::VT_LINK)
       {
         linkName = currentChild->Name();
         break;

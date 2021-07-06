@@ -49,15 +49,16 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   gazebo::rendering::ScenePtr scene = cam->GetScene();
   QVERIFY(scene != nullptr);
 
-  //Test parameters for regular and nested models
+  // Test parameters for regular and nested models
   const unsigned int testCount = 2;
-  std::string modelNameList[testCount] = {"multilink", "nested_outer::nested_inner"};
+  std::string modelNameList[testCount] =
+      {"multilink", "nested_outer::nested_inner"};
   std::string boxLinkList[testCount] = {"box_link", "nested_box_link"};
   std::string sphereLinkList[testCount] = {"sphere_link", "nested_sphere_link"};
 
   for (unsigned int i = 0; i < testCount; ++i)
   {
-    //QString defines operator== for c-strings, but not std::string
+    // QString defines operator== for c-strings, but not std::string
     const char *currentModel = modelNameList[i].c_str();
     const char *currentUnscopedBoxLink = boxLinkList[i].c_str();
     const char *currentUnscopedSphereLink = sphereLinkList[i].c_str();
@@ -140,7 +141,8 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
         applyTorqueButton = it;
       else if (it->text().toLower().toStdString() == "apply all")
         applyAllButton = it;
-      else if (it->text().toLower().toStdString() == "clear" && !clearForceButton)
+      else if (it->text().toLower().toStdString() == "clear" &&
+          !clearForceButton)
         clearForceButton = it;
       else if (it->text().toLower().toStdString() == "clear")
         clearTorqueButton = it;
@@ -261,7 +263,7 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
     delete applyWrenchDialog;
   }
 
-  //Cleanup
+  // Cleanup
   cam->Fini();
   mainWindow->close();
   delete mainWindow;
