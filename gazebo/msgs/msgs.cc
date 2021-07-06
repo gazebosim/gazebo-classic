@@ -1778,6 +1778,14 @@ namespace gazebo
       if (_sdf->HasElement("shadows"))
         result.set_shadows(_sdf->Get<bool>("shadows"));
 
+      if (_sdf->HasElement("shadow_caster_material_name"))
+      {
+        result.set_shadow_caster_material_name(
+            _sdf->Get<std::string>("shadow_caster_material_name"));
+      }
+      else
+        result.set_shadow_caster_material_name("Gazebo/shadow_caster");
+
       return result;
     }
 

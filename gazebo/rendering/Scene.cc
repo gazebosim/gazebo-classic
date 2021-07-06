@@ -1624,6 +1624,13 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
                  elem->Get<double>("start"),
                  elem->Get<double>("end"));
   }
+
+  if (_msg->has_shadow_caster_material_name())
+  {
+    this->dataPtr->shadowCasterMaterialName =
+        _msg->shadow_caster_material_name();
+  }
+
   return true;
 }
 
@@ -3283,6 +3290,12 @@ unsigned int Scene::ShadowTextureSize() const
     return RTShaderSystem::Instance()->ShadowTextureSize();
   else
     return this->dataPtr->shadowTextureSize;
+}
+
+/////////////////////////////////////////////////
+std::string Scene::ShadowCasterMaterialName() const
+{
+  return this->dataPtr->shadowCasterMaterialName;
 }
 
 /////////////////////////////////////////////////

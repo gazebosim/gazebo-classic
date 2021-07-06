@@ -418,6 +418,8 @@ namespace gazebo
       /// \return Size of the shadow texture. The default size is 1024.
       public: unsigned int ShadowTextureSize() const;
 
+      public: std::string ShadowCasterMaterialName() const;
+
       /// \brief Add a visual to the scene
       /// \param[in] _vis Visual to add.
       public: void AddVisual(VisualPtr _vis);

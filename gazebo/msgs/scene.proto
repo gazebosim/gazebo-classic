@@ -29,4 +29,6 @@ message Scene
 
   /// \brief Show/hide world origin indicator.
   optional bool origin_visual  = 11;
+
+  optional string shadow_caster_material_name   = 12;
 }

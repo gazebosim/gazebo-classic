@@ -790,8 +790,8 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
   sceneMgr->setShadowTextureCasterMaterial(
-      Ogre::MaterialManager::getSingleton().getByName("Gazebo/shadow_caster"));
+      Ogre::MaterialManager::getSingleton().getByName(_scene->ShadowCasterMaterialName()));
 #else
-  sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
+  sceneMgr->setShadowTextureCasterMaterial(_scene->ShadowCasterMaterialName());
 #endif
 }
