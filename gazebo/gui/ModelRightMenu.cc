@@ -170,7 +170,7 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     EntityTypes _type)
 {
 
-  // Set to unscoped name
+  // Set to scoped name
   this->entityName = _entityName;
 
   QMenu menu;
