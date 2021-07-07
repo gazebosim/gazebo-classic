@@ -9,18 +9,20 @@ vertex_program shadow_caster_vp_glsl glsl
   }
 }
 
-fragment_program shadow_caster_fp_glsl glsl
+fragment_program shadow_caster_ignore_heightmap_fp_glsl glsl
 {
-  source shadow_caster_fp.glsl
+  source shadow_caster_ignore_heightmap_fp.glsl
 
   default_params
   {
+    param_named_auto camera_position camera_position
+    param_named_auto world_matrix world_matrix
     // param_named_auto depth_range shadow_scene_depth_range
   }
 }
 
 
-material Gazebo/shadow_caster
+material Gazebo/shadow_caster_ignore_heightmap
 {
   technique
   {
@@ -31,7 +33,7 @@ material Gazebo/shadow_caster
       {
       }
 
-      fragment_program_ref shadow_caster_fp_glsl
+      fragment_program_ref shadow_caster_ignore_heightmap_fp_glsl
       {
       }
     }
