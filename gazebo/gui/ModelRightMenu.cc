@@ -292,8 +292,12 @@ void ModelRightMenu::OnApplyWrench()
   }
   else
   {
-    modelName = this->entityName.substr(0, this->entityName.rfind("::"));
-    linkName = this->entityName;
+    // Links should always have a parent
+    if (vis->GetParent() != nullptr)
+    {
+      modelName = vis->GetParent()->Name();
+      linkName = this->entityName;
+    }
   }
 
   applyWrenchDialog->Init(modelName, linkName);

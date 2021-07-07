@@ -500,7 +500,14 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
     // if (!((flags != GZ_VISIBILITY_ALL) && (flags & GZ_VISIBILITY_GUI)))
     if (linkName.find("_GL_MANIP_") == std::string::npos)
     {
-      std::string unscopedLinkName = linkName.substr(linkName.rfind("::") + 2);
+      size_t modelNamePos = linkName.find(_modelName);
+      // Skip if the model name isn't in the scoped link name
+      if (modelNamePos == std::string::npos)
+      {
+        continue;
+      }
+      std::string unscopedLinkName = linkName.substr(modelNamePos +
+          + _modelName.size() + 2);
 
       this->dataPtr->linksComboBox->addItem(
           QString::fromStdString(unscopedLinkName));
@@ -546,8 +553,18 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
     return false;
 
-  // Select on combo box
-  std::string unscopedLinkName = _linkName.substr(_linkName.rfind("::") + 2);
+  size_t modelNamePos = _linkName.find(this->dataPtr->modelName);
+  std::string unscopedLinkName;
+
+  // Leave unscopedLinkName empty if model name cannot be found
+  // in the scoped link name
+  if (modelNamePos != std::string::npos)
+  {
+     // Select on combo box
+    unscopedLinkName = _linkName.substr(modelNamePos +
+        this->dataPtr->modelName.size() + 2);
+  }
+
   int index = -1;
   for (int i = 0; i < this->dataPtr->linksComboBox->count(); ++i)
   {
