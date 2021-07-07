@@ -86,6 +86,8 @@ namespace gazebo
 
       /// \brief Mutex to protect shaders and shadows update
       public: std::mutex updateMutex;
+
+      public: std::string shadowCasterMaterialName;
     };
   }
 }

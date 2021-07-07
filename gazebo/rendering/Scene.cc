@@ -1906,6 +1906,8 @@ void Scene::PreRender()
     {
       if (!this->dataPtr->initialized)
         RTShaderSystem::Instance()->UpdateShaders();
+
+      RTShaderSystem::Instance()->ApplyShadows(shared_from_this());
       this->dataPtr->initialized = true;
       sceneMsgsCopy.erase(sIter++);
     }

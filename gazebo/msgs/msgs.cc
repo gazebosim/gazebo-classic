@@ -1784,7 +1784,9 @@ namespace gazebo
             _sdf->Get<std::string>("shadow_caster_material_name"));
       }
       else
+      {
         result.set_shadow_caster_material_name("Gazebo/shadow_caster");
+      }
 
       return result;
     }

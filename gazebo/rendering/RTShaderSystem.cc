@@ -512,7 +512,13 @@ void RTShaderSystem::RemoveShadows(ScenePtr _scene)
 /////////////////////////////////////////////////
 void RTShaderSystem::ApplyShadows(ScenePtr _scene)
 {
-  if (!this->dataPtr->initialized || this->dataPtr->shadowsApplied)
+  bool matchingShadowCasterName =
+      this->dataPtr->shadowCasterMaterialName == 
+      _scene->ShadowCasterMaterialName();
+
+  if ((!this->dataPtr->initialized || this->dataPtr->shadowsApplied) &&
+      matchingShadowCasterName)
+
     return;
 
   Ogre::SceneManager *sceneMgr = _scene->OgreSceneManager();
@@ -790,8 +796,10 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
   sceneMgr->setShadowTextureCasterMaterial(
-      Ogre::MaterialManager::getSingleton().getByName(_scene->ShadowCasterMaterialName()));
+      Ogre::MaterialManager::getSingleton().getByName(
+      _scene->ShadowCasterMaterialName()));
 #else
   sceneMgr->setShadowTextureCasterMaterial(_scene->ShadowCasterMaterialName());
 #endif
+  this->dataPtr->shadowCasterMaterialName = _scene->ShadowCasterMaterialName();
 }
