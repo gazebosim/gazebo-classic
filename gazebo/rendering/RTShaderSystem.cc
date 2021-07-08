@@ -477,7 +477,9 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
   // Core shader lib not found -> shader generating will fail.
   if (coreLibsPath.empty())
   {
-    gzerr << "Unable to find shader lib. Shader generating will fail.";
+    gzerr << "Unable to find shader lib. Shader generating will fail. "
+          << "Your GAZEBO_RESOURCE_PATH is probably improperly set. "
+          << "Have you sourced <prefix>/share/gazebo/setup.sh?\n";
     return false;
   }
 
@@ -784,6 +786,10 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
     glBindTexture(GL_TEXTURE_2D, texId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
         GL_COMPARE_R_TO_TEXTURE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+        GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+        GL_LINEAR);
   }
 #endif
 

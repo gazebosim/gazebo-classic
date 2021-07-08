@@ -30,7 +30,7 @@
 #include "gazebo/util/IntrospectionClientPrivate.hh"
 
 using namespace gazebo;
-using namespace util;
+using namespace gazebo::util;
 
 //////////////////////////////////////////////////
 IntrospectionClient::IntrospectionClient()

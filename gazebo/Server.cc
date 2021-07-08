@@ -30,9 +30,11 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 
+#include <sdf/parser.hh>
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Rand.hh>
+#include <ignition/math/SemanticVersion.hh>
 #include <ignition/common/Profiler.hh>
 #include <ignition/common/Filesystem.hh>
 #include <ignition/common/URI.hh>
@@ -77,6 +79,26 @@ namespace gazebo
 {
   struct ServerPrivate
   {
+    void InspectSDFElement(const sdf::ElementPtr _elem)
+    {
+      if (common::getEnv("GAZEBO11_BACKWARDS_COMPAT_WARNINGS_ERRORS"))
+        return;
+
+      // SDF 1.7 and above consider invalid sibling elements of ANY type with
+      // repeated names while SDF 1.6 and lower only elements of the SAME type
+      auto sdfVersion =
+        ignition::math::SemanticVersion(_elem->OriginalVersion());
+      bool result;
+      if (sdfVersion >= ignition::math::SemanticVersion(1, 7))
+        result = sdf::recursiveSiblingUniqueNames(_elem);
+      else
+        result = sdf::recursiveSameTypeUniqueNames(_elem);
+
+      if (!result)
+        gzerr << "SDF is not valid, see errors above. "
+              << "This can lead to an unexpected behaviour." << "\n";
+    }
+
     /// \brief Boolean used to stop the server.
     static bool stop;
 
@@ -358,7 +380,13 @@ bool Server::ParseArgs(int _argc, char **_argv)
     {
       gzwarn << "Falling back on worlds/empty.world\n";
       if (!this->LoadFile("worlds/empty.world", physics))
+      {
+        gzerr << "worlds/empty.world could not be opened, "
+              << "probably because it was not found. "
+              << "Your GAZEBO_RESOURCE_PATH is probably improperly set. "
+              << "Have you sourced <prefix>/share/gazebo/setup.sh?\n";
         return false;
+      }
     }
 
     if (this->dataPtr->vm.count("profile"))
@@ -490,6 +518,8 @@ bool Server::PreLoad()
 bool Server::LoadImpl(sdf::ElementPtr _elem,
                       const std::string &_physics)
 {
+  this->dataPtr->InspectSDFElement(_elem);
+
   // If a physics engine is specified,
   if (_physics.length())
   {

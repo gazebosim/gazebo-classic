@@ -41,7 +41,10 @@ include_directories(
 )
 
 add_library(RestWebPlugin SHARED ${server_src} )
-target_link_libraries(RestWebPlugin ${GAZEBO_libraries} gazebo_msgs)
+target_link_libraries(RestWebPlugin
+  CURL::libcurl
+  ${GAZEBO_libraries}
+  gazebo_msgs)
 install (TARGETS RestWebPlugin
          LIBRARY DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
          ARCHIVE DESTINATION ${GAZEBO_PLUGIN_LIB_INSTALL_DIR}
