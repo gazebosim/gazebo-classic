@@ -1,6 +1,28 @@
 ## Gazebo 11
 
-## Gazebo 11.6.0 (2021-06-xx)
+## Gazebo 11.7.0 (2021-06-xx)
+
+1. Qualify `gazebo::util` in `using namespace` declarations.
+    * [Pull request #2979](https://github.com/osrf/gazebo/pull/2979)
+
+1. Distortion camera initialization fix
+    * [Issue #2527](https://github.com/osrf/gazebo/issues/2527)
+    * [Pull request #3033](https://github.com/osrf/gazebo/pull/3033)
+
+1. Use CURL::libcurl instead of cmake variables
+    * [Pull request #3030](https://github.com/osrf/gazebo/pull/3030)
+
+1. Allow specifying lens flare and camera distortion texture format
+    * [Issue #3005](https://github.com/osrf/gazebo/issues/3005)
+    * [Pull request #3009](https://github.com/osrf/gazebo/pull/3009)
+
+1. Camera distortion normalization improvement and fix folding
+    * [Pull request #3009](https://github.com/osrf/gazebo/pull/3009)
+
+1. Fix Windows compilation in Server.cc (not -> !)
+    * [Pull request #3021](https://github.com/osrf/gazebo/pull/3021)
+
+## Gazebo 11.6.0 (2021-06-09)
 
 1. Enable output of gzerr for SDF sibling elements of any type with same name,
    following the SDF 1.7 specification.

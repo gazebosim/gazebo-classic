@@ -46,7 +46,7 @@
 #include "gazebo/util/LogPlay.hh"
 
 using namespace gazebo;
-using namespace util;
+using namespace gazebo::util;
 
 /////////////////////////////////////////////////
 LogPlay::LogPlay()
