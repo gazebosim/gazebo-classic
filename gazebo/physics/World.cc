@@ -218,11 +218,11 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->sceneMsg.set_name(this->Name());
 
   if (this->dataPtr->sdf->GetElement("scene")->
-      HasElement("shadow_caster_material_name"))
+      HasElement("ignition:shadow_caster_material_name"))
   {
     this->dataPtr->shadowCasterMaterialName =
       this->dataPtr->sdf->GetElement("scene")->
-        Get<std::string>("shadow_caster_material_name");
+        Get<std::string>("ignition:shadow_caster_material_name");
   }
   else
   {
@@ -3360,7 +3360,7 @@ bool World::PluginInfoService(const ignition::msgs::StringMsg &_req,
 
 //////////////////////////////////////////////////
 bool World::ShadowCasterService(const ignition::msgs::StringMsg &_req,
-                              ignition::msgs::StringMsg &_res)
+                                ignition::msgs::StringMsg &_res)
 {
   _res.set_data(this->dataPtr->shadowCasterMaterialName.c_str());
   return true;

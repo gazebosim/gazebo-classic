@@ -207,14 +207,14 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->sceneSimTimePosesApplied = common::Time();
   this->dataPtr->sceneSimTimePosesReceived = common::Time();
 
+  // Get shadow caster material name from physics::World
   ignition::transport::Node node;
-  // Prepare the input parameters.
   ignition::msgs::StringMsg req;
-  req.set_data("HELLO");
   ignition::msgs::StringMsg rep;
   bool result;
   unsigned int timeout = 5000;
-  bool executed = node.Request("/shadow_caster_material_name", req, timeout, rep, result);
+  bool executed = node.Request("/shadow_caster_material_name",
+      req, timeout, rep, result);
   if (executed)
   {
     if (result)
