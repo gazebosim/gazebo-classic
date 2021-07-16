@@ -1625,12 +1625,6 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
                  elem->Get<double>("end"));
   }
 
-  if (_msg->has_shadow_caster_material_name())
-  {
-    this->dataPtr->shadowCasterMaterialName =
-        _msg->shadow_caster_material_name();
-  }
-
   return true;
 }
 
