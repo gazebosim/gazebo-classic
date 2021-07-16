@@ -651,6 +651,9 @@ namespace gazebo
       private: bool PluginInfoService(const ignition::msgs::StringMsg &_request,
           ignition::msgs::Plugin_V &_plugins);
 
+      private: bool ShadowCasterService(const ignition::msgs::StringMsg &_request,
+          ignition::msgs::StringMsg &_response);
+
       /// \internal
       /// \brief Private data pointer.
       private: std::unique_ptr<WorldPrivate> dataPtr;

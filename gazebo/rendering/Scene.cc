@@ -206,6 +206,24 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 
   this->dataPtr->sceneSimTimePosesApplied = common::Time();
   this->dataPtr->sceneSimTimePosesReceived = common::Time();
+
+  ignition::transport::Node node;
+  // Prepare the input parameters.
+  ignition::msgs::StringMsg req;
+  req.set_data("HELLO");
+  ignition::msgs::StringMsg rep;
+  bool result;
+  unsigned int timeout = 5000;
+  bool executed = node.Request("/shadow_caster_material_name", req, timeout, rep, result);
+  if (executed)
+  {
+    if (result)
+      this->dataPtr->shadowCasterMaterialName = rep.data();
+    else
+      std::cout << "Service call failed" << std::endl;
+  }
+  else
+    std::cerr << "Service call timed out" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -1624,7 +1642,6 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
                  elem->Get<double>("start"),
                  elem->Get<double>("end"));
   }
-
   return true;
 }
 
@@ -1900,8 +1917,6 @@ void Scene::PreRender()
     {
       if (!this->dataPtr->initialized)
         RTShaderSystem::Instance()->UpdateShaders();
-
-      RTShaderSystem::Instance()->ApplyShadows(shared_from_this());
       this->dataPtr->initialized = true;
       sceneMsgsCopy.erase(sIter++);
     }
