@@ -35,6 +35,7 @@ set(tests
   contact_sensor.cc
   contacts_update.cc
   contain_plugin.cc
+  custom_shadow_caster.cc
   dem.cc
   elastic_modulus.cc
   file_handling.cc
