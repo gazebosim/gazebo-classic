@@ -56,7 +56,7 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
 }
 
 /////////////////////////////////////////////////
-// \brief Test for issue #1208
+// \brief Test for issue #2527
 TEST_F(Issue2527Test, Distortion)
 {
   Load("worlds/issue_2527_camera_distortion.world");
@@ -120,15 +120,15 @@ TEST_F(Issue2527Test, Distortion)
 
   this->ImageCompare(imgNormal, imgBarrel, width, height, 3,
                      diffMax, diffSum, diffAvg);
-  EXPECT_NE(diffSum, 0u);
+  EXPECT_NE(0u, diffSum);
 
   this->ImageCompare(imgNormal, imgPincushion, width, height, 3,
                      diffMax, diffSum, diffAvg);
-  EXPECT_NE(diffSum, 0u);
+  EXPECT_NE(0u, diffSum);
 
   this->ImageCompare(imgBarrel, imgPincushion, width, height, 3,
                      diffMax, diffSum, diffAvg);
-  EXPECT_NE(diffSum, 0u);
+  EXPECT_NE(0u, diffSum);
 
   // Compare colors. Barrel distorted image should have more darker pixels than
   // the original as the ground plane has been warped to occupy more of the
