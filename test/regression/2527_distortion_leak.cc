@@ -137,9 +137,9 @@ TEST_F(Issue2527Test, Distortion)
   // image. The same should be true for pincushion distortion, because the
   // ground plane is still distorted to be larger - just different parts
   // of the image are distorted.
-  unsigned int colorSum2 = 0;
-  unsigned int colorSum3 = 0;
-  unsigned int colorSum4 = 0;
+  unsigned int colorSumNormal = 0;
+  unsigned int colorSumBarrel = 0;
+  unsigned int colorSumPincushion = 0;
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
@@ -147,19 +147,19 @@ TEST_F(Issue2527Test, Distortion)
       unsigned int r = imgNormal[(y*width*3) + x];
       unsigned int g = imgNormal[(y*width*3) + x + 1];
       unsigned int b = imgNormal[(y*width*3) + x + 2];
-      colorSum2 += r + g + b;
+      colorSumNormal += r + g + b;
       unsigned int r3 = imgBarrel[(y*width*3) + x];
       unsigned int g3 = imgBarrel[(y*width*3) + x + 1];
       unsigned int b3 = imgBarrel[(y*width*3) + x + 2];
-      colorSum3 += r3 + g3 + b3;
+      colorSumBarrel += r3 + g3 + b3;
       unsigned int r4 = imgPincushion[(y*width*3) + x];
       unsigned int g4 = imgPincushion[(y*width*3) + x + 1];
       unsigned int b4 = imgPincushion[(y*width*3) + x + 2];
-      colorSum4 += r4 + g4 + b4;
+      colorSumPincushion += r4 + g4 + b4;
     }
   }
-  EXPECT_GT(colorSum2, colorSum3);
-  EXPECT_GT(colorSum2, colorSum4);
+  EXPECT_GT(colorSumNormal, colorSumBarrel);
+  EXPECT_GT(colorSumNormal, colorSumPincushion);
 
   delete[] imgNormal;
   delete[] imgBarrel;
