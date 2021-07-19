@@ -56,7 +56,7 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
 }
 
 /////////////////////////////////////////////////
-/// \brief Test for issue #2527. Test is the same as CheckDistortion 
+/// \brief Test for issue #2527. Test is the same as CheckDistortion
 /// "camera_sensor.cc" but loads the cameras from a world file instead,
 //  of dynamically adding cameras.
 TEST_F(Issue2527Test, Distortion)
@@ -71,17 +71,17 @@ TEST_F(Issue2527Test, Distortion)
     return;
   }
 
-  sensors::CameraSensorPtr sensorNormal = 
+  sensors::CameraSensorPtr sensorNormal =
       std::dynamic_pointer_cast<sensors::CameraSensor>(
       sensors::get_sensor("camera_normal"));
   EXPECT_TRUE(sensorNormal != nullptr);
 
-  sensors::CameraSensorPtr sensorBarrel = 
+  sensors::CameraSensorPtr sensorBarrel =
       std::dynamic_pointer_cast<sensors::CameraSensor>(
       sensors::get_sensor("camera_barrel"));
   EXPECT_TRUE(sensorBarrel != nullptr);
 
-  sensors::CameraSensorPtr sensorPincushion = 
+  sensors::CameraSensorPtr sensorPincushion =
       std::dynamic_pointer_cast<sensors::CameraSensor>(
       sensors::get_sensor("camera_pincushion"));
   EXPECT_TRUE(sensorPincushion != nullptr);
