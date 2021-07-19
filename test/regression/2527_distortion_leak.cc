@@ -56,7 +56,9 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
 }
 
 /////////////////////////////////////////////////
-// \brief Test for issue #2527
+/// \brief Test for issue #2527. Test is the same as CheckDistortion 
+/// "camera_sensor.cc" but loads the cameras from a world file instead,
+//  of dynamically adding cameras.
 TEST_F(Issue2527Test, Distortion)
 {
   Load("worlds/issue_2527_camera_distortion.world");
