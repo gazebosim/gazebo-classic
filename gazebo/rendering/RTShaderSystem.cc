@@ -771,7 +771,7 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   // vec4 texture(sampler2D, vec2, [float]).
   // NVidia, AMD, and Intel all take this as a cue to provide "hardware PCF",
   // a driver hack that softens shadow edges with 4-sample interpolation.
-  for (size_t i = 0u; i < dirShadowCount; ++i)
+  for (size_t i = 0u; i < dirShadowCount + spotShadowCount; ++i)
   {
     const Ogre::TexturePtr tex = sceneMgr->getShadowTexture(i);
     // This will fail if not using OpenGL as the rendering backend.
@@ -780,6 +780,10 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
     glBindTexture(GL_TEXTURE_2D, texId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
         GL_COMPARE_R_TO_TEXTURE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+        GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+        GL_LINEAR);
   }
 #endif
 
