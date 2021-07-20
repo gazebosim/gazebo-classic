@@ -24,6 +24,11 @@
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 
+// member variables in qwt_series_data were renamed in 6.2.0
+#if QWT_VERSION < 0x060200
+#define QWT_VERSION_LT_620
+#endif
+
 using namespace gazebo;
 using namespace gui;
 
@@ -53,22 +58,38 @@ namespace gazebo
 
       private: inline const QRectF& BoundingRect() const
                {
+#ifdef QWT_VERSION_LT_620
                  return this->d_boundingRect;
+#else
+                 return this->m_boundingRect;
+#endif
                }
 
       private: inline QRectF& BoundingRect()
                {
+#ifdef QWT_VERSION_LT_620
                  return this->d_boundingRect;
+#else
+                 return this->m_boundingRect;
+#endif
                }
 
       private: inline const QVector<QPointF>& SamplesRef() const
                {
+#ifdef QWT_VERSION_LT_620
                  return this->d_samples;
+#else
+                 return this->m_samples;
+#endif
                }
 
       private: inline QVector<QPointF>& SamplesRef()
                {
+#ifdef QWT_VERSION_LT_620
                  return this->d_samples;
+#else
+                 return this->m_samples;
+#endif
                }
 
       /// \brief Bounding rectangle accessor. This create the object
@@ -77,7 +98,13 @@ namespace gazebo
       public: virtual QRectF boundingRect() const
               {
                 if (this->BoundingRect().width() < 0.0)
+                {
+#ifdef QWT_VERSION_LT_620
                   this->d_boundingRect = qwtBoundingRect(*this);
+#else
+                  this->m_boundingRect = qwtBoundingRect(*this);
+#endif
+                }
 
                 // set a minimum bounding box height
                 // this prevents plot's auto scale to zoom in on near-zero
@@ -89,8 +116,13 @@ namespace gazebo
                   double halfMinHeight = minHeight * 0.5;
                   double mid = this->BoundingRect().top() +
                       (absHeight * 0.5);
+#ifdef QWT_VERSION_LT_620
                   this->d_boundingRect.setTop(mid - halfMinHeight);
                   this->d_boundingRect.setBottom(mid + halfMinHeight);
+#else
+                  this->m_boundingRect.setTop(mid - halfMinHeight);
+                  this->m_boundingRect.setBottom(mid + halfMinHeight);
+#endif
                 }
 
                 return this->BoundingRect();

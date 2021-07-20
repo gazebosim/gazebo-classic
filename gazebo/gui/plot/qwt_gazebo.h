@@ -26,6 +26,7 @@
 #if defined __has_include
   #if __has_include (<qwt.h>)
     #include <qwt_curve_fitter.h>
+    #include <qwt_global.h>
     #include <qwt_legend.h>
     #include <qwt_painter.h>
     #include <qwt_picker_machine.h>
@@ -50,6 +51,7 @@
 
 #ifndef GAZEBO_GUI_QWT_IS_INCLUDED
   #include <qwt/qwt_curve_fitter.h>
+  #include <qwt/qwt_global.h>
   #include <qwt/qwt_legend.h>
   #include <qwt/qwt_painter.h>
   #include <qwt/qwt_picker_machine.h>
