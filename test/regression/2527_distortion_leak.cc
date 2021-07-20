@@ -34,12 +34,12 @@ class Issue2527Test : public ServerFixture
 
 std::mutex mutex;
 
-unsigned char* imgNormal = NULL;
-unsigned char* imgBarrel = NULL;
-unsigned char* imgPincushion = NULL;
-int imageCountNormal = 0;
-int imageCountBarrel = 0;
-int imageCountPincushion = 0;
+unsigned char* img = NULL;
+unsigned char* img3 = NULL;
+unsigned char* img4 = NULL;
+int imageCount = 0;
+int imageCount3 = 0;
+int imageCount4 = 0;
 std::string pixelFormat = "";
 
 /////////////////////////////////////////////////
@@ -71,48 +71,48 @@ TEST_F(Issue2527Test, Distortion)
     return;
   }
 
-  sensors::CameraSensorPtr sensorNormal =
+  sensors::CameraSensorPtr camSensorUndistorted =
       std::dynamic_pointer_cast<sensors::CameraSensor>(
-      sensors::get_sensor("camera_normal"));
-  EXPECT_TRUE(sensorNormal != nullptr);
+      sensors::get_sensor("camera_sensor_undistorted"));
+  EXPECT_TRUE(camSensorUndistorted != nullptr);
 
-  sensors::CameraSensorPtr sensorBarrel =
+  sensors::CameraSensorPtr camSensorBarrel =
       std::dynamic_pointer_cast<sensors::CameraSensor>(
-      sensors::get_sensor("camera_barrel"));
-  EXPECT_TRUE(sensorBarrel != nullptr);
+      sensors::get_sensor("camera_sensor_barrel"));
+  EXPECT_TRUE(camSensorBarrel != nullptr);
 
-  sensors::CameraSensorPtr sensorPincushion =
+  sensors::CameraSensorPtr camSensorPincushion =
       std::dynamic_pointer_cast<sensors::CameraSensor>(
-      sensors::get_sensor("camera_pincushion"));
-  EXPECT_TRUE(sensorPincushion != nullptr);
+      sensors::get_sensor("camera_sensor_pincushion"));
+  EXPECT_TRUE(camSensorPincushion != nullptr);
 
   unsigned int width  = 320;
   unsigned int height = 240;
 
-  imageCountNormal = 0;
-  imageCountBarrel = 0;
-  imageCountPincushion = 0;
-  imgNormal = new unsigned char[width * height*3];
-  imgBarrel = new unsigned char[width * height*3];
-  imgPincushion = new unsigned char[width * height*3];
+  imageCount = 0;
+  imageCount3 = 0;
+  imageCount4 = 0;
+  img = new unsigned char[width * height*3];
+  img3 = new unsigned char[width * height*3];
+  img4 = new unsigned char[width * height*3];
 
-  event::ConnectionPtr c2 =
-    sensorNormal->Camera()->ConnectNewImageFrame(
-        std::bind(&::OnNewCameraFrame, &imageCountNormal, imgNormal,
+  event::ConnectionPtr c =
+    camSensorUndistorted->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c3 =
-    sensorBarrel->Camera()->ConnectNewImageFrame(
-        std::bind(&::OnNewCameraFrame, &imageCountBarrel, imgBarrel,
+    camSensorBarrel->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount3, img3,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c4 =
-    sensorPincushion->Camera()->ConnectNewImageFrame(
-        std::bind(&::OnNewCameraFrame, &imageCountPincushion, imgPincushion,
+    camSensorPincushion->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount4, img4,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
 
-  while (imageCountNormal < 10 || imageCountBarrel < 10 || imageCountPincushion < 10)
+  while (imageCount < 10 || imageCount3 < 10 || imageCount4 < 10)
   {
     common::Time::MSleep(10);
   }
@@ -120,15 +120,19 @@ TEST_F(Issue2527Test, Distortion)
   unsigned int diffMax = 0, diffSum = 0;
   double diffAvg = 0.0;
 
-  this->ImageCompare(imgNormal, imgBarrel, width, height, 3,
+  // We expect that there will be some non-zero difference between the images,
+  // except for the 0.0 distortion camera, which should return a completely
+  // identical camera to the one with no distortion tag in the SDF.
+
+  this->ImageCompare(img, img3, width, height, 3,
                      diffMax, diffSum, diffAvg);
   EXPECT_NE(0u, diffSum);
 
-  this->ImageCompare(imgNormal, imgPincushion, width, height, 3,
+  this->ImageCompare(img, img4, width, height, 3,
                      diffMax, diffSum, diffAvg);
   EXPECT_NE(0u, diffSum);
 
-  this->ImageCompare(imgBarrel, imgPincushion, width, height, 3,
+  this->ImageCompare(img3, img4, width, height, 3,
                      diffMax, diffSum, diffAvg);
   EXPECT_NE(0u, diffSum);
 
@@ -137,33 +141,33 @@ TEST_F(Issue2527Test, Distortion)
   // image. The same should be true for pincushion distortion, because the
   // ground plane is still distorted to be larger - just different parts
   // of the image are distorted.
-  unsigned int colorSumNormal = 0;
-  unsigned int colorSumBarrel = 0;
-  unsigned int colorSumPincushion = 0;
+  unsigned int colorSum = 0;
+  unsigned int colorSum3 = 0;
+  unsigned int colorSum4 = 0;
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
     {
-      unsigned int r = imgNormal[(y*width*3) + x];
-      unsigned int g = imgNormal[(y*width*3) + x + 1];
-      unsigned int b = imgNormal[(y*width*3) + x + 2];
-      colorSumNormal += r + g + b;
-      unsigned int r3 = imgBarrel[(y*width*3) + x];
-      unsigned int g3 = imgBarrel[(y*width*3) + x + 1];
-      unsigned int b3 = imgBarrel[(y*width*3) + x + 2];
-      colorSumBarrel += r3 + g3 + b3;
-      unsigned int r4 = imgPincushion[(y*width*3) + x];
-      unsigned int g4 = imgPincushion[(y*width*3) + x + 1];
-      unsigned int b4 = imgPincushion[(y*width*3) + x + 2];
-      colorSumPincushion += r4 + g4 + b4;
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      colorSum += r + g + b;
+      unsigned int r3 = img3[(y*width*3) + x];
+      unsigned int g3 = img3[(y*width*3) + x + 1];
+      unsigned int b3 = img3[(y*width*3) + x + 2];
+      colorSum3 += r3 + g3 + b3;
+      unsigned int r4 = img4[(y*width*3) + x];
+      unsigned int g4 = img4[(y*width*3) + x + 1];
+      unsigned int b4 = img4[(y*width*3) + x + 2];
+      colorSum4 += r4 + g4 + b4;
     }
   }
-  EXPECT_GT(colorSumNormal, colorSumBarrel);
-  EXPECT_GT(colorSumNormal, colorSumPincushion);
+  EXPECT_GT(colorSum, colorSum3);
+  EXPECT_GT(colorSum, colorSum4);
 
-  delete[] imgNormal;
-  delete[] imgBarrel;
-  delete[] imgPincushion;
+  delete[] img;
+  delete[] img3;
+  delete[] img4;
 }
 
 /////////////////////////////////////////////////

@@ -10,10 +10,10 @@
       <uri>model://ground_plane</uri>
     </include>
 
-    <model name='camera_normal'>
+    <model name='camera_model_undistorted'>
       <static>1</static>
-      <pose>0.3 0 0.15 0 0 3.14159265</pose>
-      <link name='link'>
+      <pose>-5 0 5 0 0.261799 0</pose>
+      <link name='body'>
         <visual name='visual'>
           <geometry>
             <box>
@@ -21,12 +21,14 @@
             </box>
           </geometry>
         </visual>
-        <sensor name='camera_normal' type='camera'>
+        <sensor name='camera_sensor_undistorted' type='camera'>
+          <visualize>1</visualize>
           <camera>
-            <horizontal_fov>1.047</horizontal_fov>
+            <horizontal_fov>0.785398</horizontal_fov>
             <image>
-              <width>12</width>
-              <height>12</height>
+              <width>320</width>
+              <height>240</height>
+              <format>R8G8B8</format>
             </image>
             <clip>
               <near>0.1</near>
@@ -39,10 +41,10 @@
       </link>
     </model>
 
-    <model name='camera_barrel'>
+    <model name='camera_model_barrel'>
       <static>1</static>
-      <pose>0.3 0 0.15 0 0 3.14159265</pose>
-      <link name='link'>
+      <pose>-5 0 5 0 0.261799 0</pose>
+      <link name='body'>
         <visual name='visual'>
           <geometry>
             <box>
@@ -50,24 +52,27 @@
             </box>
           </geometry>
         </visual>
-        <sensor name='camera_barrel' type='camera'>
+        <sensor name='camera_sensor_barrel' type='camera'>
+          <visualize>1</visualize>
           <camera>
-            <horizontal_fov>1.047</horizontal_fov>
+            <horizontal_fov>0.785398</horizontal_fov>
             <image>
-              <width>12</width>
-              <height>12</height>
+              <width>320</width>
+              <height>240</height>
+              <format>R8G8B8</format>
             </image>
             <clip>
               <near>0.1</near>
               <far>100</far>
             </clip>
             <distortion>
-              <k1>-0.5</k1>
-              <k2>0</k2>
-              <k3>0</k3>
+              <k1>-0.1349</k1>
+              <k2>-0.51868</k2>
+              <k3>-0.001</k3>
               <p1>0</p1>
               <p2>0</p2>
               <center>0.5 0.5</center>
+              <ignition:legacy_mode>1</ignition:legacy_mode>
             </distortion>
           </camera>
           <always_on>1</always_on>
@@ -76,10 +81,10 @@
       </link>
     </model>
 
-    <model name='camera_pincushion'>
+    <model name='camera_model_pincushion'>
       <static>1</static>
-      <pose>0.3 0 0.15 0 0 3.14159265</pose>
-      <link name='link'>
+      <pose>-5 0 5 0 0.261799 0</pose>
+      <link name='body'>
         <visual name='visual'>
           <geometry>
             <box>
@@ -87,24 +92,27 @@
             </box>
           </geometry>
         </visual>
-        <sensor name='camera_pincushion' type='camera'>
+        <sensor name='camera_sensor_pincushion' type='camera'>
+          <visualize>1</visualize>
           <camera>
-            <horizontal_fov>1.047</horizontal_fov>
+            <horizontal_fov>0.785398</horizontal_fov>
             <image>
-              <width>12</width>
-              <height>12</height>
+              <width>320</width>
+              <height>240</height>
+              <format>R8G8B8</format>
             </image>
             <clip>
               <near>0.1</near>
               <far>100</far>
             </clip>
             <distortion>
-              <k1>0.5</k1>
-              <k2>0</k2>
-              <k3>0</k3>
+              <k1>0.1349</k1>
+              <k2>0.51868</k2>
+              <k3>0.001</k3>
               <p1>0</p1>
               <p2>0</p2>
               <center>0.5 0.5</center>
+              <ignition:legacy_mode>1</ignition:legacy_mode>
             </distortion>
           </camera>
           <always_on>1</always_on>
