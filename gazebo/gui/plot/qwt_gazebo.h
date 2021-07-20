@@ -40,6 +40,7 @@
     #include <qwt_plot_panner.h>
     #include <qwt_plot_zoomer.h>
     #include <qwt_scale_engine.h>
+    #include <qwt_scale_map.h>
     #include <qwt_scale_widget.h>
     #include <qwt_symbol.h>
     #include <qwt_plot_renderer.h>
@@ -63,6 +64,7 @@
   #include <qwt/qwt_plot_panner.h>
   #include <qwt/qwt_plot_zoomer.h>
   #include <qwt/qwt_scale_engine.h>
+  #include <qwt/qwt_scale_map.h>
   #include <qwt/qwt_scale_widget.h>
   #include <qwt/qwt_symbol.h>
   #include <qwt/qwt_plot_renderer.h>
