@@ -1,34 +1,125 @@
 <?xml version="1.0" ?>
-<sdf version="1.6">
+<sdf version="1.7">
   <world name="default">
-
+    <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
     </include>
-
+    <!-- A ground plane -->
     <include>
-      <pose>1.5 0 0 0 -1.57 0</pose>
-      <uri>model://checkerboard_plane</uri>
+      <uri>model://ground_plane</uri>
     </include>
 
-    <include>
-      <uri>model://cameras_with_distortion</uri>
-    </include>
+    <model name='camera_model_undistorted'>
+      <static>1</static>
+      <pose>-5 0 5 0 0.261799 0</pose>
+      <link name='body'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name='camera_sensor_undistorted' type='camera'>
+          <visualize>1</visualize>
+          <camera>
+            <horizontal_fov>0.785398</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>240</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>10</update_rate>
+        </sensor>
+      </link>
+    </model>
 
-    <include>
-      <pose>0 0.2 0 0 0 0</pose>
-      <uri>model://camera_barrel</uri>
-    </include>
+    <model name='camera_model_barrel'>
+      <static>1</static>
+      <pose>-5 0 5 0 0.261799 0</pose>
+      <link name='body'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name='camera_sensor_barrel' type='camera'>
+          <visualize>1</visualize>
+          <camera>
+            <horizontal_fov>0.785398</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>240</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+            <distortion>
+              <k1>-0.1349</k1>
+              <k2>-0.51868</k2>
+              <k3>-0.001</k3>
+              <p1>0</p1>
+              <p2>0</p2>
+              <center>0.5 0.5</center>
+              <ignition:legacy_mode>1</ignition:legacy_mode>
+            </distortion>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>10</update_rate>
+        </sensor>
+      </link>
+    </model>
 
-    <include>
-      <pose>0 -0.2 0 0 0 0</pose>
-      <uri>model://camera_pincushion</uri>
-    </include>
+    <model name='camera_model_pincushion'>
+      <static>1</static>
+      <pose>-5 0 5 0 0.261799 0</pose>
+      <link name='body'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name='camera_sensor_pincushion' type='camera'>
+          <visualize>1</visualize>
+          <camera>
+            <horizontal_fov>0.785398</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>240</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+            <distortion>
+              <k1>0.1349</k1>
+              <k2>0.51868</k2>
+              <k3>0.001</k3>
+              <p1>0</p1>
+              <p2>0</p2>
+              <center>0.5 0.5</center>
+              <ignition:legacy_mode>1</ignition:legacy_mode>
+            </distortion>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>10</update_rate>
+        </sensor>
+      </link>
+    </model>
 
-    <gui>
-      <camera name="user">
-        <pose>-2 -2 1 0 0.25 0.50</pose>
-      </camera>
-    </gui>
   </world>
 </sdf>
