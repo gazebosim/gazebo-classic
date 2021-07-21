@@ -61,7 +61,7 @@ namespace gazebo
 #ifdef QWT_VERSION_LT_620
                  return this->d_boundingRect;
 #else
-                 return this->m_boundingRect;
+                 return this->cachedBoundingRect;
 #endif
                }
 
@@ -70,7 +70,7 @@ namespace gazebo
 #ifdef QWT_VERSION_LT_620
                  return this->d_boundingRect;
 #else
-                 return this->m_boundingRect;
+                 return this->cachedBoundingRect;
 #endif
                }
 
@@ -102,7 +102,7 @@ namespace gazebo
 #ifdef QWT_VERSION_LT_620
                   this->d_boundingRect = qwtBoundingRect(*this);
 #else
-                  this->m_boundingRect = qwtBoundingRect(*this);
+                  this->cachedBoundingRect = qwtBoundingRect(*this);
 #endif
                 }
 
@@ -120,8 +120,8 @@ namespace gazebo
                   this->d_boundingRect.setTop(mid - halfMinHeight);
                   this->d_boundingRect.setBottom(mid + halfMinHeight);
 #else
-                  this->m_boundingRect.setTop(mid - halfMinHeight);
-                  this->m_boundingRect.setBottom(mid + halfMinHeight);
+                  this->cachedBoundingRect.setTop(mid - halfMinHeight);
+                  this->cachedBoundingRect.setBottom(mid + halfMinHeight);
 #endif
                 }
 
