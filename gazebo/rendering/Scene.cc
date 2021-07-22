@@ -211,19 +211,22 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   ignition::transport::Node node;
   ignition::msgs::StringMsg req;
   ignition::msgs::StringMsg rep;
+  const std::string serviceName = "/shadow_caster_material_name";
   bool result;
   unsigned int timeout = 5000;
-  bool executed = node.Request("/shadow_caster_material_name",
+  bool executed = node.Request(serviceName,
       req, timeout, rep, result);
   if (executed)
   {
     if (result)
       this->dataPtr->shadowCasterMaterialName = rep.data();
     else
-      std::cout << "Service call failed" << std::endl;
+      gzerr << "Service call[" << serviceName << "] failed" << std::endl;
   }
   else
-    std::cerr << "Service call timed out" << std::endl;
+  {
+    gzerr << "Service call[" << serviceName << "] timed out" << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
