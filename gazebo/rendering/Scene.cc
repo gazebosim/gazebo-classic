@@ -209,13 +209,12 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 
   // Get shadow caster material name from physics::World
   ignition::transport::Node node;
-  ignition::msgs::StringMsg req;
   ignition::msgs::StringMsg rep;
   const std::string serviceName = "/shadow_caster_material_name";
   bool result;
   unsigned int timeout = 5000;
   bool executed = node.Request(serviceName,
-      req, timeout, rep, result);
+      timeout, rep, result);
   if (executed)
   {
     if (result)

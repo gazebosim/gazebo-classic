@@ -3359,8 +3359,7 @@ bool World::PluginInfoService(const ignition::msgs::StringMsg &_req,
 }
 
 //////////////////////////////////////////////////
-bool World::ShadowCasterService(const ignition::msgs::StringMsg &_req,
-                                ignition::msgs::StringMsg &_res)
+bool World::ShadowCasterService(ignition::msgs::StringMsg &_res)
 {
   _res.set_data(this->dataPtr->shadowCasterMaterialName.c_str());
   return true;
