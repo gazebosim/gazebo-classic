@@ -16,37 +16,42 @@
 */
 
 #include "gazebo/test/ServerFixture.hh"
+#include "gazebo/sensors/sensors.hh"
 
 using namespace gazebo;
 class CustomShadowCasterTest : public ServerFixture
 {
+  /// \brief Test using default shadow caster
+  public: void DefaultShadowCaster();
+
+  /// \brief Test using custom shadow caster
+  public: void CustomShadowCaster();
+
+  /// \brief Counter for the numbder of image messages received.
+  public: unsigned int imageCount = 0u;
+
+  /// \brief Depth data buffer.
+  public: unsigned char* imageBuffer = nullptr;
+
+  /// \brief Camera image callback
+  /// \param[in] _msg Message with image data containing raw image values.
+  public: void OnImage(ConstImageStampedPtr &_msg);
 };
 
-std::mutex mutex;
-
-unsigned char* img = NULL;
-int imageCount = 0;
-std::string pixelFormat = "";
-
 /////////////////////////////////////////////////
-void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
-                  const unsigned char *_image,
-                  unsigned int _width, unsigned int _height,
-                  unsigned int _depth,
-                  const std::string &_format)
+void CustomShadowCasterTest::OnImage(ConstImageStampedPtr &_msg)
 {
-  std::lock_guard<std::mutex> lock(mutex);
-  pixelFormat = _format;
-  memcpy(_imageDest, _image, _width * _height * _depth);
-  *_imageCounter += 1;
+  unsigned int imageSamples = _msg->image().width() *_msg->image().height() * 3;
+  memcpy(this->imageBuffer, _msg->image().data().c_str(), imageSamples);
+  this->imageCount++;
 }
 
 /////////////////////////////////////////////////
 // \brief Use the "Gazebo/shadow_caster" material for shadow
 /// casting. Shadows will be enabled from the material.
-TEST_F(CustomShadowCasterTest, DefaultShadowCaster)
+void CustomShadowCasterTest::DefaultShadowCaster()
 {
-  Load("worlds/default_shadow_caster.world");
+  this->Load("worlds/default_shadow_caster.world");
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -60,46 +65,53 @@ TEST_F(CustomShadowCasterTest, DefaultShadowCaster)
       std::dynamic_pointer_cast<sensors::CameraSensor>(
       sensors::get_sensor("camera_normal"));
   EXPECT_TRUE(sensor != nullptr);
+  EXPECT_TRUE(sensor->IsActive());
 
   unsigned int width  = 320;
   unsigned int height = 240;
 
-  imageCount = 0;
-  img = new unsigned char[width * height*3];
-  event::ConnectionPtr c =
-    sensor->Camera()->ConnectNewImageFrame(
-        std::bind(&::OnNewCameraFrame, &imageCount, img,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-        std::placeholders::_4, std::placeholders::_5));
+  this->imageCount = 0;
+  this->imageBuffer = new unsigned char[width * height*3];
 
-  // Get some images
-  while (imageCount < 10)
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  std::string topic = sensor->Topic();
+  EXPECT_TRUE(!topic.empty());
+
+  transport::SubscriberPtr sub = node->Subscribe(topic,
+      &CustomShadowCasterTest::OnImage, this);
+
+  // wait for a few images
+  int i = 0;
+  while (this->imageCount < 10 && i < 300)
   {
     common::Time::MSleep(10);
+    i++;
+  }
+  EXPECT_LT(i, 300);
+
+  for (unsigned int x = 0; x < 320 * 240; x += 600) {
+    EXPECT_GT(50, this->imageBuffer[3 * x]);
+    EXPECT_GT(50, this->imageBuffer[3 * x + 1]);
+    EXPECT_GT(50, this->imageBuffer[3 * x + 2]);
   }
 
-  unsigned int colorSum = 0;
-  for (unsigned int y = 0; y < height; ++y)
-  {
-    for (unsigned int x = 0; x < width*3; x+=3)
-    {
-      unsigned int r = img[(y*width*3) + x];
-      unsigned int g = img[(y*width*3) + x + 1];
-      unsigned int b = img[(y*width*3) + x + 2];
-      colorSum += r + g + b;
-    }
-  }
+  delete this->imageBuffer;
+}
 
-  EXPECT_GT(18000u, colorSum);
-  EXPECT_LT(14000u, colorSum);
+/////////////////////////////////////////////////
+TEST_F(CustomShadowCasterTest, DefaultShadowCaster)
+{
+  DefaultShadowCaster();
 }
 
 /////////////////////////////////////////////////
 /// \brief Use the "Gazebo/shadow_caster_ignore_heightmap" material for shadow
 /// casting. Shadows will be disabled from the material.
-TEST_F(CustomShadowCasterTest, CustomShadowCaster)
+void CustomShadowCasterTest::CustomShadowCaster()
 {
-  Load("worlds/custom_shadow_caster.world");
+  this->Load("worlds/custom_shadow_caster.world");
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -113,38 +125,45 @@ TEST_F(CustomShadowCasterTest, CustomShadowCaster)
       std::dynamic_pointer_cast<sensors::CameraSensor>(
       sensors::get_sensor("camera_normal"));
   EXPECT_TRUE(sensor != nullptr);
+  EXPECT_TRUE(sensor->IsActive());
 
   unsigned int width  = 320;
   unsigned int height = 240;
 
-  imageCount = 0;
-  img = new unsigned char[width * height*3];
-  event::ConnectionPtr c =
-    sensor->Camera()->ConnectNewImageFrame(
-        std::bind(&::OnNewCameraFrame, &imageCount, img,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-        std::placeholders::_4, std::placeholders::_5));
+  this->imageCount = 0;
+  this->imageBuffer = new unsigned char[width * height*3];
 
-  // Get some images
-  while (imageCount < 10)
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  std::string topic = sensor->Topic();
+  EXPECT_TRUE(!topic.empty());
+
+  transport::SubscriberPtr sub = node->Subscribe(topic,
+      &CustomShadowCasterTest::OnImage, this);
+
+  // wait for a few images
+  int i = 0;
+  while (this->imageCount < 10 && i < 300)
   {
     common::Time::MSleep(10);
+    i++;
+  }
+  EXPECT_LT(i, 300);
+
+  for (unsigned int x = 0; x < 320 * 240; x += 600) {
+    EXPECT_LT(50, this->imageBuffer[3 * x]);
+    EXPECT_LT(50, this->imageBuffer[3 * x + 1]);
+    EXPECT_LT(50, this->imageBuffer[3 * x + 2]);
   }
 
-  unsigned int colorSum = 0;
-  for (unsigned int y = 0; y < height; ++y)
-  {
-    for (unsigned int x = 0; x < width*3; x+=3)
-    {
-      unsigned int r = img[(y*width*3) + x];
-      unsigned int g = img[(y*width*3) + x + 1];
-      unsigned int b = img[(y*width*3) + x + 2];
-      colorSum += r + g + b;
-    }
-  }
+  delete this->imageBuffer;
+}
 
-  EXPECT_GT(31000u, colorSum);
-  EXPECT_LT(27000u, colorSum);
+/////////////////////////////////////////////////
+TEST_F(CustomShadowCasterTest, CustomShadowCaster)
+{
+  CustomShadowCaster();
 }
 
 /////////////////////////////////////////////////
