@@ -1,0 +1,74 @@
+vertex_program Gazebo/PointLightShadowDemoVS glsl
+{
+  source point_light_shadow_demo_vp.glsl
+
+  default_params
+  {
+    param_named_auto worldViewMatrix worldview_matrix
+    param_named_auto viewProjMatrix viewproj_matrix
+    param_named_auto worldMatrix world_matrix
+
+    param_named_auto texViewProjMatrix0 texture_viewproj_matrix 0
+    param_named_auto texViewProjMatrix1 texture_viewproj_matrix 1
+    param_named_auto texViewProjMatrix2 texture_viewproj_matrix 2
+    param_named_auto texViewProjMatrix3 texture_viewproj_matrix 3
+    param_named_auto texViewProjMatrix4 texture_viewproj_matrix 4
+    param_named_auto texViewProjMatrix5 texture_viewproj_matrix 5
+  }
+}
+
+fragment_program Gazebo/PointLightShadowDemoFS glsl
+{
+  source point_light_shadow_demo_fp.glsl
+
+  default_params
+  {
+    param_named shadowMap0  int 0
+    param_named shadowMap1  int 1
+    param_named shadowMap2  int 2
+    param_named shadowMap3  int 3
+    param_named shadowMap4  int 4
+    param_named shadowMap5  int 5
+  }
+}
+
+material Gazebo/PointLightShadowDemo
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/PointLightShadowDemoVS
+      {
+      }
+
+      fragment_program_ref Gazebo/PointLightShadowDemoFS
+      {
+      }
+      texture_unit shadowMap0 {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap1 {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap2 {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap3 {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap4 {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap5 {
+        content_type shadow
+        tex_address_mode clamp
+      }
+    }
+  }
+}

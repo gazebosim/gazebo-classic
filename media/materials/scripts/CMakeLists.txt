@@ -18,6 +18,7 @@ noise.compositor
 oculus.material
 perpixel.program
 picker.material
+point_light_shadow_demo.material
 ShadowCaster.material
 shadow_caster.program
 ShadowCaster.program

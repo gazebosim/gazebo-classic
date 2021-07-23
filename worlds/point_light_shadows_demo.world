@@ -21,7 +21,7 @@
 
     <light type="point" name="point">
       <cast_shadows>true</cast_shadows>
-      <pose>-3.0 0.0 3.0 0 0 0</pose>
+      <pose>0.0 0.0 3.0 0 0 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
       <specular>0.2 0.2 0.2 1</specular>
       <attenuation>
@@ -33,7 +33,7 @@
       <cast_shadows>true</cast_shadows>
     </light>
 
-     <model name="ground_shadow_receiver">
+     <model name="ground_shadow_receiver_1">
       <pose>0 0 0.1 0 0 0</pose>
       <static>true</static>
       <link name="link">
@@ -41,7 +41,7 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>10 10</size>
+              <size>25 25</size>
             </plane>
           </geometry>
           <surface>
@@ -61,13 +61,13 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>10 10</size>
+              <size>25 25</size>
             </plane>
           </geometry>
           <material>
             <script>
-              <uri>file://media/materials/scripts/spotlight_shadow_demo.material</uri>
-              <name>Gazebo/SpotLightShadowDemo</name>
+              <uri>file://media/materials/scripts/point_light_shadow_demo.material</uri>
+              <name>Gazebo/PointLightShadowDemo</name>
             </script>
           </material>
         </visual>

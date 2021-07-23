@@ -38,6 +38,8 @@ perpixel_fp.glsl
 perpixel_vp.glsl
 plain_color_fs.glsl
 plain_color_vs.glsl
+point_light_shadow_demo_fp.glsl
+point_light_shadow_demo_vp.glsl
 point_receiver_fp.glsl
 point_receiver_vp.glsl
 projector.frag

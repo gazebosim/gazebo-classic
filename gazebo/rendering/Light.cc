@@ -31,6 +31,7 @@
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/LightPrivate.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/PointLightShadowCameraSetup.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -601,7 +602,7 @@ void Light::SetCastShadows(const bool _cast)
     if (_cast && this->dataPtr->shadowCameraSetup.isNull())
     {
       this->dataPtr->shadowCameraSetup =
-          Ogre::ShadowCameraSetupPtr(new Ogre::DefaultShadowCameraSetup());
+          Ogre::ShadowCameraSetupPtr(new PointLightShadowCameraSetup());
       this->dataPtr->light->setCustomShadowCameraSetup(
           this->dataPtr->shadowCameraSetup);
       RTShaderSystem::Instance()->UpdateShadows();
@@ -609,7 +610,6 @@ void Light::SetCastShadows(const bool _cast)
   }
   else
   {
-    // todo(anyone) make point light casts shadows
     this->dataPtr->light->setCastShadows(false);
   }
 }
