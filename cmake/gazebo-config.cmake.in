@@ -134,10 +134,6 @@ if (GAZEBO_HAS_DART)
   list(APPEND @PKG_NAME@_LIBRARIES ${DART_LIBRARIES})
 endif()
 
-# Visual Studio enables c++11 support by default
-if (NOT MSVC)
-  list(APPEND @PKG_NAME@_CXX_FLAGS -std=c++11)
-endif()
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND
     "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
   set(@PKG_NAME@_CXX_FLAGS "${@PKG_NAME@_CXX_FLAGS} -stdlib=libc++")
