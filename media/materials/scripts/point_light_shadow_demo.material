@@ -29,6 +29,8 @@ fragment_program Gazebo/PointLightShadowDemoFS glsl
     param_named shadowMap3  int 3
     param_named shadowMap4  int 4
     param_named shadowMap5  int 5
+
+    param_named_auto lightPos0 light_position_world_space 0
   }
 }
 

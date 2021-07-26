@@ -25,7 +25,7 @@
       <diffuse>0.8 0.8 0.8 1</diffuse>
       <specular>0.2 0.2 0.2 1</specular>
       <attenuation>
-        <range>10</range>
+        <range>25</range>
         <constant>0.05</constant>
         <linear>0.01</linear>
         <quadratic>0.001</quadratic>
@@ -75,7 +75,7 @@
     </model>
 
 
-    <model name="box">
+    <model name="box_0">
       <pose>0 0 0.5 0 0 0</pose>
       <link name="link">
         <collision name="collision">
@@ -90,6 +90,121 @@
             <box>
               <size>1 1 1</size>
             </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box_1">
+      <pose>2 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box_2">
+      <pose>1 4 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sphere_0">
+      <pose>-4 -4 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <size>1 1 1</size>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <size>1 1 1</size>
+            </sphere>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sphere_1">
+      <pose>-4 5 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.25</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.25</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="cylinder_0">
+      <pose>7 -6 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <size>1 1 1</size>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <size>1 1 1</size>
+            </cylinder>
           </geometry>
           <material>
             <script><name>Gazebo/Blue</name></script>

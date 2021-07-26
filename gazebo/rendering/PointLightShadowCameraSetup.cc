@@ -72,22 +72,15 @@ void PointLightShadowCameraSetup::getShadowCamera(const Ogre::SceneManager *_sm,
   // reset custom view / projection matrix in case already set
   _texCam->setCustomViewMatrix(false);
   _texCam->setCustomProjectionMatrix(false);
-  _texCam->setNearClipDistance(_light->_deriveShadowNearClipDistance(_cam) - 0.001);
+  _texCam->setNearClipDistance(_light->_deriveShadowNearClipDistance(_cam));
   _texCam->setFarClipDistance(_light->_deriveShadowFarClipDistance(_cam));
 
-  // get the shadow frustum's far distance
-  Ogre::Real shadowDist = _light->getShadowFarDistance();
-  if (!shadowDist)
-  {
-    // need a shadow distance, make one up
-    shadowDist = _cam->getNearClipDistance() * 300;
-  }
-  Ogre::Real shadowOffset = shadowDist * (_sm->getShadowDirLightTextureOffset());
-
-  // Set perspective projection
   _texCam->setProjectionType(Ogre::PT_PERSPECTIVE);
-  // Use 120 degree FOV for point light to ensure coverage more area
-  _texCam->setFOVy(Ogre::Degree(120));
+
+  // theoretically set x to +-0.25 for accuracy
+  // decrease x for quality of shadows
+  float x = 0.18;
+  _texCam->setFrustumExtents(-x, x, x, -x);
 
   if (_iteration == 0) {
     _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(1, 0, 0));

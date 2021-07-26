@@ -18,14 +18,11 @@ varying vec4 lightSpacePos4;
 varying vec4 lightSpacePos5;
 
 varying vec4 worldPos;
-varying vec4 worldViewPos;
 
 void main()
 {
   worldPos = worldMatrix * gl_Vertex;
   gl_Position = viewProjMatrix * worldPos;
-
-  worldViewPos = worldViewMatrix * gl_Vertex;
 
   lightSpacePos0 = texViewProjMatrix0 * worldPos;
   lightSpacePos1 = texViewProjMatrix1 * worldPos;

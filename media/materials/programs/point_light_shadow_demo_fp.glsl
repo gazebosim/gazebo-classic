@@ -7,6 +7,8 @@ uniform sampler2DShadow shadowMap3;
 uniform sampler2DShadow shadowMap4;
 uniform sampler2DShadow shadowMap5;
 
+uniform vec4 lightPos0;
+
 varying vec4 lightSpacePos0;
 varying vec4 lightSpacePos1;
 varying vec4 lightSpacePos2;
@@ -15,7 +17,6 @@ varying vec4 lightSpacePos4;
 varying vec4 lightSpacePos5;
 
 varying vec4 worldPos;
-varying vec4 worldViewPos;
 
 //------------------------------------------------------------------------------
 float ShadowSimple(in sampler2DShadow shadowMap, in vec4 shadowMapPos)
@@ -24,6 +25,10 @@ float ShadowSimple(in sampler2DShadow shadowMap, in vec4 shadowMapPos)
   vec3 shadowMapUV = shadowMapPos.xyz / shadowMapPos.w;
 
   if (shadowMapUV.z < 0.0 || shadowMapUV.z > 1.0)
+    return 0.0;
+  if (shadowMapUV.x < 0.0 || shadowMapUV.x > 1.0)
+    return 0.0;
+  if (shadowMapUV.y < 0.0 || shadowMapUV.y > 1.0)
     return 0.0;
 
   // get closest depth value from light's perspective
@@ -42,8 +47,7 @@ void main()
 {
   float f = 0.0f;
 
-  // flat red color - no lighting
-  vec4 outputCol = vec4(1.0, 0.0, 0.0, 1.0);
+  vec4 outColor = vec4(1.0, 0.0, 0.0, 1.0);
 
   // grey shadows
   f += ShadowSimple(shadowMap0, lightSpacePos0);
@@ -54,7 +58,7 @@ void main()
   f += ShadowSimple(shadowMap5, lightSpacePos5);
   f = clamp(f, 0.0f, 1.0f);
   if (f > 0.0f)
-    outputCol = vec4(0.2, 0.2, 0.2, 1.0);
+    outColor = vec4(0.0, 0.0, 0.0, 1.0);
 
-  gl_FragColor = outputCol;
+  gl_FragColor = outColor;
 }
