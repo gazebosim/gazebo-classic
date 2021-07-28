@@ -26,6 +26,7 @@
 #if defined __has_include
   #if __has_include (<qwt.h>)
     #include <qwt_curve_fitter.h>
+    #include <qwt_global.h>
     #include <qwt_legend.h>
     #include <qwt_painter.h>
     #include <qwt_picker_machine.h>
@@ -40,6 +41,7 @@
     #include <qwt_plot_panner.h>
     #include <qwt_plot_zoomer.h>
     #include <qwt_scale_engine.h>
+    #include <qwt_scale_map.h>
     #include <qwt_scale_widget.h>
     #include <qwt_symbol.h>
     #include <qwt_plot_renderer.h>
@@ -49,6 +51,7 @@
 
 #ifndef GAZEBO_GUI_QWT_IS_INCLUDED
   #include <qwt/qwt_curve_fitter.h>
+  #include <qwt/qwt_global.h>
   #include <qwt/qwt_legend.h>
   #include <qwt/qwt_painter.h>
   #include <qwt/qwt_picker_machine.h>
@@ -63,6 +66,7 @@
   #include <qwt/qwt_plot_panner.h>
   #include <qwt/qwt_plot_zoomer.h>
   #include <qwt/qwt_scale_engine.h>
+  #include <qwt/qwt_scale_map.h>
   #include <qwt/qwt_scale_widget.h>
   #include <qwt/qwt_symbol.h>
   #include <qwt/qwt_plot_renderer.h>

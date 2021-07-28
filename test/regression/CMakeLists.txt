@@ -43,7 +43,9 @@ set(tests
   2428_log_insertions.cc
   2430_revolute_joint_SetPosition.cc
   2505_revolute_joint_SetAxis.cc
+  2527_distortion_leak.cc
   2728_nested_urdf.cc
+  2875_connect_pub_to_sub_crash.cc
   2896_gazebo_subnamespace.cc
   2902_performance_metrics_deadlock.cc
 )

@@ -92,7 +92,8 @@ namespace gazebo
       /// \brief Sets a height value at a position.
       /// \param[in] _x X position.
       /// \param[in] _y Y position.
-      public: void SetHeight(int _x, int _y, float _value);
+      /// \param[in] _h Height to set.
+      public: void SetHeight(int _x, int _y, HeightType _h);
 
       /// \brief Fill a geometry message with this shape's data. Raw height
       /// data are not packed in this message to minimize packet size.
