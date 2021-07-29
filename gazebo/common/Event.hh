@@ -593,7 +593,7 @@ namespace gazebo
       private: EvtConnectionMap connections;
 
       /// \brief A thread lock.
-      private: std::mutex mutex;
+      private: mutable std::mutex mutex;
 
       /// \brief List of connections to remove
       private: std::list<typename EvtConnectionMap::const_iterator>
