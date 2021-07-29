@@ -611,6 +611,7 @@ namespace gazebo
     template<typename T>
     EventT<T>::~EventT()
     {
+      std::lock_guard<std::mutex> lock(this->mutex);
       this->connections.clear();
     }
 
