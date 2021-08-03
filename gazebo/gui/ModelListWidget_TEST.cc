@@ -16,6 +16,7 @@
 */
 #include <boost/filesystem.hpp>
 #include <memory>
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -24,7 +25,6 @@
 #include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
 #include "gazebo/gui/ModelListWidget.hh"
 #include "gazebo/gui/ModelListWidget_TEST.hh"
-
 #include "test_config.h"
 
 /////////////////////////////////////////////////
@@ -659,6 +659,10 @@ void ModelListWidget_TEST::LinkProperties(const std::string &_worldFilename,
   modelListWidget->setGeometry(0, 0, 400, 800);
   QCoreApplication::processEvents();
 
+  // Add the test model database
+  gazebo::common::SystemPaths::Instance()->AddModelPathsUpdate(
+      PROJECT_SOURCE_PATH "/test/models");
+
   this->Load(_worldFilename);
 
   gazebo::transport::NodePtr node;
@@ -1009,10 +1013,21 @@ void ModelListWidget_TEST::PluginProperties()
   maxSleep = 5;
   while (!modelItem->isSelected() && sleep < maxSleep)
   {
-    QTest::qWait(10);
+    QTest::qWait(500);
     sleep++;
   }
   QVERIFY(modelItem->isSelected());
+
+  // Wait for the plugin properties to appear
+  sleep = 0;
+  maxSleep = 10;
+  while (propTreeBrowser->properties().size() == 0 && sleep < maxSleep)
+  {
+    QCoreApplication::processEvents();
+    QTest::qWait(500);
+    sleep++;
+  }
+  auto propertySize = propTreeBrowser->properties().size();
 
   // Get the buoyancy plugin
   QTreeWidgetItem *pluginItem = modelItem->child(6);
@@ -1039,7 +1054,9 @@ void ModelListWidget_TEST::PluginProperties()
   // Wait for the plugin properties to appear
   sleep = 0;
   maxSleep = 10;
-  while (propTreeBrowser->properties().size() == 0 && sleep < maxSleep)
+  while (propTreeBrowser->properties().size() == 0 &&
+      propTreeBrowser->properties().size() != propertySize &&
+      sleep < maxSleep)
   {
     QCoreApplication::processEvents();
     QTest::qWait(500);

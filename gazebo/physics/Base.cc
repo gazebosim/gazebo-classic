@@ -295,7 +295,8 @@ BasePtr Base::GetById(unsigned int _id) const
 //////////////////////////////////////////////////
 BasePtr Base::GetByIdRecursive(unsigned int _id)
 {
-  if (this->GetId() == _id) {
+  if (this->GetId() == _id)
+  {
     return shared_from_this();
   }
 
@@ -303,7 +304,7 @@ BasePtr Base::GetByIdRecursive(unsigned int _id)
   Base_V::const_iterator biter;
 
   for (biter = this->children.begin();
-      biter != this->children.end() && result == NULL; ++biter)
+      biter != this->children.end() && result == nullptr; ++biter)
   {
     result = (*biter)->GetByIdRecursive(_id);
   }
@@ -336,33 +337,39 @@ std::string Base::GetScopedName(bool _prependWorldName) const
     return this->scopedName;
 }
 
+//////////////////////////////////////////////////
 std::string Base::StripScopedName(const std::string &_name) const
 {
-  if (_name.find(this->GetScopedName() + "::") == 0){
+  if (_name.find(this->GetScopedName() + "::") == 0)
+  {
     return _name.substr(this->GetScopedName().size() + 2);
-  } else {
+  }
+  else
+  {
     // it's okay if current element IS the world, otherwise logerr
     if ((this->GetName() != this->world->Name()))
     {
       gzerr << "Cannot strip scoped name " << this->GetScopedName()
             << " from the beginning of given _name " << _name
-            << ". returning _name without stripping."
+            << ". Returning _name without stripping."
             << std::endl;
     }
     return _name;
   }
 }
 
+//////////////////////////////////////////////////
 std::string Base::StripParentScopedName(const std::string &_name) const
 {
-  if (!this->GetParent()){
+  if (!this->GetParent())
+  {
     return _name;
-  } else {
+  }
+  else
+  {
     return this->GetParent()->StripScopedName(_name);
   }
 }
-
-
 
 //////////////////////////////////////////////////
 common::URI Base::URI() const
