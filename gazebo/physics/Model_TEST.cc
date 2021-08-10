@@ -242,6 +242,43 @@ TEST_F(ModelTest, BoundingBox)
 }
 
 //////////////////////////////////////////////////
+TEST_F(ModelTest, StripScopedName)
+{
+  this->Load("test/worlds/deeply_nested_models.world", true);
+
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  std::string modelName = "model_00";
+  auto model = world->ModelByName(modelName);
+  ASSERT_TRUE(model != nullptr);
+  EXPECT_EQ(modelName, model->GetName());
+  EXPECT_EQ(modelName, model->GetScopedName());
+  // no parent scope, so should return the original string
+  EXPECT_EQ(modelName, model->StripParentScopedName(model->GetScopedName()));
+
+  modelName = "model_01";
+  model = world->ModelByName(modelName);
+  ASSERT_TRUE(model != nullptr);
+  EXPECT_EQ(modelName, model->GetName());
+  EXPECT_NE(modelName, model->GetScopedName());
+  EXPECT_EQ(modelName, model->StripParentScopedName(model->GetScopedName()));
+  EXPECT_EQ(modelName, model->GetParent()->StripScopedName(model->GetScopedName()));
+
+  modelName = "model_02";
+  model = world->ModelByName(modelName);
+  ASSERT_TRUE(model != nullptr);
+  EXPECT_EQ(modelName, model->GetName());
+  EXPECT_NE(modelName, model->GetScopedName());
+  EXPECT_EQ(modelName, model->StripParentScopedName(model->GetScopedName()));
+  EXPECT_EQ(modelName, model->GetParent()->StripScopedName(model->GetScopedName()));
+
+  // should not be able to strip its own name
+  EXPECT_EQ(model->GetScopedName(), model->StripScopedName(model->GetScopedName()));
+  EXPECT_EQ(model->GetName(), model->StripScopedName(model->GetName()));
+}
+
+//////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
