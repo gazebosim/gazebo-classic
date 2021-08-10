@@ -922,7 +922,8 @@ void ModelListWidget_TEST::IncludedLinkProperties()
 /////////////////////////////////////////////////
 void ModelListWidget_TEST::NestedLinkProperties()
 {
-  LinkProperties("worlds/multilink_shape_nested.world", "multilink_nested::multilink", 1);
+  LinkProperties("worlds/multilink_shape_nested.world",
+      "multilink_nested::multilink", 1);
 }
 
 /////////////////////////////////////////////////
