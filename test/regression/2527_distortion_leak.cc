@@ -162,8 +162,9 @@ TEST_F(Issue2527Test, Distortion)
       colorSum4 += r4 + g4 + b4;
     }
   }
-  EXPECT_GT(colorSum3, colorSum);
-  EXPECT_GT(colorSum4, colorSum);
+  EXPECT_GT(colorSum3, colorSum + 5000000);
+  EXPECT_GT(colorSum4, colorSum + 500000);
+  EXPECT_GT(colorSum3, colorSum4 + 4500000);
 
   delete[] img;
   delete[] img3;
