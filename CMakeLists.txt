@@ -351,9 +351,15 @@ else (build_errors)
   gz_install_includes("" ${PROJECT_BINARY_DIR}/gazebo/gazebo_config.h)
 
   configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.sh.in ${PROJECT_BINARY_DIR}/setup.sh @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/)
-  # Also install the setup.sh in an unversioned location
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/gazebo/)
+  install(FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/setup.sh
+            ${CMAKE_SOURCE_DIR}/cmake/setup.bash
+          DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/)
+  # Also install the setup scripts in an unversioned location
+  install(FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/setup.sh
+            ${CMAKE_SOURCE_DIR}/cmake/setup.bash
+          DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/gazebo/)
 
   if (WIN32)
     configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.bat.in ${PROJECT_BINARY_DIR}/setup.bat @ONLY)
