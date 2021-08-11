@@ -5,14 +5,14 @@
       <uri>model://sun</uri>
     </include>
 
-    <include>
+<!--     <include>
       <pose>1.5 0 0 0 -1.57 0</pose>
       <uri>model://checkerboard_plane</uri>
-    </include>
+    </include> -->
 
-<!--     <scene>
+    <scene>
       <background>1.0 0.0 0.0 1</background>
-    </scene> -->
+    </scene>
 
     <model name='camera_model_undistorted'>
       <static>1</static>

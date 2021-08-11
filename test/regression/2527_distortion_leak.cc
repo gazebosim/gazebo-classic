@@ -86,8 +86,8 @@ TEST_F(Issue2527Test, Distortion)
       sensors::get_sensor("camera_sensor_pincushion"));
   EXPECT_TRUE(camSensorPincushion != nullptr);
 
-  unsigned int width  = 320;
-  unsigned int height = 240;
+  unsigned int width  = 640;
+  unsigned int height = 480;
 
   imageCount = 0;
   imageCount3 = 0;
