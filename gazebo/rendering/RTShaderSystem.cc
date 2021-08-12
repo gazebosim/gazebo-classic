@@ -479,7 +479,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
   {
     gzerr << "Unable to find shader lib. Shader generating will fail. "
           << "Your GAZEBO_RESOURCE_PATH is probably improperly set. "
-          << "Have you sourced <prefix>/share/gazebo/setup.sh?\n";
+          << "Have you sourced <prefix>/share/gazebo/setup.bash?\n";
     return false;
   }
 
@@ -796,8 +796,9 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
   sceneMgr->setShadowTextureCasterMaterial(
-      Ogre::MaterialManager::getSingleton().getByName("Gazebo/shadow_caster"));
+      Ogre::MaterialManager::getSingleton().getByName(
+      _scene->ShadowCasterMaterialName()));
 #else
-  sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
+  sceneMgr->setShadowTextureCasterMaterial(_scene->ShadowCasterMaterialName());
 #endif
 }
