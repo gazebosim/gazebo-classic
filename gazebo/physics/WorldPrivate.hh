@@ -385,6 +385,9 @@ namespace gazebo
 
       /// \brief SDF World DOM object
       public: std::unique_ptr<sdf::World> worldSDFDom;
+
+      /// \brief Shadow caster material name from scene SDF
+      public: std::string shadowCasterMaterialName;
     };
   }
 }
