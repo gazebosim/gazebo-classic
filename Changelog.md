@@ -1,5 +1,34 @@
 ## Gazebo 11
 
+## Gazebo 11.8.0 (2021-08-13)
+
+1. Find tbb version lower than 2021 with pkg-config
+    * [Pull request #3037](https://github.com/osrf/gazebo/pull/3037)
+
+1. Fix build with qwt 6.2
+    * [Pull request #3047](https://github.com/osrf/gazebo/pull/3047)
+
+1. Enable hardware PCF for spotlight shadows
+    * [Pull request #3036](https://github.com/osrf/gazebo/pull/3036)
+
+1. Apply Force/Torque for nested models
+    * [Pull request #3039](https://github.com/osrf/gazebo/pull/3039)
+    * A contribution by Cameron Miller
+
+1. Make links within nested models modifiable from GUI Client
+    * [Pull request #3039](https://github.com/osrf/gazebo/pull/3039)
+    * A contribution by Sonia Jin (Amazon)
+
+1. Make events threadsafe
+    * [Pull request #3042](https://github.com/osrf/gazebo/pull/3042)
+    * A contribution by Sonia Jin (Amazon)
+
+1. Add relocatable setup.bash script
+    * [Pull request #3061](https://github.com/osrf/gazebo/pull/3061)
+
+1. Support custom shadow caster materials
+    * [Pull request #3048](https://github.com/osrf/gazebo/pull/3048)
+
 ## Gazebo 11.7.0 (2021-06-xx)
 
 1. Qualify `gazebo::util` in `using namespace` declarations.
