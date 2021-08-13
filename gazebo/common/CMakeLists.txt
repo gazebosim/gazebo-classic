@@ -226,6 +226,10 @@ set (remotery_sources
   RemoteryProfilerImpl.cc
 )
 
+set(profiler_headers
+  Profiler.hh
+)
+
 if (APPLE)
   set (remotery_sources ${remotery_sources}
     ./Remotery/lib/RemoteryMetal.mm
@@ -236,6 +240,7 @@ if (APPLE)
 endif()
 
 list(APPEND sources ${remotery_sources})
+list(APPEND headers_install ${profiler_headers})
 
 set(RMT_ENABLED 1)
 set(RMT_USE_TINYCRT 0)
