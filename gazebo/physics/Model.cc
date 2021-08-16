@@ -1252,7 +1252,8 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     return;
   }
 
-  this->SetName(this->world->StripWorldName(_msg.name()));
+  this->SetName(this->StripParentScopedName(_msg.name()));
+
   if (_msg.has_pose())
     this->SetWorldPose(msgs::ConvertIgn(_msg.pose()));
   for (int i = 0; i < _msg.link_size(); i++)

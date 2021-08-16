@@ -112,7 +112,33 @@ class ModelListWidget_TEST : public QTestFixture
   /// This is similar to the ModelProperties test except the property browser
   /// now only displays link properties as the result of directly clicking on
   /// the link item in the models tree widget.
+  /// \param[in] _worldFilename File name of world to be loaded
+  /// \param[in] _modelName name of the model whose link properties are being
+  /// tested
+  /// \param[in] _nestLevel the level the child is nested at
+  private slots: void LinkProperties(const std::string &_worldFilename,
+      const std::string &_modelName, int _nestLevel);
+
+  /// \brief Test that the property browser displays correct link properties
+  /// in a world with an unnested model defined outright.
+  /// This is similar to the ModelProperties test except the property browser
+  /// now only displays link properties as the result of directly clicking on
+  /// the link item in the models tree widget.
   private slots: void LinkProperties();
+
+  /// \brief Test that the property browser displays correct link properties
+  /// in a world with an unnested model referenced in an include.
+  /// This is similar to the ModelProperties test except the property browser
+  /// now only displays link properties as the result of directly clicking on
+  /// the link item in the models tree widget.
+  private slots: void IncludedLinkProperties();
+
+  /// \brief Test that the property browser displays correct link properties
+  /// in a world with nested models.
+  /// This is similar to the ModelProperties test except the property browser
+  /// now only displays link properties as the result of directly clicking on
+  /// the link item in the models tree widget.
+  private slots: void NestedLinkProperties();
 
   /// \brief Test that the property browser displays correct plugin properties.
   /// This is similar to the LinkProperties test.
