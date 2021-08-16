@@ -2116,7 +2116,7 @@ bool Camera::SetBackgroundColor(const ignition::math::Color &_color)
     // https://github.com/osrf/gazebo/pull/3033
     if (this->dataPtr->distortion)
     {
-      this->dataPtr->distortion->SetCamera(shared_from_this());
+      this->dataPtr->distortion->RefreshCompositor(shared_from_this());
       this->renderTarget->update();
     }
 
