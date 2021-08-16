@@ -273,7 +273,7 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if ((iter.second != NULL) && iter.second->on)
             iter.second->callback();
         }
       }
@@ -288,7 +288,7 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if ((iter.second != NULL) && iter.second->on)
             iter.second->callback(_p);
         }
       }
@@ -304,7 +304,7 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if ((iter.second != NULL) && iter.second->on)
             iter.second->callback(_p1, _p2);
         }
       }
@@ -321,7 +321,7 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if ((iter.second != NULL) && iter.second->on)
             iter.second->callback(_p1, _p2, _p3);
         }
       }
@@ -340,7 +340,7 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if ((iter.second != NULL) && iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4);
         }
       }
@@ -361,7 +361,7 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if ((iter.second != NULL) && iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4, _p5);
         }
       }
@@ -383,7 +383,7 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if ((iter.second != NULL) && iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6);
         }
       }
@@ -406,7 +406,7 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if ((iter.second != NULL) && iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
         }
       }
@@ -431,7 +431,7 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if ((iter.second != NULL) && iter.second->on)
           {
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
           }
@@ -460,7 +460,7 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if ((iter.second != NULL) && iter.second->on)
           {
             iter.second->callback(
                 _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
@@ -491,7 +491,7 @@ namespace gazebo
         this->SetSignaled(true);
         for (const auto &iter: this->connections)
         {
-          if (iter.second->on)
+          if ((iter.second != NULL) && iter.second->on)
           {
             iter.second->callback(
                 _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
@@ -531,7 +531,7 @@ namespace gazebo
       private: EvtConnectionMap connections;
 
       /// \brief A thread lock.
-      private: std::mutex mutex;
+      private: mutable std::mutex mutex;
 
       /// \brief List of connections to remove
       private: std::list<typename EvtConnectionMap::const_iterator>
@@ -549,6 +549,7 @@ namespace gazebo
     template<typename T>
     EventT<T>::~EventT()
     {
+      std::lock_guard<std::mutex> lock(this->mutex);
       this->connections.clear();
     }
 
@@ -557,6 +558,7 @@ namespace gazebo
     template<typename T>
     ConnectionPtr EventT<T>::Connect(const std::function<T> &_subscriber)
     {
+      std::lock_guard<std::mutex> lock(this->mutex);
       int index = 0;
       if (!this->connections.empty())
       {
@@ -572,6 +574,7 @@ namespace gazebo
     template<typename T>
     unsigned int EventT<T>::ConnectionCount() const
     {
+      std::lock_guard<std::mutex> lock(this->mutex);
       return this->connections.size();
     }
 
@@ -580,6 +583,7 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Disconnect(int _id)
     {
+      std::lock_guard<std::mutex> lock(this->mutex);
       // Find the connection
       auto const &it = this->connections.find(_id);
 
@@ -591,6 +595,7 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
+    /// \brief Erases all connections from connectionsToRemove.
     template<typename T>
     void EventT<T>::Cleanup()
     {
