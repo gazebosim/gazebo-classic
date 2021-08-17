@@ -50,10 +50,10 @@ namespace gazebo
       public: virtual ~MultiCameraSensor();
 
       // Documentation inherited
-      public: virtual void Load(const std::string &_worldName);
+      public: virtual void Load(const std::string &_worldName) override;
 
       // Documentation inherited
-      public: virtual void Init();
+      public: virtual void Init() override;
 
       /// \brief reset timing related members
       protected: void ResetLastUpdateTime() override;
@@ -67,7 +67,7 @@ namespace gazebo
       public: double NextRequiredTimestamp() const override;
 
       // Documentation inherited
-      public: virtual std::string Topic() const;
+      public: virtual std::string Topic() const override;
 
       /// \brief Set whether the sensor is active or not.
       /// \param[in] _value True if active, false if not.
@@ -109,13 +109,13 @@ namespace gazebo
       public: bool SaveFrame(const std::vector<std::string> &_filenames);
 
       // Documentation inherited.
-      public: virtual bool IsActive() const;
+      public: virtual bool IsActive() const override;
 
       // Documentation inherited.
-      protected: virtual bool UpdateImpl(const bool _force);
+      protected: virtual bool UpdateImpl(const bool _force) override;
 
       // Documentation inherited.
-      protected: virtual void Fini();
+      protected: virtual void Fini() override;
 
       /// \brief Handle the render event.
       private: void Render();
