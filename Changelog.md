@@ -1,6 +1,6 @@
 ## Gazebo 11
 
-## Gazebo 11.8.0 (2021-08-13)
+## Gazebo 11.8.0 (2021-08-17)
 
 1. Find tbb version lower than 2021 with pkg-config
     * [Pull request #3037](https://github.com/osrf/gazebo/pull/3037)
