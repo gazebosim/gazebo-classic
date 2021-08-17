@@ -2111,6 +2111,15 @@ bool Camera::SetBackgroundColor(const ignition::math::Color &_color)
   if (this->OgreViewport())
   {
     this->OgreViewport()->setBackgroundColour(Conversions::Convert(_color));
+
+    // refresh distortion to prevent improper compositor initialization
+    // https://github.com/osrf/gazebo/pull/3033
+    if (this->dataPtr->distortion)
+    {
+      this->dataPtr->distortion->RefreshCompositor(shared_from_this());
+      this->renderTarget->update();
+    }
+
     return true;
   }
   return false;
