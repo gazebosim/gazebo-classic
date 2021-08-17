@@ -16,7 +16,8 @@
     * A contribution by Cameron Miller
 
 1. Make links within nested models modifiable from GUI Client
-    * [Pull request #3039](https://github.com/osrf/gazebo/pull/3039)
+    * [Pull request #3031](https://github.com/osrf/gazebo/pull/3031)
+    * [Pull request #3059](https://github.com/osrf/gazebo/pull/3059)
     * A contribution by Sonia Jin (Amazon)
 
 1. Make events threadsafe
@@ -25,9 +26,15 @@
 
 1. Add relocatable setup.bash script
     * [Pull request #3061](https://github.com/osrf/gazebo/pull/3061)
+    * [Issue #3056](https://github.com/osrf/gazebo/issues/3056)
 
 1. Support custom shadow caster materials
     * [Pull request #3048](https://github.com/osrf/gazebo/pull/3048)
+
+1. Distortion camera initialization tests and fix with background color
+    * [Issue #2527](https://github.com/osrf/gazebo/issues/2527)
+    * [Pull request #3044](https://github.com/osrf/gazebo/pull/3044)
+    * [Pull request #3060](https://github.com/osrf/gazebo/pull/3060)
 
 ## Gazebo 11.7.0 (2021-06-xx)
 
