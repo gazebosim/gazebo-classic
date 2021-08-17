@@ -82,24 +82,27 @@ void PointLightShadowCameraSetup::getShadowCamera(const Ogre::SceneManager *_sm,
   float x = 0.18;
   _texCam->setFrustumExtents(-x, x, x, -x);
 
-  if (_iteration == 0) {
-    _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(1, 0, 0));
-  }
-  if (_iteration == 1) {
-    _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(-1, 0, 0));
-  }
-  if (_iteration == 2) {
-    _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(0, 1, 0));
-  }
-  if (_iteration == 3) {
-    _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(0, -1, 0));
-  }
-  if (_iteration == 4) {
-    // up
-    _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(0, 0, 1));
-  }
-  if (_iteration == 5) {
-    // down
-    _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(0, 0, -1));
+  // set shadow cube map depending on the iteration
+  switch (_iteration) {
+    case 0:
+      _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(1, 0, 0));
+      break;
+    case 1:
+      _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(-1, 0, 0));
+      break;
+    case 2:
+      _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(0, 1, 0));
+      break;
+    case 3:
+      _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(0, -1, 0));
+      break;
+    case 4:
+      _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(0, 0, 1));
+      break;
+    case 5:
+      _texCam->lookAt(_texCam->getPosition() + Ogre::Vector3(0, 0, -1));
+      break;
+    default:
+      break;
   }
 }
