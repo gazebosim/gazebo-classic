@@ -97,7 +97,7 @@ void ViewAngleTest::OrthoProjection()
   QVERIFY(glWidget != NULL);
 
   // focus
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
 
   this->ProcessEventsAndDraw(mainWindow);

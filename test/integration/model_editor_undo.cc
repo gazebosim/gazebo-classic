@@ -782,8 +782,8 @@ void ModelEditorUndoTest::TriggerDelete()
 
       // This only works as long as the Delete action is the last one in the
       // menu
-      QTest::mouseClick(context, Qt::LeftButton, 0, QPoint(10,
-          context->height() - 10));
+      QTest::mouseClick(context, Qt::LeftButton, Qt::KeyboardModifiers(),
+          QPoint(10, context->height() - 10));
 
       return;
     }

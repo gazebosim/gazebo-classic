@@ -236,7 +236,7 @@ void ViewControlTest::MouseZoomTerrain()
   QCOMPARE(vis->GetRootVisual(), boxVis);
 
   // zoom in. It should not zoom pass the terrain.
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
   MouseZoom(glWidget);
 
@@ -303,7 +303,7 @@ void ViewControlTest::MouseZoomBoundingBox()
   QVERIFY(pos.Z() < 1.5);
 
   // zoom in. It should not zoom pass the drill
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
   MouseZoom(glWidget);
 

@@ -128,7 +128,7 @@ GLWidget::GLWidget(QWidget *_parent)
       &GLWidget::OnRequest, this);
 
   this->installEventFilter(this);
-  this->dataPtr->keyModifiers = 0;
+  this->dataPtr->keyModifiers = Qt::KeyboardModifiers();
 
   MouseEventHandler::Instance()->AddPressFilter("glwidget",
       std::bind(&GLWidget::OnMousePress, this, std::placeholders::_1));
@@ -936,7 +936,7 @@ void GLWidget::Clear()
   this->dataPtr->userCamera.reset();
   this->dataPtr->scene.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
-  this->dataPtr->keyModifiers = 0;
+  this->dataPtr->keyModifiers = Qt::KeyboardModifiers();
 }
 
 //////////////////////////////////////////////////
