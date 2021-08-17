@@ -40,8 +40,7 @@ class Issue2896Test : public ::gazebo::ServerFixture
 TEST_F(Issue2896Test, CompilationTest)
 {
     rhabarber::barbera::gazebo::bar bar;
-    // Suppress unused variable warning
-    bar = bar;
+    bar.print_something();
 }
 
 
