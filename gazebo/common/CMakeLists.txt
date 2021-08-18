@@ -304,7 +304,7 @@ target_link_libraries(gazebo_common
   ${libavformat_LIBRARIES}
   ${libavutil_LIBRARIES}
   ${libavdevice_LIBRARIES}
-  ${CURL_LIBRARIES}
+  CURL::libcurl
   ${libswscale_LIBRARIES}
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
