@@ -30,6 +30,7 @@
 
 1. Support custom shadow caster materials
     * [Pull request #3048](https://github.com/osrf/gazebo/pull/3048)
+    * [Pull request #3067](https://github.com/osrf/gazebo/pull/3067)
 
 1. Distortion camera initialization tests and fix with background color
     * [Issue #2527](https://github.com/osrf/gazebo/issues/2527)
