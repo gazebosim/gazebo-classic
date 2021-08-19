@@ -1369,7 +1369,7 @@ void GLWidget::SetMouseEventButtons(const Qt::MouseButtons &_buttons)
         this->dataPtr->mouseEvent.Buttons() | 0x0);
   }
 
-  if (_buttons & Qt::MidButton)
+  if (_buttons & Qt::MiddleButton)
   {
     this->dataPtr->mouseEvent.SetButtons(
         this->dataPtr->mouseEvent.Buttons() | common::MouseEvent::MIDDLE);
@@ -1388,6 +1388,6 @@ void GLWidget::SetMouseEventButton(const Qt::MouseButton &_button)
     this->dataPtr->mouseEvent.SetButton(common::MouseEvent::LEFT);
   else if (_button == Qt::RightButton)
     this->dataPtr->mouseEvent.SetButton(common::MouseEvent::RIGHT);
-  else if (_button == Qt::MidButton)
+  else if (_button == Qt::MiddleButton)
     this->dataPtr->mouseEvent.SetButton(common::MouseEvent::MIDDLE);
 }
