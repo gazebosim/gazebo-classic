@@ -1,14 +1,3 @@
-vertex_program shadow_caster_vp_glsl glsl
-{
-  source shadow_caster_vp.glsl
-
-  default_params
-  {
-    param_named_auto world_view_proj_mat worldviewproj_matrix
-    param_named_auto texel_offsets texel_offsets
-  }
-}
-
 fragment_program shadow_caster_ignore_heightmap_fp_glsl glsl
 {
   source shadow_caster_ignore_heightmap_fp.glsl
