@@ -17,14 +17,6 @@ if (HAVE_GDAL)
   include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
-if (CURL_FOUND)
-  include_directories(${CURL_INCLUDEDIR})
-  link_directories(${CURL_LIBDIR})
-  if (WIN32)
-    add_definitions(-DCURL_STATICLIB)
-  endif()
-endif()
-
 include_directories(${tinyxml_INCLUDE_DIRS})
 link_directories(${tinyxml_LIBRARY_DIRS})
 
@@ -317,7 +309,7 @@ target_link_libraries(gazebo_common
   ${libavformat_LIBRARIES}
   ${libavutil_LIBRARIES}
   ${libavdevice_LIBRARIES}
-  ${CURL_LIBRARIES}
+  CURL::libcurl
   ${libswscale_LIBRARIES}
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
