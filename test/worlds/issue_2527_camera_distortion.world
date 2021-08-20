@@ -1,18 +1,43 @@
 <?xml version="1.0" ?>
 <sdf version="1.7">
   <world name="default">
-    <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
     </include>
-    <!-- A ground plane -->
-    <include>
-      <uri>model://ground_plane</uri>
-    </include>
+
+<!--     <include>
+      <pose>1.5 0 0 0 -1.57 0</pose>
+      <uri>model://checkerboard_plane</uri>
+    </include> -->
+
+    <model name="box">
+      <static>1</static>
+      <pose>1.5 0 0 0 -1.57 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <scene>
+      <background>1.0 0.0 0.0 1</background>
+    </scene>
 
     <model name='camera_model_undistorted'>
       <static>1</static>
-      <pose>-5 0 5 0 0.261799 0</pose>
+      <pose>0 0 0 0 0.0 0</pose>
       <link name='body'>
         <visual name='visual'>
           <geometry>
@@ -24,10 +49,10 @@
         <sensor name='camera_sensor_undistorted' type='camera'>
           <visualize>1</visualize>
           <camera>
-            <horizontal_fov>0.785398</horizontal_fov>
+            <horizontal_fov>0.927295218</horizontal_fov>
             <image>
-              <width>320</width>
-              <height>240</height>
+              <width>640</width>
+              <height>480</height>
               <format>R8G8B8</format>
             </image>
             <clip>
@@ -43,7 +68,7 @@
 
     <model name='camera_model_barrel'>
       <static>1</static>
-      <pose>-5 0 5 0 0.261799 0</pose>
+      <pose>0 0 0 0 0.0 0</pose>
       <link name='body'>
         <visual name='visual'>
           <geometry>
@@ -55,10 +80,10 @@
         <sensor name='camera_sensor_barrel' type='camera'>
           <visualize>1</visualize>
           <camera>
-            <horizontal_fov>0.785398</horizontal_fov>
+            <horizontal_fov>0.927295218</horizontal_fov>
             <image>
-              <width>320</width>
-              <height>240</height>
+              <width>640</width>
+              <height>480</height>
               <format>R8G8B8</format>
             </image>
             <clip>
@@ -66,13 +91,12 @@
               <far>100</far>
             </clip>
             <distortion>
-              <k1>-0.1349</k1>
-              <k2>-0.51868</k2>
-              <k3>-0.001</k3>
+              <k1>-0.5</k1>
+              <k2>0</k2>
+              <k3>0</k3>
               <p1>0</p1>
               <p2>0</p2>
               <center>0.5 0.5</center>
-              <ignition:legacy_mode>1</ignition:legacy_mode>
             </distortion>
           </camera>
           <always_on>1</always_on>
@@ -83,7 +107,7 @@
 
     <model name='camera_model_pincushion'>
       <static>1</static>
-      <pose>-5 0 5 0 0.261799 0</pose>
+      <pose>0 0 0 0 0.0 0</pose>
       <link name='body'>
         <visual name='visual'>
           <geometry>
@@ -95,10 +119,10 @@
         <sensor name='camera_sensor_pincushion' type='camera'>
           <visualize>1</visualize>
           <camera>
-            <horizontal_fov>0.785398</horizontal_fov>
+            <horizontal_fov>0.927295218</horizontal_fov>
             <image>
-              <width>320</width>
-              <height>240</height>
+              <width>640</width>
+              <height>480</height>
               <format>R8G8B8</format>
             </image>
             <clip>
@@ -106,13 +130,12 @@
               <far>100</far>
             </clip>
             <distortion>
-              <k1>0.1349</k1>
-              <k2>0.51868</k2>
-              <k3>0.001</k3>
+              <k1>0.5</k1>
+              <k2>0</k2>
+              <k3>0</k3>
               <p1>0</p1>
               <p2>0</p2>
               <center>0.5 0.5</center>
-              <ignition:legacy_mode>1</ignition:legacy_mode>
             </distortion>
           </camera>
           <always_on>1</always_on>

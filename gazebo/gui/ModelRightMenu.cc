@@ -169,15 +169,8 @@ ModelRightMenu::~ModelRightMenu()
 void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     EntityTypes _type)
 {
-  // Find out the entity type
-  if (_type == EntityTypes::MODEL)
-  {
-    this->entityName = _entityName.substr(0, _entityName.find("::"));
-  }
-  else if (_type == EntityTypes::LINK || _type == EntityTypes::LIGHT)
-  {
-    this->entityName = _entityName;
-  }
+  // Set to scoped name
+  this->entityName = _entityName;
 
   QMenu menu;
 
@@ -283,16 +276,28 @@ void ModelRightMenu::OnApplyWrench()
   }
 
   std::string modelName, linkName;
-  if (vis == vis->GetRootVisual())
+  if (vis->GetType() == rendering::Visual::VT_MODEL)
   {
     modelName = this->entityName;
     // If model selected just take the first link
-    linkName = vis->GetChild(0)->Name();
+    for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
+    {
+      rendering::VisualPtr currentChild = vis->GetChild(i);
+      if (currentChild->GetType() == rendering::Visual::VT_LINK)
+      {
+        linkName = currentChild->Name();
+        break;
+      }
+    }
   }
   else
   {
-    modelName = vis->GetRootVisual()->Name();
-    linkName = this->entityName;
+    // Links should always have a parent
+    if (vis->GetParent() != nullptr)
+    {
+      modelName = vis->GetParent()->Name();
+      linkName = this->entityName;
+    }
   }
 
   applyWrenchDialog->Init(modelName, linkName);
