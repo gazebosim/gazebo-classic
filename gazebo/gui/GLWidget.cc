@@ -656,7 +656,7 @@ void GLWidget::wheelEvent(QWheelEvent *_event)
   this->dataPtr->lastWheelEventTime = eventTime;
 
   int scrollY = 0;
-  int delta = _event->delta();
+  int delta = _event->angleDelta().y();
 
   if (delta > 0)
     scrollY = -1;
