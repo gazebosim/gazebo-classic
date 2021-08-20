@@ -1,7 +1,22 @@
+# if GAZEBO_INSTALL_PREFIX is unset, fall back to
+# configure-time value of CMAKE_INSTALL_PREFIX
+installPrefix=${GAZEBO_INSTALL_PREFIX:-@CMAKE_INSTALL_PREFIX@}
+if [ ! -d "${installPrefix}" ]; then
+  echo "The install prefix ${installPrefix} does not exist."
+  unset installPrefix
+  return 1
+elif [ ! -f "${installPrefix}/@GAZEBO_RELATIVE_RESOURCE_PATH@/setup.sh" ]; then
+  echo "The install prefix ${installPrefix}/@GAZEBO_RELATIVE_RESOURCE_PATH@ does not contain setup.sh."
+  unset installPrefix
+  return 1
+fi
+
 export GAZEBO_MASTER_URI=${GAZEBO_MASTER_URI:-http://@GAZEBO_DEFAULT_MASTER_HOST@:@GAZEBO_DEFAULT_MASTER_PORT@}
 export GAZEBO_MODEL_DATABASE_URI=@GAZEBO_MODEL_DATABASE_URI@
-export GAZEBO_RESOURCE_PATH=@GAZEBO_RESOURCE_PATH@:${GAZEBO_RESOURCE_PATH}
-export GAZEBO_PLUGIN_PATH=@GAZEBO_PLUGIN_PATH@:${GAZEBO_PLUGIN_PATH}
-export GAZEBO_MODEL_PATH=@GAZEBO_MODEL_PATH@:${GAZEBO_MODEL_PATH}
+export GAZEBO_RESOURCE_PATH=${installPrefix}/@GAZEBO_RELATIVE_RESOURCE_PATH@:${GAZEBO_RESOURCE_PATH}
+export GAZEBO_PLUGIN_PATH=${installPrefix}/@GAZEBO_RELATIVE_PLUGIN_PATH@:${GAZEBO_PLUGIN_PATH}
+export GAZEBO_MODEL_PATH=${installPrefix}/@GAZEBO_RELATIVE_MODEL_PATH@:${GAZEBO_MODEL_PATH}
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:@GAZEBO_PLUGIN_PATH@
 export OGRE_RESOURCE_PATH=@OGRE_RESOURCE_PATH@
+
+unset installPrefix

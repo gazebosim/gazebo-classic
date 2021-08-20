@@ -479,7 +479,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
   {
     gzerr << "Unable to find shader lib. Shader generating will fail. "
           << "Your GAZEBO_RESOURCE_PATH is probably improperly set. "
-          << "Have you sourced <prefix>/share/gazebo/setup.sh?\n";
+          << "Have you sourced <prefix>/share/gazebo/setup.bash?\n";
     return false;
   }
 

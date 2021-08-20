@@ -384,7 +384,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
         gzerr << "worlds/empty.world could not be opened, "
               << "probably because it was not found. "
               << "Your GAZEBO_RESOURCE_PATH is probably improperly set. "
-              << "Have you sourced <prefix>/share/gazebo/setup.sh?\n";
+              << "Have you sourced <prefix>/share/gazebo/setup.bash?\n";
         return false;
       }
     }

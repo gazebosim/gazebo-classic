@@ -378,7 +378,7 @@ namespace gazebo
       public: std::map<int32_t, bool> layerState;
 
       /// \brief Shadow caster material name
-      public: std::string shadowCasterMaterialName;
+      public: std::string shadowCasterMaterialName = "Gazebo/shadow_caster";
     };
   }
 }

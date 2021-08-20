@@ -86,8 +86,8 @@ TEST_F(Issue2527Test, Distortion)
       sensors::get_sensor("camera_sensor_pincushion"));
   EXPECT_TRUE(camSensorPincushion != nullptr);
 
-  unsigned int width  = 320;
-  unsigned int height = 240;
+  unsigned int width  = 640;
+  unsigned int height = 480;
 
   imageCount = 0;
   imageCount3 = 0;
@@ -162,8 +162,9 @@ TEST_F(Issue2527Test, Distortion)
       colorSum4 += r4 + g4 + b4;
     }
   }
-  EXPECT_GT(colorSum, colorSum3);
-  EXPECT_GT(colorSum, colorSum4);
+  EXPECT_GT(colorSum3, colorSum + 2000000);
+  EXPECT_GT(colorSum4, colorSum + 250000);
+  EXPECT_GT(colorSum3, colorSum4 + 1500000);
 
   delete[] img;
   delete[] img3;

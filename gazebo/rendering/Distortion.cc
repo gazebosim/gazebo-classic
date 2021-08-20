@@ -421,17 +421,28 @@ void Distortion::SetCamera(CameraPtr _camera)
   }
   pixelBuffer->unlock();
 
+  this->CalculateAndApplyDistortionScale();
+
   // set up the distortion map texture to be used in the pixel shader.
   this->dataPtr->distortionMaterial->getTechnique(0)->getPass(0)->
       createTextureUnitState(texName, 1);
+
+  this->RefreshCompositor(_camera);
+}
+
+//////////////////////////////////////////////////
+void Distortion::RefreshCompositor(CameraPtr _camera)
+{
+  if (this->dataPtr->lensDistortionInstance) {
+    Ogre::CompositorManager::getSingleton().removeCompositor(
+      _camera->OgreViewport(), this->dataPtr->compositorName);
+  }
 
   this->dataPtr->lensDistortionInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(
       _camera->OgreViewport(), this->dataPtr->compositorName);
   this->dataPtr->lensDistortionInstance->getTechnique()->getOutputTargetPass()->
       getPass(0)->setMaterial(this->dataPtr->distortionMaterial);
-
-  this->CalculateAndApplyDistortionScale();
 
   this->dataPtr->lensDistortionInstance->setEnabled(true);
 

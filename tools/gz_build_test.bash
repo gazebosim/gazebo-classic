@@ -40,7 +40,7 @@ do
   cd build
   cmake -DCMAKE_INSTALL_PREFIX=/tmp/gazebo_build/install ../
   make -j4 install
-  . /tmp/gazebo_build/install/share/gazebo/setup.sh
+  . /tmp/gazebo_build/install/share/gazebo/setup.bash
 
   echo "Branch: $branch" >> $logfile
   echo "==================================================" >> $logfile

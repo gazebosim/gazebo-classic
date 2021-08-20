@@ -36,10 +36,12 @@ class CameraSensor : public ServerFixture
 
 std::mutex mutex;
 
+unsigned char* img0 = NULL;
 unsigned char* img = NULL;
 unsigned char* img2 = NULL;
 unsigned char* img3 = NULL;
 unsigned char* img4 = NULL;
+int imageCount0 = 0;
 int imageCount = 0;
 int imageCount2 = 0;
 int imageCount3 = 0;
@@ -2061,6 +2063,10 @@ TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
   const std::string modelNameBarrelNew = "camera_model_barrel_new";
   const std::string cameraNameBarrelNew = "camera_sensor_barrel_new";
 
+  const std::string modelNamePincushionFirst =
+    "camera_model_pincushion_first";
+  const std::string cameraNamePincushionFirst =
+    "camera_sensor_pincushion_first";
   const std::string modelNamePincushionLegacy =
     "camera_model_pincushion_legacy";
   const std::string cameraNamePincushionLegacy =
@@ -2075,6 +2081,12 @@ TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
       ignition::math::Quaterniond(0, 0, 0));
   const double horizontalFov = 1.6;
 
+  // spawn an extra camera first that has the pincushion legacy parameters
+  // to confirm that the order of spawning cameras doesn't matter
+  SpawnCamera(modelNamePincushionFirst, cameraNamePincushionFirst,
+      setPose.Pos(), setPose.Rot().Euler(), width, height, updateRate,
+      "", 0, 0, true, 0.5, 0, 0, 0, 0, 0.5, 0.5,
+      true, horizontalFov);
   // spawn a camera with  pincushion distortion
   SpawnCamera(modelNamePincushionLegacy, cameraNamePincushionLegacy,
       setPose.Pos(), setPose.Rot().Euler(), width, height, updateRate,
@@ -2094,6 +2106,10 @@ TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
       "", 0, 0, true, -0.5, 0, 0, 0, 0, 0.5, 0.5,
       false, horizontalFov);
 
+  sensors::SensorPtr sensorPincushionFirst =
+    sensors::get_sensor(cameraNamePincushionFirst);
+  sensors::CameraSensorPtr camSensorPincushionFirst =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorPincushionFirst);
   sensors::SensorPtr sensorPincushionLegacy =
     sensors::get_sensor(cameraNamePincushionLegacy);
   sensors::CameraSensorPtr camSensorPincushionLegacy =
@@ -2112,16 +2128,23 @@ TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
   sensors::CameraSensorPtr camSensorBarrelNew =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensorBarrelNew);
 
+  imageCount0 = 0;
   imageCount = 0;
   imageCount2 = 0;
   imageCount3 = 0;
   imageCount4 = 0;
 
+  img0 = new unsigned char[width * height*3];
   img = new unsigned char[width * height*3];
   img2 = new unsigned char[width * height*3];
   img3 = new unsigned char[width * height*3];
   img4 = new unsigned char[width * height*3];
 
+  event::ConnectionPtr c0 =
+    camSensorPincushionFirst->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount0, img0,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c1 =
     camSensorPincushionLegacy->Camera()->ConnectNewImageFrame(
         std::bind(&::OnNewCameraFrame, &imageCount, img,
@@ -2145,11 +2168,21 @@ TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
 
   // Get some images
   while (
+    imageCount0 < 10 ||
     imageCount < 10 || imageCount2 < 10 ||
     imageCount3 < 10 || imageCount4 < 10)
   {
     common::Time::MSleep(10);
   }
+
+  // Expect pincusion legacy cameras with identical parameters to produce
+  // identical images
+  unsigned int accumulatedPixelError = 0;
+  for (unsigned int x = 0; x < width*height*3; ++x)
+  {
+    accumulatedPixelError += std::abs(img0[x] - img[x]);
+  }
+  EXPECT_EQ(0u, accumulatedPixelError);
 
   unsigned int colorSum1 = 0;
   unsigned int colorSum2 = 0;
