@@ -116,12 +116,47 @@ namespace gazebo
             {
               TPtr result;
               // PluginPtr result;
-              struct stat st;
-              bool found = false;
-              std::string fullname, filename(_filename);
-              std::list<std::string>::iterator iter;
+              std::string filename(_filename);
               std::list<std::string> pluginPaths =
                 common::SystemPaths::Instance()->GetPluginPaths();
+              std::ostringstream errorStream;
+
+              // helper function to find and dlopen a plugin file
+              // returns void * dlHandle
+              auto findAndDlopenPluginFile = [](
+                  const std::string &_pluginFilename,
+                  const std::list<std::string> &_pluginPaths,
+                  std::ostringstream &_errorStream) -> void *
+              {
+                struct stat st;
+                bool found = false;
+                std::string fullname;
+                std::list<std::string>::const_iterator iter;
+
+                for (iter = _pluginPaths.begin();
+                     iter!= _pluginPaths.end(); ++iter)
+                {
+                  fullname = (*iter)+std::string("/")+_pluginFilename;
+                  fullname = boost::filesystem::path(fullname)
+                      .make_preferred().string();
+                  if (stat(fullname.c_str(), &st) == 0)
+                  {
+                    found = true;
+                    break;
+                  }
+                }
+
+                if (!found)
+                  fullname = _pluginFilename;
+
+                void *dlHandle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+                if (!dlHandle)
+                {
+                  _errorStream << "Failed to load plugin " << fullname << ": "
+                    << dlerror() << "\n";
+                }
+                return dlHandle;
+              };
 
 #ifdef __APPLE__
               // This is a hack to work around issue #800,
@@ -153,32 +188,16 @@ namespace gazebo
               }
 #endif  // ifdef __APPLE__
 
-              for (iter = pluginPaths.begin();
-                   iter!= pluginPaths.end(); ++iter)
+              void *dlHandle = findAndDlopenPluginFile(filename, pluginPaths,
+                                                       errorStream);
+              if (!dlHandle)
               {
-                fullname = (*iter)+std::string("/")+filename;
-                fullname = boost::filesystem::path(fullname)
-                    .make_preferred().string();
-                if (stat(fullname.c_str(), &st) == 0)
-                {
-                  found = true;
-                  break;
-                }
+                gzerr << errorStream.str();
+                return result;
               }
-
-              if (!found)
-                fullname = filename;
 
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
-
-              void *dlHandle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-              if (!dlHandle)
-              {
-                gzerr << "Failed to load plugin " << fullname << ": "
-                  << dlerror() << "\n";
-                return result;
-              }
 
               registerFunc.ptr = dlsym(dlHandle, registerName.c_str());
 
