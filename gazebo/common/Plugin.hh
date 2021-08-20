@@ -158,19 +158,17 @@ namespace gazebo
                 return dlHandle;
               };
 
-#ifdef __APPLE__
-              // This is a hack to work around issue #800,
-              // error loading plugin libraries with different extensions
-              {
-                size_t soSuffix = filename.rfind(".so");
-                if (soSuffix != std::string::npos)
-                {
-                  const std::string macSuffix(".dylib");
-                  filename.replace(soSuffix, macSuffix.length(), macSuffix);
-                }
-              }
-#elif _WIN32
-              // Corresponding windows hack
+              // This logic is to support different extensions on each OS
+              // see issue #800
+              //
+              // Linux: lib*.so
+              // macOS: lib*.so, lib*.dylib
+              // Windows: *.dll
+              //
+              // Assuming that most plugin names are specified as lib*.so,
+              // replace prefix and suffix depending on the OS.
+              // On macOS, first try the lib*.so name, then try lib*.dylib
+#ifdef _WIN32
               {
                 // replace .so with .dll
                 size_t soSuffix = filename.rfind(".so");
@@ -186,10 +184,29 @@ namespace gazebo
                   filename.erase(0, 3);
                 }
               }
-#endif  // ifdef __APPLE__
+#endif  // ifdef _WIN32
 
+              // Try to find and dlopen plugin with the following pattern:
+              // Linux: lib*.so
+              // macOS: lib*.so
+              // Windows: *.dll
               void *dlHandle = findAndDlopenPluginFile(filename, pluginPaths,
                                                        errorStream);
+#ifdef __APPLE__
+              if (!dlHandle)
+              {
+                // lib*.so file could not be found or opened, try lib*.dylib
+                size_t soSuffix = filename.rfind(".so");
+                if (soSuffix != std::string::npos)
+                {
+                  const std::string macSuffix(".dylib");
+                  filename.replace(soSuffix, macSuffix.length(), macSuffix);
+                }
+              }
+              // macOS: lib*.dylib
+              dlHandle = findAndDlopenPluginFile(filename, pluginPaths, errorStream);
+#endif  // ifdef __APPLE__
+
               if (!dlHandle)
               {
                 gzerr << errorStream.str();
@@ -197,9 +214,9 @@ namespace gazebo
               }
 
               fptr_union_t registerFunc;
-              std::string registerName = "RegisterPlugin";
+              const char *registerName = "RegisterPlugin";
 
-              registerFunc.ptr = dlsym(dlHandle, registerName.c_str());
+              registerFunc.ptr = dlsym(dlHandle, registerName);
 
               if (!registerFunc.ptr)
               {
