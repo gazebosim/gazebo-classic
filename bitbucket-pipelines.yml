@@ -1,7 +1,0 @@
-image: ubuntu:bionic
-
-pipelines:
-  default:
-    - step:
-        script:
-          - apt-get update
