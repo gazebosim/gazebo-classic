@@ -434,7 +434,7 @@ else (build_errors)
 
   file(RELATIVE_PATH
     PC_CONFIG_RELATIVE_PATH_TO_PREFIX
-    ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/pkgconfig
+    ${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig
     ${CMAKE_INSTALL_PREFIX}
   )
   foreach (pkgconfig ${pkgconfig_files})
