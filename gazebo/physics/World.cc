@@ -707,6 +707,11 @@ void World::Step()
   DIAG_TIMER_START("World::Step");
 
   IGN_PROFILE("World::Step");
+
+  IGN_PROFILE_BEGIN("lockMutex");
+  std::lock_guard<std::mutex> lock(this->dataPtr->stepMutex);
+  IGN_PROFILE_END();
+
   IGN_PROFILE_BEGIN("loadPlugins");
   /// need this because ODE does not call dxReallocateWorldProcessContext()
   /// until dWorld.*Step
@@ -952,12 +957,26 @@ void World::Fini()
   this->dataPtr->stop = true;
   this->dataPtr->enablePhysicsEngine = false;
 
+  // wait until World::Step has completed before proceeding
+  std::lock_guard<std::mutex> lock(this->dataPtr->stepMutex);
+
 #ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Fini();
 #endif
 
   // Clean transport
   {
+    // Clear subscribers first
+    this->dataPtr->controlSub.reset();
+    this->dataPtr->factorySub.reset();
+    this->dataPtr->jointSub.reset();
+    this->dataPtr->lightFactorySub.reset();
+    this->dataPtr->lightModifySub.reset();
+    this->dataPtr->lightSub.reset();
+    this->dataPtr->modelSub.reset();
+    this->dataPtr->playbackControlSub.reset();
+    this->dataPtr->requestSub.reset();
+
     this->dataPtr->deleteEntity.clear();
     this->dataPtr->requestMsgs.clear();
     this->dataPtr->factoryMsgs.clear();
@@ -974,16 +993,6 @@ void World::Fini()
     this->dataPtr->modelPub.reset();
     this->dataPtr->lightPub.reset();
     this->dataPtr->lightFactoryPub.reset();
-
-    this->dataPtr->factorySub.reset();
-    this->dataPtr->controlSub.reset();
-    this->dataPtr->playbackControlSub.reset();
-    this->dataPtr->requestSub.reset();
-    this->dataPtr->jointSub.reset();
-    this->dataPtr->lightSub.reset();
-    this->dataPtr->lightFactorySub.reset();
-    this->dataPtr->lightModifySub.reset();
-    this->dataPtr->modelSub.reset();
 
     if (this->dataPtr->node)
       this->dataPtr->node->Fini();
