@@ -707,6 +707,11 @@ void World::Step()
   DIAG_TIMER_START("World::Step");
 
   IGN_PROFILE("World::Step");
+
+  IGN_PROFILE_BEGIN("lockMutex");
+  std::lock_guard<std::mutex> lock(this->dataPtr->stepMutex);
+  IGN_PROFILE_END();
+
   IGN_PROFILE_BEGIN("loadPlugins");
   /// need this because ODE does not call dxReallocateWorldProcessContext()
   /// until dWorld.*Step
@@ -951,6 +956,9 @@ void World::Fini()
 {
   this->dataPtr->stop = true;
   this->dataPtr->enablePhysicsEngine = false;
+
+  // wait until World::Step has completed before proceeding
+  std::lock_guard<std::mutex> lock(this->dataPtr->stepMutex);
 
 #ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Fini();

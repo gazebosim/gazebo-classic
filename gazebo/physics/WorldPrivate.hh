@@ -182,6 +182,9 @@ namespace gazebo
       /// Entity::SetWorldPose to call Entity::setWorldPoseFunc
       public: std::mutex setWorldPoseMutex;
 
+      /// \brief Used in World::Step and World::Fini
+      public: std::mutex stepMutex;
+
       /// \brief Used by World classs in following calls:
       /// World::Step for then entire function
       /// World::StepWorld for changing World::stepInc,
