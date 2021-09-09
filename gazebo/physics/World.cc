@@ -966,6 +966,17 @@ void World::Fini()
 
   // Clean transport
   {
+    // Clear subscribers first
+    this->dataPtr->controlSub.reset();
+    this->dataPtr->factorySub.reset();
+    this->dataPtr->jointSub.reset();
+    this->dataPtr->lightFactorySub.reset();
+    this->dataPtr->lightModifySub.reset();
+    this->dataPtr->lightSub.reset();
+    this->dataPtr->modelSub.reset();
+    this->dataPtr->playbackControlSub.reset();
+    this->dataPtr->requestSub.reset();
+
     this->dataPtr->deleteEntity.clear();
     this->dataPtr->requestMsgs.clear();
     this->dataPtr->factoryMsgs.clear();
@@ -982,16 +993,6 @@ void World::Fini()
     this->dataPtr->modelPub.reset();
     this->dataPtr->lightPub.reset();
     this->dataPtr->lightFactoryPub.reset();
-
-    this->dataPtr->factorySub.reset();
-    this->dataPtr->controlSub.reset();
-    this->dataPtr->playbackControlSub.reset();
-    this->dataPtr->requestSub.reset();
-    this->dataPtr->jointSub.reset();
-    this->dataPtr->lightSub.reset();
-    this->dataPtr->lightFactorySub.reset();
-    this->dataPtr->lightModifySub.reset();
-    this->dataPtr->modelSub.reset();
 
     if (this->dataPtr->node)
       this->dataPtr->node->Fini();
