@@ -430,9 +430,21 @@ void Scene::Init()
       this->dataPtr->worldVisual));
   this->dataPtr->originVisual->Load();
 
-  this->dataPtr->requestPub->WaitForConnection();
-  this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
-  this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+  // Get scene info from physics::World with ignition transport service
+  ignition::transport::Node node;
+  ignition::msgs::Scene sceneInfo;
+  const std::string serviceName = "/scene_info";
+  std::vector<ignition::transport::ServicePublisher> publishers;
+  if (!node.ServiceInfo(serviceName, publishers) ||
+      !node.Request(serviceName, &Scene::OnSceneInfo, this))
+  {
+    gzwarn << "Ignition transport [" << serviceName << "] service call failed,"
+           << " falling back to gazebo transport [scene_info] request."
+           << std::endl;
+    this->dataPtr->requestPub->WaitForConnection();
+    this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
+    this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+  }
 
   if (!this->dataPtr->isServer)
   {
@@ -2459,6 +2471,21 @@ void Scene::OnScene(ConstScenePtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void Scene::OnSceneInfo(const msgs::Scene &_msg, const bool _result)
+{
+  if (_result)
+  {
+    std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+    auto msgptr = boost::make_shared<const msgs::Scene>(_msg);
+    this->dataPtr->sceneMsgs.push_back(msgptr);
+  }
+  else
+  {
+    gzerr << "Error when calling /scene_info service" << std::endl;
+  }
+}
+
+/////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->dataPtr->requestMsg ||
@@ -2467,10 +2494,8 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
 
   msgs::Scene sceneMsg;
   sceneMsg.ParseFromString(_msg->serialized_data());
-  boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
+  this->OnSceneInfo(sceneMsg, true);
 
-  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  this->dataPtr->sceneMsgs.push_back(sm);
   this->dataPtr->requestMsg = NULL;
 }
 
