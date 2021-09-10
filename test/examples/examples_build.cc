@@ -123,7 +123,9 @@ auto standaloneValues = ::testing::Values(
   , "arrange"
   , "clone_simulation"
   , "custom_main"
+#ifndef __APPLE__
   , "custom_main_pkgconfig"
+#endif
   , "diagnostics"
   , "harness"
   , "introspection_client"
