@@ -296,6 +296,14 @@ void World::Load(sdf::ElementPtr _sdf)
         << std::endl;
   }
 
+  std::string sceneInfoService("/scene_info");
+  if (!this->dataPtr->ignNode.Advertise(sceneInfoService,
+      &World::SceneInfoService, this))
+  {
+    gzerr << "Error advertising service [" << sceneInfoService << "]"
+        << std::endl;
+  }
+
   std::string shadowCasterService("/shadow_caster_material_name");
   if (!this->dataPtr->ignNode.Advertise(shadowCasterService,
       &World::ShadowCasterService, this))
@@ -3370,6 +3378,27 @@ bool World::PluginInfoService(const ignition::msgs::StringMsg &_req,
       << std::endl;
 
   return false;
+}
+
+//////////////////////////////////////////////////
+bool World::SceneInfoService(msgs::Scene &_res)
+{
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
+
+  // Copy implementation from ProcessRequestMsgs
+  this->dataPtr->sceneMsg.clear_model();
+  this->dataPtr->sceneMsg.clear_light();
+  this->BuildSceneMsg(this->dataPtr->sceneMsg, this->dataPtr->rootElement);
+
+  _res = this->dataPtr->sceneMsg;
+
+  for (auto road : this->dataPtr->roads)
+  {
+    // this causes the roads to publish road msgs.
+    road->Init();
+  }
+
+  return true;
 }
 
 //////////////////////////////////////////////////
