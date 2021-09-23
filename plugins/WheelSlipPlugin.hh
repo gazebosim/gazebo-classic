@@ -130,8 +130,8 @@ namespace gazebo
     public: void SetSlipComplianceLateral(const double _compliance);
 
     /// \brief Set unitless lateral slip compliance for a particular wheel.
-    /// \param[in] _compliance unitless slip compliance to set.
     /// \param[in] _wheel_name name of the wheel link on which _compliance should be set.
+    /// \param[in] _compliance unitless slip compliance to set.
     public: void SetSlipComplianceLateral(std::string _wheel_name, const double _compliance);
 
     /// \brief Set unitless longitudinal slip compliance for all wheels.
@@ -139,8 +139,8 @@ namespace gazebo
     public: void SetSlipComplianceLongitudinal(const double _compliance);
 
     /// \brief Set unitless longitudinal slip compliance for a particular wheel.
-    /// \param[in] _compliance unitless slip compliance to set.
     /// \param[in] _wheel_name name of the wheel link on which _compliance should be set.
+    /// \param[in] _compliance unitless slip compliance to set.
     public: void SetSlipComplianceLongitudinal(std::string _wheel_name, const double _compliance);
 
     /// \brief Transport callback for setting lateral slip compliance.

@@ -453,7 +453,8 @@ void WheelSlipPlugin::SetSlipComplianceLateral(const double _compliance)
 void WheelSlipPlugin::SetSlipComplianceLateral(std::string _wheel_name, const double _compliance)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  if (this->dataPtr->mapLinkNames.count(_wheel_name) > 0) {
+  if (this->dataPtr->mapLinkNames.count(_wheel_name) > 0)
+  {
     auto link = this->dataPtr->mapLinkNames[_wheel_name];
     this->dataPtr->mapLinkSurfaceParams[link].slipComplianceLateral = _compliance;
   }
@@ -473,7 +474,8 @@ void WheelSlipPlugin::SetSlipComplianceLongitudinal(const double _compliance)
 void WheelSlipPlugin::SetSlipComplianceLongitudinal(std::string _wheel_name, const double _compliance)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  if (this->dataPtr->mapLinkNames.count(_wheel_name) > 0) {
+  if (this->dataPtr->mapLinkNames.count(_wheel_name) > 0)
+  {
     auto link = this->dataPtr->mapLinkNames[_wheel_name];
     this->dataPtr->mapLinkSurfaceParams[link].slipComplianceLongitudinal = _compliance;
   }
