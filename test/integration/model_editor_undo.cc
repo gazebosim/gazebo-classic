@@ -89,7 +89,7 @@ void ModelEditorUndoTest::LinkInsertionByMouse()
   QVERIFY(cylinderButton->isChecked());
 
   // Press the mouse in the scene to finish inserting a link
-  QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
+  QTest::mouseRelease(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(-mainWindow->width()*0.5, -mainWindow->height()*0.5));
 
   this->ProcessEventsAndDraw(mainWindow);
@@ -284,7 +284,7 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
       cococanItem[0]), Q_ARG(int, 0));
 
   // Press the mouse in the scene to finish inserting a model
-  QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
+  QTest::mouseRelease(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(-mainWindow->width()*0.5, -mainWindow->height()*0.5));
 
   this->ProcessEventsAndDraw(mainWindow);
@@ -496,7 +496,7 @@ void ModelEditorUndoTest::JointInsertionByDialog()
       nestedModelItem[0]), Q_ARG(int, 0));
 
   // Press the mouse in the scene to finish inserting a model
-  QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
+  QTest::mouseRelease(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(-mainWindow->width()*0.5, -mainWindow->height()*0.5));
 
   this->ProcessEventsAndDraw(mainWindow);
@@ -506,7 +506,7 @@ void ModelEditorUndoTest::JointInsertionByDialog()
   QVERIFY(cylinderButton->isChecked());
 
   // Press the mouse in the scene to finish inserting a link
-  QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
+  QTest::mouseRelease(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(-mainWindow->width()*0.3, -mainWindow->height()*0.5));
 
   this->ProcessEventsAndDraw(mainWindow);
@@ -782,8 +782,8 @@ void ModelEditorUndoTest::TriggerDelete()
 
       // This only works as long as the Delete action is the last one in the
       // menu
-      QTest::mouseClick(context, Qt::LeftButton, 0, QPoint(10,
-          context->height() - 10));
+      QTest::mouseClick(context, Qt::LeftButton, Qt::KeyboardModifiers(),
+          QPoint(10, context->height() - 10));
 
       return;
     }

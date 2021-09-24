@@ -18,7 +18,7 @@ void main()
   bool matchingVectors = (magicVector1 == world_matrix[0] && magicVector2 == world_matrix[1] && magicVector3 == world_matrix[2]);
 
   if (length(camera_position.xyz) == 0 && matchingVectors) {
-    depth = 1.0;
+    discard;
   }
 
   gl_FragColor = vec4(depth, depth, depth, 1.0);

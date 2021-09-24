@@ -200,8 +200,9 @@ namespace gazebo
                  private: void wheelEvent(QWheelEvent *_event)
                  {
                    this->viewZoomed = true;
-                   _event->delta() > 0 ? this->scale(1.15, 1.15) :
-                                         this->scale(1.0 / 1.15, 1.0 / 1.15);
+                   _event->angleDelta().y() > 0 ?
+                       this->scale(1.15, 1.15) :
+                       this->scale(1.0 / 1.15, 1.0 / 1.15);
                    _event->accept();
                  }
 

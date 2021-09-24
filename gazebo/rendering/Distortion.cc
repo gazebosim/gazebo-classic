@@ -433,6 +433,16 @@ void Distortion::SetCamera(CameraPtr _camera)
 //////////////////////////////////////////////////
 void Distortion::RefreshCompositor(CameraPtr _camera)
 {
+  // If no distortion is required, immediately return.
+  if (ignition::math::equal(this->dataPtr->k1, 0.0) &&
+      ignition::math::equal(this->dataPtr->k2, 0.0) &&
+      ignition::math::equal(this->dataPtr->k3, 0.0) &&
+      ignition::math::equal(this->dataPtr->p1, 0.0) &&
+      ignition::math::equal(this->dataPtr->p2, 0.0))
+  {
+    return;
+  }
+
   if (this->dataPtr->lensDistortionInstance) {
     Ogre::CompositorManager::getSingleton().removeCompositor(
       _camera->OgreViewport(), this->dataPtr->compositorName);

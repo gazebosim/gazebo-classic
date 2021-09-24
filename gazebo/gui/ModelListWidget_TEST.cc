@@ -440,8 +440,8 @@ void ModelListWidget_TEST::ModelProperties()
 
   // select the models item
   QRect modelsRect = modelTreeWidget->visualItemRect(modelsItem);
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      modelsRect.center() );
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), modelsRect.center() );
   QCoreApplication::processEvents();
   // wait for the model to be selected
   sleep = 0;
@@ -455,8 +455,8 @@ void ModelListWidget_TEST::ModelProperties()
 
   // select the multi-link model
   QRect modelRect = modelTreeWidget->visualItemRect(modelItem);
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      modelRect.center());
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), modelRect.center());
   QCoreApplication::processEvents();
   sleep = 0;
   maxSleep = 5;
@@ -579,8 +579,8 @@ void ModelListWidget_TEST::ModelProperties()
   QCOMPARE(numLinks, 2);
 
   // select the multi-link model again to refresh the property browser
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      modelRect.center() );
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), modelRect.center() );
   QCoreApplication::processEvents();
   QTest::qWait(100);
   sleep = 0;
@@ -716,8 +716,8 @@ void ModelListWidget_TEST::LinkProperties(const std::string &_worldFilename,
 
   // select the models item
   QRect modelsRect = modelTreeWidget->visualItemRect(modelsItem);
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      modelsRect.center() );
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), modelsRect.center() );
   QCoreApplication::processEvents();
   // wait for the models item to be selected
   sleep = 0;
@@ -731,8 +731,8 @@ void ModelListWidget_TEST::LinkProperties(const std::string &_worldFilename,
 
   // select the multi-link model
   QRect modelRect = modelTreeWidget->visualItemRect(modelItem);
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      modelRect.center());
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), modelRect.center());
   QCoreApplication::processEvents();
   sleep = 0;
   maxSleep = 5;
@@ -762,8 +762,8 @@ void ModelListWidget_TEST::LinkProperties(const std::string &_worldFilename,
   QCOMPARE(boxLinkItem->text(0), tr(boxLinkName.c_str()));
 
   QRect boxLinkRect = modelTreeWidget->visualItemRect(boxLinkItem);
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      boxLinkRect.center() );
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), boxLinkRect.center() );
 
   QCoreApplication::processEvents();
   sleep = 0;
@@ -798,8 +798,8 @@ void ModelListWidget_TEST::LinkProperties(const std::string &_worldFilename,
       ignition::math::Pose3d(2.5, 1.0, 4.2, 0.8, 0.5, 0.1));
 
   // select the box link again to refresh the property browser
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      boxLinkRect.center() );
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), boxLinkRect.center() );
 
   QCoreApplication::processEvents();
   QTest::qWait(100);
@@ -836,8 +836,8 @@ void ModelListWidget_TEST::LinkProperties(const std::string &_worldFilename,
   QCOMPARE(sphereLinkItem->text(0), tr(sphereLinkName.c_str()));
 
   QRect sphereLinkRect = modelTreeWidget->visualItemRect(sphereLinkItem);
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      sphereLinkRect.center() );
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), sphereLinkRect.center() );
   QCoreApplication::processEvents();
   QTest::qWait(100);
   sleep = 0;
@@ -873,8 +873,8 @@ void ModelListWidget_TEST::LinkProperties(const std::string &_worldFilename,
       ignition::math::Pose3d(-2.0, 0.1, -1.2, 0, 1.57, 0));
 
   // select the sphere link again to refresh the property browser
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      sphereLinkRect.center() );
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), sphereLinkRect.center() );
   QCoreApplication::processEvents();
   QTest::qWait(100);
   sleep = 0;
@@ -986,8 +986,8 @@ void ModelListWidget_TEST::PluginProperties()
 
   // Select the models item
   QRect modelsRect = modelTreeWidget->visualItemRect(modelsItem);
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      modelsRect.center() );
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), modelsRect.center() );
   QCoreApplication::processEvents();
 
   // Wait for the models item to be selected
@@ -1007,8 +1007,8 @@ void ModelListWidget_TEST::PluginProperties()
 
   // Select the submarine model
   QRect modelRect = modelTreeWidget->visualItemRect(modelItem);
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      modelRect.center());
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), modelRect.center());
   QCoreApplication::processEvents();
   sleep = 0;
   maxSleep = 5;
@@ -1038,8 +1038,8 @@ void ModelListWidget_TEST::PluginProperties()
 
   // Select the buoyancy plugin
   QRect pluginRect = modelTreeWidget->visualItemRect(pluginItem);
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      pluginRect.center() );
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), pluginRect.center() );
   QCoreApplication::processEvents();
 
   // Wait for the models plugin to be selected
@@ -1111,8 +1111,8 @@ void ModelListWidget_TEST::PhysicsProperties()
   QRect physicsRect;
   {
     physicsRect = modelTreeWidget->visualItemRect(physicsItem);
-    QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-        physicsRect.center() );
+    QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+        Qt::KeyboardModifiers(), physicsRect.center() );
     QCoreApplication::processEvents();
     // wait for the physics item to be selected
     int sleep = 0;
@@ -1208,8 +1208,8 @@ void ModelListWidget_TEST::PhysicsProperties()
   }
 
   // select the box link again to refresh the property browser
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      physicsRect.center() );
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+      Qt::KeyboardModifiers(), physicsRect.center() );
 
   {
     QCoreApplication::processEvents();
@@ -1288,8 +1288,8 @@ void ModelListWidget_TEST::GUIProperties()
   QRect guiRect;
   {
     guiRect = modelTreeWidget->visualItemRect(guiItem);
-    QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-        guiRect.center() );
+    QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton,
+        Qt::KeyboardModifiers(), guiRect.center() );
     QCoreApplication::processEvents();
 
     // wait for the gui item to be selected

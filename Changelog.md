@@ -1,5 +1,13 @@
 ## Gazebo 11
 
+## Gazebo 11.8.1 (2021-08-24)
+
+1. Fixes for shadow caster shaders
+    * [Pull request #3070](https://github.com/osrf/gazebo/pull/3070)
+
+1. Distortion::RefreshCompositor check nonzero params
+    * [Pull request #3071](https://github.com/osrf/gazebo/pull/3071)
+
 ## Gazebo 11.8.0 (2021-08-17)
 
 1. Find tbb version lower than 2021 with pkg-config
