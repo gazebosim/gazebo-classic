@@ -1,6 +1,0 @@
-add_subdirectory(looknfeel)
-add_subdirectory(schemes)
-add_subdirectory(imagesets)
-add_subdirectory(fonts)
-add_subdirectory(layouts)
-add_subdirectory(animations)
