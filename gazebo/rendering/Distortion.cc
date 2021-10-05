@@ -191,7 +191,7 @@ void Distortion::SetCamera(CameraPtr _camera)
 
   // Half step-size vector to add to the value being placed in distortion map.
   // Necessary for compositor to correctly interpolate pixel values.
-  const auto halfStepVec =
+  const auto halfTexelSize =
       0.5 * ignition::math::Vector2d(rowStepSize, colStepSize);
 
   // initialize distortion map
@@ -284,13 +284,13 @@ void Distortion::SetCamera(CameraPtr _camera)
               currDistortedCoordinates.Distance(distortionCenterCoordinates))
           {
             this->dataPtr->distortionMap[distortedIdx] = normalizedLocation +
-              halfStepVec;
+              halfTexelSize;
           }
         }
         else
         {
           this->dataPtr->distortionMap[distortedIdx] = normalizedLocation +
-            halfStepVec;
+            halfTexelSize;
         }
       }
       // else: mapping is outside of the image bounds.
