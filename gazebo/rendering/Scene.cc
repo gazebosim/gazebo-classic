@@ -1852,6 +1852,7 @@ void Scene::PreRender()
   LinkMsgs_L linkMsgsCopy;
   RoadMsgs_L roadMsgsCopy;
 
+  IGN_PROFILE_BEGIN("copyMsgs");
   {
     std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
 
@@ -1911,8 +1912,10 @@ void Scene::PreRender()
               std::back_inserter(roadMsgsCopy));
     this->dataPtr->roadMsgs.clear();
   }
+  IGN_PROFILE_END();
 
   // Process the scene messages. DO THIS FIRST
+  IGN_PROFILE_BEGIN("processMsgs");
   for (sIter = sceneMsgsCopy.begin(); sIter != sceneMsgsCopy.end();)
   {
     if (this->ProcessSceneMsg(*sIter))
@@ -2025,15 +2028,19 @@ void Scene::PreRender()
     else
       ++lightIter;
   }
+  IGN_PROFILE_END();
 
   // Process the request messages
+  IGN_PROFILE_BEGIN("processRequestMsgs");
   for (rIter =  this->dataPtr->requestMsgs.begin();
       rIter != this->dataPtr->requestMsgs.end(); ++rIter)
   {
     this->ProcessRequestMsg(*rIter);
   }
   this->dataPtr->requestMsgs.clear();
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("copyFrontInsert");
   {
     std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
 
@@ -2070,16 +2077,22 @@ void Scene::PreRender()
     std::copy(linkMsgsCopy.begin(), linkMsgsCopy.end(),
         std::front_inserter(this->dataPtr->linkMsgs));
   }
+  IGN_PROFILE_END();
 
   // update the rt shader
+  IGN_PROFILE_BEGIN("rtShaderUpdate");
   RTShaderSystem::Instance()->Update();
+  IGN_PROFILE_END();
 
   {
+    IGN_PROFILE_BEGIN("poseMsgMutex");
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->poseMsgMutex);
+    IGN_PROFILE_END();
 
     // Process all the model messages last. Remove pose message from the list
     // only when a corresponding visual exits. We may receive pose updates
     // over the wire before  we recieve the visual
+    IGN_PROFILE_BEGIN("poseMsgs");
     pIter = this->dataPtr->poseMsgs.begin();
     while (pIter != this->dataPtr->poseMsgs.end())
     {
@@ -2117,8 +2130,10 @@ void Scene::PreRender()
           ++pIter;
       }
     }
+    IGN_PROFILE_END();
 
     // process skeleton pose msgs
+    IGN_PROFILE_BEGIN("skeletonPoseMsgs");
     spIter = this->dataPtr->skeletonPoseMsgs.begin();
     while (spIter != this->dataPtr->skeletonPoseMsgs.end())
     {
@@ -2154,8 +2169,10 @@ void Scene::PreRender()
       else
         ++spIter;
     }
+    IGN_PROFILE_END();
 
     // Process the road messages.
+    IGN_PROFILE_BEGIN("roadMsgs");
     for (const auto &msg : roadMsgsCopy)
     {
       // do not add road if it already exists
@@ -2180,6 +2197,7 @@ void Scene::PreRender()
     // official time stamp of approval
     this->dataPtr->sceneSimTimePosesApplied =
         this->dataPtr->sceneSimTimePosesReceived;
+    IGN_PROFILE_END();
   }
 }
 
