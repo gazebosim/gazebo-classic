@@ -349,18 +349,28 @@ void Model::Init()
 //////////////////////////////////////////////////
 void Model::Update()
 {
+  IGN_PROFILE("Model::Update");
   if (this->IsStatic())
     return;
 
+  IGN_PROFILE_BEGIN("lockMutex");
   boost::recursive_mutex::scoped_lock lock(this->updateMutex);
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("jointUpdate");
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
+  {
     (*jiter)->Update();
+  }
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("jointControllerUpdate");
   if (this->jointController)
     this->jointController->Update();
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("jointAnimations");
   if (!this->jointAnimations.empty())
   {
     common::NumericKeyFrame kf(0);
@@ -396,9 +406,12 @@ void Model::Update()
     }
     this->prevAnimationTime = this->world->SimTime();
   }
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("nestedModelUpdate");
   for (auto &model : this->models)
     model->Update();
+  IGN_PROFILE_END();
 }
 
 //////////////////////////////////////////////////

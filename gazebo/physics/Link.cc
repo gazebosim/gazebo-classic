@@ -586,7 +586,9 @@ void Link::SetLaserRetro(float _retro)
 //////////////////////////////////////////////////
 void Link::Update(const common::UpdateInfo & /*_info*/)
 {
+  IGN_PROFILE("Link::Update");
 #ifdef HAVE_OPENAL
+  IGN_PROFILE_BEGIN("audio");
   if (this->dataPtr->audioSink)
   {
     this->dataPtr->audioSink->SetPose(this->WorldPose());
@@ -601,6 +603,7 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
     (*iter)->SetPose(this->WorldPose());
     (*iter)->SetVelocity(this->WorldLinearVel());
   }
+  IGN_PROFILE_END();
 #endif
 
   // FIXME: race condition on factory-based model loading!!!!!
@@ -610,6 +613,7 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
      this->dataPtr->enabledSignal(this->dataPtr->enabled);
    }*/
 
+  IGN_PROFILE_BEGIN("wrenches");
   if (!this->IsStatic() && !this->dataPtr->wrenchMsgs.empty())
   {
     std::vector<msgs::Wrench> messages;
@@ -624,12 +628,15 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
       this->ProcessWrenchMsg(it);
     }
   }
+  IGN_PROFILE_END();
 
   // Update the batteries.
+  IGN_PROFILE_BEGIN("batteries");
   for (auto &battery : this->dataPtr->batteries)
   {
     battery->Update();
   }
+  IGN_PROFILE_END();
 }
 
 //////////////////////////////////////////////////
@@ -1251,6 +1258,8 @@ void Link::SetPublishData(bool _enable)
 /////////////////////////////////////////////////
 void Link::PublishData()
 {
+  IGN_PROFILE("Link::PublishData");
+  IGN_PROFILE_BEGIN("publish");
   if (this->dataPtr->publishData && this->dataPtr->dataPub->HasConnections())
   {
     msgs::Set(this->dataPtr->linkDataMsg.mutable_time(),
@@ -1262,6 +1271,7 @@ void Link::PublishData()
         this->WorldAngularVel());
     this->dataPtr->dataPub->Publish(this->dataPtr->linkDataMsg);
   }
+  IGN_PROFILE_END();
 }
 
 //////////////////////////////////////////////////
