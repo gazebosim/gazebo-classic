@@ -182,12 +182,17 @@ void Distortion::SetCamera(CameraPtr _camera)
   const double fov = _camera->ImageHeight() > _camera->ImageWidth() ?
       _camera->VFOV().Radian() : _camera->HFOV().Radian();
   const double focalLength = texSide/(2*tan(fov/2));
-  this->dataPtr->distortionTexWidth = texSide - 1;
-  this->dataPtr->distortionTexHeight = texSide - 1;
+  this->dataPtr->distortionTexWidth = texSide;
+  this->dataPtr->distortionTexHeight = texSide;
   unsigned int imageSize =
       this->dataPtr->distortionTexWidth * this->dataPtr->distortionTexHeight;
   double colStepSize = 1.0 / this->dataPtr->distortionTexWidth;
   double rowStepSize = 1.0 / this->dataPtr->distortionTexHeight;
+
+  // Half step-size vector to add to the value being placed in distortion map.
+  // Necessary for compositor to correctly interpolate pixel values.
+  const auto halfStepVec =
+      0.5 * ignition::math::Vector2d(rowStepSize, colStepSize);
 
   // initialize distortion map
   this->dataPtr->distortionMap.resize(imageSize);
@@ -244,9 +249,10 @@ void Distortion::SetCamera(CameraPtr _camera)
       }
 
       // compute the index in the distortion map
-      distortedCol = distortedLocation.X() * this->dataPtr->distortionTexWidth;
-      distortedRow = distortedLocation.Y() *
-        this->dataPtr->distortionTexHeight;
+      distortedCol = round(distortedLocation.X() * 
+        this->dataPtr->distortionTexWidth);
+      distortedRow = round(distortedLocation.Y() *
+        this->dataPtr->distortionTexHeight);
 
       // Note that the following makes sure that, for significant distortions,
       // there is not a problem where the distorted image seems to fold over
@@ -277,12 +283,14 @@ void Distortion::SetCamera(CameraPtr _camera)
           if (newDistortedCoordinates.Distance(distortionCenterCoordinates) <
               currDistortedCoordinates.Distance(distortionCenterCoordinates))
           {
-            this->dataPtr->distortionMap[distortedIdx] = normalizedLocation;
+            this->dataPtr->distortionMap[distortedIdx] = normalizedLocation +
+              halfStepVec;
           }
         }
         else
         {
-          this->dataPtr->distortionMap[distortedIdx] = normalizedLocation;
+          this->dataPtr->distortionMap[distortedIdx] = normalizedLocation +
+            halfStepVec;
         }
       }
       // else: mapping is outside of the image bounds.
