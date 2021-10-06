@@ -391,6 +391,9 @@ namespace gazebo
 
       /// \brief Shadow caster material name from scene SDF
       public: std::string shadowCasterMaterialName;
+
+      /// \brief Shadow caster render back faces from scene SDF
+      public: bool shadowCasterRenderBackFaces;
     };
   }
 }
