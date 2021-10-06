@@ -207,24 +207,48 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->sceneSimTimePosesApplied = common::Time();
   this->dataPtr->sceneSimTimePosesReceived = common::Time();
 
-  // Get shadow caster material name from physics::World
-  ignition::transport::Node node;
-  ignition::msgs::StringMsg rep;
-  const std::string serviceName = "/shadow_caster_material_name";
-  bool result;
-  unsigned int timeout = 5000;
-  bool executed = node.Request(serviceName,
-      timeout, rep, result);
-  if (executed)
   {
-    if (result)
-      this->dataPtr->shadowCasterMaterialName = rep.data();
+    // Get shadow caster material name from physics::World
+    ignition::transport::Node node;
+    ignition::msgs::StringMsg rep;
+    const std::string serviceName = "/shadow_caster_material_name";
+    bool result;
+    unsigned int timeout = 5000;
+    bool executed = node.Request(serviceName,
+        timeout, rep, result);
+    if (executed)
+    {
+      if (result)
+        this->dataPtr->shadowCasterMaterialName = rep.data();
+      else
+        gzerr << "Service call[" << serviceName << "] failed" << std::endl;
+    }
     else
-      gzerr << "Service call[" << serviceName << "] failed" << std::endl;
+    {
+      gzerr << "Service call[" << serviceName << "] timed out" << std::endl;
+    } 
   }
-  else
+
   {
-    gzerr << "Service call[" << serviceName << "] timed out" << std::endl;
+    // Get shadow caster render back faces from physics::World
+    ignition::transport::Node node;
+    ignition::msgs::Boolean rep;
+    const std::string serviceName = "/shadow_caster_render_back_faces";
+    bool result;
+    unsigned int timeout = 5000;
+    bool executed = node.Request(serviceName,
+        timeout, rep, result);
+    if (executed)
+    {
+      if (result)
+        this->dataPtr->shadowCasterRenderBackFaces = rep.data();
+      else
+        gzerr << "Service call[" << serviceName << "] failed" << std::endl;
+    }
+    else
+    {
+      gzerr << "Service call[" << serviceName << "] timed out" << std::endl;
+    } 
   }
 }
 
@@ -3309,6 +3333,12 @@ unsigned int Scene::ShadowTextureSize() const
 std::string Scene::ShadowCasterMaterialName() const
 {
   return this->dataPtr->shadowCasterMaterialName;
+}
+
+/////////////////////////////////////////////////
+bool Scene::ShadowCasterRenderBackFaces() const
+{
+  return this->dataPtr->shadowCasterRenderBackFaces;
 }
 
 /////////////////////////////////////////////////
