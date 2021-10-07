@@ -238,7 +238,7 @@ void World::Load(sdf::ElementPtr _sdf)
   }
   else
   {
-    this->dataPtr->shadowCasterRenderBackFaces = 1;
+    this->dataPtr->shadowCasterRenderBackFaces = true;
   }
 
   // The period at which messages are processed
