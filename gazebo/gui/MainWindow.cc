@@ -1097,6 +1097,10 @@ void MainWindow::CreateActions()
   this->connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
   */
 
+  g_renderAct = new QAction(tr("Open Render Settings"), this);
+  this->connect(g_renderAct, SIGNAL(triggered()), this,
+      SLOT(ShowGrid()));
+
   g_topicVisAct = new QAction(tr("Topic Visualization"), this);
   g_topicVisAct->setShortcut(tr("Ctrl+T"));
   g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
@@ -1669,6 +1673,9 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 /////////////////////////////////////////////////
 void MainWindow::DeleteActions()
 {
+  delete g_renderAct;
+  g_renderAct = nullptr;
+
   delete g_topicVisAct;
   g_topicVisAct = nullptr;
 
@@ -1890,6 +1897,7 @@ void MainWindow::CreateMenuBar()
   cameraMenu->addAction(g_orbitAct);
   cameraMenu->addSeparator();
   cameraMenu->addAction(g_resetAct);
+  cameraMenu->addAction(g_renderAct);
 
   QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
@@ -2423,6 +2431,7 @@ void MainWindow::OnWindowMode(const std::string &_mode)
   g_fpsAct->setVisible(simOrLog);
   g_orbitAct->setVisible(simOrLog);
   g_resetAct->setVisible(simOrLog);
+  g_renderAct->setVisible(simOrLog);
 
   // View
   g_showGridAct->setVisible(simOrLog);
