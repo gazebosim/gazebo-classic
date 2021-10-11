@@ -47,6 +47,18 @@ void Palette_TEST::TopicsTab()
   QVERIFY(topicsModel != nullptr);
 
   // Check the model has as many rows as there are topics
+  if (topicsModel->rowCount() > count)
+  {
+    // Recount the number of topics being advertised
+    count = 0;
+    msgTopics = gazebo::transport::getAdvertisedTopics();
+    for (auto msgTopic : msgTopics)
+    {
+      for (auto topic : msgTopic.second)
+        count++;
+    }
+  }
+
   QCOMPARE(topicsModel->rowCount(), count);
 
   delete palette;
