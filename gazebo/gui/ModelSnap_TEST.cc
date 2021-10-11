@@ -114,7 +114,8 @@ void ModelSnap_TEST::Highlight()
 
   QPoint moveTo(spherePt.X(), spherePt.Y());
   QTest::mouseMove(glWidget, moveTo, 100);
-  QTest::mouseRelease(glWidget, Qt::LeftButton, 0, moveTo);
+  QTest::mouseRelease(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
+      moveTo);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -141,7 +142,7 @@ void ModelSnap_TEST::Highlight()
         cam->Project(model02Vis->WorldPose().Pos() +
         ignition::math::Vector3d(0.5, 0, 0));
 
-    QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
+    QTest::mouseRelease(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
          QPoint(boxPt.X(), boxPt.Y()));
 
     this->ProcessEventsAndDraw(mainWindow);

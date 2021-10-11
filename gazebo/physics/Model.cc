@@ -1266,7 +1266,8 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     return;
   }
 
-  this->SetName(this->world->StripWorldName(_msg.name()));
+  this->SetName(this->StripParentScopedName(_msg.name()));
+
   if (_msg.has_pose())
     this->SetWorldPose(msgs::ConvertIgn(_msg.pose()));
   for (int i = 0; i < _msg.link_size(); i++)
@@ -1389,17 +1390,17 @@ void Model::SetState(const ModelState &_state)
 void Model::SetScale(const ignition::math::Vector3d &_scale,
       const bool _publish)
 {
-  if (this->scale == _scale)
-    return;
-
-  this->scale = _scale;
-
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  if (this->scale != _scale)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    this->scale = _scale;
+
+    Base_V::iterator iter;
+    for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     {
-      boost::static_pointer_cast<Link>(*iter)->SetScale(_scale);
+      if (*iter && (*iter)->HasType(LINK))
+      {
+        boost::static_pointer_cast<Link>(*iter)->SetScale(_scale);
+      }
     }
   }
 

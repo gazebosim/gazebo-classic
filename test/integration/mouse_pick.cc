@@ -128,7 +128,7 @@ void MousePickingTest::Shapes()
   auto pickPt = cam->Project(model01Vis->WorldPose().Pos());
   auto pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(), pt);
 
   this->ProcessEventsAndDraw(mainWindow, 10, 30);
 
@@ -140,7 +140,7 @@ void MousePickingTest::Shapes()
   pickPt = cam->Project(model02Vis->WorldPose().Pos());
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(), pt);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -152,7 +152,7 @@ void MousePickingTest::Shapes()
   pickPt = cam->Project(model03Vis->WorldPose().Pos());
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(), pt);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -165,7 +165,7 @@ void MousePickingTest::Shapes()
       ignition::math::Vector3d(-0.5, 0.49, 0));
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(), pt);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -178,7 +178,7 @@ void MousePickingTest::Shapes()
       ignition::math::Vector3d(-0.5, 0.51, 0));
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(), pt);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -253,7 +253,7 @@ void MousePickingTest::ModelEditorSelection()
   // click on the cylinder
   QTest::mouseMove(glWidget,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
 
   // Process some events and draw the screen
@@ -341,7 +341,7 @@ void MousePickingTest::Transparency()
 
   QTest::mouseMove(glWidget,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
 
   // Process some events, and draw the screen
@@ -362,7 +362,7 @@ void MousePickingTest::Transparency()
 
   QTest::mouseMove(glWidget,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
 
   this->ProcessEventsAndDraw(mainWindow);
@@ -380,7 +380,7 @@ void MousePickingTest::Transparency()
 
   QTest::mouseMove(glWidget,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
 
   this->ProcessEventsAndDraw(mainWindow);
@@ -398,7 +398,7 @@ void MousePickingTest::Transparency()
 
   QTest::mouseMove(glWidget,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
 
   this->ProcessEventsAndDraw(mainWindow);

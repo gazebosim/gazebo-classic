@@ -130,6 +130,13 @@ if (NOT WIN32)
   )
 endif()
 
+if (NOT APPLE)
+  set(tests
+    ${tests}
+    custom_shadow_caster.cc
+  )
+endif()
+
 if (HAVE_GTS)
   set(tests
     ${tests}

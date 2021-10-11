@@ -53,6 +53,11 @@ namespace gazebo
       /// \param[in] _camera Camera to be distorted
       public: void SetCamera(CameraPtr _camera);
 
+      /// \brief Add the distortion compositor to a camera. Used to refresh the
+      ///        distortion compositor.
+      /// \param[in] _camera Camera to add the compositor.
+      public: void RefreshCompositor(CameraPtr _camera);
+
       /// \brief Set whether to crop the black border around the distorted
       /// image points. Note that cropping only occurs for the legacy mode
       /// distortion implementation.

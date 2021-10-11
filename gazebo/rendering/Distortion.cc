@@ -182,12 +182,17 @@ void Distortion::SetCamera(CameraPtr _camera)
   const double fov = _camera->ImageHeight() > _camera->ImageWidth() ?
       _camera->VFOV().Radian() : _camera->HFOV().Radian();
   const double focalLength = texSide/(2*tan(fov/2));
-  this->dataPtr->distortionTexWidth = texSide - 1;
-  this->dataPtr->distortionTexHeight = texSide - 1;
+  this->dataPtr->distortionTexWidth = texSide;
+  this->dataPtr->distortionTexHeight = texSide;
   unsigned int imageSize =
       this->dataPtr->distortionTexWidth * this->dataPtr->distortionTexHeight;
   double colStepSize = 1.0 / this->dataPtr->distortionTexWidth;
   double rowStepSize = 1.0 / this->dataPtr->distortionTexHeight;
+
+  // Half step-size vector to add to the value being placed in distortion map.
+  // Necessary for compositor to correctly interpolate pixel values.
+  const auto halfTexelSize =
+      0.5 * ignition::math::Vector2d(rowStepSize, colStepSize);
 
   // initialize distortion map
   this->dataPtr->distortionMap.resize(imageSize);
@@ -244,9 +249,10 @@ void Distortion::SetCamera(CameraPtr _camera)
       }
 
       // compute the index in the distortion map
-      distortedCol = distortedLocation.X() * this->dataPtr->distortionTexWidth;
-      distortedRow = distortedLocation.Y() *
-        this->dataPtr->distortionTexHeight;
+      distortedCol = round(distortedLocation.X() * 
+        this->dataPtr->distortionTexWidth);
+      distortedRow = round(distortedLocation.Y() *
+        this->dataPtr->distortionTexHeight);
 
       // Note that the following makes sure that, for significant distortions,
       // there is not a problem where the distorted image seems to fold over
@@ -277,12 +283,14 @@ void Distortion::SetCamera(CameraPtr _camera)
           if (newDistortedCoordinates.Distance(distortionCenterCoordinates) <
               currDistortedCoordinates.Distance(distortionCenterCoordinates))
           {
-            this->dataPtr->distortionMap[distortedIdx] = normalizedLocation;
+            this->dataPtr->distortionMap[distortedIdx] = normalizedLocation +
+              halfTexelSize;
           }
         }
         else
         {
-          this->dataPtr->distortionMap[distortedIdx] = normalizedLocation;
+          this->dataPtr->distortionMap[distortedIdx] = normalizedLocation +
+            halfTexelSize;
         }
       }
       // else: mapping is outside of the image bounds.
@@ -421,17 +429,38 @@ void Distortion::SetCamera(CameraPtr _camera)
   }
   pixelBuffer->unlock();
 
+  this->CalculateAndApplyDistortionScale();
+
   // set up the distortion map texture to be used in the pixel shader.
   this->dataPtr->distortionMaterial->getTechnique(0)->getPass(0)->
       createTextureUnitState(texName, 1);
+
+  this->RefreshCompositor(_camera);
+}
+
+//////////////////////////////////////////////////
+void Distortion::RefreshCompositor(CameraPtr _camera)
+{
+  // If no distortion is required, immediately return.
+  if (ignition::math::equal(this->dataPtr->k1, 0.0) &&
+      ignition::math::equal(this->dataPtr->k2, 0.0) &&
+      ignition::math::equal(this->dataPtr->k3, 0.0) &&
+      ignition::math::equal(this->dataPtr->p1, 0.0) &&
+      ignition::math::equal(this->dataPtr->p2, 0.0))
+  {
+    return;
+  }
+
+  if (this->dataPtr->lensDistortionInstance) {
+    Ogre::CompositorManager::getSingleton().removeCompositor(
+      _camera->OgreViewport(), this->dataPtr->compositorName);
+  }
 
   this->dataPtr->lensDistortionInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(
       _camera->OgreViewport(), this->dataPtr->compositorName);
   this->dataPtr->lensDistortionInstance->getTechnique()->getOutputTargetPass()->
       getPass(0)->setMaterial(this->dataPtr->distortionMaterial);
-
-  this->CalculateAndApplyDistortionScale();
 
   this->dataPtr->lensDistortionInstance->setEnabled(true);
 

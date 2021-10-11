@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <physics type="ode">
+      <gravity>0 0 0</gravity>
+    </physics>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://multilink</uri>
+    </include>
+
+  </world>
+</sdf>
