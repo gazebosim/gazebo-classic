@@ -47,6 +47,7 @@
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/LayersWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
+#include "gazebo/gui/RenderOptionsWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/SpaceNav.hh"
 #include "gazebo/gui/TimePanel.hh"
@@ -408,6 +409,25 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->dataPtr->spacenav = nullptr;
 
   emit Close();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::RenderOptions()
+{
+  std::unique_ptr<RenderOptionsWindow> renderOptionsWindow(
+      new RenderOptionsWindow(this));
+  if (renderOptionsWindow->exec() == QDialog::Accepted)
+  {
+    transport::PublisherPtr pub =
+      this->dataPtr->node->Advertise<gazebo::msgs::GzString>(
+       "~/user_camera/render_rate");
+
+    pub->WaitForConnection();
+
+    gazebo::msgs::GzString msg;
+    msg.set_data(std::to_string(renderOptionsWindow->RenderRate()));
+    pub->Publish(msg);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1097,9 +1117,9 @@ void MainWindow::CreateActions()
   this->connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
   */
 
-  g_renderAct = new QAction(tr("Open Render Settings"), this);
+  g_renderAct = new QAction(tr("Open Render Options"), this);
   this->connect(g_renderAct, SIGNAL(triggered()), this,
-      SLOT(ShowGrid()));
+      SLOT(RenderOptions()));
 
   g_topicVisAct = new QAction(tr("Topic Visualization"), this);
   g_topicVisAct->setShortcut(tr("Ctrl+T"));

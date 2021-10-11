@@ -135,6 +135,8 @@ namespace gazebo
 
       private: void OnGUI(ConstGUIPtr &_msg);
 
+      private slots: void RenderOptions();
+
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
       private slots: void Open();
