@@ -123,7 +123,6 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->transparent = false;
   this->dataPtr->wireframe = false;
 
-  this->dataPtr->requestMsg = NULL;
   this->dataPtr->enableVisualizations = _enableVisualizations;
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init(_name);
@@ -331,8 +330,7 @@ Scene::~Scene()
 {
   this->Clear();
 
-  delete this->dataPtr->requestMsg;
-  this->dataPtr->requestMsg = NULL;
+  this->dataPtr->requestMsg.reset(nullptr);
   delete this->dataPtr->receiveMutex;
   this->dataPtr->receiveMutex = NULL;
 
@@ -442,7 +440,7 @@ void Scene::Init()
            << " falling back to gazebo transport [scene_info] request."
            << std::endl;
     this->dataPtr->requestPub->WaitForConnection();
-    this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
+    this->dataPtr->requestMsg.reset(msgs::CreateRequest("scene_info"));
     this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
   }
 
@@ -2496,7 +2494,7 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   sceneMsg.ParseFromString(_msg->serialized_data());
   this->OnSceneInfo(sceneMsg, true);
 
-  this->dataPtr->requestMsg = NULL;
+  this->dataPtr->requestMsg.reset(nullptr);
 }
 
 /////////////////////////////////////////////////
