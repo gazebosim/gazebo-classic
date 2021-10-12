@@ -2809,7 +2809,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
           if (matMsg.has_script())
           {
             auto scriptMsg = matMsg.script();
-            for (auto const uri : scriptMsg.uri())
+            for (auto const &uri : scriptMsg.uri())
             {
               if (!uri.empty())
                 RenderEngine::Instance()->AddResourcePath(uri);

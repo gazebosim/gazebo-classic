@@ -1218,7 +1218,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
   if (_sdf->GetName() == "model")
   {
     std::string modelName = _sdf->Get<std::string>("name");
-    for (auto const m : this->dataPtr->models)
+    for (auto const &m : this->dataPtr->models)
     {
       if (m->GetName() == modelName)
       {

@@ -1426,7 +1426,7 @@ void Link::ParseVisuals()
 {
   this->UpdateVisualMsg();
 
-  for (auto const it : this->visuals)
+  for (auto const &it : this->visuals)
     this->visPub->Publish(it.second);
 }
 
