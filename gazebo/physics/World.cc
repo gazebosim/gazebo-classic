@@ -224,10 +224,6 @@ void World::Load(sdf::ElementPtr _sdf)
       this->dataPtr->sdf->GetElement("scene")->
         Get<std::string>("ignition:shadow_caster_material_name");
   }
-  else
-  {
-    this->dataPtr->shadowCasterMaterialName = "Gazebo/shadow_caster";
-  }
 
   if (this->dataPtr->sdf->GetElement("scene")->
       HasElement("ignition:shadow_caster_render_back_faces"))
@@ -235,10 +231,6 @@ void World::Load(sdf::ElementPtr _sdf)
     this->dataPtr->shadowCasterRenderBackFaces =
       this->dataPtr->sdf->GetElement("scene")->
         Get<bool>("ignition:shadow_caster_render_back_faces");
-  }
-  else
-  {
-    this->dataPtr->shadowCasterRenderBackFaces = true;
   }
 
   // The period at which messages are processed
