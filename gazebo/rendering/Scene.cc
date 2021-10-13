@@ -3275,6 +3275,12 @@ void Scene::SetShadowsEnabled(bool _value)
 }
 
 /////////////////////////////////////////////////
+bool Scene::IsServer() const
+{
+  return this->dataPtr->isServer;
+}
+
+/////////////////////////////////////////////////
 bool Scene::ShadowsEnabled() const
 {
   return this->dataPtr->sdf->Get<bool>("shadows");
