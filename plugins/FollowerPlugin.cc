@@ -203,7 +203,7 @@ void FollowerPlugin::FindJoints()
 bool FollowerPlugin::FindSensor(const physics::ModelPtr &_model)
 {
   // loop through links to find depth sensor
-  for (const auto l : _model->GetLinks())
+  for (const auto &l : _model->GetLinks())
   {
     for (unsigned int i = 0; i < l->GetSensorCount(); ++i)
     {

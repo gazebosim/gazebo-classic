@@ -733,11 +733,13 @@ void World::Step()
 
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
 
-  IGN_PROFILE_BEGIN("sleepOffset");
+  IGN_PROFILE_BEGIN("waitForSensors");
   if (this->dataPtr->waitForSensors)
     this->dataPtr->waitForSensors(this->dataPtr->simTime.Double(),
         this->dataPtr->physicsEngine->GetMaxStepSize());
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("sleepOffset");
   double updatePeriod = this->dataPtr->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
@@ -797,14 +799,17 @@ void World::Step()
   }
   IGN_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("Step");
-
+  IGN_PROFILE_BEGIN("IntrospectionManager->NotifyUpdates");
   gazebo::util::IntrospectionManager::Instance()->NotifyUpdates();
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("ProcessMessages");
   this->ProcessMessages();
+  IGN_PROFILE_END();
 
   DIAG_TIMER_STOP("World::Step");
 
+  IGN_PROFILE_BEGIN("ClearModels");
   if (g_clearModels)
     this->ClearModels();
   IGN_PROFILE_END();
@@ -1213,7 +1218,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
   if (_sdf->GetName() == "model")
   {
     std::string modelName = _sdf->Get<std::string>("name");
-    for (auto const m : this->dataPtr->models)
+    for (auto const &m : this->dataPtr->models)
     {
       if (m->GetName() == modelName)
       {
