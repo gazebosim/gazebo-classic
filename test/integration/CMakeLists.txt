@@ -99,6 +99,7 @@ set(tests
   sensor.cc
   sdf_frame_semantics.cc
   server_fixture.cc
+  shadow_caster_render_back_faces.cc
   sim_events.cc
   speed.cc
   speed_thread_islands.cc
