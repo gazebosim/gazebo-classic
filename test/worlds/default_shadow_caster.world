@@ -35,7 +35,7 @@
             <image>
               <width>320</width>
               <height>240</height>
-              <format>R8G8B8</format>\
+              <format>R8G8B8</format>
             </image>
             <clip>
               <near>0.1</near>
