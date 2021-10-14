@@ -1308,6 +1308,13 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
       g_pasteAct->setEnabled(false);
     }
   }
+
+  if (_msg->request() == "update_render_rate")
+  {
+    this->dataPtr->updateTimer->start(
+      static_cast<int>(
+        std::round(1000.0 / this->dataPtr->userCamera->RenderRate())));
+  }
 }
 
 /////////////////////////////////////////////////
