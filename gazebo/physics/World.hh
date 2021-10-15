@@ -50,6 +50,7 @@ namespace ignition
   {
     class Plugin_V;
     class StringMsg;
+    class Boolean;
   }
 }
 
@@ -659,7 +660,16 @@ namespace gazebo
       /// \brief Callback for "<this_name>/shadow_caster_material_name" service.
       /// \param[out] _response Message containing shadow caster material name
       /// \return True if the info was successfully obtained.
-      private: bool ShadowCasterService(ignition::msgs::StringMsg &_response);
+      private: bool ShadowCasterMaterialNameService(
+          ignition::msgs::StringMsg &_response);
+
+      /// \brief Callback for "<this_name>/shadow_caster_render_back_faces"
+      ///     service.
+      /// \param[out] _response Message containing shadow caster render back
+      ///     faces
+      /// \return True if the info was successfully obtained.
+      private: bool ShadowCasterRenderBackFacesService(
+          ignition::msgs::Boolean &_response);
 
       /// \internal
       /// \brief Private data pointer.

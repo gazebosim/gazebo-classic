@@ -224,9 +224,13 @@ void World::Load(sdf::ElementPtr _sdf)
       this->dataPtr->sdf->GetElement("scene")->
         Get<std::string>("ignition:shadow_caster_material_name");
   }
-  else
+
+  if (this->dataPtr->sdf->GetElement("scene")->
+      HasElement("ignition:shadow_caster_render_back_faces"))
   {
-    this->dataPtr->shadowCasterMaterialName = "Gazebo/shadow_caster";
+    this->dataPtr->shadowCasterRenderBackFaces =
+      this->dataPtr->sdf->GetElement("scene")->
+        Get<bool>("ignition:shadow_caster_render_back_faces");
   }
 
   // The period at which messages are processed
@@ -304,12 +308,21 @@ void World::Load(sdf::ElementPtr _sdf)
         << std::endl;
   }
 
-  std::string shadowCasterService("/shadow_caster_material_name");
-  if (!this->dataPtr->ignNode.Advertise(shadowCasterService,
-      &World::ShadowCasterService, this))
+  std::string shadowCasterMaterialNameService("/shadow_caster_material_name");
+  if (!this->dataPtr->ignNode.Advertise(shadowCasterMaterialNameService,
+      &World::ShadowCasterMaterialNameService, this))
   {
-    gzerr << "Error advertising service [" << shadowCasterService << "]"
-        << std::endl;
+    gzerr << "Error advertising service [" <<
+        shadowCasterMaterialNameService << "]" << std::endl;
+  }
+
+  std::string shadowCasterRenderBackFacesService(
+      "/shadow_caster_render_back_faces");
+  if (!this->dataPtr->ignNode.Advertise(shadowCasterRenderBackFacesService,
+      &World::ShadowCasterRenderBackFacesService, this))
+  {
+    gzerr << "Error advertising service [" <<
+        shadowCasterRenderBackFacesService << "]" << std::endl;
   }
 
   // This should come before loading of entities
@@ -3402,8 +3415,15 @@ bool World::SceneInfoService(msgs::Scene &_res)
 }
 
 //////////////////////////////////////////////////
-bool World::ShadowCasterService(ignition::msgs::StringMsg &_res)
+bool World::ShadowCasterMaterialNameService(ignition::msgs::StringMsg &_res)
 {
   _res.set_data(this->dataPtr->shadowCasterMaterialName.c_str());
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool World::ShadowCasterRenderBackFacesService(ignition::msgs::Boolean &_res)
+{
+  _res.set_data(this->dataPtr->shadowCasterRenderBackFaces);
   return true;
 }

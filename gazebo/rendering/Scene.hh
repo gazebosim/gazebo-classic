@@ -424,6 +424,10 @@ namespace gazebo
       /// \return Name of the shadow caster material
       public: std::string ShadowCasterMaterialName() const;
 
+      /// \brief Get the shadow caster render back faces
+      /// \return Shadow caster render back faces
+      public: bool ShadowCasterRenderBackFaces() const;
+
       /// \brief Add a visual to the scene
       /// \param[in] _vis Visual to add.
       public: void AddVisual(VisualPtr _vis);
