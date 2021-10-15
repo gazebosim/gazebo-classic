@@ -15,6 +15,7 @@
     </include>
 
     <scene>
+      <ignition:shadow_caster_render_back_faces>false</ignition:shadow_caster_render_back_faces>
       <background>0.0 0.0 0.0 1</background>
     </scene>
 
@@ -50,20 +51,20 @@
 
     <model name="box">
       <static>true</static>
-      <pose>0 0 1.0 0 0 0</pose>
+      <pose>0 0 1.0 0 2.0 0</pose>
       <link name="link">
         <collision name="collision">
           <geometry>
-            <box>
+            <plane>
               <size>1 1 1</size>
-            </box>
+            </plane>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
-            <box>
+            <plane>
               <size>1 1 1</size>
-            </box>
+            </plane>
           </geometry>
         </visual>
       </link>

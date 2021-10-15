@@ -379,6 +379,9 @@ namespace gazebo
 
       /// \brief Shadow caster material name
       public: std::string shadowCasterMaterialName = "Gazebo/shadow_caster";
+
+      /// \brief Shadow caster render back faces
+      public: bool shadowCasterRenderBackFaces = true;
     };
   }
 }
