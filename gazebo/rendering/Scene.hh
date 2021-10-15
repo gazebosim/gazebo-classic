@@ -661,6 +661,12 @@ namespace gazebo
       /// \param[in] _msg The message.
       private: void OnScene(ConstScenePtr &_msg);
 
+      /// \brief Called when the scene info service replies with the scene
+      /// message.
+      /// \param[in] _msg The message.
+      /// \param[in] _result Flag indicating if service call succeeded.
+      private: void OnSceneInfo(const msgs::Scene &_msg, const bool _result);
+
       /// \brief Response callback
       /// \param[in] _msg The message data.
       private: void OnResponse(ConstResponsePtr &_msg);

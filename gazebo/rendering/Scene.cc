@@ -123,7 +123,6 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->transparent = false;
   this->dataPtr->wireframe = false;
 
-  this->dataPtr->requestMsg = NULL;
   this->dataPtr->enableVisualizations = _enableVisualizations;
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init(_name);
@@ -226,7 +225,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
     else
     {
       gzerr << "Service call[" << serviceName << "] timed out" << std::endl;
-    } 
+    }
   }
 
   {
@@ -248,7 +247,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
     else
     {
       gzerr << "Service call[" << serviceName << "] timed out" << std::endl;
-    } 
+    }
   }
 }
 
@@ -355,8 +354,7 @@ Scene::~Scene()
 {
   this->Clear();
 
-  delete this->dataPtr->requestMsg;
-  this->dataPtr->requestMsg = NULL;
+  this->dataPtr->requestMsg.reset(nullptr);
   delete this->dataPtr->receiveMutex;
   this->dataPtr->receiveMutex = NULL;
 
@@ -454,9 +452,20 @@ void Scene::Init()
       this->dataPtr->worldVisual));
   this->dataPtr->originVisual->Load();
 
-  this->dataPtr->requestPub->WaitForConnection();
-  this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
-  this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+  // Get scene info from physics::World with ignition transport service
+  ignition::transport::Node node;
+  const std::string serviceName = "/scene_info";
+  std::vector<ignition::transport::ServicePublisher> publishers;
+  if (!node.ServiceInfo(serviceName, publishers) ||
+      !node.Request(serviceName, &Scene::OnSceneInfo, this))
+  {
+    gzwarn << "Ignition transport [" << serviceName << "] service call failed,"
+           << " falling back to gazebo transport [scene_info] request."
+           << std::endl;
+    this->dataPtr->requestPub->WaitForConnection();
+    this->dataPtr->requestMsg.reset(msgs::CreateRequest("scene_info"));
+    this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+  }
 
   if (!this->dataPtr->isServer)
   {
@@ -2483,6 +2492,21 @@ void Scene::OnScene(ConstScenePtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void Scene::OnSceneInfo(const msgs::Scene &_msg, const bool _result)
+{
+  if (_result)
+  {
+    std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+    auto msgptr = boost::make_shared<const msgs::Scene>(_msg);
+    this->dataPtr->sceneMsgs.push_back(msgptr);
+  }
+  else
+  {
+    gzerr << "Error when calling /scene_info service" << std::endl;
+  }
+}
+
+/////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->dataPtr->requestMsg ||
@@ -2491,11 +2515,9 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
 
   msgs::Scene sceneMsg;
   sceneMsg.ParseFromString(_msg->serialized_data());
-  boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
+  this->OnSceneInfo(sceneMsg, true);
 
-  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  this->dataPtr->sceneMsgs.push_back(sm);
-  this->dataPtr->requestMsg = NULL;
+  this->dataPtr->requestMsg.reset(nullptr);
 }
 
 /////////////////////////////////////////////////

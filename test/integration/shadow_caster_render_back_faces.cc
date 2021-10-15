@@ -107,7 +107,7 @@ TEST_F(ShadowCasterRenderBackFacesTest, ShadowCasterBackFaces)
 }
 
 /////////////////////////////////////////////////
-// \brief The shadow caster will not render back faces; The plane in the world 
+// \brief The shadow caster will not render back faces; The plane in the world
 /// will not cast a shadow
 void ShadowCasterRenderBackFacesTest::ShadowCasterNoBackFaces()
 {
