@@ -454,7 +454,6 @@ void Scene::Init()
 
   // Get scene info from physics::World with ignition transport service
   ignition::transport::Node node;
-  ignition::msgs::Scene sceneInfo;
   const std::string serviceName = "/scene_info";
   std::vector<ignition::transport::ServicePublisher> publishers;
   if (!node.ServiceInfo(serviceName, publishers) ||
