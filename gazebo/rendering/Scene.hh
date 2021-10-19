@@ -406,6 +406,10 @@ namespace gazebo
       /// \param[in] _value True to enable shadows, False to disable
       public: void SetShadowsEnabled(const bool _value);
 
+      /// \brief Get whether this scene is in the server.
+      /// \return True if scene is in the server.
+      public: bool IsServer() const;
+
       /// \brief Get whether shadows are on or off
       /// \return True if shadows are enabled.
       public: bool ShadowsEnabled() const;

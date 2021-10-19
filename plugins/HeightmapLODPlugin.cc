@@ -60,11 +60,38 @@ void HeightmapLODPlugin::Load(rendering::VisualPtr _visual,
     return;
   }
 
-  if (_sdf->HasElement("lod"))
-    this->dataPtr->lod = _sdf->Get<unsigned int>("lod");
-  if (_sdf->HasElement("skirt_length"))
-    this->dataPtr->skirtLength = _sdf->Get<double>("skirt_length");
+  auto scene = _visual->GetScene();
 
-  _visual->GetScene()->SetHeightmapLOD(this->dataPtr->lod);
-  _visual->GetScene()->SetHeightmapSkirtLength(this->dataPtr->skirtLength);
+  // Pointer to the <server/> or <gui/> element, depending on the result
+  // of scene->IsServer() or nullptr if they don't exist.
+  sdf::ElementPtr serverGui;
+  if (scene->IsServer() && _sdf->HasElement("server"))
+  {
+    serverGui = _sdf->GetElement("server");
+  }
+  else if (!scene->IsServer() && _sdf->HasElement("gui"))
+  {
+    serverGui = _sdf->GetElement("gui");
+  }
+
+  if (_sdf->HasElement("lod"))
+  {
+    this->dataPtr->lod = _sdf->Get<unsigned int>("lod");
+  }
+  else if (serverGui && serverGui->HasElement("lod"))
+  {
+    this->dataPtr->lod = serverGui->Get<unsigned int>("lod");
+  }
+
+  if (_sdf->HasElement("skirt_length"))
+  {
+    this->dataPtr->skirtLength = _sdf->Get<double>("skirt_length");
+  }
+  else if (serverGui && serverGui->HasElement("skirt_length"))
+  {
+    this->dataPtr->skirtLength = serverGui->Get<double>("skirt_length");
+  }
+
+  scene->SetHeightmapLOD(this->dataPtr->lod);
+  scene->SetHeightmapSkirtLength(this->dataPtr->skirtLength);
 }
