@@ -2141,6 +2141,7 @@ void World::ProcessLightFactoryMsgs()
 //////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
+  IGN_PROFILE("World::ProcessFactoryMsgs");
   std::list<sdf::ElementPtr> modelsToLoad, lightsToLoad;
 
   std::list<msgs::Factory> factoryMsgsCopy;
