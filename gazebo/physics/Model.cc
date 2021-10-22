@@ -1034,11 +1034,12 @@ void Model::LoadPlugins()
   if (this->GetPluginCount() > 0)
   {
     int iterations = 0;
+    const int maxIterations = 500;
 
     // Wait for the sensors to be initialized before loading
     // plugins, if there are any sensors
     while (this->GetSensorCount() > 0 && !this->world->SensorsInitialized() &&
-           iterations < 50)
+           iterations < maxIterations)
     {
       common::Time::MSleep(100);
       iterations++;
@@ -1046,7 +1047,7 @@ void Model::LoadPlugins()
 
     // Load the plugins if the sensors have been loaded, or if there
     // are no sensors attached to the model.
-    if (iterations < 50)
+    if (iterations < maxIterations)
     {
       // Load the plugins
       sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
