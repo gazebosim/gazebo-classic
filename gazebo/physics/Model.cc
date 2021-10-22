@@ -1030,11 +1030,17 @@ std::vector<std::string> Model::SensorScopedName(
 //////////////////////////////////////////////////
 void Model::LoadPlugins()
 {
+  this->LoadPlugins(5);
+}
+
+//////////////////////////////////////////////////
+void Model::LoadPlugins(unsigned int _timeout)
+{
   // Check to see if we need to load any model plugins
   if (this->GetPluginCount() > 0)
   {
     int iterations = 0;
-    const int maxIterations = 500;
+    const int maxIterations = _timeout * 10;
 
     // Wait for the sensors to be initialized before loading
     // plugins, if there are any sensors
@@ -1066,7 +1072,7 @@ void Model::LoadPlugins()
   }
 
   for (auto &model : this->models)
-    model->LoadPlugins();
+    model->LoadPlugins(_timeout);
 }
 
 //////////////////////////////////////////////////

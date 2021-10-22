@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
-  <world name="default">
+  <world name='default' xmlns:ignition="http://ignitionrobotics.org/schema">
     <include>
       <uri>model://ground_plane</uri>
     </include>
@@ -8,6 +8,7 @@
       <uri>model://sun</uri>
     </include>
 
+    <ignition:model_plugin_loading_timeout>30</ignition:model_plugin_loading_timeout>
     <plugin filename="libWorldSpawnModelPlugin.so" name="world_spawn_model">
       <sdf version="1.6">
         <model name="slow_loading_model">

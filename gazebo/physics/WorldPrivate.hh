@@ -196,6 +196,9 @@ namespace gazebo
       /// \brief The world's current SDF description.
       public: sdf::ElementPtr sdf;
 
+      /// \brief Timeout for Model::LoadPlugins in seconds.
+      public: unsigned int modelPluginLoadingTimeout = 5;
+
       /// \brief All the plugins.
       public: std::vector<WorldPluginPtr> plugins;
 
