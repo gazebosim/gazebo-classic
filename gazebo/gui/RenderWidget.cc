@@ -103,6 +103,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
+void RenderWidget::SetRenderRate(float renderRate)
+{
+  this->glWidget->SetRenderRate(renderRate);
+}
+
+/////////////////////////////////////////////////
 void RenderWidget::Init()
 {
   // Load all GUI Plugins.

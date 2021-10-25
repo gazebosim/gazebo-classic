@@ -924,6 +924,14 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
 }
 
 /////////////////////////////////////////////////
+void GLWidget::SetRenderRate(float renderRate)
+{
+  this->dataPtr->updateTimer->start(
+      static_cast<int>(
+        std::round(1000.0 / renderRate)));
+}
+
+/////////////////////////////////////////////////
 rendering::ScenePtr GLWidget::Scene() const
 {
   return this->dataPtr->scene;
@@ -1307,13 +1315,6 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
       this->dataPtr->copyEntityName = "";
       g_pasteAct->setEnabled(false);
     }
-  }
-
-  if (_msg->request() == "update_render_rate")
-  {
-    this->dataPtr->updateTimer->start(
-      static_cast<int>(
-        std::round(1000.0 / this->dataPtr->userCamera->RenderRate())));
   }
 }
 

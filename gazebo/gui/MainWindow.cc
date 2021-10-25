@@ -428,7 +428,8 @@ void MainWindow::RenderOptions()
     msg.set_data(std::to_string(renderOptionsWindow->RenderRate()));
     pub->Publish(msg);
 
-    transport::requestNoReply(this->dataPtr->node, "update_render_rate", "");
+    this->dataPtr->renderWidget->SetRenderRate(
+        renderOptionsWindow->RenderRate());
   }
 }
 

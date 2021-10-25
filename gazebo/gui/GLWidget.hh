@@ -53,6 +53,8 @@ namespace gazebo
       public: explicit GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
+      void SetRenderRate(float renderRate);
+
       /// \brief View a scene in this widget.
       /// This will use the scene's UserCamera to visualize the scene.
       /// If a UserCamera does not exist, one is created with the

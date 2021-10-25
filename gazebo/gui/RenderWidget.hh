@@ -40,6 +40,8 @@ namespace gazebo
       public: explicit RenderWidget(QWidget *_parent = 0);
       public: virtual ~RenderWidget();
 
+      public: void SetRenderRate(float renderRate);
+
       // \brief Initialization
       public: void Init();
 
