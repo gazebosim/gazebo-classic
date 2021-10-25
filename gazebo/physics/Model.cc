@@ -1030,7 +1030,7 @@ std::vector<std::string> Model::SensorScopedName(
 //////////////////////////////////////////////////
 void Model::LoadPlugins()
 {
-  this->LoadPlugins(5);
+  this->LoadPlugins(30);
 }
 
 //////////////////////////////////////////////////
