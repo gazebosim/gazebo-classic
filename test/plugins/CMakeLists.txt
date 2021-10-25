@@ -27,7 +27,9 @@ set (plugins
   Issue1208Plugin
   ModelTrajectoryTestPlugin
   PluginInterfaceTest
+  SlowLoadingSensorPlugin
   SpringTestPlugin
+  WorldSpawnModelPlugin
 )
 
 foreach (src ${plugins})

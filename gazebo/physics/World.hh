@@ -299,17 +299,17 @@ namespace gazebo
       public: void SetState(const WorldState &_state);
 
       /// \brief Insert a model from an SDF file.
-      /// Spawns a model into the world base on and SDF file.
+      /// Spawns a model into the world based on an SDF file.
       /// \param[in] _sdfFilename The name of the SDF file (including path).
       public: void InsertModelFile(const std::string &_sdfFilename);
 
       /// \brief Insert a model from an SDF string.
-      /// Spawns a model into the world base on and SDF string.
+      /// Spawns a model into the world based on an SDF string.
       /// \param[in] _sdfString A string containing valid SDF markup.
       public: void InsertModelString(const std::string &_sdfString);
 
       /// \brief Insert a model using SDF.
-      /// Spawns a model into the world base on and SDF object.
+      /// Spawns a model into the world based on an SDF object.
       /// \param[in] _sdf A reference to an SDF object.
       public: void InsertModelSDF(const sdf::SDF &_sdf);
 

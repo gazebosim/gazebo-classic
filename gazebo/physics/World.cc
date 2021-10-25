@@ -233,6 +233,15 @@ void World::Load(sdf::ElementPtr _sdf)
         Get<bool>("ignition:shadow_caster_render_back_faces");
   }
 
+  {
+    const std::string kElementName = "ignition:model_plugin_loading_timeout";
+    if (this->dataPtr->sdf->HasElement(kElementName))
+    {
+      this->dataPtr->modelPluginLoadingTimeout =
+        this->dataPtr->sdf->Get<unsigned int>(kElementName);
+    }
+  }
+
   // The period at which messages are processed
   this->dataPtr->processMsgsPeriod = common::Time(0, 200000000);
 
@@ -1774,7 +1783,7 @@ void World::LoadPlugins()
     {
       ModelPtr model = boost::static_pointer_cast<Model>(
           this->dataPtr->rootElement->GetChild(i));
-      model->LoadPlugins();
+      model->LoadPlugins(this->dataPtr->modelPluginLoadingTimeout);
     }
   }
 }
@@ -2141,6 +2150,7 @@ void World::ProcessLightFactoryMsgs()
 //////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
+  IGN_PROFILE("World::ProcessFactoryMsgs");
   std::list<sdf::ElementPtr> modelsToLoad, lightsToLoad;
 
   std::list<msgs::Factory> factoryMsgsCopy;
@@ -2333,7 +2343,7 @@ void World::ProcessFactoryMsgs()
       if (model != nullptr)
       {
         model->Init();
-        model->LoadPlugins();
+        model->LoadPlugins(this->dataPtr->modelPluginLoadingTimeout);
       }
     }
     catch(...)
@@ -2459,7 +2469,7 @@ void World::SetState(const WorldState &_state)
         {
           model->Init();
           if (!util::LogPlay::Instance()->IsOpen())
-            model->LoadPlugins();
+            model->LoadPlugins(this->dataPtr->modelPluginLoadingTimeout);
         }
       }
       catch(...)

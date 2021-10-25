@@ -1030,15 +1030,22 @@ std::vector<std::string> Model::SensorScopedName(
 //////////////////////////////////////////////////
 void Model::LoadPlugins()
 {
+  this->LoadPlugins(30);
+}
+
+//////////////////////////////////////////////////
+void Model::LoadPlugins(unsigned int _timeout)
+{
   // Check to see if we need to load any model plugins
   if (this->GetPluginCount() > 0)
   {
     int iterations = 0;
+    const int maxIterations = _timeout * 10;
 
     // Wait for the sensors to be initialized before loading
     // plugins, if there are any sensors
     while (this->GetSensorCount() > 0 && !this->world->SensorsInitialized() &&
-           iterations < 50)
+           iterations < maxIterations)
     {
       common::Time::MSleep(100);
       iterations++;
@@ -1046,7 +1053,7 @@ void Model::LoadPlugins()
 
     // Load the plugins if the sensors have been loaded, or if there
     // are no sensors attached to the model.
-    if (iterations < 50)
+    if (iterations < maxIterations)
     {
       // Load the plugins
       sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
@@ -1065,7 +1072,7 @@ void Model::LoadPlugins()
   }
 
   for (auto &model : this->models)
-    model->LoadPlugins();
+    model->LoadPlugins(_timeout);
 }
 
 //////////////////////////////////////////////////
