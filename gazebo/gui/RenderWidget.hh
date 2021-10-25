@@ -40,8 +40,6 @@ namespace gazebo
       public: explicit RenderWidget(QWidget *_parent = 0);
       public: virtual ~RenderWidget();
 
-      public: void SetRenderRate(float renderRate);
-
       // \brief Initialization
       public: void Init();
 
@@ -105,6 +103,10 @@ namespace gazebo
       /// \brief Set the visibility of the toolbar.
       /// \param[in] _show Whether or not to show the toolbar.
       public: void ShowToolbar(const bool _show);
+
+      /// \brief Change render rate for GLWidget
+      /// \param[in] _renderRate Updated render rate
+      public: void SetRenderRate(float _renderRate);
 
       /// \brief Qt callback to clear overlay message if a duration is
       /// specified

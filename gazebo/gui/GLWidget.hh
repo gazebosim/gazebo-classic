@@ -53,8 +53,6 @@ namespace gazebo
       public: explicit GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
-      void SetRenderRate(float renderRate);
-
       /// \brief View a scene in this widget.
       /// This will use the scene's UserCamera to visualize the scene.
       /// If a UserCamera does not exist, one is created with the
@@ -75,6 +73,10 @@ namespace gazebo
       /// \brief Returns the list of selected visuals.
       /// \return List with pointers to selected visuals.
       public: std::vector<rendering::VisualPtr> SelectedVisuals() const;
+
+      /// \brief Change render rate for GLWidget
+      /// \param[in] _renderRate Updated render rate
+      public: void SetRenderRate(float _renderRate);
 
       signals: void clicked();
 

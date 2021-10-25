@@ -924,11 +924,11 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
 }
 
 /////////////////////////////////////////////////
-void GLWidget::SetRenderRate(float renderRate)
+void GLWidget::SetRenderRate(float _renderRate)
 {
   this->dataPtr->updateTimer->start(
       static_cast<int>(
-        std::round(1000.0 / renderRate)));
+        std::round(1000.0 / _renderRate)));
 }
 
 /////////////////////////////////////////////////
