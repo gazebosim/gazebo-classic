@@ -695,7 +695,7 @@ void BuildingMaker::GenerateSDF()
   modelElem->GetElement("pose")->Set(modelOrigin);
 
   // loop through all model manips
-  for (const auto itemsIt : this->dataPtr->allItems)
+  for (const auto &itemsIt : this->dataPtr->allItems)
   {
     visualNameStream.str("");
     collisionNameStream.str("");

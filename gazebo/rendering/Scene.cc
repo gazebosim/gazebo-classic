@@ -123,7 +123,6 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->transparent = false;
   this->dataPtr->wireframe = false;
 
-  this->dataPtr->requestMsg = NULL;
   this->dataPtr->enableVisualizations = _enableVisualizations;
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init(_name);
@@ -207,24 +206,48 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->sceneSimTimePosesApplied = common::Time();
   this->dataPtr->sceneSimTimePosesReceived = common::Time();
 
-  // Get shadow caster material name from physics::World
-  ignition::transport::Node node;
-  ignition::msgs::StringMsg rep;
-  const std::string serviceName = "/shadow_caster_material_name";
-  bool result;
-  unsigned int timeout = 5000;
-  bool executed = node.Request(serviceName,
-      timeout, rep, result);
-  if (executed)
   {
-    if (result)
-      this->dataPtr->shadowCasterMaterialName = rep.data();
+    // Get shadow caster material name from physics::World
+    ignition::transport::Node node;
+    ignition::msgs::StringMsg rep;
+    const std::string serviceName = "/shadow_caster_material_name";
+    bool result;
+    unsigned int timeout = 5000;
+    bool executed = node.Request(serviceName,
+        timeout, rep, result);
+    if (executed)
+    {
+      if (result)
+        this->dataPtr->shadowCasterMaterialName = rep.data();
+      else
+        gzerr << "Service call[" << serviceName << "] failed" << std::endl;
+    }
     else
-      gzerr << "Service call[" << serviceName << "] failed" << std::endl;
+    {
+      gzerr << "Service call[" << serviceName << "] timed out" << std::endl;
+    }
   }
-  else
+
   {
-    gzerr << "Service call[" << serviceName << "] timed out" << std::endl;
+    // Get shadow caster render back faces from physics::World
+    ignition::transport::Node node;
+    ignition::msgs::Boolean rep;
+    const std::string serviceName = "/shadow_caster_render_back_faces";
+    bool result;
+    unsigned int timeout = 5000;
+    bool executed = node.Request(serviceName,
+        timeout, rep, result);
+    if (executed)
+    {
+      if (result)
+        this->dataPtr->shadowCasterRenderBackFaces = rep.data();
+      else
+        gzerr << "Service call[" << serviceName << "] failed" << std::endl;
+    }
+    else
+    {
+      gzerr << "Service call[" << serviceName << "] timed out" << std::endl;
+    }
   }
 }
 
@@ -331,8 +354,7 @@ Scene::~Scene()
 {
   this->Clear();
 
-  delete this->dataPtr->requestMsg;
-  this->dataPtr->requestMsg = NULL;
+  this->dataPtr->requestMsg.reset(nullptr);
   delete this->dataPtr->receiveMutex;
   this->dataPtr->receiveMutex = NULL;
 
@@ -430,9 +452,20 @@ void Scene::Init()
       this->dataPtr->worldVisual));
   this->dataPtr->originVisual->Load();
 
-  this->dataPtr->requestPub->WaitForConnection();
-  this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
-  this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+  // Get scene info from physics::World with ignition transport service
+  ignition::transport::Node node;
+  const std::string serviceName = "/scene_info";
+  std::vector<ignition::transport::ServicePublisher> publishers;
+  if (!node.ServiceInfo(serviceName, publishers) ||
+      !node.Request(serviceName, &Scene::OnSceneInfo, this))
+  {
+    gzwarn << "Ignition transport [" << serviceName << "] service call failed,"
+           << " falling back to gazebo transport [scene_info] request."
+           << std::endl;
+    this->dataPtr->requestPub->WaitForConnection();
+    this->dataPtr->requestMsg.reset(msgs::CreateRequest("scene_info"));
+    this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+  }
 
   if (!this->dataPtr->isServer)
   {
@@ -1852,6 +1885,7 @@ void Scene::PreRender()
   LinkMsgs_L linkMsgsCopy;
   RoadMsgs_L roadMsgsCopy;
 
+  IGN_PROFILE_BEGIN("copyMsgs");
   {
     std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
 
@@ -1911,8 +1945,10 @@ void Scene::PreRender()
               std::back_inserter(roadMsgsCopy));
     this->dataPtr->roadMsgs.clear();
   }
+  IGN_PROFILE_END();
 
   // Process the scene messages. DO THIS FIRST
+  IGN_PROFILE_BEGIN("processMsgs");
   for (sIter = sceneMsgsCopy.begin(); sIter != sceneMsgsCopy.end();)
   {
     if (this->ProcessSceneMsg(*sIter))
@@ -2025,15 +2061,19 @@ void Scene::PreRender()
     else
       ++lightIter;
   }
+  IGN_PROFILE_END();
 
   // Process the request messages
+  IGN_PROFILE_BEGIN("processRequestMsgs");
   for (rIter =  this->dataPtr->requestMsgs.begin();
       rIter != this->dataPtr->requestMsgs.end(); ++rIter)
   {
     this->ProcessRequestMsg(*rIter);
   }
   this->dataPtr->requestMsgs.clear();
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("copyFrontInsert");
   {
     std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
 
@@ -2070,16 +2110,22 @@ void Scene::PreRender()
     std::copy(linkMsgsCopy.begin(), linkMsgsCopy.end(),
         std::front_inserter(this->dataPtr->linkMsgs));
   }
+  IGN_PROFILE_END();
 
   // update the rt shader
+  IGN_PROFILE_BEGIN("rtShaderUpdate");
   RTShaderSystem::Instance()->Update();
+  IGN_PROFILE_END();
 
   {
+    IGN_PROFILE_BEGIN("poseMsgMutex");
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->poseMsgMutex);
+    IGN_PROFILE_END();
 
     // Process all the model messages last. Remove pose message from the list
     // only when a corresponding visual exits. We may receive pose updates
     // over the wire before  we recieve the visual
+    IGN_PROFILE_BEGIN("poseMsgs");
     pIter = this->dataPtr->poseMsgs.begin();
     while (pIter != this->dataPtr->poseMsgs.end())
     {
@@ -2117,8 +2163,10 @@ void Scene::PreRender()
           ++pIter;
       }
     }
+    IGN_PROFILE_END();
 
     // process skeleton pose msgs
+    IGN_PROFILE_BEGIN("skeletonPoseMsgs");
     spIter = this->dataPtr->skeletonPoseMsgs.begin();
     while (spIter != this->dataPtr->skeletonPoseMsgs.end())
     {
@@ -2154,8 +2202,10 @@ void Scene::PreRender()
       else
         ++spIter;
     }
+    IGN_PROFILE_END();
 
     // Process the road messages.
+    IGN_PROFILE_BEGIN("roadMsgs");
     for (const auto &msg : roadMsgsCopy)
     {
       // do not add road if it already exists
@@ -2180,6 +2230,7 @@ void Scene::PreRender()
     // official time stamp of approval
     this->dataPtr->sceneSimTimePosesApplied =
         this->dataPtr->sceneSimTimePosesReceived;
+    IGN_PROFILE_END();
   }
 }
 
@@ -2441,6 +2492,21 @@ void Scene::OnScene(ConstScenePtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void Scene::OnSceneInfo(const msgs::Scene &_msg, const bool _result)
+{
+  if (_result)
+  {
+    std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+    auto msgptr = boost::make_shared<const msgs::Scene>(_msg);
+    this->dataPtr->sceneMsgs.push_back(msgptr);
+  }
+  else
+  {
+    gzerr << "Error when calling /scene_info service" << std::endl;
+  }
+}
+
+/////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->dataPtr->requestMsg ||
@@ -2449,11 +2515,9 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
 
   msgs::Scene sceneMsg;
   sceneMsg.ParseFromString(_msg->serialized_data());
-  boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
+  this->OnSceneInfo(sceneMsg, true);
 
-  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  this->dataPtr->sceneMsgs.push_back(sm);
-  this->dataPtr->requestMsg = NULL;
+  this->dataPtr->requestMsg.reset(nullptr);
 }
 
 /////////////////////////////////////////////////
@@ -2791,7 +2855,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
           if (matMsg.has_script())
           {
             auto scriptMsg = matMsg.script();
-            for (auto const uri : scriptMsg.uri())
+            for (auto const &uri : scriptMsg.uri())
             {
               if (!uri.empty())
                 RenderEngine::Instance()->AddResourcePath(uri);
@@ -3257,6 +3321,12 @@ void Scene::SetShadowsEnabled(bool _value)
 }
 
 /////////////////////////////////////////////////
+bool Scene::IsServer() const
+{
+  return this->dataPtr->isServer;
+}
+
+/////////////////////////////////////////////////
 bool Scene::ShadowsEnabled() const
 {
   return this->dataPtr->sdf->Get<bool>("shadows");
@@ -3309,6 +3379,12 @@ unsigned int Scene::ShadowTextureSize() const
 std::string Scene::ShadowCasterMaterialName() const
 {
   return this->dataPtr->shadowCasterMaterialName;
+}
+
+/////////////////////////////////////////////////
+bool Scene::ShadowCasterRenderBackFaces() const
+{
+  return this->dataPtr->shadowCasterRenderBackFaces;
 }
 
 /////////////////////////////////////////////////

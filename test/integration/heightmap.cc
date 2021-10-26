@@ -79,6 +79,10 @@ class HeightmapTest : public ServerFixture,
   /// \brief Test loading a heightmap with an LOD visual plugin
   public: void LODVisualPlugin();
 
+  /// \brief Test loading a heightmap with an LOD visual plugin that has
+  /// different parameters for the Server and GUI.
+  public: void LODVisualPluginServerGUI();
+
 /// \brief Test loading a heightmap and verify cache files are created
   public: void HeightmapCache();
 
@@ -719,6 +723,36 @@ void HeightmapTest::LODVisualPlugin()
 }
 
 /////////////////////////////////////////////////
+void HeightmapTest::LODVisualPluginServerGUI()
+{
+  // load a heightmap with no visual
+  Load("worlds/heightmap_lod_plugin_server_gui.world", false);
+  physics::ModelPtr heightmap = GetModel("heightmap");
+  ASSERT_NE(heightmap, nullptr);
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+  ASSERT_NE(scene, nullptr);
+  EXPECT_TRUE(scene->IsServer());
+
+  // make sure scene is initialized and running
+  int sleep = 0;
+  int maxSleep = 30;
+  while (scene->SimTime().Double() < 2.0 && sleep++ < maxSleep)
+    common::Time::MSleep(100);
+
+  // check the heightmap lod via scene
+  EXPECT_EQ(scene->HeightmapLOD(), 0u);
+  // check skirt length param via scene
+  EXPECT_EQ(scene->HeightmapSkirtLength(), 0.5);
+
+  // get heightmap object and check lod params
+  rendering::Heightmap *h = scene->GetHeightmap();
+  EXPECT_NE(h, nullptr);
+  EXPECT_EQ(h->LOD(), 0u);
+  EXPECT_EQ(h->SkirtLength(), 0.5);
+}
+
+/////////////////////////////////////////////////
 void HeightmapTest::HeightmapCache()
 {
   // path to heightmap cache files
@@ -1171,6 +1205,12 @@ TEST_F(HeightmapTest, NoVisual)
 TEST_F(HeightmapTest, LODVisualPlugin)
 {
   LODVisualPlugin();
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, LODVisualPluginServerGUI)
+{
+  LODVisualPluginServerGUI();
 }
 
 /////////////////////////////////////////////////

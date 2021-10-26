@@ -152,6 +152,23 @@ TEST_F(ModelTest, SetScale)
     receivedVisualMsg.geometry().sphere().radius());
 
   g_modelMsgs.clear();
+
+  // Call SetScale again with same value and expect another message
+  model->SetScale(scale, true);
+
+  // publish msg
+  sleep = 0;
+  receivedMsgs = false;
+  while (!receivedMsgs && sleep++ < 100)
+  {
+    world->Step(1);
+    common::Time::MSleep(100);
+    {
+      std::lock_guard<std::mutex> lock(g_mutex);
+      receivedMsgs = !g_modelMsgs.empty();
+    }
+  }
+  EXPECT_FALSE(g_modelMsgs.empty());
 }
 
 

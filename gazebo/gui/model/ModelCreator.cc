@@ -1013,7 +1013,7 @@ bool ModelCreator::SaveModelFiles()
     QString msg("The edited model was automatically converted to SDFormat 1.7."
         " The resulting model had the following errors.\n\n");
 
-    for (const auto err : errors)
+    for (const auto &err : errors)
     {
       msg.append("* " + QString::fromStdString(err.Message()) + "\n");
       gzerr << err.Message() << "\n";

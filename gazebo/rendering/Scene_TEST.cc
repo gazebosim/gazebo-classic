@@ -33,6 +33,7 @@ TEST_F(Scene_TEST, AddRemoveCameras)
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != nullptr);
+  EXPECT_TRUE(scene->IsServer());
 
   // verify no cameras are currently in the scene
   EXPECT_EQ(scene->CameraCount(), 0u);

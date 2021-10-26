@@ -788,7 +788,8 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
 #endif
 
   sceneMgr->setShadowTextureSelfShadow(false);
-  sceneMgr->setShadowCasterRenderBackFaces(true);
+  sceneMgr->setShadowCasterRenderBackFaces(
+      _scene->ShadowCasterRenderBackFaces());
 
   // TODO: We have two different shadow caster materials, both taken from
   // OGRE samples. They should be compared and tested.

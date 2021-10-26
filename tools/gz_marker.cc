@@ -227,10 +227,10 @@ void MarkerCommand::List()
         data[ns].push_back(std::make_tuple(id, layer, type));
       }
 
-      for (auto const d : data)
+      for (auto const &d : data)
       {
         std::cout << "NAMESPACE " << d.first << std::endl;
-        for (auto const m : d.second)
+        for (auto const &m : d.second)
         {
           uint64_t id = std::get<0>(m);
           std::cout << "  ID " << id;

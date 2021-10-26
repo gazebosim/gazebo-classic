@@ -116,26 +116,59 @@ namespace gazebo
             {
               TPtr result;
               // PluginPtr result;
-              struct stat st;
-              bool found = false;
-              std::string fullname, filename(_filename);
-              std::list<std::string>::iterator iter;
+              std::string filename(_filename);
               std::list<std::string> pluginPaths =
                 common::SystemPaths::Instance()->GetPluginPaths();
+              std::ostringstream errorStream;
 
-#ifdef __APPLE__
-              // This is a hack to work around issue #800,
-              // error loading plugin libraries with different extensions
+              // helper function to find and dlopen a plugin file
+              // returns void * dlHandle
+              auto findAndDlopenPluginFile = [](
+                  const std::string &_pluginFilename,
+                  const std::list<std::string> &_pluginPaths,
+                  std::ostringstream &_errorStream) -> void *
               {
-                size_t soSuffix = filename.rfind(".so");
-                if (soSuffix != std::string::npos)
+                struct stat st;
+                bool found = false;
+                std::string fullname;
+                std::list<std::string>::const_iterator iter;
+
+                for (iter = _pluginPaths.begin();
+                     iter!= _pluginPaths.end(); ++iter)
                 {
-                  const std::string macSuffix(".dylib");
-                  filename.replace(soSuffix, macSuffix.length(), macSuffix);
+                  fullname = (*iter)+std::string("/")+_pluginFilename;
+                  fullname = boost::filesystem::path(fullname)
+                      .make_preferred().string();
+                  if (stat(fullname.c_str(), &st) == 0)
+                  {
+                    found = true;
+                    break;
+                  }
                 }
-              }
-#elif _WIN32
-              // Corresponding windows hack
+
+                if (!found)
+                  fullname = _pluginFilename;
+
+                void *dlHandle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+                if (!dlHandle)
+                {
+                  _errorStream << "Failed to load plugin " << fullname << ": "
+                    << dlerror() << "\n";
+                }
+                return dlHandle;
+              };
+
+              // This logic is to support different extensions on each OS
+              // see issue #800
+              //
+              // Linux: lib*.so
+              // macOS: lib*.so, lib*.dylib
+              // Windows: *.dll
+              //
+              // Assuming that most plugin names are specified as lib*.so,
+              // replace prefix and suffix depending on the OS.
+              // On macOS, first try the lib*.so name, then try lib*.dylib
+#ifdef _WIN32
               {
                 // replace .so with .dll
                 size_t soSuffix = filename.rfind(".so");
@@ -151,36 +184,39 @@ namespace gazebo
                   filename.erase(0, 3);
                 }
               }
-#endif  // ifdef __APPLE__
+#endif  // ifdef _WIN32
 
-              for (iter = pluginPaths.begin();
-                   iter!= pluginPaths.end(); ++iter)
-              {
-                fullname = (*iter)+std::string("/")+filename;
-                fullname = boost::filesystem::path(fullname)
-                    .make_preferred().string();
-                if (stat(fullname.c_str(), &st) == 0)
-                {
-                  found = true;
-                  break;
-                }
-              }
-
-              if (!found)
-                fullname = filename;
-
-              fptr_union_t registerFunc;
-              std::string registerName = "RegisterPlugin";
-
-              void *dlHandle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+              // Try to find and dlopen plugin with the following pattern:
+              // Linux: lib*.so
+              // macOS: lib*.so
+              // Windows: *.dll
+              void *dlHandle = findAndDlopenPluginFile(filename, pluginPaths,
+                                                       errorStream);
+#ifdef __APPLE__
               if (!dlHandle)
               {
-                gzerr << "Failed to load plugin " << fullname << ": "
-                  << dlerror() << "\n";
+                // lib*.so file could not be found or opened, try lib*.dylib
+                size_t soSuffix = filename.rfind(".so");
+                if (soSuffix != std::string::npos)
+                {
+                  const std::string macSuffix(".dylib");
+                  filename.replace(soSuffix, macSuffix.length(), macSuffix);
+                }
+              }
+              // macOS: lib*.dylib
+              dlHandle = findAndDlopenPluginFile(filename, pluginPaths, errorStream);
+#endif  // ifdef __APPLE__
+
+              if (!dlHandle)
+              {
+                gzerr << errorStream.str();
                 return result;
               }
 
-              registerFunc.ptr = dlsym(dlHandle, registerName.c_str());
+              fptr_union_t registerFunc;
+              const char *registerName = "RegisterPlugin";
+
+              registerFunc.ptr = dlsym(dlHandle, registerName);
 
               if (!registerFunc.ptr)
               {

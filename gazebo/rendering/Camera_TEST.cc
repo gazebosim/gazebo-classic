@@ -38,6 +38,7 @@ TEST_F(Camera_TEST, Create)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
   ASSERT_TRUE(scene != nullptr);
+  EXPECT_TRUE(scene->IsServer());
 
   // test creating rgb camera
   {
