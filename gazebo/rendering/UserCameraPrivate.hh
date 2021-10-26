@@ -87,9 +87,6 @@ namespace gazebo
 
       /// \brief Initial camera pose.
       public: ignition::math::Pose3d initialPose;
-
-      /// \brief Subscribes to render rate messages.
-      public: transport::SubscriberPtr renderRateSub;
     };
   }
 }

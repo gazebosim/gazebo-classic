@@ -36,6 +36,7 @@
 #include "gazebo/gui/ModelListWidget.hh"
 #include "gazebo/gui/ModelListWidgetPrivate.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
+#include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
 
@@ -175,6 +176,12 @@ ModelListWidget::~ModelListWidget()
   delete this->dataPtr->propMutex;
   delete this->dataPtr->receiveMutex;
   this->dataPtr->node.reset();
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::ConnectRenderWidget(RenderWidget* renderWidget)
+{
+  this->dataPtr->renderWidget = renderWidget;
 }
 
 /////////////////////////////////////////////////
@@ -840,6 +847,24 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
       rendering::UserCameraPtr cam = gui::get_active_camera();
       if (cam)
         cam->SetWorldPose(msgs::ConvertIgn(poseMsg));
+    }
+  }
+
+  QtProperty *cameraRenderRateProperty = this->ChildItem(cameraProperty,
+      "render rate");
+  if (cameraRenderRateProperty)
+  {
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+
+    if (cam)
+    {
+      cam->SetRenderRate(this->dataPtr->variantManager->value(
+          this->ChildItem(cameraRenderRateProperty, "render rate")).toDouble());
+
+      this->dataPtr->renderWidget->SetRenderRate(
+          this->dataPtr->variantManager->value(
+            this->ChildItem(cameraRenderRateProperty, "render rate")).
+              toDouble());
     }
   }
 
@@ -3438,6 +3463,11 @@ void ModelListWidget::FillUserCamera()
   item->setValue(cameraName.c_str());
   topItem->addSubProperty(item);
   item->setEnabled(false);
+
+  auto renderRateItem = this->dataPtr->variantManager->addProperty(
+      QVariant::Double, tr("render rate"));
+  renderRateItem->setValue(cam->RenderRate());
+  topItem->addSubProperty(renderRateItem);
 
   // Create and set the gui camera clip distance items
   auto clipItem = this->dataPtr->variantManager->addProperty(

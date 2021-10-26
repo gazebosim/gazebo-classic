@@ -19,9 +19,6 @@
 #include "gazebo/util/system.hh"
 
 GZ_GUI_VISIBLE
-QAction *gazebo::gui::g_renderAct = 0;
-
-GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_arrowAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_translateAct = 0;

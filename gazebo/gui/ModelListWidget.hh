@@ -24,6 +24,7 @@
 #include <ignition/msgs/plugin_v.pb.h>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
@@ -43,6 +44,8 @@ namespace gazebo
       Q_OBJECT
       public: explicit ModelListWidget(QWidget *_parent = 0);
       public: virtual ~ModelListWidget();
+
+      public: void ConnectRenderWidget(RenderWidget* renderWidget);
 
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
       private slots: void Update();

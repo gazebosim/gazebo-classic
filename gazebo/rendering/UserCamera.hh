@@ -294,12 +294,6 @@ namespace gazebo
       /// \param[in] _msg New pose message.
       private: void OnJoyPose(ConstPosePtr &_msg);
 
-      /// \brief Handles incoming relative joystick messages.
-      /// Incoming joystick messages are used to control
-      /// translation and rotation rates of the camera position.
-      /// \param[in] _msg New joystick message.
-      private: void OnRenderRate(ConstGzStringPtr &_msg);
-
       /// \internal
       /// \brief Pointer to private data.
       private: UserCameraPrivate *dataPtr;

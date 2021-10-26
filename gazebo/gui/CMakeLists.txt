@@ -49,7 +49,6 @@ set (sources
   ModelRightMenu.cc
   ModelSnap.cc
   MouseEventHandler.cc
-  RenderOptionsWindow.cc
   RenderWidget.cc
   SaveEntityDialog.cc
   SpaceNav.cc

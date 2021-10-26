@@ -26,8 +26,6 @@ namespace gazebo
 {
   namespace gui
   {
-    extern GZ_GUI_VISIBLE QAction *g_renderAct;
-
     extern GZ_GUI_VISIBLE QAction *g_newAct;
     extern GZ_GUI_VISIBLE QAction *g_openAct;
     extern GZ_GUI_VISIBLE QAction *g_saveAct;

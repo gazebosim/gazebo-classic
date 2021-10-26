@@ -47,7 +47,6 @@
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/LayersWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
-#include "gazebo/gui/RenderOptionsWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/SpaceNav.hh"
 #include "gazebo/gui/TimePanel.hh"
@@ -120,6 +119,9 @@ MainWindow::MainWindow()
   this->dataPtr->renderWidget = new gui::RenderWidget(mainWidget);
   // don't call RenderWidget::Init() yet, as some GUI plugins loaded from
   // there may need the main window to be finalised already.
+
+  this->dataPtr->modelListWidget->ConnectRenderWidget(
+      this->dataPtr->renderWidget);
 
   this->CreateEditors();
 
@@ -409,28 +411,6 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->dataPtr->spacenav = nullptr;
 
   emit Close();
-}
-
-/////////////////////////////////////////////////
-void MainWindow::RenderOptions()
-{
-  std::unique_ptr<RenderOptionsWindow> renderOptionsWindow(
-      new RenderOptionsWindow(this));
-  if (renderOptionsWindow->exec() == QDialog::Accepted)
-  {
-    transport::PublisherPtr pub =
-      this->dataPtr->node->Advertise<gazebo::msgs::GzString>(
-       "~/user_camera/render_rate");
-
-    pub->WaitForConnection();
-
-    gazebo::msgs::GzString msg;
-    msg.set_data(std::to_string(renderOptionsWindow->RenderRate()));
-    pub->Publish(msg);
-
-    this->dataPtr->renderWidget->SetRenderRate(
-        renderOptionsWindow->RenderRate());
-  }
 }
 
 /////////////////////////////////////////////////
@@ -1120,10 +1100,6 @@ void MainWindow::CreateActions()
   this->connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
   */
 
-  g_renderAct = new QAction(tr("Open Render Options"), this);
-  this->connect(g_renderAct, SIGNAL(triggered()), this,
-      SLOT(RenderOptions()));
-
   g_topicVisAct = new QAction(tr("Topic Visualization"), this);
   g_topicVisAct->setShortcut(tr("Ctrl+T"));
   g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
@@ -1696,9 +1672,6 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 /////////////////////////////////////////////////
 void MainWindow::DeleteActions()
 {
-  delete g_renderAct;
-  g_renderAct = nullptr;
-
   delete g_topicVisAct;
   g_topicVisAct = nullptr;
 
@@ -1920,7 +1893,6 @@ void MainWindow::CreateMenuBar()
   cameraMenu->addAction(g_orbitAct);
   cameraMenu->addSeparator();
   cameraMenu->addAction(g_resetAct);
-  cameraMenu->addAction(g_renderAct);
 
   QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
@@ -2454,7 +2426,6 @@ void MainWindow::OnWindowMode(const std::string &_mode)
   g_fpsAct->setVisible(simOrLog);
   g_orbitAct->setVisible(simOrLog);
   g_resetAct->setVisible(simOrLog);
-  g_renderAct->setVisible(simOrLog);
 
   // View
   g_showGridAct->setVisible(simOrLog);

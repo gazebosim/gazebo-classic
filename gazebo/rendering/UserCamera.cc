@@ -102,10 +102,6 @@ void UserCamera::Load()
 
   this->dataPtr->posePub =
     this->dataPtr->node->Advertise<msgs::Pose>("~/user_camera/pose", 1, 30.0);
-
-  this->dataPtr->renderRateSub =
-    this->dataPtr->node->Subscribe("~/user_camera/render_rate",
-    &UserCamera::OnRenderRate, this);
 }
 
 //////////////////////////////////////////////////
@@ -945,8 +941,3 @@ ignition::math::Vector2i UserCamera::Project(
   return pt / this->dataPtr->devicePixelRatio;
 }
 
-//////////////////////////////////////////////////
-void UserCamera::OnRenderRate(ConstGzStringPtr &_msg)
-{
-  this->SetRenderRate(std::stof(_msg->data()));
-}
