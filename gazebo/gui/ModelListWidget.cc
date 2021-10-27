@@ -830,11 +830,12 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
 /////////////////////////////////////////////////
 void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
 {
+  const std::string changedProperty = _item->propertyName().toStdString();
+
   QtProperty *cameraProperty = this->ChildItem("camera");
   QtProperty *cameraPoseProperty = this->ChildItem(cameraProperty, "pose");
   if (cameraPoseProperty)
   {
-    std::string changedProperty = _item->propertyName().toStdString();
     if (changedProperty == "x"
       || changedProperty == "y"
       || changedProperty == "z"
@@ -852,7 +853,7 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
 
   QtProperty *cameraRenderRateProperty = this->ChildItem(cameraProperty,
       "render rate");
-  if (cameraRenderRateProperty)
+  if (cameraRenderRateProperty && changedProperty == "render rate")
   {
     rendering::UserCameraPtr cam = gui::get_active_camera();
 
@@ -869,9 +870,8 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
   }
 
   QtProperty *cameraClipProperty = this->ChildItem(cameraProperty, "clip");
-  if (cameraPoseProperty)
+  if (cameraClipProperty)
   {
-    std::string changedProperty = _item->propertyName().toStdString();
     rendering::UserCameraPtr cam = gui::get_active_camera();
 
     if (cam)
@@ -886,11 +886,6 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
       {
         cam->SetClipDist(cam->NearClip(), this->dataPtr->variantManager->value(
               this->ChildItem(cameraClipProperty, "far")).toDouble());
-      }
-      else
-      {
-        gzerr << "Unable to process user camera clip property["
-          << changedProperty << "]\n";
       }
     }
     else
@@ -907,7 +902,6 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
     rendering::UserCameraPtr cam = gui::get_active_camera();
     if (!cam)
       return;
-    std::string changedProperty = _item->propertyName().toStdString();
     if (changedProperty == "static")
     {
       cam->SetTrackIsStatic(this->dataPtr->variantManager->value(

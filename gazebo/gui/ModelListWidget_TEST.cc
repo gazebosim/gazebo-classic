@@ -1338,17 +1338,23 @@ void ModelListWidget_TEST::GUIProperties()
       auto prop =
           static_cast<QtVariantProperty *>(property->subProperties()[1]);
       Q_ASSERT(prop);
-      QCOMPARE(prop->propertyName(), tr("clip"));
+      QCOMPARE(prop->propertyName(), tr("render rate"));
     }
     {
       auto prop =
           static_cast<QtVariantProperty *>(property->subProperties()[2]);
       Q_ASSERT(prop);
-      QCOMPARE(prop->propertyName(), tr("pose"));
+      QCOMPARE(prop->propertyName(), tr("clip"));
     }
     {
       auto prop =
           static_cast<QtVariantProperty *>(property->subProperties()[3]);
+      Q_ASSERT(prop);
+      QCOMPARE(prop->propertyName(), tr("pose"));
+    }
+    {
+      auto prop =
+          static_cast<QtVariantProperty *>(property->subProperties()[4]);
       Q_ASSERT(prop);
       QCOMPARE(prop->propertyName(), tr("track_visual"));
     }

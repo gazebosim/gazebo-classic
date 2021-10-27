@@ -940,4 +940,3 @@ ignition::math::Vector2i UserCamera::Project(
   auto pt = Camera::Project(_pt);
   return pt / this->dataPtr->devicePixelRatio;
 }
-
