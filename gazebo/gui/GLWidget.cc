@@ -105,6 +105,10 @@ GLWidget::GLWidget(QWidget *_parent)
         std::bind(&GLWidget::OnManipMode, this, std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
+      gui::Events::ConnectSetRenderRate(
+      std::bind(&GLWidget::SetRenderRate, this, std::placeholders::_1)));
+
+  this->dataPtr->connections.push_back(
     event::Events::ConnectSetSelectedEntity(
       std::bind(&GLWidget::OnSetSelectedEntity, this, std::placeholders::_1,
         std::placeholders::_2)));
@@ -924,8 +928,9 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
 }
 
 /////////////////////////////////////////////////
-void GLWidget::SetRenderRate(float _renderRate)
+void GLWidget::SetRenderRate(double _renderRate)
 {
+  this->dataPtr->userCamera->SetRenderRate(_renderRate);
   this->dataPtr->updateTimer->start(
       static_cast<int>(
         std::round(1000.0 / _renderRate)));

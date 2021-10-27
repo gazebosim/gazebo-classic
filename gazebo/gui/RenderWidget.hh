@@ -104,10 +104,6 @@ namespace gazebo
       /// \param[in] _show Whether or not to show the toolbar.
       public: void ShowToolbar(const bool _show);
 
-      /// \brief Change render rate for GLWidget
-      /// \param[in] _renderRate Updated render rate
-      public: void SetRenderRate(float _renderRate);
-
       /// \brief Qt callback to clear overlay message if a duration is
       /// specified
       private slots: void OnClearOverlayMsg();

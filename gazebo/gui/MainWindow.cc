@@ -120,9 +120,6 @@ MainWindow::MainWindow()
   // don't call RenderWidget::Init() yet, as some GUI plugins loaded from
   // there may need the main window to be finalised already.
 
-  this->dataPtr->modelListWidget->ConnectRenderWidget(
-      this->dataPtr->renderWidget);
-
   this->CreateEditors();
 
   QHBoxLayout *centerLayout = new QHBoxLayout;

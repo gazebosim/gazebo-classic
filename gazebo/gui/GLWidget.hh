@@ -76,7 +76,7 @@ namespace gazebo
 
       /// \brief Change render rate for GLWidget
       /// \param[in] _renderRate Updated render rate
-      public: void SetRenderRate(float _renderRate);
+      public: void SetRenderRate(double _renderRate);
 
       signals: void clicked();
 

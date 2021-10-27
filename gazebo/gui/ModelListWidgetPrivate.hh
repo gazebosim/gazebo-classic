@@ -26,7 +26,6 @@
 #include <ignition/transport/Node.hh>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -133,9 +132,6 @@ namespace gazebo
 
       /// \brief Node for ignition transport communication.
       public: ignition::transport::Node ignNode;
-
-      /// \brief Pointer to RenderWidget used to update the render rate.
-      public: RenderWidget* renderWidget;
     };
   }
 }
