@@ -857,15 +857,12 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
   {
     rendering::UserCameraPtr cam = gui::get_active_camera();
 
-    if (cam)
+    if (cam && this->dataPtr->renderWidget)
     {
-      cam->SetRenderRate(this->dataPtr->variantManager->value(
-          this->ChildItem(cameraRenderRateProperty, "render rate")).toDouble());
-
-      this->dataPtr->renderWidget->SetRenderRate(
-          this->dataPtr->variantManager->value(
-            this->ChildItem(cameraRenderRateProperty, "render rate")).
-              toDouble());
+      double renderRate = this->dataPtr->variantManager->value(
+          this->ChildItem(cameraRenderRateProperty, "render rate")).toDouble();
+      cam->SetRenderRate(renderRate);
+      this->dataPtr->renderWidget->SetRenderRate(renderRate);
     }
   }
 

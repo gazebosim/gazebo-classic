@@ -24,7 +24,6 @@
 #include <ignition/msgs/plugin_v.pb.h>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
@@ -38,6 +37,7 @@ namespace gazebo
   namespace gui
   {
     class ModelListWidgetPrivate;
+    class RenderWidget;
 
     class GZ_GUI_VISIBLE ModelListWidget : public QWidget
     {
@@ -45,6 +45,8 @@ namespace gazebo
       public: explicit ModelListWidget(QWidget *_parent = 0);
       public: virtual ~ModelListWidget();
 
+      /// \brief Pass RenderWidget pointer to this object so it can be used
+      /// to update the render rate.
       public: void ConnectRenderWidget(RenderWidget* renderWidget);
 
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);

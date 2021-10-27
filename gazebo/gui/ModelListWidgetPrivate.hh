@@ -134,6 +134,7 @@ namespace gazebo
       /// \brief Node for ignition transport communication.
       public: ignition::transport::Node ignNode;
 
+      /// \brief Pointer to RenderWidget used to update the render rate.
       public: RenderWidget* renderWidget;
     };
   }
