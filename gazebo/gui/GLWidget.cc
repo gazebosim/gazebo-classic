@@ -931,9 +931,9 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
 void GLWidget::SetRenderRate(double _renderRate)
 {
   this->dataPtr->userCamera->SetRenderRate(_renderRate);
-  this->dataPtr->updateTimer->start(
+  QMetaObject::invokeMethod(this->dataPtr->updateTimer, "start", Q_ARG(int,
       static_cast<int>(
-        std::round(1000.0 / _renderRate)));
+        std::round(1000.0 / _renderRate))));
 }
 
 /////////////////////////////////////////////////
