@@ -1,0 +1,78 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="cameras_with_distortion">
+    <static>true</static>
+    <link name="link">
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.000166667</ixx>
+          <iyy>0.000166667</iyy>
+          <izz>0.000166667</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.1 0.1 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>0.1 0.1 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+      <sensor type="camera" name="camera_barrel">
+        <update_rate>30</update_rate>
+        <camera name="head_barrel">
+          <horizontal_fov>0.927295218</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <distortion>
+            <k1>-0.5</k1>
+            <k2>0</k2>
+            <p1>0</p1>
+            <p2>0</p2>
+            <k3>0</k3>
+            <center>0.5 0.5</center>
+          </distortion>
+        </camera>
+        <always_on>1</always_on>
+      </sensor>
+      <sensor type="camera" name="camera_pincushion">
+        <update_rate>60</update_rate>
+        <camera name="head_pincushion">
+          <horizontal_fov>0.927295218</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <distortion>
+            <k1>0.5</k1>
+            <k2>0</k2>
+            <p1>0</p1>
+            <p2>0</p2>
+            <k3>0</k3>
+            <center>0.5 0.5</center>
+          </distortion>
+        </camera>
+        <always_on>1</always_on>
+      </sensor>
+    </link>
+  </model>
+</sdf>

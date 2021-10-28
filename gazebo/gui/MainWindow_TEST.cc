@@ -223,6 +223,7 @@ void MainWindow_TEST::SceneDestruction()
   QVERIFY(cam != NULL);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
   QVERIFY(scene != NULL);
+  QVERIFY(!scene->IsServer());
 
   cam->Fini();
   mainWindow->close();

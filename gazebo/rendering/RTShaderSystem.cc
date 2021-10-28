@@ -477,7 +477,9 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
   // Core shader lib not found -> shader generating will fail.
   if (coreLibsPath.empty())
   {
-    gzerr << "Unable to find shader lib. Shader generating will fail.";
+    gzerr << "Unable to find shader lib. Shader generating will fail. "
+          << "Your GAZEBO_RESOURCE_PATH is probably improperly set. "
+          << "Have you sourced <prefix>/share/gazebo/setup.bash?\n";
     return false;
   }
 
@@ -769,7 +771,7 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   // vec4 texture(sampler2D, vec2, [float]).
   // NVidia, AMD, and Intel all take this as a cue to provide "hardware PCF",
   // a driver hack that softens shadow edges with 4-sample interpolation.
-  for (size_t i = 0u; i < dirShadowCount; ++i)
+  for (size_t i = 0u; i < dirShadowCount + spotShadowCount; ++i)
   {
     const Ogre::TexturePtr tex = sceneMgr->getShadowTexture(i);
     // This will fail if not using OpenGL as the rendering backend.
@@ -778,11 +780,16 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
     glBindTexture(GL_TEXTURE_2D, texId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
         GL_COMPARE_R_TO_TEXTURE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+        GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+        GL_LINEAR);
   }
 #endif
 
   sceneMgr->setShadowTextureSelfShadow(false);
-  sceneMgr->setShadowCasterRenderBackFaces(true);
+  sceneMgr->setShadowCasterRenderBackFaces(
+      _scene->ShadowCasterRenderBackFaces());
 
   // TODO: We have two different shadow caster materials, both taken from
   // OGRE samples. They should be compared and tested.
@@ -790,8 +797,9 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 11
   sceneMgr->setShadowTextureCasterMaterial(
-      Ogre::MaterialManager::getSingleton().getByName("Gazebo/shadow_caster"));
+      Ogre::MaterialManager::getSingleton().getByName(
+      _scene->ShadowCasterMaterialName()));
 #else
-  sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
+  sceneMgr->setShadowTextureCasterMaterial(_scene->ShadowCasterMaterialName());
 #endif
 }

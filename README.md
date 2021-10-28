@@ -14,7 +14,7 @@ Instructions are located at
 
 Gazebo cmake parameters available at configuring time:
 
- - BUILD_TESTING (boot) [default False]
+ - BUILD_TESTING (bool) [default False]
    Include the test suite compilation in the default make call (make all).
  - ENABLE_DIAGNOSTICS
    If this is defined, it will enable diagnostic timers using the macros
@@ -26,7 +26,7 @@ Gazebo cmake parameters available at configuring time:
    Check the building machine for supported compiler optimizations and use
    them to build the software.
  - USE_UPSTREAM_CFLAGS (bool) [default True]
-   Use the recommend gazebo developers compiler optimizations flags.
+   Use the recommended gazebo developers compiler optimizations flags.
  - USE_EXTERNAL_TINYXML (bool) [default True]
    Use external copy of tinyxml during the build.
  - USE_EXTERNAL_TINYXML2 (bool) [default True]

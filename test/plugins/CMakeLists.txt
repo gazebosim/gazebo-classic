@@ -27,11 +27,13 @@ set (plugins
   Issue1208Plugin
   ModelTrajectoryTestPlugin
   PluginInterfaceTest
+  SlowLoadingSensorPlugin
   SpringTestPlugin
+  WorldSpawnModelPlugin
 )
 
 foreach (src ${plugins})
-  add_library(${src} STATIC ${src}.cc)
+  add_library(${src} MODULE ${src}.cc)
   target_link_libraries(${src} libgazebo ${ogre_libraries})
   add_dependencies(tests ${src})
 endforeach (src ${plugins})

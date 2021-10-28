@@ -25,7 +25,48 @@ namespace gazebo
   // Forward declare private data class.
   class HeightmapLODPluginPrivate;
 
-  /// \brief Plugin that sets the heightmap LOD
+  /// \brief Plugin that sets the heightmap Level of Detail (LOD) parameters.
+  /// `lod`: a render-engine specific value used to compute Level of Detail.
+  /// `skirt_length`: length of skirts on LOD tiles.
+  /// These parameters can be set uniformly for all scenes in a simulation
+  /// by specifying the parameters directly under the <plugin /> element:
+  /** \verbatim
+    <plugin filename="libHeightmapLODPlugin.so" name="heightmap_lod">
+      <lod>5</lod>
+      <skirt_length>0.5</skirt_length>
+    </plugin>
+   \endverbatim */
+  /// Alternatively, you can specify distinct values for server scene used
+  /// for rendering camera sensors, and the gui scene used for gzclient's
+  /// graphical interface.
+  /** \verbatim
+    <plugin filename="libHeightmapLODPlugin.so" name="heightmap_lod">
+      <gui>
+        <lod>5</lod>
+        <skirt_length>1.5</skirt_length>
+      </gui>
+      <server>
+        <lod>0</lod>
+        <skirt_length>0.5</skirt_length>
+      </server>
+    </plugin>
+   \endverbatim */
+  /// Parameters specified in the root namespace have precedence. The
+  /// <server/> and <gui/> elements are only checked if parameters
+  /// are not set in the root namespace.
+  /** \verbatim
+    <plugin filename="libHeightmapLODPlugin.so" name="heightmap_lod">
+      <skirt_length>2.5</skirt_length>
+      <gui>
+        <lod>5</lod>
+        <skirt_length>1.5</skirt_length> <!-- this is ignored -->
+      </gui>
+      <server>
+        <lod>0</lod>
+        <skirt_length>0.5</skirt_length> <!-- this is ignored -->
+      </server>
+    </plugin>
+   \endverbatim */
   class GZ_PLUGIN_VISIBLE HeightmapLODPlugin : public VisualPlugin
   {
     /// \brief Constructor.

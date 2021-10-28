@@ -199,7 +199,7 @@ void ModelManipulationTest::Shortcuts()
   // select a model in arrow mode
   QTest::mouseMove(glWidget,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(),
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
   QVERIFY(boxVis->GetHighlighted());
 
@@ -288,7 +288,7 @@ void ModelManipulationTest::GlobalLocalFrames()
   auto pickPt = cam->Project(modelVis->WorldPose().Pos());
   auto pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::KeyboardModifiers(), pt);
 
   this->ProcessEventsAndDraw(mainWindow, 10, 30);
 

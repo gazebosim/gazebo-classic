@@ -217,6 +217,31 @@ void World::Load(sdf::ElementPtr _sdf)
       msgs::SceneFromSDF(this->dataPtr->sdf->GetElement("scene")));
   this->dataPtr->sceneMsg.set_name(this->Name());
 
+  if (this->dataPtr->sdf->GetElement("scene")->
+      HasElement("ignition:shadow_caster_material_name"))
+  {
+    this->dataPtr->shadowCasterMaterialName =
+      this->dataPtr->sdf->GetElement("scene")->
+        Get<std::string>("ignition:shadow_caster_material_name");
+  }
+
+  if (this->dataPtr->sdf->GetElement("scene")->
+      HasElement("ignition:shadow_caster_render_back_faces"))
+  {
+    this->dataPtr->shadowCasterRenderBackFaces =
+      this->dataPtr->sdf->GetElement("scene")->
+        Get<bool>("ignition:shadow_caster_render_back_faces");
+  }
+
+  {
+    const std::string kElementName = "ignition:model_plugin_loading_timeout";
+    if (this->dataPtr->sdf->HasElement(kElementName))
+    {
+      this->dataPtr->modelPluginLoadingTimeout =
+        this->dataPtr->sdf->Get<unsigned int>(kElementName);
+    }
+  }
+
   // The period at which messages are processed
   this->dataPtr->processMsgsPeriod = common::Time(0, 200000000);
 
@@ -282,6 +307,31 @@ void World::Load(sdf::ElementPtr _sdf)
   {
     gzerr << "Error advertising service [" << pluginInfoService << "]"
         << std::endl;
+  }
+
+  std::string sceneInfoService("/scene_info");
+  if (!this->dataPtr->ignNode.Advertise(sceneInfoService,
+      &World::SceneInfoService, this))
+  {
+    gzerr << "Error advertising service [" << sceneInfoService << "]"
+        << std::endl;
+  }
+
+  std::string shadowCasterMaterialNameService("/shadow_caster_material_name");
+  if (!this->dataPtr->ignNode.Advertise(shadowCasterMaterialNameService,
+      &World::ShadowCasterMaterialNameService, this))
+  {
+    gzerr << "Error advertising service [" <<
+        shadowCasterMaterialNameService << "]" << std::endl;
+  }
+
+  std::string shadowCasterRenderBackFacesService(
+      "/shadow_caster_render_back_faces");
+  if (!this->dataPtr->ignNode.Advertise(shadowCasterRenderBackFacesService,
+      &World::ShadowCasterRenderBackFacesService, this))
+  {
+    gzerr << "Error advertising service [" <<
+        shadowCasterRenderBackFacesService << "]" << std::endl;
   }
 
   // This should come before loading of entities
@@ -687,6 +737,11 @@ void World::Step()
   DIAG_TIMER_START("World::Step");
 
   IGN_PROFILE("World::Step");
+
+  IGN_PROFILE_BEGIN("lockMutex");
+  std::lock_guard<std::mutex> lock(this->dataPtr->stepMutex);
+  IGN_PROFILE_END();
+
   IGN_PROFILE_BEGIN("loadPlugins");
   /// need this because ODE does not call dxReallocateWorldProcessContext()
   /// until dWorld.*Step
@@ -708,11 +763,13 @@ void World::Step()
 
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
 
-  IGN_PROFILE_BEGIN("sleepOffset");
+  IGN_PROFILE_BEGIN("waitForSensors");
   if (this->dataPtr->waitForSensors)
     this->dataPtr->waitForSensors(this->dataPtr->simTime.Double(),
         this->dataPtr->physicsEngine->GetMaxStepSize());
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("sleepOffset");
   double updatePeriod = this->dataPtr->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
   common::Time tmpTime = common::Time::GetWallTime();
@@ -772,14 +829,17 @@ void World::Step()
   }
   IGN_PROFILE_END();
 
-  IGN_PROFILE_BEGIN("Step");
-
+  IGN_PROFILE_BEGIN("IntrospectionManager->NotifyUpdates");
   gazebo::util::IntrospectionManager::Instance()->NotifyUpdates();
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("ProcessMessages");
   this->ProcessMessages();
+  IGN_PROFILE_END();
 
   DIAG_TIMER_STOP("World::Step");
 
+  IGN_PROFILE_BEGIN("ClearModels");
   if (g_clearModels)
     this->ClearModels();
   IGN_PROFILE_END();
@@ -932,12 +992,26 @@ void World::Fini()
   this->dataPtr->stop = true;
   this->dataPtr->enablePhysicsEngine = false;
 
+  // wait until World::Step has completed before proceeding
+  std::lock_guard<std::mutex> lock(this->dataPtr->stepMutex);
+
 #ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Fini();
 #endif
 
   // Clean transport
   {
+    // Clear subscribers first
+    this->dataPtr->controlSub.reset();
+    this->dataPtr->factorySub.reset();
+    this->dataPtr->jointSub.reset();
+    this->dataPtr->lightFactorySub.reset();
+    this->dataPtr->lightModifySub.reset();
+    this->dataPtr->lightSub.reset();
+    this->dataPtr->modelSub.reset();
+    this->dataPtr->playbackControlSub.reset();
+    this->dataPtr->requestSub.reset();
+
     this->dataPtr->deleteEntity.clear();
     this->dataPtr->requestMsgs.clear();
     this->dataPtr->factoryMsgs.clear();
@@ -954,16 +1028,6 @@ void World::Fini()
     this->dataPtr->modelPub.reset();
     this->dataPtr->lightPub.reset();
     this->dataPtr->lightFactoryPub.reset();
-
-    this->dataPtr->factorySub.reset();
-    this->dataPtr->controlSub.reset();
-    this->dataPtr->playbackControlSub.reset();
-    this->dataPtr->requestSub.reset();
-    this->dataPtr->jointSub.reset();
-    this->dataPtr->lightSub.reset();
-    this->dataPtr->lightFactorySub.reset();
-    this->dataPtr->lightModifySub.reset();
-    this->dataPtr->modelSub.reset();
 
     if (this->dataPtr->node)
       this->dataPtr->node->Fini();
@@ -1152,7 +1216,7 @@ BasePtr World::BaseByName(const std::string &_name) const
 ModelPtr World::ModelById(unsigned int _id) const
 {
   return boost::dynamic_pointer_cast<Model>(
-      this->dataPtr->rootElement->GetById(_id));
+      this->dataPtr->rootElement->GetByIdRecursive(_id));
 }
 
 //////////////////////////////////////////////////
@@ -1184,7 +1248,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
   if (_sdf->GetName() == "model")
   {
     std::string modelName = _sdf->Get<std::string>("name");
-    for (auto const m : this->dataPtr->models)
+    for (auto const &m : this->dataPtr->models)
     {
       if (m->GetName() == modelName)
       {
@@ -1719,7 +1783,7 @@ void World::LoadPlugins()
     {
       ModelPtr model = boost::static_pointer_cast<Model>(
           this->dataPtr->rootElement->GetChild(i));
-      model->LoadPlugins();
+      model->LoadPlugins(this->dataPtr->modelPluginLoadingTimeout);
     }
   }
 }
@@ -2086,6 +2150,7 @@ void World::ProcessLightFactoryMsgs()
 //////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
+  IGN_PROFILE("World::ProcessFactoryMsgs");
   std::list<sdf::ElementPtr> modelsToLoad, lightsToLoad;
 
   std::list<msgs::Factory> factoryMsgsCopy;
@@ -2278,7 +2343,7 @@ void World::ProcessFactoryMsgs()
       if (model != nullptr)
       {
         model->Init();
-        model->LoadPlugins();
+        model->LoadPlugins(this->dataPtr->modelPluginLoadingTimeout);
       }
     }
     catch(...)
@@ -2404,7 +2469,7 @@ void World::SetState(const WorldState &_state)
         {
           model->Init();
           if (!util::LogPlay::Instance()->IsOpen())
-            model->LoadPlugins();
+            model->LoadPlugins(this->dataPtr->modelPluginLoadingTimeout);
         }
       }
       catch(...)
@@ -3336,4 +3401,39 @@ bool World::PluginInfoService(const ignition::msgs::StringMsg &_req,
       << std::endl;
 
   return false;
+}
+
+//////////////////////////////////////////////////
+bool World::SceneInfoService(msgs::Scene &_res)
+{
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
+
+  // Copy implementation from ProcessRequestMsgs
+  this->dataPtr->sceneMsg.clear_model();
+  this->dataPtr->sceneMsg.clear_light();
+  this->BuildSceneMsg(this->dataPtr->sceneMsg, this->dataPtr->rootElement);
+
+  _res = this->dataPtr->sceneMsg;
+
+  for (auto road : this->dataPtr->roads)
+  {
+    // this causes the roads to publish road msgs.
+    road->Init();
+  }
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool World::ShadowCasterMaterialNameService(ignition::msgs::StringMsg &_res)
+{
+  _res.set_data(this->dataPtr->shadowCasterMaterialName.c_str());
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool World::ShadowCasterRenderBackFacesService(ignition::msgs::Boolean &_res)
+{
+  _res.set_data(this->dataPtr->shadowCasterRenderBackFaces);
+  return true;
 }

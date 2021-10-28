@@ -349,18 +349,28 @@ void Model::Init()
 //////////////////////////////////////////////////
 void Model::Update()
 {
+  IGN_PROFILE("Model::Update");
   if (this->IsStatic())
     return;
 
+  IGN_PROFILE_BEGIN("lockMutex");
   boost::recursive_mutex::scoped_lock lock(this->updateMutex);
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("jointUpdate");
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
+  {
     (*jiter)->Update();
+  }
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("jointControllerUpdate");
   if (this->jointController)
     this->jointController->Update();
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("jointAnimations");
   if (!this->jointAnimations.empty())
   {
     common::NumericKeyFrame kf(0);
@@ -396,9 +406,12 @@ void Model::Update()
     }
     this->prevAnimationTime = this->world->SimTime();
   }
+  IGN_PROFILE_END();
 
+  IGN_PROFILE_BEGIN("nestedModelUpdate");
   for (auto &model : this->models)
     model->Update();
+  IGN_PROFILE_END();
 }
 
 //////////////////////////////////////////////////
@@ -1017,15 +1030,22 @@ std::vector<std::string> Model::SensorScopedName(
 //////////////////////////////////////////////////
 void Model::LoadPlugins()
 {
+  this->LoadPlugins(30);
+}
+
+//////////////////////////////////////////////////
+void Model::LoadPlugins(unsigned int _timeout)
+{
   // Check to see if we need to load any model plugins
   if (this->GetPluginCount() > 0)
   {
     int iterations = 0;
+    const int maxIterations = _timeout * 10;
 
     // Wait for the sensors to be initialized before loading
     // plugins, if there are any sensors
     while (this->GetSensorCount() > 0 && !this->world->SensorsInitialized() &&
-           iterations < 50)
+           iterations < maxIterations)
     {
       common::Time::MSleep(100);
       iterations++;
@@ -1033,7 +1053,7 @@ void Model::LoadPlugins()
 
     // Load the plugins if the sensors have been loaded, or if there
     // are no sensors attached to the model.
-    if (iterations < 50)
+    if (iterations < maxIterations)
     {
       // Load the plugins
       sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
@@ -1052,7 +1072,7 @@ void Model::LoadPlugins()
   }
 
   for (auto &model : this->models)
-    model->LoadPlugins();
+    model->LoadPlugins(_timeout);
 }
 
 //////////////////////////////////////////////////
@@ -1266,7 +1286,8 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     return;
   }
 
-  this->SetName(this->world->StripWorldName(_msg.name()));
+  this->SetName(this->StripParentScopedName(_msg.name()));
+
   if (_msg.has_pose())
     this->SetWorldPose(msgs::ConvertIgn(_msg.pose()));
   for (int i = 0; i < _msg.link_size(); i++)
@@ -1389,17 +1410,17 @@ void Model::SetState(const ModelState &_state)
 void Model::SetScale(const ignition::math::Vector3d &_scale,
       const bool _publish)
 {
-  if (this->scale == _scale)
-    return;
-
-  this->scale = _scale;
-
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  if (this->scale != _scale)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    this->scale = _scale;
+
+    Base_V::iterator iter;
+    for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     {
-      boost::static_pointer_cast<Link>(*iter)->SetScale(_scale);
+      if (*iter && (*iter)->HasType(LINK))
+      {
+        boost::static_pointer_cast<Link>(*iter)->SetScale(_scale);
+      }
     }
   }
 

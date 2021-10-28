@@ -102,6 +102,10 @@ namespace gazebo
     public: std::map<physics::LinkWeakPtr,
                         LinkSurfaceParams> mapLinkSurfaceParams;
 
+    /// \brief Link names and their pointers
+    public: std::map<std::string,
+            physics::LinkWeakPtr> mapLinkNames;
+
     /// \brief Lateral slip compliance subscriber.
     /// \todo: Transition to ignition-transport in gazebo8.
     public: transport::SubscriberPtr lateralComplianceSub;
@@ -317,6 +321,7 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     }
 
     this->dataPtr->mapLinkSurfaceParams[link] = params;
+    this->dataPtr->mapLinkNames[link->GetName()] = link;
   }
 
   if (this->dataPtr->mapLinkSurfaceParams.empty())
@@ -445,12 +450,34 @@ void WheelSlipPlugin::SetSlipComplianceLateral(const double _compliance)
 }
 
 /////////////////////////////////////////////////
+void WheelSlipPlugin::SetSlipComplianceLateral(std::string _wheel_name, const double _compliance)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  if (this->dataPtr->mapLinkNames.count(_wheel_name) > 0)
+  {
+    auto link = this->dataPtr->mapLinkNames[_wheel_name];
+    this->dataPtr->mapLinkSurfaceParams[link].slipComplianceLateral = _compliance;
+  }
+}
+
+/////////////////////////////////////////////////
 void WheelSlipPlugin::SetSlipComplianceLongitudinal(const double _compliance)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
     linkSurface.second.slipComplianceLongitudinal = _compliance;
+  }
+}
+
+/////////////////////////////////////////////////
+void WheelSlipPlugin::SetSlipComplianceLongitudinal(std::string _wheel_name, const double _compliance)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  if (this->dataPtr->mapLinkNames.count(_wheel_name) > 0)
+  {
+    auto link = this->dataPtr->mapLinkNames[_wheel_name];
+    this->dataPtr->mapLinkSurfaceParams[link].slipComplianceLongitudinal = _compliance;
   }
 }
 

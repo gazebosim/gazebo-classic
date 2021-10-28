@@ -113,6 +113,7 @@ void JointController::Reset()
 /////////////////////////////////////////////////
 void JointController::Update()
 {
+  IGN_PROFILE("JointController::Update");
   common::Time currTime = this->dataPtr->model->GetWorld()->SimTime();
   common::Time stepTime = currTime - this->dataPtr->prevUpdateTime;
   this->dataPtr->prevUpdateTime = currTime;
@@ -123,6 +124,7 @@ void JointController::Update()
   // TODO: fix this when World::ResetTime is improved
   if (stepTime > 0)
   {
+    IGN_PROFILE_BEGIN("forces");
     if (!this->dataPtr->forces.empty())
     {
       std::map<std::string, double>::iterator iter;
@@ -132,7 +134,9 @@ void JointController::Update()
         this->dataPtr->joints[iter->first]->SetForce(0, iter->second);
       }
     }
+    IGN_PROFILE_END();
 
+    IGN_PROFILE_BEGIN("positions");
     if (!this->dataPtr->positions.empty())
     {
       std::map<std::string, double>::iterator iter;
@@ -146,7 +150,9 @@ void JointController::Update()
         this->dataPtr->joints[iter->first]->SetForce(0, cmd);
       }
     }
+    IGN_PROFILE_END();
 
+    IGN_PROFILE_BEGIN("velocities");
     if (!this->dataPtr->velocities.empty())
     {
       std::map<std::string, double>::iterator iter;
@@ -160,6 +166,7 @@ void JointController::Update()
         this->dataPtr->joints[iter->first]->SetForce(0, cmd);
       }
     }
+    IGN_PROFILE_END();
   }
 
   /* enable below if we want to set position kinematically

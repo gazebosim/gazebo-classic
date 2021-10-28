@@ -205,6 +205,36 @@ TEST_F(InfoServicesTest, ModelPlugins)
 }
 
 /////////////////////////////////////////////////
+// Request info about scene
+TEST_F(InfoServicesTest, Scene)
+{
+  this->Load("worlds/empty.world");
+
+  ignition::transport::Node ignNode;
+
+  std::string sceneInfoService("/scene_info");
+
+  std::vector<ignition::transport::ServicePublisher> publishers;
+  ASSERT_TRUE(ignNode.ServiceInfo(sceneInfoService, publishers));
+
+  gazebo::msgs::Scene scene;
+  unsigned int timeout = 5000;
+  bool result;
+  EXPECT_TRUE(ignNode.Request(sceneInfoService, timeout, scene, result));
+  EXPECT_TRUE(result);
+
+  EXPECT_EQ("default", scene.name());
+
+  ASSERT_EQ(1, scene.model_size());
+  auto model = scene.model(0);
+  EXPECT_EQ("ground_plane", model.name());
+
+  ASSERT_EQ(1, scene.light_size());
+  auto light = scene.light(0);
+  EXPECT_EQ("sun", light.name());
+}
+
+/////////////////////////////////////////////////
 // Main
 int main(int argc, char **argv)
 {

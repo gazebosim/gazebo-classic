@@ -146,6 +146,12 @@ namespace gazebo
               static event::ConnectionPtr ConnectMoveEntity(T _subscriber)
               { return moveEntity.Connect(_subscriber); }
 
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a signal to the set render rate event.
+      public: template<typename T>
+              static event::ConnectionPtr ConnectSetRenderRate(T _subscriber)
+              { return setRenderRate.Connect(_subscriber); }
+
       /// \brief Indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveMode;
 
@@ -210,6 +216,9 @@ namespace gazebo
       /// indicating whether the pose is final.
       public: static event::EventT<void (const std::string &,
           const ignition::math::Pose3d &, const bool)> moveEntity;
+
+      /// \brief Set GUI render rate event. Parameter: render rate in Hz.
+      public: static event::EventT<void (double)> setRenderRate;
     };
   }
 }

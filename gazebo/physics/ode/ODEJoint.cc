@@ -1167,10 +1167,19 @@ double ODEJoint::GetForce(unsigned int _index)
 //////////////////////////////////////////////////
 void ODEJoint::ApplyStiffnessDamping()
 {
+  IGN_PROFILE("ODEJoint::ApplyStiffnessDamping");
   if (this->useImplicitSpringDamper)
+  {
+    IGN_PROFILE_BEGIN("implicit");
     this->ApplyImplicitStiffnessDamping();
+    IGN_PROFILE_END();
+  }
   else
+  {
+    IGN_PROFILE_BEGIN("explicit");
     this->ApplyExplicitStiffnessDamping();
+    IGN_PROFILE_END();
+  }
 }
 
 //////////////////////////////////////////////////

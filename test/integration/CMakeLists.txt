@@ -95,6 +95,7 @@ set(tests
   rest_web.cc
   saving_and_loading.cc
   sdf.cc
+  sdf_errors.cc
   sensor.cc
   sdf_frame_semantics.cc
   server_fixture.cc
@@ -126,6 +127,14 @@ if (NOT WIN32)
   set(tests
     ${tests}
     transport_msg_count.cc
+  )
+endif()
+
+if (NOT APPLE)
+  set(tests
+    ${tests}
+    custom_shadow_caster.cc
+    shadow_caster_render_back_faces.cc
   )
 endif()
 
@@ -164,6 +173,9 @@ endif()
 # Add plugin dependency
 add_dependencies(${TEST_TYPE}_joint_control_plugin JointControlPlugin)
 add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+add_dependencies(${TEST_TYPE}_plugin ExceptionModelPluginConstructor)
+add_dependencies(${TEST_TYPE}_plugin ExceptionModelPluginInit)
+add_dependencies(${TEST_TYPE}_plugin ExceptionModelPluginLoad)
 add_dependencies(${TEST_TYPE}_plugin_interface PluginInterfaceTest)
 add_dependencies(${TEST_TYPE}_tracked_vehicles SimpleTrackedVehiclePlugin)
 add_dependencies(${TEST_TYPE}_tracked_vehicles WheelTrackedVehiclePlugin)

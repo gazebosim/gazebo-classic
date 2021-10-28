@@ -17,12 +17,13 @@
 #ifndef GAZEBO_RENDERING_SCENE_PRIVATE_HH_
 #define GAZEBO_RENDERING_SCENE_PRIVATE_HH_
 
+#include <condition_variable>
 #include <list>
 #include <map>
+#include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
-#include <mutex>
-#include <condition_variable>
 
 #include <boost/unordered/unordered_map.hpp>
 
@@ -300,7 +301,7 @@ namespace gazebo
       public: std::string selectionMode;
 
       /// \brief Keep around our request message.
-      public: msgs::Request *requestMsg = nullptr;
+      public: std::unique_ptr<msgs::Request> requestMsg;
 
       /// \brief True if visualizations should be rendered.
       public: bool enableVisualizations;
@@ -376,6 +377,12 @@ namespace gazebo
       /// \brief State of each layer where key is the layer id, and value is
       /// the layer's visibility.
       public: std::map<int32_t, bool> layerState;
+
+      /// \brief Shadow caster material name
+      public: std::string shadowCasterMaterialName = "Gazebo/shadow_caster";
+
+      /// \brief Shadow caster render back faces
+      public: bool shadowCasterRenderBackFaces = true;
     };
   }
 }
