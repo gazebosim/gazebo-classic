@@ -5,12 +5,14 @@
 1. Forward port windows fixes from #2789
     * [Pull request #2985](https://github.com/ignitionrobotics/gazebo/pull/2985)
     * [Pull request #2789](https://github.com/ignitionrobotics/gazebo/pull/2789)
+    * A contribution from: Tobias Fischer <info@tobiasfischer.info>
 
 1. GUI option to change render rate
     * [Pull request #3127](https://github.com/ignitionrobotics/gazebo/pull/3127)
 
 1. GaussianNoiseModel: fix for unspecified biasStdDev
     * [Pull request #3083](https://github.com/ignitionrobotics/gazebo/pull/3083)
+    * A contribution from: Ludovic J <unifai@protonmail.com>
 
 1. wind\_demo.world: add required parameter
     * [Pull request #3035](https://github.com/ignitionrobotics/gazebo/pull/3035)
@@ -35,6 +37,7 @@
 
 1. Fix Camera Distortion rounding
     * [Pull request #3114](https://github.com/ignitionrobotics/gazebo/pull/3114)
+    * A contribution from: kjeppesen1 <kjeppesen1@gmail.com>
 
 1. Always publish if flag is passed to Model::SetScale
     * [Pull request #3116](https://github.com/ignitionrobotics/gazebo/pull/3116)
@@ -44,12 +47,14 @@
 
 1. Fix standalone marker example
     * [Pull request #3014](https://github.com/ignitionrobotics/gazebo/pull/3014)
+    * A contribution from: Dhruv Maroo <dhruvmaru007@gmail.com>
 
 1. Faster examples build test and other CI fixes
     * [Pull request #3080](https://github.com/ignitionrobotics/gazebo/pull/3080)
 
 1. Fix pkgconfig prefix with absolute CMAKE_INSTALL_LIBDIR
     * [Pull request #3076](https://github.com/ignitionrobotics/gazebo/pull/3076)
+    * A contribution from: Ben Wolsieffer <benwolsieffer@gmail.com>
 
 1. Add mutex lock in World::Step and World::Fini to fix test
     * [Pull request #3078](https://github.com/ignitionrobotics/gazebo/pull/3078)
