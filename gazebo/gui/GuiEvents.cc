@@ -42,3 +42,4 @@ event::EventT<void (const std::string &, const ignition::math::Vector3d &)>
     Events::scaleEntity;
 event::EventT<void (const std::string &, const ignition::math::Pose3d &,
     const bool)> Events::moveEntity;
+event::EventT<void (double)> Events::setRenderRate;

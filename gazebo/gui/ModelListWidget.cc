@@ -823,11 +823,12 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
 /////////////////////////////////////////////////
 void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
 {
+  const std::string changedProperty = _item->propertyName().toStdString();
+
   QtProperty *cameraProperty = this->ChildItem("camera");
   QtProperty *cameraPoseProperty = this->ChildItem(cameraProperty, "pose");
   if (cameraPoseProperty)
   {
-    std::string changedProperty = _item->propertyName().toStdString();
     if (changedProperty == "x"
       || changedProperty == "y"
       || changedProperty == "z"
@@ -843,10 +844,23 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
     }
   }
 
-  QtProperty *cameraClipProperty = this->ChildItem(cameraProperty, "clip");
-  if (cameraPoseProperty)
+  QtProperty *cameraRenderRateProperty = this->ChildItem(cameraProperty,
+      "render rate");
+  if (cameraRenderRateProperty && changedProperty == "render rate")
   {
-    std::string changedProperty = _item->propertyName().toStdString();
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+
+    if (cam)
+    {
+      double renderRate = this->dataPtr->variantManager->value(
+          this->ChildItem(cameraRenderRateProperty, "render rate")).toDouble();
+      gui::Events::setRenderRate(renderRate);
+    }
+  }
+
+  QtProperty *cameraClipProperty = this->ChildItem(cameraProperty, "clip");
+  if (cameraClipProperty)
+  {
     rendering::UserCameraPtr cam = gui::get_active_camera();
 
     if (cam)
@@ -861,11 +875,6 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
       {
         cam->SetClipDist(cam->NearClip(), this->dataPtr->variantManager->value(
               this->ChildItem(cameraClipProperty, "far")).toDouble());
-      }
-      else
-      {
-        gzerr << "Unable to process user camera clip property["
-          << changedProperty << "]\n";
       }
     }
     else
@@ -882,7 +891,6 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
     rendering::UserCameraPtr cam = gui::get_active_camera();
     if (!cam)
       return;
-    std::string changedProperty = _item->propertyName().toStdString();
     if (changedProperty == "static")
     {
       cam->SetTrackIsStatic(this->dataPtr->variantManager->value(
@@ -3438,6 +3446,11 @@ void ModelListWidget::FillUserCamera()
   item->setValue(cameraName.c_str());
   topItem->addSubProperty(item);
   item->setEnabled(false);
+
+  auto renderRateItem = this->dataPtr->variantManager->addProperty(
+      QVariant::Double, tr("render rate"));
+  renderRateItem->setValue(cam->RenderRate());
+  topItem->addSubProperty(renderRateItem);
 
   // Create and set the gui camera clip distance items
   auto clipItem = this->dataPtr->variantManager->addProperty(
