@@ -520,7 +520,8 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       auto ret = system(cmdline.c_str());
       if (ret != 0)
       {
-        gzerr << "tar extract ret = " << ret << ", cmdline = " << cmdline << std::endl;
+        gzerr << "tar extract ret = " << ret << ", cmdline = " << cmdline
+              << std::endl;
       }
 #endif
       path = outputPath + "/" + modelName;
