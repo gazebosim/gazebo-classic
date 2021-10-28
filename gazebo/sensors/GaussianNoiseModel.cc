@@ -219,7 +219,7 @@ double GaussianNoiseModel::GetBias() const
 //////////////////////////////////////////////////
 void GaussianNoiseModel::SampleBias()
 {
-  if(!math::equal(0.0, this->biasStdDev))
+  if(!ignition::math::equal(0.0, this->biasStdDev, 1e-6))
   {
     this->bias =
         ignition::math::Rand::DblNormal(this->biasMean, this->biasStdDev);

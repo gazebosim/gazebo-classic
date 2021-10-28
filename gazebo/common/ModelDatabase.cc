@@ -505,7 +505,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
 
       std::string outputPath = getenv("HOME");
       outputPath += "/.gazebo/models";
-      
+
 #ifndef _WIN32
       TAR *tar;
       tar_open(&tar, const_cast<char*>(tarfilename.c_str()),
