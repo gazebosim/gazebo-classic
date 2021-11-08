@@ -30,8 +30,8 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/LightPrivate.hh"
-#include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/PointLightShadowCameraSetup.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
 
 using namespace gazebo;
 using namespace rendering;

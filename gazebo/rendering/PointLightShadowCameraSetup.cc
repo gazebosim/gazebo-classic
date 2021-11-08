@@ -63,9 +63,10 @@ PointLightShadowCameraSetup::~PointLightShadowCameraSetup()
 }
 
 //////////////////////////////////////////////////
-void PointLightShadowCameraSetup::getShadowCamera(const Ogre::SceneManager *_sm,
-    const Ogre::Camera *_cam, const Ogre::Viewport *_vp,
-    const Ogre::Light *_light, Ogre::Camera *_texCam, size_t _iteration) const
+void PointLightShadowCameraSetup::getShadowCamera(
+    const Ogre::SceneManager /**_sm*/, const Ogre::Camera *_cam,
+    const Ogre::Viewport /**_vp*/, const Ogre::Light *_light,
+    Ogre::Camera *_texCam, size_t _iteration) const
 {
   Ogre::Vector3 pos, dir;
 
@@ -79,7 +80,7 @@ void PointLightShadowCameraSetup::getShadowCamera(const Ogre::SceneManager *_sm,
 
   // theoretically set x to +-0.25 for accuracy
   // decrease x for quality of shadows
-  float x = 0.18;
+  float x = 0.18f;
   _texCam->setFrustumExtents(-x, x, x, -x);
 
   // set shadow cube map depending on the iteration
