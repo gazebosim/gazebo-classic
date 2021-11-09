@@ -74,6 +74,7 @@
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 
 #include "gazebo/physics/ode/ODEPhysicsPrivate.hh"
+#include <iostream>
 
 using namespace gazebo;
 using namespace physics;
@@ -382,8 +383,10 @@ void ODEPhysics::UpdateCollision()
 
   IGN_PROFILE_BEGIN("collideShapes");
   // Generate non-trimesh collisions.
+  std::cout << "** UpdateCollision call ** " << std::endl;
   for (i = 0; i < this->dataPtr->collidersCount; ++i)
   {
+    std::cout << "Colliding a pair " << i << std::endl; 
     this->Collide(this->dataPtr->colliders[i].first,
         this->dataPtr->colliders[i].second, this->dataPtr->contactCollisions);
   }
@@ -947,6 +950,7 @@ void ODEPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 //////////////////////////////////////////////////
 void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
+  // std::cout << "Collision cb fcn ---- " << std::this_thread::get_id() << std::endl;
   IGN_PROFILE("ODEPhysics::CollisionCallback");
   dBodyID b1 = dGeomGetBody(_o1);
   dBodyID b2 = dGeomGetBody(_o2);
@@ -996,6 +1000,7 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
     // Make sure both collision pointers are valid.
     if (collision1 && collision2)
     {
+      std::cout << "Adding collider" << std::endl;
       // Add either a tri-mesh collider or a regular collider.
       if (collision1->HasType(Base::MESH_SHAPE) ||
           collision2->HasType(Base::MESH_SHAPE))
@@ -1003,9 +1008,11 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
       else
       {
         self->AddCollider(collision1, collision2);
+        std::cout << "Added simple collider" << std::endl;
       }
     }
   }
+  // std::cout << "Collision cb fcn END ---- " << std::this_thread::get_id() << std::endl;
 }
 
 
@@ -1013,6 +1020,7 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactGeom *_contactCollisions)
 {
+  std::cout << "\nCollide fcn---- " << std::this_thread::get_id() << std::endl;
   // Filter collisions based on collide bitmask.
   if ((_collision1->GetSurface()->collideBitmask &
         _collision2->GetSurface()->collideBitmask) == 0)
@@ -1065,6 +1073,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Generate the contacts
   numc = dCollide(_collision1->GetCollisionId(), _collision2->GetCollisionId(),
       MAX_COLLIDE_RETURNS, _contactCollisions, sizeof(_contactCollisions[0]));
+  
 
   // Return if no contacts.
   if (numc == 0)
@@ -1090,6 +1099,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     // Make sure numc has the valid number of contacts.
     numc = maxCollide;
   }
+  
+  std::cout << "Num of contacts: " << numc << std::endl;
 
   // Set the contact surface parameter flags.
   contact.surface.mode = dContactBounce |
@@ -1159,6 +1170,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     contact.fdir1[0] = fd.X();
     contact.fdir1[1] = fd.Y();
     contact.fdir1[2] = fd.Z();
+    std::cout  << "Fdir1 " << fd.X() << " " << fd.Y() << " " << fd.Z() << std::endl;
   }
 
   // Set the friction coefficients.
@@ -1262,6 +1274,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(_collision2->GetCollisionId());
 
+  std::cout << "Collision IDs : " << b1 << " " << b2 << std::endl;
+
   // Add a new contact to the manager. This will return nullptr if no one is
   // listening for contact information.
   Contact *contactFeedback = this->contactManager->NewContact(_collision1,
@@ -1272,6 +1286,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Create a joint feedback mechanism
   if (contactFeedback)
   {
+    std::cout << "Contact feedback section" << std::endl;
     if (this->dataPtr->jointFeedbackIndex <
         this->dataPtr->jointFeedbacks.size())
       jointFeedback =
@@ -1290,6 +1305,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Create a joint for each contact
   for (unsigned int j = 0; j < numc; ++j)
   {
+    std::cout << "Creating a joint" << std::endl;
     contact.geom = _contactCollisions[this->dataPtr->indices[j]];
 
     // Create the contact joint. This introduces the contact constraint to
@@ -1300,6 +1316,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     // Store contact information.
     if (contactFeedback && jointFeedback)
     {
+      std::cout << "Joint feedback section" << std::endl;
       // Store the contact depth
       contactFeedback->depths[j] =
         _contactCollisions[this->dataPtr->indices[j]].depth;
@@ -1329,6 +1346,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
         !_collision2->GetSurface()->collideWithoutContact)
       dJointAttach(contactJoint, b1, b2);
   }
+  std::cout << "Collide fcn END ---- " << std::this_thread::get_id() << "\n" << std::endl;
 }
 
 /////////////////////////////////////////////////
