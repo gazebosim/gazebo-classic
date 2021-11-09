@@ -1308,6 +1308,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     std::cout << "Creating a joint" << std::endl;
     contact.geom = _contactCollisions[this->dataPtr->indices[j]];
 
+    auto temp = _contactCollisions[this->dataPtr->indices[j]];
+    std::cout << "Pos : " << temp.pos[0] << " " << temp.pos[1] << " " << temp.pos[2] << std::endl;
+    std::cout << "Normal : " << temp.normal[0] << " " << temp.normal[1] << " " << temp.normal[2] << std::endl;
+
     // Create the contact joint. This introduces the contact constraint to
     // ODE
     dJointID contactJoint = dJointCreateContact(this->dataPtr->worldId,

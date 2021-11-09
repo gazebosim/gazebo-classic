@@ -38,6 +38,7 @@ dContactGeom::g1 and dContactGeom::g2.
 #include "collision_kernel.h"
 #include "collision_std.h"
 #include "collision_util.h"
+#include <iostream>
 
 #ifdef _MSC_VER
 #pragma warning(disable:4291)  // for VC++, no complaints about "no matching operator delete found"
@@ -222,6 +223,7 @@ int dCollideSphereBox (dxGeom *o1, dxGeom *o2, int /*flags*/,
 int dCollideSpherePlane (dxGeom *o1, dxGeom *o2, int /*flags*/,
 			 dContactGeom *contact, int /*skip*/)
 {
+  std::cout << "dCollide sphere plane triggered..." << std::endl;
   //dIASSERT (skip >= (int)sizeof(dContactGeom));
   dIASSERT (o1->type == dSphereClass);
   dIASSERT (o2->type == dPlaneClass);
