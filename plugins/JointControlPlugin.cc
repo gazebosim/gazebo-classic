@@ -137,7 +137,7 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
               gzwarn << "No joints found matching \""
                      << grandchild->Get<std::string>() << "\".\n";
             }
-            for (const auto match : matches)
+            for (const auto &match : matches)
             {
               msg.set_name(match);
               jointPub.Publish(msg);

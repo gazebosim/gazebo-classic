@@ -349,6 +349,14 @@ namespace gazebo
       /// Load all plugins specified in the SDF for the model.
       public: void LoadPlugins();
 
+      /// \brief Load all plugins with a configurable timeout.
+      /// This waits for sensors to be loaded before loading model plugins
+      /// with a configurable timeout.
+      ///
+      /// Load all plugins specified in the SDF for the model.
+      /// \param[in] _timeout Seconds to wait for sensors to initialize.
+      public: void LoadPlugins(unsigned int _timeout);
+
       /// \brief Get the number of plugins this model has.
       /// \return Number of plugins associated with this model.
       public: unsigned int GetPluginCount() const;

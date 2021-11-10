@@ -1,5 +1,67 @@
 ## Gazebo 11
 
+## Gazebo 11.9.0 (2021-10-28)
+
+1. Forward port windows fixes from #2789
+    * [Pull request #2985](https://github.com/osrf/gazebo/pull/2985)
+    * [Pull request #2789](https://github.com/osrf/gazebo/pull/2789)
+    * A contribution from: Tobias Fischer <info@tobiasfischer.info>
+
+1. GUI option to change render rate
+    * [Pull request #3127](https://github.com/osrf/gazebo/pull/3127)
+
+1. GaussianNoiseModel: fix for unspecified biasStdDev
+    * [Pull request #3083](https://github.com/osrf/gazebo/pull/3083)
+    * A contribution from: Ludovic J <unifai@protonmail.com>
+
+1. wind\_demo.world: add required parameter
+    * [Pull request #3035](https://github.com/osrf/gazebo/pull/3035)
+
+1. Fix slow loading of spawned model with plugins
+    * [Pull request #3126](https://github.com/osrf/gazebo/pull/3126)
+
+1. HeightmapLODPlugin: add server/gui params
+    * [Pull request #3120](https://github.com/osrf/gazebo/pull/3120)
+
+1. Fix gzclient starting with black screen
+    * [Pull request #3121](https://github.com/osrf/gazebo/pull/3121)
+
+1. Optionally disable "render back faces" for the shadow caster
+    * [Pull request #3117](https://github.com/osrf/gazebo/pull/3117)
+
+1. Add more profiling hooks in physics, rendering
+    * [Pull request #3119](https://github.com/osrf/gazebo/pull/3119)
+
+1. Load both .so and .dylib plugins on macOS
+    * [Pull request #3069](https://github.com/osrf/gazebo/pull/3069)
+
+1. Fix Camera Distortion rounding
+    * [Pull request #3114](https://github.com/osrf/gazebo/pull/3114)
+    * A contribution from: kjeppesen1 <kjeppesen1@gmail.com>
+
+1. Always publish if flag is passed to Model::SetScale
+    * [Pull request #3116](https://github.com/osrf/gazebo/pull/3116)
+
+1. Add slip values for individual wheels
+    * [Pull request #3082](https://github.com/osrf/gazebo/pull/3082)
+
+1. Fix standalone marker example
+    * [Pull request #3014](https://github.com/osrf/gazebo/pull/3014)
+    * A contribution from: Dhruv Maroo <dhruvmaru007@gmail.com>
+
+1. Faster examples build test and other CI fixes
+    * [Pull request #3080](https://github.com/osrf/gazebo/pull/3080)
+
+1. Fix pkgconfig prefix with absolute CMAKE_INSTALL_LIBDIR
+    * [Pull request #3076](https://github.com/osrf/gazebo/pull/3076)
+    * A contribution from: Ben Wolsieffer <benwolsieffer@gmail.com>
+
+1. Add mutex lock in World::Step and World::Fini to fix test
+    * [Pull request #3078](https://github.com/osrf/gazebo/pull/3078)
+
+1. 👩‍🌾 Remove bitbucket-pipelines
+    * [Pull request #3074](https://github.com/osrf/gazebo/pull/3074)
+
 ## Gazebo 11.8.1 (2021-08-24)
 
 1. Fixes for shadow caster shaders

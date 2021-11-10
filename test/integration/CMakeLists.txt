@@ -134,6 +134,7 @@ if (NOT APPLE)
   set(tests
     ${tests}
     custom_shadow_caster.cc
+    shadow_caster_render_back_faces.cc
   )
 endif()
 

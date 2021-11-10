@@ -48,6 +48,7 @@ set(tests
   2875_connect_pub_to_sub_crash.cc
   2896_gazebo_subnamespace.cc
   2902_performance_metrics_deadlock.cc
+  3125_slow_loading_model_spawn.cc
 )
 gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 

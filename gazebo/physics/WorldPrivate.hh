@@ -196,6 +196,9 @@ namespace gazebo
       /// \brief The world's current SDF description.
       public: sdf::ElementPtr sdf;
 
+      /// \brief Timeout for Model::LoadPlugins in seconds.
+      public: unsigned int modelPluginLoadingTimeout = 30;
+
       /// \brief All the plugins.
       public: std::vector<WorldPluginPtr> plugins;
 
@@ -390,7 +393,10 @@ namespace gazebo
       public: std::unique_ptr<sdf::World> worldSDFDom;
 
       /// \brief Shadow caster material name from scene SDF
-      public: std::string shadowCasterMaterialName;
+      public: std::string shadowCasterMaterialName = "Gazebo/shadow_caster";
+
+      /// \brief Shadow caster render back faces from scene SDF
+      public: bool shadowCasterRenderBackFaces = true;
     };
   }
 }

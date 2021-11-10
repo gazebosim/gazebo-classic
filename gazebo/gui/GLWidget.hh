@@ -74,6 +74,10 @@ namespace gazebo
       /// \return List with pointers to selected visuals.
       public: std::vector<rendering::VisualPtr> SelectedVisuals() const;
 
+      /// \brief Change render rate for GLWidget
+      /// \param[in] _renderRate Updated render rate
+      public: void SetRenderRate(double _renderRate);
+
       signals: void clicked();
 
       /// \brief QT signal to notify when we received a selection msg.

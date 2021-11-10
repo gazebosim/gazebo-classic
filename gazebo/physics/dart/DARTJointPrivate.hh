@@ -76,7 +76,11 @@ namespace gazebo
 
         mFuncs.clear();
 
+#if DART_VERSION_AT_LEAST(6, 10, 0)
+        this->dtJoint->setLimitEnforcement(true);
+ #else
         this->dtJoint->setPositionLimitEnforced(true);
+ #endif
       }
 
       /// \brief Return true if DART Joint is initialized
