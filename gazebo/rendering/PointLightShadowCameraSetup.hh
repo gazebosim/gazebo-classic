@@ -37,8 +37,8 @@ namespace gazebo
 
       /// \brief Returns a shadow camera for a spotlight
       /// \sa FocusedShadowCameraSetup::getShadowCamera()
-      public: virtual void getShadowCamera(const Ogre::SceneManager /**_sm*/,
-          const Ogre::Camera *_cam, const Ogre::Viewport /**_vp*/,
+      public: virtual void getShadowCamera(const Ogre::SceneManager *_sm,
+          const Ogre::Camera *_cam, const Ogre::Viewport *_vp,
           const Ogre::Light *_light, Ogre::Camera *_texCam, size_t _iteration)
           const override;
     };

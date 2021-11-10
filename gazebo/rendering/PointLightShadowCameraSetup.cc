@@ -64,8 +64,8 @@ PointLightShadowCameraSetup::~PointLightShadowCameraSetup()
 
 //////////////////////////////////////////////////
 void PointLightShadowCameraSetup::getShadowCamera(
-    const Ogre::SceneManager /**_sm*/, const Ogre::Camera *_cam,
-    const Ogre::Viewport /**_vp*/, const Ogre::Light *_light,
+    const Ogre::SceneManager *_sm, const Ogre::Camera *_cam,
+    const Ogre::Viewport *_vp, const Ogre::Light *_light,
     Ogre::Camera *_texCam, size_t _iteration) const
 {
   Ogre::Vector3 pos, dir;
