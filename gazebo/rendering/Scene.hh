@@ -127,6 +127,7 @@ namespace gazebo
       /// \brief Process all received messages.
       public: void PreRender();
 
+
       /// \brief Wait until a render request occurs
       /// \param[in] _timeoutsec timeout expressed in seconds
       /// \return True if timeout was NOT met
@@ -380,6 +381,7 @@ namespace gazebo
                             const ignition::math::Vector3d &_end,
                             const std::string &_name);
 
+
       /// \brief Set the fog parameters.
       /// \param[in] _type Type of fog: "linear", "exp", or "exp2".
       /// \param[in] _color Color of the fog.
@@ -404,6 +406,10 @@ namespace gazebo
       /// \param[in] _value True to enable shadows, False to disable
       public: void SetShadowsEnabled(const bool _value);
 
+      /// \brief Get whether this scene is in the server.
+      /// \return True if scene is in the server.
+      public: bool IsServer() const;
+
       /// \brief Get whether shadows are on or off
       /// \return True if shadows are enabled.
       public: bool ShadowsEnabled() const;
@@ -417,6 +423,14 @@ namespace gazebo
       /// \brief Get the shadow texture size
       /// \return Size of the shadow texture. The default size is 1024.
       public: unsigned int ShadowTextureSize() const;
+
+      /// \brief Get the shadow caster material name
+      /// \return Name of the shadow caster material
+      public: std::string ShadowCasterMaterialName() const;
+
+      /// \brief Get the shadow caster render back faces
+      /// \return Shadow caster render back faces
+      public: bool ShadowCasterRenderBackFaces() const;
 
       /// \brief Add a visual to the scene
       /// \param[in] _vis Visual to add.
@@ -650,6 +664,12 @@ namespace gazebo
       /// ~/scene topic
       /// \param[in] _msg The message.
       private: void OnScene(ConstScenePtr &_msg);
+
+      /// \brief Called when the scene info service replies with the scene
+      /// message.
+      /// \param[in] _msg The message.
+      /// \param[in] _result Flag indicating if service call succeeded.
+      private: void OnSceneInfo(const msgs::Scene &_msg, const bool _result);
 
       /// \brief Response callback
       /// \param[in] _msg The message data.

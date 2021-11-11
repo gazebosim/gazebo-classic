@@ -35,6 +35,13 @@ namespace gazebo
 
     /// \brief Lens flare scale
     public: double scale = 1.0;
+
+    /// \brief Lens flare color
+    public: ignition::math::Vector3d color
+        = ignition::math::Vector3d(1.4, 1.2, 1.0);
+
+    /// \brief Lens flare compositor name
+    public: std::string compositorName;
   };
 }
 
@@ -75,6 +82,17 @@ void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor,
       gzerr << "Lens flare scale must be greater than 0" << std::endl;
   }
 
+  if (_sdf->HasElement("color"))
+  {
+    this->dataPtr->color = _sdf->Get<ignition::math::Vector3d>("color");
+  }
+
+  const std::string compositorName = "compositor";
+  if (_sdf->HasElement(compositorName))
+  {
+    this->dataPtr->compositorName = _sdf->Get<std::string>(compositorName);
+  }
+
   sensors::CameraSensorPtr cameraSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
 
@@ -102,6 +120,28 @@ void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor,
 }
 
 /////////////////////////////////////////////////
+void LensFlareSensorPlugin::SetScale(const double _scale)
+{
+  this->dataPtr->scale = _scale;
+
+  for (auto flare : this->dataPtr->lensFlares)
+  {
+    flare->SetScale(_scale);
+  }
+}
+
+/////////////////////////////////////////////////
+void LensFlareSensorPlugin::SetColor(const ignition::math::Vector3d &_color)
+{
+  this->dataPtr->color = _color;
+
+  for (auto flare : this->dataPtr->lensFlares)
+  {
+    flare->SetColor(_color);
+  }
+}
+
+/////////////////////////////////////////////////
 void LensFlareSensorPlugin::AddLensFlare(rendering::CameraPtr _camera)
 {
   if (!_camera)
@@ -109,7 +149,12 @@ void LensFlareSensorPlugin::AddLensFlare(rendering::CameraPtr _camera)
 
   rendering::LensFlarePtr lensFlare;
   lensFlare.reset(new rendering::LensFlare);
+  if (!this->dataPtr->compositorName.empty())
+  {
+    lensFlare->SetCompositorName(this->dataPtr->compositorName);
+  }
   lensFlare->SetCamera(_camera);
   lensFlare->SetScale(this->dataPtr->scale);
+  lensFlare->SetColor(this->dataPtr->color);
   this->dataPtr->lensFlares.push_back(lensFlare);
 }

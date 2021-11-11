@@ -50,6 +50,7 @@ namespace ignition
   {
     class Plugin_V;
     class StringMsg;
+    class Boolean;
   }
 }
 
@@ -298,17 +299,17 @@ namespace gazebo
       public: void SetState(const WorldState &_state);
 
       /// \brief Insert a model from an SDF file.
-      /// Spawns a model into the world base on and SDF file.
+      /// Spawns a model into the world based on an SDF file.
       /// \param[in] _sdfFilename The name of the SDF file (including path).
       public: void InsertModelFile(const std::string &_sdfFilename);
 
       /// \brief Insert a model from an SDF string.
-      /// Spawns a model into the world base on and SDF string.
+      /// Spawns a model into the world based on an SDF string.
       /// \param[in] _sdfString A string containing valid SDF markup.
       public: void InsertModelString(const std::string &_sdfString);
 
       /// \brief Insert a model using SDF.
-      /// Spawns a model into the world base on and SDF object.
+      /// Spawns a model into the world based on an SDF object.
       /// \param[in] _sdf A reference to an SDF object.
       public: void InsertModelSDF(const sdf::SDF &_sdf);
 
@@ -650,6 +651,25 @@ namespace gazebo
       /// \return True if the info was successfully obtained.
       private: bool PluginInfoService(const ignition::msgs::StringMsg &_request,
           ignition::msgs::Plugin_V &_plugins);
+
+      /// \brief Callback for "<this_name>/scene_info" service.
+      /// \param[out] _response Message containing scene info
+      /// \return True if the info was successfully obtained.
+      private: bool SceneInfoService(msgs::Scene &_response);
+
+      /// \brief Callback for "<this_name>/shadow_caster_material_name" service.
+      /// \param[out] _response Message containing shadow caster material name
+      /// \return True if the info was successfully obtained.
+      private: bool ShadowCasterMaterialNameService(
+          ignition::msgs::StringMsg &_response);
+
+      /// \brief Callback for "<this_name>/shadow_caster_render_back_faces"
+      ///     service.
+      /// \param[out] _response Message containing shadow caster render back
+      ///     faces
+      /// \return True if the info was successfully obtained.
+      private: bool ShadowCasterRenderBackFacesService(
+          ignition::msgs::Boolean &_response);
 
       /// \internal
       /// \brief Private data pointer.

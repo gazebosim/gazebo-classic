@@ -1,6 +1,250 @@
 ## Gazebo 11
 
-## Gazebo 11.x.x (202x-xx-xx)
+## Gazebo 11.9.0 (2021-10-28)
+
+1. Forward port windows fixes from #2789
+    * [Pull request #2985](https://github.com/osrf/gazebo/pull/2985)
+    * [Pull request #2789](https://github.com/osrf/gazebo/pull/2789)
+    * A contribution from: Tobias Fischer <info@tobiasfischer.info>
+
+1. GUI option to change render rate
+    * [Pull request #3127](https://github.com/osrf/gazebo/pull/3127)
+
+1. GaussianNoiseModel: fix for unspecified biasStdDev
+    * [Pull request #3083](https://github.com/osrf/gazebo/pull/3083)
+    * A contribution from: Ludovic J <unifai@protonmail.com>
+
+1. wind\_demo.world: add required parameter
+    * [Pull request #3035](https://github.com/osrf/gazebo/pull/3035)
+
+1. Fix slow loading of spawned model with plugins
+    * [Pull request #3126](https://github.com/osrf/gazebo/pull/3126)
+
+1. HeightmapLODPlugin: add server/gui params
+    * [Pull request #3120](https://github.com/osrf/gazebo/pull/3120)
+
+1. Fix gzclient starting with black screen
+    * [Pull request #3121](https://github.com/osrf/gazebo/pull/3121)
+
+1. Optionally disable "render back faces" for the shadow caster
+    * [Pull request #3117](https://github.com/osrf/gazebo/pull/3117)
+
+1. Add more profiling hooks in physics, rendering
+    * [Pull request #3119](https://github.com/osrf/gazebo/pull/3119)
+
+1. Load both .so and .dylib plugins on macOS
+    * [Pull request #3069](https://github.com/osrf/gazebo/pull/3069)
+
+1. Fix Camera Distortion rounding
+    * [Pull request #3114](https://github.com/osrf/gazebo/pull/3114)
+    * A contribution from: kjeppesen1 <kjeppesen1@gmail.com>
+
+1. Always publish if flag is passed to Model::SetScale
+    * [Pull request #3116](https://github.com/osrf/gazebo/pull/3116)
+
+1. Add slip values for individual wheels
+    * [Pull request #3082](https://github.com/osrf/gazebo/pull/3082)
+
+1. Fix standalone marker example
+    * [Pull request #3014](https://github.com/osrf/gazebo/pull/3014)
+    * A contribution from: Dhruv Maroo <dhruvmaru007@gmail.com>
+
+1. Faster examples build test and other CI fixes
+    * [Pull request #3080](https://github.com/osrf/gazebo/pull/3080)
+
+1. Fix pkgconfig prefix with absolute CMAKE_INSTALL_LIBDIR
+    * [Pull request #3076](https://github.com/osrf/gazebo/pull/3076)
+    * A contribution from: Ben Wolsieffer <benwolsieffer@gmail.com>
+
+1. Add mutex lock in World::Step and World::Fini to fix test
+    * [Pull request #3078](https://github.com/osrf/gazebo/pull/3078)
+
+1. 👩‍🌾 Remove bitbucket-pipelines
+    * [Pull request #3074](https://github.com/osrf/gazebo/pull/3074)
+
+## Gazebo 11.8.1 (2021-08-24)
+
+1. Fixes for shadow caster shaders
+    * [Pull request #3070](https://github.com/osrf/gazebo/pull/3070)
+
+1. Distortion::RefreshCompositor check nonzero params
+    * [Pull request #3071](https://github.com/osrf/gazebo/pull/3071)
+
+## Gazebo 11.8.0 (2021-08-17)
+
+1. Find tbb version lower than 2021 with pkg-config
+    * [Pull request #3037](https://github.com/osrf/gazebo/pull/3037)
+
+1. Fix build with qwt 6.2
+    * [Pull request #3047](https://github.com/osrf/gazebo/pull/3047)
+
+1. Enable hardware PCF for spotlight shadows
+    * [Pull request #3036](https://github.com/osrf/gazebo/pull/3036)
+
+1. Apply Force/Torque for nested models
+    * [Pull request #3039](https://github.com/osrf/gazebo/pull/3039)
+    * A contribution by Cameron Miller
+
+1. Make links within nested models modifiable from GUI Client
+    * [Pull request #3031](https://github.com/osrf/gazebo/pull/3031)
+    * [Pull request #3059](https://github.com/osrf/gazebo/pull/3059)
+    * A contribution by Sonia Jin (Amazon)
+
+1. Make events threadsafe
+    * [Pull request #3042](https://github.com/osrf/gazebo/pull/3042)
+    * A contribution by Sonia Jin (Amazon)
+
+1. Add relocatable setup.bash script
+    * [Pull request #3061](https://github.com/osrf/gazebo/pull/3061)
+    * [Issue #3056](https://github.com/osrf/gazebo/issues/3056)
+
+1. Support custom shadow caster materials
+    * [Pull request #3048](https://github.com/osrf/gazebo/pull/3048)
+    * [Pull request #3067](https://github.com/osrf/gazebo/pull/3067)
+
+1. Distortion camera initialization tests and fix with background color
+    * [Issue #2527](https://github.com/osrf/gazebo/issues/2527)
+    * [Pull request #3044](https://github.com/osrf/gazebo/pull/3044)
+    * [Pull request #3060](https://github.com/osrf/gazebo/pull/3060)
+
+## Gazebo 11.7.0 (2021-06-xx)
+
+1. Qualify `gazebo::util` in `using namespace` declarations.
+    * [Pull request #2979](https://github.com/osrf/gazebo/pull/2979)
+
+1. Distortion camera initialization fix
+    * [Issue #2527](https://github.com/osrf/gazebo/issues/2527)
+    * [Pull request #3033](https://github.com/osrf/gazebo/pull/3033)
+
+1. Use CURL::libcurl instead of cmake variables
+    * [Pull request #3030](https://github.com/osrf/gazebo/pull/3030)
+
+1. Allow specifying lens flare and camera distortion texture format
+    * [Issue #3005](https://github.com/osrf/gazebo/issues/3005)
+    * [Pull request #3009](https://github.com/osrf/gazebo/pull/3009)
+
+1. Camera distortion normalization improvement and fix folding
+    * [Pull request #3009](https://github.com/osrf/gazebo/pull/3009)
+
+1. Fix Windows compilation in Server.cc (not -> !)
+    * [Pull request #3021](https://github.com/osrf/gazebo/pull/3021)
+
+## Gazebo 11.6.0 (2021-06-09)
+
+1. Enable output of gzerr for SDF sibling elements of any type with same name,
+   following the SDF 1.7 specification.
+   Environment variable GAZEBO11_BACKWARDS_COMPAT_WARNINGS_ERRORS can be set to
+   use the previous behaviour and do not report these problems.
+    * [Pull request #3017](https://github.com/osrf/gazebo/pull/3017)
+
+1. Allow specifying lens flare and camera distortion texture format
+    * [Issue #3005](https://github.com/osrf/gazebo/issues/3005)
+    * [Pull request #3007](https://github.com/osrf/gazebo/pull/3007)
+
+1.  Initialize the worldPoseDirty flag in Collision.cc
+    * A contribution from Zachary Michaels zmichaels11@gmail.com>
+    * [Pull request #2999](https://github.com/osrf/gazebo/pull/2999)
+
+1.  Compile test plugins as MODULE instead of STATIC
+    * [Pull request #2897](https://github.com/osrf/gazebo/pull/2897)
+
+1.  Add warning if GAZEBO_RESOURCE_PATH may not be set correctly
+    * [Pull request #2991](https://github.com/osrf/gazebo/pull/2991)
+
+## Gazebo 11.5.1 (2021-05-05)
+
+1. Avoid range-loop-construct in TopicManager
+    * [Pull request #2983](https://github.com/osrf/gazebo/pull/2983)
+
+1. Check for nullptr in TopicManager::ConnectPubToSub
+    * A contribution from Emerson Knapp <emerson.b.knapp@gmail.com> (Amazon)
+    * [Pull request #2978](https://github.com/osrf/gazebo/pull/2978)
+    * [Issue #2875](https://github.com/osrf/gazebo/issues/2875)
+
+## Gazebo 11.5.0 (2021-04-20)
+
+1. Specify wide angle camera cube map texture format
+    * [Pull request #2960](https://github.com/osrf/gazebo/pull/2960)
+    * [Issue #2928](https://github.com/osrf/gazebo/issues/2928)
+
+1. Protect DepthCameraPlugin globals with a mutex
+    * [Pull request #2949](https://github.com/osrf/gazebo/pull/2949)
+
+1. Avoid deadlock in ConnectionManager::Stop
+    * [Pull request #2950](https://github.com/osrf/gazebo/pull/2950)
+
+1. Optimize collision checking in ODE
+    * [Pull request #2945](https://github.com/osrf/gazebo/pull/2945)
+
+1. Fix size of spotlight visual
+    * [Pull request #2947](https://github.com/osrf/gazebo/pull/2947)
+
+1. Fix depth camera breaking shadows
+    * [Pull request #2907](https://github.com/osrf/gazebo/pull/2907)
+
+1. Fix color channel of point clouds from DepthCamera
+    * [Pull request #2853](https://github.com/osrf/gazebo/pull/2853)
+
+1. GpuRaySensor: validate scene existence
+    * [Pull request #2937](https://github.com/osrf/gazebo/pull/2937)
+
+1. LensFlare: allow inheritance
+    * [Pull request #2965](https://github.com/osrf/gazebo/pull/2965)
+    * [Pull request #2975](https://github.com/osrf/gazebo/pull/2975)
+
+1. Silence message conversion warning messages
+    * [Pull request #2963](https://github.com/osrf/gazebo/pull/2963)
+    * [Pull request #2973](https://github.com/osrf/gazebo/pull/2973)
+
+
+## Gazebo 11.4.0 (2021-04-01)
+
+1. Restore HeightmapShape::SetHeight implementation (#2955)
+    * [Pull request #2955](https://github.com/osrf/gazebo/pull/2955)
+    * [BitBucket pull request 3210](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3210)
+
+1. Lens flare cleanup and colorization
+    * [Pull request #2927](https://github.com/osrf/gazebo/pull/2927)
+    * [Pull request #2954](https://github.com/osrf/gazebo/pull/2954)
+
+1. Fix build on Linux with conda-forge dependencies
+    * [Pull request #2944](https://github.com/osrf/gazebo/pull/2944)
+
+1. Fix build issues with OpenAL
+    * [Pull request #2941](https://github.com/osrf/gazebo/pull/2941)
+    * [Pull request #2943](https://github.com/osrf/gazebo/pull/2943)
+
+1. Do not overwrite default linker flags
+    * [Pull request #2922](https://github.com/osrf/gazebo/pull/2922)
+
+1. Fix support for camera with single channel floating point image format
+    * [Pull request #2918](https://github.com/osrf/gazebo/pull/2918)
+
+1. Fix performance metrics deadlock with multiple types of sensors
+    * [Pull request #2917](https://github.com/osrf/gazebo/pull/2917)
+    * [Issue #2902](https://github.com/osrf/gazebo/issues/2902)
+
+1. Generate spot light shadow maps
+    * [Pull request #2914](https://github.com/osrf/gazebo/pull/2914)
+
+1. Fix `find_package(gazebo)` on Windows
+    * [Pull request #2906](https://github.com/osrf/gazebo/pull/2906)
+    * [Issue #2905](https://github.com/osrf/gazebo/issues/2905)
+
+1. Fix namespace usage in console macros
+    * [Pull request #2892](https://github.com/osrf/gazebo/pull/2892)
+    * [Issue #2896](https://github.com/osrf/gazebo/issues/2896)
+
+1. Ensure relocatable package config files
+    * [Pull request #2879](https://github.com/osrf/gazebo/pull/2879)
+    * [Issue #2755](https://github.com/osrf/gazebo/issues/2755)
+    * [Issue #2782](https://github.com/osrf/gazebo/issues/2782)
+
+1. DARTHeightmapShape: correctly load asymmetric terrains
+    * [Pull request #2818](https://github.com/osrf/gazebo/pull/2818)
+
+1. Set friction params in DARTCollision for dart 6.10
+    * [Pull request #2781](https://github.com/osrf/gazebo/pull/2781)
 
 ## Gazebo 11.3.0 (2020-11-26)
 
@@ -81,7 +325,7 @@
 1. Fix corruption when a URDF file is included from a SDFormat 1.6 model
     * [Pull request 2734](https://github.com/osrf/gazebo/pull/2734)
 
-1. Preserve GAZEBO_MASTER_URI if set before setup.sh
+1. Preserve `GAZEBO_MASTER_URI` if set before setup.sh
     * [GitHub pull request 2737](https://github.com/osrf/gazebo/pull/2737)
 
 1. Fix sensor update rate throttling when new sensors are spawned
@@ -187,6 +431,12 @@
 ## Gazebo 10
 
 ## Gazebo 10.x.x (202x-xx-xx)
+
+1. DARTHeightmapShape: correctly load asymmetric terrains
+    * [Pull request #2818](https://github.com/osrf/gazebo/pull/2818)
+
+1. Set friction params in DARTCollision for dart 6.10
+    * [Pull request #2781](https://github.com/osrf/gazebo/pull/2781)
 
 1. Fix problem with automoc in CMake 3.17
     * [BitBucket pull request 3206](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3206/)
@@ -458,6 +708,21 @@
 
 ## Gazebo 9.xx.x (202x-xx-xx)
 
+1. Lens flare cleanup and colorization
+    * [Pull request #2927](https://github.com/osrf/gazebo/pull/2927)
+
+1. Fix support for camera with single channel floating point image format
+    * [Pull request #2918](https://github.com/osrf/gazebo/pull/2918)
+
+1. Fix performance metrics deadlock with multiple types of sensors
+    * [Pull request #2917](https://github.com/osrf/gazebo/pull/2917)
+    * [Issue #2902](https://github.com/osrf/gazebo/issues/2902)
+
+1. Generate spot light shadow maps
+    * [Pull request #2914](https://github.com/osrf/gazebo/pull/2914)
+
+## Gazebo 9.16.0 (2020-11-24)
+
 1. Updated the version of TinyOBJLoader from 1.0.0 to 2.0.0rc8.
     * [Pull request #2885](https://github.com/osrf/gazebo/pull/2885)
 
@@ -466,6 +731,18 @@
 
 1. Fix physics based sensor update rate in lockstep mode
     * [Pull request #2863](https://github.com/osrf/gazebo/pull/2863)
+
+1. Added Profiler to gazebo::rendering and gzclient
+    * [Pull request #2836](https://github.com/osrf/gazebo/pull/2836)
+
+1. Fix segfault when deleting an model that's being manipulated
+    * [Pull request #2856](https://github.com/osrf/gazebo/pull/2856)
+
+1. SimpleTrackedVehiclePlugin: fix for boost 1.74
+    * [Pull request #2865](https://github.com/osrf/gazebo/pull/2865)
+
+1. Add mutex to make Sensor::SetActive threadsafe
+    * [Pull request #2871](https://github.com/osrf/gazebo/pull/2871)
 
 ## Gazebo 9.15.0 (2020-09-30)
 
@@ -1918,6 +2195,17 @@
 ## Gazebo 7
 
 ## Gazebo 7.X.X (2019-XX-XX)
+
+## Gazebo 7.16.1 (2019-07-28)
+
+1. Remove X11 call from Gazebo 7
+    * [BitBucket pull request 3195](https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/3195)
+
+1. Update BitBucket links
+    * [Pull request 2715](https://github.com/osrf/gazebo/pull/2715)
+
+1. [backport Gazebo7] Fixed crash when collision size is zero
+    * [Pull request 2769](https://github.com/osrf/gazebo/pull/2769)
 
 ## Gazebo 7.16.0 (2019-09-04)
 

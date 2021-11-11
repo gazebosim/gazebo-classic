@@ -219,13 +219,16 @@ double GaussianNoiseModel::GetBias() const
 //////////////////////////////////////////////////
 void GaussianNoiseModel::SampleBias()
 {
-  this->bias =
-      ignition::math::Rand::DblNormal(this->biasMean, this->biasStdDev);
-  // With equal probability, we pick a negative bias (by convention,
-  // rateBiasMean should be positive, though it would work fine if
-  // negative).
-  if (ignition::math::Rand::DblUniform() < 0.5)
-    this->bias = -this->bias;
+  if(!ignition::math::equal(0.0, this->biasStdDev, 1e-6))
+  {
+    this->bias =
+        ignition::math::Rand::DblNormal(this->biasMean, this->biasStdDev);
+    // With equal probability, we pick a negative bias (by convention,
+    // rateBiasMean should be positive, though it would work fine if
+    // negative).
+    if (ignition::math::Rand::DblUniform() < 0.5)
+      this->bias = -this->bias;
+  }
 }
 
 //////////////////////////////////////////////////

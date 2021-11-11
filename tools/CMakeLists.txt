@@ -24,14 +24,6 @@ if (HAVE_DART)
   link_directories(${DART_LIBRARY_DIRS})
 endif()
 
-if (CURL_FOUND)
-  include_directories(${CURL_INCLUDEDIR})
-  link_directories(${CURL_LIBDIR})
-  if (WIN32)
-    add_definitions(-DCURL_STATICLIB)
-  endif()
-endif()
-
 if(NOT WIN32)
   # gz_TEST and gz_log_TEST use fork(), that is not available on Windows
   set (test_sources

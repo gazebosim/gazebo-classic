@@ -3341,27 +3341,34 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generate(
 
       // set up shadow split points in a way that is consistent with the
       // default ogre terrain material generator
-      Ogre::PSSMShadowCameraSetup* pssm =
-          RTShaderSystem::Instance()->GetPSSMShadowCameraSetup();
-      unsigned int numTextures =
-          static_cast<unsigned int>(pssm->getSplitCount());
-      Ogre::Vector4 splitPoints;
-      const Ogre::PSSMShadowCameraSetup::SplitPointList& splitPointList =
-          pssm->getSplitPoints();
-      // populate from split point 1 not 0, and include shadowFarDistance
-      for (unsigned int t = 0u; t < numTextures; ++t)
-        splitPoints[t] = splitPointList[t+1];
-      params->setNamedConstant("pssmSplitPoints", splitPoints);
 
-      // set up uv transform
-      double xTrans = static_cast<int>(gridCount / gridWidth) * factor;
-      double yTrans = (gridWidth - 1 - (gridCount % gridWidth)) * factor;
-      // explicitly set all matrix elements to avoid uninitialized values
-      Ogre::Matrix4 uvTransform(factor, 0.0, 0.0, xTrans,
-                                0.0, factor, 0.0, yTrans,
-                                0.0, 0.0, 1.0, 0.0,
-                                0.0, 0.0, 0.0, 1.0);
-      params->setNamedConstant("uvTransform", uvTransform);
+      if (params->_findNamedConstantDefinition("pssmSplitPoints"))
+      {
+        Ogre::PSSMShadowCameraSetup* pssm =
+            RTShaderSystem::Instance()->GetPSSMShadowCameraSetup();
+        unsigned int numTextures =
+            static_cast<unsigned int>(pssm->getSplitCount());
+        Ogre::Vector4 splitPoints;
+        const Ogre::PSSMShadowCameraSetup::SplitPointList& splitPointList =
+            pssm->getSplitPoints();
+        // populate from split point 1 not 0, and include shadowFarDistance
+        for (unsigned int t = 0u; t < numTextures; ++t)
+          splitPoints[t] = splitPointList[t+1];
+        params->setNamedConstant("pssmSplitPoints", splitPoints);
+      }
+
+      if (params->_findNamedConstantDefinition("uvTransform"))
+      {
+        // set up uv transform
+        double xTrans = static_cast<int>(gridCount / gridWidth) * factor;
+        double yTrans = (gridWidth - 1 - (gridCount % gridWidth)) * factor;
+        // explicitly set all matrix elements to avoid uninitialized values
+        Ogre::Matrix4 uvTransform(factor, 0.0, 0.0, xTrans,
+                                  0.0, factor, 0.0, yTrans,
+                                  0.0, 0.0, 1.0, 0.0,
+                                  0.0, 0.0, 0.0, 1.0);
+        params->setNamedConstant("uvTransform", uvTransform);
+      }
     }
   }
   gridCount++;

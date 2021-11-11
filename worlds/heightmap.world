@@ -1,6 +1,11 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
+    <physics type="ode">
+      <dart>
+        <collision_detector>bullet</collision_detector>
+      </dart>
+    </physics>
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>

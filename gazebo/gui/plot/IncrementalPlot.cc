@@ -195,7 +195,7 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   // box zoom
   this->dataPtr->zoomer = new QwtPlotZoomer(this->canvas());
   this->dataPtr->zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
-      Qt::MidButton);
+      Qt::MiddleButton);
   this->dataPtr->zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
       Qt::RightButton, Qt::ControlModifier);
   this->dataPtr->zoomer->setMousePattern(QwtEventPattern::MouseSelect3,

@@ -239,6 +239,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
   this->SetDepthTarget(this->depthTarget);
 
   this->depthViewport->setOverlaysEnabled(false);
+  this->depthViewport->setShadowsEnabled(false);
   this->depthViewport->setBackgroundColour(
       Ogre::ColourValue(Ogre::ColourValue(0, 0, 0)));
 
@@ -282,6 +283,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
     this->dataPtr->pcdViewport->setBackgroundColour(
         Conversions::Convert(ignBG));
     this->dataPtr->pcdViewport->setOverlaysEnabled(false);
+    this->dataPtr->pcdViewport->setShadowsEnabled(false);
     this->dataPtr->pcdViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
@@ -378,6 +380,7 @@ void DepthCamera::CreateNormalsTexture(const std::string &_textureName)
     this->dataPtr->normalsViewport->setBackgroundColour(
         Conversions::Convert(ignBG));
     this->dataPtr->normalsViewport->setOverlaysEnabled(false);
+    this->dataPtr->normalsViewport->setShadowsEnabled(false);
     this->dataPtr->normalsViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
@@ -602,9 +605,6 @@ void DepthCamera::RenderImpl()
 {
   Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
 
-  Ogre::ShadowTechnique shadowTech = sceneMgr->getShadowTechnique();
-
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
   sceneMgr->_suppressRenderStateChanges(true);
 
   this->UpdateRenderTarget(this->depthTarget,
@@ -614,14 +614,12 @@ void DepthCamera::RenderImpl()
   this->depthTarget->update(false);
 
   sceneMgr->_suppressRenderStateChanges(false);
-  sceneMgr->setShadowTechnique(shadowTech);
 
   // for camera image
   Camera::RenderImpl();
 
   if (this->dataPtr->outputPoints)
   {
-    sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
     sceneMgr->_suppressRenderStateChanges(true);
 
     this->UpdateRenderTarget(this->dataPtr->pcdTarget,
@@ -630,7 +628,6 @@ void DepthCamera::RenderImpl()
     this->dataPtr->pcdTarget->update(false);
 
     sceneMgr->_suppressRenderStateChanges(false);
-    sceneMgr->setShadowTechnique(shadowTech);
   }
 
   if (this->dataPtr->outputReflectance)
@@ -640,7 +637,6 @@ void DepthCamera::RenderImpl()
 
   if (this->dataPtr->outputNormals)
   {
-    sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
     sceneMgr->_suppressRenderStateChanges(true);
 
     this->UpdateRenderTarget(this->dataPtr->normalsTarget,
@@ -649,7 +645,6 @@ void DepthCamera::RenderImpl()
     this->dataPtr->normalsTarget->update(false);
 
     sceneMgr->_suppressRenderStateChanges(false);
-    sceneMgr->setShadowTechnique(shadowTech);
   }
 }
 

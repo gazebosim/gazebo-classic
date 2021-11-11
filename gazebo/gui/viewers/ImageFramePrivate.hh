@@ -35,6 +35,9 @@ namespace gazebo
       /// \brief Depth camera image data buffer.
       public: float *depthBuffer = nullptr;
 
+      /// \brief camera image data buffer 16 bit format.
+      public: uint16_t *imageBufferHalf = nullptr;
+
       /// \brief Camera image data buffer.
       public: unsigned char *imageBuffer = nullptr;
     };

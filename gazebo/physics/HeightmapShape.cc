@@ -338,6 +338,20 @@ HeightmapShape::HeightType HeightmapShape::GetHeight(int _x, int _y) const
 }
 
 /////////////////////////////////////////////////
+void HeightmapShape::SetHeight(int _x, int _y, HeightmapShape::HeightType _h)
+{
+  int index =  _y * this->vertSize + _x;
+  if (_x < 0 || _y < 0 || index >= static_cast<int>(this->heights.size()))
+  {
+    gzerr << "SetHeight position (" << _x << ", " << _y << ")"
+          << " is out of bounds" << std::endl;
+    return;
+  }
+
+  this->heights[index] = _h;
+}
+
+/////////////////////////////////////////////////
 HeightmapShape::HeightType HeightmapShape::GetMaxHeight() const
 {
   HeightType max = -std::numeric_limits<HeightType>::max();

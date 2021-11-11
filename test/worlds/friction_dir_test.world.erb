@@ -9,6 +9,11 @@
       <uri>model://ground_plane</uri>
     </include>
     <gravity>0 1 -9.81</gravity>
+    <physics type="ode">
+      <dart>
+        <collision_detector>bullet</collision_detector>
+      </dart>
+    </physics>
 <%
   # Test pyramid friction model
   # Set asymmetric friction coefficients and friction direction

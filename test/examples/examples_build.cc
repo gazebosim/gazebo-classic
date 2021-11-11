@@ -75,7 +75,7 @@ void ExamplesBuild::Build(const std::string &_type, const std::string &_name)
   char cmd[1024];
 
   // cd build && cmake source
-  snprintf(cmd, sizeof(cmd), "cd %s && cmake %s && make",
+  snprintf(cmd, sizeof(cmd), "cd %s && cmake %s && make -j",
     build.c_str(), source.c_str());
   ASSERT_EQ(system(cmd), 0);
 
@@ -123,7 +123,9 @@ auto standaloneValues = ::testing::Values(
   , "arrange"
   , "clone_simulation"
   , "custom_main"
+#ifndef __APPLE__
   , "custom_main_pkgconfig"
+#endif
   , "diagnostics"
   , "harness"
   , "introspection_client"

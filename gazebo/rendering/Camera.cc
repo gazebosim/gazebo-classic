@@ -933,6 +933,10 @@ unsigned int Camera::ImageDepth() const
   else if ((imgFmt == "BAYER_RGGB8") || (imgFmt == "BAYER_BGGR8") ||
             (imgFmt == "BAYER_GBRG8") || (imgFmt == "BAYER_GRBG8"))
     return 1;
+  else if (imgFmt == "FLOAT32" || imgFmt == "R_FLOAT32")
+    return 4;
+  else if (imgFmt == "FLOAT16" || imgFmt == "R_FLOAT16")
+    return 2;
   else
   {
     gzerr << "Error parsing image format ("
@@ -1000,9 +1004,9 @@ int Camera::OgrePixelFormat(const std::string &_format)
     result = static_cast<int>(Ogre::PF_BYTE_RGB);
   else if (_format == "B8G8R8" || _format == "BGR_INT8")
     result = static_cast<int>(Ogre::PF_BYTE_BGR);
-  else if (_format == "FLOAT32")
+  else if (_format == "FLOAT32" || _format == "R_FLOAT32")
     result = static_cast<int>(Ogre::PF_FLOAT32_R);
-  else if (_format == "FLOAT16")
+  else if (_format == "FLOAT16" || _format == "R_FLOAT16")
     result = static_cast<int>(Ogre::PF_FLOAT16_R);
   else if (_format == "R16G16B16" || _format == "RGB_INT16"
       || _format == "RGB_UINT16")
@@ -1624,7 +1628,10 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     }
 
     if (this->dataPtr->distortion)
+    {
       this->dataPtr->distortion->SetCamera(shared_from_this());
+      this->renderTarget->update();
+    }
 
     if (this->GetScene()->GetSkyX() != NULL)
       this->renderTarget->addListener(this->GetScene()->GetSkyX());
@@ -2104,6 +2111,15 @@ bool Camera::SetBackgroundColor(const ignition::math::Color &_color)
   if (this->OgreViewport())
   {
     this->OgreViewport()->setBackgroundColour(Conversions::Convert(_color));
+
+    // refresh distortion to prevent improper compositor initialization
+    // https://github.com/osrf/gazebo/pull/3033
+    if (this->dataPtr->distortion)
+    {
+      this->dataPtr->distortion->RefreshCompositor(shared_from_this());
+      this->renderTarget->update();
+    }
+
     return true;
   }
   return false;

@@ -20,6 +20,7 @@
 #include <mutex>
 
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/util/system.hh"
 
 
@@ -58,6 +59,9 @@ namespace gazebo
 
       /// \brief Viewports for the render targets
       public: Ogre::Viewport *envViewports[6];
+
+      /// \brief Pixel format for cube map texture
+      public: Ogre::PixelFormat envCubeMapTextureFormat;
 
       /// \brief A single cube map texture
       public: Ogre::Texture *envCubeMapTexture;

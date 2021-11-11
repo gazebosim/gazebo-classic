@@ -69,12 +69,19 @@ class HeightmapTest : public ServerFixture,
   //  is the collision detector to use in DART. Can be fcl, dart, bullet or ode.
   public: void TerrainCollision(const std::string &_physicsEngine,
                                 const std::string &_dartCollision = "");
+  // \brief Test dropping boxes on asymmetric terrain
+  // \param[in] _physics the physics engine to test
+  public: void TerrainCollisionAsymmetric(const std::string &_physics);
 
   /// \brief Test loading a heightmap that has no visuals
   public: void NoVisual();
 
   /// \brief Test loading a heightmap with an LOD visual plugin
   public: void LODVisualPlugin();
+
+  /// \brief Test loading a heightmap with an LOD visual plugin that has
+  /// different parameters for the Server and GUI.
+  public: void LODVisualPluginServerGUI();
 
 /// \brief Test loading a heightmap and verify cache files are created
   public: void HeightmapCache();
@@ -716,6 +723,36 @@ void HeightmapTest::LODVisualPlugin()
 }
 
 /////////////////////////////////////////////////
+void HeightmapTest::LODVisualPluginServerGUI()
+{
+  // load a heightmap with no visual
+  Load("worlds/heightmap_lod_plugin_server_gui.world", false);
+  physics::ModelPtr heightmap = GetModel("heightmap");
+  ASSERT_NE(heightmap, nullptr);
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+  ASSERT_NE(scene, nullptr);
+  EXPECT_TRUE(scene->IsServer());
+
+  // make sure scene is initialized and running
+  int sleep = 0;
+  int maxSleep = 30;
+  while (scene->SimTime().Double() < 2.0 && sleep++ < maxSleep)
+    common::Time::MSleep(100);
+
+  // check the heightmap lod via scene
+  EXPECT_EQ(scene->HeightmapLOD(), 0u);
+  // check skirt length param via scene
+  EXPECT_EQ(scene->HeightmapSkirtLength(), 0.5);
+
+  // get heightmap object and check lod params
+  rendering::Heightmap *h = scene->GetHeightmap();
+  EXPECT_NE(h, nullptr);
+  EXPECT_EQ(h->LOD(), 0u);
+  EXPECT_EQ(h->SkirtLength(), 0.5);
+}
+
+/////////////////////////////////////////////////
 void HeightmapTest::HeightmapCache()
 {
   // path to heightmap cache files
@@ -882,6 +919,75 @@ void HeightmapTest::TerrainCollision(const std::string &_physicsEngine,
   EXPECT_LE(spherePose.Pos().Z(), (minHeight + radius*1.01));
   // ensure it has not dropped below terrain, with some tolerance
   EXPECT_GE(spherePose.Pos().Z(), (minHeight + radius*0.99));
+}
+
+/////////////////////////////////////////////////
+void HeightmapTest::TerrainCollisionAsymmetric(const std::string &_physics)
+{
+  if (_physics == "bullet")
+  {
+    gzerr << "Skipping test for bullet. See issue #2506" << std::endl;
+    return;
+  }
+
+  if (_physics == "simbody")
+  {
+    // SimbodyHeightmapShape unimplemented.
+    gzerr << "Aborting test for " << _physics << std::endl;
+    return;
+  }
+
+  Load("worlds/heightmap.world", true, _physics);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  if (_physics == "dart")
+  {
+#ifdef HAVE_DART
+    physics::PhysicsEnginePtr engine = world->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet")
+    {
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
+  }
+
+  // each box has an initial z position of 10. meters
+  physics::ModelPtr box1 = GetModel("box1");
+  physics::ModelPtr box2 = GetModel("box2");
+  physics::ModelPtr box3 = GetModel("box3");
+  physics::ModelPtr box4 = GetModel("box4");
+  ASSERT_NE(box1, nullptr);
+  ASSERT_NE(box2, nullptr);
+  ASSERT_NE(box3, nullptr);
+  ASSERT_NE(box4, nullptr);
+  EXPECT_GE(box1->WorldPose().Pos().Z(), 9.9);
+  EXPECT_GE(box2->WorldPose().Pos().Z(), 9.9);
+  EXPECT_GE(box3->WorldPose().Pos().Z(), 9.9);
+  EXPECT_GE(box4->WorldPose().Pos().Z(), 9.9);
+
+  // step the world and verify that only box2 falls
+  world->Step(1000);
+
+  EXPECT_GE(box1->WorldPose().Pos().Z(), 9.9);
+  EXPECT_GE(box3->WorldPose().Pos().Z(), 9.9);
+  EXPECT_GE(box4->WorldPose().Pos().Z(), 9.9);
+
+  EXPECT_LT(box2->WorldPose().Pos().Z(), 5.5);
 }
 
 /////////////////////////////////////////////////
@@ -1056,6 +1162,12 @@ TEST_F(HeightmapTest, TerrainCollisionDartBullet)
 }
 
 /////////////////////////////////////////////////
+TEST_P(HeightmapTest, TerrainCollisionAsymmetric)
+{
+  TerrainCollisionAsymmetric(GetParam());
+}
+
+/////////////////////////////////////////////////
 //
 // Disabled: segfaults ocassionally
 // See https://github.com/osrf/gazebo/issues/521 for details
@@ -1093,6 +1205,12 @@ TEST_F(HeightmapTest, NoVisual)
 TEST_F(HeightmapTest, LODVisualPlugin)
 {
   LODVisualPlugin();
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, LODVisualPluginServerGUI)
+{
+  LODVisualPluginServerGUI();
 }
 
 /////////////////////////////////////////////////

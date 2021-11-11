@@ -20,7 +20,9 @@ perpixel.program
 picker.material
 ShadowCaster.material
 shadow_caster.program
+shadow_caster_ignore_heightmap.program
 ShadowCaster.program
+spotlight_shadow_demo.material
 ssao.compositor
 ssao.material
 SSAOPost.compositor

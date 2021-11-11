@@ -115,8 +115,9 @@ TEST_F(Light_TEST, CastShadows)
   msg.set_cast_shadows(true);
   spotLight->LoadFromMsg(msg);
   EXPECT_EQ(spotLight->LightType(), "spot");
-  // issue #2083: spot light does not cast shadows
-  EXPECT_FALSE(spotLight->CastShadows());
+  // issue #2083: spot light generates shadow maps but they are not currently
+  // being rendered
+  EXPECT_TRUE(spotLight->CastShadows());
   scene->RemoveLight(spotLight);
   spotLight.reset();
 

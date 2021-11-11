@@ -16,7 +16,6 @@
 */
 
 #include <iostream>
-#include <curl/curl.h>
 
 #include "RestUiLoginDialog.hh"
 #include "RestUiWidget.hh"

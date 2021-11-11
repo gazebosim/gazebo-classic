@@ -227,6 +227,13 @@ namespace gazebo
       public: BasePtr GetById(unsigned int _id) const;
       /// \endcond
 
+      /// This is an internal function.
+      /// \brief Recursively get descendent or self by id.
+      /// \param[in] _id ID of the object to retreive.
+      /// \return A pointer to the object, NULL if not found
+      public: BasePtr GetByIdRecursive(unsigned int _id);
+
+
       /// \brief Get by name.
       /// \param[in] _name Get a child (or self) object by name
       /// \return A pointer to the object, NULL if not found
@@ -276,6 +283,18 @@ namespace gazebo
       /// world::model1::...::modelN::entityName.
       /// \return The scoped name.
       public: std::string GetScopedName(bool _prependWorldName = false) const;
+
+      /// \brief Return a short version of the name with "ScopedName::" removed
+      /// \param[in] _scoped name - Usually the scoped name of a new
+      /// name a child entity is to be set to.
+      /// \return The stripped name.
+      public: std::string StripScopedName(const std::string &_name) const;
+
+      /// \brief Return a short version of the name with "ParentScopedName::" removed
+      /// \param[in] _scoped name - Usually the scoped name of a new
+      /// name this entity is to be set to.
+      /// \return The stripped name.
+      public: std::string StripParentScopedName(const std::string &_name) const;
 
       /// \brief Return the common::URI of this entity.
       /// The URI includes the world where the entity is contained and all the

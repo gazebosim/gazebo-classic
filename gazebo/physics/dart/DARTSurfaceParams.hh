@@ -34,7 +34,9 @@ namespace gazebo
     /// Forward declare private data class
     class DARTSurfaceParamsPrivate;
 
-    /// \brief DART surface parameters.
+    /// \brief Data structure containing DART surface parameters.
+    /// Updating the parameters in this class doesn't update the
+    /// actual DART objects.
     class GZ_PHYSICS_VISIBLE DARTSurfaceParams : public SurfaceParams
     {
       /// \brief Constructor.

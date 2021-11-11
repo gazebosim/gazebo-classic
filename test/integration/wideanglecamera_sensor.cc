@@ -225,3 +225,112 @@ TEST_F(WideAngleCameraSensor, Projection)
   EXPECT_LT(screenPt.Z(), 1.0);
 #endif
 }
+
+/////////////////////////////////////////////////
+TEST_F(WideAngleCameraSensor, TextureFormat)
+{
+#if not defined(__APPLE__)
+  Load("worlds/test/issue_2928_wide_angle_camera_texture_format.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run wide angle camera test\n";
+    return;
+  }
+
+  const unsigned int width  = 12;
+  const unsigned int height = 12;
+
+  {  // check camera with default texture format
+    sensors::SensorPtr sensor = sensors::get_sensor(
+      "wide_angle_camera_sensor_with_default_texture");
+    sensors::WideAngleCameraSensorPtr cameraSensor =
+        std::dynamic_pointer_cast<sensors::WideAngleCameraSensor>(sensor);
+
+    imageCount = 0;
+    img = new unsigned char[width * height * 3];
+    event::ConnectionPtr c =
+      cameraSensor->Camera()->ConnectNewImageFrame(
+          std::bind(&::OnNewCameraFrame, &imageCount, img,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
+
+    // Get some images
+    int sleep = 0;
+    int maxSleep = 30;
+    while (imageCount < 10 && sleep < maxSleep)
+    {
+      common::Time::MSleep(50);
+      sleep++;
+    }
+
+    unsigned int rSum = 0;
+    unsigned int gSum = 0;
+    unsigned int bSum = 0;
+    for (unsigned int i = 0; i < height*width*3; i+=3)
+    {
+      unsigned int r = img[i];
+      unsigned int g = img[i+1];
+      unsigned int b = img[i+2];
+      rSum += r;
+      gSum += g;
+      bSum += b;
+    }
+
+    EXPECT_NE(rSum, gSum);
+    EXPECT_NE(rSum, bSum);
+    EXPECT_NE(gSum, bSum);
+
+    EXPECT_GT(rSum - bSum, 30000.0);
+    EXPECT_GT(rSum - gSum, 20000.0);
+
+    delete [] img;
+  }
+
+  {  // check camera with grayscale texture format
+    sensors::SensorPtr sensor = sensors::get_sensor(
+      "wide_angle_camera_sensor_with_grayscale_texture");
+    sensors::WideAngleCameraSensorPtr cameraSensor =
+        std::dynamic_pointer_cast<sensors::WideAngleCameraSensor>(sensor);
+
+    imageCount = 0;
+    img = new unsigned char[width * height * 3];
+    event::ConnectionPtr c =
+      cameraSensor->Camera()->ConnectNewImageFrame(
+          std::bind(&::OnNewCameraFrame, &imageCount, img,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
+
+    // Get some images
+    int sleep = 0;
+    int maxSleep = 30;
+    while (imageCount < 10 && sleep < maxSleep)
+    {
+      common::Time::MSleep(50);
+      sleep++;
+    }
+
+    unsigned int rSum = 0;
+    unsigned int gSum = 0;
+    unsigned int bSum = 0;
+    for (unsigned int i = 0; i < height*width*3; i+=3)
+    {
+      unsigned int r = img[i];
+      unsigned int g = img[i+1];
+      unsigned int b = img[i+2];
+      rSum += r;
+      gSum += g;
+      bSum += b;
+    }
+
+    // For grayscale, all RGB channels should have the same value
+    EXPECT_EQ(rSum, gSum);
+    EXPECT_EQ(gSum, bSum);
+    EXPECT_GT(gSum, 10000u);
+
+    delete [] img;
+  }
+#endif
+}

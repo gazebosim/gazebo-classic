@@ -205,6 +205,7 @@ void DARTLink::Init()
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
+#if DART_MAJOR_MINOR_VERSION_AT_MOST(6, 9)
   // Friction coefficient
 
   /// \todo FIXME: Friction Parameters
@@ -247,6 +248,7 @@ void DARTLink::Init()
   // friction coefficient may not be negative in DART
   coeff = std::max(0.0f, coeff);
   this->dataPtr->dtBodyNode->setFrictionCoeff(coeff);
+#endif
 
   // We don't add dart body node to the skeleton here because dart body node
   // should be set its parent joint before being added. This body node will be

@@ -30,6 +30,7 @@ DARTHeightmapShape::DARTHeightmapShape(DARTCollisionPtr _parent)
   : HeightmapShape(_parent),
     dataPtr(new DARTHeightmapShapePrivate<HeightmapShape::HeightType>())
 {
+  this->flipY = false;
 }
 
 //////////////////////////////////////////////////

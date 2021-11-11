@@ -42,7 +42,7 @@
 #include "gazebo/util/OpenAL.hh"
 
 using namespace gazebo;
-using namespace util;
+using namespace gazebo::util;
 
 #ifdef HAVE_OPENAL
 /////////////////////////////////////////////////

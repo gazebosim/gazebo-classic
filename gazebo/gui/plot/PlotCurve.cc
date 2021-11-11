@@ -24,6 +24,11 @@
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 
+// member variables in qwt_series_data were renamed in 6.2.0
+#if QWT_VERSION < 0x060200
+#define QWT_VERSION_LT_620
+#endif
+
 using namespace gazebo;
 using namespace gui;
 
@@ -51,75 +56,123 @@ namespace gazebo
       public: CurveData()
               {}
 
-      /// \brief Add a point to the sample.
+      private: inline const QRectF& BoundingRect() const
+               {
+#ifdef QWT_VERSION_LT_620
+                 return this->d_boundingRect;
+#else
+                 return this->cachedBoundingRect;
+#endif
+               }
+
+      private: inline QRectF& BoundingRect()
+               {
+#ifdef QWT_VERSION_LT_620
+                 return this->d_boundingRect;
+#else
+                 return this->cachedBoundingRect;
+#endif
+               }
+
+      private: inline const QVector<QPointF>& SamplesRef() const
+               {
+#ifdef QWT_VERSION_LT_620
+                 return this->d_samples;
+#else
+                 return this->m_samples;
+#endif
+               }
+
+      private: inline QVector<QPointF>& SamplesRef()
+               {
+#ifdef QWT_VERSION_LT_620
+                 return this->d_samples;
+#else
+                 return this->m_samples;
+#endif
+               }
+
+      /// \brief Bounding rectangle accessor. This create the object
+      /// if it does not already exist or is too small.
       /// \return Bounding box of the sample.
       public: virtual QRectF boundingRect() const
               {
-                if (this->d_boundingRect.width() < 0.0)
+                if (this->BoundingRect().width() < 0.0)
+                {
+#ifdef QWT_VERSION_LT_620
                   this->d_boundingRect = qwtBoundingRect(*this);
+#else
+                  this->cachedBoundingRect = qwtBoundingRect(*this);
+#endif
+                }
 
                 // set a minimum bounding box height
                 // this prevents plot's auto scale to zoom in on near-zero
                 // floating point noise.
                 double minHeight = 1e-3;
-                double absHeight = std::fabs(this->d_boundingRect.height());
+                double absHeight = std::fabs(this->BoundingRect().height());
                 if (absHeight < minHeight)
                 {
                   double halfMinHeight = minHeight * 0.5;
-                  double mid = this->d_boundingRect.top() +
+                  double mid = this->BoundingRect().top() +
                       (absHeight * 0.5);
+#ifdef QWT_VERSION_LT_620
                   this->d_boundingRect.setTop(mid - halfMinHeight);
                   this->d_boundingRect.setBottom(mid + halfMinHeight);
+#else
+                  this->cachedBoundingRect.setTop(mid - halfMinHeight);
+                  this->cachedBoundingRect.setBottom(mid + halfMinHeight);
+#endif
                 }
 
-                return this->d_boundingRect;
+                return this->BoundingRect();
               }
 
       /// \brief Add a point to the sample.
       /// \param[in] _point Point to add.
       public: inline void Add(const QPointF &_point)
               {
-                this->d_samples += _point;
+                this->SamplesRef() += _point;
 
-                if (this->d_samples.size() > maxSampleSize)
+                if (this->SamplesRef().size() > maxSampleSize)
                 {
                   // remove sample window
                   // update bounding rect?
-                  this->d_samples.remove(0, windowSize);
+                  this->SamplesRef().remove(0, windowSize);
                 }
 
-                if (this->d_samples.size() == 1)
+                if (this->SamplesRef().size() == 1)
                 {
                   // init bounding rect
-                  this->d_boundingRect.setTopLeft(_point);
-                  this->d_boundingRect.setBottomRight(_point);
+                  this->BoundingRect().setTopLeft(_point);
+                  this->BoundingRect().setBottomRight(_point);
                   return;
                 }
 
                 // expand bounding rect
-                if (_point.x() < this->d_boundingRect.left())
-                  this->d_boundingRect.setLeft(_point.x());
-                else if (_point.x() > this->d_boundingRect.right())
-                  this->d_boundingRect.setRight(_point.x());
-                if (_point.y() < this->d_boundingRect.top())
-                  this->d_boundingRect.setTop(_point.y());
-                else if (_point.y() > this->d_boundingRect.bottom())
-                  this->d_boundingRect.setBottom(_point.y());
+                if (_point.x() < this->BoundingRect().left())
+                  this->BoundingRect().setLeft(_point.x());
+                else if (_point.x() > this->BoundingRect().right())
+                  this->BoundingRect().setRight(_point.x());
+                if (_point.y() < this->BoundingRect().top())
+                  this->BoundingRect().setTop(_point.y());
+                else if (_point.y() > this->BoundingRect().bottom())
+                  this->BoundingRect().setBottom(_point.y());
               }
 
       /// \brief Clear the sample data.
       public: void Clear()
               {
-                this->d_samples.clear();
-                this->d_samples.squeeze();
-                this->d_boundingRect = QRectF(0.0, 0.0, -1.0, -1.0);
+                this->SamplesRef().clear();
+                this->SamplesRef().squeeze();
+                this->BoundingRect() = QRectF(0.0, 0.0, -1.0, -1.0);
               }
 
       /// \brief Get the sample data.
       /// \return A vector of same points.
       public: QVector<QPointF> Samples() const
               {
-                return this->d_samples;
+                return this->SamplesRef();
               }
 
       /// \brief maxium sample size of this curve.

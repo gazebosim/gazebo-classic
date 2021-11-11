@@ -38,7 +38,7 @@ namespace gazebo
     class LightPrivate
     {
       /// \brief The ogre light source
-      public: Ogre::Light *light;
+      public: Ogre::Light *light = nullptr;
 
       /// \brief The visual used to visualize the light.
       public: VisualPtr visual;
@@ -63,6 +63,9 @@ namespace gazebo
 
       /// \brief Counter used to generate unique light names.
       public: static unsigned int lightCounter;
+
+      /// \brief Custom shadow camera setup for non-directional lights
+      public: Ogre::ShadowCameraSetupPtr shadowCameraSetup;
     };
   }
 }

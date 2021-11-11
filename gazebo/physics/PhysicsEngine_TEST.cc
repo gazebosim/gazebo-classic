@@ -126,7 +126,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
     {
       boost::any value;
       double maxStepSize = 0.02;
-      double realTimeUpdateRate = 0.03;
+      double realTimeUpdateRate = 3.03;
       double realTimeFactor = 0.04;
       ignition::math::Vector3d gravity(0, 0, 0);
       ignition::math::Vector3d magField(0.1, 0.1, 0.1);

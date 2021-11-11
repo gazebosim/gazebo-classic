@@ -1,0 +1,48 @@
+vertex_program Gazebo/SpotLightShadowDemoVS glsl
+{
+  source spotlight_shadow_demo_vp.glsl
+
+  default_params
+  {
+    param_named_auto worldViewMatrix worldview_matrix
+    param_named_auto viewProjMatrix viewproj_matrix
+    param_named_auto worldMatrix world_matrix
+
+    param_named_auto texViewProjMatrix0 texture_viewproj_matrix 0
+  }
+}
+
+fragment_program Gazebo/SpotLightShadowDemoFS glsl
+{
+  source spotlight_shadow_demo_fp.glsl
+
+  default_params
+  {
+    param_named shadowMap0 int 0
+  }
+}
+
+material Gazebo/SpotLightShadowDemo
+{
+  technique
+  {
+    pass
+    {
+      max_lights 32
+      iteration 1 per_n_lights 1 spot
+
+      vertex_program_ref Gazebo/SpotLightShadowDemoVS
+      {
+      }
+
+      fragment_program_ref Gazebo/SpotLightShadowDemoFS
+      {
+      }
+      texture_unit shadowMap0
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+    }
+  }
+}

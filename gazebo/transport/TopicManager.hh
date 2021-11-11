@@ -128,7 +128,7 @@ namespace gazebo
                 {
                   if (iter2.first == _topic)
                   {
-                    for (const auto liter : iter2.second)
+                    for (const auto &liter : iter2.second)
                     {
                       publication->AddSubscription(liter);
                     }

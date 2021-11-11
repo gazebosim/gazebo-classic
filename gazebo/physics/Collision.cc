@@ -57,7 +57,7 @@ static SDFCollisionInitializer g_SDFInit;
 
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-: Entity(_link), maxContacts(1)
+: Entity(_link), maxContacts(1), worldPoseDirty(true)
 {
   this->AddType(Base::COLLISION);
 
