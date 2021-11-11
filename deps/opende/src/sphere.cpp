@@ -29,6 +29,8 @@ dContactGeom::g1 and dContactGeom::g2.
 
 */
 
+#include <ignition/math/Vector3.hh>
+
 #include <gazebo/ode/common.h>
 #include <gazebo/ode/collision.h>
 #include <gazebo/ode/matrix.h>
@@ -39,6 +41,7 @@ dContactGeom::g1 and dContactGeom::g2.
 #include "collision_std.h"
 #include "collision_util.h"
 #include <iostream>
+#include <math.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable:4291)  // for VC++, no complaints about "no matching operator delete found"
@@ -220,10 +223,43 @@ int dCollideSphereBox (dxGeom *o1, dxGeom *o2, int /*flags*/,
 }
 
 
+//int dCollideSpherePlane (dxGeom *o1, dxGeom *o2, int /*flags*/,
+//			 dContactGeom *contact, int /*skip*/)
+//{
+//  std::cout << "dCollide sphere plane triggered..." << std::endl;
+//  //dIASSERT (skip >= (int)sizeof(dContactGeom));
+//  dIASSERT (o1->type == dSphereClass);
+//  dIASSERT (o2->type == dPlaneClass);
+//  //dIASSERT ((flags & NUMC_MASK) >= 1);
+//
+//  dxSphere *sphere = (dxSphere*) o1;
+//  dxPlane *plane = (dxPlane*) o2;
+//
+//  contact->g1 = o1;
+//  contact->g2 = o2;
+//  contact->side1 = -1;
+//  contact->side2 = -1;
+//  
+//  dReal k = dCalcVectorDot3 (o1->final_posr->pos,plane->p);
+//  dReal depth = plane->p[3] - k + sphere->radius;
+//  if (depth >= 0) {
+//    contact->normal[0] = plane->p[0];
+//    contact->normal[1] = plane->p[1];
+//    contact->normal[2] = plane->p[2];
+//    contact->pos[0] = o1->final_posr->pos[0] - plane->p[0] * sphere->radius;
+//    contact->pos[1] = o1->final_posr->pos[1] - plane->p[1] * sphere->radius;
+//    contact->pos[2] = o1->final_posr->pos[2] - plane->p[2] * sphere->radius;
+//    contact->depth = depth;
+//    return 1;
+//  }
+//  else return 0;
+//}
+
+
 int dCollideSpherePlane (dxGeom *o1, dxGeom *o2, int /*flags*/,
 			 dContactGeom *contact, int /*skip*/)
 {
-  std::cout << "dCollide sphere plane triggered..." << std::endl;
+  std::cout << "dCollide sphere plane start............." << std::endl;
   //dIASSERT (skip >= (int)sizeof(dContactGeom));
   dIASSERT (o1->type == dSphereClass);
   dIASSERT (o2->type == dPlaneClass);
@@ -247,7 +283,61 @@ int dCollideSpherePlane (dxGeom *o1, dxGeom *o2, int /*flags*/,
     contact->pos[1] = o1->final_posr->pos[1] - plane->p[1] * sphere->radius;
     contact->pos[2] = o1->final_posr->pos[2] - plane->p[2] * sphere->radius;
     contact->depth = depth;
+
+    std::cout << "Original contact pt ----" << std::endl;
+    std::cout << "Pos: " << contact->pos[0] << " " << contact->pos[1] << " " << contact->pos[2] << std::endl;
+    std::cout << "Normal: " << contact->normal[0] << " " << contact->normal[1] << " " << contact->normal[2] 
+      << std::endl;
+    std::cout << "Depth: " << contact->depth << std::endl;
+
+    // Modify contact point
+    // Get the velocity of the sphere
+    float theta = 15 * 3.1416/180;
+    dVector3 vel_vec;
+    dBodyGetPointVel(o1->body, o1->final_posr->pos[0], o1->final_posr->pos[1], 
+        o1->final_posr->pos[2], vel_vec);
+
+    // Axis of rotation is (p - c) X v
+    double centre_to_contact[3];
+    for (int i = 0; i < 3 ; i++) centre_to_contact[i] = contact->pos[i] - o1->final_posr->pos[i];
+    auto r = ignition::math::Vector3d(centre_to_contact[0], centre_to_contact[1], centre_to_contact[2]);
+    auto axis = ignition::math::Vector3d(vel_vec[0], vel_vec[1], vel_vec[2]).Cross(r);
+
+    // Rotate the normal
+    auto new_norm = RotateVecAbout(contact->normal, axis, -theta);
+    std::cout << "New norm: " << new_norm[0] << " " << new_norm[1] << " " << new_norm[2] << std::endl;
+
+    // Rotate the contact point
+    auto centre_to_new_contact = RotateVecAbout(centre_to_contact, axis, -theta);
+    double new_contact_pos[3];
+    for (int i = 0; i < 3 ; i++) new_contact_pos[i] = o1->final_posr->pos[i] + centre_to_new_contact[i];
+
+    // Apply the new normal and contact point
+    for (int i = 0; i < 3 ; i++) {
+      contact->pos[i] = new_contact_pos[i];
+      contact->normal[i] = new_norm[i];
+    }
+
+    std::cout << "New pos: " << new_contact_pos[0] << " " << new_contact_pos[1] << " " << 
+      new_contact_pos[2] << std::endl;
+
+    std::cout << "dCollide end -------" << std::endl; 
     return 1;
   }
   else return 0;
+}
+
+
+// Rodrigues' rotation formula
+// Rotate vector v about k by angle theta (radians)
+ignition::math::Vector3d RotateVecAbout(dVector3 v, ignition::math::Vector3d k, double theta)
+{
+  ignition::math::Vector3d vec_v(v[0], v[1], v[2]);
+  ignition::math::Vector3d vec_k = ignition::math::Vector3d(k[0], k[1], k[2]).Normalize();
+
+  auto vec_v_rot = vec_v * cos(theta) + vec_k.Cross(vec_v) * sin(theta) 
+    + vec_k * (1 - cos(theta)) * vec_k.Dot(vec_v);
+
+  return vec_v_rot;
+
 }

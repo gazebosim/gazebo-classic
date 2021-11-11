@@ -29,6 +29,7 @@ the standard ODE geometry primitives.
 #ifndef _ODE_COLLISION_STD_H_
 #define _ODE_COLLISION_STD_H_
 
+#include <ignition/math/Vector3.hh>
 #include <gazebo/ode/common.h>
 #include "collision_kernel.h"
 
@@ -65,6 +66,8 @@ int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int flags,
 		      dContactGeom *contact, int skip);
 int dCollideRayCylinder (dxGeom *o1, dxGeom *o2, int flags,
 		      dContactGeom *contact, int skip);
+
+ignition::math::Vector3d RotateVecAbout(dVector3, ignition::math::Vector3d, double);
 
 // Cylinder - Box/Sphere by (C) CroTeam
 // Ported by Nguyen Binh
