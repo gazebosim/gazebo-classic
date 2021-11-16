@@ -16,13 +16,13 @@ endif ( GRAPHVIZ_CGRAPH_LIBRARY )
 
 # use pkg-config to get the directories and then use these values
 # in the FIND_PATH() and FIND_LIBRARY() calls
-if( NOT WIN32 )
-  find_package(PkgConfig)
+find_package(PkgConfig)
+if( PkgConfig_FOUND )
 
   pkg_check_modules(GRAPHVIZ_GVC_PKG libgvc)
   pkg_check_modules(GRAPHVIZ_CGRAPH_PKG libcgraph)
   pkg_check_modules(GRAPHVIZ_CDT_PKG libcdt)
-endif( NOT WIN32 )
+endif( PkgConfig_FOUND )
 
 FIND_LIBRARY(GRAPHVIZ_GVC_LIBRARY NAMES gvc libgvc
   PATHS
