@@ -35,7 +35,13 @@ void main()
 {
   // calculate angle from optical axis based on the mapping function specified
   float param = r/(c1*f);
-  float theta = fun.x*asin(param)+fun.y*atan(param)+fun.z*param;
+  float theta = 0.0;
+  if(fun.x > 0)
+    theta = asin(param);
+  else if(fun.y > 0)
+    theta = atan(param);
+  else if(fun.z > 0)
+    theta = param;
   theta = (theta-c3)*c2;
 
   // compute the direction vector that will be used to sample from the cubemap
