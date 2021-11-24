@@ -74,6 +74,9 @@ namespace gazebo
       /// \brief Ogre Material that contains the distortion shader
       public: Ogre::MaterialPtr distortionMaterial;
 
+      /// \brief Ogre Texture that contains the distortion map
+      public: Ogre::TexturePtr distortionTexture;
+
       /// \brief Connection for the pre render event.
       public: event::ConnectionPtr preRenderConnection;
 
@@ -91,6 +94,14 @@ namespace gazebo
       virtual void notifyMaterialRender(Ogre::uint32 _passId,
                                         Ogre::MaterialPtr& _material)
       {
+        // If more compositors are added to the camera in addition to the
+        // distortion compositor, an Ogre bug will cause the material for the
+        // last camera initialized to be used for all cameras. This workaround
+        // doesn't correct the material used, but it applies the correct texture
+        // to this active material.
+        _material->getTechnique(0)->getPass(_passId)->getTextureUnitState(1)->
+          setTexture(distortionTexture);
+      
         // @todo Explore more efficent implementations as it is run every frame
         Ogre::GpuProgramParametersSharedPtr params =
             _material->getTechnique(0)->getPass(_passId)
@@ -309,7 +320,7 @@ void Distortion::SetCamera(CameraPtr _camera)
 
   // create the distortion map texture for the distortion instance
   std::string texName = _camera->Name() + "_distortionTex";
-  Ogre::TexturePtr renderTexture =
+  this->dataPtr->distortionTexture =
       Ogre::TextureManager::getSingleton().createManual(
           texName,
           "General",
@@ -318,7 +329,8 @@ void Distortion::SetCamera(CameraPtr _camera)
           this->dataPtr->distortionTexHeight,
           0,
           Ogre::PF_FLOAT32_RGB);
-  Ogre::HardwarePixelBufferSharedPtr pixelBuffer = renderTexture->getBuffer();
+  Ogre::HardwarePixelBufferSharedPtr pixelBuffer =
+      this->dataPtr->distortionTexture->getBuffer();
 
   // fill the distortion map, while interpolating to fill dead pixels
   pixelBuffer->lock(Ogre::HardwareBuffer::HBL_NORMAL);
