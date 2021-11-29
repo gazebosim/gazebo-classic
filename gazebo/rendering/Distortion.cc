@@ -101,7 +101,7 @@ namespace gazebo
         // to this active material.
         _material->getTechnique(0)->getPass(_passId)->getTextureUnitState(1)->
           setTexture(distortionTexture);
-      
+
         // @todo Explore more efficent implementations as it is run every frame
         Ogre::GpuProgramParametersSharedPtr params =
             _material->getTechnique(0)->getPass(_passId)
