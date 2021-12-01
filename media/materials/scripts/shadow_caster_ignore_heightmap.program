@@ -22,7 +22,6 @@ fragment_program shadow_caster_ignore_heightmap_fp_glsl glsl
   }
 }
 
-
 material Gazebo/shadow_caster_ignore_heightmap
 {
   technique
