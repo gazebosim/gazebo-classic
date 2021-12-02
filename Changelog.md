@@ -2,6 +2,9 @@
 
 ## Gazebo 11.9.1 (2021-12-02)
 
+1. setup.sh: fix relocatability of `LD_LIBRARY_PATH`
+    * [Pull request #3140](https://github.com/osrf/gazebo/pull/3140)
+
 1. Fix setup.sh and install dirs with absolute paths
     * [Pull request #3138](https://github.com/osrf/gazebo/pull/3138)
     * A contribution from: Ben Wolsieffer <benwolsieffer@gmail.com>
