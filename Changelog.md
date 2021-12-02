@@ -1,5 +1,25 @@
 ## Gazebo 11
 
+## Gazebo 11.9.1 (2021-12-02)
+
+1. Fix setup.sh and install dirs with absolute paths
+    * [Pull request #3138](https://github.com/osrf/gazebo/pull/3138)
+    * A contribution from: Ben Wolsieffer <benwolsieffer@gmail.com>
+
+1. Add check for function type to avoid undefined asin computation
+    * [Pull request #3135](https://github.com/osrf/gazebo/pull/3135)
+    * A contribution from: Kaden Jeppesen <kjeppesen1@gmail.com>
+
+1. Workaround for wrong distortion material applied to some cameras (#3136)
+    * [Pull request #3136](https://github.com/osrf/gazebo/pull/3136)
+    * [Issue #2527](https://github.com/osrf/gazebo/issues/2527)
+    * A contribution from: Terry Welsh
+
+1. Fix Gazebo crash in building editor when adding door or window (#2276) (#3129)
+    * [Pull request #3129](https://github.com/osrf/gazebo/pull/3129)
+    * [Issue #2276](https://github.com/osrf/gazebo/issues/2276)
+    * A contribution from: Joep Jansen <joep.w.jansen@gmail.com>
+
 ## Gazebo 11.9.0 (2021-10-28)
 
 1. Forward port windows fixes from #2789
