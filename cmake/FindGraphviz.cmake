@@ -22,7 +22,7 @@ if( PkgConfig_FOUND )
   pkg_check_modules(GRAPHVIZ_GVC_PKG libgvc)
   pkg_check_modules(GRAPHVIZ_CGRAPH_PKG libcgraph)
   pkg_check_modules(GRAPHVIZ_CDT_PKG libcdt)
-endif( PkgConfig_FOUND )
+endif()
 
 FIND_LIBRARY(GRAPHVIZ_GVC_LIBRARY NAMES gvc libgvc
   PATHS
