@@ -181,7 +181,7 @@ macro (gz_setup_windows)
     endif()
 
     if (MSVC)
-      add_compile_options(/Zc:__cplusplus /permissive- /Zc:strictStrings-)
+      add_compile_options(/Zc:__cplusplus /permissive- /Zc:strictStrings- /Zc:externC-)
     endif()
 endmacro()
 
