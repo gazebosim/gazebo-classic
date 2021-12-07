@@ -35,7 +35,7 @@ namespace gazebo
       /// \brief Destructor
       public: ~PointLightShadowCameraSetup();
 
-      /// \brief Returns a shadow camera for a spotlight
+      /// \brief Returns a shadow camera for a point light
       /// \sa FocusedShadowCameraSetup::getShadowCamera()
       public: virtual void getShadowCamera(const Ogre::SceneManager *_sm,
           const Ogre::Camera *_cam, const Ogre::Viewport *_vp,

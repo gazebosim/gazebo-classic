@@ -148,14 +148,14 @@
         <collision name="collision">
           <geometry>
             <sphere>
-              <size>1 1 1</size>
+              <radius>1</radius>
             </sphere>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <sphere>
-              <size>1 1 1</size>
+              <radius>1</radius>
             </sphere>
           </geometry>
           <material>
@@ -194,14 +194,16 @@
         <collision name="collision">
           <geometry>
             <cylinder>
-              <size>1 1 1</size>
+              <radius>1</radius>
+              <length>1</length>
             </cylinder>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <cylinder>
-              <size>1 1 1</size>
+              <radius>1</radius>
+              <length>1</length>
             </cylinder>
           </geometry>
           <material>
