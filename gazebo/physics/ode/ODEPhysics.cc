@@ -402,6 +402,7 @@ void ODEPhysics::UpdateCollision()
   // This must happen in this thread sequentially
   for (i = 0; i < this->dataPtr->trimeshCollidersCount; ++i)
   {
+    std::cout << "Colliding a trimesh pair " << i << std::endl; 
     ODECollision *collision1 = this->dataPtr->trimeshColliders[i].first;
     ODECollision *collision2 = this->dataPtr->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->dataPtr->contactCollisions);
@@ -415,6 +416,7 @@ void ODEPhysics::UpdateCollision()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdatePhysics()
 {
+  std::cout << "------------- Update Physics call" << std::endl;
   DIAG_TIMER_START("ODEPhysics::UpdatePhysics");
   IGN_PROFILE("ODEPhysics:UpdatePhysics");
 
@@ -431,6 +433,7 @@ void ODEPhysics::UpdatePhysics()
     // Set the joint contact feedback for each contact.
     for (unsigned int i = 0; i < this->dataPtr->jointFeedbackIndex; ++i)
     {
+      std::cout << "Global jt feedbacks: " << i << std::endl;
       Contact *contactFeedback = this->dataPtr->jointFeedbacks[i]->contact;
       Collision *col1 = contactFeedback->collision1;
       Collision *col2 = contactFeedback->collision2;
@@ -460,6 +463,8 @@ void ODEPhysics::UpdatePhysics()
   }
 
   DIAG_TIMER_STOP("ODEPhysics::UpdatePhysics");
+
+  std::cout << "---- Update phy end" <<std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -1076,6 +1081,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Generate the contacts
   numc = dCollide(_collision1->GetCollisionId(), _collision2->GetCollisionId(),
       MAX_COLLIDE_RETURNS, _contactCollisions, sizeof(_contactCollisions[0]));
+
+  std::cout << "Max returns: " << MAX_COLLIDE_RETURNS << " " << sizeof(_contactCollisions[0]) << std::endl;
+  
+  //numc = ApplyPlowingEffect(_contactCollisions, _collision1);
   
 
   // Return if no contacts.
@@ -1167,6 +1176,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     ///         << " comparing mu1 from both surfaces, and use fdir1"
     ///         << " from surface with smaller mu1\n";
   }
+  
+  std::cout  << "Fdir2 " << fd2.X() << " " << fd2.Y() << " " << fd2.Z() << std::endl;
 
   if (fd != ignition::math::Vector3d::Zero)
   {
@@ -1178,9 +1189,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   }
 
   // Manipulate contact points
-  auto begin_time = std::clock();
-  ApplyPlowingEffect(_contactCollisions, _collision1);
-  std::cout << "TIME TAKEN: " << float(std::clock() - begin_time) / CLOCKS_PER_SEC;
+  //ApplyPlowingEffect(_contactCollisions, _collision1);
 
   // Set the friction coefficients.
   contact.surface.mu = std::min(surf1->FrictionPyramid()->MuPrimary(),
@@ -1189,6 +1198,12 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                                  surf2->FrictionPyramid()->MuSecondary());
   contact.surface.mu3 = std::min(surf1->FrictionPyramid()->MuTorsion(),
                                  surf2->FrictionPyramid()->MuTorsion());
+
+  std::cout << "OG mu: " << contact.surface.mu << " " << contact.surface.mu2 << " " << contact.surface.mu3 << std::endl;
+
+  //contact.fdir1[0] = 0;
+  //contact.fdir1[1] = 0;
+  //contact.fdir1[2] = 0;
 
   // Combine the slip values
   // The slip is equivalent to the inverse of a viscous damping term
@@ -1704,7 +1719,7 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
   return true;
 }
 
-void ApplyPlowingEffect(dContactGeom * _contactCollisions, void * c1)
+int ApplyPlowingEffect(dContactGeom * _contactCollisions, void * c1)
 {
   // Angle of rotation must be decided by mod of velocity
   // Direction of rotation by directin of velocity
@@ -1731,7 +1746,7 @@ void ApplyPlowingEffect(dContactGeom * _contactCollisions, void * c1)
   double dead_zone_vel = 1.0;
   double k = 0.01;
 
-  if (std::abs(vel) <= std::abs(dead_zone_vel)) return;
+  if (std::abs(vel) <= std::abs(dead_zone_vel)) return 1;
 
   // Get angle by which the normal and contact pt must be perturbed
   auto theta = GetRotationAngle(max_angle, dead_zone_vel, k, vel);
@@ -1767,10 +1782,19 @@ void ApplyPlowingEffect(dContactGeom * _contactCollisions, void * c1)
   std::cout << "New contact : " << new_contact_pos << std::endl;
 
   // Apply changed normal and contact point
+  _contactCollisions[1].depth = 0;
+  _contactCollisions[1].g1 = _contactCollisions[0].g1;
+  _contactCollisions[1].g2 = _contactCollisions[0].g2;
+  _contactCollisions[1].side1 = _contactCollisions[0].side1;
+  _contactCollisions[1].side2 = _contactCollisions[0].side2;
+
   for (int i = 0; i < 3; i++) {
-    _contactCollisions[0].normal[i] = new_normal[i];
-    _contactCollisions[0].pos[i] = new_contact_pos[i];
+    _contactCollisions[1].pos[i] = new_contact_pos[i];
+    _contactCollisions[1].normal[i] = new_normal[i];
+    //_contactCollisions[1].normal[i] = _contactCollisions[0].normal[i];
   }
+
+  return 2;
 
 }
 

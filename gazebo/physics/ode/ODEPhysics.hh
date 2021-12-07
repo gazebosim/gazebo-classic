@@ -324,6 +324,6 @@ namespace gazebo
 }
 
 ignition::math::Vector3d RotateVecAbout(ignition::math::Vector3d, ignition::math::Vector3d, double);
-void ApplyPlowingEffect(dContactGeom *, void *);
+int ApplyPlowingEffect(dContactGeom *, void *);
 double GetRotationAngle(double, double, double, double);
 #endif

@@ -41,10 +41,10 @@ dContactGeom::g1 and dContactGeom::g2.
 #include "collision_std.h"
 #include "collision_util.h"
 #include <iostream>
-#include <math.h> 
-                  
-#ifdef _MSC_VER   
-#pragma warning(d isable:4291)  // for VC++, no complaints about "no matching operator delete found"
+#include <math.h>
+
+#ifdef _MSC_VER
+#pragma warning(disable:4291)  // for VC++, no complaints about "no matching operator delete found"
 #endif
 
 
