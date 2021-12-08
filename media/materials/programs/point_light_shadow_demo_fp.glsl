@@ -7,8 +7,6 @@ uniform sampler2DShadow shadowMap3;
 uniform sampler2DShadow shadowMap4;
 uniform sampler2DShadow shadowMap5;
 
-uniform vec4 lightPos0;
-
 varying vec4 lightSpacePos0;
 varying vec4 lightSpacePos1;
 varying vec4 lightSpacePos2;
