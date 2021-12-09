@@ -728,6 +728,7 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   // point: not working yet
   unsigned int dirLightCount = 1u;
   unsigned int spotLightCount = 0u;
+  unsigned int pointLightCount = 0u;
   for (unsigned int i = 0; i < _scene->LightCount(); ++i)
   {
     LightPtr light = _scene->LightByIndex(i);
@@ -737,6 +738,9 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
 
     if (light->Type() == "spot")
       spotLightCount++;
+
+    if (light->Type() == "point")
+      pointLightCount++;
   }
 
   // 3 textures per directional light
@@ -746,12 +750,14 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 1);
 
   // \todo(anyone) make point light shadows work
-  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 6);
 
   // \todo(anyone) include point light shadows when it is working
   unsigned int dirShadowCount = 3 * dirLightCount;
   unsigned int spotShadowCount = spotLightCount;
-  sceneMgr->setShadowTextureCount(dirShadowCount + spotShadowCount);
+  unsigned int pointShadowCount = 6 * pointLightCount;
+  sceneMgr->setShadowTextureCount(dirShadowCount + spotShadowCount +
+      pointShadowCount);
 
   unsigned int texSize = this->dataPtr->shadowTextureSize;
 #if defined(__APPLE__)
@@ -771,7 +777,8 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   // vec4 texture(sampler2D, vec2, [float]).
   // NVidia, AMD, and Intel all take this as a cue to provide "hardware PCF",
   // a driver hack that softens shadow edges with 4-sample interpolation.
-  for (size_t i = 0u; i < dirShadowCount + spotShadowCount; ++i)
+  for (size_t i = 0u; i < dirShadowCount + spotShadowCount + pointShadowCount; 
+      ++i)
   {
     const Ogre::TexturePtr tex = sceneMgr->getShadowTexture(i);
     // This will fail if not using OpenGL as the rendering backend.

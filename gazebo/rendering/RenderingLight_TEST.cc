@@ -127,8 +127,7 @@ TEST_F(Light_TEST, CastShadows)
   msg.set_cast_shadows(true);
   pointLight->LoadFromMsg(msg);
   EXPECT_EQ(pointLight->LightType(), "point");
-  // issue #2083: point light does not cast shadows
-  EXPECT_FALSE(pointLight->CastShadows());
+  EXPECT_TRUE(pointLight->CastShadows());
   scene->RemoveLight(pointLight);
   pointLight.reset();
 }

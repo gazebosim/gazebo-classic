@@ -47,6 +47,7 @@ set (sources
   OrbitViewController.cc
   OriginVisual.cc
   OrthoViewController.cc
+  PointLightShadowCameraSetup.cc
   Projector.cc
   RayQuery.cc
   RenderEngine.cc
