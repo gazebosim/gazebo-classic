@@ -1072,9 +1072,20 @@ void ODEJoint::SetStiffnessDamping(unsigned int _index,
     {
       if (!parentStatic && !childStatic)
       {
-        this->applyDamping = physics::Joint::ConnectJointUpdate(
-          boost::bind(&ODEJoint::ApplyStiffnessDamping, this));
-        this->stiffnessDampingInitialized = true;
+        // Only enable stiffness/damping callback if values are non-zero
+        if (!ignition::math::equal(_damping, 0.0) ||
+            !ignition::math::equal(_stiffness, 0.0))
+        {
+          this->applyDamping = physics::Joint::ConnectJointUpdate(
+            boost::bind(&ODEJoint::ApplyStiffnessDamping, this));
+          this->stiffnessDampingInitialized = true;
+        }
+        // Otherwise disable the callback, since both values are zero
+        else
+        {
+          this->applyDamping.reset();
+          this->stiffnessDampingInitialized = false;
+        }
       }
       else
       {
