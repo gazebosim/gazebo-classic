@@ -27,17 +27,6 @@
 using namespace gazebo;
 using namespace transport;
 
-/// TBB task to process nodes.
-class TopicManagerProcessTask : public tbb::task
-{
-  /// Implements the necessary execute function
-  public: tbb::task *execute()
-          {
-            TopicManager::Instance()->ProcessNodes();
-            return NULL;
-          }
-};
-
 /// TBB task to establish subscriber to publisher connection.
 class TopicManagerConnectionTask : public tbb::task
 {
@@ -272,11 +261,6 @@ void ConnectionManager::RunUpdate()
   if (this->masterConn)
     this->masterConn->ProcessWriteQueue();
 
-  // Use TBB to process nodes. Need more testing to see if this makes
-  // a difference.
-  // TopicManagerProcessTask *task = new(tbb::task::allocate_root())
-  //   TopicManagerProcessTask();
-  // tbb::task::enqueue(*task);
   boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
 
   TopicManager::Instance()->ProcessNodes();
