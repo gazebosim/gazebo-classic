@@ -17,7 +17,6 @@
 #ifndef _CONNECTION_HH_
 #define _CONNECTION_HH_
 
-#include <tbb/task.h>
 #include <google/protobuf/message.h>
 
 #include <boost/asio.hpp>
@@ -37,6 +36,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/WeakBind.hh"
+#include "gazebo/transport/TaskGroup.hh"
 #include "gazebo/util/system.hh"
 
 #define HEADER_LENGTH 8
@@ -54,7 +54,7 @@ namespace gazebo
     /// \cond
     /// \brief A task instance that is created when data is read from
     /// a socket and used by TBB
-    class GZ_TRANSPORT_VISIBLE ConnectionReadTask : public tbb::task
+    class GZ_TRANSPORT_VISIBLE ConnectionReadTask
     {
       /// \brief Constructor
       /// \param[_in] _func Boost function pointer, which is the function
@@ -68,13 +68,9 @@ namespace gazebo
               {
               }
 
-      /// \bried Overridden function from tbb::task that exectues the data
-      /// callback.
-      public: tbb::task *execute()
-              {
-                this->func(this->data);
-                return NULL;
-              }
+      /// \brief Execute the data callback
+      public: void operator()() const
+              { this->func(this->data); }
 
       /// \brief The boost function pointer
       private: boost::function<void (const std::string &)> func;
@@ -310,12 +306,7 @@ namespace gazebo
 
                 if (!_e && !transport::is_stopped())
                 {
-                  ConnectionReadTask *task = new(tbb::task::allocate_root())
-                        ConnectionReadTask(boost::get<0>(_handler), data);
-                  tbb::task::enqueue(*task);
-
-                  // Non-tbb version:
-                  // boost::get<0>(_handler)(data);
+                  this->taskGroup.run<ConnectionReadTask>(boost::get<0>(_handler), data);
                 }
               }
 
@@ -465,6 +456,10 @@ namespace gazebo
 
       /// \brief True if the connection is open.
       private: bool isOpen;
+               
+
+      /// \brief For managing asynchronous tasks with tbb
+      private: TaskGroup taskGroup;
     };
     /// \}
   }

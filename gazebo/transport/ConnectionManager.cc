@@ -28,18 +28,15 @@ using namespace gazebo;
 using namespace transport;
 
 /// TBB task to establish subscriber to publisher connection.
-class TopicManagerConnectionTask : public tbb::task
+class TopicManagerConnectionTask
 {
   /// \brief Constructor.
   /// \param[in] _pub Publish message
   public: explicit TopicManagerConnectionTask(msgs::Publish _pub) : pub(_pub) {}
 
   /// Implements the necessary execute function
-  public: tbb::task *execute()
-          {
-            TopicManager::Instance()->ConnectSubToPub(pub);
-            return NULL;
-          }
+  public: void operator()() const
+          { TopicManager::Instance()->ConnectSubToPub(pub); }
 
   /// \brief Publish message
   private: msgs::Publish pub;
@@ -385,9 +382,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
-      TopicManagerConnectionTask *task = new(tbb::task::allocate_root())
-      TopicManagerConnectionTask(pub);
-      tbb::task::enqueue(*task);
+      this->taskGroup.run<TopicManagerConnectionTask>(pub);
     }
   }
   // publisher_subscribe. This occurs when we try to subscribe to a topic, and

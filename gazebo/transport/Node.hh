@@ -18,7 +18,6 @@
 #ifndef GAZEBO_TRANSPORT_NODE_HH_
 #define GAZEBO_TRANSPORT_NODE_HH_
 
-#include <tbb/task.h>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <map>
@@ -26,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/transport/TaskGroup.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/util/system.hh"
@@ -36,7 +36,7 @@ namespace gazebo
   {
     /// \cond
     /// \brief Task used by Node::Publish to publish on a one-time publisher
-    class GZ_TRANSPORT_VISIBLE PublishTask : public tbb::task
+    class GZ_TRANSPORT_VISIBLE PublishTask
     {
       /// \brief Constructor
       /// \param[in] _pub Publisher to publish the message on.
@@ -49,16 +49,14 @@ namespace gazebo
         this->msg->CopyFrom(_message);
       }
 
-      /// \brief Overridden function from tbb::task that exectues the
-      /// publish task.
-      public: tbb::task *execute()
+      /// \brief Executes the publish task.
+      public: void operator()()
               {
                 this->pub->WaitForConnection();
                 this->pub->Publish(*this->msg, true);
                 this->pub->SendMessage();
                 delete this->msg;
                 this->pub.reset();
-                return NULL;
               }
 
       /// \brief Pointer to the publisher.
@@ -159,11 +157,7 @@ namespace gazebo
                   const google::protobuf::Message &_message)
               {
                 transport::PublisherPtr pub = this->Advertise<M>(_topic);
-                PublishTask *task = new(tbb::task::allocate_root())
-                  PublishTask(pub, _message);
-
-                tbb::task::enqueue(*task);
-                return;
+                this->taskGroup.run<PublishTask>(pub, _message);
               }
 
       /// \brief Advertise a topic
@@ -418,6 +412,9 @@ namespace gazebo
 
       /// \brief List of newly arrive messages
       private: std::map<std::string, std::list<MessagePtr> > incomingMsgsLocal;
+      
+      /// \brief For managing asynchronous tasks with tbb
+      private: TaskGroup taskGroup;
 
       private: boost::mutex publisherMutex;
       private: boost::mutex publisherDeleteMutex;

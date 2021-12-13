@@ -29,6 +29,7 @@ set (headers
   SubscribeOptions.hh
   Subscriber.hh
   SubscriptionTransport.hh
+  TaskGroup.hh
   TopicManager.hh
   TransportIface.hh
   TransportTypes.hh
