@@ -27,8 +27,9 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
 
-#include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Connection.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/TaskGroup.hh"
 #include "gazebo/util/system.hh"
 
 /// \brief Explicit instantiation for typed SingletonT.
@@ -193,6 +194,9 @@ namespace gazebo
 
       /// \brief Condition used for synchronization
       private: boost::condition_variable namespaceCondition;
+               
+      /// \brief For managing asynchronous tasks with tbb
+      private: TaskGroup taskGroup;
 
       // Singleton implementation
       private: friend class SingletonT<ConnectionManager>;
