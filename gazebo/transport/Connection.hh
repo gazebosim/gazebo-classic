@@ -376,7 +376,7 @@ namespace gazebo
       private: boost::asio::ip::tcp::endpoint GetRemoteEndpoint() const;
 
       /// \brief Gets hostname
-      /// \param[in] _ep The end point to get the hostename of
+      /// \param[in] _ep The end point to get the hostname of
       private: static std::string GetHostname(
                    boost::asio::ip::tcp::endpoint _ep);
 
