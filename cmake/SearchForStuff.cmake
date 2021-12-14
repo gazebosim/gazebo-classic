@@ -326,6 +326,22 @@ if (PKG_CONFIG_FOUND)
     endif (NOT TBB_FOUND)
   endif (NOT TBB_FOUND)
 
+  # tbb::task was removed in tbb v2021.01, so in this case we must move to the
+  # newer tbb::task_group API. This could also be used with earlier versions of
+  # TBB, but we want to maintain ABI compatibility for Ubuntu 18.04 etc., so
+  # disable this by default.
+  if (NOT DEFINED USE_LEGACY_TBB_TASK)
+    if (${TBB_VERSION} VERSION_LESS 2021)
+      set (USE_LEGACY_TBB_TASK ON)
+    else (${TBB_VERSION} VERSION_LESS 2021)
+      set (USE_LEGACY_TBB_TASK OFF)
+    endif(${TBB_VERSION} VERSION_LESS 2021)
+  endif()
+  set(USE_LEGACY_TBB_TASK ${USE_LEGACY_TBB_TASK} CACHE BOOL "Whether to use the deprecated tbb::task class")
+  if (USE_LEGACY_TBB_TASK)
+    add_definitions(-DUSE_LEGACY_TBB_TASK)
+  endif (USE_LEGACY_TBB_TASK)
+
   #################################################
   # Find OGRE
 

@@ -19,7 +19,7 @@
 
 #include <utility>
 
-#if __has_include(<oneapi/tbb/task_group.h>)
+#ifndef USE_LEGACY_TBB_TASK
 
 // Emit is both a macro in Qt and a function defined by tbb
 #undef emit
