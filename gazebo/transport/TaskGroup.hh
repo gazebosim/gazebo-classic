@@ -72,7 +72,7 @@ namespace gazebo {
 
       public: template<class Functor, class... Args> void run(Args&&... args)
               {
-                auto *task = new (tbb::task::allocate_root())
+                TaskWrapper<Functor> *task = new (tbb::task::allocate_root())
                     TaskWrapper<Functor>(std::forward<Args>(args)...);
                 tbb::task::enqueue(*task);
               }
