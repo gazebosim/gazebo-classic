@@ -625,6 +625,9 @@ if (NOT Boost_FOUND)
   BUILD_ERROR ("Boost not found. Please install thread system filesystem program_options regex iostreams date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
 
+# Suppress warnings from boost/bind.hpp about use of global placeholders (e.g. _1, _2 etc.)
+add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
+
 ########################################
 # Find libdl
 find_path(libdl_include_dir dlfcn.h /usr/include /usr/local/include)
