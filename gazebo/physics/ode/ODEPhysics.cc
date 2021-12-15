@@ -386,10 +386,9 @@ void ODEPhysics::UpdateCollision()
 
   IGN_PROFILE_BEGIN("collideShapes");
   // Generate non-trimesh collisions.
-  std::cout << "** UpdateCollision call ** " << std::endl;
+  //std::cout << "** UpdateCollision call ** " << std::endl;
   for (i = 0; i < this->dataPtr->collidersCount; ++i)
   {
-    std::cout << "Colliding a pair " << i << std::endl; 
     this->Collide(this->dataPtr->colliders[i].first,
         this->dataPtr->colliders[i].second, this->dataPtr->contactCollisions);
   }
@@ -402,7 +401,6 @@ void ODEPhysics::UpdateCollision()
   // This must happen in this thread sequentially
   for (i = 0; i < this->dataPtr->trimeshCollidersCount; ++i)
   {
-    std::cout << "Colliding a trimesh pair " << i << std::endl; 
     ODECollision *collision1 = this->dataPtr->trimeshColliders[i].first;
     ODECollision *collision2 = this->dataPtr->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->dataPtr->contactCollisions);
@@ -416,7 +414,6 @@ void ODEPhysics::UpdateCollision()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdatePhysics()
 {
-  std::cout << "------------- Update Physics call" << std::endl;
   DIAG_TIMER_START("ODEPhysics::UpdatePhysics");
   IGN_PROFILE("ODEPhysics:UpdatePhysics");
 
@@ -463,8 +460,6 @@ void ODEPhysics::UpdatePhysics()
   }
 
   DIAG_TIMER_STOP("ODEPhysics::UpdatePhysics");
-
-  std::cout << "---- Update phy end" <<std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -958,7 +953,6 @@ void ODEPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 //////////////////////////////////////////////////
 void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
-  // std::cout << "Collision cb fcn ---- " << std::this_thread::get_id() << std::endl;
   IGN_PROFILE("ODEPhysics::CollisionCallback");
   dBodyID b1 = dGeomGetBody(_o1);
   dBodyID b2 = dGeomGetBody(_o2);
@@ -1008,7 +1002,6 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
     // Make sure both collision pointers are valid.
     if (collision1 && collision2)
     {
-      std::cout << "Adding collider" << std::endl;
       // Add either a tri-mesh collider or a regular collider.
       if (collision1->HasType(Base::MESH_SHAPE) ||
           collision2->HasType(Base::MESH_SHAPE))
@@ -1016,11 +1009,9 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
       else
       {
         self->AddCollider(collision1, collision2);
-        std::cout << "Added simple collider" << std::endl;
       }
     }
   }
-  // std::cout << "Collision cb fcn END ---- " << std::this_thread::get_id() << std::endl;
 }
 
 
@@ -1028,7 +1019,6 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactGeom *_contactCollisions)
 {
-  std::cout << "\nCollide fcn---- " << std::this_thread::get_id() << std::endl;
   // Filter collisions based on collide bitmask.
   if ((_collision1->GetSurface()->collideBitmask &
         _collision2->GetSurface()->collideBitmask) == 0)
@@ -1082,11 +1072,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   numc = dCollide(_collision1->GetCollisionId(), _collision2->GetCollisionId(),
       MAX_COLLIDE_RETURNS, _contactCollisions, sizeof(_contactCollisions[0]));
 
-  std::cout << "Max returns: " << MAX_COLLIDE_RETURNS << " " << sizeof(_contactCollisions[0]) << std::endl;
-  
-  //numc = ApplyPlowingEffect(_contactCollisions, _collision1);
-  
-
   // Return if no contacts.
   if (numc == 0)
     return;
@@ -1112,7 +1097,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     numc = maxCollide;
   }
   
-  std::cout << "Num of contacts: " << numc << std::endl;
 
   // Set the contact surface parameter flags.
   contact.surface.mode = dContactBounce |
@@ -1144,7 +1128,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   // assign fdir1 if not set as 0
   ignition::math::Vector3d fd = surf1->FrictionPyramid()->direction1;
-  std::cout << "fdir1 original: " << fd << std::endl;
   if (fd != ignition::math::Vector3d::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
@@ -1177,7 +1160,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     ///         << " from surface with smaller mu1\n";
   }
   
-  std::cout  << "Fdir2 " << fd2.X() << " " << fd2.Y() << " " << fd2.Z() << std::endl;
 
   if (fd != ignition::math::Vector3d::Zero)
   {
@@ -1185,11 +1167,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     contact.fdir1[0] = fd.X();
     contact.fdir1[1] = fd.Y();
     contact.fdir1[2] = fd.Z();
-    std::cout  << "Fdir1 " << fd.X() << " " << fd.Y() << " " << fd.Z() << std::endl;
   }
 
-  // Manipulate contact points
-  //ApplyPlowingEffect(_contactCollisions, _collision1);
+  // App;y virtual force and torque
+  ApplyPlowingEffect(20, 0.01,  _collision1);
 
   // Set the friction coefficients.
   contact.surface.mu = std::min(surf1->FrictionPyramid()->MuPrimary(),
@@ -1199,11 +1180,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   contact.surface.mu3 = std::min(surf1->FrictionPyramid()->MuTorsion(),
                                  surf2->FrictionPyramid()->MuTorsion());
 
-  std::cout << "OG mu: " << contact.surface.mu << " " << contact.surface.mu2 << " " << contact.surface.mu3 << std::endl;
-
-  //contact.fdir1[0] = 0;
-  //contact.fdir1[1] = 0;
-  //contact.fdir1[2] = 0;
 
   // Combine the slip values
   // The slip is equivalent to the inverse of a viscous damping term
@@ -1298,7 +1274,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(_collision2->GetCollisionId());
 
-  std::cout << "Collision IDs : " << b1 << " " << b2 << std::endl;
 
   // Add a new contact to the manager. This will return nullptr if no one is
   // listening for contact information.
@@ -1310,7 +1285,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Create a joint feedback mechanism
   if (contactFeedback)
   {
-    std::cout << "Contact feedback section" << std::endl;
     if (this->dataPtr->jointFeedbackIndex <
         this->dataPtr->jointFeedbacks.size())
       jointFeedback =
@@ -1329,12 +1303,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Create a joint for each contact
   for (unsigned int j = 0; j < numc; ++j)
   {
-    std::cout << "Creating a joint" << std::endl;
     contact.geom = _contactCollisions[this->dataPtr->indices[j]];
-
-    auto temp = _contactCollisions[this->dataPtr->indices[j]];
-    std::cout << "Pos : " << temp.pos[0] << " " << temp.pos[1] << " " << temp.pos[2] << std::endl;
-    std::cout << "Normal : " << temp.normal[0] << " " << temp.normal[1] << " " << temp.normal[2] << std::endl;
 
     // Create the contact joint. This introduces the contact constraint to
     // ODE
@@ -1344,7 +1313,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     // Store contact information.
     if (contactFeedback && jointFeedback)
     {
-      std::cout << "Joint feedback section" << std::endl;
       // Store the contact depth
       contactFeedback->depths[j] =
         _contactCollisions[this->dataPtr->indices[j]].depth;
@@ -1374,7 +1342,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
         !_collision2->GetSurface()->collideWithoutContact)
       dJointAttach(contactJoint, b1, b2);
   }
-  std::cout << "Collide fcn END ---- " << std::this_thread::get_id() << "\n" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -1719,115 +1686,32 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
   return true;
 }
 
-int ApplyPlowingEffect(dContactGeom * _contactCollisions, void * c1)
+void ApplyPlowingEffect(double coeff_force, double coeff_torque , void * c1)
 {
-  // Angle of rotation must be decided by mod of velocity
-  // Direction of rotation by directin of velocity
-  // Axis of rotation = fd
-
   // Calculate velocity
   ODECollision* _collision1= (ODECollision*)c1;
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
+
+  // Opposing force
   auto linear_vel = dBodyGetLinearVel(b1);
-  std::cout << "Linear vel " << linear_vel[0] << " " << linear_vel[1] << " " << linear_vel[2] << std::endl;
-
-  dVector3 jt_axis;
-  dJointGetHingeAxis(dBodyGetJoint(b1,0), jt_axis);
-  auto rot_axis = ignition::math::Vector3d(jt_axis[0], jt_axis[1], jt_axis[2]).Normalize();
-
-  // Get V . (N X J) , velocity component along NxJ
-  auto N_cross_J = ignition::math::Vector3d(
-      _contactCollisions[0].normal[0],
-      _contactCollisions[0].normal[1],
-      _contactCollisions[0].normal[2]).Cross(rot_axis);
-
-  double vel = ignition::math::Vector3d(linear_vel[0], linear_vel[1], linear_vel[2]).Dot(N_cross_J.Normalize());
-  double max_angle = 15 * 3.1416/180;
-  double dead_zone_vel = 1.0;
-  double k = 0.01;
-
-  if (std::abs(vel) <= std::abs(dead_zone_vel)) return 1;
-
-  // Get angle by which the normal and contact pt must be perturbed
-  auto theta = GetRotationAngle(max_angle, dead_zone_vel, k, vel);
-
-  // ----- Rotate normal -----
-  auto old_normal = ignition::math::Vector3d(
-      _contactCollisions[0].normal[0],
-      _contactCollisions[0].normal[1],
-      _contactCollisions[0].normal[2]);
-
-  auto new_normal = RotateVecAbout(old_normal, rot_axis, theta);
-  std::cout << "Velocity component along NxJ: " << vel <<std::endl;
-  std::cout << "Angle of rotation: " << theta*180/3.1416 << std::endl;
-  std::cout << "New normal: " << new_normal << std::endl;
-
-  // ---- Rotate contact point ----
-  // Get vector from centre of wheel to contact point
-  ignition::math::Vector3d centre_to_contact(0, 0, 0);
+  auto linear_vel_vec = ignition::math::Vector3d(linear_vel[0], linear_vel[1], linear_vel[2]);
+  
   auto centre_pos = dBodyGetPosition(b1);
-  for (int i = 0; i < 3; i++) centre_to_contact[i] = _contactCollisions[0].pos[i] - centre_pos[i];
+  auto f =  - coeff_force * linear_vel_vec.Length() * linear_vel_vec;
 
-  // Rotate centre_to_contact vector
-  auto centre_to_new_contact = RotateVecAbout(centre_to_contact, rot_axis, theta);
-  // Add to position of body to get new contact point
-  ignition::math::Vector3d new_contact_pos(0, 0, 0);
-  for (int i = 0; i < 3; i++) new_contact_pos[i] = centre_pos[i] + centre_to_new_contact[i];
+  //std::cout << "Fd :" << f << std::endl;
+  //std::cout << "Speed: " << linear_vel_vec.Length() << std::endl;
+  
+  dBodyAddForceAtPos(b1, f[0], f[1], f[2], centre_pos[0], centre_pos[1], centre_pos[2]);
 
-  std::cout << "Body pos: " << centre_pos[0] << " " << centre_pos[1] << " " << centre_pos[2] << std::endl;
-  std::cout << "Old pos: " << _contactCollisions[0].pos[0] 
-    << " " << _contactCollisions[0].pos[1] 
-    << " " << _contactCollisions[1].pos[2] << std::endl;
+  // Add opposing torque
+  auto angular_vel = dBodyGetAngularVel(b1);
+  auto angular_vel_vec = ignition::math::Vector3d(angular_vel[0], angular_vel[1], angular_vel[2]);
+	
+  auto t = -coeff_torque * angular_vel_vec.Length() * angular_vel_vec;
+  dBodyAddTorque(b1, t[0], t[1], t[2]);
 
-  std::cout << "New contact : " << new_contact_pos << std::endl;
-
-  // Apply changed normal and contact point
-  _contactCollisions[1].depth = 0;
-  _contactCollisions[1].g1 = _contactCollisions[0].g1;
-  _contactCollisions[1].g2 = _contactCollisions[0].g2;
-  _contactCollisions[1].side1 = _contactCollisions[0].side1;
-  _contactCollisions[1].side2 = _contactCollisions[0].side2;
-
-  for (int i = 0; i < 3; i++) {
-    _contactCollisions[1].pos[i] = new_contact_pos[i];
-    _contactCollisions[1].normal[i] = new_normal[i];
-    //_contactCollisions[1].normal[i] = _contactCollisions[0].normal[i];
-  }
-
-  return 2;
-
-}
-
-// Rodrigues' rotation formula to rotate vector
-ignition::math::Vector3d RotateVecAbout(ignition::math::Vector3d vec_v,
-    ignition::math::Vector3d k, double theta)
-{
-  ignition::math::Vector3d vec_k = ignition::math::Vector3d(k[0], k[1], k[2]).Normalize();
-
-  auto vec_v_rot = vec_v * cos(theta) + vec_k.Cross(vec_v) * sin(theta) 
-    + vec_k * (1 - cos(theta)) * vec_k.Dot(vec_v);
-
-  return vec_v_rot;
-
-}
-
-double GetRotationAngle(double max_angle, double dead_zone_vel, double slope, double vel)
-{
-  if (std::abs(vel) <= std::abs(dead_zone_vel)) {
-    return 0;
-  }
-
-  double result_angle;
-  if (vel > 0) {
-    result_angle = (vel - std::abs(dead_zone_vel)) * slope;
-  } else {
-    result_angle = (vel + std::abs(dead_zone_vel)) * slope;
-  }
-
-  if (result_angle > 0) {
-    return std::min(result_angle, std::abs(max_angle));
-  } else {
-    return std::max(result_angle, -std::abs(max_angle));
-  }
-
+  //auto bt = dBodyGetTorque(b1);
+  //std::cout << "Torque on body : "<< bt[0] << " " << bt[1] << " " << bt[2] << std::endl;
+  //std::cout << "Angular vel: " << angular_vel_vec << std::endl;
 }
