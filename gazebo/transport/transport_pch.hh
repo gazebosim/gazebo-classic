@@ -46,11 +46,12 @@
 #include <string>
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_for.h>
-#ifdef USE_LEGACY_TBB_TASK
+#include <tbb/version.h>
+#if TBB_MAJOR_VERSION < 2021
 #include <tbb/task.h>
 #else
 #undef emit
-#include <oneapi/tbb/task_group.h>
+#include <tbb/task_group.h>
 #define emit
 #endif
 #include <utility>
