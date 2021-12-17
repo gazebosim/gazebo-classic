@@ -44,15 +44,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
-#include <tbb/blocked_range.h>
-#include <tbb/parallel_for.h>
-#include <tbb/version.h>
-#if TBB_MAJOR_VERSION < 2021
-#include <tbb/task.h>
-#else
 #undef emit
-#include <tbb/task_group.h>
+#include <tbb/tbb.h>
 #define emit
-#endif
 #include <utility>
 #include <vector>
