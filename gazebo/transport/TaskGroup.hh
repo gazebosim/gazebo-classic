@@ -18,16 +18,14 @@
 #define _TASK_GROUP_HH_
 
 #include <utility>
-#include <tbb/version.h>
-
-// tbb::task was removed in v2021.01, so we need a workaround
-#if TBB_VERSION_MAJOR >= 2021
 
 // Emit is both a macro in Qt and a function defined by tbb
 #undef emit
-#include <tbb/task_group.h>
+#include <tbb/tbb.h>
 #define emit
 
+// tbb::task was removed in v2021.01, so we need a workaround
+#if TBB_VERSION_MAJOR >= 2021
 namespace gazebo {
   namespace transport {
     class TaskGroup
@@ -48,8 +46,6 @@ namespace gazebo {
   }
 }
 #else
-#include <tbb/task.h>
-
 namespace gazebo {
   namespace transport {
     class TaskGroup
