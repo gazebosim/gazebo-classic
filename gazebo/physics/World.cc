@@ -1091,7 +1091,7 @@ BasePtr World::BaseByName(const std::string &_name) const
 ModelPtr World::ModelById(unsigned int _id) const
 {
   return boost::dynamic_pointer_cast<Model>(
-      this->dataPtr->rootElement->GetById(_id));
+      this->dataPtr->rootElement->GetByIdRecursive(_id));
 }
 
 //////////////////////////////////////////////////

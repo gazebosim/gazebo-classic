@@ -23,7 +23,6 @@ if(WIN32 AND NOT UNIX)
 endif()
 
 include_directories(SYSTEM
-  ${CURL_INCLUDEDIR}
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
@@ -48,15 +47,11 @@ include_directories(SYSTEM
 # failures in clang.
 link_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${CURL_LIBDIR}
   ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
 )
 
-if (WIN32)
-  add_definitions(-DCURL_STATICLIB)
-endif()
 add_definitions(${Qt5Core_DEFINITIONS})
 set (CMAKE_AUTOMOC ON)
 
@@ -188,6 +183,8 @@ target_include_directories(SimpleTrackedVehiclePlugin SYSTEM PRIVATE
         ${CMAKE_SOURCE_DIR}/deps/opende/include)
 target_link_libraries(SimpleTrackedVehiclePlugin TrackedVehiclePlugin)
 add_dependencies(SimpleTrackedVehiclePlugin TrackedVehiclePlugin)
+
+target_link_libraries(StaticMapPlugin CURL::libcurl)
 
 target_link_libraries(WheelTrackedVehiclePlugin TrackedVehiclePlugin)
 add_dependencies(WheelTrackedVehiclePlugin TrackedVehiclePlugin)

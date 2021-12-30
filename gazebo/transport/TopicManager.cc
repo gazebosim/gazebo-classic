@@ -267,7 +267,9 @@ void TopicManager::ConnectPubToSub(const std::string &_topic,
                                    const SubscriptionTransportPtr _sublink)
 {
   PublicationPtr publication = this->FindPublication(_topic);
-  publication->AddSubscription(_sublink);
+  if (publication) {
+    publication->AddSubscription(_sublink);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -275,7 +277,9 @@ void TopicManager::DisconnectPubFromSub(const std::string &topic,
     const std::string &host, unsigned int port)
 {
   PublicationPtr publication = this->FindPublication(topic);
-  publication->RemoveSubscription(host, port);
+  if (publication) {
+    publication->RemoveSubscription(host, port);
+  }
 }
 
 //////////////////////////////////////////////////

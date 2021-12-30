@@ -17,14 +17,6 @@ if (HAVE_GDAL)
   include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
-if (CURL_FOUND)
-  include_directories(${CURL_INCLUDEDIR})
-  link_directories(${CURL_LIBDIR})
-  if (WIN32)
-    add_definitions(-DCURL_STATICLIB)
-  endif()
-endif()
-
 include_directories(${tinyxml_INCLUDE_DIRS})
 link_directories(${tinyxml_LIBRARY_DIRS})
 
@@ -226,6 +218,10 @@ set (remotery_sources
   RemoteryProfilerImpl.cc
 )
 
+set(profiler_headers
+  Profiler.hh
+)
+
 if (APPLE)
   set (remotery_sources ${remotery_sources}
     ./Remotery/lib/RemoteryMetal.mm
@@ -236,6 +232,7 @@ if (APPLE)
 endif()
 
 list(APPEND sources ${remotery_sources})
+list(APPEND headers_install ${profiler_headers})
 
 set(RMT_ENABLED 1)
 set(RMT_USE_TINYCRT 0)
@@ -312,7 +309,7 @@ target_link_libraries(gazebo_common
   ${libavformat_LIBRARIES}
   ${libavutil_LIBRARIES}
   ${libavdevice_LIBRARIES}
-  ${CURL_LIBRARIES}
+  CURL::libcurl
   ${libswscale_LIBRARIES}
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}

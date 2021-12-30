@@ -16,7 +16,6 @@ link_directories(
   ${SDFormat_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
   ${TBB_LIBRARY_DIR}
-  ${CURL_LIBDIR}
   ${IGNITION-MSGS_LIBRARY_DIRS}
 )
 
