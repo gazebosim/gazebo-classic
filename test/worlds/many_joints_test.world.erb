@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>-17 9 10  0 0.4 0</pose>
+      </camera>
+    </gui>
+
+    <physics type="ode">
+      <real_time_update_rate>0</real_time_update_rate>
+    </physics>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+<%
+  # Revolute joints
+  i = 0
+  y_positions = (0..19).step(2)
+  y_positions.each do |y_pos|
+    i_s = i.to_s
+    i = i + 1
+%>
+    <include>
+      <uri>model://demo_joint_types</uri>
+      <name>demo_joint_types_<%= i_s %></name>
+      <pose>0 <%= y_pos %> 0  0 0 0</pose>
+    </include>
+<%
+  end
+%>
+  </world>
+</sdf>

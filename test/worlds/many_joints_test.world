@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>-17 9 10  0 0.4 0</pose>
+      </camera>
+    </gui>
+
+    <physics type="ode">
+      <real_time_update_rate>0</real_time_update_rate>
+    </physics>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+
+    <include>
+      <uri>model://demo_joint_types</uri>
+      <name>demo_joint_types_0</name>
+      <pose>0 0 0  0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://demo_joint_types</uri>
+      <name>demo_joint_types_1</name>
+      <pose>0 2 0  0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://demo_joint_types</uri>
+      <name>demo_joint_types_2</name>
+      <pose>0 4 0  0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://demo_joint_types</uri>
+      <name>demo_joint_types_3</name>
+      <pose>0 6 0  0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://demo_joint_types</uri>
+      <name>demo_joint_types_4</name>
+      <pose>0 8 0  0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://demo_joint_types</uri>
+      <name>demo_joint_types_5</name>
+      <pose>0 10 0  0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://demo_joint_types</uri>
+      <name>demo_joint_types_6</name>
+      <pose>0 12 0  0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://demo_joint_types</uri>
+      <name>demo_joint_types_7</name>
+      <pose>0 14 0  0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://demo_joint_types</uri>
+      <name>demo_joint_types_8</name>
+      <pose>0 16 0  0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://demo_joint_types</uri>
+      <name>demo_joint_types_9</name>
+      <pose>0 18 0  0 0 0</pose>
+    </include>
+
+  </world>
+</sdf>
