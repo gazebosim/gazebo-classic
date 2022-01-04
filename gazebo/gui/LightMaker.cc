@@ -115,6 +115,8 @@ bool LightMaker::Init()
   this->dataPtr->light->Load();
   scene->AddLight(this->dataPtr->light);
 
+  this->msg.clear_name();
+  this->dataPtr->light->UpdateFromMsg(this->msg);
   this->dataPtr->light->SetLightType(this->lightTypename);
   this->dataPtr->light->SetPosition(ignition::math::Vector3d(0, 0, 1));
   if (this->lightTypename == "directional")

@@ -156,14 +156,21 @@ void Light::UpdateSDFFromMsg(const msgs::Light &_msg)
 //////////////////////////////////////////////////
 void Light::UpdateFromMsg(ConstLightPtr &_msg)
 {
-  this->UpdateSDFFromMsg(*_msg);
+  if (_msg)
+    this->UpdateFromMsg(*_msg);
+}
+
+//////////////////////////////////////////////////
+void Light::UpdateFromMsg(const msgs::Light &_msg)
+{
+  this->UpdateSDFFromMsg(_msg);
 
   this->Update();
 
-  if (_msg->has_pose())
+  if (_msg.has_pose())
   {
-    this->SetPosition(msgs::ConvertIgn(_msg->pose().position()));
-    this->SetRotation(msgs::ConvertIgn(_msg->pose().orientation()));
+    this->SetPosition(msgs::ConvertIgn(_msg.pose().position()));
+    this->SetRotation(msgs::ConvertIgn(_msg.pose().orientation()));
   }
 }
 
@@ -622,6 +629,15 @@ bool Light::CastShadows() const
 }
 
 //////////////////////////////////////////////////
+double Light::SpotInnerAngle() const
+{
+  if (this->dataPtr->light->getType() != Ogre::Light::LT_SPOTLIGHT)
+    return std::numeric_limits<double>::quiet_NaN();
+
+  return this->dataPtr->light->getSpotlightInnerAngle().valueRadians();
+}
+
+//////////////////////////////////////////////////
 void Light::SetSpotInnerAngle(const double _angle)
 {
   sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("spot");
@@ -637,6 +653,15 @@ void Light::SetSpotInnerAngle(const double _angle)
 }
 
 //////////////////////////////////////////////////
+double Light::SpotOuterAngle() const
+{
+  if (this->dataPtr->light->getType() != Ogre::Light::LT_SPOTLIGHT)
+    return std::numeric_limits<double>::quiet_NaN();
+
+  return this->dataPtr->light->getSpotlightOuterAngle().valueRadians();
+}
+
+//////////////////////////////////////////////////
 void Light::SetSpotOuterAngle(const double _angle)
 {
   sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("spot");
@@ -649,6 +674,15 @@ void Light::SetSpotOuterAngle(const double _angle)
         Ogre::Radian(elem->Get<double>("outer_angle")),
         elem->Get<double>("falloff"));
   }
+}
+
+//////////////////////////////////////////////////
+double Light::SpotFalloff() const
+{
+  if (this->dataPtr->light->getType() != Ogre::Light::LT_SPOTLIGHT)
+    return std::numeric_limits<double>::quiet_NaN();
+
+  return this->dataPtr->light->getSpotlightFalloff();
 }
 
 //////////////////////////////////////////////////
