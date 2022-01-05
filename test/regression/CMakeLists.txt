@@ -52,6 +52,10 @@ set(tests
 )
 gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
+add_dependencies(${TEST_TYPE}_3125_slow_loading_model_spawn
+                 SlowLoadingSensorPlugin
+                 WorldSpawnModelPlugin)
+
 set(display_tests
 )
 

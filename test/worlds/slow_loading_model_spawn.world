@@ -8,7 +8,7 @@
       <uri>model://sun</uri>
     </include>
 
-    <ignition:model_plugin_loading_timeout>30</ignition:model_plugin_loading_timeout>
+    <ignition:model_plugin_loading_timeout>5</ignition:model_plugin_loading_timeout>
     <plugin filename="libWorldSpawnModelPlugin.so" name="world_spawn_model">
       <sdf version="1.6">
         <model name="slow_loading_model">
