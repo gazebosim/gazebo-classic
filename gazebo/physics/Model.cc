@@ -1051,9 +1051,18 @@ void Model::LoadPlugins(unsigned int _timeout)
       iterations++;
     }
 
-    // Load the plugins if the sensors have been loaded, or if there
-    // are no sensors attached to the model.
-    if (iterations < maxIterations)
+    // Print an error message if sensors still haven't been loaded.
+    if (iterations >= maxIterations)
+    {
+      gzerr << "Sensors failed to initialize when loading model["
+        << this->GetName() << "] via the factory mechanism."
+        << " Model plugins may not function properly."
+        << " Consider setting <ignition:model_plugin_loading_timeout/>"
+        << " to a value larger than " << _timeout << " in the world file."
+        << std::endl;
+    }
+
+    // Load the model plugins
     {
       // Load the plugins
       sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
@@ -1062,12 +1071,6 @@ void Model::LoadPlugins(unsigned int _timeout)
         this->LoadPlugin(pluginElem);
         pluginElem = pluginElem->GetNextElement("plugin");
       }
-    }
-    else
-    {
-      gzerr << "Sensors failed to initialize when loading model["
-        << this->GetName() << "] via the factory mechanism."
-        << " Plugins for the model will not be loaded.\n";
     }
   }
 
