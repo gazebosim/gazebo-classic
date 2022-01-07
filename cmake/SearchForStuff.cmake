@@ -676,6 +676,13 @@ else()
 endif()
 
 ########################################
+# Find python3, which is used by tools/check_test_ran.py
+find_package(PythonInterp 3)
+if (NOT EXISTS ${PYTHON_EXECUTABLE})
+  BUILD_WARNING("python3 not found. The check_test_ran.py script will cause tests to fail.")
+endif()
+
+########################################
 # Find xsltproc, which is used by tools/check_test_ran.py
 find_program(XSLTPROC xsltproc)
 if (NOT EXISTS ${XSLTPROC})
