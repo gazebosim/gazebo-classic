@@ -49,7 +49,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
 

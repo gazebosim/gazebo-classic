@@ -15,7 +15,7 @@
  *
  */
 #include <vector>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/thread/mutex.hpp>
 #include <sdf/sdf.hh>
 

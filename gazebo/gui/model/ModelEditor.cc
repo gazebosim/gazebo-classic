@@ -15,7 +15,7 @@
  *
 */
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <string>
 
 #include "gazebo/gazebo_config.h"

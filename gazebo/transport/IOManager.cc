@@ -15,7 +15,7 @@
  *
 */
 #include <atomic>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/thread/thread.hpp>
 #include <iostream>
 #include "gazebo/transport/IOManager.hh"

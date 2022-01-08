@@ -17,7 +17,7 @@
 /* Desc: Contact Visualization Class
  * Author: Nate Koenig
  */
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include <ignition/common/Profiler.hh>
 

@@ -17,7 +17,7 @@
 #ifndef _GAZEBO_TRANSPORTIFACE_HH_
 #define _GAZEBO_TRANSPORTIFACE_HH_
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <string>
 #include <list>
 #include <map>

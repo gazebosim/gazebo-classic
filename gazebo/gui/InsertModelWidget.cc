@@ -18,7 +18,7 @@
 #include <fstream>
 #include <cstdlib>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sdf/sdf.hh>

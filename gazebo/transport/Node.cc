@@ -15,7 +15,7 @@
  *
 */
 #include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 

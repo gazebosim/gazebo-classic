@@ -19,7 +19,7 @@
 #include <tbb/blocked_range.h>
 #include <float.h>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <ignition/math/Pose3.hh>

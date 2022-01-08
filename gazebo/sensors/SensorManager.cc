@@ -16,7 +16,7 @@
 */
 
 #include <functional>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Model.hh"

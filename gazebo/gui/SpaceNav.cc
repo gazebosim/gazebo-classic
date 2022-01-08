@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <gazebo/gazebo_config.h>
 #ifdef HAVE_SPNAV
 #include <spnav.h>

@@ -15,7 +15,7 @@
  *
 */
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/function.hpp>
 #include "gazebo/common/WeakBind.hh"
 #include "SubscriptionTransport.hh"

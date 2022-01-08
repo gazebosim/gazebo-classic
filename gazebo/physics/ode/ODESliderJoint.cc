@@ -18,7 +18,7 @@
  * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"

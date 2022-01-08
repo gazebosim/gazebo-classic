@@ -15,7 +15,7 @@
  *
 */
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <ignition/common/Profiler.hh>
 
 #include "gazebo/common/MeshManager.hh"
