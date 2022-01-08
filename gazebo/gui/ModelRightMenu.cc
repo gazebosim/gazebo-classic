@@ -34,6 +34,7 @@ using namespace gui;
 /////////////////////////////////////////////////
 ModelRightMenu::ModelRightMenu()
 {
+  using namespace boost::placeholders;
   KeyEventHandler::Instance()->AddReleaseFilter("ModelRightMenu",
         boost::bind(&ModelRightMenu::OnKeyRelease, this, _1));
 

@@ -97,6 +97,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
+  using namespace boost::placeholders;
   this->connections.push_back(
       gui::Events::ConnectFollow(
         boost::bind(&RenderWidget::OnFollow, this, _1)));

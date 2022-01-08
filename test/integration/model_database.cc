@@ -20,6 +20,7 @@
 #include "test_config.h"
 
 using namespace gazebo;
+using namespace boost::placeholders;
 
 int g_onModels = 0;
 int g_onModels1 = 0;

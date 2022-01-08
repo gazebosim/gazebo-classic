@@ -87,6 +87,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   this->serverConn.reset(new Connection());
 
   // Create a new TCP server on a free port
+  using namespace boost::placeholders;
   this->serverConn->Listen(0,
       boost::bind(&ConnectionManager::OnAccept, this, _1));
 
@@ -326,6 +327,7 @@ bool ConnectionManager::IsRunning() const
 //////////////////////////////////////////////////
 void ConnectionManager::OnMasterRead(const std::string &_data)
 {
+  using namespace boost::placeholders;
   if (this->masterConn && this->masterConn->IsOpen())
     this->masterConn->AsyncRead(
         boost::bind(&ConnectionManager::OnMasterRead, this, _1));
@@ -448,6 +450,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
 //////////////////////////////////////////////////
 void ConnectionManager::OnAccept(ConnectionPtr _newConnection)
 {
+  using namespace boost::placeholders;
   _newConnection->AsyncRead(
       boost::bind(&ConnectionManager::OnRead, this, _newConnection, _1));
 
@@ -463,6 +466,7 @@ void ConnectionManager::OnRead(ConnectionPtr _connection,
   if (_data.empty())
   {
     gzerr << "Data was empty, try again\n";
+    using namespace boost::placeholders;
     _connection->AsyncRead(
         boost::bind(&ConnectionManager::OnRead, this, _connection, _1));
     return;

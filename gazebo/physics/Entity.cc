@@ -199,6 +199,7 @@ void Entity::SetAnimation(common::PoseAnimationPtr _anim)
   this->prevAnimationTime = this->world->SimTime();
   this->animation = _anim;
   this->onAnimationComplete.clear();
+  using namespace boost::placeholders;
   this->animationConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Entity::UpdateAnimation, this, _1));
 }
@@ -212,6 +213,7 @@ void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
   this->prevAnimationTime = this->world->SimTime();
   this->animation = _anim;
   this->onAnimationComplete = _onComplete;
+  using namespace boost::placeholders;
   this->animationConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Entity::UpdateAnimation, this, _1));
 }

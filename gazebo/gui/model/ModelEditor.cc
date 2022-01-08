@@ -272,6 +272,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   connect(this->dataPtr->modelPalette->ModelCreator()->JointMaker(),
       SIGNAL(JointAdded()), this, SLOT(OnJointAdded()));
 
+  using namespace boost::placeholders;
   this->dataPtr->connections.push_back(
       gui::Events::ConnectCreateEntity(
         boost::bind(&ModelEditor::OnCreateEntity, this, _1, _2)));

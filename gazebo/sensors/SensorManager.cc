@@ -1008,6 +1008,7 @@ bool SensorManager::ImageSensorContainer::WaitForPrerendered(double _timeoutsec)
 /////////////////////////////////////////////////
 SimTimeEventHandler::SimTimeEventHandler()
 {
+  using namespace boost::placeholders;
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&SimTimeEventHandler::OnUpdate, this, _1));
 }

@@ -87,6 +87,7 @@ void Master::Init(uint16_t _port)
 {
   try
   {
+    using namespace boost::placeholders;
     this->dataPtr->connection->Listen(_port,
           boost::bind(&Master::OnAccept, this, _1));
   }
@@ -136,6 +137,7 @@ void Master::OnAccept(transport::ConnectionPtr _newConnection)
     this->dataPtr->connections[index] = _newConnection;
 
     // Start reading from the connection
+    using namespace boost::placeholders;
     _newConnection->AsyncRead(
         boost::bind(&Master::OnRead, this, index, _1));
   }
@@ -156,6 +158,7 @@ void Master::OnRead(const unsigned int _connectionIndex,
   transport::ConnectionPtr conn = this->dataPtr->connections[_connectionIndex];
 
   // Read the next message
+  using namespace boost::placeholders;
   if (conn && conn->IsOpen())
     conn->AsyncRead(boost::bind(&Master::OnRead, this, _connectionIndex, _1));
 

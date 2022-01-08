@@ -48,6 +48,7 @@ bool SubscriptionTransport::HandleMessage(MessagePtr _newMsg)
 {
   std::string data;
   _newMsg->SerializeToString(&data);
+  using namespace boost::placeholders;
   return this->HandleData(data, boost::bind(&dummy_callback_fn, _1), 0);
 }
 

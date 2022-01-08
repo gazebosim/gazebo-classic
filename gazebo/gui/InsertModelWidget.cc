@@ -128,6 +128,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
           this, SLOT(OnDirectoryChanged(const QString &)));
 
   // Connect a callback to trigger when the model paths are updated.
+  using namespace boost::placeholders;
   this->connections.push_back(
           common::SystemPaths::Instance()->updateModelRequest.Connect(
             boost::bind(&InsertModelWidget::OnModelUpdateRequest, this, _1)));

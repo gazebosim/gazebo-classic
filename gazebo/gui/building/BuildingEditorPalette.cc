@@ -261,6 +261,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->setLayout(scrollLayout);
 
   // Connections
+  using namespace boost::placeholders;
   this->dataPtr->connections.push_back(
       gui::editor::Events::ConnectSaveBuildingModel(
       boost::bind(&BuildingEditorPalette::OnSaveModel, this, _1)));

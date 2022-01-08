@@ -531,6 +531,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
   this->imgData = _imgData;
 
   this->gotImage = 0;
+  using namespace boost::placeholders;
   event::ConnectionPtr c =
     camSensor->Camera()->ConnectNewImageFrame(
         boost::bind(&ServerFixture::OnNewFrame,

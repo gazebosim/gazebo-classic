@@ -247,6 +247,7 @@ namespace gazebo
         ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
         {
+          using namespace boost::placeholders;
           boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
           this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
                 new CallbackHelperT<M>(boost::bind(_fp, _obj, _1), _latching)));
@@ -306,6 +307,7 @@ namespace gazebo
         ops.Init(decodedTopic, shared_from_this(), _latching);
 
         {
+          using namespace boost::placeholders;
           boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
           this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
                 new RawCallbackHelper(boost::bind(_fp, _obj, _1))));
