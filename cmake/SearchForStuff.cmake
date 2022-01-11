@@ -676,6 +676,20 @@ else()
 endif()
 
 ########################################
+# Find python3, which is used by tools/check_test_ran.py
+if (${CMAKE_VERSION} VERSION_LESS 3.12)
+  find_package(PythonInterp 3)
+else()
+  find_package(Python3 COMPONENTS Interpreter)
+  if (Python3_FOUND)
+    set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
+  endif()
+endif()
+if (NOT EXISTS ${PYTHON_EXECUTABLE})
+  BUILD_WARNING("python3 not found. The check_test_ran.py script will cause tests to fail.")
+endif()
+
+########################################
 # Find xsltproc, which is used by tools/check_test_ran.py
 find_program(XSLTPROC xsltproc)
 if (NOT EXISTS ${XSLTPROC})
