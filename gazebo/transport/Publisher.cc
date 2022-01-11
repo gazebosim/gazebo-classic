@@ -17,7 +17,6 @@
 /* Desc: Handles pushing messages out on a named topic
  * Author: Nate Koenig
  */
-#include <boost/bind/bind.hpp>
 
 #include <ignition/math/Helpers.hh>
 
