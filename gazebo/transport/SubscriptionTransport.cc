@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/function.hpp>
 #include "gazebo/transport/ConnectionManager.hh"
 #include "gazebo/transport/SubscriptionTransport.hh"
@@ -48,6 +48,7 @@ bool SubscriptionTransport::HandleMessage(MessagePtr _newMsg)
 {
   std::string data;
   _newMsg->SerializeToString(&data);
+  using namespace boost::placeholders;
   return this->HandleData(data, boost::bind(&dummy_callback_fn, _1), 0);
 }
 

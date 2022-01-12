@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -240,6 +240,7 @@ void TerrainEditorPalette::SetState(const std::string &_state)
 
     // Add an event filter, which allows the TerrainEditor to capture
     // mouse events.
+    using namespace boost::placeholders;
     MouseEventHandler::Instance()->AddPressFilter("terrain",
         boost::bind(&TerrainEditorPalette::OnMousePress, this, _1));
 

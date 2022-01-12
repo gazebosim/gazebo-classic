@@ -21,7 +21,7 @@
 #include <google/protobuf/message.h>
 
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>

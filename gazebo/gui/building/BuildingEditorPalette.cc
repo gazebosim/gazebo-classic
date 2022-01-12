@@ -17,7 +17,7 @@
  * thenounproject.com
  * Stairs designed by Brian Oppenlander from the thenounproject.com
 */
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "gazebo/gui/building/BuildingEditorPalettePrivate.hh"
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
@@ -261,6 +261,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->setLayout(scrollLayout);
 
   // Connections
+  using namespace boost::placeholders;
   this->dataPtr->connections.push_back(
       gui::editor::Events::ConnectSaveBuildingModel(
       boost::bind(&BuildingEditorPalette::OnSaveModel, this, _1)));

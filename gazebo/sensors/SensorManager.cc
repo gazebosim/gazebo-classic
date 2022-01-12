@@ -16,7 +16,7 @@
 */
 
 #include <functional>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Model.hh"
@@ -1008,6 +1008,7 @@ bool SensorManager::ImageSensorContainer::WaitForPrerendered(double _timeoutsec)
 /////////////////////////////////////////////////
 SimTimeEventHandler::SimTimeEventHandler()
 {
+  using namespace boost::placeholders;
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&SimTimeEventHandler::OnUpdate, this, _1));
 }

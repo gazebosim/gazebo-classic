@@ -15,8 +15,8 @@
  *
 */
 
+#include <functional>
 #include <sstream>
-#include <boost/bind.hpp>
 
 #include <ignition/math/Vector2.hh>
 
@@ -54,39 +54,39 @@ EditorView::EditorView(QWidget *_parent)
 
   this->connections.push_back(
       gui::editor::Events::ConnectCreateBuildingEditorItem(
-      boost::bind(&EditorView::OnCreateEditorItem, this, _1)));
+      std::bind(&EditorView::OnCreateEditorItem, this, std::placeholders::_1)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectColorSelected(
-      boost::bind(&EditorView::OnColorSelected, this, _1)));
+      std::bind(&EditorView::OnColorSelected, this, std::placeholders::_1)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectTextureSelected(
-      boost::bind(&EditorView::OnTextureSelected, this, _1)));
+      std::bind(&EditorView::OnTextureSelected, this, std::placeholders::_1)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectNewBuildingModel(
-      boost::bind(&EditorView::OnDiscardModel, this)));
+      std::bind(&EditorView::OnDiscardModel, this)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectAddBuildingLevel(
-      boost::bind(&EditorView::OnAddLevel, this)));
+      std::bind(&EditorView::OnAddLevel, this)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectDeleteBuildingLevel(
-      boost::bind(&EditorView::OnDeleteLevel, this)));
+      std::bind(&EditorView::OnDeleteLevel, this)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectChangeBuildingLevel(
-      boost::bind(&EditorView::OnChangeLevel, this, _1)));
+      std::bind(&EditorView::OnChangeLevel, this, std::placeholders::_1)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectShowFloorplan(
-      boost::bind(&EditorView::OnShowFloorplan, this)));
+      std::bind(&EditorView::OnShowFloorplan, this)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectShowElements(
-      boost::bind(&EditorView::OnShowElements, this)));
+      std::bind(&EditorView::OnShowElements, this)));
 
   this->mousePressRotation = 0;
 

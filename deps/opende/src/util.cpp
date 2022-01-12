@@ -26,7 +26,7 @@
 #include "joints/joint.h"
 #include "util.h"
 #include <boost/thread/recursive_mutex.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <gazebo/ode/timer.h>
 
 #undef REPORT_THREAD_TIMING

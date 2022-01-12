@@ -57,7 +57,7 @@
 #ifdef USE_TPROW
 // added for threading per constraint rows
 #include <boost/thread/recursive_mutex.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include "gazebo/ode/odeinit.h"
 #endif
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/gui/JointControlWidget.hh"
@@ -60,6 +60,7 @@ ToolsWidget::ToolsWidget(QWidget *_parent)
   this->setLayout(mainLayout);
 
   // Listen to entity selection events
+  using namespace boost::placeholders;
   this->connections.push_back(
       event::Events::ConnectSetSelectedEntity(
         boost::bind(&ToolsWidget::OnSetSelectedEntity, this, _1, _2)));

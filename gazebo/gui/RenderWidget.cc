@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <iomanip>
 
 #include "gazebo/common/CommonIface.hh"
@@ -97,6 +97,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
+  using namespace boost::placeholders;
   this->connections.push_back(
       gui::Events::ConnectFollow(
         boost::bind(&RenderWidget::OnFollow, this, _1)));

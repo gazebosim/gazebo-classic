@@ -25,7 +25,7 @@
 #include <iostream>
 
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/function.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>

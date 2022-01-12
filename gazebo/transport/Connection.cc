@@ -49,7 +49,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -289,6 +289,7 @@ void Connection::StopRead()
 //////////////////////////////////////////////////
 void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 {
+  using namespace boost::placeholders;
   this->EnqueueMsg(_buffer, boost::bind(&dummy_callback_fn, _1), 0, _force);
 }
 

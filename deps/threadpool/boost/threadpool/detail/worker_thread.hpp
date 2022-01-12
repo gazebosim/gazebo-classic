@@ -24,7 +24,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/exceptions.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 
 namespace boost { namespace threadpool { namespace detail 

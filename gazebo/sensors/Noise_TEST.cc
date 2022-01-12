@@ -21,7 +21,7 @@
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include <ignition/math/Rand.hh>
 
@@ -363,6 +363,7 @@ TEST_F(NoiseTest, OnApplyNoise)
   ASSERT_TRUE(noise != nullptr);
   EXPECT_TRUE(noise->GetNoiseType() == sensors::Noise::CUSTOM);
 
+  using namespace boost::placeholders;
   noise->SetCustomNoiseCallback(
     boost::bind(&OnApplyCustomNoise, _1));
 

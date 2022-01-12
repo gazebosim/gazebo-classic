@@ -20,7 +20,7 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <unistd.h>
 
 #include "gazebo/common/Console.hh"

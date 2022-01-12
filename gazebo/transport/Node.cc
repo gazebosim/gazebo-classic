@@ -15,7 +15,7 @@
  *
 */
 #include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
@@ -250,6 +250,7 @@ void Node::ProcessIncoming()
           for (liter = cbIter->second.begin();
               liter != cbIter->second.end(); ++liter)
           {
+            using namespace boost::placeholders;
             (*liter)->HandleData(*msgIter,
                 boost::bind(&dummy_callback_fn, _1), 0);
           }
@@ -312,6 +313,7 @@ void Node::InsertLatchedMsg(const std::string &_topic, const std::string &_msg)
     {
       if ((*liter)->GetLatching())
       {
+        using namespace boost::placeholders;
         (*liter)->HandleData(_msg, boost::bind(&dummy_callback_fn, _1), 0);
         (*liter)->SetLatching(false);
       }

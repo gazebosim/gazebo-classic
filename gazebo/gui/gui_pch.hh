@@ -22,7 +22,7 @@
  *    grep --include="*.hh" --include="*.cc" --no-filename -r "#include <" | sort -u
  */
 #include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>

@@ -17,7 +17,6 @@
 /* Desc: Handles pushing messages out on a named topic
  * Author: Nate Koenig
  */
-#include <boost/bind.hpp>
 
 #include <ignition/math/Helpers.hh>
 
@@ -212,6 +211,7 @@ void Publisher::SendMessage()
       // calling of OnPublishComplete() happens asynchronously though
       // (the subscriber callback SubscriptionTransport::HandleData() only
       // enqueues the message!).
+      using namespace boost::placeholders;
       int result = this->publication->Publish(*iter,
           common::weakBind(&Publisher::OnPublishComplete,
               this->shared_from_this(), _1), *pubIter);

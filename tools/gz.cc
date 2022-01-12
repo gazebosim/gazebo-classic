@@ -150,6 +150,7 @@ bool Command::Run(int _argc, char **_argv)
   }
 
   // The SDF find file callback.
+  using namespace boost::placeholders;
   sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
 
   // Hidden options

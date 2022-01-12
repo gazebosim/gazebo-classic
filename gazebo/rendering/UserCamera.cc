@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <ignition/common/Profiler.hh>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Vector2.hh>
