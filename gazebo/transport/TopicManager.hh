@@ -17,7 +17,7 @@
 #ifndef GAZEBO_TRANSPORT_TOPICMANAGER_HH_
 #define GAZEBO_TRANSPORT_TOPICMANAGER_HH_
 
-#include <boost/bind/bind.hpp>
+#include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <map>
 #include <list>

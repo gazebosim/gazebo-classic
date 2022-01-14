@@ -19,7 +19,7 @@
 #define GAZEBO_COMMON_WEAKBIND_HH_
 
 #include <boost/shared_ptr.hpp>
-#include <boost/bind/bind.hpp>
+#include <boost/bind.hpp>
 
 namespace gazebo
 {
