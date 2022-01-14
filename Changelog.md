@@ -3,34 +3,34 @@
 ## Gazebo 11.10.1 (2022-01-13)
 
 1. Revert boost/bind.hpp changes in header files
-    * [Pull request #3160](https://github.com/ignitionrobotics/gazebo/pull/3160)
+    * [Pull request #3160](https://github.com/osrf/gazebo/pull/3160)
 
 ## Gazebo 11.10.0 (2022-01-12)
 
 1. Use boost/bind/bind.hpp to fix warnings on Arch Linux
-    * [Pull request #3156](https://github.com/ignitionrobotics/gazebo/pull/3156)
+    * [Pull request #3156](https://github.com/osrf/gazebo/pull/3156)
     * Inspired by a contribution from Alex Dewar <alex.dewar@gmx.co.uk>
 
 1. Fix focal builds: use python3 with check_test_ran.py
-    * [Pull request #3155](https://github.com/ignitionrobotics/gazebo/pull/3155)
+    * [Pull request #3155](https://github.com/osrf/gazebo/pull/3155)
 
 1. Load model plugins even after sensor timeout
-    * [Pull request #3154](https://github.com/ignitionrobotics/gazebo/pull/3154)
+    * [Pull request #3154](https://github.com/osrf/gazebo/pull/3154)
 
 1. CMake exports: remove -std=c++11 flag
-    * [Pull request #3050](https://github.com/ignitionrobotics/gazebo/pull/3050)
+    * [Pull request #3050](https://github.com/osrf/gazebo/pull/3050)
     * A contribution from Guilhem Saurel <guilhem.saurel@laas.fr>
 
 1. Create github action ci
-    * [Pull request #3049](https://github.com/ignitionrobotics/gazebo/pull/3049)
+    * [Pull request #3049](https://github.com/osrf/gazebo/pull/3049)
     * A contribution from Tal Regev <tal.regev@gmail.com>
 
 1. Fix Windows build when using vcpkg
-    * [Pull request #3132](https://github.com/ignitionrobotics/gazebo/pull/3132)
+    * [Pull request #3132](https://github.com/osrf/gazebo/pull/3132)
     * A contribution from Akash Munagala <akash.munagala@gmail.com>
 
 1. Point light shadows
-    * [Pull request #3051](https://github.com/ignitionrobotics/gazebo/pull/3051)
+    * [Pull request #3051](https://github.com/osrf/gazebo/pull/3051)
 
 ## Gazebo 11.9.1 (2021-12-02)
 
