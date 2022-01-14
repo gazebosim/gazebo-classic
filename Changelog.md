@@ -1,5 +1,10 @@
 ## Gazebo 11
 
+## Gazebo 11.10.1 (2022-01-13)
+
+1. Revert boost/bind.hpp changes in header files
+    * [Pull request #3160](https://github.com/ignitionrobotics/gazebo/pull/3160)
+
 ## Gazebo 11.10.0 (2022-01-12)
 
 1. Use boost/bind/bind.hpp to fix warnings on Arch Linux
