@@ -18,8 +18,12 @@
 #ifndef GAZEBO_COMMON_WEAKBIND_HH_
 #define GAZEBO_COMMON_WEAKBIND_HH_
 
-#include <boost/shared_ptr.hpp>
+// This fixes compiler warnings, see #3147 and #3160
+#ifndef BOOST_BIND_GLOBAL_PLACEHOLDERS
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#endif
 #include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace gazebo
 {
