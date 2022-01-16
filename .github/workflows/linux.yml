@@ -39,15 +39,29 @@ jobs:
       - name: Man Page Support
         run: |
           sudo apt-get install ruby-ronn
-          
+
+      - name: Install lcov
+        run: |
+          sudo apt install lcov
+
       - name: Build Gazebo
         run: |
           mkdir build
           cd build
-          cmake ../
+          cmake -DCMAKE_BUILD_TYPE=coverage ../
           make -j $(nproc --all)
           
       - name: Optional tests suite compilation
         run: |
           cd build
-          make tests 
+          make tests
+
+      - name: Run tests suite
+        run: |
+          cd build
+          make test
+
+      - name: Make the coverage report
+        run: |
+          cd build
+          make coverage
