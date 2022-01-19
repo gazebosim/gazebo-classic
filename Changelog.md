@@ -5,6 +5,9 @@
 1. Revert boost/bind.hpp changes in header files
     * [Pull request #3160](https://github.com/osrf/gazebo/pull/3160)
 
+1. Fix duplicate vertex program name Ogre crash
+    * [Pull request #3161](https://github.com/osrf/gazebo/pull/3161)
+
 ## Gazebo 11.10.0 (2022-01-12)
 
 1. Use boost/bind/bind.hpp to fix warnings on Arch Linux
