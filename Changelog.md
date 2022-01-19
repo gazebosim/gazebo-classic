@@ -1,6 +1,6 @@
 ## Gazebo 11
 
-## Gazebo 11.10.1 (2022-01-13)
+## Gazebo 11.10.1 (2022-01-19)
 
 1. Revert boost/bind.hpp changes in header files
     * [Pull request #3160](https://github.com/osrf/gazebo/pull/3160)
