@@ -17,7 +17,11 @@
 #ifndef _GAZEBO_TRANSPORTIFACE_HH_
 #define _GAZEBO_TRANSPORTIFACE_HH_
 
-#include <boost/bind/bind.hpp>
+// This fixes compiler warnings, see #3147 and #3160
+#ifndef BOOST_BIND_GLOBAL_PLACEHOLDERS
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#endif
+#include <boost/bind.hpp>
 #include <string>
 #include <list>
 #include <map>
