@@ -222,7 +222,7 @@ ignition::math::Vector3d Collision::RelativeLinearVel() const
 ignition::math::Vector3d Collision::WorldLinearVel() const
 {
   if (this->link)
-    return this->link->WorldLinearVel();
+    return this->link->WorldLinearVel(this->RelativePose().Pos());
   else
     return ignition::math::Vector3d::Zero;
 }
