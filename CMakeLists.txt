@@ -194,6 +194,7 @@ set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
 # Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
 # we pass it to the compiler later.
 string(REPLACE "\n" "" OGRE_RESOURCE_PATH ${OGRE_RESOURCE_PATH})
+FILE(TO_CMAKE_PATH "${OGRE_RESOURCE_PATH}" OGRE_RESOURCE_PATH)
 
 
 # Check for DRI capable Display
