@@ -77,8 +77,6 @@
 
 #include "gazebo/physics/ode/ODEPhysicsPrivate.hh"
 
-ignition::math::Vector3d RotateVecAbout(ignition::math::Vector3d, ignition::math::Vector3d, double);
-void ApplyPlowingEffect(dContactGeom *, gazebo::physics::ODECollision *, double, double, double);
 double GetRotationAngle(double, double, double, double);
 
 
@@ -1168,24 +1166,46 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     contact.fdir1[2] = fd.Z();
 
     // Check for plowing parameters if friction direction is specified
-    auto collisionSdf = _collision1->GetSDF();
+    auto collision1Sdf = _collision1->GetSDF();
+    auto collision2Sdf = _collision2->GetSDF();
+
+    const std::string kPlowingTerrain =
+      "ignition:plowing_terrain";
+    const std::string kPlowingWheel =
+      "ignition:plowing_wheel";
+
+    sdf::ElementPtr wheelSdf = nullptr;
+    sdf::ElementPtr terrainSdf = nullptr;
+
+    if (collision1Sdf->HasElement(kPlowingWheel) && 
+	collision2Sdf->HasElement(kPlowingTerrain))
+    {
+      wheelSdf = collision1Sdf;
+      terrainSdf = collision2Sdf;
+    } else if (collision2Sdf->HasElement(kPlowingWheel) && 
+	collision1Sdf->HasElement(kPlowingTerrain))
+    {
+      wheelSdf = collision2Sdf;
+      terrainSdf = collision1Sdf;
+    }
 
     const std::string kPlowingMaxDegrees =
       "ignition:plowing_max_degrees";
     const std::string kPlowingSaturationVelocity =
       "ignition:plowing_saturation_velocity";
-    if (collisionSdf->HasElement(kPlowingMaxDegrees) &&
-        collisionSdf->HasElement(kPlowingSaturationVelocity))
+    if (wheelSdf && terrainSdf &&
+	wheelSdf->HasElement(kPlowingMaxDegrees) &&
+        wheelSdf->HasElement(kPlowingSaturationVelocity))
     {
       const std::string kPlowingDeadbandVelocity =
         "ignition:plowing_deadband_velocity";
       ignition::math::Angle plowingMaxAngle;
-      plowingMaxAngle.SetDegree(collisionSdf->Get<double>(kPlowingMaxDegrees));
+      plowingMaxAngle.SetDegree(wheelSdf->Get<double>(kPlowingMaxDegrees));
       double plowingSaturationVelocity =
-        collisionSdf->Get<double>(kPlowingSaturationVelocity);
+        wheelSdf->Get<double>(kPlowingSaturationVelocity);
       // Use deadband velocity = 0 if parameter is not set
       double plowingDeadbandVelocity =
-        collisionSdf->Get<double>(kPlowingDeadbandVelocity, 0.0).first;
+        wheelSdf->Get<double>(kPlowingDeadbandVelocity, 0.0).first;
 
       // compute slope
       double slope = plowingMaxAngle.Radian() / (plowingSaturationVelocity - plowingDeadbandVelocity);
@@ -1246,19 +1266,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
         contactPosition[2] = contactPositionCopy[2];
       }
     }
-  }
-
-  // Apply virtual force and torque
-  auto sdf_object = _collision1->GetSDF();
-
-  auto shift_contact = sdf_object->Get<bool>("foo:shift_contact");
-  if (shift_contact) {
-    double dead_zone_vel = sdf_object->Get<double>("foo:dead_zone_vel");
-    double max_angle_deg = sdf_object->Get<double>("foo:max_angle_deg");
-    double k = sdf_object->Get<double>("foo:k");
-    std::cout << "dead vel, max angle, k: " << dead_zone_vel << " " << max_angle_deg << " " << k << std::endl;
-
-    ApplyPlowingEffect(_contactCollisions, _collision1, max_angle_deg, dead_zone_vel, k);
   }
 
   // Set the friction coefficients.
@@ -1789,88 +1796,6 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     return PhysicsEngine::GetParam(_key, _value);
   }
   return true;
-}
-
-void ApplyPlowingEffect(dContactGeom * _contactCollisions, gazebo::physics::ODECollision * _collision1, double max_angle_deg, double dead_zone_vel, double k)
-{
-  // Angle of rotation must be decided by mod of velocity
-  // Direction of rotation by directin of velocity
-  // Axis of rotation = fd
-
-  // Calculate velocity
-  dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
-  auto linear_vel = dBodyGetLinearVel(b1);
-  std::cout << "Linear vel " << linear_vel[0] << " " << linear_vel[1] << " " << linear_vel[2] << std::endl;
-
-  dVector3 jt_axis;
-  dJointGetHingeAxis(dBodyGetJoint(b1,0), jt_axis);
-  auto rot_axis = ignition::math::Vector3d(jt_axis[0], jt_axis[1], jt_axis[2]).Normalize();
-
-  // Get V . (N X J) , velocity component along NxJ
-  auto N_cross_J = ignition::math::Vector3d(
-      _contactCollisions[0].normal[0],
-      _contactCollisions[0].normal[1],
-      _contactCollisions[0].normal[2]).Cross(rot_axis);
-
-  double vel = ignition::math::Vector3d(linear_vel[0], linear_vel[1], linear_vel[2]).Dot(N_cross_J.Normalize());
-  double max_angle = max_angle_deg * 3.1416/180;
-  //double dead_zone_vel = 1.0;
-  //double k = 0.01;
-
-  if (std::abs(vel) <= std::abs(dead_zone_vel)) return;
-
-  // Get angle by which the normal and contact pt must be perturbed
-  auto theta = GetRotationAngle(max_angle, dead_zone_vel, k, vel);
-
-  // ----- Rotate normal -----
-  auto old_normal = ignition::math::Vector3d(
-      _contactCollisions[0].normal[0],
-      _contactCollisions[0].normal[1],
-      _contactCollisions[0].normal[2]);
-
-  auto new_normal = RotateVecAbout(old_normal, rot_axis, theta);
-  std::cout << "Velocity component along NxJ: " << vel <<std::endl;
-  std::cout << "Angle of rotation: " << theta*180/3.1416 << std::endl;
-  std::cout << "New normal: " << new_normal << std::endl;
-
-  // ---- Rotate contact point ----
-  // Get vector from centre of wheel to contact point
-  ignition::math::Vector3d centre_to_contact(0, 0, 0);
-  auto centre_pos = dBodyGetPosition(b1);
-  for (int i = 0; i < 3; i++) centre_to_contact[i] = _contactCollisions[0].pos[i] - centre_pos[i];
-
-  // Rotate centre_to_contact vector
-  auto centre_to_new_contact = RotateVecAbout(centre_to_contact, rot_axis, theta);
-  // Add to position of body to get new contact point
-  ignition::math::Vector3d new_contact_pos(0, 0, 0);
-  for (int i = 0; i < 3; i++) new_contact_pos[i] = centre_pos[i] + centre_to_new_contact[i];
-
-  std::cout << "Body pos: " << centre_pos[0] << " " << centre_pos[1] << " " << centre_pos[2] << std::endl;
-  std::cout << "Old pos: " << _contactCollisions[0].pos[0] 
-    << " " << _contactCollisions[0].pos[1] 
-    << " " << _contactCollisions[1].pos[2] << std::endl;
-
-  std::cout << "New contact : " << new_contact_pos << std::endl;
-
-  // Apply changed normal and contact point
-  for (int i = 0; i < 3; i++) {
-    _contactCollisions[0].normal[i] = new_normal[i];
-    _contactCollisions[0].pos[i] = new_contact_pos[i];
-  }
-
-}
-
-// Rodrigues' rotation formula to rotate vector
-ignition::math::Vector3d RotateVecAbout(ignition::math::Vector3d vec_v,
-    ignition::math::Vector3d k, double theta)
-{
-  ignition::math::Vector3d vec_k = ignition::math::Vector3d(k[0], k[1], k[2]).Normalize();
-
-  auto vec_v_rot = vec_v * cos(theta) + vec_k.Cross(vec_v) * sin(theta) 
-    + vec_k * (1 - cos(theta)) * vec_k.Dot(vec_v);
-
-  return vec_v_rot;
-
 }
 
 double GetRotationAngle(double max_angle, double dead_zone_vel, double slope, double vel)
