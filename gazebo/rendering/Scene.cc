@@ -300,6 +300,7 @@ void Scene::Clear()
 
   delete this->dataPtr->terrain;
   this->dataPtr->terrain = NULL;
+  this->dataPtr->terrainVisualId.reset();
 
   while (!this->dataPtr->visuals.empty())
     this->RemoveVisual(this->dataPtr->visuals.begin()->first);
@@ -2847,6 +2848,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
         m.clear_material();
         visual->Load(msgs::VisualToSDF(m));
 
+        this->dataPtr->terrainVisualId.emplace(visual->GetId());
         this->dataPtr->terrain = new Heightmap(shared_from_this());
         // check the material fields and set material if it is specified
         if (_msg->has_material())
@@ -3407,6 +3409,14 @@ void Scene::RemoveVisual(uint32_t _id)
   if (iter != this->dataPtr->visuals.end())
   {
     VisualPtr vis = iter->second;
+    // Remove the terrain object if this is the heightmap visual
+    if (this->dataPtr->terrainVisualId &&
+        *this->dataPtr->terrainVisualId == _id)
+    {
+      delete this->dataPtr->terrain;
+      this->dataPtr->terrain = NULL;
+      this->dataPtr->terrainVisualId.reset();
+    }
     // Remove all projectors attached to the visual
     auto piter = this->dataPtr->projectors.begin();
     while (piter != this->dataPtr->projectors.end())
