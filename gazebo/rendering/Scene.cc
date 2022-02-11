@@ -2866,9 +2866,17 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
           visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
         }
 
-        auto m = *_msg.get();
-        m.clear_material();
-        visual->Load(msgs::VisualToSDF(m));
+        {
+          // Copy the const _msg so that we can clear materials before
+          // loading from message
+          msgs::Visual *msgMutable = new msgs::Visual(*_msg.get());
+          msgMutable->clear_material();
+
+          // assign ownership of the copy to a const shared_ptr so it will be
+          // deleted when exiting this scope
+          ConstVisualPtr msgShared(static_cast<const msgs::Visual*>(msgMutable));
+          visual->LoadFromMsg(msgShared);
+        }
 
         // Store VisualId corresponding to terrain
         this->dataPtr->terrainVisualId.emplace(visual->GetId());
