@@ -2843,12 +2843,36 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       {
         // create a dummy visual for loading heightmap visual plugin
         // TODO make heightmap a visual to avoid special treatment here?
-        VisualPtr visual(new Visual(_msg->name(), this->dataPtr->worldVisual));
+        VisualPtr visual;
+
+        // If the visual has a parent which is not the name of the scene...
+        if (_msg->has_parent_name() && _msg->parent_name() != this->Name())
+        {
+          // Make sure the parent visual exists before trying to add a child
+          // visual
+          VisualPtr parent = this->GetVisual(_msg->parent_name());
+          if (!parent)
+            return false;
+
+          visual.reset(new Visual(_msg->name(), parent));
+        }
+        else
+        {
+          // Make sure the world visual exists before trying to add a child visual
+          if (!this->dataPtr->worldVisual)
+            return false;
+
+          // Add a visual that is attached to the scene root
+          visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
+        }
+
         auto m = *_msg.get();
         m.clear_material();
         visual->Load(msgs::VisualToSDF(m));
 
+        // Store VisualId corresponding to terrain
         this->dataPtr->terrainVisualId.emplace(visual->GetId());
+
         this->dataPtr->terrain = new Heightmap(shared_from_this());
         // check the material fields and set material if it is specified
         if (_msg->has_material())
@@ -2870,6 +2894,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
         const double skirtLen = this->dataPtr->heightmapSkirtLength;
         this->dataPtr->terrain->SetSkirtLength(skirtLen);
         this->dataPtr->terrain->LoadFromMsg(_msg);
+
+        this->dataPtr->visuals[visual->GetId()] = visual;
       }
     }
     return true;
