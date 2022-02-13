@@ -21,10 +21,7 @@
  * To get a starting list for this file, I use the command:
  *    grep --include="*.hh" --include="*.cc" --no-filename -r "#include <" | sort -u
  */
-#include <tbb/task.h>
-#ifndef TBB_VERSION_MAJOR
-#include <tbb/version.h>
-#endif
+
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
@@ -48,6 +45,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <tbb/task.h>
+#ifndef TBB_VERSION_MAJOR
+#include <tbb/version.h>
+#endif
 #if TBB_VERSION_MAJOR < 2021
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_for.h>
