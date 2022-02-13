@@ -182,9 +182,8 @@ namespace gazebo
               {
                 transport::PublisherPtr pub = this->Advertise<M>(_topic);
 #if TBB_VERSION_MAJOR < 2021
-                PublishTask *task = new(tbb::task::allocate_root())
-                
-                PublishTask(pub, _message);
+                PublishTask *task = new(tbb::task::allocate_root()) 
+                  PublishTask(pub, _message);
 
                 tbb::task::enqueue(*task);
                 return;

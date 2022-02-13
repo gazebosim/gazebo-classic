@@ -335,8 +335,7 @@ namespace gazebo
                 {
 #if TBB_VERSION_MAJOR < 2021
                   ConnectionReadTask *task = new(tbb::task::allocate_root())
-
-                  ConnectionReadTask(boost::get<0>(_handler), data);
+                        ConnectionReadTask(boost::get<0>(_handler), data);
                   tbb::task::enqueue(*task);
 
                   // Non-tbb version:
