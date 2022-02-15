@@ -184,7 +184,7 @@ namespace gazebo
               {
                 transport::PublisherPtr pub = this->Advertise<M>(_topic);
 #if TBB_VERSION_MAJOR < 2021
-                PublishTask *task = new(tbb::task::allocate_root()) 
+                PublishTask *task = new(tbb::task::allocate_root())
                   PublishTask(pub, _message);
 
                 tbb::task::enqueue(*task);
@@ -448,7 +448,7 @@ namespace gazebo
 
       /// \brief List of newly arrive messages
       private: std::map<std::string, std::list<MessagePtr> > incomingMsgsLocal;
-      
+
 #if TBB_VERSION_MAJOR >= 2021
       /// \brief For managing asynchronous tasks with tbb
       private: TaskGroup taskGroup;
