@@ -325,6 +325,12 @@ if (PKG_CONFIG_FOUND)
       endif(tbb_library)
     endif (NOT TBB_FOUND)
   endif (NOT TBB_FOUND)
+  set(HAVE_TBB_GREATER_OR_EQUAL_2021 OFF)
+  if (DEFINED TBB_VERSION)
+    if (${TBB_VERSION} VERSION_GREATER_EQUAL "2021.0")
+      set(HAVE_TBB_GREATER_OR_EQUAL_2021 ON)
+    endif()
+  endif()
 
   #################################################
   # Find OGRE
