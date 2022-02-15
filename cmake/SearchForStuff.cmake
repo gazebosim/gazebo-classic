@@ -845,7 +845,6 @@ find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 )
 
 find_library(QWT_LIBRARY NAMES qwt-qt5 qwt PATHS
-  /usr/lib
   /usr/local/lib
   /usr/local/lib/qwt.framework
   ${QWT_WIN_LIBRARY_DIR}
