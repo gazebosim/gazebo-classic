@@ -24,8 +24,6 @@
 #include <tbb/tbb.h>
 #define emit
 
-// tbb::task was removed in v2021.01, so we need a workaround
-#if TBB_VERSION_MAJOR >= 2021
 namespace gazebo {
   namespace transport {
     class TaskGroup
@@ -45,38 +43,5 @@ namespace gazebo {
     };
   }
 }
-#else
-namespace gazebo {
-  namespace transport {
-    class TaskGroup
-    {
-      /// \brief A helper class which provides the requisite execute() method
-      /// required by tbb.
-      private: template<class T> class TaskWrapper : public tbb::task
-      {
-        public: template<class... Args> TaskWrapper<T>(Args&&... args)
-          : functor(std::forward<Args>(args)...)
-        {
-        }
 
-        public: tbb::task *execute()
-                {
-                  this->functor();
-                  return nullptr;
-                }
-        
-        private: T functor;
-      };
-
-      public: template<class Functor, class... Args> void run(Args&&... args)
-              {
-                TaskWrapper<Functor> *task = new (tbb::task::allocate_root())
-                    TaskWrapper<Functor>(std::forward<Args>(args)...);
-                tbb::task::enqueue(*task);
-              }
-    };
-  }
-}
-
-#endif
 #endif
