@@ -71,6 +71,12 @@ if (WIN32)
   target_link_libraries(gazebo_transport ws2_32 Iphlpapi)
 endif()
 
+if(${CMAKE_VERSION} VERSION_LESS "3.13.0")
+  link_directories(${TBB_LIBRARY_DIRS})
+else()
+  target_link_directories(gazebo_transport PUBLIC ${TBB_LIBRARY_DIRS})
+endif()
+
 if (USE_PCH)
     add_pch(gazebo_transport transport_pch.hh ${Boost_PKGCONFIG_CFLAGS} "-I${PROTOBUF_INCLUDE_DIR}" "-I${TBB_INCLUDEDIR}")
 endif()

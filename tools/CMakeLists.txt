@@ -49,6 +49,7 @@ target_link_libraries(gz
  gazebo_gui
  gazebo_physics
  gazebo_sensors
+ gazebo_transport
  ${Qt5Core_LIBRARIES}
  ${Qt5Widgets_LIBRARIES}
  ${Boost_LIBRARIES}
