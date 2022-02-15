@@ -18,7 +18,9 @@
 #ifndef GAZEBO_TRANSPORT_NODE_HH_
 #define GAZEBO_TRANSPORT_NODE_HH_
 
+#undef emit
 #include <tbb/task.h>
+#define emit
 #ifndef TBB_VERSION_MAJOR
 #include <tbb/version.h>
 #endif

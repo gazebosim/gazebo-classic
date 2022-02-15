@@ -17,7 +17,9 @@
 #ifndef _CONNECTION_HH_
 #define _CONNECTION_HH_
 
+#undef emit
 #include <tbb/task.h>
+#define emit
 
 // If TBB_VERSION_MAJOR is not defined, this means that
 // tbb >= 2021 and we can include the tbb/version.h header
