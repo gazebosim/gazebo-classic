@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _TASK_GROUP_HH_
-#define _TASK_GROUP_HH_
+#ifndef GAZEBO_TRANSPORT_TASKGROUP_HH_
+#define GAZEBO_TRANSPORT_TASKGROUP_HH_
 
 #include <utility>
 
