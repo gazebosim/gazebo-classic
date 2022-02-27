@@ -72,15 +72,15 @@ namespace gazebo
       public: tbb::task *execute()
 #else
       /// \brief Executes the publish task.
-      public: void operator()()
+      public: void operator()() const
 #endif
               {
                 this->pub->WaitForConnection();
                 this->pub->Publish(*this->msg, true);
                 this->pub->SendMessage();
                 delete this->msg;
-                this->pub.reset();
 #if TBB_VERSION_MAJOR < 2021
+                this->pub.reset();
                 return NULL;
 #endif
               }
