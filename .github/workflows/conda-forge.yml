@@ -1,0 +1,104 @@
+name: C++ CI Workflow with conda-forge dependencies
+
+on:
+  push:
+    branches:
+    - gazebo11
+  pull_request:
+  schedule:
+  # * is a special character in YAML so you have to quote this string
+  # Execute a "nightly" build at 2 AM UTC
+  - cron:  '0 2 * * *'
+
+jobs:
+  build:
+    name: '[${{ matrix.os }}@${{ matrix.build_type }}@conda]'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build_type: [Release]
+        os: [ubuntu-latest, windows-2019, macos-latest]
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        mamba-version: "*"
+        channels: conda-forge
+        channel-priority: true
+
+    - name: Dependencies
+      shell: bash -l {0}
+      run: |
+        # Workaround for https://github.com/conda-incubator/setup-miniconda/issues/186
+        conda config --remove channels defaults
+        # Compilation related dependencies
+        mamba install cmake compilers make ninja pkg-config
+        # Actual dependencies
+        mamba install libprotobuf libsdformat libignition-cmake2 libignition-math6 libignition-transport8 libignition-common3 libignition-fuel-tools4 qt=5.12.9=*_4 ogre=1.10 freeimage curl tbb-devel qwt tinyxml2 libccd boost-cpp libcurl tinyxml bzip2 zlib ffmpeg graphviz libgdal libusb bullet-cpp dartsim simbody hdf5 openal-soft
+
+    - name: Linux-only Dependencies [Linux]
+      if: contains(matrix.os, 'ubuntu')
+      shell: bash -l {0}
+      run: |
+        # See https://github.com/robotology/robotology-superbuild/issues/477
+        mamba install expat-cos6-x86_64 libselinux-cos6-x86_64 libxau-cos6-x86_64 libxcb-cos6-x86_64 libxdamage-cos6-x86_64 libxext-cos6-x86_64 libxfixes-cos6-x86_64 libxxf86vm-cos6-x86_64 mesalib mesa-libgl-cos6-x86_64 mesa-libgl-devel-cos6-x86_64 libuuid
+
+    - name: Unix-only Dependencies [Linux&macOS]
+      if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'ubuntu')
+      shell: bash -l {0}
+      run: |
+        mamba install libtar
+
+    - name: Windows-only Dependencies [Windows]
+      if: contains(matrix.os, 'windows')
+      shell: bash -l {0}
+      run: |
+        # Compilation related dependencies
+        mamba install vs2019_win-64 dlfcn-win32 tiny-process-library
+
+    - name: Configure [Linux&macOS]
+      if: contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu')
+      shell: bash -l {0}
+      run: |
+        mkdir -p build
+        cd build
+        cmake -GNinja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ..
+
+    - name: Build [Linux&macOS]
+      if: contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu')
+      shell: bash -l {0}
+      run: |
+        cd build
+        cmake --build . --config ${{ matrix.build_type }}
+
+#    - name: Test [Linux&macOS]
+#      if: contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu')
+#      shell: bash -l {0}
+#      run: |
+#        cd build
+#        ctest --output-on-failure -C ${{ matrix.build_type }}
+
+    - name: Configure [Windows]
+      if: contains(matrix.os, 'windows')
+      shell: cmd /C call {0}
+      run: |
+        mkdir -p build
+        cd build
+        cmake -GNinja -DBUILD_TESTING:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ..
+
+    - name: Build [Windows]
+      if: contains(matrix.os, 'windows')
+      shell: cmd /C call {0}
+      run: |
+        cd build
+        cmake --build . --config ${{ matrix.build_type }}
+
+#    - name: Test [Windows]
+#      if: contains(matrix.os, 'windows')
+#      shell: cmd /C call {0}
+#      run: |
+#        cd build
+#        ctest --output-on-failure -C ${{ matrix.build_type }}
