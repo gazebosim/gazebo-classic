@@ -47,7 +47,7 @@ jobs:
         mamba install expat-cos6-x86_64 libselinux-cos6-x86_64 libxau-cos6-x86_64 libxcb-cos6-x86_64 libxdamage-cos6-x86_64 libxext-cos6-x86_64 libxfixes-cos6-x86_64 libxxf86vm-cos6-x86_64 mesalib mesa-libgl-cos6-x86_64 mesa-libgl-devel-cos6-x86_64 libuuid
 
     - name: Unix-only Dependencies [Linux&macOS]
-      if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'ubuntu')
+      if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
       shell: bash -l {0}
       run: |
         mamba install libtar
