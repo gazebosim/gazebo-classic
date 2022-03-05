@@ -94,7 +94,7 @@ jobs:
       shell: cmd /C call {0}
       run: |
         cd build
-        cmake --build . --config ${{ matrix.build_type }}
+        cmake --build . --config ${{ matrix.build_type }} --parallel 2
 
 #    - name: Test [Windows]
 #      if: contains(matrix.os, 'windows')
