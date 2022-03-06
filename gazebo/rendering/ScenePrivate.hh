@@ -22,6 +22,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -308,6 +309,9 @@ namespace gazebo
 
       /// \brief True if this scene is running on the server.
       public: bool isServer;
+
+      /// \brief Terrain Visual Id.
+      public: std::optional<uint32_t> terrainVisualId;
 
       /// \brief The heightmap, if any.
       public: Heightmap *terrain = nullptr;
