@@ -18,6 +18,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <boost/algorithm/string.hpp>
 #include <google/protobuf/message.h>
 #include <ignition/transport/Node.hh>
 
@@ -870,6 +871,10 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
 
     // Process path
     auto pathParts = common::split(pathStr, "/");
+    for (auto & part : pathParts)
+    {
+      boost::replace_all(part, "%2f", "/");
+    }
 
     QStandardItem *previousItem = nullptr;
     unsigned int i = 0;

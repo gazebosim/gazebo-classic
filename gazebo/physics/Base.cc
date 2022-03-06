@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/algorithm/string.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -383,7 +384,9 @@ common::URI Base::URI() const
   {
     if (p->GetParent())
     {
-      uri.Path().PushFront(p->GetName());
+      std::string escapedParentName = p->GetName();
+      boost::replace_all(escapedParentName, "/", "%2f");
+      uri.Path().PushFront(escapedParentName);
       uri.Path().PushFront(p->TypeStr());
     }
 
@@ -391,7 +394,9 @@ common::URI Base::URI() const
   }
 
   uri.Path().PushBack(this->TypeStr());
-  uri.Path().PushBack(this->GetName());
+  std::string escapedName = this->GetName();
+  boost::replace_all(escapedName, "/", "%2f");
+  uri.Path().PushBack(escapedName);
   uri.Path().PushFront(this->world->Name());
   uri.Path().PushFront("world");
 

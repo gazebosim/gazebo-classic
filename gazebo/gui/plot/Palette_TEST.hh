@@ -30,5 +30,8 @@ class Palette_TEST : public QTestFixture
 
   /// \brief Test the models tab.
   private slots: void ModelsTab();
+
+  /// \brief test that models with slashes in name are handled.
+  private slots: void ModelsTabNamesWithSlashes();
 };
 #endif
