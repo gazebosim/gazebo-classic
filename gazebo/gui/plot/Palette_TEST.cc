@@ -140,29 +140,29 @@ void Palette_TEST::ModelsTabNamesWithSlashes()
   QCOMPARE(modelsModel->rowCount(), static_cast<int>(count + 1));
 
   auto model = modelsModel->item(1);
-  QCOMPARE("double/pendulum", model->text().toStdString());
+  QCOMPARE(0, model->text().toStdString().compare("double/pendulum"));
   QVERIFY(model->hasChildren());
 
   auto jointsLabel = model->child(3);
   QVERIFY(!jointsLabel->hasChildren());
 
   auto joint1 = model->child(4);
-  QCOMPARE("lower/joint", joint1->text().toStdString());
+  QCOMPARE(0, joint1->text().toStdString().compare("lower/joint"));
   QCOMPARE(2, joint1->rowCount());
 
   auto joint2 = model->child(5);
-  QCOMPARE("upper/joint", joint2->text().toStdString());
+  QCOMPARE(0, joint2->text().toStdString().compare("upper/joint"));
   QCOMPARE(2, joint1->rowCount());
 
   auto linksLabel = model->child(6);
   QVERIFY(!linksLabel->hasChildren());
 
   auto link1 = model->child(7);
-  QCOMPARE("lower/link", link1->text().toStdString());
+  QCOMPARE(0, link1->text().toStdString().compare("lower/link"));
   QCOMPARE(3, link1->rowCount());
 
   auto link2 = model->child(8);
-  QCOMPARE("upper/link", link2->text().toStdString());
+  QCOMPARE(0, link2->text().toStdString().compare("upper/link"));
   QCOMPARE(3, link2->rowCount());
 
   this->ProcessEventsAndDraw();
