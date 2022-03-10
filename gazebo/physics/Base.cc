@@ -385,6 +385,7 @@ common::URI Base::URI() const
     if (p->GetParent())
     {
       std::string escapedParentName = p->GetName();
+      escapedParentName = common::replaceAll(escapedParentName, "%", "%25");
       escapedParentName = common::replaceAll(escapedParentName, "/", "%2f");
       uri.Path().PushFront(escapedParentName);
       uri.Path().PushFront(p->TypeStr());
@@ -395,6 +396,7 @@ common::URI Base::URI() const
 
   uri.Path().PushBack(this->TypeStr());
   std::string escapedName = this->GetName();
+  escapedName = common::replaceAll(escapedName, "%", "%25");
   escapedName = common::replaceAll(escapedName, "/", "%2f");
   uri.Path().PushBack(escapedName);
   uri.Path().PushFront(this->world->Name());

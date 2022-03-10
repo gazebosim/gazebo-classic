@@ -873,6 +873,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
     for (auto & part : pathParts)
     {
       part = common::replaceAll(part, "%2f", "/");
+      part = common::replaceAll(part, "%25", "%");
     }
 
     QStandardItem *previousItem = nullptr;

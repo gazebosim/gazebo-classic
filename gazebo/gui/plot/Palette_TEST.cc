@@ -140,7 +140,7 @@ void Palette_TEST::ModelsTabNamesWithSlashes()
   QCOMPARE(modelsModel->rowCount(), static_cast<int>(count + 1));
 
   auto model = modelsModel->item(1);
-  QCOMPARE(0, model->text().toStdString().compare("double/pendulum"));
+  QCOMPARE(0, model->text().toStdString().compare("double/pendulum_%2f"));
   QVERIFY(model->hasChildren());
 
   auto jointsLabel = model->child(3);
