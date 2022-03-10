@@ -17,7 +17,16 @@
 #ifndef _CONNECTION_HH_
 #define _CONNECTION_HH_
 
+#undef emit
 #include <tbb/task.h>
+#define emit
+
+// If TBB_VERSION_MAJOR is not defined, this means that
+// tbb >= 2021 and we can include the tbb/version.h header
+#ifndef TBB_VERSION_MAJOR
+#include <tbb/version.h>
+#endif
+
 #include <google/protobuf/message.h>
 
 // This fixes compiler warnings, see #3147 and #3160
@@ -41,6 +50,9 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/WeakBind.hh"
+#if TBB_VERSION_MAJOR >= 2021
+#include "gazebo/transport/TaskGroup.hh"
+#endif
 #include "gazebo/util/system.hh"
 
 #define HEADER_LENGTH 8
@@ -58,7 +70,11 @@ namespace gazebo
     /// \cond
     /// \brief A task instance that is created when data is read from
     /// a socket and used by TBB
+#if TBB_VERSION_MAJOR < 2021
     class GZ_TRANSPORT_VISIBLE ConnectionReadTask : public tbb::task
+#else
+    class GZ_TRANSPORT_VISIBLE ConnectionReadTask
+#endif
     {
       /// \brief Constructor
       /// \param[_in] _func Boost function pointer, which is the function
@@ -72,6 +88,7 @@ namespace gazebo
               {
               }
 
+#if TBB_VERSION_MAJOR < 2021
       /// \bried Overridden function from tbb::task that exectues the data
       /// callback.
       public: tbb::task *execute()
@@ -79,7 +96,11 @@ namespace gazebo
                 this->func(this->data);
                 return NULL;
               }
-
+#else
+      /// \brief Execute the data callback
+      public: void operator()() const
+              { this->func(this->data); }
+#endif
       /// \brief The boost function pointer
       private: boost::function<void (const std::string &)> func;
 
@@ -314,12 +335,16 @@ namespace gazebo
 
                 if (!_e && !transport::is_stopped())
                 {
+#if TBB_VERSION_MAJOR < 2021
                   ConnectionReadTask *task = new(tbb::task::allocate_root())
                         ConnectionReadTask(boost::get<0>(_handler), data);
                   tbb::task::enqueue(*task);
 
                   // Non-tbb version:
                   // boost::get<0>(_handler)(data);
+#else
+                  this->taskGroup.run<ConnectionReadTask>(boost::get<0>(_handler), data);
+#endif
                 }
               }
 
@@ -376,7 +401,7 @@ namespace gazebo
       private: boost::asio::ip::tcp::endpoint GetRemoteEndpoint() const;
 
       /// \brief Gets hostname
-      /// \param[in] _ep The end point to get the hostename of
+      /// \param[in] _ep The end point to get the hostname of
       private: static std::string GetHostname(
                    boost::asio::ip::tcp::endpoint _ep);
 
@@ -469,6 +494,11 @@ namespace gazebo
 
       /// \brief True if the connection is open.
       private: bool isOpen;
+
+#if TBB_VERSION_MAJOR >= 2021
+      /// \brief For managing asynchronous tasks with tbb
+      private: TaskGroup taskGroup;
+#endif
     };
     /// \}
   }

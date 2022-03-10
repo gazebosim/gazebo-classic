@@ -37,7 +37,7 @@ jobs:
         # Compilation related dependencies
         mamba install cmake compilers make ninja pkg-config
         # Actual dependencies
-        mamba install libprotobuf libsdformat libignition-cmake2 libignition-math6 libignition-transport8 libignition-common3 libignition-fuel-tools4 qt=5.12.9=*_4 ogre=1.10 freeimage curl tbb-devel=2020 qwt tinyxml2 libccd boost-cpp libcurl tinyxml bzip2 zlib ffmpeg graphviz libgdal libusb bullet-cpp dartsim simbody hdf5 openal-soft glib gts
+        mamba install libprotobuf libsdformat libignition-cmake2 libignition-math6 libignition-transport8 libignition-common3 libignition-fuel-tools4 qt=5.12.9=*_4 ogre=1.10 freeimage curl tbb-devel qwt tinyxml2 libccd boost-cpp libcurl tinyxml bzip2 zlib ffmpeg graphviz libgdal libusb bullet-cpp dartsim simbody hdf5 openal-soft glib gts
 
     - name: Linux-only Dependencies [Linux]
       if: contains(matrix.os, 'ubuntu')
