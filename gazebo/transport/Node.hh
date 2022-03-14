@@ -18,14 +18,27 @@
 #ifndef GAZEBO_TRANSPORT_NODE_HH_
 #define GAZEBO_TRANSPORT_NODE_HH_
 
+#undef emit
 #include <tbb/task.h>
-#include <boost/bind/bind.hpp>
+#define emit
+#ifndef TBB_VERSION_MAJOR
+#include <tbb/version.h>
+#endif
+
+// This fixes compiler warnings, see #3147 and #3160
+#ifndef BOOST_BIND_GLOBAL_PLACEHOLDERS
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#endif
+
+#include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <map>
 #include <list>
 #include <string>
 #include <vector>
-
+#if TBB_VERSION_MAJOR >= 2021
+#include "gazebo/transport/TaskGroup.hh"
+#endif
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/util/system.hh"
@@ -36,7 +49,11 @@ namespace gazebo
   {
     /// \cond
     /// \brief Task used by Node::Publish to publish on a one-time publisher
+#if TBB_VERSION_MAJOR < 2021
     class GZ_TRANSPORT_VISIBLE PublishTask : public tbb::task
+#else
+    class GZ_TRANSPORT_VISIBLE PublishTask
+#endif
     {
       /// \brief Constructor
       /// \param[in] _pub Publisher to publish the message on.
@@ -49,16 +66,23 @@ namespace gazebo
         this->msg->CopyFrom(_message);
       }
 
+#if TBB_VERSION_MAJOR < 2021
       /// \brief Overridden function from tbb::task that exectues the
       /// publish task.
       public: tbb::task *execute()
+#else
+      /// \brief Executes the publish task.
+      public: void operator()() const
+#endif
               {
                 this->pub->WaitForConnection();
                 this->pub->Publish(*this->msg, true);
                 this->pub->SendMessage();
                 delete this->msg;
+#if TBB_VERSION_MAJOR < 2021
                 this->pub.reset();
                 return NULL;
+#endif
               }
 
       /// \brief Pointer to the publisher.
@@ -159,11 +183,15 @@ namespace gazebo
                   const google::protobuf::Message &_message)
               {
                 transport::PublisherPtr pub = this->Advertise<M>(_topic);
+#if TBB_VERSION_MAJOR < 2021
                 PublishTask *task = new(tbb::task::allocate_root())
                   PublishTask(pub, _message);
 
                 tbb::task::enqueue(*task);
                 return;
+#else
+                this->taskGroup.run<PublishTask>(pub, _message);
+#endif
               }
 
       /// \brief Advertise a topic
@@ -420,6 +448,11 @@ namespace gazebo
 
       /// \brief List of newly arrive messages
       private: std::map<std::string, std::list<MessagePtr> > incomingMsgsLocal;
+
+#if TBB_VERSION_MAJOR >= 2021
+      /// \brief For managing asynchronous tasks with tbb
+      private: TaskGroup taskGroup;
+#endif
 
       private: boost::mutex publisherMutex;
       private: boost::mutex publisherDeleteMutex;

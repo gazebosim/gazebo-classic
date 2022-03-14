@@ -29,6 +29,7 @@ set (headers
   SubscribeOptions.hh
   Subscriber.hh
   SubscriptionTransport.hh
+  TaskGroup.hh
   TopicManager.hh
   TransportIface.hh
   TransportTypes.hh
@@ -68,6 +69,12 @@ target_link_libraries(gazebo_transport
 )
 if (WIN32)
   target_link_libraries(gazebo_transport ws2_32 Iphlpapi)
+endif()
+
+if(${CMAKE_VERSION} VERSION_LESS "3.13.0")
+  link_directories(${TBB_LIBRARY_DIRS})
+else()
+  target_link_directories(gazebo_transport PUBLIC ${TBB_LIBRARY_DIRS})
 endif()
 
 if (USE_PCH)

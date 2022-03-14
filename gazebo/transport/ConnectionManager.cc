@@ -27,6 +27,7 @@
 using namespace gazebo;
 using namespace transport;
 
+#if TBB_VERSION_MAJOR < 2021
 /// TBB task to process nodes.
 class TopicManagerProcessTask : public tbb::task
 {
@@ -37,20 +38,30 @@ class TopicManagerProcessTask : public tbb::task
             return NULL;
           }
 };
+#endif
 
 /// TBB task to establish subscriber to publisher connection.
+#if TBB_VERSION_MAJOR < 2021
 class TopicManagerConnectionTask : public tbb::task
+#else
+class TopicManagerConnectionTask
+#endif
 {
   /// \brief Constructor.
   /// \param[in] _pub Publish message
   public: explicit TopicManagerConnectionTask(msgs::Publish _pub) : pub(_pub) {}
 
   /// Implements the necessary execute function
+#if TBB_VERSION_MAJOR < 2021
   public: tbb::task *execute()
           {
             TopicManager::Instance()->ConnectSubToPub(pub);
             return NULL;
           }
+#else
+  public: void operator()() const
+          { TopicManager::Instance()->ConnectSubToPub(pub); }
+#endif
 
   /// \brief Publish message
   private: msgs::Publish pub;
@@ -273,11 +284,6 @@ void ConnectionManager::RunUpdate()
   if (this->masterConn)
     this->masterConn->ProcessWriteQueue();
 
-  // Use TBB to process nodes. Need more testing to see if this makes
-  // a difference.
-  // TopicManagerProcessTask *task = new(tbb::task::allocate_root())
-  //   TopicManagerProcessTask();
-  // tbb::task::enqueue(*task);
   boost::recursive_mutex::scoped_lock lock(this->connectionMutex);
 
   TopicManager::Instance()->ProcessNodes();
@@ -403,9 +409,13 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
+#if TBB_VERSION_MAJOR < 2021
       TopicManagerConnectionTask *task = new(tbb::task::allocate_root())
       TopicManagerConnectionTask(pub);
       tbb::task::enqueue(*task);
+#else
+      this->taskGroup.run<TopicManagerConnectionTask>(pub);
+#endif
     }
   }
   // publisher_subscribe. This occurs when we try to subscribe to a topic, and

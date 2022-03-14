@@ -300,6 +300,7 @@ void Scene::Clear()
 
   delete this->dataPtr->terrain;
   this->dataPtr->terrain = NULL;
+  this->dataPtr->terrainVisualId.reset();
 
   while (!this->dataPtr->visuals.empty())
     this->RemoveVisual(this->dataPtr->visuals.begin()->first);
@@ -2825,54 +2826,6 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
     return true;
   }
 
-  // Creating heightmap
-  // FIXME: A bit of a hack.
-  if (_msg->has_geometry() &&
-      _msg->geometry().type() == msgs::Geometry::HEIGHTMAP &&
-      _type != Visual::VT_COLLISION)
-  {
-    if (this->dataPtr->terrain)
-    {
-      // Only one Heightmap can be created per Scene
-      return true;
-    }
-    else
-    {
-      if (!this->dataPtr->terrain)
-      {
-        // create a dummy visual for loading heightmap visual plugin
-        // TODO make heightmap a visual to avoid special treatment here?
-        VisualPtr visual(new Visual(_msg->name(), this->dataPtr->worldVisual));
-        auto m = *_msg.get();
-        m.clear_material();
-        visual->Load(msgs::VisualToSDF(m));
-
-        this->dataPtr->terrain = new Heightmap(shared_from_this());
-        // check the material fields and set material if it is specified
-        if (_msg->has_material())
-        {
-          auto matMsg = _msg->material();
-          if (matMsg.has_script())
-          {
-            auto scriptMsg = matMsg.script();
-            for (auto const &uri : scriptMsg.uri())
-            {
-              if (!uri.empty())
-                RenderEngine::Instance()->AddResourcePath(uri);
-            }
-            std::string matName = scriptMsg.name();
-            this->dataPtr->terrain->SetMaterial(matName);
-          }
-        }
-        this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
-        const double skirtLen = this->dataPtr->heightmapSkirtLength;
-        this->dataPtr->terrain->SetSkirtLength(skirtLen);
-        this->dataPtr->terrain->LoadFromMsg(_msg);
-      }
-    }
-    return true;
-  }
-
   // Creating collision
   if (_type == Visual::VT_COLLISION)
   {
@@ -2896,6 +2849,20 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 
     return true;
   }
+
+  // Exit early if a heightmap already exists
+  bool hasHeightmap = false;
+  if (_msg->has_geometry() &&
+      _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
+  {
+    hasHeightmap = true;
+    if (this->dataPtr->terrain)
+    {
+      // Only one Heightmap can be created per Scene
+      return true;
+    }
+  }
+
 
   // All other visuals
   VisualPtr visual;
@@ -2924,7 +2891,51 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   if (_msg->has_id())
     visual->SetId(_msg->id());
 
-  visual->LoadFromMsg(_msg);
+  if (!hasHeightmap)
+  {
+    visual->LoadFromMsg(_msg);
+  }
+  else
+  // Creating heightmap
+  // FIXME: A bit of a hack.
+  {
+    {
+      // Copy the const _msg so that we can clear materials before
+      // loading from message
+      msgs::Visual *msgMutable = new msgs::Visual(*_msg.get());
+      msgMutable->clear_material();
+
+      // assign ownership of the copy to a const shared_ptr so it will be
+      // deleted when exiting this scope
+      ConstVisualPtr msgShared(static_cast<const msgs::Visual*>(msgMutable));
+      visual->LoadFromMsg(msgShared);
+    }
+
+    // Store VisualId corresponding to terrain
+    this->dataPtr->terrainVisualId.emplace(visual->GetId());
+
+    this->dataPtr->terrain = new Heightmap(shared_from_this());
+    // check the material fields and set material if it is specified
+    if (_msg->has_material())
+    {
+      auto matMsg = _msg->material();
+      if (matMsg.has_script())
+      {
+        auto scriptMsg = matMsg.script();
+        for (auto const &uri : scriptMsg.uri())
+        {
+          if (!uri.empty())
+            RenderEngine::Instance()->AddResourcePath(uri);
+        }
+        std::string matName = scriptMsg.name();
+        this->dataPtr->terrain->SetMaterial(matName);
+      }
+    }
+    this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+    const double skirtLen = this->dataPtr->heightmapSkirtLength;
+    this->dataPtr->terrain->SetSkirtLength(skirtLen);
+    this->dataPtr->terrain->LoadFromMsg(_msg);
+  }
   visual->SetType(_type);
 
   this->dataPtr->visuals[visual->GetId()] = visual;
@@ -3407,6 +3418,14 @@ void Scene::RemoveVisual(uint32_t _id)
   if (iter != this->dataPtr->visuals.end())
   {
     VisualPtr vis = iter->second;
+    // Remove the terrain object if this is the heightmap visual
+    if (this->dataPtr->terrainVisualId &&
+        *this->dataPtr->terrainVisualId == _id)
+    {
+      delete this->dataPtr->terrain;
+      this->dataPtr->terrain = NULL;
+      this->dataPtr->terrainVisualId.reset();
+    }
     // Remove all projectors attached to the visual
     auto piter = this->dataPtr->projectors.begin();
     while (piter != this->dataPtr->projectors.end())

@@ -1,4 +1,4 @@
-vertex_program shadow_caster_vp_glsl glsl
+vertex_program shadow_caster_ignore_heightmap_vp_glsl glsl
 {
   source shadow_caster_vp.glsl
 
@@ -29,7 +29,7 @@ material Gazebo/shadow_caster_ignore_heightmap
     // all this will do is write depth and depth*depth to red and green
     pass
     {
-      vertex_program_ref shadow_caster_vp_glsl
+      vertex_program_ref shadow_caster_ignore_heightmap_vp_glsl
       {
       }
 

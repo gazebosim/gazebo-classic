@@ -15,6 +15,7 @@
  *
 */
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SdfFrameSemantics.hh"
@@ -383,7 +384,10 @@ common::URI Base::URI() const
   {
     if (p->GetParent())
     {
-      uri.Path().PushFront(p->GetName());
+      std::string escapedParentName = p->GetName();
+      escapedParentName = common::replaceAll(escapedParentName, "%", "%25");
+      escapedParentName = common::replaceAll(escapedParentName, "/", "%2f");
+      uri.Path().PushFront(escapedParentName);
       uri.Path().PushFront(p->TypeStr());
     }
 
@@ -391,7 +395,10 @@ common::URI Base::URI() const
   }
 
   uri.Path().PushBack(this->TypeStr());
-  uri.Path().PushBack(this->GetName());
+  std::string escapedName = this->GetName();
+  escapedName = common::replaceAll(escapedName, "%", "%25");
+  escapedName = common::replaceAll(escapedName, "/", "%2f");
+  uri.Path().PushBack(escapedName);
   uri.Path().PushFront(this->world->Name());
   uri.Path().PushFront("world");
 

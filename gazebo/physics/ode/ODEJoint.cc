@@ -1032,6 +1032,12 @@ void ODEJoint::SetStiffness(unsigned int _index, const double _stiffness)
 void ODEJoint::SetStiffnessDamping(unsigned int _index,
   double _stiffness, double _damping, double _reference)
 {
+  // Gearbox joints don't support this, so exit early in that case
+  if (this->HasType(Base::GEARBOX_JOINT))
+  {
+    return;
+  }
+
   if (_index < this->DOF())
   {
     this->stiffnessCoefficient[_index] = _stiffness;
