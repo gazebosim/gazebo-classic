@@ -55,10 +55,11 @@ def usage():
     print(sys.argv)
     sys.exit(getattr(os, 'EX_USAGE', 1))
 
-def run_grep(filename, arg):
-    process = subprocess.Popen(['grep', arg, filename], stdout=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    return stdout, stderr
+def file_contains_string(filename, string):
+    with open(filename, 'r') as f:
+        if string in f.read():
+            return True
+    return False
 
 def run_xsltproc(stylesheet, document):
     test_ran_message = ''
@@ -124,8 +125,7 @@ def check_main():
         sys.exit(getattr(os, 'EX_USAGE', 1))
 
     # Checking if test is a QTest file
-    stdout, stderr = run_grep(test_file, "QtVersion")
-    if (stdout):
+    if file_contains_string(test_file, "QtVersion"):
         print("Detect QTest xml file. Converting to JUNIT ...")
         stylesheet = os.path.dirname(os.path.abspath(__file__)) + "/qtest_to_junit.xslt"
         run_xsltproc(stylesheet, test_file)

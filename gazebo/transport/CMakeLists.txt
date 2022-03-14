@@ -29,7 +29,9 @@ set (headers
   SubscribeOptions.hh
   Subscriber.hh
   SubscriptionTransport.hh
-  TaskGroup.hh
+  # don't include TaskGroup.hh in transport.hh
+  # append it to `headers` after transport.hh is configured
+  # TaskGroup.hh
   TopicManager.hh
   TransportIface.hh
   TransportTypes.hh
@@ -41,6 +43,7 @@ foreach (hdr ${headers})
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/transport.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/transport.hh )
+list(APPEND headers TaskGroup.hh)
 
 set_property(
   SOURCE TransportIface.cc
