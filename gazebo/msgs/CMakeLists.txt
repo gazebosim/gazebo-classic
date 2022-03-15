@@ -1,3 +1,32 @@
+# Cross-compilation related options
+# In a cross-compilation scenario, it is possible that the gazebomsgs_out
+# generator compiled for the target machine cannot be used to generate
+# the C++ code corresponding to the .proto definition. For this scenario, 
+# the following two options can be used as follows. 
+# First of all, gazebo is compiled targeting the host machine, and in the
+# build targeting the host, the INSTALL_GAZEBOMSGS_OUT_EXECUTABLE option is
+# enabled:
+# > cmake -DINSTALL_GAZEBOMSGS_OUT_EXECUTABLE:BOOL=ON .. 
+# ensuring that the gazebomsgs_out is installed in 
+# <host_install_prefix>/bin/gazebomsgs_out . Then, the same version of gazebo
+# can be cross-compiled, and in the cross-compilation build the location of the
+# host gazebomsgs_out is specified via the GAZEBOMSGS_OUT_EXECUTABLE 
+# CMake cache variable: 
+# > cmake -DGAZEBOMSGS_OUT_EXECUTABLE=<host_install_prefix>/bin/gazebomsgs_out .. 
+
+option(
+  INSTALL_GAZEBOMSGS_OUT_EXECUTABLE
+  "Install the gazebomsgs_out executable."
+  OFF)
+mark_as_advanced(INSTALL_GAZEBOMSGS_OUT_EXECUTABLE)
+
+set(
+  GAZEBOMSGS_OUT_EXECUTABLE
+  "$<TARGET_FILE:gazebomsgs_out>"
+  CACHE STRING
+  "gazebomsgs_out executable used in gazebo protobuf msgs generation.")
+mark_as_advanced(GAZEBOMSGS_OUT_EXECUTABLE)
+
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include_directories(${IGNITION-MATH_INCLUDE_DIRS} ${IGNITION-MSGS_INCLUDE_DIRS})
 
@@ -187,7 +216,7 @@ foreach(FIL ${msgs})
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc"
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h"
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS --plugin=protoc-gen-gazebomsgs=$<TARGET_FILE:gazebomsgs_out> --cpp_out=dllexport_decl=GZ_MSGS_VISIBLE:${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
+    ARGS --plugin=protoc-gen-gazebomsgs=${GAZEBOMSGS_OUT_EXECUTABLE}--cpp_out=dllexport_decl=GZ_MSGS_VISIBLE:${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
     DEPENDS ${ABS_FIL} gazebomsgs_out
     COMMENT "Running C++ protocol buffer compiler on ${FIL}"
     VERBATIM )
@@ -229,3 +258,7 @@ configure_file (${PROJECT_SOURCE_DIR}/gazebo/msgs/MessageTypes.hh.in
 gz_install_library(gazebo_msgs)
 gz_install_includes("msgs" ${PROTO_HDRS} ${headers} ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh)
 gz_install_includes("msgs/proto" ${msgs})
+
+if (INSTALL_GAZEBOMSGS_OUT_EXECUTABLE)
+  gz_install_executable(gazebomsgs_out)
+endif()
