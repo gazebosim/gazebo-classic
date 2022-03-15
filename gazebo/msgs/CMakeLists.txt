@@ -216,7 +216,7 @@ foreach(FIL ${msgs})
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc"
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h"
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS --plugin=protoc-gen-gazebomsgs=${GAZEBOMSGS_OUT_EXECUTABLE}--cpp_out=dllexport_decl=GZ_MSGS_VISIBLE:${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
+    ARGS --plugin=protoc-gen-gazebomsgs=${GAZEBOMSGS_OUT_EXECUTABLE} --cpp_out=dllexport_decl=GZ_MSGS_VISIBLE:${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
     DEPENDS ${ABS_FIL} gazebomsgs_out
     COMMENT "Running C++ protocol buffer compiler on ${FIL}"
     VERBATIM )
