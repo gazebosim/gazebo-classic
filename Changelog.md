@@ -1,5 +1,29 @@
 ## Gazebo 11
 
+## Gazebo 11.10.2 (2022-03-19)
+
+1. Support plotting for entities with / in the name
+    * [Pull request #3187](https://github.com/osrf/gazebo/pull/3187)
+
+1. Replace deprecated tbb task for tbb >= 2021
+    * [Pull request #3174](https://github.com/osrf/gazebo/pull/3174)
+    * A contrubition from Alex Dewar and Silvio Traversaro
+    * [Pull request #3157](https://github.com/osrf/gazebo/pull/3157)
+
+1. Add CI for compiling gazebo with conda-forge dependencies
+    * [Pull request #3186](https://github.com/osrf/gazebo/pull/3186)
+    * A contrubition from Silvio Traversaro
+
+1. SearchForStuff: Do not pass /usr/lib to PATH in qwt's find_library
+    * [Pull request #3178](https://github.com/osrf/gazebo/pull/3178)
+    * A contrubition from Silvio Traversaro
+
+1. Scene: support deletion of Heightmap Visuals
+    * [Pull request #3171](https://github.com/osrf/gazebo/pull/3171)
+
+1. ODEJoint: don't SetStiffnessDamping for gearbox
+    * [Pull request #3169](https://github.com/osrf/gazebo/pull/3169)
+
 ## Gazebo 11.10.1 (2022-01-19)
 
 1. Revert boost/bind.hpp changes in header files
