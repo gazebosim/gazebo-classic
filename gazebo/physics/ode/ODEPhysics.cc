@@ -30,6 +30,8 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/common/Profiler.hh>
 
+#include <sdf/Param.hh>
+
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -1557,7 +1559,25 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
     }
     else if (_key == "ode_quiet")
     {
-      bool odeQuiet = any_cast<bool>(_value);
+      bool odeQuiet;
+      try
+      {
+        odeQuiet = any_cast<bool>(_value);
+      }
+      catch(std::bad_any_cast &)
+      {
+        // If added to an SDFormat world file, this parameter will be
+        // encoded as a string, since it is not part of the SDFormat spec.
+        // In order to parse it, define an sdf::Param with type string
+        // and call Get<bool> to use libsdformat's existing logic for this.
+        // copied from sdformat's Param_TEST.cc
+        sdf::Param strParam("key", "string", "false", false, "description");
+        // cast to std::string and set the sdf::Param with this value
+        strParam.Set(any_cast<std::string>(_value));
+        // get the string value as bool
+        strParam.Get<bool>(odeQuiet);
+      }
+
       if (odeQuiet)
       {
         dSetMessageHandler(&dMessageQuiet);
