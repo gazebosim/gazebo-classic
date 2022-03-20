@@ -59,8 +59,12 @@ void AudioDecoder::Cleanup()
 #ifdef HAVE_FFMPEG
 bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 {
-  AVPacket packet, packet1;
+#if LIBAVFORMAT_VERSION_MAJOR < 59
+  AVPacket *packet, packet1;
   int bytesDecoded = 0;
+#else
+  AVPacket *packet;
+#endif
   unsigned int maxBufferSize = 0;
   AVFrame *decodedFrame = nullptr;
 
@@ -97,14 +101,66 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
   else
     common::AVFrameUnref(decodedFrame);
 
-  av_init_packet(&packet);
-  while (av_read_frame(this->formatCtx, &packet) == 0)
+  packet = av_packet_alloc();
+  if (!packet)
   {
-    if (packet.stream_index == this->audioStream)
+    gzerr << "Failed to allocate AVPacket" << std::endl;
+    return false;
+  }
+  while (av_read_frame(this->formatCtx, packet) == 0)
+  {
+    if (packet->stream_index == this->audioStream)
     {
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+      // Inspired from
+      // https://github.com/FFmpeg/FFmpeg/blob/n5.0/doc/examples/decode_audio.c#L71
+
+      // send the packet with the compressed data to the decoder
+      int ret = avcodec_send_packet(this->codecCtx, packet);
+      if (ret < 0)
+      {
+        gzerr << "Error submitting the packet to the decoder" << std::endl;
+        return false;
+      }
+
+      // read all the output frames
+      // (in general there may be any number of them)
+      while (ret >= 0)
+      {
+        ret = avcodec_receive_frame(this->codecCtx, decodedFrame);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+        {
+          break;
+        }
+        else if (ret < 0)
+        {
+            gzerr << "Error during decoding" << std::endl;
+            return false;
+        }
+
+        // Total size of the data. Some padding can be added to
+        // decodedFrame->data[0], which is why we can't use
+        // decodedFrame->linesize[0].
+        int size = decodedFrame->nb_samples *
+          av_get_bytes_per_sample(this->codecCtx->sample_fmt) *
+          this->codecCtx->channels;
+
+        // Resize the audio buffer as necessary
+        if (*_outBufferSize + size > maxBufferSize)
+        {
+          maxBufferSize += size * 5;
+          *_outBuffer = reinterpret_cast<uint8_t*>(realloc(*_outBuffer,
+                maxBufferSize * sizeof(*_outBuffer[0])));
+        }
+
+        memcpy(*_outBuffer + *_outBufferSize, decodedFrame->data[0],
+            size);
+        *_outBufferSize += size;
+    }
+#else
       int gotFrame = 0;
 
-      packet1 = packet;
+      packet1 = *packet;
       while (packet1.size)
       {
         // Some frames rely on multiple packets, so we have to make sure
@@ -144,11 +200,12 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         packet1.data += bytesDecoded;
         packet1.size -= bytesDecoded;
       }
+#endif
     }
-    AVPacketUnref(&packet);
+    av_packet_unref(packet);
   }
 
-  AVPacketUnref(&packet);
+  av_packet_unref(packet);
 
   // Seek to the beginning so that it can be decoded again, if necessary.
   av_seek_frame(this->formatCtx, this->audioStream, 0, 0);
@@ -214,7 +271,11 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+    if (this->formatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
+#else
     if (this->formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO)
+#endif
 #ifndef _WIN32
 # pragma GCC diagnostic pop
 #endif
@@ -238,13 +299,61 @@ bool AudioDecoder::SetFile(const std::string &_filename)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
+#if LIBAVFORMAT_VERSION_MAJOR < 59
   this->codecCtx = this->formatCtx->streams[audioStream]->codec;
+#endif
 #ifndef _WIN32
 # pragma GCC diagnostic pop
 #endif
 
   // Find a decoder
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+  const AVCodec * local_codec = avcodec_find_decoder(this->formatCtx->streams[
+    this->audioStream]->codecpar->codec_id);
+  if (!local_codec)
+  {
+    gzerr << "Failed to find the codec" << std::endl;
+    return false;
+  }
+  this->codecCtx = avcodec_alloc_context3(local_codec);
+  if (!this->codecCtx)
+  {
+    gzerr << "Failed to allocate the codec context" << std::endl;
+    return false;
+  }
+
+  // Copy all relevant parameters from codepar to codecCtx
+  if (avcodec_parameters_to_context(this->codecCtx,
+    this->formatCtx->streams[this->audioStream]->codecpar) < 0)
+  {
+    gzerr << "Failed to copy codec parameters to decoder context"
+           << std::endl;
+    return false;
+  }
+
+  // This copy should be done by avcodec_parameters_to_context, but at least on
+  // conda-forge with 5.0.0 h594f047_1 this is not happening for some reason.
+  // As temporary workaround, we copy directly the data structures, taking the code from
+  // https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavcodec/codec_par.c#L120
+  AVCodecParameters* par = this->formatCtx->streams[this->audioStream]->codecpar;
+  this->codecCtx->sample_fmt       = static_cast<AVSampleFormat>(par->format);
+  this->codecCtx->channel_layout   = par->channel_layout;
+  this->codecCtx->channels         = par->channels;
+  this->codecCtx->sample_rate      = par->sample_rate;
+  this->codecCtx->block_align      = par->block_align;
+  this->codecCtx->frame_size       = par->frame_size;
+  this->codecCtx->delay            =
+  this->codecCtx->initial_padding  = par->initial_padding;
+  this->codecCtx->trailing_padding = par->trailing_padding;
+  this->codecCtx->seek_preroll     = par->seek_preroll;
+
+  // It would be better to just define codec as const AVCodec *,
+  // but that is not done to avoid ABI problem. Anyhow, as codec
+  // it is a private attribute there should be no problem
+  this->codec = const_cast<AVCodec *>(local_codec);
+#else
   this->codec = avcodec_find_decoder(codecCtx->codec_id);
+#endif
 
   if (this->codec == nullptr)
   {
