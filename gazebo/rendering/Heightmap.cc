@@ -523,7 +523,9 @@ void Heightmap::Load()
   {
     this->dataPtr->splitTerrain = true;
     nTerrains = this->dataPtr->numTerrainSubdivisions;
-    prefix = terrainDirPath / "gazebo_terrain_cache";
+    std::string terrainName = "gazebo_terrain_cache" +
+        std::to_string(this->LOD());
+    prefix = terrainDirPath / terrainName.c_str();
   }
   else
   {
@@ -542,7 +544,8 @@ void Heightmap::Load()
       gzmsg << "Large heightmap used with LOD. It will be subdivided into " <<
           this->dataPtr->numTerrainSubdivisions << " terrains." << std::endl;
     }
-    prefix = terrainDirPath / "gazebo_terrain";
+    std::string terrainName = "gazebo_terrain_" + std::to_string(this->LOD());
+    prefix = terrainDirPath / terrainName.c_str();
   }
 
   double sqrtN = sqrt(nTerrains);
