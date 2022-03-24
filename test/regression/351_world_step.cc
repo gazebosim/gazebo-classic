@@ -35,4 +35,21 @@ TEST_F(Issue351Test, WorldStep)
 
   // Take 500 steps; it passes if it doesn't seg-fault
   world->Step(500);
+
+  // Confirm that ode_quiet has been set to true.
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
+  EXPECT_EQ(physics->GetType(), "ode");
+  {
+    std::string solver;
+    EXPECT_NO_THROW(
+      solver = boost::any_cast<std::string>(physics->GetParam("solver_type")));
+    EXPECT_EQ("world", solver);
+  }
+  {
+    bool odeQuiet = false;
+    EXPECT_NO_THROW(
+      odeQuiet = boost::any_cast<bool>(physics->GetParam("ode_quiet")));
+    EXPECT_TRUE(odeQuiet);
+  }
 }

@@ -3,6 +3,7 @@
     <physics type="ode">
       <gravity>0.000000 0.000000 -9.810000</gravity>
       <ode>
+        <ode_quiet>1</ode_quiet>
         <solver>
           <type>world</type>
           <iters>250</iters>
