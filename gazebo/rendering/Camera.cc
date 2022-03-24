@@ -118,6 +118,8 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
+
+  this->dataPtr->antiAliasingValue = 4;
 }
 
 //////////////////////////////////////////////////
@@ -143,6 +145,8 @@ void Camera::Load()
     this->imageHeight = imgElem->Get<int>("height");
     this->imageFormat = this->OgrePixelFormat(
         imgElem->Get<std::string>("format"));
+
+    this->dataPtr->antiAliasingValue = imgElem->Get<int>("anti_aliasing");
   }
   else
     gzthrow("Camera has no <image> tag.");
@@ -1480,7 +1484,7 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       RenderEngine::Instance()->FSAALevels();
 
   // check if target fsaa is supported
-  unsigned int targetFSAA = 4;
+  unsigned int targetFSAA = this->dataPtr->antiAliasingValue;
   auto const it = std::find(fsaaLevels.begin(), fsaaLevels.end(), targetFSAA);
   if (it != fsaaLevels.end())
     fsaa = targetFSAA;
