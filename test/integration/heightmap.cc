@@ -761,7 +761,7 @@ void HeightmapTest::HeightmapCache()
       + "/paging");
   std::string shaPath = heightmapDir + "/" + heightmapName + "/gzterrain.SHA1";
   std::string cachePath = heightmapDir +
-      "/" + heightmapName + "/gazebo_terrain_00000000.dat";
+      "/" + heightmapName + "/gazebo_terrain_LOD0_00000000.dat";
 
   // temporary backup files for testing if cache files exist.
   std::string shaPathBk = shaPath + ".bk";

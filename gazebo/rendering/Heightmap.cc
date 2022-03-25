@@ -550,7 +550,7 @@ void Heightmap::Load()
       gzmsg << "Large heightmap used with LOD. It will be subdivided into " <<
           this->dataPtr->numTerrainSubdivisions << " terrains." << std::endl;
     }
-    std::string terrainName = "gazebo_terrain_" + terrainNameSuffix;
+    std::string terrainName = "gazebo_terrain" + terrainNameSuffix;
     prefix = terrainDirPath / terrainName.c_str();
   }
 
