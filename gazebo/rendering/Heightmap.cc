@@ -518,12 +518,20 @@ void Heightmap::Load()
     }
   }
 
+  std::string terrainNameSuffix = "";
+  if (this->LOD() == 0)
+  {
+    terrainNameSuffix = "_LOD0";
+  }
+
   // If the paging is enabled we modify the number of subterrains
   if (this->dataPtr->useTerrainPaging)
   {
     this->dataPtr->splitTerrain = true;
     nTerrains = this->dataPtr->numTerrainSubdivisions;
-    prefix = terrainDirPath / "gazebo_terrain_cache";
+    std::string terrainName = "gazebo_terrain_cache" +
+        terrainNameSuffix;
+    prefix = terrainDirPath / terrainName.c_str();
   }
   else
   {
@@ -542,7 +550,8 @@ void Heightmap::Load()
       gzmsg << "Large heightmap used with LOD. It will be subdivided into " <<
           this->dataPtr->numTerrainSubdivisions << " terrains." << std::endl;
     }
-    prefix = terrainDirPath / "gazebo_terrain";
+    std::string terrainName = "gazebo_terrain" + terrainNameSuffix;
+    prefix = terrainDirPath / terrainName.c_str();
   }
 
   double sqrtN = sqrt(nTerrains);
