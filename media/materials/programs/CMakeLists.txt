@@ -24,11 +24,9 @@ GBufferFP.glsl
 GBufferVP.glsl
 grid_fp.glsl
 grid_vp.glsl
-laser_1st_pass_dbg.frag
-laser_1st_pass.frag
-laser_1st_pass.vert
-laser_2nd_pass.frag
-laser_2nd_pass.vert
+laser_pass_dbg.frag
+laser_pass.frag
+laser_pass.vert
 ModulateFP.glsl
 NoFilterFP.glsl
 oculus.cg

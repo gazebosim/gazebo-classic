@@ -15,12 +15,12 @@
  *
 */
 
+#include <algorithm>
 #include <sstream>
+#include <utility>
 
 #include <ignition/common/Profiler.hh>
-#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
-#include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 
 #ifndef _WIN32
@@ -32,15 +32,9 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Assert.hh"
-#include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Mesh.hh"
-#include "gazebo/common/MeshManager.hh"
-#include "gazebo/common/Timer.hh"
 
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/GpuLaserPrivate.hh"
@@ -48,27 +42,25 @@
 using namespace gazebo;
 using namespace rendering;
 
-int GpuLaserPrivate::texCount = 0;
-
 //////////////////////////////////////////////////
 GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
                    const bool _autoRender)
-: Camera(_namePrefix, _scene, _autoRender),
-  dataPtr(new GpuLaserPrivate)
+  : Camera(_namePrefix, std::move(_scene), _autoRender)
+  , horzHalfAngle {0.0}
+  , vertHalfAngle {0.0}
+  , rayCountRatio {0.0}
+  , hfov {0.0}
+  , vfov {0.0}
+  , chfov {0.0}
+  , cvfov {0.0}
+  , nearClip {0.0}
+  , farClip {0.0}
+  , isHorizontal {false}
+  , dataPtr {std::make_unique<GpuLaserPrivate>()}
 {
-  this->dataPtr->laserBuffer = NULL;
-  this->dataPtr->laserScan = NULL;
-  this->dataPtr->matFirstPass = NULL;
-  this->dataPtr->matSecondPass = NULL;
-  for (int i = 0; i < 3; ++i)
-    this->dataPtr->firstPassTextures[i] = NULL;
-  this->dataPtr->secondPassTexture = NULL;
-  this->dataPtr->orthoCam = NULL;
-  this->dataPtr->w2nd = 0;
-  this->dataPtr->h2nd = 0;
-  this->cameraCount = 0;
-  this->dataPtr->textureCount = 0;
-  this->dataPtr->visual.reset();
+  this->dataPtr->material = nullptr;
+  this->dataPtr->horizontalRangeCount = 0;
+  this->dataPtr->verticalRangeCount = 0;
 }
 
 //////////////////////////////////////////////////
@@ -93,43 +85,21 @@ void GpuLaser::Load()
 void GpuLaser::Init()
 {
   Camera::Init();
-  this->dataPtr->visual.reset(new Visual(this->Name()+"second_pass_canvas",
-     this->GetScene()->WorldVisual()));
 }
 
 //////////////////////////////////////////////////
 void GpuLaser::Fini()
 {
-  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
+  for (const auto& [cubeFaceId, cubeFace] : this->dataPtr->cubeMapFaces)
   {
-    if (this->dataPtr->firstPassTextures[i])
+    if (!cubeFace.texture.isNull())
     {
       Ogre::TextureManager::getSingleton().remove(
-          this->dataPtr->firstPassTextures[i]->getName());
-      this->dataPtr->firstPassTextures[i] = nullptr;
+          cubeFace.texture->getName());
     }
   }
-  if (this->dataPtr->secondPassTexture)
-  {
-    Ogre::TextureManager::getSingleton().remove(
-        this->dataPtr->secondPassTexture->getName());
-    this->dataPtr->secondPassTexture = nullptr;
-  }
 
-  if (this->dataPtr->orthoCam)
-  {
-    this->scene->OgreSceneManager()->destroyCamera(this->dataPtr->orthoCam);
-    this->dataPtr->orthoCam = nullptr;
-  }
-
-  this->dataPtr->visual.reset();
-  this->dataPtr->texIdx.clear();
-  this->dataPtr->texCount = 0;
-
-  delete [] this->dataPtr->laserBuffer;
-  this->dataPtr->laserBuffer = nullptr;
-  delete [] this->dataPtr->laserScan;
-  this->dataPtr->laserScan = nullptr;
+  this->dataPtr->laserScan.clear();
 
   Camera::Fini();
 }
@@ -137,176 +107,152 @@ void GpuLaser::Fini()
 //////////////////////////////////////////////////
 void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 {
-  this->camera->yaw(Ogre::Radian(this->horzHalfAngle));
-
-  this->CreateOrthoCam();
-
-  this->dataPtr->textureCount = this->cameraCount;
-
-  if (this->dataPtr->textureCount == 2)
-  {
-    this->dataPtr->cameraYaws[0] = -this->hfov/2;
-    this->dataPtr->cameraYaws[1] = +this->hfov;
-    this->dataPtr->cameraYaws[2] = 0;
-    this->dataPtr->cameraYaws[3] = -this->hfov/2;
-  }
-  else
-  {
-    this->dataPtr->cameraYaws[0] = -this->hfov;
-    this->dataPtr->cameraYaws[1] = +this->hfov;
-    this->dataPtr->cameraYaws[2] = +this->hfov;
-    this->dataPtr->cameraYaws[3] = -this->hfov;
-  }
-
-  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
+  unsigned int cubeFaceTexIndex = 0;
+  for (auto& [cubeFaceId, cubeFace] : this->dataPtr->cubeMapFaces)
   {
     std::stringstream texName;
-    texName << _textureName << "first_pass_" << i;
-    this->dataPtr->firstPassTextures[i] =
-      Ogre::TextureManager::getSingleton().createManual(
-      texName.str(), "General", Ogre::TEX_TYPE_2D,
-      this->ImageWidth(), this->ImageHeight(), 0,
-      Ogre::PF_FLOAT32_RGB, Ogre::TU_RENDERTARGET).getPointer();
+    texName << _textureName << "_cube_face_texture_" << cubeFaceTexIndex;
 
-    this->Set1stPassTarget(
-        this->dataPtr->firstPassTextures[i]->getBuffer()->getRenderTarget(), i);
+    cubeFace.texture = Ogre::TextureManager::getSingleton().createManual(
+        texName.str(), "General", Ogre::TEX_TYPE_2D,
+        this->ImageWidth(), this->ImageHeight(), 0,
+        Ogre::PF_FLOAT32_RGB, Ogre::TU_RENDERTARGET);
 
-    this->dataPtr->firstPassTargets[i]->setAutoUpdated(false);
+    this->SetUpRenderTarget(cubeFace);
+
+    cubeFaceTexIndex++;
   }
 
-  this->dataPtr->matFirstPass = (Ogre::Material*)(
-  Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan1st").get());
+  this->dataPtr->material =
+      static_cast<Ogre::Material *>(Ogre::MaterialManager::getSingleton()
+                                        .getByName("Gazebo/LaserScan")
+                                        .get());
 
-  this->dataPtr->matFirstPass->load();
-  this->dataPtr->matFirstPass->setCullingMode(Ogre::CULL_NONE);
-
-  this->dataPtr->secondPassTexture =
-      Ogre::TextureManager::getSingleton().createManual(
-      _textureName + "second_pass",
-      "General",
-      Ogre::TEX_TYPE_2D,
-      this->dataPtr->w2nd, this->dataPtr->h2nd, 0,
-      Ogre::PF_FLOAT32_RGB,
-      Ogre::TU_RENDERTARGET).getPointer();
-
-  this->Set2ndPassTarget(
-      this->dataPtr->secondPassTexture->getBuffer()->getRenderTarget());
-
-  this->dataPtr->secondPassTarget->setAutoUpdated(false);
-
-  this->dataPtr->matSecondPass = (Ogre::Material*)(
-  Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan2nd").get());
-
-  this->dataPtr->matSecondPass->load();
-
-  Ogre::TextureUnitState *texUnit;
-  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
-  {
-    unsigned int texIndex = this->dataPtr->texCount++;
-    Ogre::Technique *technique = this->dataPtr->matSecondPass->getTechnique(0);
-    GZ_ASSERT(technique, "GpuLaser material script error: technique not found");
-
-    Ogre::Pass *pass = technique->getPass(0);
-    GZ_ASSERT(pass, "GpuLaser material script error: pass not found");
-
-    if (!pass->getTextureUnitState(
-        this->dataPtr->firstPassTextures[i]->getName()))
-    {
-      texUnit = pass->createTextureUnitState(
-            this->dataPtr->firstPassTextures[i]->getName(), texIndex);
-
-      this->dataPtr->texIdx.push_back(texIndex);
-
-      texUnit->setTextureFiltering(Ogre::TFO_NONE);
-      texUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
-    }
-  }
-
-  this->CreateCanvas();
+  this->dataPtr->material->load();
+  this->dataPtr->material->setCullingMode(Ogre::CULL_NONE);
 }
 
 //////////////////////////////////////////////////
 void GpuLaser::PostRender()
 {
-  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
+  for (auto& [cubeFaceId, cubeFace] : this->dataPtr->cubeMapFaces)
   {
-    this->dataPtr->firstPassTargets[i]->swapBuffers();
+    cubeFace.texture->getBuffer()->getRenderTarget()->swapBuffers();
   }
-  this->dataPtr->secondPassTarget->swapBuffers();
 
+  constexpr unsigned int numberOfChannels = 3;
+
+  IGN_PROFILE_BEGIN("blitToMemory");
+  // Blit the depth buffer if needed
   if (this->newData && this->captureData)
   {
-    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
+    const unsigned int imageWidth = this->ImageWidth();
+    const unsigned int imageHeight = this->ImageHeight();
 
-    unsigned int width = this->dataPtr->secondPassViewport->getActualWidth();
-    unsigned int height = this->dataPtr->secondPassViewport->getActualHeight();
+    const size_t laserBufferSize = this->dataPtr->horizontalRangeCount * this->dataPtr->verticalRangeCount * numberOfChannels;
+    const size_t depthImageBufferSize = imageWidth * imageHeight * numberOfChannels;
 
-    // Get access to the buffer and make an image and write it to file
-    pixelBuffer = this->dataPtr->secondPassTexture->getBuffer();
-
-    size_t size = Ogre::PixelUtil::getMemorySize(
-                    width, height, 1, Ogre::PF_FLOAT32_RGB);
-
-    // Blit the depth buffer if needed
-    if (!this->dataPtr->laserBuffer)
-      this->dataPtr->laserBuffer = new float[size];
-
-    memset(this->dataPtr->laserBuffer, 255, size);
-
-    Ogre::PixelBox dstBox(width, height,
-        1, Ogre::PF_FLOAT32_RGB, this->dataPtr->laserBuffer);
-
-    pixelBuffer->blitToMemory(dstBox);
-
-    if (!this->dataPtr->laserScan)
+    if (this->dataPtr->laserBuffer.empty())
     {
-      int len = this->dataPtr->w2nd * this->dataPtr->h2nd * 3;
-      this->dataPtr->laserScan = new float[len];
+      this->dataPtr->laserBuffer.resize(laserBufferSize);
     }
 
-    memcpy(this->dataPtr->laserScan, this->dataPtr->laserBuffer,
-           this->dataPtr->w2nd * this->dataPtr->h2nd * 3 *
-           sizeof(this->dataPtr->laserScan[0]));
+    for (auto& [cubeFaceId, cubeFace] : this->dataPtr->cubeMapFaces)
+    {
+      cubeFace.depthImg.resize(depthImageBufferSize);
 
-    this->dataPtr->newLaserFrame(this->dataPtr->laserScan, this->dataPtr->w2nd,
-        this->dataPtr->h2nd, 3, "BLABLA");
+      Ogre::PixelBox dstBox(imageWidth, imageHeight, 1, Ogre::PF_FLOAT32_RGB, cubeFace.depthImg.data());
+
+      cubeFace.texture->getBuffer()->blitToMemory(dstBox);
+    }
+    IGN_PROFILE_END();
+
+    // read ranges
+    GZ_ASSERT(this->dataPtr->horizontalRangeCount == this->dataPtr->mapping.size(), "cube face mapping size doesn't match number of horizontal rays");
+
+    IGN_PROFILE_BEGIN("applyMapping");
+    for (unsigned int azimuthIndex = 0; azimuthIndex < this->dataPtr->horizontalRangeCount; ++azimuthIndex)
+    {
+      GZ_ASSERT(this->dataPtr->verticalRangeCount == this->dataPtr->mapping[azimuthIndex].size(), "cube face mapping size doesn't match number of vertical rays");
+
+      for (unsigned int elevationIndex = 0; elevationIndex < this->dataPtr->verticalRangeCount; ++elevationIndex)
+      {
+        const auto& [cubeFaceId, faceCoordinates] = this->dataPtr->mapping[azimuthIndex][elevationIndex];
+
+        GZ_ASSERT(this->dataPtr->cubeMapFaces.find(cubeFaceId) != this->dataPtr->cubeMapFaces.end(), "Required cube face has not been initialized");
+
+        const auto &cubeFace = this->dataPtr->cubeMapFaces.at(cubeFaceId);
+
+        // pixel coordinates
+        const auto imageX = static_cast<unsigned int>(faceCoordinates.X() * (imageWidth - 1));
+        const auto imageY = static_cast<unsigned int>(faceCoordinates.Y() * (imageHeight - 1));
+
+        GZ_ASSERT(imageX < imageWidth, "Calculated image X exceeds image width");
+        GZ_ASSERT(imageY < imageHeight, "Calculated image Y exceeds image height");
+
+        const unsigned int depthImageBufferIndex = (imageY * imageWidth + imageX) * numberOfChannels;
+
+        GZ_ASSERT(depthImageBufferIndex + 2 < cubeFace.depthImg.size(), "Depth image buffer index is out of range");
+
+        const unsigned int laserBufferIndex = (elevationIndex * this->dataPtr->horizontalRangeCount + azimuthIndex) * numberOfChannels;
+
+        GZ_ASSERT(laserBufferIndex + 2 < this->dataPtr->laserBuffer.size(), "Laser buffer index is out of range");
+
+        this->dataPtr->laserBuffer[laserBufferIndex] = cubeFace.depthImg[depthImageBufferIndex];
+        this->dataPtr->laserBuffer[laserBufferIndex + 1] = cubeFace.depthImg[depthImageBufferIndex + 1];
+        this->dataPtr->laserBuffer[laserBufferIndex + 2] = cubeFace.depthImg[depthImageBufferIndex + 2];
+      }
+    }
+    IGN_PROFILE_END();
+
+    IGN_PROFILE_BEGIN("copyBufferToScan");
+    if (this->dataPtr->laserScan.size() != laserBufferSize) {
+      this->dataPtr->laserScan.resize(laserBufferSize);
+    }
+
+    std::copy(this->dataPtr->laserBuffer.begin(),
+              this->dataPtr->laserBuffer.end(),
+              this->dataPtr->laserScan.begin());
+    IGN_PROFILE_END();
+
+    this->dataPtr->newLaserFrame(
+        this->dataPtr->laserScan.data(), this->dataPtr->horizontalRangeCount,
+        this->dataPtr->verticalRangeCount, 3, "BLABLA");
   }
 
   this->newData = false;
 }
 
 /////////////////////////////////////////////////
-void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
-                   Ogre::Material *_material, Ogre::Camera *_cam,
-                   const bool _updateTex)
+void GpuLaser::UpdateRenderTarget(GpuLaserCubeFace &_cube_face)
 {
-  Ogre::RenderSystem *renderSys;
-  Ogre::Viewport *vp = NULL;
+  Ogre::RenderTarget *renderTarget = _cube_face.texture->getBuffer()->getRenderTarget();
   Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
-  Ogre::Pass *pass;
+  Ogre::RenderSystem *renderSys = sceneMgr->getDestinationRenderSystem();
 
-  renderSys = this->scene->OgreSceneManager()->getDestinationRenderSystem();
+  this->dataPtr->currentTarget = renderTarget;
+
   // Get pointer to the material pass
-  pass = _material->getBestTechnique()->getPass(0);
+  Ogre::Pass *pass = this->dataPtr->material->getBestTechnique()->getPass(0);
 
   // Render the depth texture
   // OgreSceneManager::_render function automatically sets farClip to 0.
   // Which normally equates to infinite distance. We don't want this. So
   // we have to set the distance every time.
-  _cam->setFarClipDistance(this->FarClip());
+  this->camera->setFarClipDistance(static_cast<float>(this->FarClip()));
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
-  vp = _target->getViewport(0);
+  Ogre::Viewport *vp = renderTarget->getViewport(0);
 
   // Need this line to render the ground plane. No idea why it's necessary.
   renderSys->_setViewport(vp);
   sceneMgr->_setPass(pass, true, false);
   autoParamDataSource.setCurrentPass(pass);
   autoParamDataSource.setCurrentViewport(vp);
-  autoParamDataSource.setCurrentRenderTarget(_target);
+  autoParamDataSource.setCurrentRenderTarget(renderTarget);
   autoParamDataSource.setCurrentSceneManager(sceneMgr);
-  autoParamDataSource.setCurrentCamera(_cam, true);
+  autoParamDataSource.setCurrentCamera(this->camera, true);
 
   renderSys->setLightingEnabled(false);
   renderSys->_setFog(Ogre::FOG_NONE);
@@ -316,20 +262,6 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
 #else
   pass->_updateAutoParams(&autoParamDataSource, 1);
 #endif
-
-  if (_updateTex)
-  {
-    pass->getFragmentProgramParameters()->setNamedConstant("tex1",
-      this->dataPtr->texIdx[0]);
-    if (this->dataPtr->texIdx.size() > 1)
-    {
-      pass->getFragmentProgramParameters()->setNamedConstant("tex2",
-        this->dataPtr->texIdx[1]);
-      if (this->dataPtr->texIdx.size() > 2)
-        pass->getFragmentProgramParameters()->setNamedConstant("tex3",
-          this->dataPtr->texIdx[2]);
-    }
-  }
 
   // NOTE: We MUST bind parameters AFTER updating the autos
   if (pass->hasVertexProgram())
@@ -359,6 +291,8 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
       pass->getFragmentProgramParameters(), 1);
 #endif
   }
+
+  renderTarget->update(false);
 }
 
 /////////////////////////////////////////////////
@@ -376,7 +310,7 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
     _rend->setCustomParameter(1, Ogre::Vector4(0, 0, 0, 0));
   }
 
-  Ogre::Pass *pass = this->dataPtr->currentMat->getBestTechnique()->getPass(0);
+  Ogre::Pass *pass = this->dataPtr->material->getBestTechnique()->getPass(0);
   Ogre::RenderSystem *renderSys =
                   this->scene->OgreSceneManager()->getDestinationRenderSystem();
 
@@ -414,52 +348,20 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
 void GpuLaser::RenderImpl()
 {
   IGN_PROFILE("rendering::GpuLaser::RenderImpl");
-  common::Timer firstPassTimer, secondPassTimer;
-
-  firstPassTimer.Start();
-
   Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
 
   sceneMgr->_suppressRenderStateChanges(true);
   sceneMgr->addRenderObjectListener(this);
 
-  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
+  for (auto& [cubeFaceId, cubeFace] : this->dataPtr->cubeMapFaces)
   {
-    if (this->dataPtr->textureCount > 1)
-    {
-      // Cannot call Camera::RotateYaw because it rotates in world frame,
-      // but we need rotation in camera local frame
-      this->sceneNode->roll(Ogre::Radian(this->dataPtr->cameraYaws[i]));
-    }
-
-    this->dataPtr->currentMat = this->dataPtr->matFirstPass;
-    this->dataPtr->currentTarget = this->dataPtr->firstPassTargets[i];
-
-    this->UpdateRenderTarget(this->dataPtr->firstPassTargets[i],
-                  this->dataPtr->matFirstPass, this->camera);
-    this->dataPtr->firstPassTargets[i]->update(false);
+    this->ApplyCameraSetting(cubeFace.cameraSetting);
+    this->UpdateRenderTarget(cubeFace);
+    this->RevertCameraSetting(cubeFace.cameraSetting);
   }
 
-  if (this->dataPtr->textureCount > 1)
-      this->sceneNode->roll(Ogre::Radian(this->dataPtr->cameraYaws[3]));
-
   sceneMgr->removeRenderObjectListener(this);
-
-  double firstPassDur = firstPassTimer.GetElapsed().Double();
-  secondPassTimer.Start();
-
-  this->dataPtr->visual->SetVisible(true);
-
-  this->UpdateRenderTarget(this->dataPtr->secondPassTarget,
-                this->dataPtr->matSecondPass, this->dataPtr->orthoCam, true);
-  this->dataPtr->secondPassTarget->update(false);
-
-  this->dataPtr->visual->SetVisible(false);
-
   sceneMgr->_suppressRenderStateChanges(false);
-
-  double secondPassDur = secondPassTimer.GetElapsed().Double();
-  this->dataPtr->lastRenderDuration = firstPassDur + secondPassDur;
 }
 
 //////////////////////////////////////////////////
@@ -472,14 +374,14 @@ GpuLaser::DataIter GpuLaser::LaserDataBegin() const
   const unsigned int rangeOffset = 0;
   // intensity data in G channel
   const unsigned int intenOffset = 1;
-  return DataIter(index, this->dataPtr->laserBuffer, skip, rangeOffset,
-      intenOffset, this->dataPtr->w2nd);
+  return {index, this->dataPtr->laserBuffer.data(), skip, rangeOffset,
+          intenOffset, this->dataPtr->horizontalRangeCount};
 }
 
 //////////////////////////////////////////////////
 GpuLaser::DataIter GpuLaser::LaserDataEnd() const
 {
-  const unsigned int index = this->dataPtr->h2nd * this->dataPtr->w2nd;
+  const unsigned int index = this->dataPtr->verticalRangeCount * this->dataPtr->horizontalRangeCount;
 
   // Data stuffed into three floats (RGB)
   const unsigned int skip = 3;
@@ -487,273 +389,39 @@ GpuLaser::DataIter GpuLaser::LaserDataEnd() const
   const unsigned int rangeOffset = 0;
   // intensity data in G channel
   const unsigned int intenOffset = 1;
-  return DataIter(index, this->dataPtr->laserBuffer, skip, rangeOffset,
-      intenOffset, this->dataPtr->w2nd);
-}
-
-/////////////////////////////////////////////////
-void GpuLaser::CreateOrthoCam()
-{
-  this->dataPtr->pitchNodeOrtho =
-    this->GetScene()->WorldVisual()->GetSceneNode()->createChildSceneNode();
-
-  this->dataPtr->orthoCam = this->scene->OgreSceneManager()->createCamera(
-        this->dataPtr->pitchNodeOrtho->getName() + "_ortho_cam");
-
-  // Use X/Y as horizon, Z up
-  this->dataPtr->orthoCam->pitch(Ogre::Degree(90));
-
-  // Don't yaw along variable axis, causes leaning
-  this->dataPtr->orthoCam->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
-
-  this->dataPtr->orthoCam->setDirection(1, 0, 0);
-
-  this->dataPtr->pitchNodeOrtho->attachObject(this->dataPtr->orthoCam);
-  this->dataPtr->orthoCam->setAutoAspectRatio(true);
-
-  if (this->dataPtr->orthoCam)
-  {
-    this->dataPtr->orthoCam->setNearClipDistance(0.01);
-    this->dataPtr->orthoCam->setFarClipDistance(0.02);
-    this->dataPtr->orthoCam->setRenderingDistance(0.02);
-
-    this->dataPtr->orthoCam->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
-  }
-}
-
-/////////////////////////////////////////////////
-Ogre::Matrix4 GpuLaser::BuildScaledOrthoMatrix(const float _left,
-    const float _right, const float _bottom, const float _top,
-    const float _near, const float _far)
-{
-  float invw = 1 / (_right - _left);
-  float invh = 1 / (_top - _bottom);
-  float invd = 1 / (_far - _near);
-
-  Ogre::Matrix4 proj = Ogre::Matrix4::ZERO;
-  proj[0][0] = 2 * invw;
-  proj[0][3] = -(_right + _left) * invw;
-  proj[1][1] = 2 * invh;
-  proj[1][3] = -(_top + _bottom) * invh;
-  proj[2][2] = -2 * invd;
-  proj[2][3] = -(_far + _near) * invd;
-  proj[3][3] = 1;
-
-  return proj;
+  return {index, this->dataPtr->laserBuffer.data(), skip, rangeOffset,
+          intenOffset, this->dataPtr->horizontalRangeCount};
 }
 
 //////////////////////////////////////////////////
-void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
-                                const unsigned int _index)
+void GpuLaser::SetUpRenderTarget(GpuLaserCubeFace &_cube_face)
 {
-  this->dataPtr->firstPassTargets[_index] = _target;
+  Ogre::RenderTarget *renderTarget = _cube_face.texture->getBuffer()->getRenderTarget();
 
-  if (this->dataPtr->firstPassTargets[_index])
+  if (renderTarget)
   {
     // Setup the viewport to use the texture
-    this->dataPtr->firstPassViewports[_index] =
-      this->dataPtr->firstPassTargets[_index]->addViewport(this->camera);
-    this->dataPtr->firstPassViewports[_index]->setClearEveryFrame(true);
-    this->dataPtr->firstPassViewports[_index]->setOverlaysEnabled(false);
-    this->dataPtr->firstPassViewports[_index]->setShadowsEnabled(false);
-    this->dataPtr->firstPassViewports[_index]->setSkiesEnabled(false);
-    this->dataPtr->firstPassViewports[_index]->setBackgroundColour(
-        Ogre::ColourValue(this->farClip, 0.0, 1.0));
-    this->dataPtr->firstPassViewports[_index]->setVisibilityMask(
+    Ogre::Viewport *viewport = renderTarget->addViewport(this->camera);
+    viewport->setClearEveryFrame(true);
+    viewport->setOverlaysEnabled(false);
+    viewport->setShadowsEnabled(false);
+    viewport->setSkiesEnabled(false);
+    viewport->setBackgroundColour(Ogre::ColourValue(static_cast<float>(this->farClip), 0.0, 1.0));
+    viewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
 
-  if (_index == 0)
-  {
-    this->camera->setAspectRatio(this->RayCountRatio());
-    this->camera->setFOVy(Ogre::Radian(this->LimitFOV(this->CosVertFOV())));
-  }
-}
+  this->camera->setAspectRatio(static_cast<float>(this->RayCountRatio()));
+  this->camera->setFOVy(Ogre::Radian(static_cast<float>(this->CosVertFOV())));
 
-//////////////////////////////////////////////////
-void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *_target)
-{
-  this->dataPtr->secondPassTarget = _target;
-
-  if (this->dataPtr->secondPassTarget)
-  {
-    // Setup the viewport to use the texture
-    this->dataPtr->secondPassViewport =
-        this->dataPtr->secondPassTarget->addViewport(this->dataPtr->orthoCam);
-    this->dataPtr->secondPassViewport->setClearEveryFrame(true);
-    this->dataPtr->secondPassViewport->setOverlaysEnabled(false);
-    this->dataPtr->secondPassViewport->setShadowsEnabled(false);
-    this->dataPtr->secondPassViewport->setSkiesEnabled(false);
-    this->dataPtr->secondPassViewport->setBackgroundColour(
-        Ogre::ColourValue(0.0, 1.0, 0.0));
-    this->dataPtr->secondPassViewport->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
-  }
-  Ogre::Matrix4 p = this->BuildScaledOrthoMatrix(
-      0, static_cast<float>(this->dataPtr->w2nd / 10.0),
-      0, static_cast<float>(this->dataPtr->h2nd / 10.0),
-      0.01, 0.02);
-
-  this->dataPtr->orthoCam->setCustomProjectionMatrix(true, p);
+  renderTarget->setAutoUpdated(false);
 }
 
 /////////////////////////////////////////////////
 void GpuLaser::SetRangeCount(const unsigned int _w, const unsigned int _h)
 {
-  this->dataPtr->w2nd = _w;
-  this->dataPtr->h2nd = _h;
-}
-
-/////////////////////////////////////////////////
-void GpuLaser::CreateMesh()
-{
-  std::string meshName = this->Name() + "_undistortion_mesh";
-
-  common::Mesh *mesh = new common::Mesh();
-  mesh->SetName(meshName);
-
-  common::SubMesh *submesh = new common::SubMesh();
-
-  double dx, dy;
-  submesh->SetPrimitiveType(common::SubMesh::POINTS);
-
-  if (this->dataPtr->h2nd == 1)
-  {
-    dy = 0;
-  }
-  else
-  {
-    dy = 0.1;
-  }
-
-  dx = 0.1;
-
-  // startX ranges from 0 to -(w2nd/10) at dx=0.1 increments
-  // startY ranges from h2nd/10 to 0 at dy=0.1 decrements
-  // see GpuLaser::Set2ndPassTarget() on how the ortho cam is set up
-  double startX = dx;
-  double startY = this->dataPtr->h2nd/10.0;
-
-  // half of actual camera vertical FOV without padding
-  double phi = this->VertFOV() / 2;
-  double phiCamera = phi + std::abs(this->VertHalfAngle());
-  double theta = this->CosHorzFOV() / 2;
-
-  if (this->ImageHeight() == 1)
-  {
-    phi = 0;
-  }
-
-  // index of ray
-  unsigned int ptsOnLine = 0;
-
-  // total laser hfov
-  double thfov = this->dataPtr->textureCount * this->CosHorzFOV();
-  double hstep = thfov / (this->dataPtr->w2nd - 1);
-  double vstep = 2 * phi / (this->dataPtr->h2nd - 1);
-
-  if (this->dataPtr->h2nd == 1)
-  {
-    vstep = 0;
-  }
-
-  for (unsigned int j = 0; j < this->dataPtr->h2nd; ++j)
-  {
-    double gamma = 0;
-    if (this->dataPtr->h2nd != 1)
-    {
-      // gamma: current vertical angle w.r.t. camera
-      gamma = vstep * j - phi + this->VertHalfAngle();
-    }
-
-    for (unsigned int i = 0; i < this->dataPtr->w2nd; ++i)
-    {
-      // current horizontal angle from start of laser scan
-      double delta = hstep * i;
-
-      // index of texture that contains the depth value
-      unsigned int texture = delta / this->CosHorzFOV();
-
-      // cap texture index and horizontal angle
-      if (texture > this->dataPtr->textureCount-1)
-      {
-        texture -= 1;
-        delta -= hstep;
-      }
-
-      startX -= dx;
-      if (ptsOnLine == this->dataPtr->w2nd)
-      {
-        ptsOnLine = 0;
-        startX = 0;
-        startY -= dy;
-      }
-      ptsOnLine++;
-
-      // the texture/1000.0 value is used in the laser_2nd_pass.frag shader
-      // as a trick to determine which camera texture to use when stitching
-      // together the final depth image.
-      submesh->AddVertex(texture/1000.0, startX, startY);
-
-      // first compute angle from the start of current camera's horizontal
-      // min angle, then set delta to be angle from center of current camera.
-      delta = delta - (texture * this->CosHorzFOV());
-      delta = delta - theta;
-
-      // adjust uv coordinates of depth texture to match projection of current
-      // laser ray the depth image plane.
-      double u = 0.5 - tan(delta) / (2.0 * tan(theta));
-      double v = 0.5 - (tan(gamma) * cos(theta)) /
-          (2.0 * tan(phiCamera) * cos(delta));
-
-      submesh->AddTexCoord(u, v);
-      submesh->AddIndex(this->dataPtr->w2nd * j + i);
-    }
-  }
-
-  mesh->AddSubMesh(submesh);
-
-  this->dataPtr->undistMesh = mesh;
-
-  common::MeshManager::Instance()->AddMesh(this->dataPtr->undistMesh);
-}
-
-/////////////////////////////////////////////////
-void GpuLaser::CreateCanvas()
-{
-  this->CreateMesh();
-
-  Ogre::Node *parent = this->dataPtr->visual->GetSceneNode()->getParent();
-  parent->removeChild(this->dataPtr->visual->GetSceneNode());
-
-  this->dataPtr->pitchNodeOrtho->addChild(
-      this->dataPtr->visual->GetSceneNode());
-
-  this->dataPtr->visual->InsertMesh(this->dataPtr->undistMesh);
-
-  std::ostringstream stream;
-  std::string meshName = this->dataPtr->undistMesh->GetName();
-  stream << this->dataPtr->visual->GetSceneNode()->getName()
-      << "_ENTITY_" << meshName;
-
-  this->dataPtr->object = (Ogre::MovableObject*)
-      (this->dataPtr->visual->GetSceneNode()->getCreator()->createEntity(
-      stream.str(), meshName));
-
-  this->dataPtr->visual->AttachObject(this->dataPtr->object);
-  this->dataPtr->object->setVisibilityFlags(GZ_VISIBILITY_ALL
-      & ~GZ_VISIBILITY_SELECTABLE);
-
-  ignition::math::Pose3d pose;
-  pose.Pos().Set(0.01, 0, 0);
-  pose.Rot().Euler(ignition::math::Vector3d(0, 0, 0));
-
-  this->dataPtr->visual->SetPose(pose);
-
-  this->dataPtr->visual->SetDiffuse(ignition::math::Color(0, 1, 0, 0));
-  this->dataPtr->visual->SetAmbient(ignition::math::Color(0, 1, 0, 0));
-  this->dataPtr->visual->SetVisible(true);
-  this->scene->AddVisual(this->dataPtr->visual);
+  this->dataPtr->horizontalRangeCount = _w;
+  this->dataPtr->verticalRangeCount = _h;
 }
 
 //////////////////////////////////////////////////
@@ -867,13 +535,13 @@ void GpuLaser::SetFarClip(const double _far)
 //////////////////////////////////////////////////
 unsigned int GpuLaser::CameraCount() const
 {
-  return this->cameraCount;
+  return this->dataPtr->cubeMapFaces.size();
 }
 
 //////////////////////////////////////////////////
 void GpuLaser::SetCameraCount(const unsigned int _cameraCount)
 {
-  this->cameraCount = _cameraCount;
+  /*unused*/
 }
 
 //////////////////////////////////////////////////
@@ -895,4 +563,193 @@ event::ConnectionPtr GpuLaser::ConnectNewLaserFrame(
     const std::string &_format)> _subscriber)
 {
   return this->dataPtr->newLaserFrame.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::ApplyCameraSetting(const GpuLaserCameraOrientationOffset &_setting)
+{
+  this->sceneNode->roll(Ogre::Radian(static_cast<float>(_setting.azimuthOffset)));
+  this->sceneNode->yaw(Ogre::Radian(static_cast<float>(_setting.elevationOffset)));
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::RevertCameraSetting(const GpuLaserCameraOrientationOffset &_setting)
+{
+  this->sceneNode->yaw(Ogre::Radian(static_cast<float>(-_setting.elevationOffset)));
+  this->sceneNode->roll(Ogre::Radian(static_cast<float>(-_setting.azimuthOffset)));
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::InitMapping(const std::set<double> &_azimuth_values, const std::set<double> &_elevation_values)
+{
+  this->dataPtr->mapping.clear();
+  this->dataPtr->mapping.reserve(_azimuth_values.size());
+
+  if (_azimuth_values.empty())
+  {
+    return;
+  }
+
+  const double min_azimuth = *_azimuth_values.begin();
+  const double front_face_azimuth = min_azimuth + M_PI_4;
+
+  // define face orientations w.r.t. front face
+  const std::map<GpuLaserCubeFaceId, GpuLaserCameraOrientationOffset> cube_camera_orientations {
+      {GpuLaserCubeFaceId::CUBE_FRONT_FACE, {front_face_azimuth, 0.}},
+      {GpuLaserCubeFaceId::CUBE_LEFT_FACE, {front_face_azimuth + M_PI_2, 0.0}},
+      {GpuLaserCubeFaceId::CUBE_REAR_FACE, {front_face_azimuth + M_PI, 0.0}},
+      {GpuLaserCubeFaceId::CUBE_RIGHT_FACE, {front_face_azimuth + M_PI + M_PI_2, 0.0}},
+      {GpuLaserCubeFaceId::CUBE_TOP_FACE, {front_face_azimuth, -M_PI_2}},
+      {GpuLaserCubeFaceId::CUBE_BOTTOM_FACE, {front_face_azimuth, M_PI_2}},
+  };
+
+  for (const double azimuth : _azimuth_values)
+  {
+    this->dataPtr->mapping.emplace_back();
+    this->dataPtr->mapping.back().reserve(_elevation_values.size());
+
+    for (const double elevation : _elevation_values)
+    {
+      const auto& [cube_face_id, face_coordinates] = GpuLaser::FindCubeFaceMapping(azimuth - min_azimuth, elevation);
+      this->dataPtr->mapping.back().emplace_back(cube_face_id, face_coordinates);
+
+      // create cube map faces if necessary
+      if (this->dataPtr->cubeMapFaces.find(cube_face_id) ==
+          this->dataPtr->cubeMapFaces.end()) {
+        GpuLaserCubeFace face;
+        face.cameraSetting = cube_camera_orientations.at(cube_face_id);
+        this->dataPtr->cubeMapFaces.insert({cube_face_id, face});
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+GpuLaserCubeMappingPoint GpuLaser::FindCubeFaceMapping(const double _azimuth, const double _elevation)
+{
+  if (_azimuth < 0)
+  {
+    throw std::runtime_error("Azimuth angle should be relative to minimum angle, i.e. it must not be negative!");
+  }
+
+  const GpuLaserCubeFaceId face_id = GpuLaser::FindCubeFace(_azimuth, _elevation);
+
+  // center point of the face plane
+  ignition::math::Vector3d plane_point;
+  switch (face_id)
+  {
+    case GpuLaserCubeFaceId::CUBE_FRONT_FACE:
+      plane_point = {0.5, 0., 0.};
+      break;
+    case GpuLaserCubeFaceId::CUBE_LEFT_FACE:
+      plane_point = {0., 0.5, 0.};
+      break;
+    case GpuLaserCubeFaceId::CUBE_REAR_FACE:
+      plane_point = {-0.5, 0., 0.};
+      break;
+    case GpuLaserCubeFaceId::CUBE_RIGHT_FACE:
+      plane_point = {0., -0.5, 0.};
+      break;
+    case GpuLaserCubeFaceId::CUBE_TOP_FACE:
+      plane_point = {0., 0., 0.5};
+      break;
+    case GpuLaserCubeFaceId::CUBE_BOTTOM_FACE:
+      plane_point = {0., 0., -0.5};
+      break;
+    default:
+      throw std::runtime_error("Invalid face ID");
+  }
+
+  const ignition::math::Vector3d plane_normal = plane_point.Normalized();
+  const ignition::math::Vector3d viewing_ray = GpuLaser::ViewingRay(_azimuth, _elevation);
+
+  // calculate intersection of viewing ray with cube face plane
+  const double s = (-plane_normal).Dot(-plane_point) / plane_normal.Dot(viewing_ray);
+
+  // offset from face center to intersection
+  const ignition::math::Vector3d intersection_offset = s * viewing_ray - plane_point;
+
+  // offset in the 2D image on the face
+  ignition::math::Vector2d intersection_image_offset;
+  switch (face_id)
+  {
+    case GpuLaserCubeFaceId::CUBE_FRONT_FACE:
+      intersection_image_offset = {-intersection_offset.Y(),
+                                   -intersection_offset.Z()};
+      break;
+    case GpuLaserCubeFaceId::CUBE_LEFT_FACE:
+      intersection_image_offset = {intersection_offset.X(),
+                                   -intersection_offset.Z()};
+      break;
+    case GpuLaserCubeFaceId::CUBE_REAR_FACE:
+      intersection_image_offset = {intersection_offset.Y(),
+                                   -intersection_offset.Z()};
+      break;
+    case GpuLaserCubeFaceId::CUBE_RIGHT_FACE:
+      intersection_image_offset = {-intersection_offset.X(),
+                                   -intersection_offset.Z()};
+      break;
+    case GpuLaserCubeFaceId::CUBE_TOP_FACE:
+      intersection_image_offset = {-intersection_offset.Y(),
+                                   intersection_offset.X()};
+      break;
+    case GpuLaserCubeFaceId::CUBE_BOTTOM_FACE:
+      intersection_image_offset = {-intersection_offset.Y(),
+                                   -intersection_offset.X()};
+      break;
+    default:
+      throw std::runtime_error("Invalid face ID");
+  }
+
+  // shift offset from image center to origin
+  intersection_image_offset += {0.5, 0.5};
+
+  intersection_image_offset.Set(ignition::math::clamp(intersection_image_offset.X(), 0., 1.),
+                                ignition::math::clamp(intersection_image_offset.Y(), 0., 1.));
+
+  return {face_id, intersection_image_offset};
+}
+
+//////////////////////////////////////////////////
+GpuLaserCubeFaceId GpuLaser::FindCubeFace(const double _azimuth, const double _elevation)
+{
+  const ignition::math::Vector3d v = GpuLaser::ViewingRay(_azimuth, _elevation);
+
+  // find corresponding cube face
+  if (std::abs(v.Z()) > std::abs(v.X()) && std::abs(v.Z()) > std::abs(v.Y()))
+  {
+    if (v.Z() >= 0)
+    {
+      return GpuLaserCubeFaceId::CUBE_TOP_FACE;
+    }
+    else
+    {
+      return GpuLaserCubeFaceId::CUBE_BOTTOM_FACE;
+    }
+  }
+  else if (_azimuth < M_PI_2)
+  {
+    return GpuLaserCubeFaceId::CUBE_FRONT_FACE;
+  }
+  else if (_azimuth >= M_PI_2 && _azimuth < M_PI)
+  {
+    return GpuLaserCubeFaceId::CUBE_LEFT_FACE;
+  }
+  else if (_azimuth >= M_PI && _azimuth < 3. * M_PI_2)
+  {
+    return GpuLaserCubeFaceId::CUBE_REAR_FACE;
+  }
+  else
+  {
+    return GpuLaserCubeFaceId::CUBE_RIGHT_FACE;
+  }
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d GpuLaser::ViewingRay(const double _azimuth, const double _elevation)
+{
+  /// subtracting M_PI_4 from azimuth because cube face horizontal center correspondents to azimuth = M_PI_4
+  return {std::cos(_azimuth - M_PI_4) * std::cos(_elevation),
+          std::sin(_azimuth - M_PI_4) * std::cos(_elevation),
+          std::sin(_elevation)};
 }
