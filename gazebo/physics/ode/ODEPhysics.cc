@@ -77,7 +77,7 @@
 
 #include "gazebo/physics/ode/ODEPhysicsPrivate.hh"
 
-double GetRotationAngle(double, double, double, double);
+double saturation_deadband(double, double, double, double);
 
 
 using namespace gazebo;
@@ -1170,35 +1170,36 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     auto collision2Sdf = _collision2->GetSDF();
 
     const std::string kPlowingTerrain =
-      "ignition:plowing_terrain";
+      "gz:plowing_terrain";
     const std::string kPlowingWheel =
-      "ignition:plowing_wheel";
+      "gz:plowing_wheel";
 
     sdf::ElementPtr wheelSdf = nullptr;
     sdf::ElementPtr terrainSdf = nullptr;
 
-    if (collision1Sdf->HasElement(kPlowingWheel) && 
-	collision2Sdf->HasElement(kPlowingTerrain))
+    if (collision1Sdf->HasElement(kPlowingWheel) &&
+        collision2Sdf->HasElement(kPlowingTerrain))
     {
-      wheelSdf = collision1Sdf;
+      wheelSdf = collision1Sdf->GetElement(kPlowingWheel);
       terrainSdf = collision2Sdf;
-    } else if (collision2Sdf->HasElement(kPlowingWheel) && 
-	collision1Sdf->HasElement(kPlowingTerrain))
+    }
+    else if (collision2Sdf->HasElement(kPlowingWheel) &&
+             collision1Sdf->HasElement(kPlowingTerrain))
     {
-      wheelSdf = collision2Sdf;
+      wheelSdf = collision2Sdf->GetElement(kPlowingWheel);
       terrainSdf = collision1Sdf;
     }
 
     const std::string kPlowingMaxDegrees =
-      "ignition:plowing_max_degrees";
+      "max_degrees";
     const std::string kPlowingSaturationVelocity =
-      "ignition:plowing_saturation_velocity";
+      "saturation_velocity";
     if (wheelSdf && terrainSdf &&
-	wheelSdf->HasElement(kPlowingMaxDegrees) &&
+        wheelSdf->HasElement(kPlowingMaxDegrees) &&
         wheelSdf->HasElement(kPlowingSaturationVelocity))
     {
       const std::string kPlowingDeadbandVelocity =
-        "ignition:plowing_deadband_velocity";
+        "deadband_velocity";
       ignition::math::Angle plowingMaxAngle;
       plowingMaxAngle.SetDegree(wheelSdf->Get<double>(kPlowingMaxDegrees));
       double plowingSaturationVelocity =
@@ -1208,7 +1209,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
         wheelSdf->Get<double>(kPlowingDeadbandVelocity, 0.0).first;
 
       // compute slope
-      double slope = plowingMaxAngle.Radian() / (plowingSaturationVelocity - plowingDeadbandVelocity);
+      double slope = plowingMaxAngle.Radian() /
+          (plowingSaturationVelocity - plowingDeadbandVelocity);
 
       // Assume origin of collision frame is wheel center
       // Compute position and linear velocity of wheel center
@@ -1238,7 +1240,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
         // Compute plowing angle as function of longitudinal speed
         double plowingAngle =
-          GetRotationAngle(plowingMaxAngle.Radian(),
+          saturation_deadband(plowingMaxAngle.Radian(),
           plowingDeadbandVelocity,
           slope,
           wheelSpeedLongitudinal);
@@ -1260,7 +1262,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                                 contactPosition[2] - wheelPosition[2]);
 
         // Rotate displacement vector by plowingRotation and set contact point
-        contactPositionCopy = wheelPosition + plowingRotation * contactPositionCopy;
+        contactPositionCopy = wheelPosition +
+            plowingRotation * contactPositionCopy;
         contactPosition[0] = contactPositionCopy[0];
         contactPosition[1] = contactPositionCopy[1];
         contactPosition[2] = contactPositionCopy[2];
@@ -1798,23 +1801,40 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
   return true;
 }
 
-double GetRotationAngle(double max_angle, double dead_zone_vel, double slope, double vel)
+/// \brief A mathematical function that represents a saturation function
+/// that increases linearly until reaching a constant value with the addition
+/// of a deadband near zero. THe shape of this function for positive input
+/// values is illustrated below.
+/// \param[in] _maxOutput the maximum output of the function, which is at
+/// saturation.
+/// \param[in] _deadband the size of the deadband. Any inputs with a smaller
+/// absolute value than the deadband produce zero output.
+/// \param[in] _slope the slope of the linear portion of the output.
+/// \param[in] _input the input to the function.
+/// \return the output computed using saturation and deadband.
+/** \verbatim
+      |                                                  .
+      |            _________ saturation value            .
+      |           /                                      .
+      |          /|                                      .
+      |         /-┘ slope                                .
+      |        /                                         .
+      |       /                                          .
+      |      /                                           .
+    --+-------------------------- input
+      |<----> dead-band
+
+ \endverbatim */
+double saturation_deadband(
+    double _maxOutput, double _deadband, double _slope, double _input)
 {
-  if (std::abs(vel) <= std::abs(dead_zone_vel)) {
+  if (std::abs(_input) <= std::abs(_deadband))
+  {
     return 0;
   }
 
-  double result_angle;
-  if (vel > 0) {
-    result_angle = (vel - std::abs(dead_zone_vel)) * slope;
-  } else {
-    result_angle = (vel + std::abs(dead_zone_vel)) * slope;
-  }
+  double result = _input - std::abs(_deadband) * ignition::math::sgn(_input);
+  result *= _slope;
 
-  if (result_angle > 0) {
-    return std::min(result_angle, std::abs(max_angle));
-  } else {
-    return std::max(result_angle, -std::abs(max_angle));
-  }
-
+  return ignition::math::clamp(result, -_maxOutput, _maxOutput);
 }

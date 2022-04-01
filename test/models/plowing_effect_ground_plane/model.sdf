@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
-  <model name="ground_plane">
+  <model name="plowing_effect_ground_plane" xmlns:gz="https://gazebosim.org/schema">
     <static>true</static>
     <link name="link">
       <collision name="collision">
-	<ignition:plowing_terrain />
+        <gz:plowing_terrain />
         <geometry>
           <plane>
             <normal>0 0 1</normal>

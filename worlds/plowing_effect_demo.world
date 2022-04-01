@@ -53,6 +53,7 @@
         </controller>
       </plugin>
 
+      <!-- enable these plugins if using ros2
       <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
         <alwaysOn>true</alwaysOn>
         <frameName>world</frameName>
@@ -66,6 +67,7 @@
         <joint_name>wheel_rear_left_spin</joint_name>
         <joint_name>wheel_rear_right_spin</joint_name>
       </plugin>
+      -->
 
     </include>
 
@@ -112,6 +114,7 @@
         </controller>
       </plugin>
 
+      <!-- enable these plugins if using ros2
       <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
         <alwaysOn>true</alwaysOn>
         <frameName>world</frameName>
@@ -125,6 +128,7 @@
         <joint_name>wheel_rear_left_spin</joint_name>
         <joint_name>wheel_rear_right_spin</joint_name>
       </plugin>
+      -->
 
     </include>
 
