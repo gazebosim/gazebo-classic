@@ -1803,7 +1803,7 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
 
 /// \brief A mathematical function that represents a saturation function
 /// that increases linearly until reaching a constant value with the addition
-/// of a deadband near zero. THe shape of this function for positive input
+/// of a deadband near zero. The shape of this function for positive input
 /// values is illustrated below.
 /// \param[in] _maxOutput the maximum output of the function, which is at
 /// saturation.
@@ -1830,7 +1830,7 @@ double saturation_deadband(
 {
   if (std::abs(_input) <= std::abs(_deadband))
   {
-    return 0;
+    return 0.0;
   }
 
   double result = _input - std::abs(_deadband) * ignition::math::sgn(_input);
