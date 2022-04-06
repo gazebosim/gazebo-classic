@@ -1169,55 +1169,38 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     auto collision1Sdf = _collision1->GetSDF();
     auto collision2Sdf = _collision2->GetSDF();
 
-    const std::string kPlowingTerrain =
-      "gz:plowing_terrain";
-    const std::string kPlowingWheel =
-      "gz:plowing_wheel";
+    const std::string kPlowingTerrain = "gz:plowing_terrain";
+    ODECollisionWheelPlowingParams wheelPlowing;
 
-    sdf::ElementPtr wheelSdf = nullptr;
+    ODECollision *wheelCollision = nullptr;
     sdf::ElementPtr terrainSdf = nullptr;
 
-    if (collision1Sdf->HasElement(kPlowingWheel) &&
+    if (ODECollision::ParseWheelPlowingParams(collision1Sdf, wheelPlowing) &&
         collision2Sdf->HasElement(kPlowingTerrain))
     {
-      wheelSdf = collision1Sdf->GetElement(kPlowingWheel);
+      wheelCollision = _collision1;
       terrainSdf = collision2Sdf;
     }
-    else if (collision2Sdf->HasElement(kPlowingWheel) &&
-             collision1Sdf->HasElement(kPlowingTerrain))
+    else if (collision1Sdf->HasElement(kPlowingTerrain) &&
+        ODECollision::ParseWheelPlowingParams(collision2Sdf, wheelPlowing))
     {
-      wheelSdf = collision2Sdf->GetElement(kPlowingWheel);
+      wheelCollision = _collision2;
       terrainSdf = collision1Sdf;
     }
 
-    const std::string kPlowingMaxDegrees =
-      "max_degrees";
-    const std::string kPlowingSaturationVelocity =
-      "saturation_velocity";
-    if (wheelSdf && terrainSdf &&
-        wheelSdf->HasElement(kPlowingMaxDegrees) &&
-        wheelSdf->HasElement(kPlowingSaturationVelocity))
+    if (wheelCollision && terrainSdf)
     {
-      const std::string kPlowingDeadbandVelocity =
-        "deadband_velocity";
-      ignition::math::Angle plowingMaxAngle;
-      plowingMaxAngle.SetDegree(wheelSdf->Get<double>(kPlowingMaxDegrees));
-      double plowingSaturationVelocity =
-        wheelSdf->Get<double>(kPlowingSaturationVelocity);
-      // Use deadband velocity = 0 if parameter is not set
-      double plowingDeadbandVelocity =
-        wheelSdf->Get<double>(kPlowingDeadbandVelocity, 0.0).first;
-
       // compute slope
-      double slope = plowingMaxAngle.Radian() /
-          (plowingSaturationVelocity - plowingDeadbandVelocity);
+      double slope = wheelPlowing.maxAngle.Radian() /
+          (wheelPlowing.saturationVelocity - wheelPlowing.deadbandVelocity);
 
       // Assume origin of collision frame is wheel center
       // Compute position and linear velocity of wheel center
       // (all vectors in world coordinates unless otherwise specified)
-      ignition::math::Vector3d wheelPosition = _collision1->WorldPose().Pos();
+      ignition::math::Vector3d wheelPosition =
+          wheelCollision->WorldPose().Pos();
       ignition::math::Vector3d wheelLinearVelocity =
-        _collision1->WorldLinearVel();
+          wheelCollision->WorldLinearVel();
 
       ignition::math::Vector3d fdir1 = fd.Normalized();
       ignition::math::Vector3d contactNormalCopy, contactPositionCopy;
@@ -1240,8 +1223,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
         // Compute plowing angle as function of longitudinal speed
         double plowingAngle =
-          saturation_deadband(plowingMaxAngle.Radian(),
-          plowingDeadbandVelocity,
+          saturation_deadband(wheelPlowing.maxAngle.Radian(),
+          wheelPlowing.deadbandVelocity,
           slope,
           wheelSpeedLongitudinal);
 

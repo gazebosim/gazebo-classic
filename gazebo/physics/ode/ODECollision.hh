@@ -36,6 +36,21 @@ namespace gazebo
     /// \addtogroup gazebo_physics_ode
     /// \{
 
+    /// \brief Data structure for wheel plowing parameters.
+    class ODECollisionWheelPlowingParams
+    {
+      /// \brief Maximum angle by which wheel contact points are rotated.
+      public: ignition::math::Angle maxAngle;
+
+      /// \brief Plowing saturation velocity: the linear wheel velocity [m/s]
+      /// at which maximum plowing effect is reached.
+      public: double saturationVelocity = 0.0;
+
+      /// \brief Plowing deadband velocity: the linear wheel velocity [m/s]
+      /// below which no plowing effect occurs.
+      public: double deadbandVelocity = 0.0;
+    };
+
     /// \brief Base class for all ODE collisions.
     class GZ_PHYSICS_VISIBLE ODECollision : public Collision
     {
@@ -89,6 +104,22 @@ namespace gazebo
       ///        casted pointer to ODESurfaceParams.
       /// \return Dynamically casted pointer to ODESurfaceParams.
       public: ODESurfaceParamsPtr GetODESurface() const;
+
+      /// \brief Parse wheel plowing parameters from a Collision SDF Element.
+      /// \param[in] _sdf Collision SDF Element to parse from.
+      /// \param[out] _plowing Wheel plowing parameters object to write to.
+      /// \param[in] _scopedNameForErrorMessages Scoped name of collision to
+      /// use in error messages. If empty, no error messages will be printed.
+      /// parsed.
+      /// \return True if valid wheel plowing parameters were parsed.
+      private: static bool ParseWheelPlowingParams(
+          sdf::ElementPtr _sdf,
+          ODECollisionWheelPlowingParams &_plowing,
+          const std::string &_scopedNameForErrorMessages = "");
+
+      /// \brief Friend with ODEPhysics to allow Collide callback to call
+      /// ParseWheelPlowingParams.
+      private: friend class ODEPhysics;
 
       /// \brief Used when this is static to set the posse.
       private: void OnPoseChangeGlobal();
