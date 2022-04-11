@@ -535,7 +535,7 @@ void GpuLaser::SetFarClip(const double _far)
 //////////////////////////////////////////////////
 unsigned int GpuLaser::CameraCount() const
 {
-  return this->dataPtr->cubeMapFaces.size();
+  return this->cameraCount;
 }
 
 //////////////////////////////////////////////////
@@ -622,6 +622,8 @@ void GpuLaser::InitMapping(const std::set<double> &_azimuth_values, const std::s
       }
     }
   }
+
+  this->cameraCount = this->dataPtr->cubeMapFaces.size();
 }
 
 //////////////////////////////////////////////////

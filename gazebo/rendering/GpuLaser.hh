@@ -192,9 +192,11 @@ namespace gazebo
       /// \brief Set the number of cameras required. Has no effect for this
       /// implementation since the number of cameras is calculated based on the
       /// rays.
+      /// \deprecated The camera count cannot be set from here anymore since it
+      /// is determined automatically in GpuLaser::InitMapping.
       /// \param[in] _cameraCount The number of cameras required to generate
       /// the rays
-      public: void SetCameraCount(const unsigned int _cameraCount);
+      public: void SetCameraCount(const unsigned int _cameraCount) GAZEBO_DEPRECATED(11.10);
 
       /// \brief Get the ray count ratio (equivalent to aspect ratio)
       /// \return The ray count ratio (equivalent to aspect ratio)
@@ -284,6 +286,9 @@ namespace gazebo
 
       /// \brief True if the sensor is horizontal only.
       protected: bool isHorizontal;
+
+      /// \brief Number of cameras needed to generate the rays.
+      protected: unsigned int cameraCount;
 
       /// \internal
       /// \brief Pointer to private data.
