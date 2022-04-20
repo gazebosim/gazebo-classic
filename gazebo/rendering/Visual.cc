@@ -346,6 +346,38 @@ void Visual::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Visual::Load()
 {
+  if (this->dataPtr->sdf->HasElement("material"))
+  {
+    // Get shadow caster material name from physics::World
+    ignition::transport::Node node;
+    msgs::Any rep;
+
+    const std::string visualName =
+        this->Name().substr(0, this->Name().find(":"));
+
+    const std::string serviceName = "/" +
+        visualName + "/shininess";
+
+    ignition::msgs::StringMsg req;
+    req.set_data(visualName);
+
+    bool result;
+    unsigned int timeout = 5000;
+    bool executed = node.Request(serviceName, req, timeout, rep, result);
+
+    if (executed)
+    {
+      if (result)
+        this->dataPtr->shininess = rep.double_value(); 
+      else
+        gzerr << "Service call[" << serviceName << "] failed" << std::endl;
+    }
+    else
+    {
+      gzerr << "Service call[" << serviceName << "] timed out" << std::endl;
+    }
+  }
+
   std::ostringstream stream;
   ignition::math::Pose3d pose;
   Ogre::MovableObject *obj = nullptr;

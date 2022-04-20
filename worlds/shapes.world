@@ -37,6 +37,10 @@
           </geometry>
         </collision>
         <visual name="visual">
+          <material>
+            <specular>1 0 0 1</specular>
+            <shininess>1</shininess>
+          </material>
           <geometry>
             <sphere>
               <radius>0.5</radius>

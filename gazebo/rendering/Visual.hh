@@ -24,6 +24,7 @@
 #include <vector>
 
 #include <sdf/sdf.hh>
+#include <ignition/transport/Node.hh>
 #include <ignition/math/AxisAlignedBox.hh>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
