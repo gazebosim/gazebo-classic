@@ -355,26 +355,35 @@ void Visual::Load()
     const std::string visualName =
         this->Name().substr(0, this->Name().find(":"));
 
-    const std::string serviceName = "/" +
-        visualName + "/shininess";
+    const std::string serviceName = "/" + visualName + "/shininess";
+
+    const std::string validServiceName =
+        ignition::transport::TopicUtils::AsValidTopic(serviceName);
+
+    if (validServiceName.empty())
+    {
+        gzerr << "Service name [" << serviceName << "] not valid" << std::endl;
+    }
 
     ignition::msgs::StringMsg req;
     req.set_data(visualName);
 
     bool result;
     unsigned int timeout = 5000;
-    bool executed = node.Request(serviceName, req, timeout, rep, result);
+    bool executed = node.Request(validServiceName, req, timeout, rep, result);
 
     if (executed)
     {
       if (result)
         this->dataPtr->shininess = rep.double_value(); 
       else
-        gzerr << "Service call[" << serviceName << "] failed" << std::endl;
+        gzerr << "Service call [" << validServiceName << "] failed" <<
+                 std::endl;
     }
     else
     {
-      gzerr << "Service call[" << serviceName << "] timed out" << std::endl;
+      gzerr << "Service call [" << validServiceName << "] timed out" <<
+               std::endl;
     }
   }
 

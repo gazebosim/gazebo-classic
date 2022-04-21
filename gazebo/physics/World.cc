@@ -1263,7 +1263,6 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     if (linkElem->HasElement("visual") &&
         linkElem->GetElement("visual")->HasElement("material"))
     {
-
       sdf::ElementPtr matElem = linkElem->GetElement("visual")->
           GetElement("material");
 

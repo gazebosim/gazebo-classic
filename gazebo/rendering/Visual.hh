@@ -24,13 +24,14 @@
 #include <vector>
 
 #include <sdf/sdf.hh>
-#include <ignition/transport/Node.hh>
 #include <ignition/math/AxisAlignedBox.hh>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/msgs/MessageTypes.hh>
+#include <ignition/transport/Node.hh>
+#include <ignition/transport/TopicUtils.hh>
 
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Time.hh"
