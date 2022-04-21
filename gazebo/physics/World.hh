@@ -672,7 +672,8 @@ namespace gazebo
           ignition::msgs::Boolean &_response);
 
       /// \brief Callback for "<model_name>/shininess" service.
-      /// \param[out] _response Message containing shininess value
+      /// \param[in] _request Message containing the model name.
+      /// \param[out] _response Message containing shininess value.
       /// \return True if the info was successfully obtained.
       private: bool MaterialShininessService(
           const ignition::msgs::StringMsg &_request, msgs::Any &_response);
