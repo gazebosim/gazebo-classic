@@ -671,8 +671,8 @@ namespace gazebo
       private: bool ShadowCasterRenderBackFacesService(
           ignition::msgs::Boolean &_response);
 
-      /// \brief Callback for "<this_name>/shadow_caster_material_name" service.
-      /// \param[out] _response Message containing shadow caster material name
+      /// \brief Callback for "<model_name>/shininess" service.
+      /// \param[out] _response Message containing shininess value
       /// \return True if the info was successfully obtained.
       private: bool MaterialShininessService(
           const ignition::msgs::StringMsg &_request, msgs::Any &_response);

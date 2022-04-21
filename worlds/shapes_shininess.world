@@ -18,6 +18,10 @@
           </geometry>
         </collision>
         <visual name="visual">
+          <material>
+            <specular>1 0 0 1</specular>
+            <shininess>1</shininess>
+          </material>
           <geometry>
             <box>
               <size>1 1 1</size>
@@ -37,6 +41,10 @@
           </geometry>
         </collision>
         <visual name="visual">
+          <material>
+            <specular>0 1 0 1</specular>
+            <shininess>5</shininess>
+          </material>
           <geometry>
             <sphere>
               <radius>0.5</radius>
@@ -57,6 +65,10 @@
           </geometry>
         </collision>
         <visual name="visual">
+          <material>
+            <specular>0 0 1 1</specular>
+            <shininess>10</shininess>
+          </material>
           <geometry>
             <cylinder>
               <radius>0.5</radius>

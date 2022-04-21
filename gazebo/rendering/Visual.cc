@@ -348,7 +348,7 @@ void Visual::Load()
 {
   if (this->dataPtr->sdf->HasElement("material"))
   {
-    // Get shadow caster material name from physics::World
+    // Get shininess value from physics::World
     ignition::transport::Node node;
     msgs::Any rep;
 
@@ -1464,6 +1464,7 @@ void Visual::SetSpecular(const ignition::math::Color &_color,
         {
           pass = technique->getPass(passCount);
           pass->setSpecular(Conversions::Convert(_color));
+          pass->setShininess(this->dataPtr->shininess);
         }
       }
     }
