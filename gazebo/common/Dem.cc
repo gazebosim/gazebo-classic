@@ -33,10 +33,33 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
 
+#ifdef __linux__
+#include <unistd.h>
+#include <fcntl.h>
+#endif
+
 using namespace gazebo;
 using namespace common;
 
 #ifdef HAVE_GDAL
+
+#ifdef __linux__
+class SupressErrors {
+  public:
+  int fd, nullfile;
+
+  SupressErrors() {
+    this->fd = dup(2);
+    this->nullfile = open("/dev/null", O_WRONLY);
+    dup2(this->nullfile, 2);
+    close(this->nullfile);
+  }
+  ~SupressErrors() {
+    dup2(this->fd, 2);
+    close(this->fd);
+  }
+};
+#endif
 
 //////////////////////////////////////////////////
 Dem::Dem()
@@ -230,7 +253,14 @@ void Dem::GetGeoReference(double _x, double _y,
     importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
     sourceCs.importFromWkt(&importString);
     targetCs.SetWellKnownGeogCS("WGS84");
-    cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
+
+    {
+      #ifdef __linux__
+      auto a = SupressErrors();
+      #endif
+      cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
+    }
+
     if (nullptr == cT)
     {
       gzthrow("Unable to transform terrain coordinate system to WGS84 for "
