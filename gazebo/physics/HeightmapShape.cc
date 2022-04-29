@@ -81,7 +81,20 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 //////////////////////////////////////////////////
 int HeightmapShape::LoadTerrainFile(const std::string &_filename)
 {
-  this->heightmapData = common::HeightmapDataLoader::LoadTerrainFile(_filename);
+  bool skipGeoRef = false;
+  if (this->sdf->HasElement("skipGeoRef"))
+  {
+    skipGeoRef = this->sdf->Get<bool>("skipGeoRef");
+  }
+
+  if (skipGeoRef)
+  {
+    this->heightmapData = common::HeightmapDataLoader::LoadTerrainFileWithoutTransform(_filename);
+  }
+  else
+  {
+    this->heightmapData = common::HeightmapDataLoader::LoadTerrainFile(_filename);
+  }
   if (!this->heightmapData)
   {
     gzerr << "Unable to load heightmap data" << std::endl;
@@ -118,7 +131,10 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
 
       try
       {
-        this->dem.GetGeoReferenceOrigin(latitude, longitude);
+        if (!skipGeoRef)
+        {
+          this->dem.GetGeoReferenceOrigin(latitude, longitude);
+        }
       }
       catch(const common::Exception &)
       {

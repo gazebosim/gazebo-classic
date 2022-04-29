@@ -43,24 +43,6 @@ using namespace common;
 
 #ifdef HAVE_GDAL
 
-#ifdef __linux__
-class SupressErrors {
-  public:
-  int fd, nullfile;
-
-  SupressErrors() {
-    this->fd = dup(2);
-    this->nullfile = open("/dev/null", O_WRONLY);
-    dup2(this->nullfile, 2);
-    close(this->nullfile);
-  }
-  ~SupressErrors() {
-    dup2(this->fd, 2);
-    close(this->fd);
-  }
-};
-#endif
-
 //////////////////////////////////////////////////
 Dem::Dem()
   : dataPtr(new DemPrivate)
@@ -80,6 +62,128 @@ Dem::~Dem()
   delete this->dataPtr;
   this->dataPtr = nullptr;
 }
+
+//////////////////////////////////////////////////
+int Dem::LoadWithoutTransform(const std::string &_filename)
+{
+  unsigned int width;
+  unsigned int height;
+  int xSize, ySize;
+  double upLeftX, upLeftY, upRightX, upRightY, lowLeftX, lowLeftY;
+  ignition::math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
+  ignition::math::Angle lowLeftLat, lowLeftLong;
+
+  // Sanity check
+  std::string fullName = _filename;
+  if (!boost::filesystem::exists(boost::filesystem::path(fullName)))
+    fullName = common::find_file(_filename);
+
+  if (!boost::filesystem::exists(boost::filesystem::path(fullName)))
+  {
+    gzerr << "Unable to open DEM file[" << _filename
+          << "], check your GAZEBO_RESOURCE_PATH settings." << std::endl;
+    return -1;
+  }
+
+  this->dataPtr->dataSet = reinterpret_cast<GDALDataset *>(GDALOpen(
+    fullName.c_str(), GA_ReadOnly));
+
+  if (this->dataPtr->dataSet == nullptr)
+  {
+    gzerr << "Unable to open DEM file[" << fullName
+          << "]. Format not recognised as a supported dataset." << std::endl;
+    return -1;
+  }
+
+  int nBands = this->dataPtr->dataSet->GetRasterCount();
+  if (nBands != 1)
+  {
+    gzerr << "Unsupported number of bands in file [" << fullName + "]. Found "
+          << nBands << " but only 1 is a valid value." << std::endl;
+    return -1;
+  }
+
+  // Set the pointer to the band
+  this->dataPtr->band = this->dataPtr->dataSet->GetRasterBand(1);
+
+  // Raster width and height
+  xSize = this->dataPtr->dataSet->GetRasterXSize();
+  ySize = this->dataPtr->dataSet->GetRasterYSize();
+
+  // Corner coordinates
+  try
+  {
+    upLeftX = 0.0;
+    upLeftY = 0.0;
+    upRightX = xSize;
+    upRightY = 0.0;
+    lowLeftX = 0.0;
+    lowLeftY = ySize;
+
+    // Set the world width and height
+    this->dataPtr->worldWidth =
+       common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                              upRightLat, upRightLong);
+    this->dataPtr->worldHeight =
+       common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
+                                              lowLeftLat, lowLeftLong);
+  }
+  catch(const common::Exception &)
+  {
+    gzwarn << "Failed to automatically compute DEM size. "
+           << "Please use the <size> element to manually set DEM size."
+           << std::endl;
+  }
+
+  // Set the terrain's side (the terrain will be squared after the padding)
+  if (ignition::math::isPowerOfTwo(ySize - 1))
+    height = ySize;
+  else
+    height = ignition::math::roundUpPowerOfTwo(ySize) + 1;
+
+  if (ignition::math::isPowerOfTwo(xSize - 1))
+    width = xSize;
+  else
+    width = ignition::math::roundUpPowerOfTwo(xSize) + 1;
+
+  this->dataPtr->side = std::max(width, height);
+
+  // Preload the DEM's data
+  if (this->LoadData() != 0)
+    return -1;
+
+  // Check for nodata value in dem data. This is used when computing the
+  // min elevation. If nodata value is not defined, we assume it will be one
+  // of the commonly used values such as -9999, -32768, etc.
+  // For simplicity, we will treat values <= -9999 as nodata values and
+  // ignore them when computing the min elevation.
+  int validNoData = 0;
+  const double defaultNoDataValue = -9999;
+  double noDataValue = this->dataPtr->band->GetNoDataValue(&validNoData);
+  if (validNoData <= 0)
+    noDataValue = defaultNoDataValue;
+
+  double min = ignition::math::MAX_D;
+  double max = -ignition::math::MAX_D;
+  for (auto d : this->dataPtr->demData)
+  {
+    if (d < min && d > noDataValue)
+      min = d;
+    if (d > max && d > noDataValue)
+      max = d;
+  }
+  if (ignition::math::equal(min, ignition::math::MAX_D) ||
+      ignition::math::equal(max, -ignition::math::MAX_D))
+  {
+    gzwarn << "Dem is composed of 'nodata' values!" << std::endl;
+  }
+
+  this->dataPtr->minElevation = min;
+  this->dataPtr->maxElevation = max;
+
+  return 0;
+}
+
 
 //////////////////////////////////////////////////
 int Dem::Load(const std::string &_filename)
@@ -254,12 +358,7 @@ void Dem::GetGeoReference(double _x, double _y,
     sourceCs.importFromWkt(&importString);
     targetCs.SetWellKnownGeogCS("WGS84");
 
-    {
-      #ifdef __linux__
-      auto a = SupressErrors();
-      #endif
-      cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
-    }
+    cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
 
     if (nullptr == cT)
     {

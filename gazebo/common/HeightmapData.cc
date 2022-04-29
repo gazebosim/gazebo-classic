@@ -95,6 +95,47 @@ HeightmapData *HeightmapDataLoader::LoadTerrainFile(
     return LoadDEMAsTerrain(_filename);
   }
 }
+
+//////////////////////////////////////////////////
+HeightmapData *HeightmapDataLoader::LoadTerrainFileWithoutTransform(
+    const std::string &_filename)
+{
+  // Register the GDAL drivers
+  GDALAllRegister();
+
+  GDALDataset *poDataset = reinterpret_cast<GDALDataset *>
+      (GDALOpen(_filename.c_str(), GA_ReadOnly));
+
+  if (!poDataset)
+  {
+    gzerr << "Unrecognized terrain format in file [" << _filename << "]\n";
+    return nullptr;
+  }
+
+  std::string fileFormat = poDataset->GetDriver()->GetDescription();
+  GDALClose(reinterpret_cast<GDALDataset *>(poDataset));
+
+  // Check if the heightmap file is an image
+  if (fileFormat == "JPEG" || fileFormat == "PNG")
+  {
+    // Load the terrain file as an image
+    return LoadImageAsTerrain(_filename);
+  }
+  else
+  {
+    // Load the terrain file as a DEM
+    /* return LoadDEMAsTerrain(_filename); */
+    Dem *dem = new Dem();
+    if (dem->LoadWithoutTransform(_filename) != 0)
+    {
+      gzerr << "Unable to load a DEM file as a terrain [" << _filename << "]\n";
+      return nullptr;
+    }
+    return static_cast<HeightmapData *>(dem);
+  }
+}
+
+
 #else
 HeightmapData *HeightmapDataLoader::LoadTerrainFile(
     const std::string &_filename)

@@ -54,6 +54,11 @@ namespace gazebo
       /// \return 0 when the operation succeeds to open a file.
       public: int Load(const std::string &_filename="");
 
+      /// \brief Load a DEM file without georeferencing transformation.
+      /// \param[in] _filename the path to the terrain file.
+      /// \return 0 when the operation succeeds to open a file.
+      public: int LoadWithoutTransform(const std::string &_filename="");
+
       /// \brief Get the elevation of a terrain's point in meters.
       /// \param[in] _x X coordinate of the terrain.
       /// \param[in] _y Y coordinate of the terrain.
