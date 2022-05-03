@@ -37,7 +37,7 @@ namespace cpp {
 GazeboGenerator::GazeboGenerator(const std::string &/*_name*/) {}
 GazeboGenerator::~GazeboGenerator() {}
 bool GazeboGenerator::Generate(const FileDescriptor *_file,
-                               const string &/*parameter*/,
+                               const std::string &/*parameter*/,
                                OutputDirectory *_generator_context,
                                std::string * /*_error*/) const
 {
