@@ -1259,6 +1259,32 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
       }
     }
 
+    sdf::ElementPtr linkElem = _sdf->GetElement("link");
+    if (linkElem->HasElement("visual") &&
+        linkElem->GetElement("visual")->HasElement("material"))
+    {
+      sdf::ElementPtr matElem = linkElem->GetElement("visual")->
+          GetElement("material");
+
+      if (matElem->HasElement("shininess"))
+      {
+        this->dataPtr->materialShininessMap[modelName] =
+            matElem->Get<double>("shininess");
+      }
+      else
+      {
+        this->dataPtr->materialShininessMap[modelName] = 0;
+      }
+
+      std::string materialShininessService("/" + modelName + "/shininess");
+      if (!this->dataPtr->ignNode.Advertise(materialShininessService,
+          &World::MaterialShininessService, this))
+      {
+        gzerr << "Error advertising service ["
+              << materialShininessService << "]" << std::endl;
+      }
+    }
+
     model = this->dataPtr->physicsEngine->CreateModel(_parent);
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
@@ -3435,5 +3461,14 @@ bool World::ShadowCasterMaterialNameService(ignition::msgs::StringMsg &_res)
 bool World::ShadowCasterRenderBackFacesService(ignition::msgs::Boolean &_res)
 {
   _res.set_data(this->dataPtr->shadowCasterRenderBackFaces);
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool World::MaterialShininessService(
+    const ignition::msgs::StringMsg &_req, msgs::Any &_res)
+{
+  _res.set_type(msgs::Any::DOUBLE);
+  _res.set_double_value(this->dataPtr->materialShininessMap[_req.data()]);
   return true;
 }

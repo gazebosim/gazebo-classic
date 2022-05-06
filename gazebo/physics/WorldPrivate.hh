@@ -397,6 +397,9 @@ namespace gazebo
 
       /// \brief Shadow caster render back faces from scene SDF
       public: bool shadowCasterRenderBackFaces = true;
+
+      /// \brief Shininess values from scene SDF
+      public: std::map<std::string, double> materialShininessMap;
     };
   }
 }

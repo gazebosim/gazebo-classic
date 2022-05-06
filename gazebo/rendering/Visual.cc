@@ -346,6 +346,48 @@ void Visual::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Visual::Load()
 {
+  if (this->dataPtr->sdf->HasElement("material"))
+  {
+    // Get shininess value from physics::World
+    ignition::transport::Node node;
+    msgs::Any rep;
+
+    const std::string visualName =
+        this->Name().substr(0, this->Name().find(":"));
+
+    const std::string serviceName = "/" + visualName + "/shininess";
+
+    const std::string validServiceName =
+        ignition::transport::TopicUtils::AsValidTopic(serviceName);
+
+    if (validServiceName.empty())
+    {
+        gzerr << "Service name [" << serviceName << "] not valid" << std::endl;
+        return;
+    }
+
+    ignition::msgs::StringMsg req;
+    req.set_data(visualName);
+
+    bool result;
+    unsigned int timeout = 5000;
+    bool executed = node.Request(validServiceName, req, timeout, rep, result);
+
+    if (executed)
+    {
+      if (result)
+        this->dataPtr->shininess = rep.double_value(); 
+      else
+        gzerr << "Service call [" << validServiceName << "] failed"
+              << std::endl;
+    }
+    else
+    {
+      gzerr << "Service call [" << validServiceName << "] timed out"
+            << std::endl;
+    }
+  }
+
   std::ostringstream stream;
   ignition::math::Pose3d pose;
   Ogre::MovableObject *obj = nullptr;
@@ -1432,6 +1474,7 @@ void Visual::SetSpecular(const ignition::math::Color &_color,
         {
           pass = technique->getPass(passCount);
           pass->setSpecular(Conversions::Convert(_color));
+          pass->setShininess(this->dataPtr->shininess);
         }
       }
     }
