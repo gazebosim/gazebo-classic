@@ -363,6 +363,7 @@ void Visual::Load()
     if (validServiceName.empty())
     {
         gzerr << "Service name [" << serviceName << "] not valid" << std::endl;
+        return;
     }
 
     ignition::msgs::StringMsg req;
@@ -377,13 +378,13 @@ void Visual::Load()
       if (result)
         this->dataPtr->shininess = rep.double_value(); 
       else
-        gzerr << "Service call [" << validServiceName << "] failed" <<
-                 std::endl;
+        gzerr << "Service call [" << validServiceName << "] failed"
+              << std::endl;
     }
     else
     {
-      gzerr << "Service call [" << validServiceName << "] timed out" <<
-               std::endl;
+      gzerr << "Service call [" << validServiceName << "] timed out"
+            << std::endl;
     }
   }
 

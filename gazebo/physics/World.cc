@@ -1280,8 +1280,8 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
       if (!this->dataPtr->ignNode.Advertise(materialShininessService,
           &World::MaterialShininessService, this))
       {
-        gzerr << "Error advertising service [" <<
-            materialShininessService << "]" << std::endl;
+        gzerr << "Error advertising service ["
+              << materialShininessService << "]" << std::endl;
       }
     }
 
