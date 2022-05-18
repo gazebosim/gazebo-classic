@@ -151,6 +151,22 @@ namespace gazebo
     /// \param[in] _msg Slip compliance encoded as string.
     private: void OnLongitudinalCompliance(ConstGzStringPtr &_msg);
 
+    /// brief Get friction coefficients for each wheel
+    /// \return Map of wheel name to a Vector2 of friction coefficients
+    /// The Vector2.X value is the friction coefficient in the primary direction and
+    /// the Vector2.Y value is the friction coefficient in the secondary direction.
+    public: std::map<std::string, ignition::math::Vector2d> GetFrictionCoefficients();
+
+    /// \brief Set the friction coefficient in the primary direction for a particular wheel.
+    /// \param[in] _wheel_name name of the wheel link on which _mu should be set.
+    /// \param[in] _mu Friction coefficient.
+    public: void SetMuPrimary(const std::string &_wheel_name, const double _mu);
+
+    /// \brief Set the friction coefficient in the secondary direction for a particular wheel.
+    /// \param[in] _wheel_name name of the wheel link on which _mu should be set.
+    /// \param[in] _mu Friction coefficient.
+    public: void SetMuSecondary(const std::string &_wheel_name, const double _mu);
+
     /// \brief Update the plugin. This is updated every iteration of
     /// simulation.
     private: void Update();

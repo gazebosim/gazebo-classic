@@ -482,6 +482,54 @@ void WheelSlipPlugin::SetSlipComplianceLongitudinal(std::string _wheel_name, con
 }
 
 /////////////////////////////////////////////////
+std::map<std::string, ignition::math::Vector2d> WheelSlipPlugin::GetFrictionCoefficients()
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::map<std::string, ignition::math::Vector2d> frictionCoeffs;
+  for (const auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
+  {
+    auto link = linkSurface.first.lock();
+    auto surface = linkSurface.second.surface.lock();
+    if (!link || !surface)
+      continue;
+
+    ignition::math::Vector2d friction;
+    friction.X(surface->FrictionPyramid()->MuPrimary());
+    friction.Y(surface->FrictionPyramid()->MuSecondary());
+
+    frictionCoeffs[link->GetName()] = friction;
+  }
+
+  return frictionCoeffs;
+}
+
+/////////////////////////////////////////////////
+void WheelSlipPlugin::SetMuPrimary(const std::string &_wheel_name, const double _mu)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  if (this->dataPtr->mapLinkNames.count(_wheel_name) > 0)
+  {
+    auto link = this->dataPtr->mapLinkNames[_wheel_name];
+    auto surface = this->dataPtr->mapLinkSurfaceParams[link].surface.lock();
+    if (surface)
+      surface->FrictionPyramid()->SetMuPrimary(_mu);
+  }
+}
+
+/////////////////////////////////////////////////
+void WheelSlipPlugin::SetMuSecondary(const std::string &_wheel_name, const double _mu)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  if (this->dataPtr->mapLinkNames.count(_wheel_name) > 0)
+  {
+    auto link = this->dataPtr->mapLinkNames[_wheel_name];
+    auto surface = this->dataPtr->mapLinkSurfaceParams[link].surface.lock();
+    if (surface)
+      surface->FrictionPyramid()->SetMuSecondary(_mu);
+  }
+}
+
+/////////////////////////////////////////////////
 void WheelSlipPlugin::Update()
 {
   IGN_PROFILE("WheelSlipPlugin::OnUpdate");
