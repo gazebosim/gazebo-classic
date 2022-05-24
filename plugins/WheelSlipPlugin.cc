@@ -504,29 +504,35 @@ std::map<std::string, ignition::math::Vector2d> WheelSlipPlugin::GetFrictionCoef
 }
 
 /////////////////////////////////////////////////
-void WheelSlipPlugin::SetMuPrimary(const std::string &_wheel_name, const double _mu)
+bool WheelSlipPlugin::SetMuPrimary(const std::string &_wheel_name, double _mu)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  if (this->dataPtr->mapLinkNames.count(_wheel_name) > 0)
-  {
-    auto link = this->dataPtr->mapLinkNames[_wheel_name];
-    auto surface = this->dataPtr->mapLinkSurfaceParams[link].surface.lock();
-    if (surface)
-      surface->FrictionPyramid()->SetMuPrimary(_mu);
-  }
+  if (this->dataPtr->mapLinkNames.count(_wheel_name) == 0)
+    return false;
+
+  auto link = this->dataPtr->mapLinkNames[_wheel_name];
+  auto surface = this->dataPtr->mapLinkSurfaceParams[link].surface.lock();
+  if (surface == nullptr)
+    return false;
+
+  surface->FrictionPyramid()->SetMuPrimary(_mu);
+  return true;
 }
 
 /////////////////////////////////////////////////
-void WheelSlipPlugin::SetMuSecondary(const std::string &_wheel_name, const double _mu)
+bool WheelSlipPlugin::SetMuSecondary(const std::string &_wheel_name, double _mu)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  if (this->dataPtr->mapLinkNames.count(_wheel_name) > 0)
-  {
-    auto link = this->dataPtr->mapLinkNames[_wheel_name];
-    auto surface = this->dataPtr->mapLinkSurfaceParams[link].surface.lock();
-    if (surface)
-      surface->FrictionPyramid()->SetMuSecondary(_mu);
-  }
+  if (this->dataPtr->mapLinkNames.count(_wheel_name) == 0)
+    return false;
+
+  auto link = this->dataPtr->mapLinkNames[_wheel_name];
+  auto surface = this->dataPtr->mapLinkSurfaceParams[link].surface.lock();
+  if (surface == nullptr)
+    return false;
+
+  surface->FrictionPyramid()->SetMuSecondary(_mu);
+  return true;
 }
 
 /////////////////////////////////////////////////

@@ -160,12 +160,14 @@ namespace gazebo
     /// \brief Set the friction coefficient in the primary direction for a particular wheel.
     /// \param[in] _wheel_name name of the wheel link on which _mu should be set.
     /// \param[in] _mu Friction coefficient.
-    public: void SetMuPrimary(const std::string &_wheel_name, const double _mu);
+    /// \return True if the friction coefficient was successfully set. False otherwise.
+    public: bool SetMuPrimary(const std::string &_wheel_name, double _mu);
 
     /// \brief Set the friction coefficient in the secondary direction for a particular wheel.
     /// \param[in] _wheel_name name of the wheel link on which _mu should be set.
     /// \param[in] _mu Friction coefficient.
-    public: void SetMuSecondary(const std::string &_wheel_name, const double _mu);
+    /// \return True if the friction coefficient was successfully set. False otherwise.
+    public: bool SetMuSecondary(const std::string &_wheel_name, double _mu);
 
     /// \brief Update the plugin. This is updated every iteration of
     /// simulation.
