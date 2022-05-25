@@ -40,6 +40,53 @@ using namespace common;
 // #endif
 
 /////////////////////////////////////////////////
+#ifdef HAVE_FFMPEG
+int GazeboAVCodecDecodeHelper(AVCodecContext *_codecCtx,
+    AVFrame *_frame, int *_gotFrame, AVPacket *_packet)
+{
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+  // from https://blogs.gentoo.org/lu_zero/2016/03/29/new-avcodec-api/
+  int ret;
+
+  *_gotFrame = 0;
+
+  if (_packet)
+  {
+    ret = avcodec_send_packet(_codecCtx, _packet);
+    if (ret < 0)
+    {
+      return ret == AVERROR_EOF ? 0 : ret;
+    }
+  }
+
+  ret = avcodec_receive_frame(_codecCtx, _frame);
+  if (ret < 0 && ret != AVERROR(EAGAIN))
+  {
+    return ret;
+  }
+  if (ret >= 0)
+  {
+    *_gotFrame = 1;
+  }
+
+  // new API always consumes the whole packet
+  return _packet ? _packet->size : 0;
+#else
+  // this was deprecated in ffmpeg version 3.1
+  // github.com/FFmpeg/FFmpeg/commit/7fc329e2dd6226dfecaa4a1d7adf353bf2773726
+# ifndef _WIN32
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+# endif
+  return avcodec_decode_video2(_codecCtx, _frame, _gotFrame, _packet);
+# ifndef _WIN32
+#  pragma GCC diagnostic pop
+# endif
+#endif
+}
+#endif
+
+/////////////////////////////////////////////////
 Video::Video()
 {
   this->formatCtx = nullptr;
@@ -77,7 +124,7 @@ void Video::Cleanup()
 #ifdef HAVE_FFMPEG
 bool Video::Load(const std::string &_filename)
 {
-  AVCodec *codec = nullptr;
+  const AVCodec *codec = nullptr;
   this->videoStream = -1;
 
   if (this->formatCtx || this->avFrame || this->codecCtx)
@@ -103,6 +150,9 @@ bool Video::Load(const std::string &_filename)
   // Find the first video stream
   for (unsigned int i = 0; i < this->formatCtx->nb_streams; ++i)
   {
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+    if (this->formatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+#else
 #ifndef _WIN32
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -110,6 +160,7 @@ bool Video::Load(const std::string &_filename)
     if (this->formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
 #ifndef _WIN32
 # pragma GCC diagnostic pop
+#endif
 #endif
     {
       this->videoStream = static_cast<int>(i);
@@ -124,6 +175,26 @@ bool Video::Load(const std::string &_filename)
   }
 
   // Get a pointer to the codec context for the video stream
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+  // AVCodecContext is not included in an AVStream as of ffmpeg 3.1
+  // allocate a codec context based on updated example
+  // github.com/FFmpeg/FFmpeg/commit/bba6a03b2816d805d44bce4f9701a71f7d3f8dad
+  this->codecCtx = avcodec_alloc_context3(codec);
+  if (!this->codecCtx)
+  {
+    gzerr << "Failed to allocate the codec context" << std::endl;
+    return false;
+  }
+
+  // Copy codec parameters from input stream to output codec context
+  if (avcodec_parameters_to_context(this->codecCtx,
+        this->formatCtx->streams[this->videoStream]->codecpar) < 0)
+  {
+    gzerr << "Failed to copy codec parameters to decoder context"
+           << std::endl;
+    return false;
+  }
+#else
 #ifndef _WIN32
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -132,6 +203,8 @@ bool Video::Load(const std::string &_filename)
 #ifndef _WIN32
 # pragma GCC diagnostic pop
 #endif
+#endif
+
 
   // Find the decoder for the video stream
   codec = avcodec_find_decoder(this->codecCtx->codec_id);
@@ -227,15 +300,9 @@ bool Video::GetNextFrame(unsigned char **_buffer)
     while (tmpPacket.size > 0)
     {
       // sending data to libavcodec
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-      int processedLength = avcodec_decode_video2(this->codecCtx, this->avFrame,
+      int processedLength = GazeboAVCodecDecodeHelper(this->codecCtx, this->avFrame,
           &frameAvailable, &tmpPacket);
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
+
       if (processedLength < 0)
       {
         gzerr << "Error while processing the data\n";

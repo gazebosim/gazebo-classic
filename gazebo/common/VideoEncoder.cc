@@ -224,7 +224,6 @@ bool VideoEncoder::Start(const std::string &_format,
 
   // The remainder of this function handles FFMPEG initialization of a video
   // stream
-  AVOutputFormat *outputFormat = nullptr;
 
   // This 'if' and 'free' are just for safety. We chech the value of formatCtx
   // below.
@@ -236,6 +235,11 @@ bool VideoEncoder::Start(const std::string &_format,
   if (this->dataPtr->format.compare("v4l2") == 0)
   {
 #if LIBAVDEVICE_VERSION_INT >= AV_VERSION_INT(56, 4, 100)
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+    const AVOutputFormat *outputFormat = nullptr;
+#else
+    AVOutputFormat *outputFormat = nullptr;
+#endif
     while ((outputFormat = av_output_video_device_next(outputFormat))
            != nullptr)
     {
@@ -256,7 +260,7 @@ bool VideoEncoder::Start(const std::string &_format,
   }
   else
   {
-    outputFormat = av_guess_format(nullptr,
+    const AVOutputFormat * outputFormat = av_guess_format(nullptr,
                                    this->dataPtr->filename.c_str(), nullptr);
 
     if (!outputFormat)
@@ -294,7 +298,7 @@ bool VideoEncoder::Start(const std::string &_format,
   }
 
   // find the video encoder
-  AVCodec *encoder = avcodec_find_encoder(
+  const AVCodec *encoder = avcodec_find_encoder(
       this->dataPtr->formatCtx->oformat->video_codec);
   if (!encoder)
   {
