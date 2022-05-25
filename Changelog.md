@@ -1,5 +1,36 @@
 ## Gazebo 11
 
+## Gazebo 11.11.0 (2022-05-25)
+
+1. Convert `OGRE_RESOURCE_PATH` with `TO_CMAKE_PATH`
+    * [Pull request #3165](https://github.com/ignitionrobotics/gazebo/pull/3165)
+    * A contrubition from Silvio Traversaro
+
+1. Fix compatibility with FFmpeg 5.0
+    * [Pull request #3195](https://github.com/ignitionrobotics/gazebo/pull/3195)
+    * A contrubition from Silvio Traversaro
+
+1. Get/Set friction coefficients of wheels
+    * [Pull request #3219](https://github.com/ignitionrobotics/gazebo/pull/3219)
+
+1. Support `<anti_aliasing>` element when setting up camera
+    * [Pull request #3201](https://github.com/ignitionrobotics/gazebo/pull/3201)
+
+1. Added shininess to models
+    * [Pull request #3213](https://github.com/ignitionrobotics/gazebo/pull/3213)
+
+1. Fix missing namespace for string
+    * [Pull request #3211](https://github.com/ignitionrobotics/gazebo/pull/3211)
+
+1. Fix typo in TBB target check in `gazebo-config.cmake.in`
+    * [Pull request #3207](https://github.com/ignitionrobotics/gazebo/pull/3207)
+
+1. Separate cache files for each heightmap LOD
+    * [Pull request #3200](https://github.com/ignitionrobotics/gazebo/pull/3200)
+
+1. Parse `ode_quiet` physics parameter from SDFormat
+    * [Pull request #3194](https://github.com/ignitionrobotics/gazebo/pull/3194)
+
 ## Gazebo 11.10.2 (2022-03-19)
 
 1. Support plotting for entities with / in the name
@@ -5051,3 +5082,4 @@ compilation on Windows.
 *  Numerous bug fixes
 *  APT repository hosted at [http://osrfoundation.org OSRF]
 *  Improved process control prevents zombie processes
+
