@@ -1259,29 +1259,32 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
       }
     }
 
-    sdf::ElementPtr linkElem = _sdf->GetElement("link");
-    if (linkElem->HasElement("visual") &&
-        linkElem->GetElement("visual")->HasElement("material"))
+    if (_sdf->HasElement("link"))
     {
-      sdf::ElementPtr matElem = linkElem->GetElement("visual")->
-          GetElement("material");
+      sdf::ElementPtr linkElem = _sdf->GetElement("link");
+      if (linkElem->HasElement("visual") &&
+          linkElem->GetElement("visual")->HasElement("material"))
+      {
+        sdf::ElementPtr matElem = linkElem->GetElement("visual")->
+            GetElement("material");
 
-      if (matElem->HasElement("shininess"))
-      {
-        this->dataPtr->materialShininessMap[modelName] =
-            matElem->Get<double>("shininess");
-      }
-      else
-      {
-        this->dataPtr->materialShininessMap[modelName] = 0;
-      }
+        if (matElem->HasElement("shininess"))
+        {
+          this->dataPtr->materialShininessMap[modelName] =
+              matElem->Get<double>("shininess");
+        }
+        else
+        {
+          this->dataPtr->materialShininessMap[modelName] = 0;
+        }
 
-      std::string materialShininessService("/" + modelName + "/shininess");
-      if (!this->dataPtr->ignNode.Advertise(materialShininessService,
-          &World::MaterialShininessService, this))
-      {
-        gzerr << "Error advertising service ["
-              << materialShininessService << "]" << std::endl;
+        std::string materialShininessService("/" + modelName + "/shininess");
+        if (!this->dataPtr->ignNode.Advertise(materialShininessService,
+            &World::MaterialShininessService, this))
+        {
+          gzerr << "Error advertising service ["
+                << materialShininessService << "]" << std::endl;
+        }
       }
     }
 
