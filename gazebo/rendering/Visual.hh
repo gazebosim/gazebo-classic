@@ -30,8 +30,6 @@
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/msgs/MessageTypes.hh>
-#include <ignition/transport/Node.hh>
-#include <ignition/transport/TopicUtils.hh>
 
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Time.hh"
