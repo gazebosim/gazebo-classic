@@ -18,6 +18,7 @@
 
 1. Added shininess to models
     * [Pull request #3213](https://github.com/osrf/gazebo/pull/3213)
+    * [Pull request #3223](https://github.com/osrf/gazebo/pull/3223)
 
 1. Fix missing namespace for string
     * [Pull request #3211](https://github.com/osrf/gazebo/pull/3211)
