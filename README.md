@@ -4,13 +4,13 @@ Gazebo - A dynamic multi-robot simulator
 This is the Gazebo simulator.  Gazebo simulates multiple robots in a
 3D environment, with extensive dynamic interaction between objects.
 
-  http://gazebosim.org
+  http://classic.gazebosim.org
 
 Installation
 ------------
 Instructions are located at
 
-  http://gazebosim.org/install
+  http://classic.gazebosim.org/install
 
 Gazebo cmake parameters available at configuring time:
 
@@ -51,7 +51,7 @@ Gazebo cmake parameters available at configuring time:
 
 Uninstallation
 --------------
-Read the uninstallation instructions (http://gazebosim.org/uninstall) in the
+Read the uninstallation instructions (http://classic.gazebosim.org/uninstall) in the
 online manual for generic instructions.  For most people, the following
 sequence will suffice (might need sudo if it installed in /usr):
 
