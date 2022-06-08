@@ -17,6 +17,11 @@
 #include <gtest/gtest.h>
 
 #include "test_config.h"
+
+#include <ignition/math/Color.hh>
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Material.hh"
 #include "gazebo/common/ColladaLoader.hh"

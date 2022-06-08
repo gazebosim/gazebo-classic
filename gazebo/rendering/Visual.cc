@@ -19,7 +19,15 @@
 #include <boost/lexical_cast.hpp>
 
 #include <ignition/common/Profiler.hh>
+#include <ignition/math/AxisAlignedBox.hh>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Vector4.hh>
 #include <ignition/transport/Node.hh>
 #include <ignition/transport/TopicUtils.hh>
 

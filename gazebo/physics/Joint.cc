@@ -15,6 +15,12 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/SemanticVersion.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 

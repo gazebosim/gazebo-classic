@@ -16,6 +16,8 @@
 */
 #include <gtest/gtest.h>
 
+#include <numeric>
+
 #include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/test/ServerFixture.hh"
 

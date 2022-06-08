@@ -15,6 +15,11 @@
  *
 */
 #include <functional>
+#include <ignition/math/Inertial.hh>
+#include <ignition/math/Matrix3.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
 #include "gazebo/physics/Inertial.hh"
 
 using namespace gazebo;
