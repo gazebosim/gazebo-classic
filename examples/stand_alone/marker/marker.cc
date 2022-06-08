@@ -15,7 +15,9 @@
  *
 */
 #include <ignition/transport.hh>
-#include <ignition/math.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Rand.hh>
+#include <ignition/math/Vector3.hh>
 #include <ignition/msgs.hh>
 #include <gazebo/common/Time.hh>
 
