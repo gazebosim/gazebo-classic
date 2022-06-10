@@ -156,7 +156,7 @@ void LensFlareSensorPlugin::SetOcclusionSteps(double _occlusionSteps)
 
   for (auto flare : this->dataPtr->lensFlares)
   {
-    flare->SetOcclusionSteps(occlusionSteps);
+    flare->SetOcclusionSteps(_occlusionSteps);
   }
 }
 

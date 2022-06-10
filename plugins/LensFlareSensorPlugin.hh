@@ -53,6 +53,12 @@ namespace gazebo
     /// \param[in] _color Color of lens flare
     public: void SetColor(const ignition::math::Vector3d &_color);
 
+    /// \brief Set the number of steps to take in each direction when
+    /// checking for occlusions.
+    /// \param[in] _occlusionSteps number of steps to take in each direction
+    /// when checking for occlusion.
+    public: void SetOcclusionSteps(double _occlusionSteps);
+
     /// \brief Add lens flare effect to a camera
     /// \param[in] _camera Camera to add the lens flare effect to.
     private: void AddLensFlare(rendering::CameraPtr _camera);
