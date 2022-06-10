@@ -129,6 +129,12 @@ namespace gazebo
       /// \param[in] _color Color of lens flare
       public: void SetColor(const ignition::math::Vector3d &_color);
 
+      /// \brief Set the number of steps to take in each direction when
+      /// checking for occlusions.
+      /// \param[in] _occlusionSteps number of steps to take in each direction
+      /// when checking for occlusion.
+      public: void SetOcclusionSteps(double _occlusionSteps);
+
       /// \brief Set the name of the lens flare compositor to use the next
       /// time SetCamera is called.
       /// \param[in] _name Name of the compositor to use

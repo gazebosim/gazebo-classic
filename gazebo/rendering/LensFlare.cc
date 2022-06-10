@@ -367,6 +367,9 @@ namespace gazebo
       public: ignition::math::Vector3d lensFlareColor
           = ignition::math::Vector3d(1.0, 1.0, 1.0);
 
+      /// \brief Color of lens flare.
+      public: double lensFlareOcclusionSteps = 10;
+
       /// \brief Compositor name to be used for lens flare
       public: std::string compositorName = "CameraLensFlare/Default";
 
@@ -435,7 +438,7 @@ void LensFlare::SetCamera(CameraPtr _camera)
     this->dataPtr->lensFlareCompositorListener->SetColor(
         this->dataPtr->lensFlareColor);
     this->dataPtr->lensFlareCompositorListener->SetOcclusionSteps(
-        this->dataPtr->lensFlareColor);
+        this->dataPtr->lensFlareOcclusionSteps);
 
     this->dataPtr->lensFlareInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(
@@ -479,7 +482,7 @@ void LensFlare::SetColor(const ignition::math::Vector3d &_color)
 //////////////////////////////////////////////////
 void LensFlare::SetOcclusionSteps(double _occlusionSteps)
 {
-  this->dataPtr->occlusionSteps = _occlusionSteps;
+  this->dataPtr->lensFlareOcclusionSteps = _occlusionSteps;
 }
 
 //////////////////////////////////////////////////
