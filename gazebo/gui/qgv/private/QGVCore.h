@@ -96,7 +96,7 @@ class QGVCore
       Agiodisc_t memIoDisc;
 
       memIoDisc.afread = memiofread;
-      memIoDisc.putstr = AgIoDisc.putstr;
+      memIoDisc.printf = AgIoDisc.printf;
       memIoDisc.flush = AgIoDisc.flush;
       rdr.data = cp;
       rdr.len = strlen(cp);
