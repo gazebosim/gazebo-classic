@@ -27,11 +27,16 @@ using namespace gazebo;
 class PlowingEffect : public ServerFixture
 {
  public: void RigidTerrain(const std::string &_physicsEngine);
+ public: void DeformableTerrain(const std::string &_physicsEngine);
 
   /// \brief CallbackRigidTerrain for subscribing to /gazebo/default/physics/contacts topic
  private: void CallbackRigidTerrain(const ConstContactsPtr &_msg);
+ private: void CallbackDeformableTerrain(const ConstContactsPtr &_msg);
+
+ private: physics::JointPtr wheel_front_joint = nullptr;
 };
 
+unsigned int g_messageCount = 0;
 
 ////////////////////////////////////////////////////////////////////////
 void PlowingEffect::CallbackRigidTerrain(const ConstContactsPtr &_msg)
@@ -57,9 +62,33 @@ void PlowingEffect::CallbackRigidTerrain(const ConstContactsPtr &_msg)
   }
 }
 
+void PlowingEffect::CallbackDeformableTerrain(const ConstContactsPtr &_msg)
+{
+  std::string collision1 = "my_tricycle::wheel_front::collision";
+  std::string collision2 = "plowing_effect_ground_plane::link::collision";
+
+  // no shift in contact point on rigid surface
+  for(auto idx = 0; idx < _msg->contact_size(); ++idx)
+  {
+    const gazebo::msgs::Contact& contact = _msg->contact(idx);
+    if(contact.collision1() == collision1 &&
+        contact.collision2() == collision2)
+    {
+      const ignition::math::Vector3<double>& contact_point_normal =
+          ConvertIgn( contact.normal(0));
+      const ignition::math::Vector3<double>& unit_normal =
+          ignition::math::Vector3<double>::UnitZ;
+      double angle = acos(contact_point_normal.Dot(unit_normal)/
+          contact_point_normal.Length() * unit_normal.Length());
+//      std::cout << "idx: " << ++g_messageCount << " " << angle * 180/3.14 << std::endl;
+//      std::cout << "Velocity: " << wheel_front_joint->GetVelocity(0) << std::endl;
+    }
+  }
+}
+
 void PlowingEffect::RigidTerrain(const std::string &_physicsEngine)
 {
-  // Load an plowing effect world
+  // Load the plowing effect world
   Load("worlds/plowing_effect_demo.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
@@ -71,14 +100,42 @@ void PlowingEffect::RigidTerrain(const std::string &_physicsEngine)
   ASSERT_EQ(*topics.begin(), "/gazebo/default/physics/contacts");
 
   transport::SubscriberPtr sub = this->node->Subscribe(topic,
-                                                       &PlowingEffect::CallbackRigidTerrain, this);
-
+                                 &PlowingEffect::CallbackRigidTerrain, this);
   world->Step(50);
+}
+
+void PlowingEffect::DeformableTerrain(const std::string &_physicsEngine)
+{
+  // Load the plowing effect world
+  Load("worlds/plowing_effect_demo.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  const std::string& topic = "/gazebo/default/physics/contacts";
+  std::list<std::string> topics =
+      transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+  ASSERT_TRUE(topics.size() == 1);
+  ASSERT_EQ(*topics.begin(), "/gazebo/default/physics/contacts");
+
+  physics::ModelPtr model = world->ModelByName("my_tricycle");
+  ASSERT_TRUE(model != nullptr);
+
+  this->wheel_front_joint = model->GetJoint("wheel_front_spin");
+  ASSERT_TRUE(wheel_front_joint != nullptr);
+
+  transport::SubscriberPtr sub = this->node->Subscribe(topic,
+                                                       &PlowingEffect::CallbackDeformableTerrain, this);
+  world->Step(100);
 }
 
 TEST_F(PlowingEffect, RigidTerrain)
 {
   RigidTerrain("ode");
+}
+
+TEST_F(PlowingEffect, DeformableTerrain)
+{
+  DeformableTerrain("ode");
 }
 
 int main(int argc, char **argv)
