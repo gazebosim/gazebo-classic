@@ -26,26 +26,38 @@ using namespace gazebo;
 
 class PlowingEffect : public ServerFixture
 {
- public: void RandomTest(const std::string &_physicsEngine);
+ public: void RigidTerrain(const std::string &_physicsEngine);
 
-  /// \brief Callback for subscribing to /gazebo/default/physics/contacts topic
- private: void Callback(const ConstContactsPtr &_msg);
+  /// \brief CallbackRigidTerrain for subscribing to /gazebo/default/physics/contacts topic
+ private: void CallbackRigidTerrain(const ConstContactsPtr &_msg);
 };
 
-unsigned int g_messageCount = 0;
 
 ////////////////////////////////////////////////////////////////////////
-void PlowingEffect::Callback(const ConstContactsPtr &_msg)
+void PlowingEffect::CallbackRigidTerrain(const ConstContactsPtr &_msg)
 {
-  gzdbg << "Listening to Callback: " << ++g_messageCount << std::endl;
-
   std::string collision1 = "original_tricycle::wheel_front::collision";
   std::string collision2 = "plowing_effect_ground_plane::link::collision";
 
-  std::cout << _msg->contact_size() << std::endl;
+  // no shift in contact point on rigid surface
+  for(auto idx = 0; idx < _msg->contact_size(); ++idx)
+  {
+    const gazebo::msgs::Contact& contact = _msg->contact(idx);
+    if(contact.collision1() == collision1 &&
+       contact.collision2() == collision2)
+    {
+      const ignition::math::Vector3<double>& contact_point_normal =
+                            ConvertIgn( contact.normal(0));
+      const ignition::math::Vector3<double>& unit_normal =
+                            ignition::math::Vector3<double>::UnitZ;
+      double angle = acos(contact_point_normal.Dot(unit_normal)/
+                     contact_point_normal.Length() * unit_normal.Length());
+      ASSERT_EQ(angle, 0);
+    }
+  }
 }
 
-void PlowingEffect::RandomTest(const std::string &_physicsEngine)
+void PlowingEffect::RigidTerrain(const std::string &_physicsEngine)
 {
   // Load an plowing effect world
   Load("worlds/plowing_effect_demo.world", true, _physicsEngine);
@@ -59,14 +71,14 @@ void PlowingEffect::RandomTest(const std::string &_physicsEngine)
   ASSERT_EQ(*topics.begin(), "/gazebo/default/physics/contacts");
 
   transport::SubscriberPtr sub = this->node->Subscribe(topic,
-                                                       &PlowingEffect::Callback, this);
+                                                       &PlowingEffect::CallbackRigidTerrain, this);
 
-  world->Step(10);
+  world->Step(50);
 }
 
-TEST_F(PlowingEffect, RandomTest)
+TEST_F(PlowingEffect, RigidTerrain)
 {
-  RandomTest("ode");
+  RigidTerrain("ode");
 }
 
 int main(int argc, char **argv)
