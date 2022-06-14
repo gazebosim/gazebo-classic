@@ -33,7 +33,8 @@ class PlowingEffect : public ServerFixture
  private: void CallbackRigidTerrain(const ConstContactsPtr &_msg);
  private: void CallbackDeformableTerrain(const ConstContactsPtr &_msg);
 
- private: physics::JointPtr wheel_front_joint = nullptr;
+ private: physics::JointPtr wheelJoint = nullptr;
+ private: physics::LinkPtr wheelLink = nullptr;
 };
 
 unsigned int g_messageCount = 0;
@@ -66,8 +67,13 @@ void PlowingEffect::CallbackDeformableTerrain(const ConstContactsPtr &_msg)
 {
   std::string collision1 = "my_tricycle::wheel_front::collision";
   std::string collision2 = "plowing_effect_ground_plane::link::collision";
+  auto plowing_params = wheelLink->GetCollision("collision")->
+                                  GetSDF()->GetElement("gz:plowing_wheel");
 
-  // no shift in contact point on rigid surface
+  auto maxDegrees = plowing_params->Get<double>("max_degrees");
+  auto deadbandVelocity = plowing_params->Get<double>("deadband_velocity");
+  auto saturationVelocity = plowing_params->Get<double>("saturation_velocity");
+
   for(auto idx = 0; idx < _msg->contact_size(); ++idx)
   {
     const gazebo::msgs::Contact& contact = _msg->contact(idx);
@@ -80,8 +86,12 @@ void PlowingEffect::CallbackDeformableTerrain(const ConstContactsPtr &_msg)
           ignition::math::Vector3<double>::UnitZ;
       double angle = acos(contact_point_normal.Dot(unit_normal)/
           contact_point_normal.Length() * unit_normal.Length());
-//      std::cout << "idx: " << ++g_messageCount << " " << angle * 180/3.14 << std::endl;
-//      std::cout << "Velocity: " << wheel_front_joint->GetVelocity(0) << std::endl;
+
+      // no shift in contact point
+      if(wheelJoint->GetVelocity(0) < deadbandVelocity)
+      {
+        EXPECT_EQ(angle, 0);
+      }
     }
   }
 }
@@ -120,12 +130,15 @@ void PlowingEffect::DeformableTerrain(const std::string &_physicsEngine)
   physics::ModelPtr model = world->ModelByName("my_tricycle");
   ASSERT_TRUE(model != nullptr);
 
-  this->wheel_front_joint = model->GetJoint("wheel_front_spin");
-  ASSERT_TRUE(wheel_front_joint != nullptr);
+  this->wheelJoint = model->GetJoint("wheel_front_spin");
+  ASSERT_TRUE(wheelJoint != nullptr);
+
+  this->wheelLink = model->GetLink("wheel_front");
+  ASSERT_TRUE(wheelLink != nullptr);
 
   transport::SubscriberPtr sub = this->node->Subscribe(topic,
                                                        &PlowingEffect::CallbackDeformableTerrain, this);
-  world->Step(100);
+  world->Step(10000);
 }
 
 TEST_F(PlowingEffect, RigidTerrain)
