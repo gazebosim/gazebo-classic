@@ -33,7 +33,6 @@ class PlowingEffect : public ServerFixture
  private: void CallbackRigidTerrain(const ConstContactsPtr &_msg);
  private: void CallbackDeformableTerrain(const ConstContactsPtr &_msg);
 
- private: physics::JointPtr wheelJoint = nullptr;
  private: physics::LinkPtr wheelLink = nullptr;
 };
 
@@ -42,22 +41,22 @@ unsigned int g_messageCount = 0;
 ////////////////////////////////////////////////////////////////////////
 void PlowingEffect::CallbackRigidTerrain(const ConstContactsPtr &_msg)
 {
-  std::string collision1 = "original_tricycle::wheel_front::collision";
-  std::string collision2 = "plowing_effect_ground_plane::link::collision";
+  std::string wheelCollisionStr = "original_tricycle::wheel_front::collision";
+  std::string groundCollisionStr = "plowing_effect_ground_plane::link::collision";
 
   // no shift in contact point on rigid surface
   for(auto idx = 0; idx < _msg->contact_size(); ++idx)
   {
     const gazebo::msgs::Contact& contact = _msg->contact(idx);
-    if(contact.collision1() == collision1 &&
-       contact.collision2() == collision2)
+    if(contact.collision1() == wheelCollisionStr &&
+       contact.collision2() == groundCollisionStr)
     {
-      const ignition::math::Vector3<double>& contact_point_normal =
+      const ignition::math::Vector3<double>& contactPointNormal =
                             ConvertIgn( contact.normal(0));
-      const ignition::math::Vector3<double>& unit_normal =
+      const ignition::math::Vector3<double>& unitNormal =
                             ignition::math::Vector3<double>::UnitZ;
-      double angle = acos(contact_point_normal.Dot(unit_normal)/
-                     contact_point_normal.Length() * unit_normal.Length());
+      double angle = acos(contactPointNormal.Dot(unitNormal)/
+                     contactPointNormal.Length() * unitNormal.Length());
       ASSERT_EQ(angle, 0);
     }
   }
@@ -65,8 +64,8 @@ void PlowingEffect::CallbackRigidTerrain(const ConstContactsPtr &_msg)
 
 void PlowingEffect::CallbackDeformableTerrain(const ConstContactsPtr &_msg)
 {
-  std::string collision1 = "my_tricycle::wheel_front::collision";
-  std::string collision2 = "plowing_effect_ground_plane::link::collision";
+  std::string wheelCollisionStr = "my_tricycle::wheel_front::collision";
+  std::string groundCollisionStr = "plowing_effect_ground_plane::link::collision";
   auto plowing_params = wheelLink->GetCollision("collision")->
                                   GetSDF()->GetElement("gz:plowing_wheel");
 
@@ -74,21 +73,39 @@ void PlowingEffect::CallbackDeformableTerrain(const ConstContactsPtr &_msg)
   auto deadbandVelocity = plowing_params->Get<double>("deadband_velocity");
   auto saturationVelocity = plowing_params->Get<double>("saturation_velocity");
 
+  ASSERT_EQ(maxDegrees, 15.0);
+  ASSERT_EQ(deadbandVelocity, 0.5);
+  ASSERT_EQ(saturationVelocity, 0.63);
+
+  auto fdir1 = wheelLink->GetCollision("collision")->GetSDF()->
+                          GetElement("surface")->GetElement("friction")->
+                          GetElement("ode")->Get<ignition::math::Vector3<double>>("fdir1");
+
   for(auto idx = 0; idx < _msg->contact_size(); ++idx)
   {
     const gazebo::msgs::Contact& contact = _msg->contact(idx);
-    if(contact.collision1() == collision1 &&
-        contact.collision2() == collision2)
+    if(contact.collision1() == wheelCollisionStr &&
+        contact.collision2() == groundCollisionStr)
     {
-      const ignition::math::Vector3<double>& contact_point_normal =
+      const ignition::math::Vector3<double>& contactPointNormal =
           ConvertIgn( contact.normal(0));
-      const ignition::math::Vector3<double>& unit_normal =
+      const ignition::math::Vector3<double>& unitNormal =
           ignition::math::Vector3<double>::UnitZ;
-      double angle = acos(contact_point_normal.Dot(unit_normal)/
-          contact_point_normal.Length() * unit_normal.Length());
+      double angle = acos(contactPointNormal.Dot(unitNormal)/
+                     contactPointNormal.Length() * unitNormal.Length());
+
+      auto wheelLinearVelocity = this->wheelLink->GetCollision("collision")->WorldLinearVel();
+
+      // Compute longitudinal unit vector as normal cross fdir1
+      ignition::math::Vector3d unitLongitudinal =
+                                contactPointNormal.Cross(fdir1);
+
+      // Compute longitudinal speed (dot product)
+      double wheelSpeedLongitudinal =
+          wheelLinearVelocity.AbsDot(unitLongitudinal);
 
       // no shift in contact point
-      if(wheelJoint->GetVelocity(0) < deadbandVelocity)
+      if(wheelSpeedLongitudinal < deadbandVelocity)
       {
         EXPECT_EQ(angle, 0);
       }
@@ -111,7 +128,7 @@ void PlowingEffect::RigidTerrain(const std::string &_physicsEngine)
 
   transport::SubscriberPtr sub = this->node->Subscribe(topic,
                                  &PlowingEffect::CallbackRigidTerrain, this);
-  world->Step(50);
+  world->Step(1);
 }
 
 void PlowingEffect::DeformableTerrain(const std::string &_physicsEngine)
@@ -130,15 +147,12 @@ void PlowingEffect::DeformableTerrain(const std::string &_physicsEngine)
   physics::ModelPtr model = world->ModelByName("my_tricycle");
   ASSERT_TRUE(model != nullptr);
 
-  this->wheelJoint = model->GetJoint("wheel_front_spin");
-  ASSERT_TRUE(wheelJoint != nullptr);
-
   this->wheelLink = model->GetLink("wheel_front");
   ASSERT_TRUE(wheelLink != nullptr);
 
   transport::SubscriberPtr sub = this->node->Subscribe(topic,
                                                        &PlowingEffect::CallbackDeformableTerrain, this);
-  world->Step(10000);
+  world->Step(5000);
 }
 
 TEST_F(PlowingEffect, RigidTerrain)
