@@ -65,7 +65,7 @@ class PlowingEffectSpheres : public ServerFixture
  private: physics::CollisionPtr sphere4CollisionPtr_ = nullptr;
 
  private: int callbackCount_ = 1;
- private: const int maxCallbackCount_ = 1000;
+ private: const int maxCallbackCount_ = 2000;
  private: double sphere1PlowingAngle_;
  private: double sphere2PlowingAngle_;
  private: double sphere3PlowingAngle_;
@@ -230,8 +230,6 @@ void PlowingEffectSpheres::Callback(const ConstContactsPtr &_msg)
   std::string sphere4CollisionStr = "sphere4::base_link::collision";
   std::string groundCollisionStr = "plowing_effect_ground_plane::link::collision";
 
-  ignition::math::Vector3<double> fdir1(0, 1, 0);
-
   for(auto idx = 0; idx < _msg->contact_size(); ++idx)
   {
     const gazebo::msgs::Contact& contact = _msg->contact(idx);
@@ -253,7 +251,6 @@ void PlowingEffectSpheres::Callback(const ConstContactsPtr &_msg)
       }
       else if(contact.collision1() == sphere2CollisionStr)
       {
-        const auto& test2 = ConvertIgn( contact.normal(1));
         sphere2PlowingAngle_ = angle;
         gzdbg << "sphere 2 plowing angle: " << sphere2PlowingAngle_ << "\n";
       }
