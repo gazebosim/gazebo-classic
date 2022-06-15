@@ -251,7 +251,7 @@
             <ode>
               <kp>4000</kp>
               <kd>16</kd>
-	      <max_vel>10</max_vel>
+	          <max_vel>10</max_vel>
               <min_depth>0.0005</min_depth>
             </ode>
           </contact>

@@ -90,7 +90,8 @@ void PlowingEffect::CallbackDeformableTerrain(const ConstContactsPtr &_msg)
       double wheelSpeedLongitudinal = wheelLinearVelocity.AbsDot(unitLongitudinal);
       
       // compute the angle contact point makes with unit normal
-      double angle = acos(contactPointNormal.Dot(unitNormal)/contactPointNormal.Length() * unitNormal.Length());
+      double angle = acos(contactPointNormal.Dot(unitNormal)/
+                      contactPointNormal.Length() * unitNormal.Length());
 
       // no plowing effect
       if(wheelSpeedLongitudinal < deadbandVelocity_)
@@ -99,11 +100,11 @@ void PlowingEffect::CallbackDeformableTerrain(const ConstContactsPtr &_msg)
       }
 
       // plowing effect
-      else if(wheelSpeedLongitudinal > deadbandVelocity_ && wheelSpeedLongitudinal < saturationVelocity_)
+      else if(wheelSpeedLongitudinal > deadbandVelocity_ &&
+              wheelSpeedLongitudinal < saturationVelocity_)
       {
-          // angle less than maxRadians_
-          ASSERT_LT(angle, maxRadians_);
-        // TODO: should we also check for exact angle values here
+        ASSERT_LT(angle, maxRadians_);
+        ASSERT_GT(angle, 0);
       }
 
       // maximum plowing effect.
@@ -177,7 +178,7 @@ void PlowingEffect::DeformableTerrain(const std::string &_physicsEngine)
 
   transport::SubscriberPtr sub = this->node->Subscribe(contactsTopic,
                                                        &PlowingEffect::CallbackDeformableTerrain, this);
-  world->Step(5000);
+  world->Step(100);
 }
 
 TEST_F(PlowingEffect, RigidTerrain)
