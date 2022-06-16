@@ -362,31 +362,47 @@ void Visual::Load()
     const std::string validServiceName =
         ignition::transport::TopicUtils::AsValidTopic(serviceName);
 
+    bool tryServiceCall = true;
     if (validServiceName.empty())
     {
         gzerr << "Service name [" << serviceName << "] not valid" << std::endl;
-        return;
+        tryServiceCall = false;
     }
 
-    ignition::msgs::StringMsg req;
-    req.set_data(visualName);
-
-    bool result;
-    unsigned int timeout = 5000;
-    bool executed = node.Request(validServiceName, req, timeout, rep, result);
-
-    if (executed)
     {
-      if (result)
-        this->dataPtr->shininess = rep.double_value(); 
-      else
-        gzerr << "Service call [" << validServiceName << "] failed"
+      std::vector<ignition::transport::ServicePublisher> publishers;
+      if (!node.ServiceInfo(validServiceName, publishers))
+      {
+        gzerr << "Service name [" << validServiceName << "] not advertised, "
+              << "not attempting to load shininess for visual with name ["
+              << this->Name() << "]."
               << std::endl;
+        tryServiceCall = false;
+      }
     }
-    else
+
+    if (tryServiceCall)
     {
-      gzerr << "Service call [" << validServiceName << "] timed out"
-            << std::endl;
+      ignition::msgs::StringMsg req;
+      req.set_data(visualName);
+
+      bool result;
+      unsigned int timeout = 5000;
+      bool executed = node.Request(validServiceName, req, timeout, rep, result);
+
+      if (executed)
+      {
+        if (result)
+          this->dataPtr->shininess = rep.double_value();
+        else
+          gzerr << "Service call [" << validServiceName << "] failed"
+                << std::endl;
+      }
+      else
+      {
+        gzerr << "Service call [" << validServiceName << "] timed out"
+              << std::endl;
+      }
     }
   }
 
