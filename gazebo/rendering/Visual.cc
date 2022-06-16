@@ -327,6 +327,27 @@ void Visual::Init()
   this->dataPtr->inheritTransparency = true;
   this->dataPtr->scale = ignition::math::Vector3d::One;
 
+  this->dataPtr->initialized = true;
+}
+
+//////////////////////////////////////////////////
+void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
+{
+  this->dataPtr->sdf = msgs::VisualToSDF(*_msg.get());
+  this->Load();
+  this->UpdateFromMsg(_msg);
+}
+
+//////////////////////////////////////////////////
+void Visual::Load(sdf::ElementPtr _sdf)
+{
+  this->dataPtr->sdf->Copy(_sdf);
+  this->Load();
+}
+
+//////////////////////////////////////////////////
+void Visual::Load()
+{
   if (this->dataPtr->sdf->HasElement("material"))
   {
     // Get shininess value from physics::World
@@ -369,27 +390,6 @@ void Visual::Init()
     }
   }
 
-  this->dataPtr->initialized = true;
-}
-
-//////////////////////////////////////////////////
-void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
-{
-  this->dataPtr->sdf = msgs::VisualToSDF(*_msg.get());
-  this->Load();
-  this->UpdateFromMsg(_msg);
-}
-
-//////////////////////////////////////////////////
-void Visual::Load(sdf::ElementPtr _sdf)
-{
-  this->dataPtr->sdf->Copy(_sdf);
-  this->Load();
-}
-
-//////////////////////////////////////////////////
-void Visual::Load()
-{
   std::ostringstream stream;
   ignition::math::Pose3d pose;
   Ogre::MovableObject *obj = nullptr;
