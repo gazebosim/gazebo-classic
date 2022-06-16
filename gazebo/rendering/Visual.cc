@@ -1575,6 +1575,12 @@ ignition::math::Color Visual::Emissive() const
   return this->dataPtr->emissive;
 }
 
+/////////////////////////////////////////////////
+double Visual::Shininess() const
+{
+  return this->dataPtr->shininess;
+}
+
 //////////////////////////////////////////////////
 void Visual::SetWireframe(bool _show)
 {
