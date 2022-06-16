@@ -38,14 +38,17 @@ class PlowingEffectTricycle : public ServerFixture
  private: void CallbackDeformableTerrain(const ConstContactsPtr &_msg);
 
  private: physics::CollisionPtr wheelCollisionPtr_ = nullptr;
+ private: double plowingAngleRigidTerrain_;
+
+ private: int callbackCountRigidTerrain_ = 1;
+ private: const int maxCallbackCountRigidTerrain_ = 200;
+
   /// constant params from SDF
  private: double maxRadians_;
  private: double deadbandVelocity_;
  private: double saturationVelocity_;
  private: ignition::math::Vector3<double> fdir1_;
- private: int callbackCountRigidTerrain_ = 1;
- private: const int maxCallbackCountRigidTerrain_ = 200;
- private: double plowingAngleRigidTerrain_;
+
 };
 
 /** plowing effect on four spheres of same size and inertia
@@ -57,7 +60,7 @@ class PlowingEffectSpheres : public ServerFixture
 {
   /// \brief test for max plowing angle at saturation velocity
  public: void MaxPlowingAngle(const std::string &_physicsEngine);
- private: void Callback(const ConstContactsPtr &_msg);
+ private: void CallbackMaxPlowingAngle(const ConstContactsPtr &_msg);
 
  private: physics::CollisionPtr sphere1CollisionPtr_ = nullptr;
  private: physics::CollisionPtr sphere2CollisionPtr_ = nullptr;
@@ -65,7 +68,6 @@ class PlowingEffectSpheres : public ServerFixture
  private: physics::CollisionPtr sphere4CollisionPtr_ = nullptr;
 
  private: int callbackCount_ = 1;
- private: const int maxCallbackCount_ = 2000;
  private: double sphere1PlowingAngle_;
  private: double sphere2PlowingAngle_;
  private: double sphere3PlowingAngle_;
@@ -116,25 +118,28 @@ void PlowingEffectTricycle::CallbackDeformableTerrain(const ConstContactsPtr &_m
 
       // compute longitudinal unit vector as normal cross fdir1_
       const auto& wheelLinearVelocity = wheelCollisionPtr_->WorldLinearVel();
-      const auto& unitLongitudinal = contactPointNormal.Cross(fdir1_);
-      double wheelSpeedLongitudinal = wheelLinearVelocity.AbsDot(unitLongitudinal);
+      const auto& unitLongitudinal = fdir1_.Cross(contactPointNormal);
+      double wheelSpeedLongitudinal = wheelLinearVelocity.Dot(unitLongitudinal);
       
       // compute the angle contact point makes with unit normal
       double angle = acos(contactPointNormal.Dot(unitNormal)/
                       contactPointNormal.Length() * unitNormal.Length());
 
+      // check if longitudinal speed && contact normal point in same direction
+      EXPECT_GE(unitLongitudinal.Dot(contactPointNormal), 0);
+
       // no plowing effect
-      if(wheelSpeedLongitudinal < deadbandVelocity_)
+      if(wheelSpeedLongitudinal <= deadbandVelocity_)
       {
         EXPECT_EQ(angle, 0);
       }
 
-      // plowing effect
+      // linear plowing effect
       else if(wheelSpeedLongitudinal > deadbandVelocity_ &&
               wheelSpeedLongitudinal < saturationVelocity_)
       {
         ASSERT_LT(angle, maxRadians_);
-        ASSERT_GT(angle, 0);
+        ASSERT_GE(angle, 0);
       }
 
       // maximum plowing effect.
@@ -142,6 +147,51 @@ void PlowingEffectTricycle::CallbackDeformableTerrain(const ConstContactsPtr &_m
       {
         gzdbg << "Reached maximum plowing effect" << "\n";
         EXPECT_EQ(angle, maxRadians_);
+      }
+    }
+  }
+}
+
+void PlowingEffectSpheres::CallbackMaxPlowingAngle(const ConstContactsPtr &_msg)
+{
+  if(callbackCount_ < 1800)
+  {
+    callbackCount_ = callbackCount_ + 1;
+    return;
+  }
+
+  std::string sphere1CollisionStr = "sphere1::base_link::collision";
+  std::string sphere2CollisionStr = "sphere2::base_link::collision";
+  std::string sphere3CollisionStr = "sphere3::base_link::collision";
+  std::string sphere4CollisionStr = "sphere4::base_link::collision";
+  std::string groundCollisionStr = "plowing_effect_ground_plane::link::collision";
+
+  for(auto idx = 0; idx < _msg->contact_size(); ++idx)
+  {
+    const gazebo::msgs::Contact& contact = _msg->contact(idx);
+    if(contact.collision2() == groundCollisionStr)
+    {
+      const auto& contactPointNormal = ConvertIgn( contact.normal(0));
+      const auto& unitNormal = ignition::math::Vector3<double>::UnitZ;
+
+      double angle = acos(contactPointNormal.Dot(unitNormal)/
+          contactPointNormal.Length() * unitNormal.Length());
+
+      if(contact.collision1() == sphere1CollisionStr)
+      {
+        sphere1PlowingAngle_ = angle;
+      }
+      else if(contact.collision1() == sphere2CollisionStr)
+      {
+        sphere2PlowingAngle_ = angle;
+      }
+      else if(contact.collision1() == sphere3CollisionStr)
+      {
+        sphere3PlowingAngle_ = angle;
+      }
+      else if(contact.collision1() == sphere4CollisionStr)
+      {
+        sphere4PlowingAngle_ = angle;
       }
     }
   }
@@ -161,7 +211,7 @@ void PlowingEffectTricycle::RigidTerrain(const std::string &_physicsEngine)
   ASSERT_EQ(*topics.begin(), "/gazebo/default/physics/contacts");
 
   transport::SubscriberPtr sub = this->node->Subscribe(contactsTopic,
-                                 &PlowingEffectTricycle::CallbackRigidTerrain, this);
+                                                       &PlowingEffectTricycle::CallbackRigidTerrain, this);
   world->Step(maxCallbackCountRigidTerrain_);
   ASSERT_EQ(plowingAngleRigidTerrain_, 0);
 }
@@ -210,63 +260,9 @@ void PlowingEffectTricycle::DeformableTerrain(const std::string &_physicsEngine)
 
   transport::SubscriberPtr sub = this->node->Subscribe(contactsTopic,
                                                        &PlowingEffectTricycle::CallbackDeformableTerrain, this);
-  world->Step(100);
+  world->Step(500);
 }
 
-void PlowingEffectSpheres::Callback(const ConstContactsPtr &_msg)
-{
-  if(callbackCount_ < maxCallbackCount_)
-  {
-    std::cout << callbackCount_ << std::endl;
-    callbackCount_ = callbackCount_ + 1;
-    return;
-  }
-
-  std::cout << "Here: " << callbackCount_ << std::endl;
-
-  std::string sphere1CollisionStr = "sphere1::base_link::collision";
-  std::string sphere2CollisionStr = "sphere2::base_link::collision";
-  std::string sphere3CollisionStr = "sphere3::base_link::collision";
-  std::string sphere4CollisionStr = "sphere4::base_link::collision";
-  std::string groundCollisionStr = "plowing_effect_ground_plane::link::collision";
-
-  for(auto idx = 0; idx < _msg->contact_size(); ++idx)
-  {
-    const gazebo::msgs::Contact& contact = _msg->contact(idx);
-    if(contact.collision2() == groundCollisionStr)
-    {
-      const auto& contactPointNormal = ConvertIgn( contact.normal(0));
-      const auto& unitNormal = ignition::math::Vector3<double>::UnitZ;
-
-//      std::cout << contactPointNormal.X() << " " << contactPointNormal.Y() << " " <<
-//                   contactPointNormal.Z() << std::endl;
-
-      double angle = acos(contactPointNormal.Dot(unitNormal)/
-                     contactPointNormal.Length() * unitNormal.Length());
-
-      if(contact.collision1() == sphere1CollisionStr)
-      {
-        sphere1PlowingAngle_ = angle;
-        gzdbg << "sphere 1 plowing angle: " << sphere1PlowingAngle_ << "\n";
-      }
-      else if(contact.collision1() == sphere2CollisionStr)
-      {
-        sphere2PlowingAngle_ = angle;
-        gzdbg << "sphere 2 plowing angle: " << sphere2PlowingAngle_ << "\n";
-      }
-      else if(contact.collision1() == sphere3CollisionStr)
-      {
-        sphere3PlowingAngle_ = angle;
-        gzdbg << "sphere 3 plowing angle: " << sphere3PlowingAngle_ << "\n";
-      }
-      else if(contact.collision1() == sphere4CollisionStr)
-      {
-        sphere4PlowingAngle_ = angle;
-        gzdbg << "sphere 4 plowing angle: " << sphere4PlowingAngle_ << "\n";
-      }
-    }
-  }
-}
 
 void PlowingEffectSpheres::MaxPlowingAngle(const std::string &_physicsEngine)
 {
@@ -333,8 +329,16 @@ void PlowingEffectSpheres::MaxPlowingAngle(const std::string &_physicsEngine)
   auto sphere4MaxRadians = sphere4MaxAngle.Radian();
 
   transport::SubscriberPtr sub = this->node->Subscribe(contactsTopic,
-                                                       &PlowingEffectSpheres::Callback, this);
-  world->Step(maxCallbackCount_);
+                                                       &PlowingEffectSpheres::CallbackMaxPlowingAngle, this);
+
+  world->Step(2000);
+
+  double error = 1e-15;
+  // verify spheres have reached max plowing angle
+  EXPECT_EQ(sphere1PlowingAngle_, 0); // no plowing effect
+  EXPECT_NEAR(sphere2PlowingAngle_, sphere2MaxRadians, error);
+  EXPECT_NEAR(sphere3PlowingAngle_, sphere3MaxRadians, error);
+  EXPECT_NEAR(sphere4PlowingAngle_, sphere4MaxRadians, error);
 }
 
 TEST_F(PlowingEffectTricycle, RigidTerrain)
