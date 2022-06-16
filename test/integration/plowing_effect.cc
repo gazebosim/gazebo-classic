@@ -97,7 +97,7 @@ void PlowingEffectTricycle::CallbackRigidTerrain(const ConstContactsPtr &_msg)
       const ignition::math::Vector3<double>& unitNormal =
                             ignition::math::Vector3<double>::UnitZ;
       plowingAngleRigidTerrain_ = acos(contactPointNormal.Dot(unitNormal)/
-                     contactPointNormal.Length() * unitNormal.Length());
+                            contactPointNormal.Length() * unitNormal.Length());
     }
   }
 }
@@ -212,8 +212,8 @@ void PlowingEffectTricycle::RigidTerrain(const std::string &_physicsEngine)
 
   transport::SubscriberPtr sub = this->node->Subscribe(contactsTopic,
                                                        &PlowingEffectTricycle::CallbackRigidTerrain, this);
-  world->Step(maxCallbackCountRigidTerrain_);
-  ASSERT_EQ(plowingAngleRigidTerrain_, 0);
+  world->Step(this->maxCallbackCountRigidTerrain_);
+  ASSERT_EQ(this->plowingAngleRigidTerrain_, 0);
 }
 
 void PlowingEffectTricycle::DeformableTerrain(const std::string &_physicsEngine)
@@ -235,34 +235,34 @@ void PlowingEffectTricycle::DeformableTerrain(const std::string &_physicsEngine)
   physics::LinkPtr wheelLinkPtr = model->GetLink("wheel_front");
   ASSERT_TRUE(wheelLinkPtr != nullptr);
 
-  wheelCollisionPtr_ = wheelLinkPtr->GetCollision("collision");
-  ASSERT_TRUE(wheelCollisionPtr_ != nullptr);
+  this->wheelCollisionPtr_ = wheelLinkPtr->GetCollision("collision");
+  ASSERT_TRUE(this->wheelCollisionPtr_ != nullptr);
 
-  auto plowingParams = wheelCollisionPtr_->GetSDF()->GetElement("gz:plowing_wheel");
+  auto plowingParams = this->wheelCollisionPtr_->GetSDF()->
+                                  GetElement("gz:plowing_wheel");
   ASSERT_TRUE(plowingParams != nullptr);
 
   ignition::math::Angle maxAngle;
   auto maxDegree = plowingParams->Get<double>("max_degrees");
   maxAngle.SetDegree(maxDegree);
-  
-  maxRadians_ = maxAngle.Radian();
-  deadbandVelocity_ = plowingParams->Get<double>("deadband_velocity");
-  saturationVelocity_ = plowingParams->Get<double>("saturation_velocity");
+
+  this->maxRadians_ = maxAngle.Radian();
+  this->deadbandVelocity_ = plowingParams->Get<double>("deadband_velocity");
+  this->saturationVelocity_ = plowingParams->Get<double>("saturation_velocity");
 
   ASSERT_EQ(maxDegree, 15);
-  ASSERT_EQ(deadbandVelocity_, 0.5);
-  ASSERT_EQ(saturationVelocity_, 0.63);
+  ASSERT_EQ(this->deadbandVelocity_, 0.5);
+  ASSERT_EQ(this->saturationVelocity_, 0.63);
 
-  fdir1_ =  wheelCollisionPtr_->GetSDF()->GetElement("surface")->
+  this->fdir1_ = wheelCollisionPtr_->GetSDF()->GetElement("surface")->
                  GetElement("friction")->GetElement("ode")->
                  Get<ignition::math::Vector3<double>>("fdir1");
-  ASSERT_EQ(fdir1_, ignition::math::Vector3<double>(0, 1, 0));
+  ASSERT_EQ(this->fdir1_, ignition::math::Vector3<double>(0, 1, 0));
 
   transport::SubscriberPtr sub = this->node->Subscribe(contactsTopic,
-                                                       &PlowingEffectTricycle::CallbackDeformableTerrain, this);
+                              &PlowingEffectTricycle::CallbackDeformableTerrain, this);
   world->Step(500);
 }
-
 
 void PlowingEffectSpheres::MaxPlowingAngle(const std::string &_physicsEngine)
 {
@@ -295,21 +295,24 @@ void PlowingEffectSpheres::MaxPlowingAngle(const std::string &_physicsEngine)
   ASSERT_TRUE(sphere3LinkPtr != nullptr);
   ASSERT_TRUE(sphere4LinkPtr != nullptr);
 
-  sphere1CollisionPtr_ = sphere1LinkPtr->GetCollision("collision");
-  sphere2CollisionPtr_ = sphere2LinkPtr->GetCollision("collision");
-  sphere3CollisionPtr_ = sphere3LinkPtr->GetCollision("collision");
-  sphere4CollisionPtr_ = sphere4LinkPtr->GetCollision("collision");
+  this->sphere1CollisionPtr_ = sphere1LinkPtr->GetCollision("collision");
+  this->sphere2CollisionPtr_ = sphere2LinkPtr->GetCollision("collision");
+  this->sphere3CollisionPtr_ = sphere3LinkPtr->GetCollision("collision");
+  this->sphere4CollisionPtr_ = sphere4LinkPtr->GetCollision("collision");
   ASSERT_TRUE(sphere1CollisionPtr_ != nullptr);
   ASSERT_TRUE(sphere2CollisionPtr_ != nullptr);
   ASSERT_TRUE(sphere3CollisionPtr_ != nullptr);
   ASSERT_TRUE(sphere4CollisionPtr_ != nullptr);
 
-  auto sphere2PlowingParams = sphere2CollisionPtr_->GetSDF()->GetElement("gz:plowing_wheel");
-  auto sphere3PlowingParams = sphere3CollisionPtr_->GetSDF()->GetElement("gz:plowing_wheel");
-  auto sphere4PlowingParams = sphere4CollisionPtr_->GetSDF()->GetElement("gz:plowing_wheel");
-  ASSERT_TRUE(sphere2CollisionPtr_ != nullptr);
-  ASSERT_TRUE(sphere3CollisionPtr_ != nullptr);
-  ASSERT_TRUE(sphere4CollisionPtr_ != nullptr);
+  auto sphere2PlowingParams = sphere2CollisionPtr_->GetSDF()->
+                                        GetElement("gz:plowing_wheel");
+  auto sphere3PlowingParams = sphere3CollisionPtr_->GetSDF()->
+                                        GetElement("gz:plowing_wheel");
+  auto sphere4PlowingParams = sphere4CollisionPtr_->GetSDF()->
+                                        GetElement("gz:plowing_wheel");
+  ASSERT_TRUE(this->sphere2CollisionPtr_ != nullptr);
+  ASSERT_TRUE(this->sphere3CollisionPtr_ != nullptr);
+  ASSERT_TRUE(this->sphere4CollisionPtr_ != nullptr);
 
   // zero plowing effect for sphere1
   auto sphere2MaxDegree = sphere2PlowingParams->Get<double>("max_degrees");
@@ -329,16 +332,16 @@ void PlowingEffectSpheres::MaxPlowingAngle(const std::string &_physicsEngine)
   auto sphere4MaxRadians = sphere4MaxAngle.Radian();
 
   transport::SubscriberPtr sub = this->node->Subscribe(contactsTopic,
-                                                       &PlowingEffectSpheres::CallbackMaxPlowingAngle, this);
+                                       &PlowingEffectSpheres::CallbackMaxPlowingAngle, this);
 
   world->Step(2000);
 
   double error = 1e-15;
   // verify spheres have reached max plowing angle
-  EXPECT_EQ(sphere1PlowingAngle_, 0); // no plowing effect
-  EXPECT_NEAR(sphere2PlowingAngle_, sphere2MaxRadians, error);
-  EXPECT_NEAR(sphere3PlowingAngle_, sphere3MaxRadians, error);
-  EXPECT_NEAR(sphere4PlowingAngle_, sphere4MaxRadians, error);
+  EXPECT_EQ(this->sphere1PlowingAngle_, 0); // no plowing effect
+  EXPECT_NEAR(this->sphere2PlowingAngle_, sphere2MaxRadians, error);
+  EXPECT_NEAR(this->sphere3PlowingAngle_, sphere3MaxRadians, error);
+  EXPECT_NEAR(this->sphere4PlowingAngle_, sphere4MaxRadians, error);
 }
 
 TEST_F(PlowingEffectTricycle, RigidTerrain)
