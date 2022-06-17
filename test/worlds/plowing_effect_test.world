@@ -2,7 +2,7 @@
 <sdf version="1.5">
   <world name="default">
     <!-- Gravity -->
-    <gravity>4.0 0 -9.75</gravity>
+    <gravity>1.5 0 -9.75</gravity>
     <!-- plowing effect ground plane -->
     <include>
       <uri>model://plowing_effect_ground_plane</uri>
@@ -15,11 +15,11 @@
       <link name='base_link'>
         <pose>0 0 0 0 0 0</pose>
         <inertial>
-          <mass>0.5</mass>
+          <mass>5.0</mass>
           <inertia>
-            <ixx>0.22799999999999998</ixx>
-            <iyy>0.7435210984814149</iyy>
-            <izz>0.9655210984814149</izz>
+            <ixx>0.5333</ixx>
+            <iyy>0.5333</iyy>
+            <izz>0.5333</izz>
             <ixy>0</ixy>
             <ixz>0</ixz>
             <iyz>0</iyz>
@@ -50,11 +50,11 @@
       <link name="base_link">
         <pose>0 1 0  0 0 0</pose>
         <inertial>
-          <mass>0.5</mass>
+          <mass>5.0</mass>
           <inertia>
-            <ixx>0.22799999999999998</ixx>
-            <iyy>0.7435210984814149</iyy>
-            <izz>0.9655210984814149</izz>
+            <ixx>0.5333</ixx>
+            <iyy>0.5333</iyy>
+            <izz>0.5333</izz>
             <ixy>0</ixy>
             <ixz>0</ixz>
             <iyz>0</iyz>
@@ -62,7 +62,7 @@
         </inertial>
         <collision name="collision">
           <gz:plowing_wheel>
-            <max_degrees>5.0</max_degrees>
+            <max_degrees>3.0</max_degrees>
             <deadband_velocity>0.2</deadband_velocity>
             <saturation_velocity>0.6</saturation_velocity>
           </gz:plowing_wheel>
@@ -99,11 +99,11 @@
       <link name="base_link">
         <pose>0 2 0  0 0 0</pose>
         <inertial>
-          <mass>0.5</mass>
+          <mass>5.0</mass>
           <inertia>
-            <ixx>0.22799999999999998</ixx>
-            <iyy>0.7435210984814149</iyy>
-            <izz>0.9655210984814149</izz>
+            <ixx>0.5333</ixx>
+            <iyy>0.5333</iyy>
+            <izz>0.5333</izz>
             <ixy>0</ixy>
             <ixz>0</ixz>
             <iyz>0</iyz>
@@ -111,7 +111,7 @@
         </inertial>
         <collision name="collision">
           <gz:plowing_wheel>
-            <max_degrees>10.0</max_degrees>
+            <max_degrees>6.0</max_degrees>
             <deadband_velocity>0.2</deadband_velocity>
             <saturation_velocity>0.6</saturation_velocity>
           </gz:plowing_wheel>
@@ -148,11 +148,11 @@
       <link name="base_link">
         <pose>0 3 0  0 0 0</pose>
         <inertial>
-          <mass>0.5</mass>
+          <mass>5.0</mass>
           <inertia>
-            <ixx>0.22799999999999998</ixx>
-            <iyy>0.7435210984814149</iyy>
-            <izz>0.9655210984814149</izz>
+            <ixx>0.5333</ixx>
+            <iyy>0.5333</iyy>
+            <izz>0.5333</izz>
             <ixy>0</ixy>
             <ixz>0</ixz>
             <iyz>0</iyz>
@@ -160,7 +160,7 @@
         </inertial>
         <collision name="collision">
           <gz:plowing_wheel>
-            <max_degrees>15.0</max_degrees>
+            <max_degrees>8.0</max_degrees>
             <deadband_velocity>0.2</deadband_velocity>
             <saturation_velocity>0.6</saturation_velocity>
           </gz:plowing_wheel>

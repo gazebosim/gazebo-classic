@@ -154,7 +154,7 @@ void PlowingEffectTricycle::CallbackDeformableTerrain(const ConstContactsPtr &_m
 
 void PlowingEffectSpheres::CallbackMaxPlowingAngle(const ConstContactsPtr &_msg)
 {
-  if(callbackCount_ < 1800)
+  if(callbackCount_ < 2300)
   {
     callbackCount_ = callbackCount_ + 1;
     return;
@@ -334,9 +334,9 @@ void PlowingEffectSpheres::MaxPlowingAngle(const std::string &_physicsEngine)
   transport::SubscriberPtr sub = this->node->Subscribe(contactsTopic,
                                        &PlowingEffectSpheres::CallbackMaxPlowingAngle, this);
 
-  world->Step(2000);
+  world->Step(2500);
 
-  double error = 1e-15;
+  double error = 1e-14;
   // verify spheres have reached max plowing angle
   EXPECT_EQ(this->sphere1PlowingAngle_, 0); // no plowing effect
   EXPECT_NEAR(this->sphere2PlowingAngle_, sphere2MaxRadians, error);
