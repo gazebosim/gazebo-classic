@@ -172,9 +172,10 @@ void LensFlareSensorPlugin::AddLensFlare(rendering::CameraPtr _camera)
   {
     lensFlare->SetCompositorName(this->dataPtr->compositorName);
   }
-  lensFlare->SetCamera(_camera);
   lensFlare->SetScale(this->dataPtr->scale);
   lensFlare->SetColor(this->dataPtr->color);
   lensFlare->SetOcclusionSteps(this->dataPtr->occlusionSteps);
+  // SetCamera must be called last
+  lensFlare->SetCamera(_camera);
   this->dataPtr->lensFlares.push_back(lensFlare);
 }
