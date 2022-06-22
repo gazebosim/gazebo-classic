@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2022 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,11 @@
  * limitations under the License.
  *
 */
-#include <mutex>
-#include <functional>
-
-#include <ignition/math/Rand.hh>
 
 #include "test_config.h"
 
-#include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Timer.hh"
-#include "gazebo/rendering/Camera.hh"
-#include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/rendering/rendering.hh"
 
 #include "gazebo/test/ServerFixture.hh"
 
@@ -77,7 +70,7 @@ TEST_F(VisualShininess, ShapesShininess)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run camera test"
+    gzerr << "No rendering engine, unable to run shininess test"
           << std::endl;
     return;
   }
@@ -101,6 +94,9 @@ TEST_F(VisualShininess, ShapesShininess)
     common::Time::MSleep(100);
     sleep++;
   }
+  ASSERT_NE(nullptr, box);
+  ASSERT_NE(nullptr, cylinder);
+  ASSERT_NE(nullptr, sphere);
   EXPECT_TRUE(scene->Initialized());
 
   std::unordered_map<std::string, double> nameToShininess;
