@@ -199,6 +199,8 @@ void PlowingEffectSpheres::CallbackMaxPlowingAngle(const ConstContactsPtr &_msg)
 
 void PlowingEffectTricycle::RigidTerrain(const std::string &_physicsEngine)
 {
+  gazebo::common::SystemPaths::Instance()->AddModelPaths(
+                    PROJECT_SOURCE_PATH "/test/models");
   // Load the plowing effect world
   Load("worlds/plowing_effect_demo.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -218,6 +220,8 @@ void PlowingEffectTricycle::RigidTerrain(const std::string &_physicsEngine)
 
 void PlowingEffectTricycle::DeformableTerrain(const std::string &_physicsEngine)
 {
+  gazebo::common::SystemPaths::Instance()->AddModelPaths(
+                    PROJECT_SOURCE_PATH "/test/models");
   // Load the plowing effect world
   Load("worlds/plowing_effect_demo.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
