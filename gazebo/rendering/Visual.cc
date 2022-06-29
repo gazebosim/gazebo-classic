@@ -327,53 +327,11 @@ void Visual::Init()
   this->dataPtr->inheritTransparency = true;
   this->dataPtr->scale = ignition::math::Vector3d::One;
 
-  if (this->dataPtr->sdf->HasElement("material"))
-  {
-    // Get shininess value from physics::World
-    ignition::transport::Node node;
-    msgs::Any rep;
-
-    const std::string visualName =
-        this->Name().substr(0, this->Name().find(":"));
-
-    const std::string serviceName = "/" + visualName + "/shininess";
-
-    const std::string validServiceName =
-        ignition::transport::TopicUtils::AsValidTopic(serviceName);
-
-    if (validServiceName.empty())
-    {
-        gzerr << "Service name [" << serviceName << "] not valid" << std::endl;
-        return;
-    }
-
-    ignition::msgs::StringMsg req;
-    req.set_data(visualName);
-
-    bool result;
-    unsigned int timeout = 5000;
-    bool executed = node.Request(validServiceName, req, timeout, rep, result);
-
-    if (executed)
-    {
-      if (result)
-        this->dataPtr->shininess = rep.double_value(); 
-      else
-        gzerr << "Service call [" << validServiceName << "] failed"
-              << std::endl;
-    }
-    else
-    {
-      gzerr << "Service call [" << validServiceName << "] timed out"
-            << std::endl;
-    }
-  }
-
   this->dataPtr->initialized = true;
 }
 
 //////////////////////////////////////////////////
-void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
+void Visual::LoadFromMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
 {
   this->dataPtr->sdf = msgs::VisualToSDF(*_msg.get());
   this->Load();
@@ -390,6 +348,64 @@ void Visual::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Visual::Load()
 {
+  if (this->dataPtr->sdf->HasElement("material"))
+  {
+    // Get shininess value from physics::World
+    ignition::transport::Node node;
+    msgs::Any rep;
+
+    const std::string visualName =
+        this->Name().substr(0, this->Name().find(":"));
+
+    const std::string serviceName = "/" + visualName + "/shininess";
+
+    const std::string validServiceName =
+        ignition::transport::TopicUtils::AsValidTopic(serviceName);
+
+    bool tryServiceCall = true;
+    if (validServiceName.empty())
+    {
+        gzerr << "Service name [" << serviceName << "] not valid" << std::endl;
+        tryServiceCall = false;
+    }
+
+    {
+      std::vector<ignition::transport::ServicePublisher> publishers;
+      if (!node.ServiceInfo(validServiceName, publishers))
+      {
+        gzerr << "Service name [" << validServiceName << "] not advertised, "
+              << "not attempting to load shininess for visual with name ["
+              << this->Name() << "]."
+              << std::endl;
+        tryServiceCall = false;
+      }
+    }
+
+    if (tryServiceCall)
+    {
+      ignition::msgs::StringMsg req;
+      req.set_data(visualName);
+
+      bool result;
+      unsigned int timeout = 5000;
+      bool executed = node.Request(validServiceName, req, timeout, rep, result);
+
+      if (executed)
+      {
+        if (result)
+          this->dataPtr->shininess = rep.double_value();
+        else
+          gzerr << "Service call [" << validServiceName << "] failed"
+                << std::endl;
+      }
+      else
+      {
+        gzerr << "Service call [" << validServiceName << "] timed out"
+              << std::endl;
+      }
+    }
+  }
+
   std::ostringstream stream;
   ignition::math::Pose3d pose;
   Ogre::MovableObject *obj = nullptr;
@@ -1573,6 +1589,12 @@ ignition::math::Color Visual::Specular() const
 ignition::math::Color Visual::Emissive() const
 {
   return this->dataPtr->emissive;
+}
+
+/////////////////////////////////////////////////
+double Visual::Shininess() const
+{
+  return this->dataPtr->shininess;
 }
 
 //////////////////////////////////////////////////
