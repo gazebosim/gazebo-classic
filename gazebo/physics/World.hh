@@ -464,6 +464,12 @@ namespace gazebo
       /// \param[in] _func function to be called
       public: void SetSensorWaitFunc(std::function<void(double, double)> _func);
 
+      /// \brief Set Visual shininess value by scoped name
+      /// \param[in] _scopedName Scoped name of visual.
+      /// \param[in] _shininess Shininess value.
+      public: void SetVisualShininess(const std::string &_scopedName,
+          double _shininess);
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.

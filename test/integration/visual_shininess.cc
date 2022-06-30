@@ -28,10 +28,10 @@ class VisualShininess : public RenderingFixture
 };
 
 /////////////////////////////////////////////////
-void CheckShininessService(const std::string &_modelName,
+void CheckShininessService(const std::string &_scopedName,
     double _expectedShininess)
 {
-  std::string serviceName = '/' + _modelName + "/shininess";
+  std::string serviceName = "/shininess";
   ignition::transport::Node ignNode;
 
   {
@@ -43,11 +43,11 @@ void CheckShininessService(const std::string &_modelName,
   gazebo::msgs::Any reply;
   const unsigned int timeout = 3000;
   bool result = false;
-  request.set_data(_modelName);
+  request.set_data(_scopedName);
   EXPECT_TRUE(ignNode.Request(serviceName, request, timeout, reply, result));
   EXPECT_TRUE(result);
   EXPECT_EQ(msgs::Any_ValueType_DOUBLE, reply.type());
-  EXPECT_DOUBLE_EQ(_expectedShininess, reply.double_value()) << _modelName;
+  EXPECT_DOUBLE_EQ(_expectedShininess, reply.double_value()) << _scopedName;
 }
 
 /////////////////////////////////////////////////
@@ -55,10 +55,10 @@ TEST_F(VisualShininess, ShapesShininessServices)
 {
   Load("worlds/shapes_shininess.world", true);
 
-  CheckShininessService("ground_plane", 0.0);
-  CheckShininessService("box", 1.0);
-  CheckShininessService("sphere", 5.0);
-  CheckShininessService("cylinder", 10.0);
+  CheckShininessService("ground_plane::link::visual", 0.0);
+  CheckShininessService("box::link::visual", 1.0);
+  CheckShininessService("sphere::link::visual", 5.0);
+  CheckShininessService("cylinder::link::visual", 10.0);
 }
 
 /////////////////////////////////////////////////

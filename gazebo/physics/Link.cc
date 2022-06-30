@@ -1547,6 +1547,16 @@ void Link::UpdateVisualMsg()
       bool newVis = true;
       std::string visName = this->GetScopedName() + "::" + msg.name();
 
+      if (visualElem->HasElement("material"))
+      {
+        sdf::ElementPtr matElem = visualElem->GetElement("material");
+        if (matElem->HasElement("shininess"))
+        {
+          this->world->SetVisualShininess(
+              visName, matElem->Get<double>("shininess"));
+        }
+      }
+
       // update visual msg if it exists
       for (auto &iter : this->visuals)
       {

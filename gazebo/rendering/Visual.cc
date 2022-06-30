@@ -354,10 +354,9 @@ void Visual::Load()
     ignition::transport::Node node;
     msgs::Any rep;
 
-    const std::string visualName =
-        this->Name().substr(0, this->Name().find(":"));
+    const std::string visualName = this->Name();
 
-    const std::string serviceName = "/" + visualName + "/shininess";
+    const std::string serviceName = "/shininess";
 
     const std::string validServiceName =
         ignition::transport::TopicUtils::AsValidTopic(serviceName);
