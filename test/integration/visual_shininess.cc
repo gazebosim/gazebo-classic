@@ -57,6 +57,7 @@ TEST_F(VisualShininess, ShapesShininessServices)
 
   CheckShininessService("ground_plane::link::visual", 0.0);
   CheckShininessService("box::link::visual", 1.0);
+  CheckShininessService("box::link::visual2", 10.0);
   CheckShininessService("sphere::link::visual", 5.0);
   CheckShininessService("cylinder::link::visual", 10.0);
 }
@@ -101,6 +102,7 @@ TEST_F(VisualShininess, ShapesShininess)
 
   std::unordered_map<std::string, double> nameToShininess;
   nameToShininess["box::link::visual"] = 1.0;
+  nameToShininess["box::link::visual2"] = 10.0;
   nameToShininess["sphere::link::visual"] = 5.0;
   nameToShininess["cylinder::link::visual"] = 10.0;
 
