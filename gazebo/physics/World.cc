@@ -3468,10 +3468,22 @@ bool World::ShadowCasterRenderBackFacesService(ignition::msgs::Boolean &_res)
 }
 
 //////////////////////////////////////////////////
+double World::ShininessByScopedName(const std::string &_scopedName) const
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->materialShininessMutex);
+  if (this->dataPtr->materialShininessMap.find(_scopedName) !=
+      this->dataPtr->materialShininessMap.end())
+  {
+    return this->dataPtr->materialShininessMap.at(_scopedName);
+  }
+  return 0.0;
+}
+
+//////////////////////////////////////////////////
 bool World::MaterialShininessService(
     const ignition::msgs::StringMsg &_req, msgs::Any &_res)
 {
   _res.set_type(msgs::Any::DOUBLE);
-  _res.set_double_value(this->dataPtr->materialShininessMap[_req.data()]);
+  _res.set_double_value(this->ShininessByScopedName(_req.data()));
   return true;
 }

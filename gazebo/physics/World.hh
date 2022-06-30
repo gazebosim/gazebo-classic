@@ -461,7 +461,7 @@ namespace gazebo
       public: std::string UniqueModelName(const std::string &_name);
 
       /// \brief Set callback 'waitForSensors'
-      /// \param[in] function to be called
+      /// \param[in] _func function to be called
       public: void SetSensorWaitFunc(std::function<void(double, double)> _func);
 
       /// \cond
@@ -677,6 +677,13 @@ namespace gazebo
       /// \return True if the info was successfully obtained.
       private: bool MaterialShininessService(
           const ignition::msgs::StringMsg &_request, msgs::Any &_response);
+
+      /// \brief Helper function for getting shininess values by scoped
+      /// visual name.
+      /// \param[in] _scopedName Scoped visual name.
+      /// \return Shininess value.
+      private: double ShininessByScopedName(const std::string &_scopedName)
+          const;
 
       /// \internal
       /// \brief Private data pointer.
