@@ -41,7 +41,7 @@ namespace gazebo
         = ignition::math::Vector3d(1.4, 1.2, 1.0);
 
     /// \brief Lens flare occlusion steps
-    public: double occlusionSteps = 10;
+    public: double occlusionSteps = 10.0;
 
     /// \brief Lens flare compositor name
     public: std::string compositorName;

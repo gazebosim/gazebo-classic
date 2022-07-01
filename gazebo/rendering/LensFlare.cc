@@ -58,7 +58,7 @@ namespace gazebo
 
       /// \brief Number of steps to take in each direction when checking for
       /// occlusion.
-      public: double occlusionSteps = 10;
+      public: double occlusionSteps = 10.0;
     };
 
     //////////////////////////////////////////////////
@@ -368,7 +368,7 @@ namespace gazebo
           = ignition::math::Vector3d(1.0, 1.0, 1.0);
 
       /// \brief Color of lens flare.
-      public: double lensFlareOcclusionSteps = 10;
+      public: double lensFlareOcclusionSteps = 10.0;
 
       /// \brief Compositor name to be used for lens flare
       public: std::string compositorName = "CameraLensFlare/Default";
