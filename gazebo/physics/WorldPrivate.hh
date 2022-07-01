@@ -398,6 +398,10 @@ namespace gazebo
       /// \brief Shadow caster render back faces from scene SDF
       public: bool shadowCasterRenderBackFaces = true;
 
+      /// \brief This mutex is used to by the SetVisualShininess and
+      /// ShininessByScopedName methods to protect materialShininessMap.
+      public: std::mutex materialShininessMutex;
+
       /// \brief Shininess values from scene SDF
       public: std::map<std::string, double> materialShininessMap;
     };

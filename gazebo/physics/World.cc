@@ -334,6 +334,14 @@ void World::Load(sdf::ElementPtr _sdf)
         shadowCasterRenderBackFacesService << "]" << std::endl;
   }
 
+  std::string materialShininessService("/shininess");
+  if (!this->dataPtr->ignNode.Advertise(materialShininessService,
+      &World::MaterialShininessService, this))
+  {
+    gzerr << "Error advertising service ["
+          << materialShininessService << "]" << std::endl;
+  }
+
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
 
@@ -1256,35 +1264,6 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
           << "Not inserting model. This warning can be ignored in certain "
           << "situations such as rewind during log playback.\n";
         return model;
-      }
-    }
-
-    if (_sdf->HasElement("link"))
-    {
-      sdf::ElementPtr linkElem = _sdf->GetElement("link");
-      if (linkElem->HasElement("visual") &&
-          linkElem->GetElement("visual")->HasElement("material"))
-      {
-        sdf::ElementPtr matElem = linkElem->GetElement("visual")->
-            GetElement("material");
-
-        if (matElem->HasElement("shininess"))
-        {
-          this->dataPtr->materialShininessMap[modelName] =
-              matElem->Get<double>("shininess");
-        }
-        else
-        {
-          this->dataPtr->materialShininessMap[modelName] = 0;
-        }
-
-        std::string materialShininessService("/" + modelName + "/shininess");
-        if (!this->dataPtr->ignNode.Advertise(materialShininessService,
-            &World::MaterialShininessService, this))
-        {
-          gzerr << "Error advertising service ["
-                << materialShininessService << "]" << std::endl;
-        }
       }
     }
 
@@ -3468,10 +3447,30 @@ bool World::ShadowCasterRenderBackFacesService(ignition::msgs::Boolean &_res)
 }
 
 //////////////////////////////////////////////////
+void World::SetVisualShininess(const std::string &_scopedName,
+                               double _shininess)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->materialShininessMutex);
+  this->dataPtr->materialShininessMap[_scopedName] = _shininess;
+}
+
+//////////////////////////////////////////////////
+double World::ShininessByScopedName(const std::string &_scopedName) const
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->materialShininessMutex);
+  if (this->dataPtr->materialShininessMap.find(_scopedName) !=
+      this->dataPtr->materialShininessMap.end())
+  {
+    return this->dataPtr->materialShininessMap.at(_scopedName);
+  }
+  return 0.0;
+}
+
+//////////////////////////////////////////////////
 bool World::MaterialShininessService(
     const ignition::msgs::StringMsg &_req, msgs::Any &_res)
 {
   _res.set_type(msgs::Any::DOUBLE);
-  _res.set_double_value(this->dataPtr->materialShininessMap[_req.data()]);
+  _res.set_double_value(this->ShininessByScopedName(_req.data()));
   return true;
 }

@@ -28,6 +28,18 @@
             </box>
           </geometry>
         </visual>
+        <visual name="visual2">
+          <pose>0 0 3 0 0 0</pose>
+          <material>
+            <specular>1 0 0 1</specular>
+            <shininess>10</shininess>
+          </material>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
       </link>
     </model>
     <model name="sphere">
