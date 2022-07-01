@@ -272,6 +272,10 @@ namespace gazebo
       /// \return Emissive color.
       public: ignition::math::Color Emissive() const;
 
+      /// \brief Get the shininess value of the visual.
+      /// \return Floating-point shininess value.
+      public: double Shininess() const;
+
       /// \brief Enable or disable wireframe for this visual.
       /// \param[in] _show True to enable wireframe for this visual.
       public: void SetWireframe(bool _show);

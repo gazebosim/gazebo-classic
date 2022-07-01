@@ -951,6 +951,7 @@ TEST_F(Visual_TEST, Color)
   EXPECT_EQ(cylinderVis->Diffuse(), ignmath::Color::Black);
   EXPECT_EQ(cylinderVis->Specular(), ignmath::Color::Black);
   EXPECT_EQ(cylinderVis->Emissive(), ignmath::Color::Black);
+  EXPECT_DOUBLE_EQ(0.0, cylinderVis->Shininess());
 
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
@@ -965,6 +966,7 @@ TEST_F(Visual_TEST, Color)
   EXPECT_EQ(cylinderVis2->Diffuse(), ignmath::Color::Blue);
   EXPECT_EQ(cylinderVis2->Specular(), ignmath::Color::Red);
   EXPECT_EQ(cylinderVis2->Emissive(), ignmath::Color::Yellow);
+  EXPECT_DOUBLE_EQ(0.0, cylinderVis2->Shininess());
 
   // test changing ambient/diffuse/specular colors
   {

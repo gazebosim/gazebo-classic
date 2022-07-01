@@ -1545,13 +1545,21 @@ void Link::UpdateVisualMsg()
                   common::resolveSdfPose(visualDom->SemanticPose()));
       }
       bool newVis = true;
-      std::string linkName = this->GetScopedName();
+      std::string visName = this->GetScopedName() + "::" + msg.name();
+
+      if (visualElem->HasElement("material"))
+      {
+        sdf::ElementPtr matElem = visualElem->GetElement("material");
+        if (matElem->HasElement("shininess"))
+        {
+          this->world->SetVisualShininess(
+              visName, matElem->Get<double>("shininess"));
+        }
+      }
 
       // update visual msg if it exists
       for (auto &iter : this->visuals)
       {
-        std::string visName = linkName + "::" +
-            visualElem->Get<std::string>("name");
         if (iter.second.name() == visName)
         {
           iter.second.mutable_geometry()->CopyFrom(msg.geometry());
@@ -1563,7 +1571,6 @@ void Link::UpdateVisualMsg()
       // add to visual msgs if not found.
       if (newVis)
       {
-        std::string visName = this->GetScopedName() + "::" + msg.name();
         msg.set_name(visName);
         msg.set_id(physics::getUniqueId());
         msg.set_parent_name(this->GetScopedName());
