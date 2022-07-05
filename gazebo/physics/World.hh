@@ -461,8 +461,14 @@ namespace gazebo
       public: std::string UniqueModelName(const std::string &_name);
 
       /// \brief Set callback 'waitForSensors'
-      /// \param[in] function to be called
+      /// \param[in] _func function to be called
       public: void SetSensorWaitFunc(std::function<void(double, double)> _func);
+
+      /// \brief Set Visual shininess value by scoped name
+      /// \param[in] _scopedName Scoped name of visual.
+      /// \param[in] _shininess Shininess value.
+      public: void SetVisualShininess(const std::string &_scopedName,
+          double _shininess);
 
       /// \cond
       /// This is an internal function.
@@ -670,6 +676,20 @@ namespace gazebo
       /// \return True if the info was successfully obtained.
       private: bool ShadowCasterRenderBackFacesService(
           ignition::msgs::Boolean &_response);
+
+      /// \brief Callback for "<model_name>/shininess" service.
+      /// \param[in] _request Message containing the model name.
+      /// \param[out] _response Message containing shininess value.
+      /// \return True if the info was successfully obtained.
+      private: bool MaterialShininessService(
+          const ignition::msgs::StringMsg &_request, msgs::Any &_response);
+
+      /// \brief Helper function for getting shininess values by scoped
+      /// visual name.
+      /// \param[in] _scopedName Scoped visual name.
+      /// \return Shininess value.
+      private: double ShininessByScopedName(const std::string &_scopedName)
+          const;
 
       /// \internal
       /// \brief Private data pointer.

@@ -186,6 +186,9 @@ namespace gazebo
       public: ignition::math::Color specular =
           ignition::math::Color(0, 0, 0, 0);
 
+      /// \brief Specular exponent of the visual.
+      public: double shininess = 0;
+
       /// \brief Emissive color of the visual.
       public: ignition::math::Color emissive =
           ignition::math::Color(0, 0, 0, 0);

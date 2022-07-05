@@ -117,6 +117,9 @@ namespace gazebo
 
       /// \brief Fixed axis to yaw around.
       public: ignition::math::Vector3d yawFixedAxis;
+
+      /// \brief Anti-aliasing value
+      public: uint32_t antiAliasingValue;
     };
   }
 }

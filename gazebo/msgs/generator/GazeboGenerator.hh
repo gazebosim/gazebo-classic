@@ -37,9 +37,9 @@ class GazeboGenerator : public CodeGenerator
   public: virtual ~GazeboGenerator();
 
   public: virtual bool Generate(const FileDescriptor* file,
-                const string& parameter,
+                const std::string& parameter,
                 OutputDirectory *directory,
-                string* error) const;
+                std::string* error) const;
 
   // private: GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(GazeboGenerator);
 };

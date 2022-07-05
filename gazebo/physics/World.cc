@@ -334,6 +334,14 @@ void World::Load(sdf::ElementPtr _sdf)
         shadowCasterRenderBackFacesService << "]" << std::endl;
   }
 
+  std::string materialShininessService("/shininess");
+  if (!this->dataPtr->ignNode.Advertise(materialShininessService,
+      &World::MaterialShininessService, this))
+  {
+    gzerr << "Error advertising service ["
+          << materialShininessService << "]" << std::endl;
+  }
+
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
 
@@ -3435,5 +3443,34 @@ bool World::ShadowCasterMaterialNameService(ignition::msgs::StringMsg &_res)
 bool World::ShadowCasterRenderBackFacesService(ignition::msgs::Boolean &_res)
 {
   _res.set_data(this->dataPtr->shadowCasterRenderBackFaces);
+  return true;
+}
+
+//////////////////////////////////////////////////
+void World::SetVisualShininess(const std::string &_scopedName,
+                               double _shininess)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->materialShininessMutex);
+  this->dataPtr->materialShininessMap[_scopedName] = _shininess;
+}
+
+//////////////////////////////////////////////////
+double World::ShininessByScopedName(const std::string &_scopedName) const
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->materialShininessMutex);
+  if (this->dataPtr->materialShininessMap.find(_scopedName) !=
+      this->dataPtr->materialShininessMap.end())
+  {
+    return this->dataPtr->materialShininessMap.at(_scopedName);
+  }
+  return 0.0;
+}
+
+//////////////////////////////////////////////////
+bool World::MaterialShininessService(
+    const ignition::msgs::StringMsg &_req, msgs::Any &_res)
+{
+  _res.set_type(msgs::Any::DOUBLE);
+  _res.set_double_value(this->ShininessByScopedName(_req.data()));
   return true;
 }

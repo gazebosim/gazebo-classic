@@ -206,6 +206,7 @@ set(dri_tests
   road.cc
   speed_pr2.cc
   visual.cc
+  visual_shininess.cc
   wideanglecamera_sensor.cc
   world_remove.cc
   world_reset.cc
