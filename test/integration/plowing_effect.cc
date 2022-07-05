@@ -40,7 +40,6 @@ class PlowingEffectTricycle : public ServerFixture
  private: physics::CollisionPtr wheelCollisionPtr_ = nullptr;
  private: double plowingAngleRigidTerrain_;
 
- private: int callbackCountRigidTerrain_ = 1;
  private: const int maxCallbackCountRigidTerrain_ = 200;
 
   /// constant params from SDF
@@ -77,11 +76,6 @@ class PlowingEffectSpheres : public ServerFixture
 ////////////////////////////////////////////////////////////////////////
 void PlowingEffectTricycle::CallbackRigidTerrain(const ConstContactsPtr &_msg)
 {
-  if(callbackCountRigidTerrain_ < maxCallbackCountRigidTerrain_)
-  {
-    callbackCountRigidTerrain_ = callbackCountRigidTerrain_ + 1;
-  }
-
   std::string wheelCollisionStr = "original_tricycle::wheel_front::collision";
   std::string groundCollisionStr = "plowing_effect_ground_plane::link::collision";
 

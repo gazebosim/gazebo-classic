@@ -12,8 +12,8 @@
     </include>
 
     <model name="sphere1">
+      <pose>0 0 0.4 0 0 0</pose>
       <link name='base_link'>
-        <pose>0 0 0 0 0 0</pose>
         <inertial>
           <mass>5.0</mass>
           <inertia>
@@ -47,8 +47,8 @@
     </model>
 
     <model name= "sphere2" xmlns:gz="https://gazebosim.org/schema">
+      <pose>0 1 0.4  0 0 0</pose>
       <link name="base_link">
-        <pose>0 1 0  0 0 0</pose>
         <inertial>
           <mass>5.0</mass>
           <inertia>
@@ -96,8 +96,8 @@
     </model>
 
     <model name= "sphere3" xmlns:gz="https://gazebosim.org/schema">
+      <pose>0 2 0.4  0 0 0</pose>
       <link name="base_link">
-        <pose>0 2 0  0 0 0</pose>
         <inertial>
           <mass>5.0</mass>
           <inertia>
@@ -145,8 +145,8 @@
     </model>
 
     <model name= "sphere4" xmlns:gz="https://gazebosim.org/schema">
+      <pose>0 3 0.4  0 0 0</pose>
       <link name="base_link">
-        <pose>0 3 0  0 0 0</pose>
         <inertial>
           <mass>5.0</mass>
           <inertia>
