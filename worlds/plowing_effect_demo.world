@@ -14,7 +14,7 @@
       <uri>model://plowing_effect_trisphere_cycle</uri>
       <name>my_tricycle</name>
       <pose>0 0 0  0 0 0</pose>
-      
+
       <plugin name="wheel_slip" filename="libWheelSlipPlugin.so">
         <wheel link_name="wheel_front">
 		<slip_compliance_lateral>3.0</slip_compliance_lateral>
@@ -75,7 +75,7 @@
       <uri>model://trisphere_cycle</uri>
       <name>original_tricycle</name>
       <pose>0 2 0  0 0 0</pose>
-      
+
       <plugin name="wheel_slip" filename="libWheelSlipPlugin.so">
         <wheel link_name="wheel_front">
 		<slip_compliance_lateral>3.0</slip_compliance_lateral>
