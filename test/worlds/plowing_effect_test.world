@@ -72,6 +72,14 @@
             </sphere>
           </geometry>
           <surface>
+            <contact>
+              <ode>
+                <kp>40000</kp>
+                <kd>16</kd>
+                <max_vel>10</max_vel>
+                <min_depth>0.005</min_depth>
+              </ode>
+            </contact>
             <friction>
               <ode>
                 <fdir1>0 1 0</fdir1>
@@ -121,6 +129,14 @@
             </sphere>
           </geometry>
           <surface>
+            <contact>
+              <ode>
+                <kp>40000</kp>
+                <kd>16</kd>
+                <max_vel>10</max_vel>
+                <min_depth>0.005</min_depth>
+              </ode>
+            </contact>
             <friction>
               <ode>
                 <fdir1>0 1 0</fdir1>
@@ -170,6 +186,14 @@
             </sphere>
           </geometry>
           <surface>
+            <contact>
+              <ode>
+                <kp>40000</kp>
+                <kd>16</kd>
+                <max_vel>10</max_vel>
+                <min_depth>0.005</min_depth>
+              </ode>
+            </contact>
             <friction>
               <ode>
                 <fdir1>0 1 0</fdir1>
