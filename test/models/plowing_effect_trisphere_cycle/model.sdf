@@ -237,9 +237,9 @@
       </inertial>
       <collision name="collision">
         <gz:plowing_wheel>
-          <max_degrees>15.0</max_degrees>
-          <deadband_velocity>0.5</deadband_velocity>
-          <saturation_velocity>0.63</saturation_velocity>
+          <max_degrees>5</max_degrees>
+          <deadband_velocity>0.3</deadband_velocity>
+          <saturation_velocity>0.4</saturation_velocity>
         </gz:plowing_wheel>
         <geometry>
           <sphere>
@@ -314,9 +314,9 @@
       </inertial>
       <collision name="collision">
         <gz:plowing_wheel>
-          <max_degrees>15</max_degrees>
-          <deadband_velocity>0.5</deadband_velocity>
-          <saturation_velocity>0.63</saturation_velocity>
+          <max_degrees>5</max_degrees>
+          <deadband_velocity>0.3</deadband_velocity>
+          <saturation_velocity>0.4</saturation_velocity>
         </gz:plowing_wheel>
         <geometry>
           <sphere>
@@ -377,9 +377,9 @@
       </inertial>
       <collision name="collision">
         <gz:plowing_wheel>
-          <max_degrees>15</max_degrees>
-          <deadband_velocity>0.5</deadband_velocity>
-          <saturation_velocity>0.63</saturation_velocity>
+          <max_degrees>5</max_degrees>
+          <deadband_velocity>0.3</deadband_velocity>
+          <saturation_velocity>0.4</saturation_velocity>
         </gz:plowing_wheel>
         <geometry>
           <sphere>

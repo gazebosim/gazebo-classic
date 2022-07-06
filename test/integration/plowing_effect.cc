@@ -41,6 +41,9 @@ class PlowingEffectTricycle : public ServerFixture
  private: double plowingAngleRigidTerrain_;
 
  private: const int maxCallbackCountRigidTerrain_ = 200;
+ private: bool havePrintedNoPlowingEffect_ = false;
+ private: bool havePrintedLinearPlowingEffect_ = false;
+ private: bool havePrintedMaxPlowingEffect_ = false;
 
   /// constant params from SDF
  private: double maxRadians_;
@@ -98,33 +101,41 @@ void PlowingEffectTricycle::CallbackRigidTerrain(const ConstContactsPtr &_msg)
 
 void PlowingEffectTricycle::CallbackDeformableTerrain(const ConstContactsPtr &_msg)
 {
-  std::string wheelCollisionStr = "my_tricycle::wheel_front::collision";
+  std::string wheelCollisionStr = "my_tricycle::wheel_rear_left::collision";
   std::string groundCollisionStr = "plowing_effect_ground_plane::link::collision";
 
+  bool contactFound = false;
   for(auto idx = 0; idx < _msg->contact_size(); ++idx)
   {
     const gazebo::msgs::Contact& contact = _msg->contact(idx);
     if(contact.collision1() == wheelCollisionStr &&
         contact.collision2() == groundCollisionStr)
     {
+      contactFound = true;
       const auto& contactPointNormal = ConvertIgn( contact.normal(0));
       const auto& unitNormal = ignition::math::Vector3<double>::UnitZ;
 
       // compute longitudinal unit vector as normal cross fdir1_
       const auto& wheelLinearVelocity = wheelCollisionPtr_->WorldLinearVel();
-      const auto& unitLongitudinal = fdir1_.Cross(contactPointNormal);
+      const auto& unitLongitudinal = fdir1_.Cross(unitNormal);
       double wheelSpeedLongitudinal = wheelLinearVelocity.Dot(unitLongitudinal);
       
       // compute the angle contact point makes with unit normal
-      double angle = acos(contactPointNormal.Dot(unitNormal)/
-                      contactPointNormal.Length() * unitNormal.Length());
+      double angle = acos(contactPointNormal.Dot(unitNormal) /
+                      contactPointNormal.Length());
 
-      // check if longitudinal speed && contact normal point in same direction
-      EXPECT_GE(unitLongitudinal.Dot(contactPointNormal), 0);
+      // check that longitudinal velocity and contact normal point in
+      // opposite directions
+      EXPECT_LE(unitLongitudinal.Dot(contactPointNormal), 0);
 
       // no plowing effect
       if(wheelSpeedLongitudinal <= deadbandVelocity_)
       {
+        if (!havePrintedNoPlowingEffect_)
+        {
+          havePrintedNoPlowingEffect_ = true;
+          gzdbg << "No plowing effect" << "\n";
+        }
         EXPECT_EQ(angle, 0);
       }
 
@@ -132,6 +143,11 @@ void PlowingEffectTricycle::CallbackDeformableTerrain(const ConstContactsPtr &_m
       else if(wheelSpeedLongitudinal > deadbandVelocity_ &&
               wheelSpeedLongitudinal < saturationVelocity_)
       {
+        if (!havePrintedLinearPlowingEffect_)
+        {
+          havePrintedLinearPlowingEffect_ = true;
+          gzdbg << "Reached linear plowing effect" << "\n";
+        }
         ASSERT_LT(angle, maxRadians_);
         ASSERT_GE(angle, 0);
       }
@@ -139,11 +155,16 @@ void PlowingEffectTricycle::CallbackDeformableTerrain(const ConstContactsPtr &_m
       // maximum plowing effect.
       else if(wheelSpeedLongitudinal >= saturationVelocity_)
       {
-        gzdbg << "Reached maximum plowing effect" << "\n";
-        EXPECT_EQ(angle, maxRadians_);
+        if (!havePrintedMaxPlowingEffect_)
+        {
+          havePrintedMaxPlowingEffect_ = true;
+          gzdbg << "Reached maximum plowing effect" << "\n";
+        }
+        EXPECT_NEAR(angle, maxRadians_, 1e-6);
       }
     }
   }
+  EXPECT_TRUE(contactFound);
 }
 
 void PlowingEffectSpheres::CallbackMaxPlowingAngle(const ConstContactsPtr &_msg)
@@ -248,9 +269,9 @@ void PlowingEffectTricycle::DeformableTerrain(const std::string &_physicsEngine)
   this->deadbandVelocity_ = plowingParams->Get<double>("deadband_velocity");
   this->saturationVelocity_ = plowingParams->Get<double>("saturation_velocity");
 
-  ASSERT_EQ(maxDegree, 15);
-  ASSERT_EQ(this->deadbandVelocity_, 0.5);
-  ASSERT_EQ(this->saturationVelocity_, 0.63);
+  ASSERT_EQ(maxDegree, 5);
+  ASSERT_EQ(this->deadbandVelocity_, 0.3);
+  ASSERT_EQ(this->saturationVelocity_, 0.4);
 
   this->fdir1_ = wheelCollisionPtr_->GetSDF()->GetElement("surface")->
                  GetElement("friction")->GetElement("ode")->
