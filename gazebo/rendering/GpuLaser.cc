@@ -127,6 +127,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
       static_cast<Ogre::Material *>(Ogre::MaterialManager::getSingleton()
                                         .getByName("Gazebo/LaserScan")
                                         .get());
+  GZ_ASSERT(this->dataPtr->material, "Couldn't find material Gazebo/LaserScan");
 
   this->dataPtr->material->load();
   this->dataPtr->material->setCullingMode(Ogre::CULL_NONE);
