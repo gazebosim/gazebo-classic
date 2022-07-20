@@ -40,6 +40,9 @@ namespace gazebo
     public: ignition::math::Vector3d color
         = ignition::math::Vector3d(1.4, 1.2, 1.0);
 
+    /// \brief Lens flare occlusion steps
+    public: double occlusionSteps = 10.0;
+
     /// \brief Lens flare compositor name
     public: std::string compositorName;
   };
@@ -85,6 +88,11 @@ void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor,
   if (_sdf->HasElement("color"))
   {
     this->dataPtr->color = _sdf->Get<ignition::math::Vector3d>("color");
+  }
+
+  if (_sdf->HasElement("occlusion_steps"))
+  {
+    this->dataPtr->occlusionSteps = _sdf->Get<double>("occlusion_steps");
   }
 
   const std::string compositorName = "compositor";
@@ -142,6 +150,17 @@ void LensFlareSensorPlugin::SetColor(const ignition::math::Vector3d &_color)
 }
 
 /////////////////////////////////////////////////
+void LensFlareSensorPlugin::SetOcclusionSteps(double _occlusionSteps)
+{
+  this->dataPtr->occlusionSteps = _occlusionSteps;
+
+  for (auto flare : this->dataPtr->lensFlares)
+  {
+    flare->SetOcclusionSteps(_occlusionSteps);
+  }
+}
+
+/////////////////////////////////////////////////
 void LensFlareSensorPlugin::AddLensFlare(rendering::CameraPtr _camera)
 {
   if (!_camera)
@@ -153,8 +172,10 @@ void LensFlareSensorPlugin::AddLensFlare(rendering::CameraPtr _camera)
   {
     lensFlare->SetCompositorName(this->dataPtr->compositorName);
   }
-  lensFlare->SetCamera(_camera);
   lensFlare->SetScale(this->dataPtr->scale);
   lensFlare->SetColor(this->dataPtr->color);
+  lensFlare->SetOcclusionSteps(this->dataPtr->occlusionSteps);
+  // SetCamera must be called last
+  lensFlare->SetCamera(_camera);
   this->dataPtr->lensFlares.push_back(lensFlare);
 }
