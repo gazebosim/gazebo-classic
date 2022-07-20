@@ -55,6 +55,10 @@ namespace gazebo
       /// \brief Color of lens flare.
       public: ignition::math::Vector3d color
           = ignition::math::Vector3d(1.0, 1.0, 1.0);
+
+      /// \brief Number of steps to take in each direction when checking for
+      /// occlusion.
+      public: double occlusionSteps = 10.0;
     };
 
     //////////////////////////////////////////////////
@@ -93,6 +97,13 @@ namespace gazebo
         const ignition::math::Vector3d &_color)
     {
       this->dataPtr->color = _color;
+    }
+
+    //////////////////////////////////////////////////
+    void LensFlareCompositorListener::SetOcclusionSteps(
+        double _occlusionSteps)
+    {
+      this->dataPtr->occlusionSteps = _occlusionSteps;
     }
 
     //////////////////////////////////////////////////
@@ -313,7 +324,7 @@ namespace gazebo
       // work in normalized device coordinates
       // lens flare's halfSize is just an approximated value
       double halfSize = 0.05 * this->dataPtr->scale;
-      double steps = 10;
+      double steps = this->dataPtr->occlusionSteps;
       double stepSize = halfSize * 2 / steps;
       double cx = _imgPos.X();
       double cy = _imgPos.Y();
@@ -355,6 +366,9 @@ namespace gazebo
       /// \brief Color of lens flare.
       public: ignition::math::Vector3d lensFlareColor
           = ignition::math::Vector3d(1.0, 1.0, 1.0);
+
+      /// \brief Color of lens flare.
+      public: double lensFlareOcclusionSteps = 10.0;
 
       /// \brief Compositor name to be used for lens flare
       public: std::string compositorName = "CameraLensFlare/Default";
@@ -423,6 +437,8 @@ void LensFlare::SetCamera(CameraPtr _camera)
         this->dataPtr->lensFlareScale);
     this->dataPtr->lensFlareCompositorListener->SetColor(
         this->dataPtr->lensFlareColor);
+    this->dataPtr->lensFlareCompositorListener->SetOcclusionSteps(
+        this->dataPtr->lensFlareOcclusionSteps);
 
     this->dataPtr->lensFlareInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(
@@ -461,6 +477,12 @@ void LensFlare::SetColor(const ignition::math::Vector3d &_color)
     this->dataPtr->lensFlareCompositorListener->SetColor(
         this->dataPtr->lensFlareColor);
   }
+}
+
+//////////////////////////////////////////////////
+void LensFlare::SetOcclusionSteps(double _occlusionSteps)
+{
+  this->dataPtr->lensFlareOcclusionSteps = _occlusionSteps;
 }
 
 //////////////////////////////////////////////////
