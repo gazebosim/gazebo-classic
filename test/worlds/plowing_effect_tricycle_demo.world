@@ -1,5 +1,28 @@
 <?xml version="1.0" ?>
+<!--
+  Demonstration of wheel plowing effect with tricycle models.
+  Be sure to add the test/models folder to your GAZEBO_MODEL_PATH before
+  running this world.
 
+  This world contains a ground plane with gz:plowing_terrain defined
+  and two tricycle models with the WheelSlipPlugin that use spherical wheels
+  to simplify the contact geometry.
+  The trisphere_cycle model does not have plowing enabled, while the
+  plowing_effect_trisphere_cycle model does have plowing enabled.
+  Each model has a JointControlPlugin that enables a speed controller on each
+  wheel to cause the tricycles to drive forward.
+
+  Though the joint controllers are controlling the same wheel speeds, the
+  increased drag caused by the plowing effect reduces the linear speed
+  that is reached by the plowing_effect_trisphere_cycle model.
+  Enable "View Contacts" and "View transparent" or "View Wireframe" in gzclient
+  to see the change in contact point location and normal direction due to the
+  plowing effect.
+
+  Try adjusting wheel slip parameters or the gz:plowing_wheel parameters in
+  test/models/plowing_effect_trisphere_cycle/model.sdf to experiment
+  with the plowing effect.
+-->
 <sdf version="1.6">
   <world name="default">
 	<gravity>0 0 -9.75</gravity>
