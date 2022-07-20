@@ -1,4 +1,23 @@
 <?xml version="1.0" ?>
+<!--
+  Demonstration of wheel plowing effect with simple sphere models.
+  Be sure to add the test/models folder to your GAZEBO_MODEL_PATH before
+  running this world.
+
+  This world contains a ground plane with gz:plowing_terrain defined,
+  a control model sphere1 without plowing parameters, and several other
+  spheres with gz:plowing_wheel parameters.
+  The world gravity vector has a non-zero compoenent that points in the +X
+  direction, which causes the spheres to roll, and the plowing effect
+  causes the spheres to roll more slowly.
+
+  Currently the plowing effect requires the body-fixed friction direction
+  parameter fdir1 to be set, and the effect is limited to a single direction
+  that is orthogonal to fdir1 and the contact normal. This behavior limitation
+  is motivated by the needs of a wheel attached to a vehicle by a revolute
+  joint, but it could be extended to support plowing in any direction
+  (see https://github.com/osrf/gazebo/issues/3230 ).
+-->
 <sdf version="1.5">
   <world name="default">
     <!-- Gravity -->
