@@ -217,7 +217,7 @@ void PlowingEffectTricycle::RigidTerrain(const std::string &_physicsEngine)
   gazebo::common::SystemPaths::Instance()->AddModelPaths(
                     PROJECT_SOURCE_PATH "/test/models");
   // Load the plowing effect world
-  Load("worlds/plowing_effect_demo.world", true, _physicsEngine);
+  Load("worlds/plowing_effect_tricycle_demo.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -238,7 +238,7 @@ void PlowingEffectTricycle::DeformableTerrain(const std::string &_physicsEngine)
   gazebo::common::SystemPaths::Instance()->AddModelPaths(
                     PROJECT_SOURCE_PATH "/test/models");
   // Load the plowing effect world
-  Load("worlds/plowing_effect_demo.world", true, _physicsEngine);
+  Load("worlds/plowing_effect_tricycle_demo.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -286,7 +286,7 @@ void PlowingEffectTricycle::DeformableTerrain(const std::string &_physicsEngine)
 void PlowingEffectSpheres::MaxPlowingAngle(const std::string &_physicsEngine)
 {
   // Load the plowing effect world
-  Load("worlds/plowing_effect_test.world", true, _physicsEngine);
+  Load("worlds/plowing_effect_spheres_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
