@@ -88,6 +88,7 @@ set(tests
   physics_thread_safe.cc
   physics_torsional_friction.cc
   pioneer2dx.cc
+  plowing_effect.cc
   plugin.cc
   plugin_interface.cc
   rayshape.cc

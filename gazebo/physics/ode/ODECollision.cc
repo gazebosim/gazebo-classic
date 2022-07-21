@@ -73,6 +73,122 @@ void ODECollision::Load(sdf::ElementPtr _sdf)
   {
     this->GetODESurface()->maxVel = 0.0;
   }
+
+  // Check validity of plowing parameters
+  const std::string kPlowingWheel = "gz:plowing_wheel";
+  sdf::ElementPtr wheelElem = nullptr;
+  if (_sdf->HasElement(kPlowingWheel))
+  {
+    wheelElem = _sdf->GetElement(kPlowingWheel);
+  }
+
+  // Try to parse wheel plowing params with verbose == true so errors will
+  // print once during loading
+  ODECollisionWheelPlowingParams plowing;
+  ParseWheelPlowingParams(_sdf, plowing, this->GetScopedName());
+}
+
+//////////////////////////////////////////////////
+bool ODECollision::ParseWheelPlowingParams(
+    sdf::ElementPtr _sdf,
+    ODECollisionWheelPlowingParams &_plowing,
+    const std::string &_scopedNameForErrorMessages)
+{
+  // Only print error messages of the scoped name is supplied.
+  bool verbose = !_scopedNameForErrorMessages.empty();
+
+  // Check for a plowing wheel element
+  const std::string kPlowingWheel = "gz:plowing_wheel";
+  if (!_sdf->HasElement(kPlowingWheel))
+  {
+    return false;
+  }
+  sdf::ElementPtr wheelElem = _sdf->GetElement(kPlowingWheel);
+
+  // Check for required elements: max_degrees and saturation velocity
+  const std::string kPlowingMaxDegrees = "max_degrees";
+  if (!wheelElem->HasElement(kPlowingMaxDegrees))
+  {
+    if (verbose)
+    {
+      gzerr << "Element <" << kPlowingWheel << "> in collision with name ["
+            << _scopedNameForErrorMessages << "] is missing required parameter"
+            << " <" << kPlowingMaxDegrees << ">" << std::endl;
+    }
+    return false;
+  }
+
+  const std::string kPlowingSaturationVelocity = "saturation_velocity";
+  if (!wheelElem->HasElement(kPlowingSaturationVelocity))
+  {
+    if (verbose)
+    {
+      gzerr << "Element <" << kPlowingWheel << "> in collision with name ["
+            << _scopedNameForErrorMessages << "] is missing required parameter"
+            << " <" << kPlowingSaturationVelocity << ">" << std::endl;
+    }
+    return false;
+  }
+
+  // Error unless max_degrees >= 0
+  double plowingMaxDegrees = wheelElem->Get<double>(kPlowingMaxDegrees);
+  if (!(plowingMaxDegrees >= 0))
+  {
+    if (verbose)
+    {
+      gzerr << "Element <" << kPlowingWheel << "> in collision with name ["
+            << _scopedNameForErrorMessages << "] has a parameter "
+            << "<" << kPlowingMaxDegrees << "> with a value of ["
+            << plowingMaxDegrees << "] that should be non-negative."
+            << std::endl;
+    }
+    return false;
+  }
+  ignition::math::Angle plowingMaxAngle;
+  plowingMaxAngle.SetDegree(plowingMaxDegrees);
+
+  // Error unless saturation_velocity > 0
+  double plowingSaturationVelocity =
+      wheelElem->Get<double>(kPlowingSaturationVelocity);
+  if (!(plowingSaturationVelocity > 0))
+  {
+    if (verbose)
+    {
+      gzerr << "Element <" << kPlowingWheel << "> in collision with name ["
+            << _scopedNameForErrorMessages << "] has a parameter "
+            << "<" << kPlowingSaturationVelocity << "> with a value of ["
+            << plowingSaturationVelocity << "] that should be positive."
+            << std::endl;
+    }
+    return false;
+  }
+
+  // Check also for optional element: deadband velocity
+  const std::string kPlowingDeadbandVelocity = "deadband_velocity";
+  // Use deadband velocity = 0 if parameter is not set
+  double plowingDeadbandVelocity =
+      wheelElem->Get<double>(kPlowingDeadbandVelocity, 0.0).first;
+
+  // Error unless deadband velocity < saturation velocity
+  if (!(plowingDeadbandVelocity < plowingSaturationVelocity))
+  {
+    if (verbose)
+    {
+      gzerr << "Element <" << kPlowingWheel << "> in collision with name ["
+            << _scopedNameForErrorMessages << "] has a parameter "
+            << "<" << kPlowingDeadbandVelocity << "> with a value of ["
+            << plowingDeadbandVelocity << "] that should be less than the "
+            << "<" << kPlowingSaturationVelocity << "> whose value is ["
+            << plowingSaturationVelocity << "]."
+            << std::endl;
+    }
+    return false;
+  }
+
+  _plowing.maxAngle = plowingMaxAngle;
+  _plowing.saturationVelocity = plowingSaturationVelocity;
+  _plowing.deadbandVelocity = plowingDeadbandVelocity;
+  return true;
 }
 
 //////////////////////////////////////////////////

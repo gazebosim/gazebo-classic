@@ -77,6 +77,9 @@
 
 #include "gazebo/physics/ode/ODEPhysicsPrivate.hh"
 
+double saturation_deadband(double, double, double, double);
+
+
 using namespace gazebo;
 using namespace physics;
 
@@ -1161,6 +1164,94 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     contact.fdir1[0] = fd.X();
     contact.fdir1[1] = fd.Y();
     contact.fdir1[2] = fd.Z();
+
+    // Check for plowing parameters if friction direction is specified
+    auto collision1Sdf = _collision1->GetSDF();
+    auto collision2Sdf = _collision2->GetSDF();
+
+    const std::string kPlowingTerrain = "gz:plowing_terrain";
+    ODECollisionWheelPlowingParams wheelPlowing;
+
+    ODECollision *wheelCollision = nullptr;
+    sdf::ElementPtr terrainSdf = nullptr;
+
+    if (ODECollision::ParseWheelPlowingParams(collision1Sdf, wheelPlowing) &&
+        collision2Sdf->HasElement(kPlowingTerrain))
+    {
+      wheelCollision = _collision1;
+      terrainSdf = collision2Sdf;
+    }
+    else if (collision1Sdf->HasElement(kPlowingTerrain) &&
+        ODECollision::ParseWheelPlowingParams(collision2Sdf, wheelPlowing))
+    {
+      wheelCollision = _collision2;
+      terrainSdf = collision1Sdf;
+    }
+
+    if (wheelCollision && terrainSdf)
+    {
+      // compute slope
+      double slope = wheelPlowing.maxAngle.Radian() /
+          (wheelPlowing.saturationVelocity - wheelPlowing.deadbandVelocity);
+
+      // Assume origin of collision frame is wheel center
+      // Compute position and linear velocity of wheel center
+      // (all vectors in world coordinates unless otherwise specified)
+      ignition::math::Vector3d wheelPosition =
+          wheelCollision->WorldPose().Pos();
+      ignition::math::Vector3d wheelLinearVelocity =
+          wheelCollision->WorldLinearVel();
+
+      ignition::math::Vector3d fdir1 = fd.Normalized();
+      ignition::math::Vector3d contactNormalCopy, contactPositionCopy;
+      // for each pair of contact point and normal
+      for (unsigned int c = 0; c < numc; ++c)
+      {
+        // Copy the contact normal
+        dReal *contactNormal =
+          _contactCollisions[this->dataPtr->indices[c]].normal;
+        contactNormalCopy.Set(
+          contactNormal[0], contactNormal[1], contactNormal[2]);
+
+        // Compute longitudinal unit vector as normal cross fdir1
+        ignition::math::Vector3d unitLongitudinal =
+          contactNormalCopy.Cross(fdir1);
+
+        // Compute longitudinal speed (dot product)
+        double wheelSpeedLongitudinal =
+          wheelLinearVelocity.Dot(unitLongitudinal);
+
+        // Compute plowing angle as function of longitudinal speed
+        double plowingAngle =
+          saturation_deadband(wheelPlowing.maxAngle.Radian(),
+          wheelPlowing.deadbandVelocity,
+          slope,
+          wheelSpeedLongitudinal);
+
+        // Construct axis-angle quaternion using fdir1 and plowing angle
+        ignition::math::Quaterniond plowingRotation(fdir1, plowingAngle);
+
+        // Rotate normal unit vector by plowingRotation and set normal vector
+        contactNormalCopy = plowingRotation * contactNormalCopy;
+        contactNormal[0] = contactNormalCopy[0];
+        contactNormal[1] = contactNormalCopy[1];
+        contactNormal[2] = contactNormalCopy[2];
+
+        // Construct displacement vector from wheel center to contact point
+        dReal *contactPosition =
+          _contactCollisions[this->dataPtr->indices[c]].pos;
+        contactPositionCopy.Set(contactPosition[0] - wheelPosition[0],
+                                contactPosition[1] - wheelPosition[1],
+                                contactPosition[2] - wheelPosition[2]);
+
+        // Rotate displacement vector by plowingRotation and set contact point
+        contactPositionCopy = wheelPosition +
+            plowingRotation * contactPositionCopy;
+        contactPosition[0] = contactPositionCopy[0];
+        contactPosition[1] = contactPositionCopy[1];
+        contactPosition[2] = contactPositionCopy[2];
+      }
+    }
   }
 
   // Set the friction coefficients.
@@ -1691,4 +1782,42 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     return PhysicsEngine::GetParam(_key, _value);
   }
   return true;
+}
+
+/// \brief A mathematical function that represents a saturation function
+/// that increases linearly until reaching a constant value with the addition
+/// of a deadband near zero. The shape of this function for positive input
+/// values is illustrated below.
+/// \param[in] _maxOutput the maximum output of the function, which is at
+/// saturation.
+/// \param[in] _deadband the size of the deadband. Any inputs with a smaller
+/// absolute value than the deadband produce zero output.
+/// \param[in] _slope the slope of the linear portion of the output.
+/// \param[in] _input the input to the function.
+/// \return the output computed using saturation and deadband.
+/** \verbatim
+      |                                                  .
+      |            _________ saturation value            .
+      |           /                                      .
+      |          /|                                      .
+      |         /-┘ slope                                .
+      |        /                                         .
+      |       /                                          .
+      |      /                                           .
+    --+-------------------------- input
+      |<----> dead-band
+
+ \endverbatim */
+double saturation_deadband(
+    double _maxOutput, double _deadband, double _slope, double _input)
+{
+  if (std::abs(_input) <= std::abs(_deadband))
+  {
+    return 0.0;
+  }
+
+  double result = _input - std::abs(_deadband) * ignition::math::sgn(_input);
+  result *= _slope;
+
+  return ignition::math::clamp(result, -_maxOutput, _maxOutput);
 }

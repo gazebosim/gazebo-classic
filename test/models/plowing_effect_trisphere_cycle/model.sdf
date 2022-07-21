@@ -1,0 +1,429 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="plowing_effect_trisphere_cycle" xmlns:gz="https://gazebosim.org/schema">
+    <link name="frame">
+      <pose>-0.40855911616047164 0 0.38502293110800634  0 -0.522020852957719 0</pose>
+      <inertial>
+        <pose>0.0 0 0  0 0 0</pose>
+        <mass>10</mass>
+        <inertia>
+          <ixx>0.22799999999999998</ixx>
+          <iyy>0.7435210984814149</iyy>
+          <izz>0.9655210984814149</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="axle_collision">
+        <pose>-0.4713346258704366 0 0  1.5707963267948966 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>1.0392304845413263</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="axle_visual">
+        <pose>-0.4713346258704366 0 0  1.5707963267948966 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>1.0392304845413263</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+      <collision name="frame_left_collision">
+        <pose>0 0.17155177419583564 0  0 1.5707963267948966 -0.3490658503988659</pose>
+        <geometry>
+          <cylinder>
+            <length>1.0031676644991372</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="frame_left_visual">
+        <pose>0 0.17155177419583564 0  0 1.5707963267948966 -0.3490658503988659</pose>
+        <geometry>
+          <cylinder>
+            <length>1.0031676644991372</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+      <collision name="frame_right_collision">
+        <pose>0 -0.17155177419583564 0  0 1.5707963267948966 0.3490658503988659</pose>
+        <geometry>
+          <cylinder>
+            <length>1.0031676644991372</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="frame_right_visual">
+        <pose>0 -0.17155177419583564 0  0 1.5707963267948966 0.3490658503988659</pose>
+        <geometry>
+          <cylinder>
+            <length>1.0031676644991372</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <link name="fork">
+      <pose>0.04144088383952833 0 0.38502293110800634  0 -0.17453292519943295 0</pose>
+      <inertial>
+        <mass>3</mass>
+        <inertia>
+          <ixx>0.15820312499999997</ixx>
+          <iyy>0.058359374999999984</iyy>
+          <izz>0.10265624999999999</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="handlebars_collision">
+        <pose>0 0 0.397747564417433  1.5707963267948966 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.6363961030678927</length>
+            <radius>0.0375</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="handlebars_visual">
+        <pose>0 0 0.397747564417433  1.5707963267948966 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.6363961030678927</length>
+            <radius>0.0375</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+      <collision name="headtube_collision">
+        <pose>0 0 0.2386485386504598  0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.31819805153394637</length>
+            <radius>0.0375</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="headtube_visual">
+        <pose>0 0 0.2386485386504598  0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.31819805153394637</length>
+            <radius>0.0375</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+      <collision name="spindle_collision">
+        <pose>0 0 -0.23864853865045976  1.5707963267948966 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.6363961030678927</length>
+            <radius>0.015</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="spindle_visual">
+        <pose>0 0 -0.23864853865045976  1.5707963267948966 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.6363961030678927</length>
+            <radius>0.015</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+      <collision name="fork_left_collision">
+        <pose>0 0.15909902576697318 -0.07954951288348658  0.7853981633974483 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.45</length>
+            <radius>0.0375</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="fork_left_visual">
+        <pose>0 0.15909902576697318 -0.07954951288348658  0.7853981633974483 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.45</length>
+            <radius>0.0375</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+      <collision name="fork_right_collision">
+        <pose>0 -0.15909902576697318 -0.07954951288348658  -0.7853981633974483 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.45</length>
+            <radius>0.0375</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="fork_right_visual">
+        <pose>0 -0.15909902576697318 -0.07954951288348658  -0.7853981633974483 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.45</length>
+            <radius>0.0375</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <link name="wheel_front">
+      <pose>0.08288176767905665 0 0.15  0 0 0</pose>
+      <inertial>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.0045</ixx>
+          <iyy>0.0045</iyy>
+          <izz>0.0045</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <gz:plowing_wheel>
+          <max_degrees>5</max_degrees>
+          <deadband_velocity>0.3</deadband_velocity>
+          <saturation_velocity>0.4</saturation_velocity>
+        </gz:plowing_wheel>
+        <geometry>
+          <sphere>
+            <radius>0.15</radius>
+          </sphere>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>4000</kp>
+              <kd>16</kd>
+              <max_vel>10</max_vel>
+              <min_depth>0.0005</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode>
+              <mu>0.7</mu>
+              <mu2>0.7</mu2>
+              <fdir1>0 1 0</fdir1>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <sphere>
+            <radius>0.15</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name="wheel_front_steer" type="revolute">
+      <parent>frame</parent>
+      <child>fork</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <dynamics>
+        <friction>1.0</friction> 
+        </dynamics>
+        <limit>
+          <lower>-0.9599310885968813</lower>
+          <upper>0.9599310885968813</upper>
+        </limit>
+      </axis>
+    </joint>
+    <joint name="wheel_front_spin" type="revolute">
+      <parent>fork</parent>
+      <child>wheel_front</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+      </axis>
+    </joint>
+    <link name="wheel_rear_left">
+      <pose>-0.8171182323209433 0.5196152422706631 0.15  0 0 0</pose>
+      <inertial>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.0045</ixx>
+          <iyy>0.0045</iyy>
+          <izz>0.0045</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <gz:plowing_wheel>
+          <max_degrees>5</max_degrees>
+          <deadband_velocity>0.3</deadband_velocity>
+          <saturation_velocity>0.4</saturation_velocity>
+        </gz:plowing_wheel>
+        <geometry>
+          <sphere>
+            <radius>0.15</radius>
+          </sphere>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>4000</kp>
+              <kd>16</kd>
+              <max_vel>10</max_vel>
+              <min_depth>0.0005</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode>
+              <mu>0.7</mu>
+              <mu2>0.7</mu2>
+              <fdir1>0 1 0</fdir1>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <sphere>
+            <radius>0.15</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name="wheel_rear_left_spin" type="revolute">
+      <parent>frame</parent>
+      <child>wheel_rear_left</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+      </axis>
+    </joint>
+    <link name="wheel_rear_right">
+      <pose>-0.8171182323209433 -0.5196152422706631 0.15  0 0 0</pose>
+      <inertial>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.0045</ixx>
+          <iyy>0.0045</iyy>
+          <izz>0.0045</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <gz:plowing_wheel>
+          <max_degrees>5</max_degrees>
+          <deadband_velocity>0.3</deadband_velocity>
+          <saturation_velocity>0.4</saturation_velocity>
+        </gz:plowing_wheel>
+        <geometry>
+          <sphere>
+            <radius>0.15</radius>
+          </sphere>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>4000</kp>
+              <kd>16</kd>
+              <max_vel>10</max_vel>
+              <min_depth>0.0005</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode>
+              <mu>0.7</mu>
+              <mu2>0.7</mu2>
+              <fdir1>0 1 0</fdir1>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <sphere>
+            <radius>0.15</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name="wheel_rear_right_spin" type="revolute">
+      <parent>frame</parent>
+      <child>wheel_rear_right</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+      </axis>
+    </joint>
+  </model>
+</sdf>
