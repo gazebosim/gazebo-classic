@@ -103,6 +103,13 @@ namespace gazebo
     void LensFlareCompositorListener::SetOcclusionSteps(
         double _occlusionSteps)
     {
+      if (_occlusionSteps < 1)
+      {
+        gzerr << "Invalid OcclusionSteps parameter [" << _occlusionSteps
+              << "], must be >= 1"
+              << std::endl;
+        return;
+      }
       this->dataPtr->occlusionSteps = _occlusionSteps;
     }
 
