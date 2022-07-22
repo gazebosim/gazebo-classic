@@ -465,6 +465,16 @@ void CustomPSSMShadowCameraSetup::calculateShadowMappingMatrix(
 }
 
 //////////////////////////////////////////////////
+Ogre::Matrix4 CustomPSSMShadowCameraSetup::buildSimplePerspectiveMatrix(
+    const Ogre::Real _near, const Ogre::Real _far) const
+{
+  return Ogre::Matrix4(1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, -(_far + _near) / (_far - _near), -2 * _far * _near / (_far - _near),
+    0, 0, -1, 0);
+}
+
+//////////////////////////////////////////////////
 Ogre::Matrix4 CustomPSSMShadowCameraSetup::buildViewMatrix(
     const Ogre::Vector3 &_pos, const Ogre::Vector3 &_dir,
     const Ogre::Vector3 &_up) const
@@ -611,8 +621,23 @@ void CustomPSSMShadowCameraSetup::getShadowCamera(const Ogre::SceneManager *_sm,
   Ogre::Camera *cam = const_cast<Ogre::Camera *>(_cam);
   Ogre::Real oldNear = _cam->getNearClipDistance();
   Ogre::Real oldFar = _cam->getFarClipDistance();
+  Ogre::Matrix4 oldCustomProjMat = _cam->getProjectionMatrix();
   cam->setNearClipDistance(nearDist);
   cam->setFarClipDistance(farDist);
+  if (cam->isCustomProjectionMatrixEnabled())
+  {
+    // setNearClipDistance() and setFarClipDistance() will cause a regular
+    // camera projection matrix to be rebuilt, but they do nothing if the camera
+    // is using a custom matrix. Ideally, we would build the necessary matrix
+    // from scratch here, but we do not have access to the required camera
+    // intrinsics. We work around this problem by modifying the existing matrix,
+    // resulting in a new custom matrix with altered near and far clip planes
+    // that is almost identical to one built from scratch (typically some
+    // elements differ in the forth or fifth digit).
+    Ogre::Matrix4 oldNearFarMat = buildSimplePerspectiveMatrix(oldNear, oldFar);
+    Ogre::Matrix4 newNearFarMat = buildSimplePerspectiveMatrix(nearDist, farDist);
+    cam->setCustomProjectionMatrix(true, oldCustomProjMat * oldNearFarMat.inverse() * newNearFarMat);
+  }
 
   // Replaced LiSPSMShadowCameraSetup::getShadowCamera() with
   // FocusedShadowCameraSetup::getShadowCamera(). This is the same solution
@@ -624,6 +649,10 @@ void CustomPSSMShadowCameraSetup::getShadowCamera(const Ogre::SceneManager *_sm,
   // restore near/far
   cam->setNearClipDistance(oldNear);
   cam->setFarClipDistance(oldFar);
+  if (cam->isCustomProjectionMatrixEnabled())
+  {
+    cam->setCustomProjectionMatrix(true, oldCustomProjMat);
+  }
 }
 
 //////////////////////////////////////////////////

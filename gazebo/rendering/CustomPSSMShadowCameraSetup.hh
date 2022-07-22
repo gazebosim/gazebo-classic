@@ -97,10 +97,15 @@ namespace gazebo
 
       /// \brief lightly modified
       /// FocusedShadowCameraSetup::calculateShadowMappingMatrix().
-      void calculateShadowMappingMatrix(const Ogre::SceneManager &_sm,
+      public: void calculateShadowMappingMatrix(const Ogre::SceneManager &_sm,
           const Ogre::Camera &_cam, const Ogre::Light &_light,
           Ogre::Matrix4 *_out_view, Ogre::Matrix4 *_outProj,
           Ogre::Camera *_outCam) const;
+
+      /// \brief Build a simple perspective projection matrix using only near
+      /// and far clipping planes.
+      public: Ogre::Matrix4 buildSimplePerspectiveMatrix(const Ogre::Real _near,
+          const Ogre::Real _far) const;
 
       /// \brief The same as FocusedShadowCameraSetup::buildViewMatrix() except
       /// resulting matrices are z-up instead of y-up.
