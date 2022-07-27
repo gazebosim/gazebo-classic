@@ -206,6 +206,14 @@ namespace gazebo
               const double _intrinsicsS,
               const double _clipNear, const double _clipFar);
 
+      /// \brief Compute the intrinsic camera matrix, this matrix is different
+      ///        than the one used by OpenGL internally and contains the camera
+      ///        calibrated values
+      /// \return intrinsic matrix
+      private: ignition::math::Matrix3d BuildIntrinsicMatrix(
+              const double _intrinsicsFx, const double _intrinsicsFy,
+              const double _intrinsicsCx, double _intrinsicsCy);
+
       /// \brief Initialize the camera
       public: virtual void Init();
 
@@ -392,6 +400,22 @@ namespace gazebo
       /// \brief Get the far clip distance
       /// \return Far clip distance
       public: double FarClip() const;
+
+      /// \brief  Get the X focal length in pixels
+      /// \return X focal length in pixels
+      public: double FocalLengthX() const;
+
+      /// \brief Get the Y focal length in pixels
+      /// \return Y focal length in pixels
+      public: double FocalLengthY() const;
+
+      /// \brief Get the X principal point in pixels
+      /// \return X principal point in pixels
+      public: double OpticalCentreX() const;
+
+      /// \brief Get the Y principal point in pixels
+      /// \return Y principal point in pixels
+      public: double OpticalCentreY() const;
 
       /// \brief Enable or disable saving
       /// \param[in] _enable Set to True to enable saving of frames
@@ -881,6 +905,12 @@ namespace gazebo
       /// \brief Create the ogre camera.
       private: void CreateCamera();
 
+      /// \brief Calculates the focal length and optical center by decoupling the
+      ///        projection matrix returned from ProjectionMatrix().
+      ///        This function sets focalLengthX, focalLengthY, opticalCentreX
+      ///        and opticalCentreY variables of the class.
+      private: void CalculateIntrinsicsFromProjectionMatrix();
+
       /// \brief Name of the camera.
       protected: std::string name;
 
@@ -910,6 +940,9 @@ namespace gazebo
 
       /// \brief Flag for signaling the usage of camera intrinsics within OGRE
       protected: bool cameraUsingIntrinsics;
+
+      /// \brief Camera Intrinsic Matrix
+      protected: ignition::math::Matrix3d cameraIntrinsicMatrix;
 
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;

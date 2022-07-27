@@ -120,6 +120,9 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
   this->dataPtr->node->Init();
 
   this->dataPtr->antiAliasingValue = 4;
+
+  // calculate intrinsics from default matrix
+  this->CalculateIntrinsicsFromProjectionMatrix();
 }
 
 //////////////////////////////////////////////////
@@ -234,13 +237,15 @@ void Camera::UpdateCameraIntrinsics(
     _cameraIntrinsicsFx, _cameraIntrinsicsFy,
     _cameraIntrinsicsCx, _cameraIntrinsicsCy,
     _cameraIntrinsicsS, clipNear, clipFar);
+  this->cameraIntrinsicMatrix = this->BuildIntrinsicMatrix(
+              _cameraIntrinsicsFx, _cameraIntrinsicsFy,
+              _cameraIntrinsicsCx, _cameraIntrinsicsCy);
 
   if (this->camera != nullptr)
   {
     this->camera->setCustomProjectionMatrix(true,
         Conversions::Convert(this->cameraProjectiveMatrix));
   }
-
   this->cameraUsingIntrinsics = true;
 }
 
@@ -326,6 +331,24 @@ ignition::math::Matrix4d Camera::BuildProjectionMatrix(
            _intrinsicsFx, _intrinsicsFy,
            _intrinsicsCx, _imageHeight - _intrinsicsCy,
            _intrinsicsS, _clipNear, _clipFar);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix3d Camera::BuildIntrinsicMatrix(
+    const double _intrinsicsFx, const double _intrinsicsFy,
+    const double _intrinsicsCx, double _intrinsicsCy)
+{
+  return ignition::math::Matrix3d(
+          _intrinsicsFx,
+          0,
+          _intrinsicsCx,
+          0,
+          _intrinsicsFy,
+          _intrinsicsCy,
+          0,
+          0,
+          1
+  );
 }
 
 //////////////////////////////////////////////////
@@ -1092,6 +1115,30 @@ double Camera::FarClip() const
     return this->camera->getFarClipDistance();
   else
     return 0;
+}
+
+//////////////////////////////////////////////////
+double Camera::FocalLengthX() const
+{
+  return this->cameraIntrinsicMatrix(0, 0);
+}
+
+//////////////////////////////////////////////////
+double Camera::FocalLengthY() const
+{
+  return this->cameraIntrinsicMatrix(1, 1);
+}
+
+//////////////////////////////////////////////////
+double Camera::OpticalCentreX() const
+{
+  return this->cameraIntrinsicMatrix(0, 2);
+}
+
+//////////////////////////////////////////////////
+double Camera::OpticalCentreY() const
+{
+  return this->cameraIntrinsicMatrix(1, 3);
 }
 
 //////////////////////////////////////////////////
@@ -2037,6 +2084,7 @@ void Camera::UpdateFOV()
     {
       this->camera->setAspectRatio(ratio);
       this->camera->setFOVy(Ogre::Radian(this->LimitFOV(vfov)));
+      this->CalculateIntrinsicsFromProjectionMatrix();
     }
   }
 }
@@ -2133,6 +2181,28 @@ bool Camera::SetBackgroundColor(const ignition::math::Color &_color)
 ignition::math::Matrix4d Camera::ProjectionMatrix() const
 {
   return Conversions::ConvertIgn(this->camera->getProjectionMatrix());
+}
+
+///////////////////////////////////////////////
+void Camera::CalculateIntrinsicsFromProjectionMatrix()
+{
+  const ignition::math::Matrix4d& m = this->ProjectionMatrix();
+
+  double right = this->imageWidth;
+  double left = 0.0;
+  double top = this->imageHeight;
+  double bottom = 0.0;
+
+  double inverseWidth = 1.0 / (right - left);
+  double inverseHeight = 1.0 / (top - bottom);
+
+  double fX = m(0, 0)/ 2*inverseWidth;
+  double fY = m(1, 1) / 2*inverseHeight;
+  double cX = -((m(0, 2) - ((right + left) / (right - left))) * (right - left)) / 2;
+  double cY = this->imageHeight + ((m(1, 2) - ((top + bottom) / (top - bottom))) * (top - bottom)) / 2;
+
+  this->cameraIntrinsicMatrix = this->BuildIntrinsicMatrix(
+      fX, fY, cX, cY);
 }
 
 //////////////////////////////////////////////////
