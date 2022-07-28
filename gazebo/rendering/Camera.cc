@@ -121,8 +121,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   this->dataPtr->antiAliasingValue = 4;
 
-  // calculate intrinsics from default matrix
-  this->CalculateIntrinsicsFromProjectionMatrix();
+  this->dataPtr->cameraIntrinsicMatrix = ignition::math::Matrix3d::Identity;
 }
 
 //////////////////////////////////////////////////
@@ -238,8 +237,8 @@ void Camera::UpdateCameraIntrinsics(
     _cameraIntrinsicsCx, _cameraIntrinsicsCy,
     _cameraIntrinsicsS, clipNear, clipFar);
   this->dataPtr->cameraIntrinsicMatrix = this->BuildIntrinsicMatrix(
-              _cameraIntrinsicsFx, _cameraIntrinsicsFy,
-              _cameraIntrinsicsCx, _cameraIntrinsicsCy);
+             _cameraIntrinsicsFx, _cameraIntrinsicsFy,
+             _cameraIntrinsicsCx, _cameraIntrinsicsCy);
 
   if (this->camera != nullptr)
   {
@@ -2196,8 +2195,8 @@ void Camera::CalculateIntrinsicsFromProjectionMatrix()
   double inverseWidth = 1.0 / (right - left);
   double inverseHeight = 1.0 / (top - bottom);
 
-  double fX = m(0, 0)/ 2*inverseWidth;
-  double fY = m(1, 1) / 2*inverseHeight;
+  double fX = m(0, 0)/ (2*inverseWidth);
+  double fY = m(1, 1) / (2*inverseHeight);
   double cX = -((m(0, 2) - ((right + left) / (right - left))) * (right - left)) / 2;
   double cY = this->imageHeight + ((m(1, 2) - ((top + bottom) / (top - bottom))) * (top - bottom)) / 2;
 
