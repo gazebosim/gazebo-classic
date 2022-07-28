@@ -237,7 +237,7 @@ void Camera::UpdateCameraIntrinsics(
     _cameraIntrinsicsFx, _cameraIntrinsicsFy,
     _cameraIntrinsicsCx, _cameraIntrinsicsCy,
     _cameraIntrinsicsS, clipNear, clipFar);
-  this->cameraIntrinsicMatrix = this->BuildIntrinsicMatrix(
+  this->dataPtr->cameraIntrinsicMatrix = this->BuildIntrinsicMatrix(
               _cameraIntrinsicsFx, _cameraIntrinsicsFy,
               _cameraIntrinsicsCx, _cameraIntrinsicsCy);
 
@@ -1120,25 +1120,25 @@ double Camera::FarClip() const
 //////////////////////////////////////////////////
 double Camera::FocalLengthX() const
 {
-  return this->cameraIntrinsicMatrix(0, 0);
+  return this->dataPtr->cameraIntrinsicMatrix(0, 0);
 }
 
 //////////////////////////////////////////////////
 double Camera::FocalLengthY() const
 {
-  return this->cameraIntrinsicMatrix(1, 1);
+  return this->dataPtr->cameraIntrinsicMatrix(1, 1);
 }
 
 //////////////////////////////////////////////////
 double Camera::OpticalCentreX() const
 {
-  return this->cameraIntrinsicMatrix(0, 2);
+  return this->dataPtr->cameraIntrinsicMatrix(0, 2);
 }
 
 //////////////////////////////////////////////////
 double Camera::OpticalCentreY() const
 {
-  return this->cameraIntrinsicMatrix(1, 3);
+  return this->dataPtr->cameraIntrinsicMatrix(1, 3);
 }
 
 //////////////////////////////////////////////////
@@ -2201,7 +2201,7 @@ void Camera::CalculateIntrinsicsFromProjectionMatrix()
   double cX = -((m(0, 2) - ((right + left) / (right - left))) * (right - left)) / 2;
   double cY = this->imageHeight + ((m(1, 2) - ((top + bottom) / (top - bottom))) * (top - bottom)) / 2;
 
-  this->cameraIntrinsicMatrix = this->BuildIntrinsicMatrix(
+  this->dataPtr->cameraIntrinsicMatrix = this->BuildIntrinsicMatrix(
       fX, fY, cX, cY);
 }
 

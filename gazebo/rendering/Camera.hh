@@ -941,9 +941,6 @@ namespace gazebo
       /// \brief Flag for signaling the usage of camera intrinsics within OGRE
       protected: bool cameraUsingIntrinsics;
 
-      /// \brief Camera Intrinsic Matrix
-      protected: ignition::math::Matrix3d cameraIntrinsicMatrix;
-
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
 

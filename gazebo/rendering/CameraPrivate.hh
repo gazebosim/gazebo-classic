@@ -120,6 +120,9 @@ namespace gazebo
 
       /// \brief Anti-aliasing value
       public: uint32_t antiAliasingValue;
+
+      /// \brief Camera Intrinsic Matrix
+      public: ignition::math::Matrix3d cameraIntrinsicMatrix;
     };
   }
 }
