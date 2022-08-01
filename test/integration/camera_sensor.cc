@@ -1439,7 +1439,6 @@ TEST_F(CameraSensor, Intrinsics)
   // image size, focal length and optical centre for 'default_intrinsics_camera' sensor
   unsigned int defaultCamWidth = defaultIntrinsicsCam->ImageWidth();
   unsigned int defaultCamHeight = defaultIntrinsicsCam->ImageHeight();
-
   {
     double defaultCamFx = defaultIntrinsicsCam->FocalLengthX();
     double defaultCamFy = defaultIntrinsicsCam->FocalLengthY();
@@ -1460,9 +1459,9 @@ TEST_F(CameraSensor, Intrinsics)
   // get the 'intrinsics_camera' sensor, <intrinsics> tag is used explicitly for this sensor
   // where the intrinsics provided are same as gazebo default.
   std::string intrinsicsCameraName = "intrinsics_camera_sensor";
-  sensors::SensorPtr intrinsicsSensor = sensors::get_sensor(defaultIntrinsicsCameraName);
+  sensors::SensorPtr intrinsicsSensor = sensors::get_sensor(intrinsicsCameraName);
   sensors::CameraSensorPtr intrinsicsCamSensor =
-      std::dynamic_pointer_cast<sensors::CameraSensor>(defaultIntrinsicsSensor);
+      std::dynamic_pointer_cast<sensors::CameraSensor>(intrinsicsSensor);
   EXPECT_TRUE(intrinsicsCamSensor != nullptr);
   rendering::CameraPtr intrinsicsCam = intrinsicsCamSensor->Camera();
   EXPECT_TRUE(intrinsicsCam != nullptr);
@@ -1489,6 +1488,45 @@ TEST_F(CameraSensor, Intrinsics)
   // connect to new frame event
   imageCount = 0;
   imageCount2 = 0;
+  img = new unsigned char[camWidth * camHeight * 3 * 2];
+  img2 = new unsigned char[camWidth * camHeight * 3 * 2];
+
+  event::ConnectionPtr c =
+      defaultIntrinsicsCamSensor->Camera()->ConnectNewImageFrame(
+          std::bind(&::OnNewCameraFrame, &imageCount, img,
+                    std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+                    std::placeholders::_4, std::placeholders::_5));
+
+  event::ConnectionPtr c2 =
+      intrinsicsCamSensor->Camera()->ConnectNewImageFrame(
+          std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+                    std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+                    std::placeholders::_4, std::placeholders::_5));
+
+  // wait for a few images
+  int sleep = 0;
+  int maxSleep = 500;
+  int totalImages = 10;
+  while ((imageCount < totalImages || imageCount2 < totalImages)
+      && sleep++ < maxSleep)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, totalImages);
+  EXPECT_GE(imageCount2, totalImages);
+
+  c.reset();
+  c2.reset();
+
+  unsigned int diffMax = 0, diffSum = 0;
+  double diffAvg = 0.0;
+
+  // We expect that there will be zero difference between the images
+  this->ImageCompare(img, img2, camWidth, camHeight, 3,
+                     diffMax, diffSum, diffAvg);
+  EXPECT_EQ(diffSum, 0u);
+
+  delete[] img;
+  delete[] img2;
 }
 
 /////////////////////////////////////////////////

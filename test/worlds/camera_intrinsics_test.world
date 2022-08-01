@@ -33,11 +33,16 @@
             <image>
               <width>320</width>
               <height>240</height>
+              <format>RGB_UINT16</format>
             </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
           </camera>
           <always_on>1</always_on>
-          <update_rate>30</update_rate>
-          <visualize>true</visualize>
+          <update_rate>10</update_rate>
+          <visualize>false</visualize>
         </sensor>
       </link>
     </model>
@@ -60,7 +65,12 @@
             <image>
               <width>320</width>
               <height>240</height>
+              <format>RGB_UINT16</format>
             </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
             <lens>
               <intrinsics>
                 <fx>277</fx>
@@ -72,8 +82,8 @@
             </lens>
           </camera>
           <always_on>1</always_on>
-          <update_rate>30</update_rate>
-          <visualize>true</visualize>
+          <update_rate>10</update_rate>
+          <visualize>false</visualize>
         </sensor>
       </link>
     </model>
