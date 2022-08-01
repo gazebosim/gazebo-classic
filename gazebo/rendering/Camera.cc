@@ -1117,25 +1117,25 @@ double Camera::FarClip() const
 }
 
 //////////////////////////////////////////////////
-double Camera::FocalLengthX() const
+double Camera::ImageFocalLengthX() const
 {
   return this->dataPtr->cameraIntrinsicMatrix(0, 0);
 }
 
 //////////////////////////////////////////////////
-double Camera::FocalLengthY() const
+double Camera::ImageFocalLengthY() const
 {
   return this->dataPtr->cameraIntrinsicMatrix(1, 1);
 }
 
 //////////////////////////////////////////////////
-double Camera::OpticalCentreX() const
+double Camera::ImageOpticalCentreX() const
 {
   return this->dataPtr->cameraIntrinsicMatrix(0, 2);
 }
 
 //////////////////////////////////////////////////
-double Camera::OpticalCentreY() const
+double Camera::ImageOpticalCentreY() const
 {
   return this->dataPtr->cameraIntrinsicMatrix(1, 3);
 }

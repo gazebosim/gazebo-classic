@@ -2298,10 +2298,10 @@ TEST_F(CameraSensor, CheckIntrinsics)
   unsigned int defaultCamWidth = defaultIntrinsicsCam->ImageWidth();
   unsigned int defaultCamHeight = defaultIntrinsicsCam->ImageHeight();
   {
-    double defaultCamFx = defaultIntrinsicsCam->FocalLengthX();
-    double defaultCamFy = defaultIntrinsicsCam->FocalLengthY();
-    double defaultCamCx = defaultIntrinsicsCam->OpticalCentreX();
-    double defaultCamCy = defaultIntrinsicsCam->OpticalCentreY();
+    double defaultCamFx = defaultIntrinsicsCam->ImageFocalLengthX();
+    double defaultCamFy = defaultIntrinsicsCam->ImageFocalLengthY();
+    double defaultCamCx = defaultIntrinsicsCam->ImageOpticalCentreX();
+    double defaultCamCy = defaultIntrinsicsCam->ImageOpticalCentreY();
 
     EXPECT_GT(defaultCamWidth, 0u);
     EXPECT_GT(defaultCamHeight, 0u);
@@ -2328,10 +2328,10 @@ TEST_F(CameraSensor, CheckIntrinsics)
   unsigned int camWidth = intrinsicsCam->ImageWidth();
   unsigned int camHeight = intrinsicsCam->ImageHeight();
   {
-    double camFx = intrinsicsCam->FocalLengthX();
-    double camFy = intrinsicsCam->FocalLengthY();
-    double camCx = intrinsicsCam->OpticalCentreX();
-    double camCy = intrinsicsCam->OpticalCentreY();
+    double camFx = intrinsicsCam->ImageFocalLengthX();
+    double camFy = intrinsicsCam->ImageFocalLengthY();
+    double camCx = intrinsicsCam->ImageOpticalCentreX();
+    double camCy = intrinsicsCam->ImageOpticalCentreY();
 
     EXPECT_GT(camWidth, 0u);
     EXPECT_GT(camHeight, 0u);

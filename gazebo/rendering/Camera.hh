@@ -403,19 +403,19 @@ namespace gazebo
 
       /// \brief  Get the X focal length in pixels
       /// \return X focal length in pixels
-      public: double FocalLengthX() const;
+      public: double ImageFocalLengthX() const;
 
       /// \brief Get the Y focal length in pixels
       /// \return Y focal length in pixels
-      public: double FocalLengthY() const;
+      public: double ImageFocalLengthY() const;
 
       /// \brief Get the X principal point in pixels
       /// \return X principal point in pixels
-      public: double OpticalCentreX() const;
+      public: double ImageOpticalCentreX() const;
 
       /// \brief Get the Y principal point in pixels
       /// \return Y principal point in pixels
-      public: double OpticalCentreY() const;
+      public: double ImageOpticalCentreY() const;
 
       /// \brief Enable or disable saving
       /// \param[in] _enable Set to True to enable saving of frames
