@@ -1412,6 +1412,86 @@ TEST_F(CameraSensor, LensFlare)
 }
 
 /////////////////////////////////////////////////
+TEST_F(CameraSensor, Intrinsics)
+{
+  Load("worlds/camera_intrinsics_test.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // get the 'default_intrinsics_camera' sensor, no <intrinsics> tag is used for this sensor
+  // and we expect the intrinsics to be equal to the default intrinsic values provided by gazebo.
+  std::string defaultIntrinsicsCameraName = "default_intrinsics_camera_sensor";
+  sensors::SensorPtr defaultIntrinsicsSensor = sensors::get_sensor(defaultIntrinsicsCameraName);
+  sensors::CameraSensorPtr defaultIntrinsicsCamSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(defaultIntrinsicsSensor);
+  EXPECT_TRUE(defaultIntrinsicsCamSensor != nullptr);
+  rendering::CameraPtr defaultIntrinsicsCam = defaultIntrinsicsCamSensor->Camera();
+  EXPECT_TRUE(defaultIntrinsicsCam != nullptr);
+
+  // image size, focal length and optical centre for 'default_intrinsics_camera' sensor
+  unsigned int defaultCamWidth = defaultIntrinsicsCam->ImageWidth();
+  unsigned int defaultCamHeight = defaultIntrinsicsCam->ImageHeight();
+
+  {
+    double defaultCamFx = defaultIntrinsicsCam->FocalLengthX();
+    double defaultCamFy = defaultIntrinsicsCam->FocalLengthY();
+    double defaultCamCx = defaultIntrinsicsCam->OpticalCentreX();
+    double defaultCamCy = defaultIntrinsicsCam->OpticalCentreY();
+
+    EXPECT_GT(defaultCamWidth, 0u);
+    EXPECT_GT(defaultCamHeight, 0u);
+    EXPECT_EQ(defaultCamWidth, 320u);
+    EXPECT_EQ(defaultCamHeight, 240u);
+    double error = 0.0005;
+    EXPECT_NEAR(defaultCamFx, 277.127, error);
+    EXPECT_NEAR(defaultCamFy, 277.127, error);
+    EXPECT_DOUBLE_EQ(defaultCamCx, 160);
+    EXPECT_DOUBLE_EQ(defaultCamCy, 120);
+  }
+
+  // get the 'intrinsics_camera' sensor, <intrinsics> tag is used explicitly for this sensor
+  // where the intrinsics provided are same as gazebo default.
+  std::string intrinsicsCameraName = "intrinsics_camera_sensor";
+  sensors::SensorPtr intrinsicsSensor = sensors::get_sensor(defaultIntrinsicsCameraName);
+  sensors::CameraSensorPtr intrinsicsCamSensor =
+      std::dynamic_pointer_cast<sensors::CameraSensor>(defaultIntrinsicsSensor);
+  EXPECT_TRUE(intrinsicsCamSensor != nullptr);
+  rendering::CameraPtr intrinsicsCam = intrinsicsCamSensor->Camera();
+  EXPECT_TRUE(intrinsicsCam != nullptr);
+
+  // image size, focal length and optical centre for 'intrinsics_camera_sensor' sensor
+  unsigned int camWidth = intrinsicsCam->ImageWidth();
+  unsigned int camHeight = intrinsicsCam->ImageHeight();
+  {
+    double camFx = intrinsicsCam->FocalLengthX();
+    double camFy = intrinsicsCam->FocalLengthY();
+    double camCx = intrinsicsCam->OpticalCentreX();
+    double camCy = intrinsicsCam->OpticalCentreY();
+
+    EXPECT_GT(camWidth, 0u);
+    EXPECT_GT(camHeight, 0u);
+    EXPECT_EQ(camWidth, 320u);
+    EXPECT_EQ(camHeight, 240u);
+    EXPECT_DOUBLE_EQ(camFx, 277);
+    EXPECT_DOUBLE_EQ(camFy, 277);
+    EXPECT_DOUBLE_EQ(camCx, 160);
+    EXPECT_DOUBLE_EQ(camCy, 120);
+  }
+
+  // connect to new frame event
+  imageCount = 0;
+  imageCount2 = 0;
+}
+
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, 16bit)
 {
   // World contains a box positioned at top right quadrant of image generated
