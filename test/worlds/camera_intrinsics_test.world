@@ -1,5 +1,18 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
+  <!--
+  World file for testing the intrinsics API of gazebo.
+
+  The 'default_intrinsics_camera' model uses the default intrinsics values directly
+  from gazebo for focal length and optical centre.
+  The 'intrinsics_camera' model uses the intrinsic tag explicitly to provide
+  the intrinsics same as gazebo default intrinsics.
+  The 'camera' model uses different intrinsics than the one used by default from gazebo.
+
+  We expect the 'default_intrinsics_camera' model to have the same image output as the
+  'intrinsics_camera' model and the image output for 'camera' to be different from the
+  one from 'default_intrinsics_camera' or 'intrinsics_camera' model.
+  -->
   <world name="default">
     <include>
       <uri>model://ground_plane</uri>
@@ -8,27 +21,24 @@
       <uri>model://sun</uri>
     </include>
 
-    <!--
-      The 'default_intrinsics_camera' model should have the same image output as the
-      'intrinsics_camera' model.  The 'default_intrinsics_camera' model uses the default
-      intrinsics values directly from gazebo for focal length and optical centre.
-      The 'intrinsics_camera' model however uses the intrinsic tag explicitly to provide
-      the intrinsics same as gazebo default intrinsics.
-    -->
-    <model name="default_intrinsics_camera">
-      <static>true</static>
-      <pose>0.0 0.0 0.5 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>0.1 0.1 0.1</size>
-            </box>
-          </geometry>
-        </visual>
-        <sensor name="default_intrinsics_camera_sensor" type="camera">
-          <camera>
-            <!-- Use default horizontal FOV-->
+  <!--
+  Camera sensor where no <intrinsics> tag is used and default values of
+  intrinsics are used from gazebo.
+  -->
+  <model name="default_intrinsics_camera">
+    <static>true</static>
+    <pose>0.0 0.0 0.5 0 0 0</pose>
+    <link name="link">
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>0.1 0.1 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+      <sensor name="default_intrinsics_camera_sensor" type="camera">
+        <camera>
+          <!-- Use default horizontal FOV-->
             <horizontal_fov>1.0472</horizontal_fov>
             <image>
               <width>320</width>
@@ -47,6 +57,10 @@
       </link>
     </model>
 
+    <!--
+    Camera sensor where <intrinsics> tag is used and intrinsic values used
+    are the same as default intrinsics used by gazebo.
+    -->
     <model name="intrinsics_camera">
       <static>true</static>
       <pose>0.0 0.0 0.5 0 0 0</pose>
@@ -75,6 +89,51 @@
               <intrinsics>
                 <fx>277</fx>
                 <fy>277</fy>
+                <cx>160</cx>
+                <cy>120</cy>
+                <s>0</s>
+              </intrinsics>
+            </lens>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>10</update_rate>
+          <visualize>false</visualize>
+        </sensor>
+      </link>
+    </model>
+
+    <!--
+    Camera sensor where <intrinsics> tag is used and intrinsic values used
+    are different from the default intrinsics used by gazebo.
+    -->
+    <model name="camera">
+      <static>true</static>
+      <pose>0.0 0.0 0.5 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name="camera_sensor" type="camera">
+          <camera>
+            <!-- Use default horizontal FOV-->
+            <horizontal_fov>1.0472</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>240</height>
+              <format>RGB_UINT16</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+            <lens>
+              <intrinsics>
+                <fx>320</fx>
+                <fy>320</fy>
                 <cx>160</cx>
                 <cy>120</cy>
                 <s>0</s>

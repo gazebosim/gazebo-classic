@@ -245,6 +245,7 @@ void Camera::UpdateCameraIntrinsics(
     this->camera->setCustomProjectionMatrix(true,
         Conversions::Convert(this->cameraProjectiveMatrix));
   }
+
   this->cameraUsingIntrinsics = true;
 }
 
@@ -1129,15 +1130,15 @@ double Camera::ImageFocalLengthY() const
 }
 
 //////////////////////////////////////////////////
-double Camera::ImageOpticalCentreX() const
+double Camera::ImageOpticalCenterX() const
 {
   return this->dataPtr->cameraIntrinsicMatrix(0, 2);
 }
 
 //////////////////////////////////////////////////
-double Camera::ImageOpticalCentreY() const
+double Camera::ImageOpticalCenterY() const
 {
-  return this->dataPtr->cameraIntrinsicMatrix(1, 3);
+  return this->dataPtr->cameraIntrinsicMatrix(1, 2);
 }
 
 //////////////////////////////////////////////////
@@ -2185,7 +2186,7 @@ ignition::math::Matrix4d Camera::ProjectionMatrix() const
 ///////////////////////////////////////////////
 void Camera::CalculateIntrinsicsFromProjectionMatrix()
 {
-  const ignition::math::Matrix4d& m = this->ProjectionMatrix();
+  const ignition::math::Matrix4d& projectionMat = this->ProjectionMatrix();
 
   double right = this->imageWidth;
   double left = 0.0;
@@ -2195,10 +2196,12 @@ void Camera::CalculateIntrinsicsFromProjectionMatrix()
   double inverseWidth = 1.0 / (right - left);
   double inverseHeight = 1.0 / (top - bottom);
 
-  double fX = m(0, 0)/ (2*inverseWidth);
-  double fY = m(1, 1) / (2*inverseHeight);
-  double cX = -((m(0, 2) - ((right + left) / (right - left))) * (right - left)) / 2;
-  double cY = this->imageHeight + ((m(1, 2) - ((top + bottom) / (top - bottom))) * (top - bottom)) / 2;
+  double fX = projectionMat(0, 0)/ (2*inverseWidth);
+  double fY = projectionMat(1, 1) / (2*inverseHeight);
+  double cX = -((projectionMat(0, 2) -
+            ((right + left) / (right - left))) * (right - left)) / 2;
+  double cY = this->imageHeight + ((projectionMat(1, 2) -
+            ((top + bottom) / (top - bottom))) * (top - bottom)) / 2;
 
   this->dataPtr->cameraIntrinsicMatrix = this->BuildIntrinsicMatrix(
       fX, fY, cX, cY);
