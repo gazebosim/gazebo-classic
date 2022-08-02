@@ -907,8 +907,8 @@ namespace gazebo
 
       /// \brief Calculates the focal length and optical center by decoupling the
       ///        projection matrix returned from ProjectionMatrix().
-      ///        This function sets focalLengthX, focalLengthY, opticalCentreX
-      ///        and opticalCentreY variables of the class.
+      ///        This function sets the intrinsic calibration matrix using
+      ///        BuildIntrinsicMatrix() function of this class.
       private: void CalculateIntrinsicsFromProjectionMatrix();
 
       /// \brief Name of the camera.
