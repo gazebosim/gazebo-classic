@@ -10,6 +10,7 @@ message SphericalCoordinates
   enum SurfaceModel
   {
     EARTH_WGS84 = 1;
+    MOON_SCS = 2;
   }
 
   required SurfaceModel surface_model   = 1;
