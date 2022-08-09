@@ -44,7 +44,12 @@ namespace gazebo
               {
                 /// \brief Model of reference ellipsoid for earth, based on
                 /// WGS 84 standard. see wikipedia: World_Geodetic_System
-                EARTH_WGS84 = 1
+                EARTH_WGS84 = 1,
+
+                /// \brief Model of the moon, based on the Selenographic
+                /// coordinate system, see wikipedia: Selenographic
+                /// Coordinate System.
+                MOON_SCS = 2
               };
 
       /// \enum CoordinateType
@@ -119,6 +124,23 @@ namespace gazebo
                                      const ignition::math::Angle &_latB,
                                      const ignition::math::Angle &_lonB);
 
+      /// \brief Get the distance between two points expressed in geographic
+      /// latitude and longitude. It assumes that both points are at sea level.
+      /// Example: _latA = 38.0016667 and _lonA = -123.0016667) represents
+      /// the point with latitude 38d 0'6.00"N and longitude 123d 0'6.00"W.
+      /// This is different from the deprecated static Distance() method as it
+      /// takes into account the set surface's radius.
+      /// \param[in] _latA Latitude of point A.
+      /// \param[in] _lonA Longitude of point A.
+      /// \param[in] _latB Latitude of point B.
+      /// \param[in] _lonB Longitude of point B.
+      /// \return Distance in meters.
+      public: double DistanceBetweenPoints(
+                  const gz::math::Angle &_latA,
+                  const gz::math::Angle &_lonA,
+                  const gz::math::Angle &_latB,
+                  const gz::math::Angle &_lonB);
+
       /// \brief Get SurfaceType currently in use.
       /// \return Current SurfaceType value.
       public: SurfaceType GetSurfaceType() const;
@@ -130,6 +152,22 @@ namespace gazebo
       /// \brief Get reference longitude.
       /// \return Reference longitude.
       public: ignition::math::Angle LongitudeReference() const;
+
+      /// \brief Get the radius of the surface.
+      /// \return radius of the surface in use.
+      public: double SurfaceRadius() const;
+
+      /// \brief Get the major axis of the surface.
+      /// \return Equatorial axis of the surface in use.
+      public: double SurfaceAxisEquatorial() const;
+
+      /// \brief Get the minor axis of the surface.
+      /// \return Polar axis of the surface in use.
+      public: double SurfaceAxisPolar() const;
+
+      /// \brief Get the flattening of the surface.
+      /// \return Flattening parameter of the surface in use.
+      public: double SurfaceFlattening() const;
 
       /// \brief Get reference elevation in meters.
       /// \return Reference elevation.

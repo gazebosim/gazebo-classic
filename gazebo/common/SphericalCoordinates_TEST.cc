@@ -75,6 +75,10 @@ TEST_F(SphericalCoordinatesTest, Convert)
     common::SphericalCoordinates::EARTH_WGS84;
 
   EXPECT_EQ(common::SphericalCoordinates::Convert("EARTH_WGS84"), st);
+
+  // For Moon surface type
+  st = common::SphericalCoordinates::MOON_SCS;
+  EXPECT_EQ(common::SphericalCoordinates::Convert("MOON_SCS"), st);
 }
 
 //////////////////////////////////////////////////
@@ -261,9 +265,26 @@ TEST_F(SphericalCoordinatesTest, Distance)
   longA.Degree(-122.249972);
   latB.Degree(46.124953);
   longB.Degree(-122.251683);
-  double d = common::SphericalCoordinates::Distance(latA, longA, latB, longB);
 
-  EXPECT_NEAR(14002, d, 20);
+  // Caculating distance using the statis method.
+  double d1 = common::SphericalCoordinates::Distance(latA, longA, latB, longB);
+  EXPECT_NEAR(14002, d1, 20);
+
+  // Using the non static method. The default surface type is EARTH_WGS84.
+  common::SphericalCoordinates earthSC = common::SphericalCoordinates();
+  double d2 = earthSC.DistanceBetweenPoints(latA, longA, latB, longB);
+  EXPECT_NEAR(d1, d2, 0.1);
+
+  earthSC = common::SphericalCoordinates(
+      common::SphericalCoordinates::EARTH_WGS84);
+  double d3 = earthSC.DistanceBetweenPoints(latA, longA, latB, longB);
+  EXPECT_NEAR(d2, d3, 0.1);
+
+  // Setting the surface type as Moon.
+  common::SphericalCoordinates moonSC = common::SphericalCoordinates(
+      common::SphericalCoordinates::MOON_SCS);
+  double d4 = moonSC.DistanceBetweenPoints(latA, longA, latB, longB);
+  EXPECT_NEAR(3820, d4, 5);
 }
 
 /////////////////////////////////////////////////
