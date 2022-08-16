@@ -185,6 +185,9 @@ namespace gazebo
         case common::SphericalCoordinates::EARTH_WGS84:
           _s->set_surface_model(msgs::SphericalCoordinates::EARTH_WGS84);
           break;
+        case common::SphericalCoordinates::MOON_SCS:
+          _s->set_surface_model(msgs::SphericalCoordinates::MOON_SCS);
+          break;
         default:
           gzerr << "Unable to map surface type[" <<  _v.GetSurfaceType()
             << "] to a SphericalCoordinates message.\n";
