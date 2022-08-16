@@ -128,7 +128,7 @@ namespace gazebo
       /// latitude and longitude. It assumes that both points are at sea level.
       /// Example: _latA = 38.0016667 and _lonA = -123.0016667) represents
       /// the point with latitude 38d 0'6.00"N and longitude 123d 0'6.00"W.
-      /// This is different from the deprecated static Distance() method as it
+      /// This is different from the static Distance() method as it
       /// takes into account the set surface's radius.
       /// \param[in] _latA Latitude of point A.
       /// \param[in] _lonA Longitude of point A.
