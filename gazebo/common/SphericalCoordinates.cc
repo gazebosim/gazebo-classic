@@ -292,10 +292,10 @@ double SphericalCoordinates::Distance(const ignition::math::Angle &_latA,
 /// Based on Haversine formula (http://en.wikipedia.org/wiki/Haversine_formula).
 /// This takes into account the surface type.
 double SphericalCoordinates::DistanceBetweenPoints(
-    const gz::math::Angle &_latA,
-    const gz::math::Angle &_lonA,
-    const gz::math::Angle &_latB,
-    const gz::math::Angle &_lonB)
+    const ignition::math::Angle &_latA,
+    const ignition::math::Angle &_lonA,
+    const ignition::math::Angle &_latB,
+    const ignition::math::Angle &_lonB)
 {
   ignition::math::Angle dLat = _latB - _latA;
   ignition::math::Angle dLon = _lonB - _lonA;
@@ -314,7 +314,11 @@ double SphericalCoordinates::DistanceBetweenPoints(
 //////////////////////////////////////////////////
 double SphericalCoordinates::SurfaceRadius() const
 {
-  return this->dataPtr->surfaceRadius;
+  if (this->dataPtr->surfaceType ==
+      SphericalCoordinates::SurfaceType::MOON_SCS)
+    return g_MoonRadius;
+  else
+    return g_EarthRadius;
 }
 
 //////////////////////////////////////////////////

@@ -136,10 +136,10 @@ namespace gazebo
       /// \param[in] _lonB Longitude of point B.
       /// \return Distance in meters.
       public: double DistanceBetweenPoints(
-                  const gz::math::Angle &_latA,
-                  const gz::math::Angle &_lonA,
-                  const gz::math::Angle &_latB,
-                  const gz::math::Angle &_lonB);
+                  const ignition::math::Angle &_latA,
+                  const ignition::math::Angle &_lonA,
+                  const ignition::math::Angle &_latB,
+                  const ignition::math::Angle &_lonB);
 
       /// \brief Get SurfaceType currently in use.
       /// \return Current SurfaceType value.
