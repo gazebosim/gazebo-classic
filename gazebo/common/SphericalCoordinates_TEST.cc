@@ -104,7 +104,8 @@ TEST_F(SphericalCoordinatesTest, Constructor)
   {
     common::SphericalCoordinates sc(
         common::SphericalCoordinates::MOON_SCS);
-    EXPECT_EQ(sc.GetSurfaceType(), st);
+    EXPECT_EQ(sc.GetSurfaceType(),
+        common::SphericalCoordinates::MOON_SCS);
     EXPECT_EQ(sc.LatitudeReference(), ignition::math::Angle());
     EXPECT_EQ(sc.LongitudeReference(), ignition::math::Angle());
     EXPECT_EQ(sc.HeadingOffset(), ignition::math::Angle());
@@ -126,7 +127,8 @@ TEST_F(SphericalCoordinatesTest, Constructor)
     common::SphericalCoordinates sc(
         common::SphericalCoordinates::MOON_SCS,
         lat, lon, elev, heading);
-    EXPECT_EQ(sc.GetSurfaceType(), st);
+    EXPECT_EQ(sc.GetSurfaceType(),
+        common::SphericalCoordinates::MOON_SCS);
     EXPECT_EQ(sc.LatitudeReference(), lat);
     EXPECT_EQ(sc.LongitudeReference(), lon);
     EXPECT_EQ(sc.HeadingOffset(), heading);
