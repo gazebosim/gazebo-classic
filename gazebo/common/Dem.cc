@@ -59,6 +59,14 @@ Dem::~Dem()
 }
 
 //////////////////////////////////////////////////
+void Dem::SetSphericalCoordinates(
+    const common::SphericalCoordinates &_worldSphericalCoordinates)
+{
+  this->dataPtr->sphericalCoordinates =_worldSphericalCoordinates;
+}
+
+
+//////////////////////////////////////////////////
 int Dem::Load(const std::string &_filename)
 {
   unsigned int width;
@@ -122,11 +130,11 @@ int Dem::Load(const std::string &_filename)
 
     // Set the world width and height
     this->dataPtr->worldWidth =
-       common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                              upRightLat, upRightLong);
+       this->dataPtr->sphericalCoordinates.DistanceBetweenPoints(
+           upLeftLat, upLeftLong, upRightLat, upRightLong);
     this->dataPtr->worldHeight =
-       common::SphericalCoordinates::Distance(upLeftLat, upLeftLong,
-                                              lowLeftLat, lowLeftLong);
+       this->dataPtr->sphericalCoordiantes.DistanceBetweenPoints(
+           upLeftLat, upLeftLong, lowLeftLat, lowLeftLong);
   }
   catch(const common::Exception &)
   {
@@ -221,15 +229,39 @@ void Dem::GetGeoReference(double _x, double _y,
     OGRCoordinateTransformation *cT;
     double xGeoDeg, yGeoDeg;
 
-    // Transform the terrain's coordinate system to WGS84
-    #if GDAL_VERSION_NUM >= 2030000
-    const char *importString;
-    #else
-    char *importString;
-    #endif
-    importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
-    sourceCs.importFromWkt(&importString);
-    targetCs.SetWellKnownGeogCS("WGS84");
+    // Transform the terrain's coordinate system to the appropriate
+    // coordinate system.
+    if (this->dataPtr->sphericalCoordinates.Surface() ==
+        common::SphericalCoordinates::EARTH_WGS84)
+    {
+      #if GDAL_VERSION_NUM >= 2030000
+      const char *importString;
+      #else
+      char *importString;
+      #endif
+      importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
+      sourceCs.importFromWkt(&importString);
+      targetCs.SetWellKnownGeogCS("WGS84");
+    }
+
+    else if (this->dataPtr->sphericalCoordinates.Surface() ==
+        common::SphericalCoordinates::MOON_SCS)
+    {
+      sourceCs = *(this->dataPtr->dataSet->GetSpatialRef());
+      targetCs = OGRSpatialReference();
+
+      double axisEquatorial =
+        this->dataPtr->sphericalCoordinates.SurfaceAxisEquatorial();
+      double axisPolar =
+        this->dataPtr->sphericalCoordinates.SurfaceAxisPolar();
+
+      std::string surfaceLatLongProjStr =
+        "+proj=latlong +a=" + std::to_string(axisEquatorial) +
+        " +b=" + std::to_string(axisPolar);
+
+      targetCs.importFromProj4(surfaceLatLongProjStr.c_str());
+    }
+
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
     if (nullptr == cT)
     {

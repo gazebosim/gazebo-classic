@@ -59,6 +59,10 @@ namespace gazebo
 
       /// \brief DEM data converted to be OGRE-compatible.
       public: std::vector<float> demData;
+
+      /// \brief Holds the spherical coordinates object from the world.
+      public: common::SphericalCoordinates sphericalCoordinates =
+           common::SphericalCoordinates();
     };
     /// \}
   }

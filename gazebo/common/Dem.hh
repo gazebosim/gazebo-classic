@@ -49,6 +49,13 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~Dem();
 
+      /// \brief Sets the spherical coordinates reference object.
+      /// \param[in] _worldSphericalCoordinates The spherical coordiantes
+      /// object contained in the world. This is used to compute accurate
+      /// sizes of the DEM object.
+      public: void SetSphericalCoordinates(
+                  const common::SphericalCoordinates &_worldSphericalCoordinates);
+
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.
       /// \return 0 when the operation succeeds to open a file.
