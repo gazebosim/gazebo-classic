@@ -2284,7 +2284,7 @@ TEST_F(CameraSensor, CheckIntrinsics)
     return;
   }
 
-  // get the 'default_intrinsics_camera' sensor, no <intrinsics> tag is used for this sensor,
+  // Get the 'default_intrinsics_camera' sensor, no <intrinsics> tag is used for this sensor,
   // and we expect the intrinsics to be equal to the default intrinsic values provided by gazebo.
   sensors::SensorPtr defaultIntrinsicsSensor = sensors::get_sensor("default_intrinsics_camera_sensor");
   sensors::CameraSensorPtr defaultIntrinsicsCamSensor =
@@ -2309,7 +2309,7 @@ TEST_F(CameraSensor, CheckIntrinsics)
   EXPECT_DOUBLE_EQ(defaultCamCx, 160);
   EXPECT_DOUBLE_EQ(defaultCamCy, 120);
 
-  // get the 'intrinsics_camera' sensor, <intrinsics> tag is used explicitly for this sensor
+  // Get the 'intrinsics_camera' sensor, <intrinsics> tag is used explicitly for this sensor
   // where the intrinsics provided are same as gazebo default.
   sensors::SensorPtr intrinsicsSensor = sensors::get_sensor("intrinsics_camera_sensor");
   sensors::CameraSensorPtr intrinsicsCamSensor =
@@ -2332,7 +2332,7 @@ TEST_F(CameraSensor, CheckIntrinsics)
   EXPECT_DOUBLE_EQ(intrinsicsCamCx, 160);
   EXPECT_DOUBLE_EQ(intrinsicsCamCy, 120);
 
-  // get the 'camera' sensor, <intrinsics> tag is used explicitly for this sensor
+  // Get the 'camera' sensor, <intrinsics> tag is used explicitly for this sensor
   // where the intrinsics provided are different from the gazebo default.
   sensors::SensorPtr sensor = sensors::get_sensor("camera_sensor");
   sensors::CameraSensorPtr camSensor =
@@ -2355,7 +2355,7 @@ TEST_F(CameraSensor, CheckIntrinsics)
   EXPECT_DOUBLE_EQ(camCx, 160);
   EXPECT_DOUBLE_EQ(camCy, 120);
 
-  // connect to new frame event
+  // Connect to new frame event
   imageCount = 0;
   imageCount2 = 0;
   imageCount3 = 0;
@@ -2381,7 +2381,7 @@ TEST_F(CameraSensor, CheckIntrinsics)
                     std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
                     std::placeholders::_4, std::placeholders::_5));
 
-  // wait for a few images
+  // Wait for a few images
   int sleep = 0;
   int maxSleep = 500;
   int totalImages = 10;
