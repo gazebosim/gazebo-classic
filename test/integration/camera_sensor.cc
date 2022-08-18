@@ -2293,7 +2293,7 @@ TEST_F(CameraSensor, CheckIntrinsics)
   rendering::CameraPtr defaultIntrinsicsCam = defaultIntrinsicsCamSensor->Camera();
   EXPECT_TRUE(defaultIntrinsicsCam != nullptr);
 
-  // image size, focal length and optical centre for 'default_intrinsics_camera' sensor
+  // Image size, focal length and optical centre for 'default_intrinsics_camera' sensor
   unsigned int defaultCamWidth = defaultIntrinsicsCam->ImageWidth();
   unsigned int defaultCamHeight = defaultIntrinsicsCam->ImageHeight();
   double defaultCamFx = defaultIntrinsicsCam->ImageFocalLengthX();
@@ -2318,7 +2318,7 @@ TEST_F(CameraSensor, CheckIntrinsics)
   rendering::CameraPtr intrinsicsCam = intrinsicsCamSensor->Camera();
   EXPECT_TRUE(intrinsicsCam != nullptr);
 
-  // image size, focal length and optical centre for 'intrinsics_camera' sensor
+  // Image size, focal length and optical centre for 'intrinsics_camera' sensor
   unsigned int  intrinsicsCamWidth = intrinsicsCam->ImageWidth();
   unsigned int  intrinsicsCamHeight = intrinsicsCam->ImageHeight();
   double intrinsicsCamFx = intrinsicsCam->ImageFocalLengthX();
@@ -2341,7 +2341,7 @@ TEST_F(CameraSensor, CheckIntrinsics)
   rendering::CameraPtr cam = camSensor->Camera();
   EXPECT_TRUE(cam != nullptr);
 
-  // image size, focal length and optical centre for 'camera' sensor
+  // Image size, focal length and optical centre for 'camera' sensor
   unsigned int camWidth = cam->ImageWidth();
   unsigned int camHeight = cam->ImageHeight();
   double camFx = cam->ImageFocalLengthX();

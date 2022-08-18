@@ -2188,20 +2188,13 @@ void Camera::CalculateIntrinsicsFromProjectionMatrix()
 {
   const ignition::math::Matrix4d& projectionMat = this->ProjectionMatrix();
 
-  double right = this->imageWidth;
-  double left = 0.0;
-  double top = this->imageHeight;
-  double bottom = 0.0;
+  const double width = this->imageWidth;
+  const double height = this->imageHeight;
 
-  double inverseWidth = 1.0 / (right - left);
-  double inverseHeight = 1.0 / (top - bottom);
-
-  double fX = projectionMat(0, 0)/ (2*inverseWidth);
-  double fY = projectionMat(1, 1) / (2*inverseHeight);
-  double cX = -((projectionMat(0, 2) -
-            ((right + left) / (right - left))) * (right - left)) / 2;
-  double cY = this->imageHeight + ((projectionMat(1, 2) -
-            ((top + bottom) / (top - bottom))) * (top - bottom)) / 2;
+  double fX = (projectionMat(0, 0) * width) / 2;
+  double fY = (projectionMat(1, 1) * height) / 2;
+  double cX = -(width * (projectionMat(0, 2) - 1.0)) / 2;
+  double cY = height + (height * (projectionMat(1, 2) - 1.0)) / 2;
 
   this->dataPtr->cameraIntrinsicMatrix = this->BuildIntrinsicMatrix(
       fX, fY, cX, cY);
