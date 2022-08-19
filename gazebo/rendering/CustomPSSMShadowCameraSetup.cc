@@ -465,8 +465,10 @@ void CustomPSSMShadowCameraSetup::calculateShadowMappingMatrix(
 }
 
 //////////////////////////////////////////////////
-Ogre::Matrix4 CustomPSSMShadowCameraSetup::buildSimplePerspectiveMatrix(
-    const Ogre::Real _near, const Ogre::Real _far) const
+// Build a simple perspective projection matrix using only near and far clipping
+// planes.
+static Ogre::Matrix4 buildSimplePerspectiveMatrix(
+    const Ogre::Real _near, const Ogre::Real _far)
 {
   return Ogre::Matrix4(1, 0, 0, 0,
     0, 1, 0, 0,
@@ -636,7 +638,8 @@ void CustomPSSMShadowCameraSetup::getShadowCamera(const Ogre::SceneManager *_sm,
     // elements differ in the forth or fifth digit).
     Ogre::Matrix4 oldNearFarMat = buildSimplePerspectiveMatrix(oldNear, oldFar);
     Ogre::Matrix4 newNearFarMat = buildSimplePerspectiveMatrix(nearDist, farDist);
-    cam->setCustomProjectionMatrix(true, oldCustomProjMat * oldNearFarMat.inverse() * newNearFarMat);
+    cam->setCustomProjectionMatrix(true, oldCustomProjMat *
+                                   oldNearFarMat.inverse() * newNearFarMat);
   }
 
   // Replaced LiSPSMShadowCameraSetup::getShadowCamera() with

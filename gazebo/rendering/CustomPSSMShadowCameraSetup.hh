@@ -102,11 +102,6 @@ namespace gazebo
           Ogre::Matrix4 *_out_view, Ogre::Matrix4 *_outProj,
           Ogre::Camera *_outCam) const;
 
-      /// \brief Build a simple perspective projection matrix using only near
-      /// and far clipping planes.
-      public: Ogre::Matrix4 buildSimplePerspectiveMatrix(const Ogre::Real _near,
-          const Ogre::Real _far) const;
-
       /// \brief The same as FocusedShadowCameraSetup::buildViewMatrix() except
       /// resulting matrices are z-up instead of y-up.
       /// \sa FocusedShadowCameraSetup::buildViewMatrix()
