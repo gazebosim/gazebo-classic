@@ -813,11 +813,8 @@ void Camera::SetClipDist()
 
   if (this->camera)
   {
-    if (!this->cameraUsingIntrinsics)
-    {
-      this->camera->setNearClipDistance(clipElem->Get<double>("near"));
-      this->camera->setFarClipDistance(clipElem->Get<double>("far"));
-    }
+    this->camera->setNearClipDistance(clipElem->Get<double>("near"));
+    this->camera->setFarClipDistance(clipElem->Get<double>("far"));
     this->camera->setRenderingDistance(clipElem->Get<double>("far"));
   }
   else
