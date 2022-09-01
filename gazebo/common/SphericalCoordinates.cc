@@ -305,10 +305,7 @@ double SphericalCoordinates::DistanceBetweenPoints(
              cos(_latA.Radian()) * cos(_latB.Radian());
 
   double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-  if (this->dataPtr->surfaceType == MOON_SCS)
-    return g_MoonRadius * c;
-  else
-    return g_EarthRadius * c;
+  return this->SurfaceRadius() * c;
 }
 
 //////////////////////////////////////////////////
