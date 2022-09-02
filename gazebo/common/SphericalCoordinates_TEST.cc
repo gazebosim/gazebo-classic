@@ -349,11 +349,11 @@ TEST_F(SphericalCoordinatesTest, Distance)
   EXPECT_NEAR(14002, d1, 20);
 
   // Using the non static method. The default surface type is EARTH_WGS84.
-  common::SphericalCoordinates earthSC = common::SphericalCoordinates();
-  double d2 = earthSC.DistanceBetweenPoints(latA, longA, latB, longB);
+  common::SphericalCoordinates defaultEarthSC = common::SphericalCoordinates();
+  double d2 = defaultEarthSC.DistanceBetweenPoints(latA, longA, latB, longB);
   EXPECT_NEAR(d1, d2, 0.1);
 
-  earthSC = common::SphericalCoordinates(
+  common::SphericalCoordinates earthSC = common::SphericalCoordinates(
       common::SphericalCoordinates::EARTH_WGS84);
   double d3 = earthSC.DistanceBetweenPoints(latA, longA, latB, longB);
   EXPECT_NEAR(d2, d3, 0.1);
