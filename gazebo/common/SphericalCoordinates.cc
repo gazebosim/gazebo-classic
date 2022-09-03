@@ -39,12 +39,30 @@ const double g_EarthWGS84Flattening = 1.0/298.257223563;
 // Radius of the Earth (meters).
 const double g_EarthRadius = 6371000.0;
 
+// Radius of the Moon (meters).
+// Source: https://lunar.gsfc.nasa.gov/library/451-SCI-000958.pdf
+const double g_MoonRadius = 1737400.0;
+
+// a: Equatorial radius of the Moon.
+// Source : https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
+const double g_MoonAxisEquatorial = 1738100.0;
+
+// b: Polar radius of the Moon.
+// Source : https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
+const double g_MoonAxisPolar = 1736000.0;
+
+// if: Unitless flattening parameter for the Moon.
+// Source : https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
+const double g_MoonFlattening = 0.0012;
+
 //////////////////////////////////////////////////
 SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(
   const std::string &_str)
 {
   if ("EARTH_WGS84" == _str)
     return EARTH_WGS84;
+  else if ("MOON_SCS" == _str)
+    return MOON_SCS;
 
   gzerr << "SurfaceType string not recognized, "
         << "EARTH_WGS84 returned by default" << std::endl;
@@ -156,6 +174,30 @@ void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
 
       break;
       }
+    case MOON_SCS:
+      {
+      // Set the semi-major axis
+      this->dataPtr->ellA = g_MoonAxisEquatorial;
+
+      // Set the semi-minor axis
+      this->dataPtr->ellB = g_MoonAxisPolar;
+
+      // Set the flattening parameter
+      this->dataPtr->ellF = g_MoonFlattening;
+
+      // Set the first eccentricity ellipse parameter
+      // https://en.wikipedia.org/wiki/Eccentricity_(mathematics)#Ellipses
+      this->dataPtr->ellE = sqrt(1.0 -
+          std::pow(this->dataPtr->ellB, 2) / std::pow(this->dataPtr->ellA, 2));
+
+      // Set the second eccentricity ellipse parameter
+      // https://en.wikipedia.org/wiki/Eccentricity_(mathematics)#Ellipses
+      this->dataPtr->ellP = sqrt(
+          std::pow(this->dataPtr->ellA, 2) / std::pow(this->dataPtr->ellB, 2) -
+          1.0);
+
+      break;
+      }
     default:
       gzerr << "Unknown surface type[" << this->dataPtr->surfaceType << "]\n";
       break;
@@ -244,6 +286,54 @@ double SphericalCoordinates::Distance(const ignition::math::Angle &_latA,
   double c = 2 * atan2(sqrt(a), sqrt(1 - a));
   double d = g_EarthRadius * c;
   return d;
+}
+
+//////////////////////////////////////////////////
+/// Based on Haversine formula (http://en.wikipedia.org/wiki/Haversine_formula).
+/// This takes into account the surface type.
+double SphericalCoordinates::DistanceBetweenPoints(
+    const ignition::math::Angle &_latA,
+    const ignition::math::Angle &_lonA,
+    const ignition::math::Angle &_latB,
+    const ignition::math::Angle &_lonB)
+{
+  ignition::math::Angle dLat = _latB - _latA;
+  ignition::math::Angle dLon = _lonB - _lonA;
+
+  double a = sin(dLat.Radian() / 2) * sin(dLat.Radian() / 2) +
+             sin(dLon.Radian() / 2) * sin(dLon.Radian() / 2) *
+             cos(_latA.Radian()) * cos(_latB.Radian());
+
+  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+  return this->SurfaceRadius() * c;
+}
+
+//////////////////////////////////////////////////
+double SphericalCoordinates::SurfaceRadius() const
+{
+  if (this->dataPtr->surfaceType ==
+      SphericalCoordinates::SurfaceType::MOON_SCS)
+    return g_MoonRadius;
+  else
+    return g_EarthRadius;
+}
+
+//////////////////////////////////////////////////
+double SphericalCoordinates::SurfaceAxisEquatorial() const
+{
+  return this->dataPtr->ellA;
+}
+
+//////////////////////////////////////////////////
+double SphericalCoordinates::SurfaceAxisPolar() const
+{
+  return this->dataPtr->ellB;
+}
+
+//////////////////////////////////////////////////
+double SphericalCoordinates::SurfaceFlattening() const
+{
+  return this->dataPtr->ellF;
 }
 
 //////////////////////////////////////////////////
