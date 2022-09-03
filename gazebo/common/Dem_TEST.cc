@@ -229,7 +229,7 @@ TEST_F(DemTest, LunarDemLoad)
 {
   common::Dem dem;
   boost::filesystem::path path = TEST_PATH;
-  path /= "data/dem_unfinished.tif";
+  path /= "data/dem_moon.tif";
   common::SphericalCoordinates moonSC(
     common::SphericalCoordinates::MOON_SCS);
 
