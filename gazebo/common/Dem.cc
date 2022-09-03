@@ -133,7 +133,7 @@ int Dem::Load(const std::string &_filename)
        this->dataPtr->sphericalCoordinates.DistanceBetweenPoints(
            upLeftLat, upLeftLong, upRightLat, upRightLong);
     this->dataPtr->worldHeight =
-       this->dataPtr->sphericalCoordiantes.DistanceBetweenPoints(
+       this->dataPtr->sphericalCoordinates.DistanceBetweenPoints(
            upLeftLat, upLeftLong, lowLeftLat, lowLeftLong);
   }
   catch(const common::Exception &)
@@ -231,7 +231,7 @@ void Dem::GetGeoReference(double _x, double _y,
 
     // Transform the terrain's coordinate system to the appropriate
     // coordinate system.
-    if (this->dataPtr->sphericalCoordinates.Surface() ==
+    if (this->dataPtr->sphericalCoordinates.GetSurfaceType() ==
         common::SphericalCoordinates::EARTH_WGS84)
     {
       #if GDAL_VERSION_NUM >= 2030000
@@ -244,7 +244,7 @@ void Dem::GetGeoReference(double _x, double _y,
       targetCs.SetWellKnownGeogCS("WGS84");
     }
 
-    else if (this->dataPtr->sphericalCoordinates.Surface() ==
+    else if (this->dataPtr->sphericalCoordinates.GetSurfaceType() ==
         common::SphericalCoordinates::MOON_SCS)
     {
       sourceCs = *(this->dataPtr->dataSet->GetSpatialRef());

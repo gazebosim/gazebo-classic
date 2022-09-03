@@ -223,6 +223,22 @@ TEST_F(DemTest, UnfinishedDem)
   EXPECT_FLOAT_EQ(682, demNoData.GetMinElevation());
   EXPECT_FLOAT_EQ(2932, demNoData.GetMaxElevation());
 }
+
+/////////////////////////////////////////////////
+TEST_F(DemTest, LunarDemLoad)
+{
+  common::Dem dem;
+  boost::filesystem::path path = TEST_PATH;
+  path /= "data/dem_unfinished.tif";
+  common::SphericalCoordinates moonSC(
+    common::SphericalCoordinates::MOON_SCS);
+
+  dem.SetSphericalCoordinates(moonSC);
+  EXPECT_EQ(dem.Load(path.string()), 0);
+
+  EXPECT_FLOAT_EQ(80.0417, dem.GetWorldWidth());
+  EXPECT_FLOAT_EQ(80.0417, dem.GetWorldHeight());
+}
 #endif
 
 /////////////////////////////////////////////////

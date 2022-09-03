@@ -18,6 +18,7 @@
 #ifndef _GAZEBO_DEM_PRIVATE_HH_
 #define _GAZEBO_DEM_PRIVATE_HH_
 
+#include "gazebo/common/SphericalCoordinates.hh"
 #include <gazebo/gazebo_config.h>
 #include <gazebo/util/system.hh>
 
