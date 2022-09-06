@@ -17,7 +17,11 @@
 
 #include <functional>
 
-#include <ignition/math.hh>
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Rand.hh>
+#include <ignition/math/Vector3.hh>
 #include <ignition/common/Profiler.hh>
 #include "gazebo/physics/physics.hh"
 #include "plugins/ActorPlugin.hh"

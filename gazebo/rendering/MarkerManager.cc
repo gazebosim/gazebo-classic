@@ -21,6 +21,8 @@
 #include <mutex>
 #include <string>
 
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Rand.hh>
 #include <ignition/msgs.hh>
 #include <ignition/transport/Node.hh>
 

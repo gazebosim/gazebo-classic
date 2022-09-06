@@ -22,7 +22,13 @@
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <ignition/common/Profiler.hh>
+#include <ignition/math/Angle.hh>
 #include <ignition/math/Helpers.hh>
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
 #include <sdf/sdf.hh>
 
 #ifndef _WIN32

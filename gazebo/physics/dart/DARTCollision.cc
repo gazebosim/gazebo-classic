@@ -17,6 +17,10 @@
 
 #include <sstream>
 
+#include <ignition/math/AxisAlignedBox.hh>
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/physics/SurfaceParams.hh"

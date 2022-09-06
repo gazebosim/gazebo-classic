@@ -20,6 +20,12 @@
 #include <mutex>
 #include <sstream>
 
+#include <ignition/math/AxisAlignedBox.hh>
+#include <ignition/math/Matrix3.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"

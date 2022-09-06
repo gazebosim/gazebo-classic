@@ -23,6 +23,9 @@
 #include <vector>
 
 #include <ignition/math/Color.hh>
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/common/Time.hh"

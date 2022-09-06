@@ -19,6 +19,14 @@
 #include <string>
 #include <map>
 
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Matrix3.hh>
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Plane.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"

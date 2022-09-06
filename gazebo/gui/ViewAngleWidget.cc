@@ -15,6 +15,9 @@
  *
 */
 
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
 

@@ -223,7 +223,7 @@ TEST_F(MsgsTest, ConvertMsgsVector3dToMath)
   EXPECT_DOUBLE_EQ(3, v.Z());
 }
 
-TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
+TEST_F(MsgsTest, ConvertMathQuaternionToMsgs)
 {
   msgs::Quaternion msg =
     msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));

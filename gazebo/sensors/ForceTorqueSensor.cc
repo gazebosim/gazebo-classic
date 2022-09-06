@@ -17,6 +17,9 @@
 #include <boost/algorithm/string.hpp>
 
 #include <ignition/common/Profiler.hh>
+#include <ignition/math/Matrix3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"

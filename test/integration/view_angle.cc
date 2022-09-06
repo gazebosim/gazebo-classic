@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Matrix4.hh>
+
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GLWidget.hh"
