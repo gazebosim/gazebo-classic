@@ -21,6 +21,7 @@
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Vector3.hh>
 
+#include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/Dem.hh"
 #include "test_config.h"
 #include "test/util.hh"

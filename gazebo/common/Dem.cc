@@ -247,7 +247,8 @@ void Dem::GetGeoReference(double _x, double _y,
     else if (this->dataPtr->sphericalCoordinates.GetSurfaceType() ==
         common::SphericalCoordinates::MOON_SCS)
     {
-      sourceCs = *(this->dataPtr->dataSet->GetSpatialRef());
+      auto importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
+      sourceCs.importFromWkt(&importString);
       targetCs = OGRSpatialReference();
 
       double axisEquatorial =
