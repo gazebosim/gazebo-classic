@@ -60,7 +60,8 @@ Dem::~Dem()
 
 //////////////////////////////////////////////////
 void Dem::SetSphericalCoordinates(
-    const common::SphericalCoordinates &_worldSphericalCoordinates)
+    std::shared_ptr<common::SphericalCoordinates>
+    _worldSphericalCoordinates)
 {
   this->dataPtr->sphericalCoordinates =_worldSphericalCoordinates;
 }
@@ -130,10 +131,10 @@ int Dem::Load(const std::string &_filename)
 
     // Set the world width and height
     this->dataPtr->worldWidth =
-       this->dataPtr->sphericalCoordinates.DistanceBetweenPoints(
+       this->dataPtr->sphericalCoordinates->DistanceBetweenPoints(
            upLeftLat, upLeftLong, upRightLat, upRightLong);
     this->dataPtr->worldHeight =
-       this->dataPtr->sphericalCoordinates.DistanceBetweenPoints(
+       this->dataPtr->sphericalCoordinates->DistanceBetweenPoints(
            upLeftLat, upLeftLong, lowLeftLat, lowLeftLong);
   }
   catch(const common::Exception &)
@@ -231,7 +232,7 @@ void Dem::GetGeoReference(double _x, double _y,
 
     // Transform the terrain's coordinate system to the appropriate
     // coordinate system.
-    if (this->dataPtr->sphericalCoordinates.GetSurfaceType() ==
+    if (this->dataPtr->sphericalCoordinates->GetSurfaceType() ==
         common::SphericalCoordinates::EARTH_WGS84)
     {
       #if GDAL_VERSION_NUM >= 2030000
@@ -244,7 +245,7 @@ void Dem::GetGeoReference(double _x, double _y,
       targetCs.SetWellKnownGeogCS("WGS84");
     }
 
-    else if (this->dataPtr->sphericalCoordinates.GetSurfaceType() ==
+    else if (this->dataPtr->sphericalCoordinates->GetSurfaceType() ==
         common::SphericalCoordinates::MOON_SCS)
     {
       auto importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
@@ -252,9 +253,9 @@ void Dem::GetGeoReference(double _x, double _y,
       targetCs = OGRSpatialReference();
 
       double axisEquatorial =
-        this->dataPtr->sphericalCoordinates.SurfaceAxisEquatorial();
+        this->dataPtr->sphericalCoordinates->SurfaceAxisEquatorial();
       double axisPolar =
-        this->dataPtr->sphericalCoordinates.SurfaceAxisPolar();
+        this->dataPtr->sphericalCoordinates->SurfaceAxisPolar();
 
       std::string surfaceLatLongProjStr =
         "+proj=latlong +a=" + std::to_string(axisEquatorial) +

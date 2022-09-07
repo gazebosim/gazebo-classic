@@ -62,8 +62,9 @@ namespace gazebo
       public: std::vector<float> demData;
 
       /// \brief Holds the spherical coordinates object from the world.
-      public: common::SphericalCoordinates sphericalCoordinates =
-           common::SphericalCoordinates();
+      public: std::shared_ptr<common::SphericalCoordinates>
+              sphericalCoordinates =
+                std::make_shared<common::SphericalCoordinates>();
     };
     /// \}
   }

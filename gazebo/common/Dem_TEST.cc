@@ -232,7 +232,7 @@ TEST_F(DemTest, LunarDemLoad)
   boost::filesystem::path path = TEST_PATH;
   path /= "data/dem_moon.tif";
 
-  auto moonSC = common::SphericalCoordinates(
+  auto moonSC = std::make_shared<common::SphericalCoordinates>(
     common::SphericalCoordinates::MOON_SCS);
 
   dem.SetSphericalCoordinates(moonSC);
