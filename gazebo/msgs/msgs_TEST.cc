@@ -398,6 +398,45 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_DOUBLE_EQ(1.0, v.Offset());
 }
 
+TEST_F(MsgsTest, SetSphericalCoordinate)
+{
+  msgs::SphericalCoordinates msgDefault;
+  msgs::Set(&msgDefault, common::SphericalCoordinates());
+
+  EXPECT_EQ(msgs::SphericalCoordinates::EARTH_WGS84,
+      msgDefault.surface_model());
+  EXPECT_DOUBLE_EQ(0, msgDefault.latitude_deg());
+  EXPECT_DOUBLE_EQ(0, msgDefault.longitude_deg());
+  EXPECT_DOUBLE_EQ(0, msgDefault.elevation());
+  EXPECT_DOUBLE_EQ(0, msgDefault.heading_deg());
+
+  msgs::SphericalCoordinates msgEarth;
+  msgs::Set(&msgEarth, common::SphericalCoordinates(
+        common::SphericalCoordinates::EARTH_WGS84,
+        IGN_DTOR(0.1), IGN_DTOR(0.2), 0.3,
+        IGN_DTOR(0.4)));
+
+  EXPECT_EQ(msgs::SphericalCoordinates::EARTH_WGS84,
+      msgEarth.surface_model());
+  EXPECT_DOUBLE_EQ(0.1, msgEarth.latitude_deg());
+  EXPECT_DOUBLE_EQ(0.2, msgEarth.longitude_deg());
+  EXPECT_DOUBLE_EQ(0.3, msgEarth.elevation());
+  EXPECT_DOUBLE_EQ(0.4, msgEarth.heading_deg());
+
+  msgs::SphericalCoordinates msgMoon;
+  msgs::Set(&msgMoon, common::SphericalCoordinates(
+        common::SphericalCoordinates::MOON_SCS,
+        IGN_DTOR(0.1), IGN_DTOR(0.2), 0.3,
+        IGN_DTOR(0.4)));
+
+  EXPECT_EQ(msgs::SphericalCoordinates::MOON_SCS,
+      msgMoon.surface_model());
+  EXPECT_DOUBLE_EQ(0.1, msgMoon.latitude_deg());
+  EXPECT_DOUBLE_EQ(0.2, msgMoon.longitude_deg());
+  EXPECT_DOUBLE_EQ(0.3, msgMoon.elevation());
+  EXPECT_DOUBLE_EQ(0.4, msgMoon.heading_deg());
+}
+
 //////////////////////////////////////////////////
 void CompareMsgsShaderTypeToString(const msgs::Material::ShaderType _type)
 {
