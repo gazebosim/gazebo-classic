@@ -234,6 +234,8 @@ set(qt_tests
 gz_build_qt_tests(${qt_tests})
 
 if (VALID_DRI_DISPLAY)
+  add_dependencies(${TEST_TYPE}_camera_sensor AmbientOcclusionVisualPlugin)
+  add_dependencies(${TEST_TYPE}_camera_sensor LensFlareSensorPlugin)
   add_dependencies(${TEST_TYPE}_heightmap HeightmapLODPlugin)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)

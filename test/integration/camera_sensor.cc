@@ -2268,3 +2268,163 @@ TEST_F(CameraSensor, CheckNewAndLegacyDistortionModes)
   delete[] img3;
   delete[] img4;
 }
+
+/////////////////////////////////////////////////
+// Test fails on macOS CI
+#ifndef __APPLE__
+TEST_F(CameraSensor, CheckIntrinsics)
+{
+  Load("worlds/camera_intrinsics_test.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Get the 'camera_without_intrinsics' sensor, no <intrinsics> tag is used for this sensor,
+  // and we expect the intrinsics to be equal to the default intrinsic values provided by gazebo.
+  sensors::SensorPtr camWithoutIntrinsicsSensorPtr =
+      sensors::get_sensor("camera_without_intrinsics_sensor");
+  sensors::CameraSensorPtr camWithoutIntrinsicsCameraSensorPtr =
+      std::dynamic_pointer_cast<sensors::CameraSensor>(camWithoutIntrinsicsSensorPtr);
+  EXPECT_TRUE(camWithoutIntrinsicsCameraSensorPtr != nullptr);
+  rendering::CameraPtr camWithoutIntrinsicsCameraPtr =
+      camWithoutIntrinsicsCameraSensorPtr->Camera();
+  EXPECT_TRUE(camWithoutIntrinsicsCameraPtr != nullptr);
+
+  // Image size, focal length and optical centre for 'camera_without_intrinsics' sensor
+  unsigned int camWithoutIntrinsicsWidth = camWithoutIntrinsicsCameraPtr->ImageWidth();
+  unsigned int camWithoutIntrinsicsHeight = camWithoutIntrinsicsCameraPtr->ImageHeight();
+  double camWithoutIntrinsicsFx = camWithoutIntrinsicsCameraPtr->ImageFocalLengthX();
+  double camWithoutIntrinsicsFy = camWithoutIntrinsicsCameraPtr->ImageFocalLengthY();
+  double camWithoutIntrinsicsCx = camWithoutIntrinsicsCameraPtr->ImageOpticalCenterX();
+  double camWithoutIntrinsicsCy = camWithoutIntrinsicsCameraPtr->ImageOpticalCenterY();
+
+  EXPECT_EQ(camWithoutIntrinsicsWidth, 320u);
+  EXPECT_EQ(camWithoutIntrinsicsHeight, 240u);
+  double error = 0.0005;
+  EXPECT_NEAR(camWithoutIntrinsicsFx, 277.127, error);
+  EXPECT_NEAR(camWithoutIntrinsicsFy, 277.127, error);
+  EXPECT_DOUBLE_EQ(camWithoutIntrinsicsCx, 160);
+  EXPECT_DOUBLE_EQ(camWithoutIntrinsicsCy, 120);
+
+  // Get the 'camera_default_intrinsics' sensor, <intrinsics> tag is used explicitly for this
+  // sensor where the intrinsics provided are same as gazebo default.
+  sensors::SensorPtr camDefaultIntrinsicsSensorPtr =
+      sensors::get_sensor("camera_default_intrinsics_sensor");
+  sensors::CameraSensorPtr camDefaultIntrinsicsCameraSensorPtr =
+      std::dynamic_pointer_cast<sensors::CameraSensor>(camDefaultIntrinsicsSensorPtr);
+  EXPECT_TRUE(camDefaultIntrinsicsCameraSensorPtr != nullptr);
+  rendering::CameraPtr camDefaultIntrinsicsCameraPtr =
+      camDefaultIntrinsicsCameraSensorPtr->Camera();
+  EXPECT_TRUE(camDefaultIntrinsicsCameraPtr != nullptr);
+
+  // Image size, focal length and optical centre for 'camera_default_intrinsics' sensor
+  unsigned int  camDefaultIntrinsicsWidth = camDefaultIntrinsicsCameraPtr->ImageWidth();
+  unsigned int  camDefaultIntrinsicsHeight = camDefaultIntrinsicsCameraPtr->ImageHeight();
+  double camDefaultIntrinsicsFx = camDefaultIntrinsicsCameraPtr->ImageFocalLengthX();
+  double camDefaultIntrinsicsFy = camDefaultIntrinsicsCameraPtr->ImageFocalLengthY();
+  double camDefaultIntrinsicsCx = camDefaultIntrinsicsCameraPtr->ImageOpticalCenterX();
+  double camDefaultIntrinsicsCy = camDefaultIntrinsicsCameraPtr->ImageOpticalCenterY();
+  EXPECT_EQ(camDefaultIntrinsicsWidth, 320u);
+  EXPECT_EQ(camDefaultIntrinsicsHeight, 240u);
+  EXPECT_DOUBLE_EQ(camDefaultIntrinsicsFx, 277);
+  EXPECT_DOUBLE_EQ(camDefaultIntrinsicsFy, 277);
+  EXPECT_DOUBLE_EQ(camDefaultIntrinsicsCx, 160);
+  EXPECT_DOUBLE_EQ(camDefaultIntrinsicsCy, 120);
+
+  // Get the 'camera_custom_intrinsics' sensor, <intrinsics> tag is used explicitly for this
+  // sensor where the intrinsics provided are different from the gazebo default.
+  sensors::SensorPtr camCustomIntrinsicsSensorPtr =
+      sensors::get_sensor("camera_custom_intrinsics_sensor");
+  sensors::CameraSensorPtr camCustomIntrinsicsCameraSensorPtr =
+      std::dynamic_pointer_cast<sensors::CameraSensor>(camCustomIntrinsicsSensorPtr);
+  EXPECT_TRUE(camCustomIntrinsicsCameraSensorPtr != nullptr);
+  rendering::CameraPtr camCustomIntrinsicsCameraPtr =
+      camCustomIntrinsicsCameraSensorPtr->Camera();
+  EXPECT_TRUE(camCustomIntrinsicsCameraPtr != nullptr);
+
+  // Image size, focal length and optical centre for 'camera_custom_intrinsics' sensor
+  unsigned int camCustomIntrinsicsWidth = camCustomIntrinsicsCameraPtr->ImageWidth();
+  unsigned int camCustomIntrinsicsHeight = camCustomIntrinsicsCameraPtr->ImageHeight();
+  double camCustomIntrinsicsFx = camCustomIntrinsicsCameraPtr->ImageFocalLengthX();
+  double camCustomIntrinsicsFy = camCustomIntrinsicsCameraPtr->ImageFocalLengthY();
+  double camCustomIntrinsicsCx = camCustomIntrinsicsCameraPtr->ImageOpticalCenterX();
+  double camCustomIntrinsicsCy = camCustomIntrinsicsCameraPtr->ImageOpticalCenterY();
+  EXPECT_EQ(camCustomIntrinsicsWidth, 320u);
+  EXPECT_EQ(camCustomIntrinsicsHeight, 240u);
+  EXPECT_DOUBLE_EQ(camCustomIntrinsicsFx, 320);
+  EXPECT_DOUBLE_EQ(camCustomIntrinsicsFy, 320);
+  EXPECT_DOUBLE_EQ(camCustomIntrinsicsCx, 160);
+  EXPECT_DOUBLE_EQ(camCustomIntrinsicsCy, 120);
+
+  // Connect to new frame event
+  imageCount = 0;
+  imageCount2 = 0;
+  imageCount3 = 0;
+  // Image size is same for all three cameras
+  img = new unsigned char[camCustomIntrinsicsWidth * camCustomIntrinsicsHeight * 3 * 2];
+  img2 = new unsigned char[camCustomIntrinsicsWidth * camCustomIntrinsicsHeight * 3 * 2];
+  img3 = new unsigned char[camCustomIntrinsicsWidth * camCustomIntrinsicsHeight * 3 * 2];
+
+  event::ConnectionPtr c =
+      camWithoutIntrinsicsCameraSensorPtr->Camera()->ConnectNewImageFrame(
+          std::bind(&::OnNewCameraFrame, &imageCount, img,
+                    std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+                    std::placeholders::_4, std::placeholders::_5));
+
+  event::ConnectionPtr c2 =
+      camDefaultIntrinsicsCameraSensorPtr->Camera()->ConnectNewImageFrame(
+          std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+                    std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+                    std::placeholders::_4, std::placeholders::_5));
+
+  event::ConnectionPtr c3 =
+      camCustomIntrinsicsCameraSensorPtr->Camera()->ConnectNewImageFrame(
+          std::bind(&::OnNewCameraFrame, &imageCount3, img3,
+                    std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+                    std::placeholders::_4, std::placeholders::_5));
+
+  // Wait for a few images
+  int sleep = 0;
+  int maxSleep = 500;
+  int totalImages = 10;
+  while ((imageCount < totalImages || imageCount2 < totalImages
+      || imageCount3 < totalImages) && sleep++ < maxSleep)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, totalImages);
+  EXPECT_GE(imageCount2, totalImages);
+  EXPECT_GE(imageCount3, totalImages);
+
+  c.reset();
+  c2.reset();
+  c3.reset();
+
+  unsigned int diffMax = 0, diffSum = 0;
+  double diffAvg = 0.0;
+
+  // We expect that there will be zero difference between the images img and img2 since
+  // they use the same default intrinsics.
+  this->ImageCompare(img, img2, camCustomIntrinsicsWidth,
+                     camCustomIntrinsicsHeight, 3, diffMax, diffSum,
+                     diffAvg);
+  EXPECT_EQ(diffSum, 0u);
+
+  // We expect that there will be non-zero difference between the images img2 and img3
+  // since they use different intrinsics
+  this->ImageCompare(img2, img3, camCustomIntrinsicsWidth,
+                     camCustomIntrinsicsHeight, 3, diffMax, diffSum,
+                     diffAvg);
+  EXPECT_NE(diffSum, 0u);
+
+  delete[] img;
+  delete[] img2;
+  delete[] img3;
+}
+#endif
