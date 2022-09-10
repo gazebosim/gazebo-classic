@@ -145,7 +145,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
   // Note: This step must be performed after checking the link forces when DART
   // or bullet is the physics engine, because otherwise the accelerations used
   // by the previous tests will be cleared out before they can be tested.
-  if ("dart" == _physicsEngine || "bullet" == _physicsEngine)
+  if ("ode" != _physicsEngine)
   {
     _world->Step(1);
   }
@@ -210,14 +210,6 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
 /////////////////////////////////////////////////
 void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
 {
-  // TODO simbody currently fail this test
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Aborting AddForce test for Simbody. "
-          << "See issue #1478." << std::endl;
-    return;
-  }
-
   Load("worlds/blank.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
@@ -258,6 +250,11 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   model->SetLinkWorldPose(ignition::math::Pose3d(
         ignition::math::Vector3d(2, 3, 4),
         ignition::math::Quaterniond(0, IGN_PI/2.0, 1)), link);
+  // Simbody requires a step to update the link pose
+  if(_physicsEngine == "simbody")
+  {
+    world->Step(1);
+  }
   EXPECT_NE(ignition::math::Pose3d::Zero, link->WorldPose());
   EXPECT_EQ(link->WorldPose(), link->WorldInertialPose());
   this->AddLinkForceTwoWays(_physicsEngine, false, true, world, link,
@@ -265,6 +262,11 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
 
   gzdbg << "World == link == inertial frames, with offset" << std::endl;
   model->SetLinkWorldPose(ignition::math::Pose3d::Zero, link);
+  // Simbody requires a step to update the link pose
+  if(_physicsEngine == "simbody")
+  {
+    world->Step(1);
+  }
   EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldPose());
   EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldInertialPose());
   this->AddLinkForceTwoWays(_physicsEngine, true, true, world, link,
@@ -278,6 +280,11 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
       ignition::math::Quaterniond(IGN_PI/3.0, IGN_PI*1.5, IGN_PI/4));
   link->GetInertial()->SetCoG(inertialPose);
   link->UpdateMass();
+  // Simbody requires a step to update the link pose
+  if(_physicsEngine == "simbody")
+  {
+    world->Step(1);
+  }
   EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldPose());
   EXPECT_EQ(inertialPose, link->WorldInertialPose());
   this->AddLinkForceTwoWays(_physicsEngine, true, false, world, link,
@@ -291,6 +298,11 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
       ignition::math::Quaterniond(0, 2.0*IGN_PI, IGN_PI/3));
   link->GetInertial()->SetCoG(inertialPose);
   link->UpdateMass();
+  // Simbody requires a step to update the link pose
+  if(_physicsEngine == "simbody")
+  {
+    world->Step(1);
+  }
   this->AddLinkForceTwoWays(_physicsEngine, false, false, world, link,
                             ignition::math::Vector3d(1, 2, 1),
                             ignition::math::Vector3d(-2, 0.5, 1));
@@ -305,6 +317,11 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
       ignition::math::Quaterniond(IGN_PI/9, 0, IGN_PI*3));
   link->GetInertial()->SetCoG(inertialPose);
   link->UpdateMass();
+  // Simbody requires a step to update the link pose
+  if(_physicsEngine == "simbody")
+  {
+    world->Step(1);
+  }
   link->SetLinearVel(ignition::math::Vector3d(2, -0.1, 5));
   link->SetAngularVel(ignition::math::Vector3d(-IGN_PI/10, 0, 0.0001));
   this->AddLinkForceTwoWays(_physicsEngine, false, false, world, link,
