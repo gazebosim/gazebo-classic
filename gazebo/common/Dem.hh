@@ -25,7 +25,6 @@
 #include <gazebo/util/system.hh>
 
 #ifdef HAVE_GDAL
-# include <memory>
 # include <string>
 # include <vector>
 
@@ -55,8 +54,7 @@ namespace gazebo
       /// object contained in the world. This is used to compute accurate
       /// sizes of the DEM object.
       public: void SetSphericalCoordinates(
-                  std::shared_ptr<common::SphericalCoordinates>
-                  _worldSphericalCoordinates);
+                  common::SphericalCoordinatesPtr _worldSphericalCoordinates);
 
       /// \brief Load a DEM file.
       /// \param[in] _filename the path to the terrain file.

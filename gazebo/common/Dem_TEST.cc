@@ -232,8 +232,19 @@ TEST_F(DemTest, LunarDemLoad)
   boost::filesystem::path path = TEST_PATH;
   path /= "data/dem_moon.tif";
 
-  auto moonSC = std::make_shared<common::SphericalCoordinates>(
-    common::SphericalCoordinates::MOON_SCS);
+  // Sizes will be computed incorrectly
+  // as the celestial bodies in DEM file and
+  // default spherical coordinates do not match.
+  EXPECT_EQ(dem.Load(path.string()), 0);
+  auto inf = std::numeric_limits<double>::infinity();
+  EXPECT_FLOAT_EQ(inf, dem.GetWorldWidth());
+  EXPECT_FLOAT_EQ(inf, dem.GetWorldHeight());
+
+  // Setting the spherical coordinates solves the
+  // problem.
+  common::SphericalCoordinatesPtr moonSC =
+    boost::make_shared<common::SphericalCoordinates>(
+        common::SphericalCoordinates::MOON_SCS);
 
   dem.SetSphericalCoordinates(moonSC);
   EXPECT_EQ(dem.Load(path.string()), 0);

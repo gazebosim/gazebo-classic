@@ -60,8 +60,7 @@ Dem::~Dem()
 
 //////////////////////////////////////////////////
 void Dem::SetSphericalCoordinates(
-    std::shared_ptr<common::SphericalCoordinates>
-    _worldSphericalCoordinates)
+    common::SphericalCoordinatesPtr _worldSphericalCoordinates)
 {
   this->dataPtr->sphericalCoordinates =_worldSphericalCoordinates;
 }
