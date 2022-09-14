@@ -242,6 +242,8 @@ void BulletLink::UpdateMass()
     }
     this->rigidLink->setMassProps(this->inertial->Mass(),
         BulletTypes::ConvertVector3(this->inertial->PrincipalMoments()));
+    // In case the CoG position changed
+    this->OnPoseChange();
   }
 }
 
@@ -466,21 +468,19 @@ void BulletLink::SetForce(const ignition::math::Vector3d &_force)
   if (!this->rigidLink)
     return;
 
-  this->rigidLink->applyCentralForce(
-    btVector3(_force.X(), _force.Y(), _force.Z()));
+  auto const forceToApply = _force - this->WorldForce();
+
+  this->rigidLink->applyCentralForce(BulletTypes::ConvertVector3(forceToApply));
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d BulletLink::WorldForce() const
 {
   if (!this->rigidLink)
-    return ignition::math::Vector3d(0, 0, 0);
+    return ignition::math::Vector3d::Zero;
 
-  btVector3 btVec;
-
-  btVec = this->rigidLink->getTotalForce();
-
-  return ignition::math::Vector3d(btVec.x(), btVec.y(), btVec.z());
+  auto const totalForce = this->rigidLink->getTotalForce();
+  return BulletTypes::ConvertVector3Ign(totalForce);
 }
 
 //////////////////////////////////////////////////
@@ -493,19 +493,18 @@ void BulletLink::SetTorque(const ignition::math::Vector3d &_torque)
     return;
   }
 
-  this->rigidLink->applyTorque(BulletTypes::ConvertVector3(_torque));
+  auto const torqueToApply = _torque - this->WorldTorque();
+
+  this->rigidLink->applyTorque(BulletTypes::ConvertVector3(torqueToApply));
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d BulletLink::WorldTorque() const
 {
-  // if (!this->rigidLink)
-  //   return ignition::math::Vector3d(0, 0, 0);
-  // btVector3 btVec;
-  // btVec = this->rigidLink->getTotalTorque();
-  // return ignition::math::Vector3d(btVec.x(), btVec.y(), btVec.z());
+  if (!this->rigidLink)
+    return ignition::math::Vector3d::Zero;
 
-  return ignition::math::Vector3d::Zero;
+  return BulletTypes::ConvertVector3Ign(this->rigidLink->getTotalTorque());
 }
 
 //////////////////////////////////////////////////
@@ -608,53 +607,79 @@ void BulletLink::SetAngularDamping(double _damping)
 // }
 
 /////////////////////////////////////////////////
-void BulletLink::AddForce(const ignition::math::Vector3d &/*_force*/)
+void BulletLink::AddForce(const ignition::math::Vector3d &_force)
 {
-  gzlog << "BulletLink::AddForce not yet implemented." << std::endl;
+  if (!this->rigidLink)
+    return;
+
+  this->rigidLink->applyCentralForce(BulletTypes::ConvertVector3(_force));
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddRelativeForce(const ignition::math::Vector3d &/*_force*/)
+void BulletLink::AddRelativeForce(const ignition::math::Vector3d &_force)
 {
-  gzlog << "BulletLink::AddRelativeForce not yet implemented." << std::endl;
+  auto const worldForce = this->WorldPose().Rot().RotateVector(_force);
+  this->AddForce(worldForce);
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddForceAtWorldPosition(
-    const ignition::math::Vector3d &/*_force*/,
-    const ignition::math::Vector3d &/*_pos*/)
+void BulletLink::AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
+                                         const ignition::math::Vector3d &_pos)
 {
-  gzlog << "BulletLink::AddForceAtWorldPosition not yet implemented."
-        << std::endl;
+  if (!this->rigidLink)
+    return;
+
+  this->rigidLink->applyForce(BulletTypes::ConvertVector3(_force),
+                              BulletTypes::ConvertVector3(_pos));
 }
 
 /////////////////////////////////////////////////
 void BulletLink::AddForceAtRelativePosition(
-    const ignition::math::Vector3d &/*_force*/,
-    const ignition::math::Vector3d &/*_relpos*/)
+    const ignition::math::Vector3d &_force,
+    const ignition::math::Vector3d &_relpos)
 {
-  gzlog << "BulletLink::AddForceAtRelativePosition not yet implemented."
-        << std::endl;
+  if (!this->rigidLink)
+    return;
+
+  // Compute the offset in the world frame
+  auto const cogOffset = this->WorldPose().Rot().RotateVector(_relpos);
+
+  this->rigidLink->applyForce(BulletTypes::ConvertVector3(_force),
+                              BulletTypes::ConvertVector3(cogOffset));
 }
 
 //////////////////////////////////////////////////
-void BulletLink::AddLinkForce(const ignition::math::Vector3d &/*_force*/,
-    const ignition::math::Vector3d &/*_offset*/)
+void BulletLink::AddLinkForce(const ignition::math::Vector3d &_force,
+                              const ignition::math::Vector3d &_offset)
 {
-  gzlog << "BulletLink::AddLinkForce not yet implemented (#1476)."
-        << std::endl;
+  if (!this->rigidLink)
+    return;
+
+  // Convert the force to the world frame
+  auto const worldOrientation = this->WorldPose().Rot();
+  auto const worldForce = worldOrientation.RotateVector(_force);
+  // Compute offset relative to the CoG
+  auto const cogOffset = worldOrientation.RotateVector(_offset 
+    - this->inertial->CoG());
+
+  this->rigidLink->applyForce(BulletTypes::ConvertVector3(worldForce),
+                              BulletTypes::ConvertVector3(cogOffset));
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddTorque(const ignition::math::Vector3d &/*_torque*/)
+void BulletLink::AddTorque(const ignition::math::Vector3d &_torque)
 {
-  gzlog << "BulletLink::AddTorque not yet implemented." << std::endl;
+  if (!this->rigidLink)
+    return;
+
+  this->rigidLink->applyTorque(BulletTypes::ConvertVector3(_torque));
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddRelativeTorque(const ignition::math::Vector3d &/*_torque*/)
+void BulletLink::AddRelativeTorque(const ignition::math::Vector3d &_torque)
 {
-  gzlog << "BulletLink::AddRelativeTorque not yet implemented." << std::endl;
+  auto const worldTorque = this->WorldPose().Rot().RotateVector(_torque);
+  this->AddTorque(worldTorque);
 }
 
 /////////////////////////////////////////////////
