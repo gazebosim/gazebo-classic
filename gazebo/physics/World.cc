@@ -393,8 +393,17 @@ void World::Load(sdf::ElementPtr _sdf)
       surfaceType, latitude, longitude, elevation, heading));
   }
 
+
   if (this->dataPtr->sphericalCoordinates == nullptr)
     gzthrow("Unable to create spherical coordinates data structure\n");
+
+  std::string sphericalCoordinatesSurfaceService("/spherical_coordinates_surface_type");
+  if (!this->dataPtr->ignNode.Advertise(sphericalCoordinatesSurfaceService,
+      &World::SphericalCoordinatesSurfaceService, this))
+  {
+    gzerr << "Error advertising service [" <<
+        sphericalCoordinatesSurfaceService << "]" << std::endl;
+  }
 
   this->dataPtr->rootElement.reset(new Base(BasePtr()));
   this->dataPtr->rootElement->SetName(this->Name());
@@ -3437,6 +3446,27 @@ bool World::ShadowCasterMaterialNameService(ignition::msgs::StringMsg &_res)
 {
   _res.set_data(this->dataPtr->shadowCasterMaterialName.c_str());
   return true;
+}
+
+//////////////////////////////////////////////////
+bool World::SphericalCoordinatesSurfaceService(ignition::msgs::StringMsg &_res)
+{
+  if (this->dataPtr->sphericalCoordinates != nullptr)
+  {
+    if (this->dataPtr->sphericalCoordinates->GetSurfaceType()
+        == common::SphericalCoordinates::MOON_SCS)
+    {
+      _res.set_data("MOON_SCS");
+      return true;
+    }
+    if (this->dataPtr->sphericalCoordinates->GetSurfaceType()
+        == common::SphericalCoordinates::EARTH_WGS84)
+    {
+      _res.set_data("EARTH_WGS84");
+      return true;
+    }
+  }
+  return false;
 }
 
 //////////////////////////////////////////////////

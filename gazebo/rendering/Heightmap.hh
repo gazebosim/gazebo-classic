@@ -23,6 +23,7 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
 
+#include <gazebo/common/SphericalCoordinates.hh>
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
