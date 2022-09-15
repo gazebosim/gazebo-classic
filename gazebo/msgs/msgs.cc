@@ -1807,7 +1807,8 @@ namespace gazebo
       if (_sdf->HasElement("topic"))
         result.set_topic(_sdf->Get<std::string>("topic"));
 
-      if (type == "camera" || type == "depth")
+      if (type == "camera" || type == "depth"
+          || type == "wideanglecamera" || type == "wide_angle_camera")
       {
         result.mutable_camera()->CopyFrom(
             msgs::CameraSensorFromSDF(_sdf->GetElement("camera")));
