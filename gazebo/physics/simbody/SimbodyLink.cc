@@ -516,7 +516,7 @@ void SimbodyLink::AddForce(const ignition::math::Vector3d &_force)
 void SimbodyLink::AddRelativeForce(const ignition::math::Vector3d &_force)
 {
   auto const worldForce = this->WorldPose().Rot().RotateVector(_force);
-  this->AddTorque(worldForce);
+  this->AddForce(worldForce);
 }
 
 /////////////////////////////////////////////////
