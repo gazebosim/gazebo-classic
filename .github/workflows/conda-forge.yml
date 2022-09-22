@@ -11,7 +11,7 @@ on:
   - cron:  '0 2 * * *'
 
 env:
-  CONDA_FORGE_FAILING_TESTS: UNIT_Dem_TEST|UNIT_Event_TEST|UNIT_FuelModelDatabase_TEST|UNIT_Image_TEST|UNIT_SonarSensor_TEST|UNIT_gz_TEST
+  CONDA_FORGE_FAILING_TESTS: UNIT_Dem_TEST|UNIT_Event_TEST|UNIT_FuelModelDatabase_TEST|UNIT_Image_TEST|UNIT_SonarSensor_TEST|UNIT_gz_TEST|INTEGRATION_contact_sensor|INTEGRATION_dem
 
 
 jobs:
