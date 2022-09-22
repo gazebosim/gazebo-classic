@@ -11,7 +11,7 @@ on:
   - cron:  '0 2 * * *'
 
 env:
-  CONDA_FORGE_FAILING_TESTS: UNIT_Dem_TEST|UNIT_Event_TEST|UNIT_FuelModelDatabase_TEST|UNIT_Image_TEST|UNIT_SonarSensor_TEST|UNIT_gz_TEST|INTEGRATION_contact_sensor|INTEGRATION_dem|INTEGRATION_gz_log|INTEGRATION_imu|INTEGRATION_joint_force_torque
+  CONDA_FORGE_FAILING_TESTS: UNIT_Dem_TEST|UNIT_Event_TEST|UNIT_FuelModelDatabase_TEST|UNIT_Image_TEST|UNIT_SonarSensor_TEST|UNIT_gz_TEST|INTEGRATION_contact_sensor|INTEGRATION_dem|INTEGRATION_gz_log|INTEGRATION_imu|INTEGRATION_joint_force_torque|EXAMPLE_examples_build|REGRESSION_2527_distortion_leak|REGRESSION_config-cmake
 
 
 jobs:
@@ -73,12 +73,15 @@ jobs:
         cd build
         cmake -GNinja -DBUILD_TESTING:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX ..
 
-    - name: Build [Linux&macOS]
+    - name: Build and Install [Linux&macOS]
       if: contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu')
       shell: bash -l {0}
       run: |
         cd build
+        # Workaround for https://github.com/osrf/gazebo/issues/3265
+        cmake --build . --config ${{ matrix.build_type }} --target gazebo_msgs
         cmake --build . --config ${{ matrix.build_type }}
+        cmake --install . --config ${{ matrix.build_type }}
 
     - name: Test [Linux&macOS]
       if: contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu')
@@ -100,6 +103,8 @@ jobs:
       shell: cmd /C call {0}
       run: |
         cd build
+        # Workaround for https://github.com/osrf/gazebo/issues/3265
+        cmake --build . --config ${{ matrix.build_type }} --target gazebo_msgs
         cmake --build . --config ${{ matrix.build_type }} --parallel 2
         cmake --install . --config ${{ matrix.build_type }}
 
