@@ -10,6 +10,10 @@ on:
   # Execute a "nightly" build at 2 AM UTC
   - cron:  '0 2 * * *'
 
+env:
+  CONDA_FORGE_FAILING_TESTS: UNIT_Dem_TEST|UNIT_Event_TEST|UNIT_FuelModelDatabase_TEST|UNIT_Image_TEST|UNIT_SonarSensor_TEST|UNIT_gz_TEST
+
+
 jobs:
   build:
     name: '[${{ matrix.os }}@${{ matrix.build_type }}@conda]'
@@ -67,7 +71,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -GNinja -DBUILD_TESTING:BOOL=OFF -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ..
+        cmake -GNinja -DBUILD_TESTING:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX ..
 
     - name: Build [Linux&macOS]
       if: contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu')
@@ -76,12 +80,12 @@ jobs:
         cd build
         cmake --build . --config ${{ matrix.build_type }}
 
-#    - name: Test [Linux&macOS]
-#      if: contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu')
-#      shell: bash -l {0}
-#      run: |
-#        cd build
-#        ctest --output-on-failure -C ${{ matrix.build_type }}
+    - name: Test [Linux&macOS]
+      if: contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu')
+      shell: bash -l {0}
+      run: |
+        cd build
+        ctest --output-on-failure -C ${{ matrix.build_type }} -E "$CONDA_FORGE_FAILING_TESTS"
 
     - name: Configure [Windows]
       if: contains(matrix.os, 'windows')
@@ -89,18 +93,19 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -GNinja -DBUILD_TESTING:BOOL=OFF -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ..
+        cmake -GNinja -DBUILD_TESTING:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX%\Library ..
 
-    - name: Build [Windows]
+    - name: Build and Install [Windows]
       if: contains(matrix.os, 'windows')
       shell: cmd /C call {0}
       run: |
         cd build
         cmake --build . --config ${{ matrix.build_type }} --parallel 2
+        cmake --install . --config ${{ matrix.build_type }}
 
-#    - name: Test [Windows]
-#      if: contains(matrix.os, 'windows')
-#      shell: cmd /C call {0}
-#      run: |
-#        cd build
-#        ctest --output-on-failure -C ${{ matrix.build_type }}
+    - name: Test [Windows]
+      if: contains(matrix.os, 'windows')
+      shell: cmd /C call {0}
+      run: |
+        cd build
+        ctest --output-on-failure -C ${{ matrix.build_type }} -E "%CONDA_FORGE_FAILING_TESTS%"
