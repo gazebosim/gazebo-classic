@@ -11,7 +11,7 @@ on:
   - cron:  '0 2 * * *'
 
 env:
-  CONDA_FORGE_FAILING_TESTS: UNIT_Dem_TEST|UNIT_Event_TEST|UNIT_FuelModelDatabase_TEST|UNIT_Image_TEST|UNIT_SonarSensor_TEST|UNIT_gz_TEST|INTEGRATION_contact_sensor|INTEGRATION_dem|INTEGRATION_gz_log|INTEGRATION_imu|INTEGRATION_joint_force_torque|EXAMPLE_examples_build|REGRESSION_2527_distortion_leak|REGRESSION_config-cmake|UNIT_OpenAL_TEST|PERFORMANCE_transport_stress|INTEGRATION_physics_msgs|INTEGRATION_sdf_errors|INTEGRATION_speed|INTEGRATION_speed_thread_islands|INTEGRATION_tracked_vehicles|REGRESSION_2239_revolute2_teleport|REGRESSION_config-pkgconfig|INTEGRATION_harness|INTEGRATION_joint_set_position_test|INTEGRATION_joint_test|INTEGRATION_pioneer2dx|INTEGRATION_sdf|check_INTEGRATION_sdf|INTEGRATION_swarm|REGRESSION_1569_hydra_crash|INTEGRATION_file_handling|INTEGRATION_gz_joint|REGRESSION_2430_revolute_joint_SetPosition
+  CONDA_FORGE_TESTS_TO_RUN: INTEGRATION_transport_msg_count 
 
 
 jobs:
@@ -88,7 +88,7 @@ jobs:
       shell: bash -l {0}
       run: |
         cd build
-        ctest --output-on-failure -C ${{ matrix.build_type }} -E "$CONDA_FORGE_FAILING_TESTS"
+        ctest --output-on-failure -C ${{ matrix.build_type }} -R "$CONDA_FORGE_TESTS_TO_RUN"
 
     - name: Configure [Windows]
       if: contains(matrix.os, 'windows')
@@ -115,4 +115,4 @@ jobs:
         cd build
         # Make sure that gtest shared library is found correctly
         set PATH=%PATH%;%CD%\test
-        ctest --output-on-failure -C ${{ matrix.build_type }} -E "%CONDA_FORGE_FAILING_TESTS%"
+        ctest --output-on-failure -C ${{ matrix.build_type }} -R "%CONDA_FORGE_TESTS_TO_RUN%"
