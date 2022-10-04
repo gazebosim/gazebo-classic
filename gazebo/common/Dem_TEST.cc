@@ -236,8 +236,8 @@ TEST_F(DemTest, LunarDemLoad)
   // as the celestial bodies in DEM file and
   // default spherical coordinates do not match.
   EXPECT_EQ(dem.Load(path.string()), 0);
-  EXPECT_FLOAT_EQ(293.51089, dem.GetWorldWidth());
-  EXPECT_FLOAT_EQ(293.51089, dem.GetWorldHeight());
+  EXPECT_NEAR(293.51, dem.GetWorldWidth(), 0.1);
+  EXPECT_NEAR(293.51, dem.GetWorldHeight(), 0.1);
 
   // Setting the spherical coordinates solves the
   // problem.
