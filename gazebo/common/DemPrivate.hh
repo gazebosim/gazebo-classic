@@ -18,6 +18,7 @@
 #ifndef _GAZEBO_DEM_PRIVATE_HH_
 #define _GAZEBO_DEM_PRIVATE_HH_
 
+#include "gazebo/common/SphericalCoordinates.hh"
 #include <gazebo/gazebo_config.h>
 #include <gazebo/util/system.hh>
 
@@ -59,6 +60,10 @@ namespace gazebo
 
       /// \brief DEM data converted to be OGRE-compatible.
       public: std::vector<float> demData;
+
+      /// \brief Holds the spherical coordinates object from the world.
+      public: common::SphericalCoordinatesPtr sphericalCoordinates =
+              boost::make_shared<common::SphericalCoordinates>();
     };
     /// \}
   }

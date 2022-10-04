@@ -21,6 +21,7 @@
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Vector3.hh>
 
+#include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/Dem.hh"
 #include "test_config.h"
 #include "test/util.hh"
@@ -222,6 +223,33 @@ TEST_F(DemTest, UnfinishedDem)
   // by our dem class and ignored when computing the min elevation
   EXPECT_FLOAT_EQ(682, demNoData.GetMinElevation());
   EXPECT_FLOAT_EQ(2932, demNoData.GetMaxElevation());
+}
+
+/////////////////////////////////////////////////
+TEST_F(DemTest, LunarDemLoad)
+{
+  common::Dem dem;
+  boost::filesystem::path path = TEST_PATH;
+  path /= "data/dem_moon.tif";
+
+  // Sizes will be computed incorrectly
+  // as the celestial bodies in DEM file and
+  // default spherical coordinates do not match.
+  EXPECT_EQ(dem.Load(path.string()), 0);
+  EXPECT_NEAR(293.51, dem.GetWorldWidth(), 0.1);
+  EXPECT_NEAR(293.51, dem.GetWorldHeight(), 0.1);
+
+  // Setting the spherical coordinates solves the
+  // problem.
+  common::SphericalCoordinatesPtr moonSC =
+    boost::make_shared<common::SphericalCoordinates>(
+        common::SphericalCoordinates::MOON_SCS);
+
+  dem.SetSphericalCoordinates(moonSC);
+  EXPECT_EQ(dem.Load(path.string()), 0);
+
+  EXPECT_FLOAT_EQ(80.0417, dem.GetWorldWidth());
+  EXPECT_FLOAT_EQ(80.0417, dem.GetWorldHeight());
 }
 #endif
 
