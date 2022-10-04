@@ -231,24 +231,21 @@ void Dem::GetGeoReference(double _x, double _y,
 
     // Transform the terrain's coordinate system to the appropriate
     // coordinate system.
+    #if GDAL_VERSION_NUM >= 2030000
+    const char *importString;
+    #else
+    char *importString;
+    #endif
+    importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
+    sourceCs.importFromWkt(&importString);
     if (this->dataPtr->sphericalCoordinates->GetSurfaceType() ==
         common::SphericalCoordinates::EARTH_WGS84)
     {
-      #if GDAL_VERSION_NUM >= 2030000
-      const char *importString;
-      #else
-      char *importString;
-      #endif
-      importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
-      sourceCs.importFromWkt(&importString);
       targetCs.SetWellKnownGeogCS("WGS84");
     }
-
     else if (this->dataPtr->sphericalCoordinates->GetSurfaceType() ==
         common::SphericalCoordinates::MOON_SCS)
     {
-      auto importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
-      sourceCs.importFromWkt(&importString);
       targetCs = OGRSpatialReference();
 
       double axisEquatorial =
