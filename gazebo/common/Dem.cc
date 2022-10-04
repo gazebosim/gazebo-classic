@@ -239,11 +239,6 @@ void Dem::GetGeoReference(double _x, double _y,
     importString = strdup(this->dataPtr->dataSet->GetProjectionRef());
     sourceCs.importFromWkt(&importString);
     if (this->dataPtr->sphericalCoordinates->GetSurfaceType() ==
-        common::SphericalCoordinates::EARTH_WGS84)
-    {
-      targetCs.SetWellKnownGeogCS("WGS84");
-    }
-    else if (this->dataPtr->sphericalCoordinates->GetSurfaceType() ==
         common::SphericalCoordinates::MOON_SCS)
     {
       targetCs = OGRSpatialReference();
@@ -258,6 +253,10 @@ void Dem::GetGeoReference(double _x, double _y,
         " +b=" + std::to_string(axisPolar);
 
       targetCs.importFromProj4(surfaceLatLongProjStr.c_str());
+    }
+    else
+    {
+      targetCs.SetWellKnownGeogCS("WGS84");
     }
 
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
