@@ -25,6 +25,7 @@
 #include "gazebo/gazebo_config.h"
 
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
