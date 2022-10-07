@@ -28,6 +28,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ImageHeightmap.hh"
 #include "gazebo/common/HeightmapData.hh"
+#include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/Dem.hh"
 
 
