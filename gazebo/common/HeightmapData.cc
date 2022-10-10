@@ -149,8 +149,35 @@ HeightmapData *HeightmapDataLoader::LoadTerrainFile(
   }
 }
 #else
+//////////////////////////////////////////////////
+HeightmapData *HeightmapDataLoader::LoadDEMAsTerrain(
+    const std::string &_filename)
+{
+  gzerr << "GDAL not available, LoadDEMAsTerrain will not work"
+    << std::endl;
+}
+
+//////////////////////////////////////////////////
+HeightmapData *HeightmapDataLoader::LoadDEMAsTerrain(
+    const std::string &_filename,
+    common::SphericalCoordinatesPtr _sphericalCoordinates)
+{
+  gzerr << "GDAL not available, LoadDEMAsTerrain will not work"
+    << std::endl;
+}
+
+//////////////////////////////////////////////////
 HeightmapData *HeightmapDataLoader::LoadTerrainFile(
     const std::string &_filename)
+{
+  // Load the terrain file as an image
+  return LoadImageAsTerrain(_filename);
+}
+
+//////////////////////////////////////////////////
+HeightmapData *HeightmapDataLoader::LoadTerrainFile(
+    const std::string &_filename,
+    common::SphericalCoordinatesPtr _sphericalCoordinates)
 {
   // Load the terrain file as an image
   return LoadImageAsTerrain(_filename);
