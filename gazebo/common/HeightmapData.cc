@@ -56,13 +56,8 @@ HeightmapData *HeightmapDataLoader::LoadImageAsTerrain(
 HeightmapData *HeightmapDataLoader::LoadDEMAsTerrain(
     const std::string &_filename)
 {
-  Dem *dem = new Dem();
-  if (dem->Load(_filename) != 0)
-  {
-    gzerr << "Unable to load a DEM file as a terrain [" << _filename << "]\n";
-    return nullptr;
-  }
-  return static_cast<HeightmapData *>(dem);
+  return LoadDEMAsTerrain(_filename,
+                          boost::make_shared<common::SphericalCoordinates>());
 }
 
 //////////////////////////////////////////////////
@@ -86,32 +81,8 @@ HeightmapData *HeightmapDataLoader::LoadDEMAsTerrain(
 HeightmapData *HeightmapDataLoader::LoadTerrainFile(
     const std::string &_filename)
 {
-  // Register the GDAL drivers
-  GDALAllRegister();
-
-  GDALDataset *poDataset = reinterpret_cast<GDALDataset *>
-      (GDALOpen(_filename.c_str(), GA_ReadOnly));
-
-  if (!poDataset)
-  {
-    gzerr << "Unrecognized terrain format in file [" << _filename << "]\n";
-    return nullptr;
-  }
-
-  std::string fileFormat = poDataset->GetDriver()->GetDescription();
-  GDALClose(reinterpret_cast<GDALDataset *>(poDataset));
-
-  // Check if the heightmap file is an image
-  if (fileFormat == "JPEG" || fileFormat == "PNG")
-  {
-    // Load the terrain file as an image
-    return LoadImageAsTerrain(_filename);
-  }
-  else
-  {
-    // Load the terrain file as a DEM
-    return LoadDEMAsTerrain(_filename);
-  }
+  return LoadTerrainFile(_filename,
+                         boost::make_shared<common::SphericalCoordinates>());
 }
 
 //////////////////////////////////////////////////
@@ -177,7 +148,7 @@ HeightmapData *HeightmapDataLoader::LoadTerrainFile(
 //////////////////////////////////////////////////
 HeightmapData *HeightmapDataLoader::LoadTerrainFile(
     const std::string &_filename,
-    common::SphericalCoordinatesPtr _sphericalCoordinates)
+    common::SphericalCoordinatesPtr /*_sphericalCoordinates*/)
 {
   // Load the terrain file as an image
   return LoadImageAsTerrain(_filename);
