@@ -87,6 +87,39 @@ TEST_F(HeightmapDataLoaderTest, DemHeightmap)
   EXPECT_FLOAT_EQ(142.2274, dem->GetElevation(0, height - 1));
   EXPECT_FLOAT_EQ(209.14784, dem->GetElevation(width - 1, height - 1));
 }
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapDataLoaderTest, DemHeightmapMoon)
+{
+  common::HeightmapData *heightmapData = NULL;
+
+  boost::filesystem::path path = TEST_PATH;
+  path /= "data/dem_moon.tif";
+
+  heightmapData = common::HeightmapDataLoader::LoadTerrainFile(path.string());
+  EXPECT_TRUE(heightmapData != nullptr);
+
+  common::Dem *dem = dynamic_cast<common::Dem *>(heightmapData);
+  EXPECT_TRUE(dem != nullptr);
+
+  // Width and height will not be accurately calculated,
+  // and an error will be displayed.
+  EXPECT_GT(dem->GetWorldHeight(), 290);
+  EXPECT_GT(dem->GetWorldWidth(), 290);
+
+  // Using MOON_SCS surface type
+  heightmapData =
+    common::HeightmapDataLoader::LoadTerrainFile(path.string(),
+        boost::make_shared<common::SphericalCoordinates>(
+          common::SphericalCoordinates::MOON_SCS));
+  EXPECT_TRUE(heightmapData != nullptr);
+
+  dem = dynamic_cast<common::Dem *>(heightmapData);
+  EXPECT_TRUE(dem != nullptr);
+  // The sizes will now be computed correctly.
+  EXPECT_FLOAT_EQ(80.0417, dem->GetWorldHeight());
+  EXPECT_FLOAT_EQ(80.0417, dem->GetWorldWidth());
+}
 #endif
 
 /////////////////////////////////////////////////
