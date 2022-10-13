@@ -244,6 +244,9 @@ namespace gazebo
       /// \param[in] _ptr Node to process.
       public: void AddNodeToProcess(NodePtr _ptr);
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static TopicManager* Instance();
+
       /// \brief A map of string->list of Node pointers
       typedef std::map<std::string, std::list<NodePtr> > SubNodeMap;
 

@@ -987,6 +987,19 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
   this->dataPtr->keyEvent.key = 0;
 }
 
+//////////////////////////////////////////////////
+ModelManipulator* ModelManipulator::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<ModelManipulator>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
 // Function migrated here from GLWidget.cc and commented out since it doesn't
 // seem like it's currently used. Kept here for future references
 /////////////////////////////////////////////////

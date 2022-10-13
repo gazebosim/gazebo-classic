@@ -156,6 +156,9 @@ namespace gazebo
       private: void Handle(const common::MouseEvent &_event,
                    std::list<Filter> &_list);
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static MouseEventHandler* Instance();
+
       /// \brief List of mouse press filters.
       private: std::list<Filter> pressFilters;
 

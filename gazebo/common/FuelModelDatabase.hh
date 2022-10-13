@@ -123,6 +123,9 @@ namespace gazebo
       /// \return Local path to the file
       public: std::string CachedFilePath(const std::string &_uri);
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static FuelModelDatabase* Instance();
+
       /// \brief Private data.
       private: std::unique_ptr<FuelModelDatabasePrivate> dataPtr;
 

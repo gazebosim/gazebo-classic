@@ -457,3 +457,16 @@ void TopicManager::PauseIncoming(bool _pause)
 {
   this->pauseIncoming = _pause;
 }
+
+//////////////////////////////////////////////////
+TopicManager* TopicManager::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<TopicManager>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}

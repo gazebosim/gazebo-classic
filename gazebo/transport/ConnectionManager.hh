@@ -167,6 +167,9 @@ namespace gazebo
       /// \brief Run the manager update loop once
       private: void RunUpdate();
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static ConnectionManager* Instance();
+
       /// \brief Condition used to trigger an update.
       private: boost::condition_variable updateCondition;
 

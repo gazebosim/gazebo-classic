@@ -507,3 +507,16 @@ void ModelSnap::Update()
     this->dataPtr->selectedTriangleDirty = false;
   }
 }
+
+//////////////////////////////////////////////////
+ModelSnap* ModelSnap::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<ModelSnap>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}

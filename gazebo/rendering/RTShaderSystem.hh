@@ -187,6 +187,9 @@ namespace gazebo
       /// \brief Re-apply shadows. Call this if a shadow paramenter is changed.
       private: void ReapplyShadows();
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static RTShaderSystem* Instance();
+
       /// \brief Make the RTShader system a singleton.
       private: friend class SingletonT<RTShaderSystem>;
 

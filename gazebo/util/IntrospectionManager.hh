@@ -193,6 +193,9 @@ namespace gazebo
       private: bool ValidateParameter(const gazebo::msgs::Param &_msg,
                              const std::set<std::string> &_allowedValues) const;
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static IntrospectionManager* Instance();
+
       /// \brief This is a singleton.
       private: friend class SingletonT<IntrospectionManager>;
 

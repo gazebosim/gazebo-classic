@@ -1110,3 +1110,16 @@ unsigned int LogRecord::BufferSize() const
 
   return size;
 }
+
+//////////////////////////////////////////////////
+LogRecord* LogRecord::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<LogRecord>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}

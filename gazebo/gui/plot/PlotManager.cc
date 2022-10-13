@@ -190,3 +190,16 @@ std::string PlotManager::HumanReadableName(const std::string &_uri) const
 
   return label;
 }
+
+//////////////////////////////////////////////////
+PlotManager* PlotManager::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<PlotManager>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}

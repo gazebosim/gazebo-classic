@@ -33,7 +33,7 @@ template <class T>
 class SingletonT
 {
   /// \brief Get an instance of the singleton
-  public: static T *Instance()
+  public: static T *Instance() GAZEBO_DEPRECATED(11.0)
           {
             return &GetInstance();
           }

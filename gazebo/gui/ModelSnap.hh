@@ -111,6 +111,9 @@ namespace gazebo
       /// \brief Update the visual representation of the snap spot.
       private: void Update();
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static ModelSnap* Instance();
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelSnap>;
 

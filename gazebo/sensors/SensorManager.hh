@@ -193,6 +193,9 @@ namespace gazebo
       /// \param[in] _sensor Pointer to a sensor to add.
       private: void AddSensor(SensorPtr _sensor);
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static SensorManager* Instance();
+
       /// \cond
       /// \brief A container for sensors of a specific type. This is used to
       /// separate sensors which rely on the rendering engine from those

@@ -1394,5 +1394,18 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
     }
   }
 }
+
+//////////////////////////////////////////////////
+MeshManager* MeshManager::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<MeshManager>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
 }
 }

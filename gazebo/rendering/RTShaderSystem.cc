@@ -810,3 +810,16 @@ void RTShaderSystem::UpdateShadows(ScenePtr _scene)
   sceneMgr->setShadowTextureCasterMaterial(_scene->ShadowCasterMaterialName());
 #endif
 }
+
+//////////////////////////////////////////////////
+RTShaderSystem* RTShaderSystem::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<RTShaderSystem>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}

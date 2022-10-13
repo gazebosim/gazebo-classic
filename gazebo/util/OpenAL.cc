@@ -187,6 +187,19 @@ std::set<std::string> OpenAL::DeviceList() const
   return deviceList;
 }
 
+//////////////////////////////////////////////////
+OpenAL* OpenAL::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<OpenAL>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //                      OPENAL LISTENER
