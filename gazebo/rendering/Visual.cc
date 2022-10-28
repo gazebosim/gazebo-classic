@@ -2180,8 +2180,11 @@ void Visual::SetRibbonTrail(bool _value,
 //////////////////////////////////////////////////
 DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 {
-  this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
-      boost::bind(&Visual::Update, this));
+  if (!this->dataPtr->preRenderConnection)
+  {
+    this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
+        boost::bind(&Visual::Update, this));
+  }
 
   DynamicLines *line = new DynamicLines(_type);
   this->dataPtr->lines.push_back(line);
