@@ -670,7 +670,7 @@ namespace gazebo
           ignition::msgs::StringMsg &_response);
 
       /// \brief Callback for "<this_name>/spherical_coordinates_surface_type" service.
-      /// \param[out] _response Message containing spherical ciirdinates surface name.
+      /// \param[out] _response Message containing spherical coordinates surface type.
       /// \return True if the info was successfully obtained.
       public: bool SphericalCoordinatesSurfaceService(
           ignition::msgs::StringMsg &_response);
