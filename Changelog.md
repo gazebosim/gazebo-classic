@@ -1,5 +1,39 @@
 ## Gazebo 11
 
+## Gazebo 11.12.0 (2022-09-14)
+
+1. BulletLink: add and set force and torque
+    * [Pull request #3255](https://github.com/osrf/gazebo/pull/3255)
+
+1. Camera: expose intrinsics parameters
+    * [Pull request #3245](https://github.com/osrf/gazebo/pull/3245)
+
+1. Add missing header includes
+    * [Pull request #3227](https://github.com/osrf/gazebo/pull/3227)
+
+1. Permit users to override `USE_EXTERNAL_TINYXML2` and `USE_EXTERNAL_TINYXML`
+    * [Pull request #3254](https://github.com/osrf/gazebo/pull/3254)
+
+1. CustomPSSMShadowCamera: support custom projection matrix
+    * [Pull request #3249](https://github.com/osrf/gazebo/pull/3249)
+
+1. Update Readme and add gazebo logo
+    * [Pull request #3233](https://github.com/osrf/gazebo/pull/3233)
+    * [Pull request #3226](https://github.com/osrf/gazebo/pull/3226)
+
+1. Wheel plowing approximation in ODEPhysics
+    * [Pull request #3164](https://github.com/osrf/gazebo/pull/3164)
+
+1. LensFlare: parameterize number of occlusion steps
+    * [Pull request #3234](https://github.com/osrf/gazebo/pull/3234)
+    * [Pull request #3241](https://github.com/osrf/gazebo/pull/3241)
+
+1. Support shininess value for each Visual in a Model
+    * [Pull request #3235](https://github.com/osrf/gazebo/pull/3235)
+
+1. Fix shininess and add tests
+    * [Pull request #3231](https://github.com/osrf/gazebo/pull/3231)
+
 ## Gazebo 11.11.0 (2022-05-25)
 
 1. Convert `OGRE_RESOURCE_PATH` with `TO_CMAKE_PATH`

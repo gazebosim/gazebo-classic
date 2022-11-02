@@ -17,7 +17,9 @@
 #include <string.h>
 #include <boost/algorithm/string.hpp>
 #include <ignition/math/MassMatrix3.hh>
+#include <ignition/math/Matrix3.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3Stats.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -118,39 +120,39 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
   }
 
   // Check force and torque relative to the COG in world coordinates
-  ignition::math::Vector3d forceWorld = poseWorld0.Rot().RotateVector(_force);
+  ignition::math::Vector3d const forceWorld = poseWorld0.Rot().RotateVector(
+    _force);
   EXPECT_EQ(forceWorld, _link->WorldForce());
 
-  ignition::math::Vector3d worldOffset = poseWorld0.Rot().RotateVector(
-      _offset - _link->GetInertial()->CoG());
+  ignition::math::Vector3d const worldOffset = poseWorld0.Rot().RotateVector(
+    _offset - _link->GetInertial()->CoG());
   ignition::math::Vector3d torqueWorld = worldOffset.Cross(forceWorld);
   EXPECT_EQ(torqueWorld, _link->WorldTorque());
 
   // Check acceleration in world frame
-  ignition::math::Vector3d oneStepLinearAccel =
-      forceWorld/_link->GetInertial()->Mass();
+  ignition::math::Vector3d const oneStepLinearAccel = forceWorld /
+    _link->GetInertial()->Mass();
   EXPECT_EQ(oneStepLinearAccel, _link->WorldLinearAccel());
 
   // Compute angular accel by multiplying world torque
   // by inverse of world inertia matrix.
   // In this case, the gyroscopic coupling terms are zero
   // since the model is a unit box.
-  ignition::math::Vector3d oneStepAngularAccel =
-      _link->WorldInertiaMatrix().Inverse() * torqueWorld;
+  ignition::math::Vector3d const oneStepAngularAccel =
+    _link->WorldInertiaMatrix().Inverse() * torqueWorld;
   EXPECT_EQ(oneStepAngularAccel, _link->WorldAngularAccel());
 
-
   // Note: This step must be performed after checking the link forces when DART
-  // is the physics engine, because otherwise the accelerations used by the
-  // previous tests will be cleared out before they can be tested.
-  if ("dart" == _physicsEngine)
+  // or bullet is the physics engine, because otherwise the accelerations used
+  // by the previous tests will be cleared out before they can be tested.
+  if ("dart" == _physicsEngine || "bullet" == _physicsEngine)
   {
     _world->Step(1);
   }
 
   // Check velocity in world frame
-  ignition::math::Vector3d oneStepLinearVel = linearVelWorld0 +
-    dt*oneStepLinearAccel;
+  ignition::math::Vector3d const oneStepLinearVel = linearVelWorld0 +
+    dt * oneStepLinearAccel;
 
   // Dev note (MXG): DART does not always produce quite the same result as the
   // expected value for CoG linear velocity. It might be worth investigating
@@ -168,8 +170,8 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
 
   VEC_EXPECT_NEAR(oneStepLinearVel, _link->WorldCoGLinearVel(), tolerance);
 
-  ignition::math::Vector3d oneStepAngularVel = angularVelWorld0 +
-    dt*oneStepAngularAccel;
+  ignition::math::Vector3d const oneStepAngularVel = angularVelWorld0 +
+    dt * oneStepAngularAccel;
   EXPECT_EQ(oneStepAngularVel, _link->WorldAngularVel());
 
   // Step forward and check again
@@ -208,12 +210,11 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
 /////////////////////////////////////////////////
 void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
 {
-  // TODO bullet and simbody currently fail this test
-  if (_physicsEngine != "ode" && _physicsEngine != "dart")
+  // TODO simbody currently fail this test
+  if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting AddForce test for Bullet and Simbody. "
-          << "See issues #1476 and #1478."
-          << std::endl;
+    gzerr << "Aborting AddForce test for Simbody. "
+          << "See issue #1478." << std::endl;
     return;
   }
 

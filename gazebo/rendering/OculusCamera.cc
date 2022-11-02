@@ -18,7 +18,12 @@
 #include <sstream>
 #include <string>
 #include <ignition/common/Profiler.hh>
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Vector4.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 

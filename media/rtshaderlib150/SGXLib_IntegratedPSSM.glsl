@@ -58,7 +58,22 @@ void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient,
 float _SGX_ShadowPoisson9(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 invShadowMapSize)
 {
   // Remove shadow outside shadow maps so that all that area appears lit
-  if (shadowMapPos.z < 0.0 || shadowMapPos.z > 1.0)
+  //
+  // GAZEBO CUSTOM NOTE:
+  // Due to historical API quirks, OpenGL would store depth in the range [0; 1]
+  // inside the depth buffer; but request the depth to be delivered in
+  // range [-1; 1]; while all other APIs use the range [0; 1] instead.
+  //
+  // Ogre 1.9 uses PF_FLOAT32_R colour render targets for
+  // shadow maps instead of a raw depth texture (also for historical reasons);
+  //
+  // which means the depth is in range [-1; 1] when using Ogre 1.9 + OpenGL.
+  // Newer Ogre versions use raw depth textures directly, which means
+  // the range is in [0; 1] and this fix is no longer necessary.
+  //
+  // Therefore Gazebo must reject z < -1.0 instead of z < 0.0
+  // See https://github.com/osrf/gazebo/issues/3259
+  if (shadowMapPos.z < -1.0 || shadowMapPos.z > 1.0)
     return 1.0;
 
   float shadow = 0.0;

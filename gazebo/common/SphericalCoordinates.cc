@@ -17,6 +17,11 @@
 #include <string>
 #include <math.h>
 
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Matrix3.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/SphericalCoordinatesPrivate.hh"

@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Rand.hh>
+#include <ignition/math/Vector3.hh>
 #include <ignition/msgs.hh>
 #include <ignition/transport.hh>
 #include "gazebo/gui/GuiIface.hh"

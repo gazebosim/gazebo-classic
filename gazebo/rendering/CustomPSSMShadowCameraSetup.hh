@@ -97,7 +97,7 @@ namespace gazebo
 
       /// \brief lightly modified
       /// FocusedShadowCameraSetup::calculateShadowMappingMatrix().
-      void calculateShadowMappingMatrix(const Ogre::SceneManager &_sm,
+      public: void calculateShadowMappingMatrix(const Ogre::SceneManager &_sm,
           const Ogre::Camera &_cam, const Ogre::Light &_light,
           Ogre::Matrix4 *_out_view, Ogre::Matrix4 *_outProj,
           Ogre::Camera *_outCam) const;

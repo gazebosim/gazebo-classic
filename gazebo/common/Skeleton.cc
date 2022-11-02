@@ -16,6 +16,10 @@
  */
 #include <list>
 
+#include <ignition/math/Matrix3.hh>
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Skeleton.hh"
 #include "gazebo/common/SkeletonAnimation.hh"
 

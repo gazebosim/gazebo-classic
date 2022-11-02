@@ -15,6 +15,7 @@
  *
 */
 #include <functional>
+#include <ignition/math/Rand.hh>
 #include "gazebo/sensors/Noise.hh"
 #include "RaySensorNoisePlugin.hh"
 

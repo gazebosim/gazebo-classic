@@ -1,0 +1,172 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <!--
+  World file for testing the intrinsics API of gazebo.
+
+  The 'camera_without_intrinsics' model uses the default intrinsics values directly
+  from gazebo for focal length and optical centre.
+  The 'camera_default_intrinsics' model uses the intrinsic tag explicitly to provide
+  the intrinsics same as gazebo default intrinsics.
+  The 'camera_custom_intrinsics' model uses different intrinsics than the one used
+  by default from gazebo.
+
+  We expect the 'camera_without_intrinsics' model to have the same image output as the
+  'camera_default_intrinsics' model and the image output for 'camera_custom_intrinsics'
+  to be different from 'camera_without_intrinsics' or 'camera_default_intrinsics' model.
+  -->
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+  <!--
+  Camera sensor where no <intrinsics> tag is used and default values of
+  intrinsics are used from gazebo.
+  -->
+  <model name="camera_without_intrinsics">
+    <static>true</static>
+    <pose>0.0 0.0 0.5 0 0 0</pose>
+    <link name="link">
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>0.1 0.1 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+      <sensor name="camera_without_intrinsics_sensor" type="camera">
+        <camera>
+          <!-- Use default horizontal FOV-->
+            <horizontal_fov>1.0472</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>240</height>
+              <format>RGB_UINT16</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>10</update_rate>
+          <visualize>false</visualize>
+        </sensor>
+      </link>
+    </model>
+
+    <!--
+    Camera sensor where <intrinsics> tag is used and intrinsic values used
+    are the same as default intrinsics used by gazebo.
+    -->
+    <model name="camera_default_intrinsics">
+      <static>true</static>
+      <pose>0.0 0.0 0.5 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name="camera_default_intrinsics_sensor" type="camera">
+          <camera>
+            <!-- Use default horizontal FOV-->
+            <horizontal_fov>1.0472</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>240</height>
+              <format>RGB_UINT16</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+            <lens>
+              <intrinsics>
+                <fx>277</fx>
+                <fy>277</fy>
+                <cx>160</cx>
+                <cy>120</cy>
+                <s>0</s>
+              </intrinsics>
+            </lens>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>10</update_rate>
+          <visualize>false</visualize>
+        </sensor>
+      </link>
+    </model>
+
+    <!--
+    Camera sensor where <intrinsics> tag is used and intrinsic values used
+    are different from the default intrinsics used by gazebo.
+    -->
+    <model name="camera_custom_intrinsics">
+      <static>true</static>
+      <pose>0.0 0.0 0.5 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name="camera_custom_intrinsics_sensor" type="camera">
+          <camera>
+            <!-- Use default horizontal FOV-->
+            <horizontal_fov>1.0472</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>240</height>
+              <format>RGB_UINT16</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+            <lens>
+              <intrinsics>
+                <fx>320</fx>
+                <fy>320</fy>
+                <cx>160</cx>
+                <cy>120</cy>
+                <s>0</s>
+              </intrinsics>
+            </lens>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>10</update_rate>
+          <visualize>false</visualize>
+        </sensor>
+      </link>
+    </model>
+
+    <model name="box">
+      <pose>3 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

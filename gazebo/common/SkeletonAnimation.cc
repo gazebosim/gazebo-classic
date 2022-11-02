@@ -15,6 +15,12 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Assert.hh"
