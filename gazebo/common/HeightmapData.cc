@@ -28,6 +28,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ImageHeightmap.hh"
 #include "gazebo/common/HeightmapData.hh"
+#include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/Dem.hh"
 
 
@@ -55,7 +56,19 @@ HeightmapData *HeightmapDataLoader::LoadImageAsTerrain(
 HeightmapData *HeightmapDataLoader::LoadDEMAsTerrain(
     const std::string &_filename)
 {
+  return LoadDEMAsTerrain(_filename,
+                          boost::make_shared<common::SphericalCoordinates>());
+}
+
+//////////////////////////////////////////////////
+/// Load terrain files taking into account the spherical
+/// coordinates surface type.
+HeightmapData *HeightmapDataLoader::LoadDEMAsTerrain(
+    const std::string &_filename,
+    common::SphericalCoordinatesPtr _sphericalCoordinates)
+{
   Dem *dem = new Dem();
+  dem->SetSphericalCoordinates(_sphericalCoordinates);
   if (dem->Load(_filename) != 0)
   {
     gzerr << "Unable to load a DEM file as a terrain [" << _filename << "]\n";
@@ -67,6 +80,17 @@ HeightmapData *HeightmapDataLoader::LoadDEMAsTerrain(
 //////////////////////////////////////////////////
 HeightmapData *HeightmapDataLoader::LoadTerrainFile(
     const std::string &_filename)
+{
+  return LoadTerrainFile(_filename,
+                         boost::make_shared<common::SphericalCoordinates>());
+}
+
+//////////////////////////////////////////////////
+/// Load terrain files taking into account the spherical
+/// coordinates surface type.
+HeightmapData *HeightmapDataLoader::LoadTerrainFile(
+    const std::string &_filename,
+    common::SphericalCoordinatesPtr _sphericalCoordinates)
 {
   // Register the GDAL drivers
   GDALAllRegister();
@@ -92,12 +116,39 @@ HeightmapData *HeightmapDataLoader::LoadTerrainFile(
   else
   {
     // Load the terrain file as a DEM
-    return LoadDEMAsTerrain(_filename);
+    return LoadDEMAsTerrain(_filename, _sphericalCoordinates);
   }
 }
 #else
+//////////////////////////////////////////////////
+HeightmapData *HeightmapDataLoader::LoadDEMAsTerrain(
+    const std::string &_filename)
+{
+  gzerr << "GDAL not available, LoadDEMAsTerrain will not work"
+    << std::endl;
+}
+
+//////////////////////////////////////////////////
+HeightmapData *HeightmapDataLoader::LoadDEMAsTerrain(
+    const std::string &_filename,
+    common::SphericalCoordinatesPtr _sphericalCoordinates)
+{
+  gzerr << "GDAL not available, LoadDEMAsTerrain will not work"
+    << std::endl;
+}
+
+//////////////////////////////////////////////////
 HeightmapData *HeightmapDataLoader::LoadTerrainFile(
     const std::string &_filename)
+{
+  // Load the terrain file as an image
+  return LoadImageAsTerrain(_filename);
+}
+
+//////////////////////////////////////////////////
+HeightmapData *HeightmapDataLoader::LoadTerrainFile(
+    const std::string &_filename,
+    common::SphericalCoordinatesPtr /*_sphericalCoordinates*/)
 {
   // Load the terrain file as an image
   return LoadImageAsTerrain(_filename);

@@ -81,7 +81,11 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 //////////////////////////////////////////////////
 int HeightmapShape::LoadTerrainFile(const std::string &_filename)
 {
-  this->heightmapData = common::HeightmapDataLoader::LoadTerrainFile(_filename);
+  common::SphericalCoordinatesPtr sphericalCoordinates;
+  sphericalCoordinates = this->world->SphericalCoords();
+
+  this->heightmapData = common::HeightmapDataLoader::LoadTerrainFile(_filename,
+      sphericalCoordinates);
   if (!this->heightmapData)
   {
     gzerr << "Unable to load heightmap data" << std::endl;
@@ -108,8 +112,6 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
 
     // Modify the reference geotedic latitude/longitude.
     // A GPS sensor will use the real georeferenced coordinates of the terrain.
-    common::SphericalCoordinatesPtr sphericalCoordinates;
-    sphericalCoordinates = this->world->SphericalCoords();
 
     if (sphericalCoordinates)
     {

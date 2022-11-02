@@ -22,6 +22,7 @@
 
 #include <ignition/math/Color.hh>
 #include <ignition/math/Matrix4.hh>
+#include <ignition/transport/Node.hh>
 
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
@@ -395,8 +396,38 @@ void Heightmap::Load()
   // try loading heightmap data locally
   if (!this->dataPtr->filename.empty())
   {
+    // Get spherical coordinates surface name from physics::World
+    std::string surfaceType = "EARTH_WGS84";
+    {
+      ignition::transport::Node node;
+      ignition::msgs::StringMsg rep;
+      const std::string serviceName = "/spherical_coordinates_surface_type";
+      bool result;
+      unsigned int timeout = 5000;
+      bool executed = node.Request(serviceName,
+          timeout, rep, result);
+      if (executed)
+      {
+        if (result)
+          surfaceType = rep.data();
+        else
+          gzerr << "Service call[" << serviceName << "] failed" << std::endl;
+      }
+      else
+      {
+        gzerr << "Service call[" << serviceName << "] timed out" << std::endl;
+      }
+    }
+
+    common::SphericalCoordinatesPtr sphericalCoordinates;
+    if (surfaceType == "MOON_SCS")
+    {
+       sphericalCoordinates = boost::make_shared<common::SphericalCoordinates>(
+                  common::SphericalCoordinates::MOON_SCS);
+    }
+
     this->dataPtr->heightmapData = common::HeightmapDataLoader::LoadTerrainFile(
-        this->dataPtr->filename);
+        this->dataPtr->filename, sphericalCoordinates);
 
     if (this->dataPtr->heightmapData)
     {
