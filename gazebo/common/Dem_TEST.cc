@@ -26,6 +26,8 @@
 #include "test_config.h"
 #include "test/util.hh"
 
+#include "proj.h"
+
 using namespace gazebo;
 
 class DemTest : public gazebo::testing::AutoLogFixture { };
@@ -239,6 +241,9 @@ TEST_F(DemTest, LunarDemLoad)
   EXPECT_NEAR(293.51, dem.GetWorldWidth(), 0.1);
   EXPECT_NEAR(293.51, dem.GetWorldHeight(), 0.1);
 
+  std::cout << "DEBUG " << PROJ_VERSION_MAJOR
+    << " " << PROJ_VERSION_MINOR << " " <<
+    PROJ_VERSION_PATCH << std::endl;
   // Setting the spherical coordinates solves the
   // problem.
   common::SphericalCoordinatesPtr moonSC =
