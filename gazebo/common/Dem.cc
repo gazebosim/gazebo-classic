@@ -284,6 +284,9 @@ void Dem::GetGeoReference(double _x, double _y,
     xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
     yGeoDeg = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
 
+    std::cout << "xGeoDeg :" << xGeoDeg << std::endl;
+    std::cout << "yGeoDeg :" << yGeoDeg << std::endl;
+
     cT->Transform(1, &xGeoDeg, &yGeoDeg);
 
     _latitude.Degree(yGeoDeg);
