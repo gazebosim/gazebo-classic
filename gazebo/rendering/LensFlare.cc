@@ -284,7 +284,7 @@ namespace gazebo
           pos.x /= pos.w;
           pos.y /= pos.w;
           // check if light is visible
-          if (std::fabs(pos.x) <= 1 && std::fabs(pos.y) <= 1 && pos.z > 0)
+          if (std::fabs(pos.x) <= 1 && std::fabs(pos.y) <= 1 && pos.z > abs(pos.w))
           {
             // check occlusion using this env camera
             this->dataPtr->wideAngleDummyCamera->SetWorldPose(
