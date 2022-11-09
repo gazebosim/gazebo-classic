@@ -214,6 +214,8 @@ namespace gazebo
       // a gazebo camera object
       std::vector<Ogre::Camera *> ogreEnvCameras =
           _wideAngleCam->OgreEnvCameras();
+      // set dummy camera properties based on env cam
+      Ogre::Camera *cam = ogreEnvCameras[0];
       if (!this->dataPtr->wideAngleDummyCamera)
       {
         // create camera with auto render set to false
@@ -227,17 +229,15 @@ namespace gazebo
             dummyCamName, false);
         this->dataPtr->wideAngleDummyCamera->Load();
 
-        // set dummy camera properties based on env cam
-        Ogre::Camera *cam = ogreEnvCameras[0];
         this->dataPtr->wideAngleDummyCamera->SetImageWidth(
-            cam->getViewport()->getActualWidth());
+            _wideAngleCam->ViewportWidth());
         this->dataPtr->wideAngleDummyCamera->SetImageHeight(
-            cam->getViewport()->getActualHeight());
+            _wideAngleCam->ViewportHeight());
         this->dataPtr->wideAngleDummyCamera->Init();
         this->dataPtr->wideAngleDummyCamera->CreateRenderTexture(
             dummyCamName + "_rtt");
         this->dataPtr->wideAngleDummyCamera->SetAspectRatio(
-            cam->getAspectRatio());
+            _wideAngleCam->AspectRatio());
         // aspect ratio should be 1.0 so VFOV should equal to HFOV
         this->dataPtr->wideAngleDummyCamera->SetHFOV(
             ignition::math::Angle(cam->getFOVy().valueRadians()));
@@ -268,15 +268,9 @@ namespace gazebo
       lightPos.z = (imagePos.Z() > 1.75) ? -1 : 1;
 
       // check occlusion and set scale
-      // loop through all env cameras and find the cam that sees the light
-      // ray cast using that env camera to see if the distance to closest
-      // intersection point is less than light's world pos
       double occlusionScale = 1.0;
       if (lightPos.z >= 0.0)
       {
-        // loop through all env cameras
-        for (auto cam : ogreEnvCameras)
-        {
           // project light world point to camera clip space.
           auto viewProj = cam->getProjectionMatrix() * cam->getViewMatrix();
           auto pos = viewProj *
@@ -284,7 +278,8 @@ namespace gazebo
           pos.x /= pos.w;
           pos.y /= pos.w;
           // check if light is visible
-          if (std::fabs(pos.x) <= 1 && std::fabs(pos.y) <= 1 && pos.z > 0)
+          if (std::fabs(pos.x) <= 1 &&
+              std::fabs(pos.y) <= 1 && pos.z > abs(pos.w))
           {
             // check occlusion using this env camera
             this->dataPtr->wideAngleDummyCamera->SetWorldPose(
@@ -296,9 +291,7 @@ namespace gazebo
                 this->dataPtr->wideAngleDummyCamera,
                 ignition::math::Vector3d(pos.x, pos.y, pos.z),
                 this->dataPtr->lightWorldPos);
-            break;
           }
-        }
       }
       _pos = Conversions::ConvertIgn(lightPos);
       _scale = occlusionScale * this->dataPtr->scale;
@@ -347,8 +340,11 @@ namespace gazebo
           screenPos.X() = ((j / 2.0) + 0.5) * viewportWidth;
           screenPos.Y() = (1 - ((i / 2.0) + 0.5)) * viewportHeight;
           intersect = scene->FirstContact(_cam, screenPos, position);
-          if (intersect && (position.Length() < _worldPos.Length()))
+          if (intersect &&
+              (position.SquaredLength() < _worldPos.SquaredLength()))
+          {
             occluded++;
+          }
           rays++;
         }
       }
