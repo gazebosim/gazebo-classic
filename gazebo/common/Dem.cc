@@ -272,8 +272,11 @@ void Dem::GetGeoReference(double _x, double _y,
     }
 
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
+    std::cout << "cT pointer : " << ct << std::endl;
+
     if (nullptr == cT)
     {
+      std::cout << "Exception thrown !!" << std::endl;
       gzthrow("Unable to transform terrain coordinate system to WGS84 for "
           << "coordinates (" << _x << "," << _y << ")");
     }
