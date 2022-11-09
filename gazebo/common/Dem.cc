@@ -272,7 +272,7 @@ void Dem::GetGeoReference(double _x, double _y,
     }
 
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
-    std::cout << "cT pointer : " << ct << std::endl;
+    std::cout << "cT pointer : " << cT << std::endl;
 
     if (nullptr == cT)
     {
