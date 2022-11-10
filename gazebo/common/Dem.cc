@@ -272,14 +272,6 @@ void Dem::GetGeoReference(double _x, double _y,
 
     cT->Transform(1, &xGeoDeg, &yGeoDeg);
 
-    // Workaround for https://github.com/OSGeo/gdal/issues/1546
-    // #if GDAL_VERSION_NUM >= 3000000
-    // _latitude.Degree(xGeoDeg);
-    // _longitude.Degree(yGeoDeg);
-    // #else
-    // _latitude.Degree(yGeoDeg);
-    // _longitude.Degree(xGeoDeg);
-    // #endif
     _latitude.Degree(yGeoDeg);
     _longitude.Degree(xGeoDeg);
 
