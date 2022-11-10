@@ -260,7 +260,6 @@ void Dem::GetGeoReference(double _x, double _y,
     }
 
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
-
     if (nullptr == cT)
     {
       gzthrow("Unable to transform terrain coordinate system to WGS84 for "
