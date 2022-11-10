@@ -310,8 +310,6 @@ double SphericalCoordinates::DistanceBetweenPoints(
              cos(_latA.Radian()) * cos(_latB.Radian());
 
   double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-  std::cout << "DBG 10: " << c << std::endl;
-  std::cout << "DBG 11: " << this->SurfaceRadius() * c << std::endl;
   return this->SurfaceRadius() * c;
 }
 

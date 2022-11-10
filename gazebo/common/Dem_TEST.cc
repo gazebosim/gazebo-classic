@@ -262,15 +262,15 @@ TEST_F(DemTest, LunarDemLoad)
 
   // Setting the spherical coordinates solves the
   // problem.
-  // common::SphericalCoordinatesPtr moonSC =
-  //   boost::make_shared<common::SphericalCoordinates>(
-  //       common::SphericalCoordinates::MOON_SCS);
+  common::SphericalCoordinatesPtr moonSC =
+    boost::make_shared<common::SphericalCoordinates>(
+        common::SphericalCoordinates::MOON_SCS);
 
-  // dem.SetSphericalCoordinates(moonSC);
-  // EXPECT_EQ(dem.Load(path.string()), 0);
+  dem.SetSphericalCoordinates(moonSC);
+  EXPECT_EQ(dem.Load(path.string()), 0);
 
-  // EXPECT_FLOAT_EQ(80.0417, dem.GetWorldWidth());
-  // EXPECT_FLOAT_EQ(80.0417, dem.GetWorldHeight());
+  EXPECT_FLOAT_EQ(80.0417, dem.GetWorldWidth());
+  EXPECT_FLOAT_EQ(80.0417, dem.GetWorldHeight());
 }
 #endif
 

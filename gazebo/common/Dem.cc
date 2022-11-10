@@ -113,8 +113,6 @@ int Dem::Load(const std::string &_filename)
   xSize = this->dataPtr->dataSet->GetRasterXSize();
   ySize = this->dataPtr->dataSet->GetRasterYSize();
 
-  std::cout << "BC-1 " << this->dataPtr->worldWidth << std::endl;
-  std::cout << "BC-2 " << this->dataPtr->worldHeight << std::endl;
   // Corner coordinates
   try
   {
@@ -130,10 +128,6 @@ int Dem::Load(const std::string &_filename)
     this->GetGeoReference(upRightX, upRightY, upRightLat, upRightLong);
     this->GetGeoReference(lowLeftX, lowLeftY, lowLeftLat, lowLeftLong);
 
-    std::cout << "DBG 1: " << upLeftLat << " " << upLeftLong << std::endl;
-    std::cout << "DBG 2: " << upRightLat << " " << upRightLong << std::endl;
-    std::cout << "DBG 3: " << lowLeftLat << " " << lowLeftLong << std::endl;
-
     // Set the world width and height
     this->dataPtr->worldWidth =
        this->dataPtr->sphericalCoordinates->DistanceBetweenPoints(
@@ -141,18 +135,12 @@ int Dem::Load(const std::string &_filename)
     this->dataPtr->worldHeight =
        this->dataPtr->sphericalCoordinates->DistanceBetweenPoints(
            upLeftLat, upLeftLong, lowLeftLat, lowLeftLong);
-
-    std::cout << "Went usual route " << this->dataPtr->worldWidth << " "
-      << this->dataPtr->worldHeight << std::endl;
   }
   catch(const common::Exception &)
   {
     gzwarn << "Failed to automatically compute DEM size. "
            << "Please use the <size> element to manually set DEM size."
            << std::endl;
-
-    std::cout << "BC1 " << this->dataPtr->worldWidth << std::endl;
-    std::cout << "BC2 " << this->dataPtr->worldHeight << std::endl;
   }
 
   // Set the terrain's side (the terrain will be squared after the padding)
@@ -272,11 +260,9 @@ void Dem::GetGeoReference(double _x, double _y,
     }
 
     cT = OGRCreateCoordinateTransformation(&sourceCs, &targetCs);
-    std::cout << "cT pointer : " << cT << std::endl;
 
     if (nullptr == cT)
     {
-      std::cout << "Exception thrown !!" << std::endl;
       gzthrow("Unable to transform terrain coordinate system to WGS84 for "
           << "coordinates (" << _x << "," << _y << ")");
     }
@@ -284,14 +270,16 @@ void Dem::GetGeoReference(double _x, double _y,
     xGeoDeg = geoTransf[0] + _x * geoTransf[1] + _y * geoTransf[2];
     yGeoDeg = geoTransf[3] + _x * geoTransf[4] + _y * geoTransf[5];
 
-    std::cout << "xGeoDeg 0 :" << xGeoDeg << std::endl;
-    std::cout << "yGeoDeg 0:" << yGeoDeg << std::endl;
-
     cT->Transform(1, &xGeoDeg, &yGeoDeg);
 
-    std::cout << "xGeoDeg 1 :" << xGeoDeg << std::endl;
-    std::cout << "yGeoDeg 1:" << yGeoDeg << std::endl;
-
+    // Workaround for https://github.com/OSGeo/gdal/issues/1546
+    // #if GDAL_VERSION_NUM >= 3000000
+    // _latitude.Degree(xGeoDeg);
+    // _longitude.Degree(yGeoDeg);
+    // #else
+    // _latitude.Degree(yGeoDeg);
+    // _longitude.Degree(xGeoDeg);
+    // #endif
     _latitude.Degree(yGeoDeg);
     _longitude.Degree(xGeoDeg);
 
