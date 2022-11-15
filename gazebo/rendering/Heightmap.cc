@@ -425,6 +425,11 @@ void Heightmap::Load()
        sphericalCoordinates = boost::make_shared<common::SphericalCoordinates>(
                   common::SphericalCoordinates::MOON_SCS);
     }
+    else
+    {
+       sphericalCoordinates = boost::make_shared<common::SphericalCoordinates>(
+                  common::SphericalCoordinates::EARTH_WGS84);
+    }
 
     this->dataPtr->heightmapData = common::HeightmapDataLoader::LoadTerrainFile(
         this->dataPtr->filename, sphericalCoordinates);
