@@ -118,10 +118,7 @@ namespace gazebo
                                               Ogre::MaterialPtr &_mat)
     {
       if (!this->dataPtr->light)
-
-
       {
-
         // return if this->light is not set, we may still be initializing
         return;
       }
@@ -285,9 +282,9 @@ namespace gazebo
           {
             // check occlusion using this env camera
             this->dataPtr->wideAngleDummyCamera->SetWorldPose(
-            ignition::math::Pose3d(
-            Conversions::ConvertIgn(cam->getDerivedPosition()),
-            Conversions::ConvertIgn(cam->getDerivedOrientation())));
+                ignition::math::Pose3d(
+                  Conversions::ConvertIgn(cam->getDerivedPosition()),
+                  Conversions::ConvertIgn(cam->getDerivedOrientation())));
 
             occlusionScale = this->OcclusionScale( this->dataPtr->wideAngleDummyCamera,
             ignition::math::Vector3d(pos.x, pos.y, pos.z),this->dataPtr->lightWorldPos);
@@ -347,7 +344,6 @@ namespace gazebo
       }
       double s = static_cast<double>(rays - occluded) /
           static_cast<double>(rays);
-      // std::cout<<"Camera : "<< _cam->Name() <<" Occlusion Scale: "<< s << std::endl;
       return s;
     }
 
