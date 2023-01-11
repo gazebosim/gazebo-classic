@@ -212,8 +212,8 @@ namespace gazebo
       // create dummy camera for occlusion checking
       // Needed so we can reuse Scene::FirstContact function which expects
       // a gazebo camera object
-      std::vector<Ogre::Camera *> ogreEnvCameras = _wideAngleCam->OgreEnvCameras();
-      
+      std::vector<Ogre::Camera *> ogreEnvCameras =
+          _wideAngleCam->OgreEnvCameras();
       // set dummy camera properties based on env cam
       Ogre::Camera *cam = ogreEnvCameras[0];
       if (!this->dataPtr->wideAngleDummyCamera)
@@ -278,7 +278,8 @@ namespace gazebo
           pos.x /= pos.w;
           pos.y /= pos.w;
           // check if light is visible
-          if (std::fabs(pos.x) <= 1 && std::fabs(pos.y) <= 1 && pos.z > abs(pos.w))
+          if (std::fabs(pos.x) <= 1 &&
+              std::fabs(pos.y) <= 1 && pos.z > abs(pos.w))
           {
             // check occlusion using this env camera
             this->dataPtr->wideAngleDummyCamera->SetWorldPose(
@@ -286,8 +287,10 @@ namespace gazebo
                   Conversions::ConvertIgn(cam->getDerivedPosition()),
                   Conversions::ConvertIgn(cam->getDerivedOrientation())));
 
-            occlusionScale = this->OcclusionScale( this->dataPtr->wideAngleDummyCamera,
-            ignition::math::Vector3d(pos.x, pos.y, pos.z),this->dataPtr->lightWorldPos);
+            occlusionScale = this->OcclusionScale(
+                this->dataPtr->wideAngleDummyCamera,
+                ignition::math::Vector3d(pos.x, pos.y, pos.z),
+                this->dataPtr->lightWorldPos);
           }
       }
       _pos = Conversions::ConvertIgn(lightPos);
@@ -337,8 +340,11 @@ namespace gazebo
           screenPos.X() = ((j / 2.0) + 0.5) * viewportWidth;
           screenPos.Y() = (1 - ((i / 2.0) + 0.5)) * viewportHeight;
           intersect = scene->FirstContact(_cam, screenPos, position);
-          if (intersect && (position.SquaredLength() < _worldPos.SquaredLength()))
+          if (intersect &&
+              (position.SquaredLength() < _worldPos.SquaredLength()))
+          {
             occluded++;
+          }
           rays++;
         }
       }

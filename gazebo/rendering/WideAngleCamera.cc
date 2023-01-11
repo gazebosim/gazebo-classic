@@ -773,7 +773,8 @@ ignition::math::Vector3d WideAngleCamera::Project3d(
     pos.x /= pos.w;
     pos.y /= pos.w;
     // check if point is visible
- if (std::fabs(pos.x) <= 1 && std::fabs(pos.y) <= 1 && pos.z > -std::fabs(pos.w))
+    if (std::fabs(pos.x) <= 1 &&
+        std::fabs(pos.y) <= 1 && pos.z > -std::fabs(pos.w))
     {
       // determine dir vector to projected point from env camera
       // work in y up, z forward, x right clip space
