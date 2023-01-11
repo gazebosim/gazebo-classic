@@ -1425,7 +1425,7 @@ TEST_F(CameraSensor, LensFlareWideAngleCamera)
   }
 
   // Get the lens flare wide angle camera model.
-  std::string modelNameLensFlare = "wide_angle_camera_lensflare";
+  std::string modelNameLensFlare = "wide_angle_cameras_near_heightmap";
   std::string cameraNameLensFlare = "camera_sensor_lensflare";
 
   physics::WorldPtr world = physics::get_world();
@@ -1440,7 +1440,7 @@ TEST_F(CameraSensor, LensFlareWideAngleCamera)
   ASSERT_TRUE(camSensorLensFlare != nullptr);
 
   // Get the wide angle camera without the lens flare.
-  std::string modelNameWithoutLensFlare = "wide_angle_camera_lensflare";
+  std::string modelNameWithoutLensFlare = "wide_angle_cameras_near_heightmap";
   std::string cameraNameWithoutLensFlare = "camera_sensor_without_lensflare";
 
   model = world->ModelByName(modelNameWithoutLensFlare);
