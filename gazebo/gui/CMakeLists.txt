@@ -160,6 +160,17 @@ if (HAVE_GRAPHVIZ)
   # Activate Export macro for building the library itself
   # if QGVCORE_LIB is not set or equal 0 (null), import macro is used
   add_definitions(-DQGVCORE_LIB)
+  # If Graphviz >= 3.0.0 is used as shared library on Windows, the GVDLL 
+  # preprocess definition should be defined. As at this point we can't 
+  # know if graphviz is shared or static, we always defined GVDLL, 
+  # leaving an option that users can use to explicitly specify that 
+  # the linked graphviz is static
+  option(GAZEBO_FINDGRAPHVIZ_USE_STATIC_GRAPHVIZ 
+         "Enable when linking a static graphviz" OFF)
+  mark_as_advanced(GAZEBO_FINDGRAPHVIZ_USE_STATIC_GRAPHVIZ)
+  if(WIN32 AND NOT GAZEBO_FINDGRAPHVIZ_USE_STATIC_GRAPHVIZ)
+    add_definitions(-DGVDLL)
+  endif()
   include_directories(${GRAPHVIZ_INCLUDE_DIR})
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qgv)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qgv/private)
