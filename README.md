@@ -11,8 +11,8 @@ For the latest version of Gazebo, see
 * https://github.com/gazebosim/gz-sim
 
 
-Dcoumentation
-------------
+Documentation
+-------------
 
 Get started at
 
