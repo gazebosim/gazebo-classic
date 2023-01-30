@@ -194,6 +194,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
      "Absolute path in which to store state data")
     ("record_period", po::value<double>()->default_value(-1),
      "Recording period (seconds).")
+    ("initial_sim_time", po::value<double>(),
+     "Initial simulation time (seconds).")
     ("record_filter", po::value<std::string>()->default_value(""),
      "Recording filter (supports wildcard and regular expression).")
     ("record_resources", "Recording with model meshes and materials.")
@@ -403,6 +405,23 @@ bool Server::ParseArgs(int _argc, char **_argv)
         gzerr << "Specified profile [" << profileName << "] was not found."
               << std::endl;
       }
+    }
+  }
+
+  if (this->dataPtr->vm.count("initial_sim_time"))
+  {
+    try
+    {
+      physics::get_world()->SetSimTime(
+          common::Time(this->dataPtr->vm["initial_sim_time"].as<double>()));
+      gzmsg << "Setting initial sim time to [" <<
+        physics::get_world()->SimTime() << "]\n" << std::endl;
+    }
+    catch(...)
+    {
+      gzerr << "Unable to cast initial_sim_time[" <<
+        this->dataPtr->vm["initial_sim_time"].as<double>() << "] "
+        << "to double for setting initial sim time\n" << std::endl;
     }
   }
 
