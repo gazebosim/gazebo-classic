@@ -48,7 +48,7 @@ class WorldWithInitialSimTimeFromCliTest : public ServerFixture
 
 /////////////////////////////////////////////////
 /// \brief Check that the initial simulation time is set correctly.
-TEST_F(WorldWithInitialSimTimeFromCliTest, Pause)
+TEST_F(WorldWithInitialSimTimeFromCliTest, CheckInitialSimTime)
 {
   ASSERT_TRUE(this->world != NULL);
   EXPECT_TRUE(this->world->IsPaused());
