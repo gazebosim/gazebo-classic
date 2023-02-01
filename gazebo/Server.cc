@@ -752,10 +752,6 @@ void Server::ProcessParams()
           this->dataPtr->params.count("record_resources") > 0;
       util::LogRecord::Instance()->Start(params);
     }
-    else {
-      gzerr << "Unknown parameter[" << iter->first << "] with value["
-            << iter->second << "]" << std::endl;
-    }
   }
 }
 
