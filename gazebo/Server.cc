@@ -194,11 +194,11 @@ bool Server::ParseArgs(int _argc, char **_argv)
      "Absolute path in which to store state data")
     ("record_period", po::value<double>()->default_value(-1),
      "Recording period (seconds).")
-    ("initial_sim_time", po::value<double>(),
-     "Initial simulation time (seconds).")
     ("record_filter", po::value<std::string>()->default_value(""),
      "Recording filter (supports wildcard and regular expression).")
     ("record_resources", "Recording with model meshes and materials.")
+    ("initial_sim_time", po::value<double>(),
+     "Initial simulation time (seconds).")
     ("seed",  po::value<double>(), "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
@@ -751,6 +751,10 @@ void Server::ProcessParams()
       params.recordResources =
           this->dataPtr->params.count("record_resources") > 0;
       util::LogRecord::Instance()->Start(params);
+    }
+    else {
+      gzerr << "Unknown parameter[" << iter->first << "] with value["
+            << iter->second << "]" << std::endl;
     }
   }
 }
