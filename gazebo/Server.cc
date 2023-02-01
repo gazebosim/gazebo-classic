@@ -197,9 +197,9 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("record_filter", po::value<std::string>()->default_value(""),
      "Recording filter (supports wildcard and regular expression).")
     ("record_resources", "Recording with model meshes and materials.")
+    ("seed",  po::value<double>(), "Start with a given random number seed.")
     ("initial_sim_time", po::value<double>(),
      "Initial simulation time (seconds).")
-    ("seed",  po::value<double>(), "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
