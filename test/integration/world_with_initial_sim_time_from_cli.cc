@@ -28,19 +28,10 @@ class WorldWithInitialSimTimeFromCliTest : public ServerFixture
   /// \brief Class constructor.
   public: WorldWithInitialSimTimeFromCliTest()
   {
-    // Start the server with a log file and paused.
+    // Start the server with an inital sim time and paused.
     this->LoadArgs("-u --initial_sim_time " + std::to_string(initialSimTime));
     this->world = physics::get_world("default");
-
-    // Prepare the transport.
-    this->node = transport::NodePtr(new transport::Node());
-    this->node->Init();
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
   }
-
-  /// \brief Gazebo transport node.
-  public: transport::NodePtr node;
 
   /// \brief Pointer to the world.
   public: physics::WorldPtr world;
