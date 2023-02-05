@@ -49,7 +49,7 @@ namespace gazebo
     class MovingWindowFilterPrivate
     {
       // \brief Constructor
-      public: MovingWindowFilterPrivate<T>();
+      public: MovingWindowFilterPrivate();
 
       /// \brief For moving window smoothed value
       public: unsigned int valWindowSize;
@@ -85,7 +85,7 @@ namespace gazebo
     class MovingWindowFilter
     {
       /// \brief Constructor
-      public: MovingWindowFilter<T>();
+      public: MovingWindowFilter();
 
       /// \brief Destructor
       public: virtual ~MovingWindowFilter();
@@ -112,7 +112,7 @@ namespace gazebo
 
       /// \brief Allow subclasses to initialize their own data pointer.
       /// \param[in] _d Reference to data pointer.
-      protected: explicit MovingWindowFilter<T>(
+      protected: explicit MovingWindowFilter(
                             MovingWindowFilterPrivate<T> &_d);
 
       /// \brief Data pointer.
