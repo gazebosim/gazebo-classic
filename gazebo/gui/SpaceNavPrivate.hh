@@ -67,7 +67,8 @@ namespace gazebo
       public: ignition::math::Vector3d deadbandRot;
 
       /// \brief button states
-      public: int buttons[2];
+      /// \brief 26 Bouttons for Space Nav Pro
+      public: int buttons[26];
     };
   }
 }
