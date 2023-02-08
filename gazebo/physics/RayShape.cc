@@ -74,6 +74,10 @@ void RayShape::SetPoints(const ignition::math::Vector3d &_posStart,
   this->relativeStartPos = _posStart;
   this->relativeEndPos = _posEnd;
 
+  // Compute the relative direction of the ray
+  this->relativeDir  = this->relativeEndPos - this->relativeStartPos;
+  this->relativeDir.Normalize();
+
   if (this->collisionParent)
   {
     this->globalStartPos =
@@ -114,10 +118,7 @@ void RayShape::SetLength(double _len)
 {
   this->contactLen = _len;
 
-  ignition::math::Vector3d dir = this->relativeEndPos - this->relativeStartPos;
-  dir.Normalize();
-
-  this->relativeEndPos = dir * _len + this->relativeStartPos;
+  this->relativeEndPos = this->relativeDir * _len + this->relativeStartPos;
 }
 
 //////////////////////////////////////////////////
