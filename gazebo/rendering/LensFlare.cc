@@ -214,8 +214,7 @@ namespace gazebo
       // a gazebo camera object
       std::vector<Ogre::Camera *> ogreEnvCameras =
           _wideAngleCam->OgreEnvCameras();
-      // set dummy camera properties based on env cam
-      Ogre::Camera *cam = ogreEnvCameras[0];
+
       if (!this->dataPtr->wideAngleDummyCamera)
       {
         // create camera with auto render set to false
@@ -229,15 +228,17 @@ namespace gazebo
             dummyCamName, false);
         this->dataPtr->wideAngleDummyCamera->Load();
 
+        // set dummy camera properties based on env cam
+        Ogre::Camera *cam = ogreEnvCameras[0];
         this->dataPtr->wideAngleDummyCamera->SetImageWidth(
-            _wideAngleCam->ViewportWidth());
+            cam->getViewport()->getActualWidth());
         this->dataPtr->wideAngleDummyCamera->SetImageHeight(
-            _wideAngleCam->ViewportHeight());
+            cam->getViewport()->getActualHeight());
         this->dataPtr->wideAngleDummyCamera->Init();
         this->dataPtr->wideAngleDummyCamera->CreateRenderTexture(
             dummyCamName + "_rtt");
         this->dataPtr->wideAngleDummyCamera->SetAspectRatio(
-            _wideAngleCam->AspectRatio());
+            cam->getAspectRatio());
         // aspect ratio should be 1.0 so VFOV should equal to HFOV
         this->dataPtr->wideAngleDummyCamera->SetHFOV(
             ignition::math::Angle(cam->getFOVy().valueRadians()));
@@ -271,6 +272,9 @@ namespace gazebo
       double occlusionScale = 1.0;
       if (lightPos.z >= 0.0)
       {
+        // loop through all env cameras
+        for (auto cam : ogreEnvCameras)
+        {
           // project light world point to camera clip space.
           auto viewProj = cam->getProjectionMatrix() * cam->getViewMatrix();
           auto pos = viewProj *
@@ -279,19 +283,41 @@ namespace gazebo
           pos.y /= pos.w;
           // check if light is visible
           if (std::fabs(pos.x) <= 1 &&
-              std::fabs(pos.y) <= 1 && pos.z > abs(pos.w))
+              std::fabs(pos.y) <= 1 && pos.z > -abs(pos.w))
           {
+            // The ogreEnvCamera and wideAngleDummyCamera used here both
+            // transform from gazebo z-up coords to Ogre y-up coords. If the
+            // ogreEnvCamera's orientation is injected into wideAngleDummyCamera
+            // as-is, the up direction transform is performed twice and this
+            // algorithm fails. Here we reverse the up direction transform on
+            // the ogreEnvCamera so that OcclusionScale() only sees one of them.
+            Ogre::Quaternion quat = cam->getDerivedOrientation();
+            Ogre::Vector3 axis = quat * Ogre::Vector3::UNIT_Z;
+            Ogre::Quaternion rotquat;
+            rotquat.FromAngleAxis(Ogre::Degree(90.0), axis);
+            quat = rotquat * quat;
+            axis = quat * Ogre::Vector3::UNIT_Y;
+            rotquat.FromAngleAxis(Ogre::Degree(90.0), axis);
+            quat = rotquat * quat;
+
             // check occlusion using this env camera
             this->dataPtr->wideAngleDummyCamera->SetWorldPose(
                 ignition::math::Pose3d(
                   Conversions::ConvertIgn(cam->getDerivedPosition()),
-                  Conversions::ConvertIgn(cam->getDerivedOrientation())));
+                  Conversions::ConvertIgn(quat)));
 
+            // OcclusionScale() was built for a regular perspective projection
+            // camera and cannot be passed a WideAngleCamera. A cleaner solution
+            // that does not involve ogreEnvCameras would be to make a version
+            // of OcclusionScale that only requires a camera pose and light
+            // world position. This would require heavy refactoring.
             occlusionScale = this->OcclusionScale(
                 this->dataPtr->wideAngleDummyCamera,
                 ignition::math::Vector3d(pos.x, pos.y, pos.z),
                 this->dataPtr->lightWorldPos);
+            break;
           }
+        }
       }
       _pos = Conversions::ConvertIgn(lightPos);
       _scale = occlusionScale * this->dataPtr->scale;
