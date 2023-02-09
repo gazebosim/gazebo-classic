@@ -17,6 +17,7 @@
 
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
+#include <array>
 #include <ignition/math/MassMatrix3.hh>
 #include <ignition/math/Rand.hh>
 

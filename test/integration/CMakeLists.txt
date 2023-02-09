@@ -121,6 +121,7 @@ set(tests
   world_entity_below_point.cc
   world_playback.cc
   world_population.cc
+  world_with_initial_sim_time_from_cli.cc
   worlds_installed.cc
   )
 
