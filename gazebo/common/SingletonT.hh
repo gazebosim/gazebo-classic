@@ -29,11 +29,28 @@
 
 /// \class SingletonT SingletonT.hh common/common.hh
 /// \brief Singleton template class
+///
+/// This class can be used to simplify the implementation of singletons,
+/// i.e. classes that only have one instance. An important constraint to
+/// respect is that for each type `T`, the method SingletonT<T>::Instance
+/// should be instantiated only once. For this reason this method should
+/// be called only once for class, and only in a non-inline method not 
+/// defined in an header file. To ensure that the SingletonT<T>::Instance 
+/// method is not accidentally called in a inline method, or multiple times, 
+/// the method is marked as deprecated. To call it (after making sure that 
+/// you are calling it respecting the constraint given in documentation), 
+/// make sure to temporary suppress deprecation warnings before calling it,
+/// and suppress them again after the Instance method has been called.
+///
+/// See https://github.com/gazebosim/gazebo-classic/pull/3269 for further
+/// details on the use of this class.
+
+
 template <class T>
 class SingletonT
 {
   /// \brief Get an instance of the singleton
-  public: static T *Instance()
+  public: static T *Instance() GAZEBO_DEPRECATED(11.0)
           {
             return &GetInstance();
           }

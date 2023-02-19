@@ -179,6 +179,9 @@ namespace gazebo
           const ignition::math::Vector3d &_axis,
           const ignition::math::Vector3d &_scale, const std::string &_geom);
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static ModelManipulator* Instance();
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelManipulator>;
 

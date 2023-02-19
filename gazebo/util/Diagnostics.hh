@@ -143,6 +143,9 @@ namespace gazebo
                    const common::Time &_wallTime,
                    const common::Time &_elapsedtime);
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static DiagnosticManager* Instance();
+
       // Singleton implementation
       private: friend class SingletonT<DiagnosticManager>;
 

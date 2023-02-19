@@ -250,6 +250,19 @@ common::Time DiagnosticManager::Time(const std::string &_label) const
 }
 
 //////////////////////////////////////////////////
+DiagnosticManager* DiagnosticManager::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<DiagnosticManager>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
 DiagnosticTimer::DiagnosticTimer(const std::string &_name)
 : Timer(),
   dataPtr(new DiagnosticTimerPrivate)

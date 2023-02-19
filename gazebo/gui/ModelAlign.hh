@@ -97,6 +97,9 @@ namespace gazebo
       private: void SetHighlighted(const rendering::VisualPtr &_vis,
           const bool _highlight);
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static ModelAlign* Instance();
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelAlign>;
 

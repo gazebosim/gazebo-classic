@@ -116,3 +116,16 @@ bool KeyEventHandler::Handle(const common::KeyEvent &_event,
   }
   return false;
 }
+
+//////////////////////////////////////////////////
+KeyEventHandler* KeyEventHandler::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<KeyEventHandler>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}

@@ -261,6 +261,9 @@ namespace gazebo
                       const ignition::math::Vector2d &_p,
                       double _tol);
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static MeshManager* Instance();
+
       /// \brief Singleton implementation
       private: friend class SingletonT<MeshManager>;
 

@@ -838,3 +838,16 @@ bool LogPlay::PrevChunk()
 
   return true;
 }
+
+//////////////////////////////////////////////////
+LogPlay* LogPlay::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<LogPlay>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}

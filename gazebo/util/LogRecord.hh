@@ -262,6 +262,9 @@ namespace gazebo
       /// \brief Used to get the simulation pause state.
       private: void OnPause(const bool _pause);
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static LogRecord* Instance();
+
       /// \brief This is a singleton
       private: friend class SingletonT<LogRecord>;
 

@@ -145,6 +145,9 @@ namespace gazebo
       private: bool Handle(const common::KeyEvent &_event,
                    std::list<Filter> &_list);
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static KeyEventHandler* Instance();
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<KeyEventHandler>;
 

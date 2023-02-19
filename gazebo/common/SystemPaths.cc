@@ -577,3 +577,16 @@ void SystemPaths::AddSearchPathSuffix(const std::string &_suffix)
 
   this->suffixPaths.push_back(s);
 }
+
+//////////////////////////////////////////////////
+SystemPaths* SystemPaths::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<SystemPaths>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}

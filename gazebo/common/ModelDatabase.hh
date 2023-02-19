@@ -150,6 +150,9 @@ namespace gazebo
       /// no one else should use this function.
       private: bool UpdateModelCacheImpl();
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static ModelDatabase* Instance();
+
       /// \brief Private data.
       private: ModelDatabasePrivate *dataPtr;
 

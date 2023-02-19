@@ -81,6 +81,9 @@ namespace gazebo
       /// \return A list of audio device names
       public: std::set<std::string> DeviceList() const;
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static OpenAL* Instance();
+
       /// \internal
       /// \brief Private data pointer.
       private: std::unique_ptr<OpenALPrivate> dataPtr;

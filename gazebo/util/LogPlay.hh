@@ -184,6 +184,9 @@ namespace gazebo
       /// chunks before the current one.
       private: bool PrevChunk();
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static LogPlay* Instance();
+
       /// \internal
       /// \brief Private data pointer
       private: std::unique_ptr<LogPlayPrivate> dataPtr;

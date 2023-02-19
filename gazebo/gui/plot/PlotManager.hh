@@ -87,6 +87,9 @@ namespace gazebo
       /// \return Human readable name
       public: std::string HumanReadableName(const std::string &_uri) const;
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static PlotManager* Instance();
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<PlotManager>;
 

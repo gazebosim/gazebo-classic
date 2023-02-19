@@ -883,3 +883,16 @@ Ogre::OverlaySystem *RenderEngine::OverlaySystem() const
   return this->dataPtr->overlaySystem;
 }
 #endif
+
+//////////////////////////////////////////////////
+RenderEngine* RenderEngine::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<RenderEngine>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}

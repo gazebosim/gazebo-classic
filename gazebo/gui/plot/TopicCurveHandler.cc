@@ -55,6 +55,9 @@ namespace gazebo
       /// \param[in] _msg WorldStats msg.
       public: void OnStats(ConstWorldStatisticsPtr &_msg);
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static TopicTime* Instance();
+
       /// \brief Node for communications.
       private: transport::NodePtr node;
 
@@ -166,6 +169,19 @@ void TopicTime::OnStats(ConstWorldStatisticsPtr &_msg)
 
   std::lock_guard<std::mutex> lock(this->mutex);
   this->lastSimTime = msgs::Convert(t);
+}
+
+//////////////////////////////////////////////////
+TopicTime* TopicTime::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<TopicTime>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////

@@ -135,3 +135,16 @@ void MouseEventHandler::Handle(const common::MouseEvent &_event,
       break;
   }
 }
+
+//////////////////////////////////////////////////
+MouseEventHandler* MouseEventHandler::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<MouseEventHandler>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}

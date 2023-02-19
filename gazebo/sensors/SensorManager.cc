@@ -1005,6 +1005,20 @@ bool SensorManager::ImageSensorContainer::WaitForPrerendered(double _timeoutsec)
   return (ret == std::cv_status::no_timeout);
 }
 
+//////////////////////////////////////////////////
+SensorManager* SensorManager::Instance()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return SingletonT<SensorManager>::Instance();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+
 /////////////////////////////////////////////////
 SimTimeEventHandler::SimTimeEventHandler()
 {

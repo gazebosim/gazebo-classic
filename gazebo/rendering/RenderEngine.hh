@@ -168,6 +168,9 @@ namespace gazebo
       /// \brief Check the rendering capabilities of the system.
       private: void CheckSystemCapabilities();
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static RenderEngine* Instance();
+
       /// \brief ID for a dummy window. Used for gui-less operation
       protected: uint64_t dummyWindowId;
 

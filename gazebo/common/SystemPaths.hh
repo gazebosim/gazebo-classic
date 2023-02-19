@@ -181,6 +181,9 @@ namespace gazebo
       private: void InsertUnique(const std::string &_path,
                                  std::list<std::string> &_list);
 
+      /// \brief Returns a pointer to the unique (static) instance
+      public: static SystemPaths* Instance();
+
       /// \brief Paths to installed gazebo media files
       private: std::list<std::string> gazeboPaths;
 
