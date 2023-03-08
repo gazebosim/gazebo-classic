@@ -69,6 +69,7 @@ JointController::~JointController()
 /////////////////////////////////////////////////
 void JointController::AddJoint(JointPtr _joint)
 {
+  std::unique_lock<std::mutex> lock(this->dataPtr->jointsMutex);
   this->dataPtr->joints[_joint->GetScopedName()] = _joint;
   this->dataPtr->posPids[_joint->GetScopedName()].Init(
       1, 0.1, 0.01, 1, -1, 1000, -1000);
@@ -81,6 +82,7 @@ void JointController::RemoveJoint(Joint *_joint)
 {
   if (_joint)
   {
+    std::unique_lock<std::mutex> lock(this->dataPtr->jointsMutex);
     this->dataPtr->joints.erase(_joint->GetScopedName());
     this->dataPtr->posPids.erase(_joint->GetScopedName());
     this->dataPtr->velPids.erase(_joint->GetScopedName());
@@ -124,6 +126,7 @@ void JointController::Update()
   // TODO: fix this when World::ResetTime is improved
   if (stepTime > 0)
   {
+    std::unique_lock<std::mutex> lock(this->dataPtr->jointsMutex);
     IGN_PROFILE_BEGIN("forces");
     if (!this->dataPtr->forces.empty())
     {
@@ -245,6 +248,7 @@ bool JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
 void JointController::OnJointCommand(const ignition::msgs::JointCmd &_msg)
 {
   std::map<std::string, JointPtr>::iterator iter;
+  std::unique_lock<std::mutex> lock(this->dataPtr->jointsMutex);
   iter = this->dataPtr->joints.find(_msg.name());
   if (iter != this->dataPtr->joints.end())
   {
@@ -384,6 +388,7 @@ void JointController::OnJointCommand(const ignition::msgs::JointCmd &_msg)
 void JointController::SetJointPosition(const std::string & _name,
                                        double _position, int _index)
 {
+  std::unique_lock<std::mutex> lock(this->dataPtr->jointsMutex);
   std::map<std::string, JointPtr>::iterator jiter =
     this->dataPtr->joints.find(_name);
 
@@ -402,6 +407,7 @@ void JointController::SetJointPositions(
   std::map<std::string, JointPtr>::iterator iter;
   std::map<std::string, double>::const_iterator jiter;
 
+  std::unique_lock<std::mutex> lock(this->dataPtr->jointsMutex);
   for (iter = this->dataPtr->joints.begin();
       iter != this->dataPtr->joints.end(); ++iter)
   {
@@ -436,6 +442,7 @@ common::Time JointController::GetLastUpdateTime() const
 /////////////////////////////////////////////////
 std::map<std::string, JointPtr> JointController::GetJoints() const
 {
+  std::unique_lock<std::mutex> lock(this->dataPtr->jointsMutex);
   return this->dataPtr->joints;
 }
 
@@ -474,6 +481,7 @@ void JointController::SetPositionPID(const std::string &_jointName,
                                      const common::PID &_pid)
 {
   std::map<std::string, JointPtr>::iterator iter;
+  std::unique_lock<std::mutex> lock(this->dataPtr->jointsMutex);
   iter = this->dataPtr->joints.find(_jointName);
 
   if (iter != this->dataPtr->joints.end())
@@ -503,6 +511,7 @@ void JointController::SetVelocityPID(const std::string &_jointName,
                                      const common::PID &_pid)
 {
   std::map<std::string, JointPtr>::iterator iter;
+  std::unique_lock<std::mutex> lock(this->dataPtr->jointsMutex);
   iter = this->dataPtr->joints.find(_jointName);
 
   if (iter != this->dataPtr->joints.end())
@@ -533,6 +542,7 @@ bool JointController::SetForce(const std::string &_jointName,
 {
   bool result = false;
 
+  std::unique_lock<std::mutex> lock(this->dataPtr->jointsMutex);
   if (this->dataPtr->joints.find(_jointName) !=
       this->dataPtr->joints.end())
   {
