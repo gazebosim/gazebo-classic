@@ -19,6 +19,7 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 #include <ignition/transport.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -34,6 +35,9 @@ namespace gazebo
     {
       /// \brief Model to control.
       public: ModelPtr model;
+
+      /// \brief Mutex to protect joints map.
+      public: std::mutex jointsMutex;
 
       /// \brief List of links that have been updated.
       public: Link_V updatedLinks;
