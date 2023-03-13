@@ -33,6 +33,9 @@ namespace gazebo
     /// \brief Lens flare
     public: std::vector<rendering::LensFlarePtr> lensFlares;
 
+    /// \brief Name of light that generates lens flare
+    public: std::string lightName;
+
     /// \brief Lens flare scale
     public: double scale = 1.0;
 
@@ -76,6 +79,11 @@ void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor,
   {
     gzerr << "Invalid SDF pointer." << std::endl;
     return;
+  }
+
+  if (_sdf->HasElement("light_name"))
+  {
+    this->dataPtr->lightName = _sdf->Get<std::string>("light_name");
   }
 
   if (_sdf->HasElement("scale"))
@@ -128,6 +136,17 @@ void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor,
 }
 
 /////////////////////////////////////////////////
+void LensFlareSensorPlugin::SetLightName(std::string _name)
+{
+  this->dataPtr->lightName = _name;
+
+  for (auto flare : this->dataPtr->lensFlares)
+  {
+    flare->SetLightName(_name);
+  }
+}
+
+/////////////////////////////////////////////////
 void LensFlareSensorPlugin::SetScale(const double _scale)
 {
   this->dataPtr->scale = _scale;
@@ -172,6 +191,7 @@ void LensFlareSensorPlugin::AddLensFlare(rendering::CameraPtr _camera)
   {
     lensFlare->SetCompositorName(this->dataPtr->compositorName);
   }
+  lensFlare->SetLightName(this->dataPtr->lightName);
   lensFlare->SetScale(this->dataPtr->scale);
   lensFlare->SetColor(this->dataPtr->color);
   lensFlare->SetOcclusionSteps(this->dataPtr->occlusionSteps);
