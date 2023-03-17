@@ -560,30 +560,22 @@ void LensFlare::Update()
 
   LightPtr light;
 
-  // Use the preferred light, if there is one
+  // Use the specified light, if there is one
   if (!this->dataPtr->lightName.empty())
   {
     light = this->dataPtr->camera->GetScene()->LightByName(
         this->dataPtr->lightName);
-    static bool notPrintedYet = true;
-    if (!light && notPrintedYet)
-    {
-      gzwarn << "There exists no light named " << this->dataPtr->lightName
-             << std::endl;
-      notPrintedYet = false;
-    }
   }
-
-  // Get the first directional light
-  if (!light)
+  else // Get the first directional light
   {
-    for (unsigned int i = 0; i < this->dataPtr->camera->GetScene()->LightCount();
-        ++i)
+    for (unsigned int i = 0;
+         i < this->dataPtr->camera->GetScene()->LightCount(); ++i)
     {
-      LightPtr lp = this->dataPtr->camera->GetScene()->LightByIndex(i);
-      if (lp->Type() == "directional")
+      LightPtr directionalLight =
+          this->dataPtr->camera->GetScene()->LightByIndex(i);
+      if (directionalLight->Type() == "directional")
       {
-        light = lp;
+        light = directionalLight;
         break;
       }
     }
