@@ -52,9 +52,9 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
 
   ignition::math::Vector2d imageSize = msgs::ConvertIgn(_msg.image_size());
 
-  double dist = 2.0;
   double width = 1.0;
-  double height = imageSize.Y() / imageSize.X();
+  double dist = width / (tan(_msg.horizontal_fov() * 0.5) * 2.0);
+  double height = width * imageSize.Y() / imageSize.X();
 
   dPtr->camera = dPtr->scene->CreateCamera(this->Name(), false);
 
