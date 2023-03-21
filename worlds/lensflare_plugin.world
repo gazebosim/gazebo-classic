@@ -2,13 +2,33 @@
 <sdf version="1.6">
   <world name="default">
 
-  <!-- Light Source -->
+  <!-- Light Sources -->
   <light type="directional" name="sun">
     <cast_shadows>true</cast_shadows>
     <pose>0 0 0 0.0 0.0 0.0</pose>
     <diffuse>1.0 1.0 1.0 1.0</diffuse>
     <specular>0.2 0.2 0.2 1</specular>
     <direction>-1.0 0.0 -0.2</direction>
+  </light>
+
+  <!-- spot light -->
+  <light type="spot" name="spot_light">
+    <pose>5 1 1 0 1.4 0</pose>
+    <diffuse>1 1 1 1</diffuse>
+    <specular>.2 .2 .2 1</specular>
+    <attenuation>
+      <range>10</range>
+      <linear>0.01</linear>
+      <constant>0.2</constant>
+      <quadratic>0.0</quadratic>
+    </attenuation>
+    <direction>0 0 -1</direction>
+    <spot>
+      <inner_angle>0.1</inner_angle>
+      <outer_angle>0.5</outer_angle>
+      <falloff>1.2</falloff>
+    </spot>
+    <cast_shadows>false</cast_shadows>
   </light>
 
     <!-- A ground plane -->
@@ -77,6 +97,40 @@
           <visualize>true</visualize>
           <plugin name="lensflare" filename="libLensFlareSensorPlugin.so">
             <scale>0.1</scale>
+          </plugin>
+        </sensor>
+      </link>
+    </model>
+
+    <!-- camera model with lens flare plugin that uses the spot light -->
+    <model name="camera_lensflare_spot">
+      <static>true</static>
+      <pose>0 0 0.05 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name="camera_sensor_lensflare_spot" type="camera">
+          <camera>
+            <horizontal_fov>0.78539816339744828</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>240</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
+          <plugin name="lensflare" filename="libLensFlareSensorPlugin.so">
+            <light_name>spot_light</light_name>
           </plugin>
         </sensor>
       </link>
