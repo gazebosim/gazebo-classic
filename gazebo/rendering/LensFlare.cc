@@ -40,9 +40,6 @@ namespace gazebo
       /// \brief Pointer to light
       public: LightPtr light;
 
-      /// \brief Pointer to light
-      public: std::string lightName;
-
       /// \brief Pointer to camera
       public: CameraPtr camera;
 
@@ -87,12 +84,6 @@ namespace gazebo
     void LensFlareCompositorListener::SetLight(LightPtr _light)
     {
       this->dataPtr->light = _light;
-    }
-
-    //////////////////////////////////////////////////
-    void LensFlareCompositorListener::SetLightName(std::string _name)
-    {
-      this->dataPtr->lightName = _name;
     }
 
     //////////////////////////////////////////////////
@@ -500,11 +491,6 @@ void LensFlare::SetCamera(CameraPtr _camera)
 void LensFlare::SetLightName(std::string _name)
 {
   this->dataPtr->lightName = _name;
-  if (this->dataPtr->lensFlareCompositorListener)
-  {
-    this->dataPtr->lensFlareCompositorListener->SetLightName(
-        this->dataPtr->lightName);
-  }
 }
 
 //////////////////////////////////////////////////
