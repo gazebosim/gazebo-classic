@@ -2,7 +2,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (CheckCXXSourceCompiles)
 
 include (${gazebo_cmake_dir}/FindOS.cmake)
-include (FindPkgConfig)
+find_package(PkgConfig)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
 
 execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --modversion protobuf

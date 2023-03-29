@@ -35,7 +35,7 @@ set (GAZEBO_HAS_DART_BULLET @HAVE_DART_BULLET@)
 # Set whether Gazebo was built with Ignition Fuel Tools support
 set (GAZEBO_HAS_IGNITION_FUEL_TOOLS @HAVE_IGNITION_FUEL_TOOLS@)
 
-include (FindPkgConfig)
+find_package(PkgConfig)
 
 #################################################
 # @PKG_NAME@_PROTO_PATH, @PKG_NAME@_PROTO_INCLUDE_DIRS, and
