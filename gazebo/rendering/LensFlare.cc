@@ -405,8 +405,11 @@ namespace gazebo
       /// \brief Pointer to camera
       public: CameraPtr camera;
 
-      /// \brief Name of directional light
+      /// \brief Name of preferred light
       public: std::string lightName;
+
+      /// \brief Name of light currently generating lens flare
+      public: std::string lightNameCurrentlyInUse;
 
       /// \brief Flag to indicate whether or not to remove lens flare effect.
       public: bool removeLensFlare = false;
@@ -485,6 +488,12 @@ void LensFlare::SetCamera(CameraPtr _camera)
 }
 
 //////////////////////////////////////////////////
+void LensFlare::SetLightName(std::string _name)
+{
+  this->dataPtr->lightName = _name;
+}
+
+//////////////////////////////////////////////////
 void LensFlare::SetScale(const double _scale)
 {
   this->dataPtr->lensFlareScale = std::max(0.0, _scale);
@@ -531,29 +540,39 @@ void LensFlare::Update()
     this->dataPtr->requestSub.reset();
     this->dataPtr->lensFlareInstance->setEnabled(false);
     this->dataPtr->removeLensFlare = false;
-    this->dataPtr->lightName = "";
+    this->dataPtr->lightNameCurrentlyInUse = "";
     return;
   }
 
+  LightPtr light;
 
-  // Get the first directional light
-  LightPtr directionalLight;
-  for (unsigned int i = 0; i < this->dataPtr->camera->GetScene()->LightCount();
-      ++i)
+  // Use the specified light, if there is one
+  if (!this->dataPtr->lightName.empty())
   {
-    LightPtr light = this->dataPtr->camera->GetScene()->LightByIndex(i);
-    if (light->Type() == "directional")
+    light = this->dataPtr->camera->GetScene()->LightByName(
+        this->dataPtr->lightName);
+  }
+  else // Get the first directional light
+  {
+    for (unsigned int i = 0;
+         i < this->dataPtr->camera->GetScene()->LightCount(); ++i)
     {
-      directionalLight = light;
-      break;
+      LightPtr directionalLight =
+          this->dataPtr->camera->GetScene()->LightByIndex(i);
+      if (directionalLight->Type() == "directional")
+      {
+        light = directionalLight;
+        break;
+      }
     }
   }
-  if (!directionalLight)
+
+  if (!light)
     return;
 
-  this->dataPtr->lightName = directionalLight->Name();
+  this->dataPtr->lightNameCurrentlyInUse = light->Name();
 
-  this->dataPtr->lensFlareCompositorListener->SetLight(directionalLight);
+  this->dataPtr->lensFlareCompositorListener->SetLight(light);
   this->dataPtr->lensFlareInstance->setEnabled(true);
 
   // disconnect
@@ -575,7 +594,7 @@ void LensFlare::OnRequest(ConstRequestPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   if (_msg->request() == "entity_delete" &&
-      _msg->data() == this->dataPtr->lightName)
+      _msg->data() == this->dataPtr->lightNameCurrentlyInUse)
   {
     this->dataPtr->removeLensFlare = true;
     this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(

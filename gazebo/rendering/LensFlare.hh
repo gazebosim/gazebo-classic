@@ -47,8 +47,8 @@ namespace gazebo
       /// \brief Destructor
       public: ~LensFlareCompositorListener();
 
-      /// \brief Set directional light that generates lens flare
-      /// \param[in] _light Pointer to directional light
+      /// \brief Set light that generates lens flare
+      /// \param[in] _light Pointer to light
       public: void SetLight(LightPtr _light);
 
       /// \brief Set the scale of lens flare.
@@ -120,6 +120,10 @@ namespace gazebo
       /// \brief Set the camera which lensFlare will be applied to.
       /// \param[in] _camera Camera to be distorted
       public: void SetCamera(CameraPtr _camera);
+
+      /// \brief Set the name of light that generates lens flare.
+      /// \param[in] _name Light that generates lens flare
+      public: void SetLightName(std::string _name);
 
       /// \brief Set the scale of lens flare. Must be greater than 0.
       /// \param[in] _scale Scale of lens flare

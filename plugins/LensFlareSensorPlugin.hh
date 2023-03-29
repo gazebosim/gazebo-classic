@@ -30,6 +30,7 @@ namespace gazebo
   /// The plugin has the following optional parameter:
   /// <color>           Color of lens flare.
   /// <compositor>      Name of the lens flare compositor to use.
+  /// <light_name>      Name of the light source to use.
   /// <occlusion_steps> Number of steps used when checking for occlusions.
   /// <scale>           Scale of lens flare. Must be greater than 0.
   /// \todo A potentially useful feature would be an option for constantly
@@ -45,6 +46,10 @@ namespace gazebo
     // Documentation inherited
     public: virtual void Load(sensors::SensorPtr _sensor,
         sdf::ElementPtr _sdf);
+
+    /// \brief Set the light name.
+    /// \param[in] _name Scale of lens flare
+    public: void SetLightName(std::string _name);
 
     /// \brief Set the scale of lens flare.
     /// \param[in] _scale Scale of lens flare
