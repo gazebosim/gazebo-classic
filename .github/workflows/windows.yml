@@ -1,0 +1,42 @@
+name: Windows
+on:
+  push:
+    branches: [ gazebo11 ]
+  pull_request:
+    branches: [ gazebo11 ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: windows-build
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Setup msbuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Fix vcpkg
+        run: vcpkg.exe integrate remove
+
+      - name: clone vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg/
+          vcpkg\bootstrap-vcpkg.bat
+
+
+      - name: Build Gazebo
+        run: |
+          cmake . -B build -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_MANIFEST_DIR=deps/vcpkg/manifests/windows -DVCPKG_MANIFEST_INSTALL=vcpkg\installed\ -DVCPKG_TARGET_TRIPLET=x64-windows-release  -DVCPKG_HOST_TRIPLET=x64-windows-release -DVCPKG_INSTALL_OPTIONS=--clean-after-build 
+          cmake --build build --config Release
+          
+      - name: Optional tests suite compilation
+        run: |
+          :: compile tests and run them here
