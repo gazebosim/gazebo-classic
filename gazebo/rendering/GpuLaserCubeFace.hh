@@ -55,8 +55,11 @@ namespace gazebo
       /// \brief The texture used to render the depth image
       Ogre::TexturePtr texture;
 
-      /// \brief The depth image data
-      std::vector<float> depthImg;
+      /// \brief The depth image data with float16
+      std::vector<Ogre::uint16> depthImgFloat16;
+
+      /// \brief The depth image data with float32
+      std::vector<float> depthImgFloat32;
     };
 
   }

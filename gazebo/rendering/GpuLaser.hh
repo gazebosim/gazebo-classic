@@ -93,6 +93,9 @@ namespace gazebo
       /// \brief Return an iterator to one past the end of the laser data
       public: DataIter LaserDataEnd() const;
 
+      /// \brief Return a pointer to the laser data vector
+      public: std::vector<float>* LaserData() const;
+
       /// \brief Connect to a laser frame signal
       /// \param[in] _subscriber Callback that is called when a new image is
       /// generated
@@ -207,10 +210,12 @@ namespace gazebo
       /// \param[in] _rayCountRatio ray count ratio (equivalent to aspect ratio)
       public: void SetRayCountRatio(const double _rayCountRatio);
 
-      /// TODO:
+      /// \brief Gets if sensor is a sample sensor
+      /// \return True if sample sensor, false if not
       public: void SetIsSample(const bool _sampleSensor);
 
-      /// TODO:
+      /// \brief Gets the sample size of the sensor
+      /// \return Number of samples
       public: void SetSampleSize(const unsigned int _sampleSize);
 
       /// \brief Initializes the mapping of ray angles to cube map coordinates.
@@ -220,7 +225,11 @@ namespace gazebo
       /// \param[in] _elevation_values Set of elevation angles (radians). The order matters!
       public: void InitMapping(const std::set<double> &_azimuth_values, const std::set<double> &_elevation_values);
 
-      /// TODO:
+      /// \brief Initializes the mapping of ray angles to cube map coordinates.
+      /// Combination of one azimuth and elevation value corresponds to one
+      /// laser ray.
+      /// \param[in] _azimuth_values Vector of azimuth angles (radians). The order matters!
+      /// \param[in] _elevation_values Vector of elevation angles (radians). The order matters!
       public: void InitMapping(const std::vector<double> &_azimuth_values, const std::vector<double> &_elevation_values);
 
       /// \brief Finds the corresponding cube map face and the coordinates of
@@ -300,10 +309,16 @@ namespace gazebo
       /// \brief Number of cameras needed to generate the rays.
       protected: unsigned int cameraCount;
 
-      /// \brief Sensor is publishing only samples     
+      /// \brief Sensor is publishing only samples
       protected: bool isSampleSensor;
 
+      /// \brief Size of samples
       protected: unsigned int sampleSize;
+
+      /// \internal
+      /// \brief Index used to iterate over the samples for each iteration
+      protected: unsigned int sampleOffset;
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<GpuLaserPrivate> dataPtr;

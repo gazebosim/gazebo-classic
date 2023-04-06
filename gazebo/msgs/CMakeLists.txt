@@ -50,10 +50,10 @@ set (msgs
   joint_wrench.proto
   joint_wrench_stamped.proto
   joystick.proto
-  laserscan.proto
-  laserscan_stamped.proto
-  laserscan_angles.proto
   laserscan_angles_stamped.proto
+  laserscan_angles.proto
+  laserscan_stamped.proto
+  laserscan.proto
   light.proto
   link.proto
   link_data.proto

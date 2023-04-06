@@ -277,7 +277,14 @@ namespace gazebo
       /// \brief Private data pointer.
       private: std::unique_ptr<GpuRaySensorPrivate> dataPtr;
 
+      /// \brief Read CSV file for samples.
       private: bool readCsvFile(std::string file_name, std::vector<std::vector<double>>& datas);
+
+      /// \brief Get sample size parameter.
+      public: unsigned int SampleSize() const;
+
+      /// \brief Get if sensor is a sample sensor.
+      private: bool IsSampleSensor() const
     };
     /// \}
   }
