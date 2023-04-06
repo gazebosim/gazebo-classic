@@ -25,6 +25,7 @@
 
 #include <OGRE/Ogre.h>
 #include <OGRE/OgreBillboard.h>
+#include <OGRE/OgreBitwise.h>
 #include <OGRE/OgreImageCodec.h>
 #include <OGRE/OgreMovableObject.h>
 #include <OGRE/OgreRenderable.h>

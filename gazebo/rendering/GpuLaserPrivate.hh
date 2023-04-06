@@ -75,6 +75,11 @@ namespace gazebo
 
       /// \brief Number of vertical ranges.
       public: unsigned int verticalRangeCount;
+
+      /// \brief Sample azimuth angle
+      public: std::vector<double> sampleAzimuth;
+      /// \brief Sample elevation angle
+      public: std::vector<double> sampleElevation;
     };
   }
 }

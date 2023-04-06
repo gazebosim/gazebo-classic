@@ -52,6 +52,8 @@ set (msgs
   joystick.proto
   laserscan.proto
   laserscan_stamped.proto
+  laserscan_angles.proto
+  laserscan_angles_stamped.proto
   light.proto
   link.proto
   link_data.proto

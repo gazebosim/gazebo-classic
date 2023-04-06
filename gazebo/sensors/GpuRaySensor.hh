@@ -276,6 +276,8 @@ namespace gazebo
       /// \internal
       /// \brief Private data pointer.
       private: std::unique_ptr<GpuRaySensorPrivate> dataPtr;
+
+      private: bool readCsvFile(std::string file_name, std::vector<std::vector<double>>& datas);
     };
     /// \}
   }

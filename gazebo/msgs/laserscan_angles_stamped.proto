@@ -1,0 +1,17 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface LaserScanAnglesStamped
+/// \brief Message for an laser scan with a time
+
+
+import "time.proto";
+import "laserscan_angles.proto";
+
+message LaserScanAnglesStamped
+{
+  // Time when the data was captured
+  required Time time                = 1;
+  required LaserScanAngles scan     = 2;
+}

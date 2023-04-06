@@ -79,6 +79,9 @@ namespace gazebo
       /// \brief Laser message to publish data.
       public: msgs::LaserScanStamped laserMsg;
 
+      /// \brief Laser message with angles to publish data.
+      public: msgs::LaserScanAnglesStamped laserAnglesMsg;
+
       /// \brief Parent entity of gpu ray sensor
       public: physics::EntityPtr parentEntity;
 
@@ -94,6 +97,15 @@ namespace gazebo
       /// \brief Timestamp of the forthcoming rendering
       public: double nextRenderingTime
                            = std::numeric_limits<double>::quiet_NaN();
+
+      /// \brief Sensor only publishing samples of the result
+      public: bool isSampleSensor = false;
+
+      /// \brief Number of samples published each step
+      public: unsigned int sampleSize;
+
+      /// \brief Path to load the csv of the samples
+      public: std::string sampleFile;
     };
   }
 }

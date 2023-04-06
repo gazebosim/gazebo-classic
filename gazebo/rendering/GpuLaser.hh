@@ -78,7 +78,8 @@ namespace gazebo
 
       /// \brief Create the texture which is used to render laser data.
       /// \param[in] _textureName Name of the new texture.
-      public: void CreateLaserTexture(const std::string &_textureName);
+      /// \param[in] _pixel_format Pixel format of the texture.
+      public: void CreateLaserTexture(const std::string &_textureName, const Ogre::PixelFormat _pixel_format);
 
       // Documentation inherited
       public: void PostRender() override;
@@ -206,12 +207,21 @@ namespace gazebo
       /// \param[in] _rayCountRatio ray count ratio (equivalent to aspect ratio)
       public: void SetRayCountRatio(const double _rayCountRatio);
 
+      /// TODO:
+      public: void SetIsSample(const bool _sampleSensor);
+
+      /// TODO:
+      public: void SetSampleSize(const unsigned int _sampleSize);
+
       /// \brief Initializes the mapping of ray angles to cube map coordinates.
       /// Each combination of values (azimuth, elevation) corresponds to one
       /// laser ray.
       /// \param[in] _azimuth_values Set of azimuth angles (radians). The order matters!
       /// \param[in] _elevation_values Set of elevation angles (radians). The order matters!
       public: void InitMapping(const std::set<double> &_azimuth_values, const std::set<double> &_elevation_values);
+
+      /// TODO:
+      public: void InitMapping(const std::vector<double> &_azimuth_values, const std::vector<double> &_elevation_values);
 
       /// \brief Finds the corresponding cube map face and the coordinates of
       /// intersection of the view ray.
@@ -290,6 +300,10 @@ namespace gazebo
       /// \brief Number of cameras needed to generate the rays.
       protected: unsigned int cameraCount;
 
+      /// \brief Sensor is publishing only samples     
+      protected: bool isSampleSensor;
+
+      protected: unsigned int sampleSize;
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<GpuLaserPrivate> dataPtr;

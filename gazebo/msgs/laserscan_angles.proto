@@ -1,0 +1,30 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface LaserScan
+/// \brief Data from a laser scan
+
+
+import "pose.proto";
+
+message LaserScanAngles
+{
+  required string frame               = 1;
+  required Pose world_pose            = 2;
+  optional double angle_min           = 3;
+  optional double angle_max           = 4;
+  optional double angle_step          = 5;
+  required double range_min           = 6;
+  required double range_max           = 7;
+  required uint32 count               = 8;
+  optional double vertical_angle_min  = 9;
+  optional double vertical_angle_max  = 10;
+  optional double vertical_angle_step = 11;
+  optional uint32 vertical_count      = 12;
+
+  repeated double ranges              = 13;
+  repeated double intensities         = 14;
+  repeated double azimuth             = 15;
+  repeated double zenith              = 16;
+}
