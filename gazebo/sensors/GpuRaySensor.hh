@@ -284,7 +284,7 @@ namespace gazebo
       public: unsigned int SampleSize() const;
 
       /// \brief Get if sensor is a sample sensor.
-      private: bool IsSampleSensor() const
+      private: bool IsSampleSensor() const;
     };
     /// \}
   }

@@ -680,7 +680,12 @@ void GpuLaser::InitMapping(const std::vector<double> &_azimuth_values, const std
     return;
   }
 
-  const double min_azimuth = -M_PI; //TODO: Hardcoded *std::min_element(_azimuth_values.begin(), _azimuth_values.end());//*_azimuth_values.begin();
+  double min_azimuth = -M_PI;
+  if (!isSampleSensor)
+  {
+    min_azimuth = *std::min_element(_azimuth_values.begin(), _azimuth_values.end());
+  }
+
   const double front_face_azimuth = min_azimuth + M_PI_4;
 
   // define face orientations w.r.t. front face

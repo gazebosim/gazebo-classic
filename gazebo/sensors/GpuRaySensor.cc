@@ -282,8 +282,13 @@ void GpuRaySensor::Init()
 
     // ensure minimal texture size (to mitigate issues with stepped point cloud
     // especially for shallow angles of incidence)
-    constexpr unsigned int min_texture_size = 1024;
-    const unsigned int camera_resolution = std::max(ranges, min_texture_size); //TODO GEORG: 
+    //constexpr unsigned int min_texture_size = 1024;
+    //const unsigned int camera_resolution = std::max(ranges, min_texture_size); //TODO GEORG:
+    unsigned int camera_resolution = 1024;
+    if (!IsSampleSensor())
+    {
+      camera_resolution = std::max(this->RayCount() / 4, this->VerticalRayCount() / 2);
+    }
 
     // Initialize camera sdf for GpuLaser
     this->dataPtr->cameraElem.reset(new sdf::Element);
@@ -297,7 +302,7 @@ void GpuRaySensor::Init()
 
     if (IsSampleSensor())
     {
-      ptr->GetElement("format")->Set("FLOAT16");
+      ptr->GetElement("format")->Set("R_FLOAT16");
     }
     else
     {
