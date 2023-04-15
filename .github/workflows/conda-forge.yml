@@ -34,7 +34,7 @@ jobs:
         # Workaround for https://github.com/conda-incubator/setup-miniconda/issues/186
         conda config --remove channels defaults
         # Install dependencies
-        mamba install cmake compilers make ninja pkg-config libprotobuf libsdformat libignition-cmake2 libignition-math6 libignition-transport8 libignition-common3 libignition-fuel-tools4 qt-main ogre=1.10 freeimage curl tbb-devel qwt tinyxml2 libccd boost-cpp libcurl tinyxml bzip2 zlib ffmpeg graphviz libgdal libusb bullet-cpp simbody hdf5 openal-soft glib gts dartsim
+        mamba install cmake compilers make ninja pkg-config libprotobuf libsdformat libignition-cmake2 libignition-math6 libignition-transport8 libignition-common3 libignition-fuel-tools4 qt-main ogre=1.10 freeimage curl tbb-devel qwt tinyxml2 libccd-double boost-cpp libcurl tinyxml bzip2 zlib ffmpeg graphviz libgdal libusb bullet-cpp simbody hdf5 openal-soft glib gts dartsim
 
     - name: Linux-only Dependencies [Linux]
       if: contains(matrix.os, 'ubuntu')
