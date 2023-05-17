@@ -165,9 +165,6 @@
     * [Pull request #3156](https://github.com/osrf/gazebo/pull/3156)
     * Inspired by a contribution from Alex Dewar <alex.dewar@gmx.co.uk>
 
-1. Fix focal builds: use python3 with check_test_ran.py
-    * [Pull request #3155](https://github.com/osrf/gazebo/pull/3155)
-
 1. Load model plugins even after sensor timeout
     * [Pull request #3154](https://github.com/osrf/gazebo/pull/3154)
 
