@@ -1,5 +1,57 @@
 ## Gazebo 11
 
+## Gazebo 11.13.0 (2023-05-17)
+
+1. Fix build with ffmpeg 6.0
+   * [Pull request #3318](https://github.com/gazebosim/gazebo-classic/pull/3318)
+
+1. Allow user to name a specific light that will generate lens flare
+   * [Pull request #3305](https://github.com/gazebosim/gazebo-classic/pull/3305)
+   * A contribution from Terry Welsh 
+
+1. JointController: improve thread safety
+   * [Pull request #3303](https://github.com/gazebosim/gazebo-classic/pull/3303)
+
+1. Fix pkg-config-related CMake warning
+   * [Pull request #3295](https://github.com/gazebosim/gazebo-classic/pull/3301)
+
+1. Fix template specialization in constructors to fix GCC11 build
+   * [Pull request #3295](https://github.com/gazebosim/gazebo-classic/pull/3295)
+   * A contribution from Ondřej Svoboda
+
+1. Set initial sim time from the command-line
+   * [Pull request #3294](https://github.com/gazebosim/gazebo-classic/pull/3294)
+
+1. Fix typo in README
+   * [Pull request #3291](https://github.com/gazebosim/gazebo-classic/pull/3291)
+
+1. msgs.cc: add missing <array> include
+   * [Pull request #3290](https://github.com/gazebosim/gazebo-classic/pull/3290)
+
+1.  Fix crash with DEM and Camera
+   * [Pull request #3279](https://github.com/gazebosim/gazebo-classic/pull/3279)
+
+1.  Fix focal builds: use python3 with check_test_ran.py
+   * [Pull request #3278](https://github.com/gazebosim/gazebo-classic/pull/3278)
+
+1. Fix for wide angle lens flare occlusion bug
+   * [Pull request #3276](https://github.com/gazebosim/gazebo-classic/pull/3276)
+   * With the contribution of Terry Welsh 
+
+1. Fix for opende heightfield and console spam
+   * [Pull request #3271](https://github.com/gazebosim/gazebo-classic/pull/3271)
+
+1. Fixes in conda-forge CI
+   * [Pull request #3270](https://github.com/gazebosim/gazebo-classic/pull/3270)
+   * [Pull request #3287](https://github.com/gazebosim/gazebo-classic/pull/3287)
+   * [Pull request #3315](https://github.com/gazebosim/gazebo-classic/pull/3315)
+
+1. Fix Instance() method of Singleton classes
+   * [Pull request #3269](https://github.com/gazebosim/gazebo-classic/pull/3269)
+
+1. Fix disappearing shadows when looking from certain angles
+   * [Pull request #3267](https://github.com/gazebosim/gazebo-classic/pull/3267)
+
 ## Gazebo 11.12.0 (2022-09-14)
 
 1. BulletLink: add and set force and torque
