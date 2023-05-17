@@ -13,7 +13,7 @@
    * [Pull request #3303](https://github.com/gazebosim/gazebo-classic/pull/3303)
 
 1. Fix pkg-config-related CMake warning
-   * [Pull request #3295](https://github.com/gazebosim/gazebo-classic/pull/3301)
+   * [Pull request #3301](https://github.com/gazebosim/gazebo-classic/pull/3301)
 
 1. Fix template specialization in constructors to fix GCC11 build
    * [Pull request #3295](https://github.com/gazebosim/gazebo-classic/pull/3295)
@@ -52,8 +52,11 @@
 1. Fix disappearing shadows when looking from certain angles
    * [Pull request #3267](https://github.com/gazebosim/gazebo-classic/pull/3267)
 
-1. Use DistanceBetweenPoints when loading DEMs
+1. Support Lunar DEMs
+   * [Pull request #3257](https://github.com/gazebosim/gazebo-classic/pull/3257)
+   * [Pull request #3250](https://github.com/gazebosim/gazebo-classic/pull/3250)
    * [Pull request #3252](https://github.com/gazebosim/gazebo-classic/pull/3252)
+   * [Pull request #3258](https://github.com/gazebosim/gazebo-classic/pull/3258)
 
 1. Add support for cross-compilation in Gazebo
    * [Pull request #3190](https://github.com/gazebosim/gazebo-classic/pull/3190)  
