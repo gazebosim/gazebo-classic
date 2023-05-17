@@ -52,6 +52,12 @@
 1. Fix disappearing shadows when looking from certain angles
    * [Pull request #3267](https://github.com/gazebosim/gazebo-classic/pull/3267)
 
+1. Use DistanceBetweenPoints when loading DEMs
+   * [Pull request #3252](https://github.com/gazebosim/gazebo-classic/pull/3252)
+
+1. Add support for cross-compilation in Gazebo
+   * [Pull request #3190](https://github.com/gazebosim/gazebo-classic/pull/3190)  
+
 ## Gazebo 11.12.0 (2022-09-14)
 
 1. BulletLink: add and set force and torque
