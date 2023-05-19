@@ -1433,8 +1433,11 @@ TEST_F(CameraSensor, LensFlareWideAngleCamera)
   physics::ModelPtr model = world->ModelByName(modelNameLensFlare);
   ASSERT_TRUE(model != nullptr);
 
+  // use fully scoped sensor name
   sensors::SensorPtr sensorLensFlare =
-    sensors::get_sensor(cameraNameLensFlare);
+    sensors::get_sensor(world->Name() + "::"
+                 + modelNameLensFlare + "::link::"
+                 + cameraNameLensFlare);
   sensors::CameraSensorPtr camSensorLensFlare =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensorLensFlare);
   ASSERT_TRUE(camSensorLensFlare != nullptr);
@@ -1446,8 +1449,11 @@ TEST_F(CameraSensor, LensFlareWideAngleCamera)
   model = world->ModelByName(modelNameWithoutLensFlare);
   ASSERT_TRUE(model != nullptr);
 
+  // use fully scoped sensor name
   sensors::SensorPtr sensorWithoutLensFlare =
-    sensors::get_sensor(cameraNameWithoutLensFlare);
+    sensors::get_sensor(world->Name() + "::"
+          + modelNameWithoutLensFlare + "::link::"
+          + cameraNameWithoutLensFlare);
   sensors::CameraSensorPtr camSensorWithoutLensFlare =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensorWithoutLensFlare);
   ASSERT_TRUE(camSensorWithoutLensFlare != nullptr);
