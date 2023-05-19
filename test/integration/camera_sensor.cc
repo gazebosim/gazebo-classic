@@ -1519,6 +1519,140 @@ TEST_F(CameraSensor, LensFlareWideAngleCamera)
 }
 
 /////////////////////////////////////////////////
+TEST_F(CameraSensor, LensFlareWideAngleCameraOcclusion)
+{
+  Load("worlds/lensflare_wideangle_cam.world", true);
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Get the model containing the wide angle cameras.
+  const std::string modelName = "slow_wide_angle_cameras";
+  const std::string cameraNameLensFlare = "camera_sensor_lensflare";
+
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+  physics::ModelPtr model = world->ModelByName(modelName);
+  ASSERT_TRUE(model != nullptr);
+
+  // use fully scoped sensor name
+  sensors::SensorPtr sensorLensFlare =
+    sensors::get_sensor(world->Name() + "::"
+                          + modelName + "::link::" + cameraNameLensFlare);
+  sensors::CameraSensorPtr camSensorLensFlare =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorLensFlare);
+  ASSERT_TRUE(camSensorLensFlare != nullptr);
+
+  // Get the wide angle camera without the lens flare.
+  std::string cameraNameWithoutLensFlare = "camera_sensor_without_lensflare";
+
+  // use fully scoped sensor name
+  sensors::SensorPtr sensorWithoutLensFlare =
+    sensors::get_sensor(world->Name() + "::"
+                          + modelName + "::link::" + cameraNameWithoutLensFlare);
+  sensors::CameraSensorPtr camSensorWithoutLensFlare =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorWithoutLensFlare);
+  ASSERT_TRUE(camSensorWithoutLensFlare != nullptr);
+
+  const unsigned int width = 320;
+  const unsigned int height = 240;
+
+  // Collect images from the 2 cameras.
+  imageCount = 0;
+  imageCount2 = 0;
+  img = new unsigned char[width * height * 3];
+  img2 = new unsigned char[width * height * 3];
+  event::ConnectionPtr c =
+    camSensorLensFlare->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c2 =
+    camSensorWithoutLensFlare->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // Get some images.
+  int sleep = 0;
+  while ((imageCount < 3 || imageCount2 < 3)
+      && sleep++ < 1000)
+  {
+    world->Step(10);
+    common::Time::MSleep(10);
+  }
+
+  EXPECT_GE(imageCount, 3);
+  EXPECT_GE(imageCount2, 3);
+
+  // Lock image mutex to allow safe comparison of images
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    // The lens flare should be occluded at the initial position, so expect
+    // the images with and without lens flare to be identical.
+    for (unsigned int y = 0; y < height; ++y)
+    {
+      for (unsigned int x = 0; x < width*3; x+=3)
+      {
+        EXPECT_EQ(img[(y*width*3) + x], img2[(y*width*3) + x]);
+        EXPECT_EQ(img[(y*width*3) + x + 1], img2[(y*width*3) + x + 1]);
+        EXPECT_EQ(img[(y*width*3) + x + 2], img2[(y*width*3) + x + 2]);
+      }
+    }
+  }
+
+  // Move the model up 10 meters so that it is no longer occluded.
+  auto modelPose = model->WorldPose();
+  modelPose.SetZ(modelPose.Pos().Z() + 10);
+  model->SetWorldPose(modelPose);
+
+  // Step an additional 1.2 seconds.
+  // This should generate another pair of images.
+  world->Step(1200);
+  c.reset();
+  c2.reset();
+
+  unsigned int colorSum = 0;
+  unsigned int colorSum2 = 0;
+  // Lock image mutex to allow safe comparison of images
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    EXPECT_EQ(imageCount, 4);
+    EXPECT_EQ(imageCount2, 4);
+
+    for (unsigned int y = 0; y < height; ++y)
+    {
+      for (unsigned int x = 0; x < width*3; x+=3)
+      {
+        unsigned int r = img[(y*width*3) + x];
+        unsigned int g = img[(y*width*3) + x + 1];
+        unsigned int b = img[(y*width*3) + x + 2];
+        colorSum += r + g + b;
+        unsigned int r2 = img2[(y*width*3) + x];
+        unsigned int g2 = img2[(y*width*3) + x + 1];
+        unsigned int b2 = img2[(y*width*3) + x + 2];
+        colorSum2 += r2 + g2 + b2;
+      }
+    }
+  }
+
+  // Camera with lens flare should be brighter than camera without it.
+  EXPECT_GT(colorSum, 0u) << "colorSum: " << colorSum;
+  EXPECT_GT(colorSum2, 0u) << "colorSum2: " << colorSum2;
+  EXPECT_GT(colorSum, colorSum2 + 10000000) <<
+      "colorSum: " << colorSum << ", " <<
+      "colorSum2: " << colorSum2;
+
+  delete[] img;
+  delete[] img2;
+}
+
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, 16bit)
 {
   // World contains a box positioned at top right quadrant of image generated
