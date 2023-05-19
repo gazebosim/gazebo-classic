@@ -2,6 +2,9 @@
 
 ## Gazebo 11.13.0 (2023-05-17)
 
+1. Add missing spaces to several rendering messages 
+   * [Pull request #3322](https://github.com/gazebosim/gazebo-classic/pull/3322)
+
 1. Fix build with ffmpeg 6.0
    * [Pull request #3318](https://github.com/gazebosim/gazebo-classic/pull/3318)
 
