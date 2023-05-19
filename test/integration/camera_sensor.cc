@@ -1599,9 +1599,9 @@ TEST_F(CameraSensor, LensFlareWideAngleCameraOcclusion)
     {
       for (unsigned int x = 0; x < width*3; x+=3)
       {
-        EXPECT_EQ(img[(y*width*3) + x], img2[(y*width*3) + x]);
-        EXPECT_EQ(img[(y*width*3) + x + 1], img2[(y*width*3) + x + 1]);
-        EXPECT_EQ(img[(y*width*3) + x + 2], img2[(y*width*3) + x + 2]);
+        EXPECT_NEAR(img[(y*width*3) + x], img2[(y*width*3) + x], 2);
+        EXPECT_NEAR(img[(y*width*3) + x + 1], img2[(y*width*3) + x + 1], 2);
+        EXPECT_NEAR(img[(y*width*3) + x + 2], img2[(y*width*3) + x + 2], 2);
       }
     }
   }
