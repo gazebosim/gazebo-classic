@@ -290,7 +290,7 @@ void RenderEngine::Init()
   if (this->dataPtr->renderPathType == NONE)
   {
     gzwarn << "Cannot initialize render engine since "
-           << "render path type is NONE. Ignore this warning if"
+           << "render path type is NONE. Ignore this warning if "
            << "rendering has been turned off on purpose.\n";
     return;
   }
@@ -458,7 +458,7 @@ void RenderEngine::LoadPlugins()
           if ((*piter).find("RenderSystem") != std::string::npos)
           {
             gzerr << "Unable to load Ogre Plugin[" << *piter
-                  << "]. Rendering will not be possible."
+                  << "]. Rendering will not be possible. "
                   << "Make sure you have installed OGRE and Gazebo properly.\n";
           }
         }
@@ -545,7 +545,7 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
   }
   catch(Ogre::Exception &/*_e*/)
   {
-    gzthrow("Unable to load Ogre Resources.\nMake sure the"
+    gzthrow("Unable to load Ogre Resources.\nMake sure the "
         "resources path in the world file is set correctly.");
   }
 }
@@ -839,7 +839,7 @@ void RenderEngine::CheckSystemCapabilities()
            << "Fixed function rendering will be used.\n";
 
   if (!hasGLSL)
-    gzwarn << "GLSL is missing."
+    gzwarn << "GLSL is missing. "
            << "Fixed function rendering will be used.\n";
 
   if (!hasFBO)

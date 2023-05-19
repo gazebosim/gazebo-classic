@@ -385,5 +385,64 @@
       </link>
     </model>
 
+    <!-- model with two wide-angle cameras with slow update rates, with and without lens flare plugin -->
+    <model name="slow_wide_angle_cameras">
+      <static>true</static>
+      <pose>0 12 11.0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name="camera_sensor_lensflare" type="wideanglecamera">
+          <camera>
+            <horizontal_fov>3.14159</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>240</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+            <lens>
+              <type>equidistant</type>
+              <scale_to_hfov>true</scale_to_hfov>
+              <cutoff_angle>1.5707</cutoff_angle>
+              <env_texture_size>512</env_texture_size>
+            </lens>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>1</update_rate>
+          <visualize>true</visualize>
+          <plugin name="lensflare" filename="libLensFlareSensorPlugin.so"/>
+        </sensor>
+        <sensor name="camera_sensor_without_lensflare" type="wideanglecamera">
+          <camera>
+            <horizontal_fov>3.14159</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>240</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+            <lens>
+              <type>equidistant</type>
+              <scale_to_hfov>true</scale_to_hfov>
+              <cutoff_angle>1.5707</cutoff_angle>
+              <env_texture_size>512</env_texture_size>
+            </lens>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>1</update_rate>
+          <visualize>true</visualize>
+        </sensor>
+      </link>
+    </model>
   </world>
 </sdf>
