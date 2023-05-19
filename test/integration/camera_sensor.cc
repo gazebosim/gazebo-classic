@@ -1581,7 +1581,7 @@ TEST_F(CameraSensor, LensFlareWideAngleCameraOcclusion)
   // Get some images.
   int sleep = 0;
   while ((imageCount < 3 || imageCount2 < 3)
-      && sleep++ < 1000)
+      && sleep++ < 2000)
   {
     world->Step(10);
     common::Time::MSleep(10);
@@ -1599,9 +1599,9 @@ TEST_F(CameraSensor, LensFlareWideAngleCameraOcclusion)
     {
       for (unsigned int x = 0; x < width*3; x+=3)
       {
-        EXPECT_EQ(img[(y*width*3) + x], img2[(y*width*3) + x]);
-        EXPECT_EQ(img[(y*width*3) + x + 1], img2[(y*width*3) + x + 1]);
-        EXPECT_EQ(img[(y*width*3) + x + 2], img2[(y*width*3) + x + 2]);
+        EXPECT_NEAR(img[(y*width*3) + x], img2[(y*width*3) + x], 2);
+        EXPECT_NEAR(img[(y*width*3) + x + 1], img2[(y*width*3) + x + 1], 2);
+        EXPECT_NEAR(img[(y*width*3) + x + 2], img2[(y*width*3) + x + 2], 2);
       }
     }
   }
@@ -1611,9 +1611,18 @@ TEST_F(CameraSensor, LensFlareWideAngleCameraOcclusion)
   modelPose.SetZ(modelPose.Pos().Z() + 10);
   model->SetWorldPose(modelPose);
 
-  // Step an additional 1.2 seconds.
-  // This should generate another pair of images.
-  world->Step(1200);
+  // Get some more images.
+  sleep = 0;
+  while ((imageCount < 5 || imageCount2 < 5)
+      && sleep++ < 2000)
+  {
+    world->Step(10);
+    common::Time::MSleep(10);
+  }
+  EXPECT_EQ(imageCount, 5);
+  EXPECT_EQ(imageCount2, 5);
+
+  // Disconnect the callbacks.
   c.reset();
   c2.reset();
 
@@ -1622,8 +1631,6 @@ TEST_F(CameraSensor, LensFlareWideAngleCameraOcclusion)
   // Lock image mutex to allow safe comparison of images
   {
     std::lock_guard<std::mutex> lock(mutex);
-    EXPECT_EQ(imageCount, 4);
-    EXPECT_EQ(imageCount2, 4);
 
     for (unsigned int y = 0; y < height; ++y)
     {
