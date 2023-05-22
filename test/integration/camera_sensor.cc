@@ -1578,17 +1578,29 @@ TEST_F(CameraSensor, LensFlareWideAngleCameraOcclusion)
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
 
-  // Get some images.
-  int sleep = 0;
-  while ((imageCount < 3 || imageCount2 < 3)
-      && sleep++ < 1000)
+  // Step just enough to trigger new images, then wait for images to arrive.
+  for (int i = 0; i < 3; ++i)
   {
-    world->Step(10);
-    common::Time::MSleep(10);
+    // Sensor update period of 1 second
+    // Step 1.005 seconds to ensure images are triggered
+    world->Step(1005);
+
+    int sleep = 0;
+    while ((imageCount < i+1 || imageCount2 < i+1)
+        && sleep++ < 1000)
+    {
+      common::Time::MSleep(10);
+    }
+    gzdbg << "Sim time " << world->SimTime().Double()
+          << ", slept for " << sleep * 0.01 << " seconds"
+          << std::endl;
+
+    EXPECT_EQ(imageCount, i + 1);
+    EXPECT_EQ(imageCount2, i + 1);
   }
 
-  EXPECT_GE(imageCount, 3);
-  EXPECT_GE(imageCount2, 3);
+  EXPECT_EQ(imageCount, 3);
+  EXPECT_EQ(imageCount2, 3);
 
   // Lock image mutex to allow safe comparison of images
   {
@@ -1611,9 +1623,23 @@ TEST_F(CameraSensor, LensFlareWideAngleCameraOcclusion)
   modelPose.SetZ(modelPose.Pos().Z() + 10);
   model->SetWorldPose(modelPose);
 
-  // Step an additional 1.2 seconds.
+  // Step an additional 1.005 seconds.
   // This should generate another pair of images.
-  world->Step(1200);
+  world->Step(1005);
+  {
+    int sleep = 0;
+    while ((imageCount < 4 || imageCount2 < 4)
+        && sleep++ < 1000)
+    {
+      common::Time::MSleep(10);
+    }
+    gzdbg << "Sim time " << world->SimTime().Double()
+          << ", slept for " << sleep * 0.01 << " seconds"
+          << std::endl;
+  }
+  EXPECT_EQ(imageCount, 4);
+  EXPECT_EQ(imageCount2, 4);
+
   c.reset();
   c2.reset();
 
