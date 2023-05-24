@@ -1521,7 +1521,7 @@ TEST_F(CameraSensor, LensFlareWideAngleCamera)
 /////////////////////////////////////////////////
 TEST_F(CameraSensor, LensFlareWideAngleCameraOcclusion)
 {
-  Load("worlds/lensflare_wideangle_cam.world", true);
+  LoadArgs(" --lockstep -u worlds/lensflare_wideangle_cam.world");
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
