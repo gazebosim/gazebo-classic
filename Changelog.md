@@ -2,6 +2,9 @@
 
 ## Gazebo 11.13.0 (2023-05-17)
 
+1. Fix wide-angle lens flare occlusion lag
+   * [Pull request #3325](https://github.com/gazebosim/gazebo-classic/pull/3325)
+
 1. Add missing spaces to several rendering messages 
    * [Pull request #3322](https://github.com/gazebosim/gazebo-classic/pull/3322)
 
