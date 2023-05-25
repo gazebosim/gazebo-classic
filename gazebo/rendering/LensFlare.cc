@@ -305,6 +305,8 @@ namespace gazebo
                 ignition::math::Pose3d(
                   Conversions::ConvertIgn(cam->getDerivedPosition()),
                   Conversions::ConvertIgn(quat)));
+            this->dataPtr->wideAngleDummyCamera->OgreCamera()
+                ->getParentSceneNode()->_update(true, true);
 
             // OcclusionScale() was built for a regular perspective projection
             // camera and cannot be passed a WideAngleCamera. A cleaner solution
