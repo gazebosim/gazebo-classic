@@ -176,6 +176,11 @@ target_link_libraries(gazebomsgs_out ${GZ_PROTOBUF_LIBRARY} ${GZ_PROTOBUF_PROTOC
 if (UNIX)
   target_link_libraries(gazebomsgs_out pthread)
 endif()
+
+if (WIN32)
+    target_compile_definitions(gazebomsgs_out PUBLIC ABSL_CONSUME_DLL)
+endif()
+
 # Visual Studio enables c++11 support by default
 if (NOT MSVC)
   if(CMAKE_VERSION VERSION_LESS 3.8.2)

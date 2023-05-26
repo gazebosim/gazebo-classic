@@ -253,6 +253,10 @@ if (UNIX)
   target_link_libraries(gazebo_common PRIVATE pthread)
 endif()
 
+# if (WIN32)
+#   target_link_libraries(gazebo_common PRIVATE ABSL_CONSUME_DLL)
+# endif()
+
 if (UNIX AND NOT APPLE)
   # rt is used for clock_gettime, which is not available on apple or windows
   target_link_libraries(gazebo_common PRIVATE rt)
