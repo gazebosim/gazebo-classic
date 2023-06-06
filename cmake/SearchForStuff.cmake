@@ -25,7 +25,7 @@ if (CMAKE_BUILD_TYPE)
 endif()
 
 ########################################
-if (DEFINED PROTOBUF_VERSION AND PROTOBUF_VERSION GREATER_EQUAL 22.0)
+if (PROTOBUF_VERSION LESS 2.3.0)
   BUILD_ERROR("Incorrect version: Gazebo requires protobuf version 2.3.0 or greater")
 endif()
 
