@@ -153,6 +153,38 @@ TEST_F(TransportTest, PubSub)
   subs.clear();
 }
 
+// Standard pub/sub using lambdas
+TEST_F(TransportTest, PubSubLambda)
+{
+  Load("worlds/empty.world");
+
+  transport::NodePtr node = transport::NodePtr(new transport::Node());
+  node->Init();
+  transport::PublisherPtr scenePub = node->Advertise<msgs::Scene>("~/scene");
+  transport::SubscriberPtr sceneSub = node->Subscribe("~/scene",
+      [](ConstScenePtr &/*_msg*/) -> void{g_sceneMsg=true;});
+
+  msgs::Scene msg;
+  msgs::Init(msg, "test");
+  msg.set_name("default");
+
+  scenePub->Publish(msg);
+
+  std::vector<transport::PublisherPtr> pubs;
+  std::vector<transport::SubscriberPtr> subs;
+
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    pubs.push_back(node->Advertise<msgs::Scene>("~/scene"));
+    subs.push_back(node->Subscribe("~/scene", 
+    [](ConstScenePtr &/*_msg*/) -> void{g_sceneMsg=true;}));
+    scenePub->Publish(msg);
+  }
+
+  pubs.clear();
+  subs.clear();
+}
+
 /////////////////////////////////////////////////
 TEST_F(TransportTest, DirectPublish)
 {
