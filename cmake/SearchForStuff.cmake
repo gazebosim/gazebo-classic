@@ -32,7 +32,7 @@ endif()
 ########################################
 # The Google Protobuf library for message generation + serialization
 
-# Protobuf >= 22 requires to link abseil, so we are constrained to use 
+# Protobuf >= 22 requires to link abseil, so we are constrained to use
 # find_package(Protobuf) and link to protobuf::libprotobuf,
 # see https://github.com/conda-forge/conda-forge-pinning-feedstock/issues/4075#issuecomment-1569242816
 if (DEFINED PROTOBUF_VERSION AND PROTOBUF_VERSION GREATER_EQUAL 22.0)
