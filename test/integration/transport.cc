@@ -176,8 +176,8 @@ TEST_F(TransportTest, PubSubLambda)
   for (unsigned int i = 0; i < 10; ++i)
   {
     pubs.push_back(node->Advertise<msgs::Scene>("~/scene"));
-    subs.push_back(node->Subscribe("~/scene", 
-    [](ConstScenePtr &/*_msg*/) -> void{g_sceneMsg=true;}));
+    subs.push_back(node->Subscribe<msgs::Scene>("~/scene", 
+    [](ConstScenePtr &/*_msg*/) -> void {g_sceneMsg=true;}));
     scenePub->Publish(msg);
   }
 
