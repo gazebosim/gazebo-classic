@@ -1,0 +1,69 @@
+name: Windows
+on:
+  push:
+    branches: [ gazebo11 ]
+  pull_request:
+    branches: [ gazebo11 ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: windows-build
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: deps\vcpkg\cache\windows
+          key: windows-${{ hashFiles('.github\workflows\windows.yml') }}
+
+      - name: Setup msbuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Fix vcpkg
+        run: vcpkg.exe integrate remove
+
+      - name: Clone vcpkg
+        shell: cmd
+        run: |
+          git clone https://github.com/microsoft/vcpkg/
+          vcpkg\bootstrap-vcpkg.bat
+
+      - name: Configure Gazebo
+        shell: cmd
+        run: |
+          set VCPKG_BINARY_SOURCES=clear;files,%CD%\deps\vcpkg\cache\windows,readwrite;
+          cmake . -B build ^
+              -DCMAKE_TOOLCHAIN_FILE=vcpkg\scripts\buildsystems\vcpkg.cmake ^
+              -DVCPKG_MANIFEST_DIR=deps\vcpkg\manifests\windows ^
+              -DVCPKG_INSTALLED_DIR=%CD%\vcpkg\installed ^
+              -DVCPKG_TARGET_TRIPLET=x64-windows-release ^
+              -DVCPKG_HOST_TRIPLET=x64-windows-release ^
+              -DVCPKG_INSTALL_OPTIONS=--clean-after-build ^
+              -DUSE_EXTERNAL_TINYXML=ON ^
+              -DUSE_EXTERNAL_TINYXML2=ON ^
+              -DCMAKE_INSTALL_PREFIX=%CD%\vcpkg\installed\x64-windows-release
+
+      - name: Build Gazebo
+        shell: cmd
+        run: |
+          cmake --build build --config Release
+
+      - name: Install Gazebo
+        shell: cmd
+        run: |
+          cmake --install build --config Release
+          
+      - name: Tests suite compilation
+        shell: cmd
+        run: |
+          echo compile and run tests here
