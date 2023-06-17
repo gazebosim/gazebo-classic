@@ -1,0 +1,156 @@
+{
+  "name": "gazebo",
+  "description": "Open source robotics simulator.",
+  "homepage": "http://gazebosim.org",
+  "license": "Apache-2.0",
+  "builtin-baseline": "19af97cba8ca48474e4ad15a24ed50271a9ecdac",
+  "dependencies": [
+    "boost-asio",
+    "boost-date-time",
+    "boost-filesystem",
+    "boost-format",
+    "boost-interprocess",
+    "boost-iostreams",
+    "boost-program-options",
+    "boost-property-tree",
+    "boost-regex",
+    "boost-system",
+    "boost-thread",
+    "boost-uuid",
+    "ccd",
+    "freeimage",
+    {
+      "name": "hdf5",
+      "features": [
+        "cpp"
+      ]
+    },
+    "ignition-common3",
+    "ignition-fuel-tools4",
+    "ignition-math6",
+    "ignition-msgs5",
+    "ignition-transport8",
+    {
+      "name": "libtar",
+      "platform": "!windows"
+    },
+    "ogre",
+    "opengl",
+    {
+      "name": "pkgconf",
+      "host": true
+    },
+    "protobuf",
+    "qt5-base",
+    "qwt",
+    "sdformat9",
+    "tbb",
+    "tiny-process-library",
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ],
+  "default-features": [
+    "bullet",
+    "dart",
+    "ffmpeg",
+    "gdal",
+    "graphviz",
+    "gts",
+    "libusb",
+    "openal",
+    "simbody"
+  ],
+  "features": {
+    "bullet": {
+      "description": "Use the bullet physics engine",
+      "dependencies": [
+        "bullet3"
+      ]
+    },
+    "dart": {
+      "description": "Use the dart physics engine",
+      "dependencies": [
+        "dartsim"
+      ]
+    },
+    "ffmpeg": {
+      "description": "Enable audio-video capabilities",
+      "dependencies": [
+        {
+          "name": "ffmpeg",
+          "features": [
+            "avcodec",
+            "avformat",
+            "swscale"
+          ]
+        }
+      ]
+    },
+    "gdal": {
+      "description": "Enable digital elevation terrains support",
+      "dependencies": [
+        "gdal"
+      ]
+    },
+    "graphviz": {
+      "description": "Enable model editor's schematic view",
+      "dependencies": [
+        "graphviz"
+      ]
+    },
+    "gts": {
+      "description": "Enable CSG support",
+      "dependencies": [
+        "gts"
+      ]
+    },
+    "libusb": {
+      "description": "Enable USB peripheral support",
+      "dependencies": [
+        "libusb"
+      ]
+    },
+    "openal": {
+      "description": "Enable audio support",
+      "dependencies": [
+        "openal-soft"
+      ]
+    },
+    "plugins": {
+      "description": "Build gazebo plugins",
+      "supports": "!linux"
+    },
+    "simbody": {
+      "description": "Use the simbody physics engine",
+      "dependencies": [
+        "simbody"
+      ]
+    },
+    "tools": {
+      "description": "Build gazebo tools",
+      "supports": "!(linux & static)"
+    }
+  },
+  "overrides": [
+    {
+      "name": "ogre",
+      "version": "1.12.9",
+      "port-version": 10
+    },
+    {
+      "name": "qwt",
+      "version": "6.1.5"
+    },
+    {
+      "name": "graphviz",
+      "version": "2.49.1",
+      "port-version": 4
+    }
+  ]
+}
