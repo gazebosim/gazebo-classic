@@ -288,7 +288,7 @@ namespace gazebo
 
         return result;
       }
-      
+
       /// \brief Subscribe to a topic using a bost::function as the callback,
       /// allowing to pass lambdas.
       /// \param[in] _topic The topic to subscribe to
