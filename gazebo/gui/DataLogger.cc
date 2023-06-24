@@ -254,11 +254,7 @@ DataLogger::DataLogger(QWidget *_parent)
       "~/log/status",  &DataLogger::OnStatus, this);
 
   // Fill the path with the home folder - duplicated from util/LogRecord
-#ifndef _WIN32
-  const char *homePath = common::getEnv("HOME");
-#else
-  const char *homePath = common::getEnv("HOMEPATH");
-#endif
+  const char *homePath = common::getEnv(HOMEDIR);
 
   GZ_ASSERT(homePath, "HOME environment variable is missing");
 

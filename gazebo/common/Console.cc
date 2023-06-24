@@ -23,6 +23,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonIface.hh"
 
 #include "gazebo/gazebo_config.h"
 
@@ -155,9 +156,9 @@ FileLogger::~FileLogger()
 /////////////////////////////////////////////////
 void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
 {
-  if (!getenv("HOME"))
+  if (!getenv(HOMEDIR))
   {
-    gzerr << "Missing HOME environment variable."
+    gzerr << "Missing " << HOMEDIR << " environment variable."
           << "No log file will be generated.";
     return;
   }
@@ -165,7 +166,7 @@ void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
   FileLogger::Buffer *buf = static_cast<FileLogger::Buffer*>(
       this->rdbuf());
 
-  boost::filesystem::path logPath(getenv("HOME"));
+  boost::filesystem::path logPath(getenv(HOMEDIR));
 
   // Create a subdirectory for the informational log. The name of the directory
   // will be <PREFIX><MASTER_PORT>. E.g.: server-11346. If the environment
