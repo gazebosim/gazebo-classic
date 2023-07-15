@@ -289,6 +289,36 @@ namespace gazebo
         return result;
       }
 
+      /// \brief Subscribe to a topic using a bost::function as the callback,
+      /// allowing to pass lambdas.
+      /// \param[in] _topic The topic to subscribe to
+      /// \param[in] _cb Function to be called on receipt of new message
+      /// \param[in] _latching If true, latch latest incoming message;
+      /// otherwise don't latch
+      /// \return Pointer to new Subscriber object
+      public: template<typename M>
+      SubscriberPtr Subscribe(const std::string &_topic,
+          const boost::function<void (const boost::shared_ptr<M const> &)> &_cb,
+                     bool _latching = false)
+      {
+        SubscribeOptions ops;
+        std::string decodedTopic = this->DecodeTopicName(_topic);
+        ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
+
+        {
+          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          this->callbacks[decodedTopic].push_back(
+              CallbackHelperPtr(new CallbackHelperT<M>(_cb, _latching)));
+        }
+
+        SubscriberPtr result =
+          transport::TopicManager::Instance()->Subscribe(ops);
+
+        result->SetCallbackId(this->callbacks[decodedTopic].back()->GetId());
+
+        return result;
+      }
+
       /// \brief Subscribe to a topic using a bare function as the callback
       /// \param[in] _topic The topic to subscribe to
       /// \param[in] _fp Function to be called on receipt of new message
