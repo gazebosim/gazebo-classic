@@ -19,6 +19,7 @@
 
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonIface.hh"
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/SaveEntityDialog.hh"
@@ -408,7 +409,7 @@ void SaveEntityDialog::AddDirToModelPaths(const std::string &_path)
 
     // Save any changes that were made to the property tree
     // TODO: check gui.ini env variable
-    char *home = getenv("HOME");
+    char *home = getenv(HOMEDIR);
     if (home)
     {
       boost::filesystem::path guiINIPath = home;

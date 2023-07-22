@@ -17,6 +17,7 @@
 #include <boost/filesystem.hpp>
 
 #include "gazebo/test/ServerFixture.hh"
+#include "gazebo/common/CommonIface.hh"
 
 using namespace gazebo;
 class PluginTest : public ServerFixture
@@ -36,7 +37,7 @@ TEST_F(PluginTest, ModelExceptionConstructor)
 
   world->Step(100);
 
-  char *home = getenv("HOME");
+  char *home = getenv(HOMEDIR);
   ASSERT_TRUE(home);
 
   boost::filesystem::path path(home);
@@ -71,7 +72,7 @@ TEST_F(PluginTest, ModelExceptionInit)
 
   world->Step(100);
 
-  char *home = getenv("HOME");
+  char *home = getenv(HOMEDIR);
   ASSERT_TRUE(home);
 
   boost::filesystem::path path(home);
@@ -106,7 +107,7 @@ TEST_F(PluginTest, ModelExceptionLoad)
 
   world->Step(100);
 
-  char *home = getenv("HOME");
+  char *home = getenv(HOMEDIR);
   ASSERT_TRUE(home);
 
   boost::filesystem::path path(home);

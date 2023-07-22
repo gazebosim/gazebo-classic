@@ -32,18 +32,14 @@ using namespace gazebo::util;
 DiagnosticManager::DiagnosticManager()
 : dataPtr(new DiagnosticManagerPrivate)
 {
-#ifndef _WIN32
-  const char *homePath = common::getEnv("HOME");
-#else
-  const char *homePath = common::getEnv("HOMEPATH");
-#endif
+  const char *homePath = common::getEnv(HOMEDIR);
   this->dataPtr->logPath = homePath;
 
   // Get the base of the time logging path
   if (!homePath)
   {
     common::SystemPaths *paths = common::SystemPaths::Instance();
-    gzwarn << "HOME environment variable missing. Diagnostic timing " <<
+    gzwarn << HOMEDIR << " environment variable missing. Diagnostic timing " <<
       "information will be logged to " << paths->TmpPath() << "\n";
     this->dataPtr->logPath = paths->TmpPath() + "/gazebo";
   }

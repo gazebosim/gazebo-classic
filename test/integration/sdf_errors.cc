@@ -40,11 +40,7 @@ class SDFLogsTest : public ServerFixture
 {
   public: void SetUp()
   {
-#ifndef _WIN32
-  const boost::filesystem::path home = common::getEnv("HOME");
-#else
-  const boost::filesystem::path home = common::getEnv("HOMEPATH");
-#endif
+    const boost::filesystem::path home = common::getEnv(HOMEDIR);
     boost::filesystem::path log_path("/.gazebo/server-11345/default.log");
     path = home / log_path;
   }

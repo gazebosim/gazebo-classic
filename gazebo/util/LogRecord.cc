@@ -71,13 +71,10 @@ LogRecord::LogRecord()
   this->dataPtr->readyToStart = false;
 
   // Get the user's home directory
-#ifndef _WIN32
-  const char *homePath = common::getEnv("HOME");
-#else
-  const char *homePath = common::getEnv("HOMEPATH");
-#endif
-
-  GZ_ASSERT(homePath, "HOME environment variable is missing");
+  const char *homePath = common::getEnv(HOMEDIR);
+  std::string home_warning = HOMEDIR;
+  home_warning += " environment variable is missing";
+  GZ_ASSERT(homePath, home_warning.c_str());
 
   if (!homePath)
   {

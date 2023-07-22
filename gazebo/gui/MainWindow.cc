@@ -27,6 +27,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/CommonIface.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -463,10 +464,10 @@ void MainWindow::Open()
 /////////////////////////////////////////////////
 void MainWindow::SaveINI()
 {
-  char *home = getenv("HOME");
+  char *home = getenv(HOMEDIR);
   if (!home)
   {
-    gzerr << "HOME environment variable not found. "
+    gzerr << HOMEDIR << " environment variable not found. "
       "Unable to save configuration file\n";
     return;
   }

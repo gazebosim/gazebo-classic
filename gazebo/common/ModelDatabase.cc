@@ -40,6 +40,7 @@
 #include "gazebo/common/ModelDatabasePrivate.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/SemanticVersion.hh"
+#include "gazebo/common/CommonIface.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -503,7 +504,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
         continue;
       }
 
-      std::string outputPath = getenv("HOME");
+      std::string outputPath = getenv(HOMEDIR);
       outputPath += "/.gazebo/models";
 
 #ifndef _WIN32

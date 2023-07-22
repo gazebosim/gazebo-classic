@@ -44,6 +44,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/VideoEncoder.hh"
+#include "gazebo/common/CommonIface.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -101,7 +102,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   this->sceneNode = NULL;
 
-  this->screenshotPath = getenv("HOME");
+  this->screenshotPath = getenv(HOMEDIR);
   this->screenshotPath += "/.gazebo/pictures";
 
   // Connect to the render signal

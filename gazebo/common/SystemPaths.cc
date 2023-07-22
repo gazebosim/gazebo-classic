@@ -38,6 +38,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/CommonIface.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -81,7 +82,7 @@ SystemPaths::SystemPaths()
     return;
   }
 
-  char *homePath = getenv("HOME");
+  char *homePath = getenv(HOMEDIR);
   std::string home;
   if (!homePath)
     home = this->TmpPath() + "/gazebo";

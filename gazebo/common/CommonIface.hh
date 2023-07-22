@@ -85,6 +85,12 @@ namespace gazebo
     GZ_COMMON_VISIBLE
     const char *getEnv(const char *_name);
 
+#ifdef _WIN32
+    #define HOMEDIR "USERPROFILE"
+#else
+    #define HOMEDIR "HOME"
+#endif  // _WIN32
+
     /// \brief Get the current working directory
     /// \return Name of the current directory
     GZ_COMMON_VISIBLE
