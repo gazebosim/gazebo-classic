@@ -285,6 +285,12 @@ namespace gazebo
       /// \param[in] _msg Pointer to the light message.
       private: void OnLight(ConstLightPtr &_msg);
 
+      /// \brief Called when the scene info service replies with the scene
+      /// message.
+      /// \param[in] _msg The message.
+      /// \param[in] _result Flag indicating if service call succeeded.
+      private: void OnSceneInfo(const msgs::Scene &_msg, const bool _result);
+
       private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnWorldModify(ConstWorldModifyPtr &_msg);
       private: void OnManipMode(const std::string &_mode);
