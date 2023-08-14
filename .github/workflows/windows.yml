@@ -1,4 +1,4 @@
-name: 🪟 Windows
+name: 🪟 Windows-vcpkg
 on:
   push:
     branches: [ gazebo11 ]
