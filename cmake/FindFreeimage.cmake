@@ -10,6 +10,8 @@ if (PKG_CONFIG_FOUND)
   endif (NOT freeimage_FOUND)
 endif (PKG_CONFIG_FOUND)
 if (NOT freeimage_FOUND)
+  # Workaround for CMake bug https://gitlab.kitware.com/cmake/cmake/issues/17135
+  unset(freeimage_FOUND CACHE)
   find_package(freeimage CONFIG)
   if (freeimage_FOUND)
     set(freeimage_LIBRARIES freeimage::FreeImage)
