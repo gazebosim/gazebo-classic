@@ -166,6 +166,7 @@ if (PKG_CONFIG_FOUND)
   #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake)
   find_package(Simbody)
   if (Simbody_FOUND)  
+    # When simbody is found but it don't define any libs, we should manually define the libs.
     if ("${Simbody_LIBRARIES}" STREQUAL "" OR "${Simbody_LIBRARIES}" STREQUAL "Simbody_LIBRARIES-NOTFOUND")
       set(Simbody_LIBRARIES SimTKmath SimTKcommon SimTKsimbody)
     endif()
