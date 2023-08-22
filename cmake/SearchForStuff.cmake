@@ -689,10 +689,10 @@ endif ()
 
 ########################################
 # Find gdal
-find_package(GDAL CONFIG)
+include (FindGDAL)
 if ("${GDAL_LIBRARY}" STREQUAL "")
   unset(GDAL_FOUND CACHE)
-  include (FindGDAL)
+  find_package(GDAL CONFIG)
 endif()
 if (NOT GDAL_FOUND)
   message (STATUS "Looking for libgdal - not found")
