@@ -240,6 +240,10 @@ namespace gazebo
       /// \return The real time.
       public: common::Time RealTime() const;
 
+      /// \brief Set the initial sim time.
+      /// \param[in] _t The new simulation time
+      public: void SetInitialSimTime(const common::Time &_t);
+
       /// \brief Returns the state of the simulation true if paused.
       /// \return True if paused.
       public: bool IsPaused() const;

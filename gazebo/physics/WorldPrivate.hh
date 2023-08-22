@@ -86,6 +86,9 @@ namespace gazebo
       /// \brief Clock time when simulation was started.
       public: common::Time startTime;
 
+      /// \brief Initial simulation time.
+      public: common::Time initialSimTime;
+
       /// \brief True if simulation is paused.
       public: bool pause;
 

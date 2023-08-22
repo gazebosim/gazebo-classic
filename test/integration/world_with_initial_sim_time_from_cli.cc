@@ -46,7 +46,17 @@ TEST_F(WorldWithInitialSimTimeFromCliTest, CheckInitialSimTime)
 
   // check that the simulation time is the same as the initial sim time
   EXPECT_DOUBLE_EQ(this->world->SimTime().Double(), initialSimTime);
+
+  // check that after a step, the simulation time advances
+  this->world->Step(2);
+  EXPECT_GT(this->world->SimTime().Double() - initialSimTime, 1e-4);
+
+  // check that the simulation time is again the same as the initial sim time
+  // after a reset
+  this->world->Reset();
+  EXPECT_DOUBLE_EQ(this->world->SimTime().Double(), initialSimTime);
 }
+
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

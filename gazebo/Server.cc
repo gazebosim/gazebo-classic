@@ -412,8 +412,10 @@ bool Server::ParseArgs(int _argc, char **_argv)
   {
     try
     {
-      physics::get_world()->SetSimTime(
-          common::Time(this->dataPtr->vm["initial_sim_time"].as<double>()));
+      common::Time initialSimTime {
+        this->dataPtr->vm["initial_sim_time"].as<double>()};
+      physics::get_world()->SetSimTime(initialSimTime);
+      physics::get_world()->SetInitialSimTime(initialSimTime);
       gzmsg << "Setting initial sim time to [" <<
         physics::get_world()->SimTime() << "]\n" << std::endl;
     }

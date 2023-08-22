@@ -1455,7 +1455,7 @@ Light_V World::Lights() const
 //////////////////////////////////////////////////
 void World::ResetTime()
 {
-  this->dataPtr->simTime = common::Time(0);
+  this->dataPtr->simTime = common::Time(this->dataPtr->initialSimTime);
   this->dataPtr->pauseTime = common::Time(0);
   this->dataPtr->startTime = common::Time::GetWallTime();
   this->dataPtr->realTimeOffset = common::Time(0);
@@ -1526,6 +1526,12 @@ gazebo::common::Time World::SimTime() const
 void World::SetSimTime(const common::Time &_t)
 {
   this->dataPtr->simTime = _t;
+}
+
+//////////////////////////////////////////////////
+void World::SetInitialSimTime(const common::Time &_t)
+{
+  this->dataPtr->initialSimTime = _t;
 }
 
 //////////////////////////////////////////////////
