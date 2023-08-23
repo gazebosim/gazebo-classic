@@ -690,10 +690,6 @@ endif ()
 ########################################
 # Find gdal
 include (FindGDAL)
-if ("${GDAL_LIBRARY}" STREQUAL "")
-  unset(GDAL_FOUND CACHE)
-  find_package(GDAL CONFIG)
-endif()
 if (NOT GDAL_FOUND)
   message (STATUS "Looking for libgdal - not found")
   BUILD_WARNING ("GDAL not found, Digital elevation terrains support will be disabled.")
