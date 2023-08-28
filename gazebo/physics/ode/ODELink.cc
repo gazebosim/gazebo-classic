@@ -172,6 +172,9 @@ void ODELink::MoveCallback(dBodyID _id)
     const dReal *dtorque = dBodyGetTorque(_id);
     self->torque.Set(dtorque[0], dtorque[1], dtorque[2]);
   }
+
+  // clear cache of AddForce values
+  self->addedForce.Set(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
@@ -568,12 +571,19 @@ void ODELink::SetTorque(const ignition::math::Vector3d &_torque)
 }
 
 //////////////////////////////////////////////////
+const ignition::math::Vector3d &ODELink::AddedForce() const
+{
+  return this->addedForce;
+}
+
+//////////////////////////////////////////////////
 void ODELink::AddForce(const ignition::math::Vector3d &_force)
 {
   if (this->linkId)
   {
     this->SetEnabled(true);
     dBodyAddForce(this->linkId, _force.X(), _force.Y(), _force.Z());
+    this->addedForce += _force;
   }
   else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
@@ -587,6 +597,7 @@ void ODELink::AddRelativeForce(const ignition::math::Vector3d &_force)
   {
     this->SetEnabled(true);
     dBodyAddRelForce(this->linkId, _force.X(), _force.Y(), _force.Z());
+    this->addedForce += this->WorldPose().Rot().RotateVector(_force);
   }
   else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"

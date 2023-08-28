@@ -83,6 +83,10 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetTorque(const ignition::math::Vector3d &_torque);
 
+      /// Get sum of forces expressed in world frame that have been added by
+      /// Link::Add*Force during this timestep.
+      public: const ignition::math::Vector3d &AddedForce() const;
+
       // Documentation inherited
       public: virtual void AddForce(const ignition::math::Vector3d &_force);
 
@@ -196,6 +200,9 @@ namespace gazebo
 
       /// \brief Cache torque applied on body
       private: ignition::math::Vector3d torque;
+
+      /// \brief Cache force applied by AddForce
+      private: ignition::math::Vector3d addedForce;
     };
     /// \}
   }
