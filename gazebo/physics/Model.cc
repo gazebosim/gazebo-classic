@@ -297,6 +297,14 @@ void Model::LoadJoints()
 //////////////////////////////////////////////////
 void Model::Init()
 {
+  // Cache the total mass of the model
+  this->mass = 0.0;
+  for (uint64_t i = 0; i < this->modelSDFDom->LinkCount(); ++i)
+  {
+    this->mass +=
+        this->modelSDFDom->LinkByIndex(i)->Inertial().MassMatrix().Mass();
+  }
+
   // Record the model's initial pose (for reseting)
   this->SetInitialRelativePose(this->SDFPoseRelativeToParent());
   this->SetRelativePose(this->SDFPoseRelativeToParent());
@@ -1861,6 +1869,7 @@ void Model::PluginInfo(const common::URI &_pluginUri,
       << std::endl;
 }
 
+//////////////////////////////////////////////////
 std::optional<sdf::SemanticPose> Model::SDFSemanticPose() const
 {
   if (nullptr != this->modelSDFDom)
@@ -1868,4 +1877,10 @@ std::optional<sdf::SemanticPose> Model::SDFSemanticPose() const
     return this->modelSDFDom->SemanticPose();
   }
   return std::nullopt;
+}
+
+//////////////////////////////////////////////////
+double Model::GetMass() const
+{
+  return this->mass;
 }

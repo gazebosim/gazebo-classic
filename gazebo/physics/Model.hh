@@ -93,6 +93,10 @@ namespace gazebo
       /// \return The SDF DOM for this model.
       public: const sdf::Model *GetSDFDom() const;
 
+      /// \brief Get the total mass of this model.
+      /// \return The mass of the model, cached during initialization.
+      public: double GetMass() const;
+
       /// \internal
       /// \brief Get the SDF element for the model, without all effects of
       /// scaling. This is useful in cases when the scale will be applied
@@ -567,6 +571,9 @@ namespace gazebo
 
       /// \brief SDF Model DOM object
       private: const sdf::Model *modelSDFDom = nullptr;
+
+      /// \brief Cached mass of the entire model.
+      private: double mass = 0.0;
     };
     /// \}
   }
