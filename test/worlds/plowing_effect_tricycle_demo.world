@@ -25,7 +25,7 @@
 -->
 <sdf version="1.6">
   <world name="default">
-	<gravity>0 0 -9.75</gravity>
+    <gravity>0 0 -9.75</gravity>
     <include>
       <uri>model://plowing_effect_ground_plane</uri>
     </include>
@@ -40,18 +40,18 @@
 
       <plugin name="wheel_slip" filename="libWheelSlipPlugin.so">
         <wheel link_name="wheel_front">
-		<slip_compliance_lateral>3.0</slip_compliance_lateral>
-		<slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
+          <slip_compliance_lateral>3.0</slip_compliance_lateral>
+          <slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
           <wheel_normal_force>32</wheel_normal_force>
         </wheel>
         <wheel link_name="wheel_rear_left">
-		<slip_compliance_lateral>3.0</slip_compliance_lateral>
-		<slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
+          <slip_compliance_lateral>3.0</slip_compliance_lateral>
+          <slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
           <wheel_normal_force>32</wheel_normal_force>
         </wheel>
         <wheel link_name="wheel_rear_right">
-		<slip_compliance_lateral>3.0</slip_compliance_lateral>
-		<slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
+          <slip_compliance_lateral>3.0</slip_compliance_lateral>
+          <slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
           <wheel_normal_force>32</wheel_normal_force>
         </wheel>
       </plugin>
@@ -101,18 +101,18 @@
 
       <plugin name="wheel_slip" filename="libWheelSlipPlugin.so">
         <wheel link_name="wheel_front">
-		<slip_compliance_lateral>3.0</slip_compliance_lateral>
-		<slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
+          <slip_compliance_lateral>3.0</slip_compliance_lateral>
+          <slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
           <wheel_normal_force>32</wheel_normal_force>
         </wheel>
         <wheel link_name="wheel_rear_left">
-		<slip_compliance_lateral>3.0</slip_compliance_lateral>
-		<slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
+          <slip_compliance_lateral>3.0</slip_compliance_lateral>
+          <slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
           <wheel_normal_force>32</wheel_normal_force>
         </wheel>
         <wheel link_name="wheel_rear_right">
-		<slip_compliance_lateral>3.0</slip_compliance_lateral>
-		<slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
+          <slip_compliance_lateral>3.0</slip_compliance_lateral>
+          <slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
           <wheel_normal_force>32</wheel_normal_force>
         </wheel>
       </plugin>
