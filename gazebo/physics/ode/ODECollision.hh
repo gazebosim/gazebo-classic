@@ -49,6 +49,22 @@ namespace gazebo
       /// \brief Plowing deadband velocity: the linear wheel velocity [m/s]
       /// below which no plowing effect occurs.
       public: double deadbandVelocity = 0.0;
+
+      /// \brief The slope value in degrees below which the nonlinear slip
+      /// effect is applied.
+      public: double nonlinearSlipLowerDegree = -361.0;
+
+      /// \brief The slope value in degrees above which the nonlinear slip
+      /// effect is applied.
+      public: double nonlinearSlipUpperDegree = 361.0;
+
+      /// \brief The rate of change in slip compliance per degree of slope
+      /// below the "lower degree" value.
+      public: double nonlinearSlipLowerPerDegree = 0.0;
+
+      /// \brief The rate of change in slip compliance per degree of slope
+      /// above the "upper degree" value.
+      public: double nonlinearSlipUpperPerDegree = 0.0;
     };
 
     /// \brief Base class for all ODE collisions.

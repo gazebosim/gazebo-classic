@@ -185,6 +185,24 @@ bool ODECollision::ParseWheelPlowingParams(
     return false;
   }
 
+  const std::string kNonlinearSlip = "nonlinear_slip";
+  if (wheelElem->HasElement(kNonlinearSlip))
+  {
+    sdf::ElementPtr nonlinearSlipElem = wheelElem->GetElement(kNonlinearSlip);
+    if (nonlinearSlipElem->HasElement("lower"))
+    {
+      sdf::ElementPtr lowerElem = nonlinearSlipElem->GetElement("lower");
+      _plowing.nonlinearSlipLowerDegree = lowerElem->Get<double>("degree");
+      _plowing.nonlinearSlipLowerPerDegree = lowerElem->Get<double>("per_degree");
+    }
+    if (nonlinearSlipElem->HasElement("upper"))
+    {
+      sdf::ElementPtr upperElem = nonlinearSlipElem->GetElement("upper");
+      _plowing.nonlinearSlipUpperDegree = upperElem->Get<double>("degree");
+      _plowing.nonlinearSlipUpperPerDegree = upperElem->Get<double>("per_degree");
+    }
+  }
+
   _plowing.maxAngle = plowingMaxAngle;
   _plowing.saturationVelocity = plowingSaturationVelocity;
   _plowing.deadbandVelocity = plowingDeadbandVelocity;
