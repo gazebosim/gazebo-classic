@@ -26,7 +26,9 @@
 #include <utility>
 #include <vector>
 
+#include <ignition/math/Angle.hh>
 #include <ignition/math/Rand.hh>
+#include <ignition/math/SignalStats.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/common/Profiler.hh>
 
@@ -1158,6 +1160,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     ///         << " from surface with smaller mu1\n";
   }
 
+  // Longitudinal slope angle in degrees averaged over each contact point.
+  ignition::math::SignalMean meanSlopeDegrees;
+  ODECollisionWheelPlowingParams wheelPlowing;
+
   if (fd != ignition::math::Vector3d::Zero)
   {
     contact.surface.mode |= dContactFDir1;
@@ -1170,7 +1176,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     auto collision2Sdf = _collision2->GetSDF();
 
     const std::string kPlowingTerrain = "gz:plowing_terrain";
-    ODECollisionWheelPlowingParams wheelPlowing;
 
     ODECollision *wheelCollision = nullptr;
     sdf::ElementPtr terrainSdf = nullptr;
@@ -1190,8 +1195,20 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
     if (wheelCollision && terrainSdf)
     {
-      // compute slope
-      double slope = wheelPlowing.maxAngle.Radian() /
+      // compute chassis world force
+      ModelPtr wheelModel = wheelCollision->GetModel();
+      // initialize from model's gravity force
+      ignition::math::Vector3d worldForce =
+          wheelModel->GetMass() * this->world->Gravity();
+      // Get the added force applied to the canonical link
+      LinkPtr link = wheelModel->GetLink();
+      ODELinkPtr chassisLink = boost::dynamic_pointer_cast<ODELink>(link);
+      if (chassisLink)
+      {
+        worldForce += chassisLink->AddedForce();
+      }
+      // compute sensitivity of plowing angle to velocity
+      double plowingSensitivity = wheelPlowing.maxAngle.Radian() /
           (wheelPlowing.saturationVelocity - wheelPlowing.deadbandVelocity);
 
       // Assume origin of collision frame is wheel center
@@ -1217,6 +1234,16 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
         ignition::math::Vector3d unitLongitudinal =
           contactNormalCopy.Cross(fdir1);
 
+        // Compute normal and longitudinal forces (before plowing)
+        double normalForce = -worldForce.Dot(contactNormalCopy);
+        double longitudinalForce = worldForce.Dot(unitLongitudinal);
+
+        // Estimate slope angle from world force in longitudinal/normal plane
+        ignition::math::Angle slopeAngle(atan2(longitudinalForce, normalForce));
+
+        // Store average slope degrees
+        meanSlopeDegrees.InsertData(slopeAngle.Degree());
+
         // Compute longitudinal speed (dot product)
         double wheelSpeedLongitudinal =
           wheelLinearVelocity.Dot(unitLongitudinal);
@@ -1225,7 +1252,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
         double plowingAngle =
           saturation_deadband(wheelPlowing.maxAngle.Radian(),
           wheelPlowing.deadbandVelocity,
-          slope,
+          plowingSensitivity,
           wheelSpeedLongitudinal);
 
         // Construct axis-angle quaternion using fdir1 and plowing angle
@@ -1277,6 +1304,29 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   contact.surface.slip1 *= numc;
   contact.surface.slip2 *= numc;
   contact.surface.slip3 *= numc;
+
+  if (meanSlopeDegrees.Count() > 0)
+  {
+    // multiplying by numc has issues with plowing so undo that operation
+    contact.surface.slip1 /= numc;
+    contact.surface.slip2 /= numc;
+    contact.surface.slip3 /= numc;
+
+    // Increase slip compliance at a specified rate above and below thresholds
+    // modify slip2 value to affect longitudinal slip
+    if (meanSlopeDegrees.Value() > wheelPlowing.nonlinearSlipUpperDegree)
+    {
+      const double degreesAboveThreshold =
+          meanSlopeDegrees.Value() - wheelPlowing.nonlinearSlipUpperDegree;
+      contact.surface.slip2 *= (1 + wheelPlowing.nonlinearSlipUpperPerDegree * degreesAboveThreshold);
+    }
+    else if (meanSlopeDegrees.Value() < wheelPlowing.nonlinearSlipLowerDegree)
+    {
+      const double degreesBelowThreshold =
+          wheelPlowing.nonlinearSlipLowerDegree - meanSlopeDegrees.Value();
+      contact.surface.slip2 *= (1 + wheelPlowing.nonlinearSlipLowerPerDegree * degreesBelowThreshold);
+    }
+  }
 
   // Combine torsional friction patch radius values
   contact.surface.patch_radius =
