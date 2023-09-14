@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: deps\vcpkg\cache\windows
-        key: windows-${{ inputs.arch }}-${{ hashFiles('.github\workflows\windows-config\action.yml') }}
+        key: windows-${{ inputs.arch }}-${{ hashFiles('.github\workflows\windows-config\action.yml', 'deps\vcpkg\manifest\vcpkg.json') }}
 
     - name: Setup msbuild
       uses: ilammy/msvc-dev-cmd@v1

@@ -93,17 +93,3 @@ jobs:
         with:
           name: windows_logs_${{matrix.arch}}_${{github.event.pull_request.head.sha}}
           path: logs.7z
-
-      - name: Prepare artifacts for deploy
-        if: success()
-        shell: cmd
-        run: |
-          move vcpkg\installed\${{ matrix.arch }}-windows-release vcpkg\installed\gazebo
-          7z a -t7z -r gazebo.7z ./vcpkg/installed/gazebo/
-
-      - name: Upload gazebo
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: gazebo_windows_${{matrix.arch}}_${{github.event.pull_request.head.sha}}
-          path: gazebo.7z
