@@ -206,6 +206,11 @@ add_dependencies(gzclient gazebo_gui)
 target_compile_definitions(gazebo_gui
   PRIVATE BUILDING_DLL_GZ_GUI
 )
+if (GRAPHVIZ_VERSION_LT_9)
+  target_compile_definitions(gazebo_gui
+    PRIVATE GRAPHVIZ_VERSION_LT_9
+  )
+endif()
 
 target_link_libraries(gazebo_gui
   libgazebo_client
