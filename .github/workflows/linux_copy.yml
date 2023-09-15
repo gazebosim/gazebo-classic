@@ -1,0 +1,83 @@
+name: 🐧 Linux
+on:
+  push:
+    branches: [ gazebo11 ]
+  pull_request:
+    branches: [ gazebo11 ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  config:
+    name: x64-config
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Config Gazebo
+        uses: ./.github/workflows/linux-config/
+
+      - name: Prepare logs on failure
+        if: failure()
+        shell: bash
+        run: |
+          7z a -t7z -r -mx=9 logs.7z \
+              vcpkg/buildtrees/*.log
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux_logs_x64_${{github.event.pull_request.head.sha}}
+          path: logs.7z
+
+  build:
+    name: x64-build
+    needs: config
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  
+    steps:
+      - uses: actions/checkout@v3     
+
+      - name: Config Gazebo
+        uses: ./.github/workflows/linux-config/
+              
+      - name: Build Gazebo
+        shell: bash
+        run: |
+          export proc=$(nproc)
+          echo proc=$proc
+          cmake --build build --config Release -j $proc
+
+      - name: Install Gazebo
+        shell: bash
+        run: |
+          cmake --install build --config Release
+          
+      - name: Tests suite compilation
+        shell: bash
+        run: |
+          echo compile and run tests here
+
+      - name: Prepare logs on failure
+        if: failure()
+        shell: bash
+        run: |
+          7z a -t7z -r -mx=9 logs.7z \
+              vcpkg/buildtrees/*.log \
+              build/.ninja_log \
+              build/build.ninja \
+              build/install_manifest.txt \
+              build/vcpkg-manifest-install.log
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux_logs_x64_${{github.event.pull_request.head.sha}}
+          path: logs.7z

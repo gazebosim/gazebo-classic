@@ -1,0 +1,63 @@
+name: linux-config
+description: configure linux
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: deps/vcpkg/cache/linux
+        key: linux-x64-${{ hashFiles('.github/workflows/linux-config/action.yml', 'deps/vcpkg/manifest/vcpkg.json') }}
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        # vcpkg
+        # qt5-base
+        # ffmpeg
+        # ogre
+        # libusb
+        sudo apt install -y \
+        ninja-build \
+        \
+        '^libxcb.*-dev' \
+        libx11-xcb-dev \
+        libglu1-mesa-dev \
+        libxrender-dev \
+        libxi-dev \
+        libxkbcommon-dev \
+        libxkbcommon-x11-dev \
+        \
+        nasm \
+        \
+        libxaw7-dev \
+        libxrandr-dev \
+        \
+        libudev-dev \
+        autoconf
+
+    - name: Clone vcpkg
+      shell: bash
+      run: |
+        git clone https://github.com/microsoft/vcpkg/
+
+    - name: Configure Gazebo
+      shell: bash
+      run: |
+        export VCPKG_BINARY_SOURCES="clear;files,$PWD/deps/vcpkg/cache/linux,readwrite;"
+        cmake . -G Ninja -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake \
+            -DVCPKG_MANIFEST_DIR=deps/vcpkg/manifest \
+            -DVCPKG_OVERLAY_TRIPLETS=deps/vcpkg/triplets \
+            -DVCPKG_OVERLAY_PORTS=deps/vcpkg/ports \
+            -DVCPKG_INSTALLED_DIR=$PWD/vcpkg/installed \
+            -DVCPKG_TARGET_TRIPLET=x64-linux-release \
+            -DVCPKG_HOST_TRIPLET=x64-linux-release \
+            -DVCPKG_INSTALL_OPTIONS=--clean-after-build \
+            -DUSE_EXTERNAL_TINYXML=ON \
+            -DUSE_EXTERNAL_TINYXML2=ON \
+            -DUSE_EXTERNAL_TINY_PROCESS_LIBRARY=ON \
+            -DGZ_PROTOBUF_USE_CMAKE_CONFIG=ON \
+            -DCMAKE_INSTALL_PREFIX=$PWD/vcpkg/installed/x64-linux-release
