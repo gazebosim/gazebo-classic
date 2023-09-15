@@ -65,7 +65,6 @@ typedef boost::shared_ptr<gazebo::physics::SimbodyJoint> SimbodyJointPtr;
 
 using namespace gazebo;
 using namespace physics;
-using namespace SimTK;
 
 GZ_REGISTER_PHYSICS_ENGINE("simbody", SimbodyPhysics)
 
@@ -314,7 +313,7 @@ void SimbodyPhysics::InitModel(const physics::ModelPtr _model)
     else
     {
       //---------------------- GENERATE MULTIBODY GRAPH ------------------------
-      MultibodyGraphMaker mbgraph;
+      SimTK::MultibodyGraphMaker mbgraph;
       this->CreateMultibodyGraph(mbgraph, _model);
       // Optional: dump the graph to stdout for debugging or curiosity.
       // mbgraph.dumpGraph(gzdbg);
@@ -929,7 +928,7 @@ void SimbodyPhysics::AddStaticModelToSimbodySystem(
     if (simbodyLink)
     {
       this->AddCollisionsToLink(simbodyLink.get(), this->matter.updGround(),
-        ContactCliqueId());
+        SimTK::ContactCliqueId());
       simbodyLink->masterMobod = this->matter.updGround();
     }
     else
@@ -946,7 +945,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
   // Generate a contact clique we can put collision geometry in to prevent
   // self-collisions.
   // \TODO: put this in a gazebo::physics::SimbodyModel class
-  ContactCliqueId modelClique = ContactSurface::createNewContactClique();
+  SimTK::ContactCliqueId modelClique = SimTK::ContactSurface::createNewContactClique();
 
   // Will specify explicitly when needed
   // Record the MobilizedBody for the World link.
@@ -960,7 +959,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     // Get a mobilizer from the graph, then extract its corresponding
     // joint and bodies. Note that these don't necessarily have equivalents
     // in the GazeboLink and GazeboJoint inputs.
-    const MultibodyGraphMaker::Mobilizer& mob = _mbgraph.getMobilizer(mobNum);
+    const SimTK::MultibodyGraphMaker::Mobilizer& mob = _mbgraph.getMobilizer(mobNum);
     const std::string& type = mob.getJointTypeName();
 
     // The inboard body always corresponds to one of the input links,
@@ -974,7 +973,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     SimbodyLink* gzOutb =
       static_cast<SimbodyLink*>(mob.getOutboardMasterBodyRef());
 
-    const MassProperties massProps =
+    const SimTK::MassProperties massProps =
         gzOutb->GetEffectiveMassProps(mob.getNumFragments());
 
     // debug
@@ -987,9 +986,9 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     //         << "\n";
 
     // This will reference the new mobilized body once we create it.
-    MobilizedBody mobod;
+    SimTK::MobilizedBody mobod;
 
-    MobilizedBody parentMobod =
+    SimTK::MobilizedBody parentMobod =
       gzInb == nullptr ? this->matter.Ground() : gzInb->masterMobod;
 
     if (mob.isAddedBaseMobilizer())
@@ -1001,9 +1000,9 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       GZ_ASSERT(type == "free", "type is not 'free', not allowed.");
       if (type == "free")
       {
-        MobilizedBody::Free freeJoint(
-            parentMobod,  Transform(),
-            massProps,    Transform());
+        SimTK::MobilizedBody::Free freeJoint(
+            parentMobod,  SimTK::Transform(),
+            massProps,    SimTK::Transform());
 
         SimTK::Transform inboard_X_ML;
         if (gzInb == nullptr)
@@ -1036,26 +1035,26 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       // Find inboard and outboard frames for the mobilizer; these are
       // parent and child frames or the reverse.
 
-      const Transform& X_IF0 = isReversed ? gzJoint->xCB : gzJoint->xPA;
-      const Transform& X_OM0 = isReversed ? gzJoint->xPA : gzJoint->xCB;
+      const SimTK::Transform& X_IF0 = isReversed ? gzJoint->xCB : gzJoint->xPA;
+      const SimTK::Transform& X_OM0 = isReversed ? gzJoint->xPA : gzJoint->xCB;
 
-      const MobilizedBody::Direction direction =
-          isReversed ? MobilizedBody::Reverse : MobilizedBody::Forward;
+      const SimTK::MobilizedBody::Direction direction =
+          isReversed ? SimTK::MobilizedBody::Reverse : SimTK::MobilizedBody::Forward;
 
       if (type == "free")
       {
-        MobilizedBody::Free freeJoint(
+        SimTK::MobilizedBody::Free freeJoint(
             parentMobod,  X_IF0,
             massProps,          X_OM0,
             direction);
-        Transform defX_FM = isReversed ? Transform(~gzJoint->defxAB)
+        SimTK::Transform defX_FM = isReversed ? SimTK::Transform(~gzJoint->defxAB)
                                        : gzJoint->defxAB;
         freeJoint.setDefaultTransform(defX_FM);
         mobod = freeJoint;
       }
       else if (type == "screw")
       {
-        UnitVec3 axis(
+        SimTK::UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(
             gzJoint->AxisFrameOffset(0).RotateVector(
             gzJoint->LocalAxis(0))));
@@ -1071,10 +1070,10 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         }
 
         // Simbody's screw joint axis (both rotation and translation) is along Z
-        Rotation R_JZ(axis, ZAxis);
-        Transform X_IF(X_IF0.R()*R_JZ, X_IF0.p());
-        Transform X_OM(X_OM0.R()*R_JZ, X_OM0.p());
-        MobilizedBody::Screw screwJoint(
+        SimTK::Rotation R_JZ(axis, SimTK::ZAxis);
+        SimTK::Transform X_IF(X_IF0.R()*R_JZ, X_IF0.p());
+        SimTK::Transform X_OM(X_OM0.R()*R_JZ, X_OM0.p());
+        SimTK::MobilizedBody::Screw screwJoint(
             parentMobod,      X_IF,
             massProps,        X_OM,
             -1.0/pitch,
@@ -1088,7 +1087,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
         // initialize stop stiffness and dissipation from joint parameters
         gzJoint->limitForce[0] =
-          Force::MobilityLinearStop(this->forces, mobod,
+          SimTK::Force::MobilityLinearStop(this->forces, mobod,
           SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
           gzJoint->GetStopDissipation(0), low, high);
 
@@ -1099,22 +1098,22 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // is zero.  This will allow user to change damping coefficients
         // on the fly.
         gzJoint->damper[0] =
-          Force::MobilityLinearDamper(this->forces, mobod, 0,
+          SimTK::Force::MobilityLinearDamper(this->forces, mobod, 0,
                                    gzJoint->GetDamping(0));
 
         // add spring (stiffness proportional to mass)
         gzJoint->spring[0] =
-          Force::MobilityLinearSpring(this->forces, mobod, 0,
+          SimTK::Force::MobilityLinearSpring(this->forces, mobod, 0,
             gzJoint->GetStiffness(0),
             gzJoint->GetSpringReferencePosition(0));
       }
       else if (type == "universal")
       {
-        UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
+        SimTK::UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
           gzJoint->AxisFrameOffset(0).RotateVector(
           gzJoint->LocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
         /// \TODO: check if this is right, or AxisFrameOffset(1) is needed.
-        UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
+        SimTK::UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
           gzJoint->AxisFrameOffset(0).RotateVector(
           gzJoint->LocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
 
@@ -1122,10 +1121,10 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // note X and Y are reversed because Simbody defines universal joint
         // rotation in body-fixed frames, whereas Gazebo/ODE uses space-fixed
         // frames.
-        Rotation R_JF(axis1, XAxis, axis2, YAxis);
-        Transform X_IF(X_IF0.R()*R_JF, X_IF0.p());
-        Transform X_OM(X_OM0.R()*R_JF, X_OM0.p());
-        MobilizedBody::Universal uJoint(
+        SimTK::Rotation R_JF(axis1, SimTK::XAxis, axis2, SimTK::YAxis);
+        SimTK::Transform X_IF(X_IF0.R()*R_JF, X_IF0.p());
+        SimTK::Transform X_OM(X_OM0.R()*R_JF, X_OM0.p());
+        SimTK::MobilizedBody::Universal uJoint(
             parentMobod,      X_IF,
             massProps,        X_OM,
             direction);
@@ -1138,7 +1137,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
           // initialize stop stiffness and dissipation from joint parameters
           gzJoint->limitForce[nj] =
-            Force::MobilityLinearStop(this->forces, mobod,
+            SimTK::Force::MobilityLinearStop(this->forces, mobod,
             SimTK::MobilizerQIndex(nj), gzJoint->GetStopStiffness(nj),
             gzJoint->GetStopDissipation(nj), low, high);
 
@@ -1154,11 +1153,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           // is zero.  This will allow user to change damping coefficients
           // on the fly.
           gzJoint->damper[nj] =
-            Force::MobilityLinearDamper(this->forces, mobod, nj,
+            SimTK::Force::MobilityLinearDamper(this->forces, mobod, nj,
                                      gzJoint->GetDamping(nj));
           // add spring (stiffness proportional to mass)
           gzJoint->spring[nj] =
-            Force::MobilityLinearSpring(this->forces, mobod, nj,
+            SimTK::Force::MobilityLinearSpring(this->forces, mobod, nj,
               gzJoint->GetStiffness(nj),
               gzJoint->GetSpringReferencePosition(nj));
         }
@@ -1174,7 +1173,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // simbody always assumes axis is specified in the child link frame.
         // \TODO: come up with a test case where we might need to
         // flip transform based on isReversed flag.
-        UnitVec3 axis(
+        SimTK::UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(
             gzJoint->AxisFrameOffset(0).RotateVector(
             gzJoint->LocalAxis(0))));
@@ -1185,10 +1184,10 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         //          gzJoint->LocalAxis(0)) << "]\n";
 
         // Simbody's pin is along Z
-        Rotation R_JZ(axis, ZAxis);
-        Transform X_IF(X_IF0.R()*R_JZ, X_IF0.p());
-        Transform X_OM(X_OM0.R()*R_JZ, X_OM0.p());
-        MobilizedBody::Pin pinJoint(
+        SimTK::Rotation R_JZ(axis, SimTK::ZAxis);
+        SimTK::Transform X_IF(X_IF0.R()*R_JZ, X_IF0.p());
+        SimTK::Transform X_OM(X_OM0.R()*R_JZ, X_OM0.p());
+        SimTK::MobilizedBody::Pin pinJoint(
             parentMobod,      X_IF,
             massProps,              X_OM,
             direction);
@@ -1199,7 +1198,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
         // initialize stop stiffness and dissipation from joint parameters
         gzJoint->limitForce[0] =
-          Force::MobilityLinearStop(this->forces, mobod,
+          SimTK::Force::MobilityLinearStop(this->forces, mobod,
           SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
           gzJoint->GetStopDissipation(0), low, high);
 
@@ -1210,26 +1209,26 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // is zero.  This will allow user to change damping coefficients
         // on the fly.
         gzJoint->damper[0] =
-          Force::MobilityLinearDamper(this->forces, mobod, 0,
+          SimTK::Force::MobilityLinearDamper(this->forces, mobod, 0,
                                    gzJoint->GetDamping(0));
 
         // add spring (stiffness proportional to mass)
         gzJoint->spring[0] =
-          Force::MobilityLinearSpring(this->forces, mobod, 0,
+          SimTK::Force::MobilityLinearSpring(this->forces, mobod, 0,
             gzJoint->GetStiffness(0),
             gzJoint->GetSpringReferencePosition(0));
       }
       else if (type == "prismatic")
       {
-        UnitVec3 axis(SimbodyPhysics::Vector3ToVec3(
+        SimTK::UnitVec3 axis(SimbodyPhysics::Vector3ToVec3(
             gzJoint->AxisFrameOffset(0).RotateVector(
             gzJoint->LocalAxis(0))));
 
         // Simbody's slider is along X
-        Rotation R_JX(axis, XAxis);
-        Transform X_IF(X_IF0.R()*R_JX, X_IF0.p());
-        Transform X_OM(X_OM0.R()*R_JX, X_OM0.p());
-        MobilizedBody::Slider sliderJoint(
+        SimTK::Rotation R_JX(axis, SimTK::XAxis);
+        SimTK::Transform X_IF(X_IF0.R()*R_JX, X_IF0.p());
+        SimTK::Transform X_OM(X_OM0.R()*R_JX, X_OM0.p());
+        SimTK::MobilizedBody::Slider sliderJoint(
             parentMobod,      X_IF,
             massProps,              X_OM,
             direction);
@@ -1240,7 +1239,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
         // initialize stop stiffness and dissipation from joint parameters
         gzJoint->limitForce[0] =
-          Force::MobilityLinearStop(this->forces, mobod,
+          SimTK::Force::MobilityLinearStop(this->forces, mobod,
           SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
           gzJoint->GetStopDissipation(0), low, high);
 
@@ -1248,30 +1247,30 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // is zero.  This will allow user to change damping coefficients
         // on the fly.
         gzJoint->damper[0] =
-          Force::MobilityLinearDamper(this->forces, mobod, 0,
+          SimTK::Force::MobilityLinearDamper(this->forces, mobod, 0,
                                    gzJoint->GetDamping(0));
 
         // add spring (stiffness proportional to mass)
         gzJoint->spring[0] =
-          Force::MobilityLinearSpring(this->forces, mobod, 0,
+          SimTK::Force::MobilityLinearSpring(this->forces, mobod, 0,
             gzJoint->GetStiffness(0),
             gzJoint->GetSpringReferencePosition(0));
       }
       else if (type == "ball")
       {
-        MobilizedBody::Ball ballJoint(
+        SimTK::MobilizedBody::Ball ballJoint(
             parentMobod,  X_IF0,
             massProps,          X_OM0,
             direction);
-        Rotation defR_FM = isReversed
-            ? Rotation(~gzJoint->defxAB.R())
+        SimTK::Rotation defR_FM = isReversed
+            ? SimTK::Rotation(~gzJoint->defxAB.R())
             : gzJoint->defxAB.R();
         ballJoint.setDefaultRotation(defR_FM);
         mobod = ballJoint;
       }
       else if (type == "fixed")
       {
-        MobilizedBody::Weld fixedJoint(
+        SimTK::MobilizedBody::Weld fixedJoint(
             parentMobod,  X_IF0,
             massProps,    X_OM0);
         mobod = fixedJoint;
@@ -1311,7 +1310,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       if (link->slaveMobods.empty()) continue;
       for (unsigned i = 0; i < link->slaveMobods.size(); ++i)
       {
-        Constraint::Weld weld(link->masterMobod, link->slaveMobods[i]);
+        SimTK::Constraint::Weld weld(link->masterMobod, link->slaveMobods[i]);
 
         // in case we want to know later
         link->slaveWelds.push_back(weld);
@@ -1322,7 +1321,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
   //   leave out optimization
   // // Add the loop joints if any.
   // for (int lcx=0; lcx < _mbgraph.getNumLoopConstraints(); ++lcx) {
-  //     const MultibodyGraphMaker::LoopConstraint& loop =
+  //     const SimTK::MultibodyGraphMaker::LoopConstraint& loop =
   //         _mbgraph.getLoopConstraint(lcx);
 
   //     SimbodyJointPtr joint(loop.getJointRef());
@@ -1330,18 +1329,18 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
   //     SimbodyLinkPtr  child(loop.getChildBodyRef());
 
   //     if (joint.type == "weld") {
-  //         Constraint::Weld weld(parent.masterMobod, joint.xPA,
+  //         SimTK::Constraint::Weld weld(parent.masterMobod, joint.xPA,
   //                               child.masterMobod,  joint.xCB);
   //         joint.constraint = weld;
   //     } else if (joint.type == "ball") {
-  //         Constraint::Ball ball(parent.masterMobod, joint.xPA.p(),
+  //         SimTK::Constraint::Ball ball(parent.masterMobod, joint.xPA.p(),
   //                               child.masterMobod,  joint.xCB.p());
   //         joint.constraint = ball;
   //     } else if (joint.type == "free") {
   //         // A "free" loop constraint is no constraint at all so we can
   //         // just ignore it. It might be more convenient if there were
-  //         // a 0-constraint Constraint::Free, just as there is a 0-mobility
-  //         // MobilizedBody::Weld.
+  //         // a 0-constraint SimTK::Constraint::Free, just as there is a 0-mobility
+  //         // SimTK::MobilizedBody::Weld.
   //     } else
   //         throw std::runtime_error(
   //             "Unrecognized loop constraint type '" + joint.type + "'.");
@@ -1403,7 +1402,7 @@ void SimbodyPhysics::SetSeed(uint32_t /*_seed*/)
 
 /////////////////////////////////////////////////
 void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
-  MobilizedBody &_mobod, ContactCliqueId _modelClique)
+  SimTK::MobilizedBody &_mobod, SimTK::ContactCliqueId _modelClique)
 {
   // TODO: Edit physics::Surface class to support these properties
   // Define a material to use for contact. This is not very stiff.
@@ -1429,7 +1428,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
   for (Collision_V::iterator ci =  collisions.begin();
                              ci !=  collisions.end(); ++ci)
   {
-    Transform X_LC =
+    SimTK::Transform X_LC =
       SimbodyPhysics::Pose2Transform((*ci)->RelativePose());
 
     // use pointer to store CollisionGeometry
@@ -1447,10 +1446,10 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         // rotate it based on normal vector specified by user
         // Create a rotation whos x-axis is in the
         // negative normal vector direction
-        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->Normal());
-        Rotation R_XN(-UnitVec3(normal), XAxis);
+        SimTK::Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->Normal());
+        SimTK::Rotation R_XN(-SimTK::UnitVec3(normal), SimTK::XAxis);
 
-        ContactSurface surface(ContactGeometry::HalfSpace(), material);
+        SimTK::ContactSurface surface(SimTK::ContactGeometry::HalfSpace(), material);
 
         if (addModelClique)
             surface.joinClique(_modelClique);
@@ -1469,7 +1468,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         boost::shared_ptr<physics::SphereShape> s =
           boost::dynamic_pointer_cast<physics::SphereShape>((*ci)->GetShape());
         double r = s->GetRadius();
-        ContactSurface surface(ContactGeometry::Sphere(r), material);
+        SimTK::ContactSurface surface(SimTK::ContactGeometry::Sphere(r), material);
         if (addModelClique)
             surface.joinClique(_modelClique);
         int surfNum = _mobod.updBody().addContactSurface(X_LC, surface);
@@ -1491,13 +1490,13 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
 
         // chunky hexagonal shape
         const int resolution = 1;
-        const PolygonalMesh mesh = PolygonalMesh::
-            createCylinderMesh(ZAxis, r, len/2, resolution);
-        const ContactGeometry::TriangleMesh triMesh(mesh);
-        ContactSurface surface(triMesh, material, 1 /*Thickness*/);
+        const SimTK::PolygonalMesh mesh = SimTK::PolygonalMesh::
+            createCylinderMesh(SimTK::ZAxis, r, len/2, resolution);
+        const SimTK::ContactGeometry::TriangleMesh triMesh(mesh);
+        SimTK::ContactSurface surface(triMesh, material, 1 /*Thickness*/);
 
-        // Vec3 esz = Vec3(r, r, len/2);  // Use ellipsoid instead
-        // ContactSurface surface(ContactGeometry::Ellipsoid(esz),
+        // SimTK::Vec3 esz = SimTK::Vec3(r, r, len/2);  // Use ellipsoid instead
+        // SimTK::ContactSurface surface(SimTK::ContactGeometry::Ellipsoid(esz),
         //                        material);
 
         if (addModelClique)
@@ -1513,7 +1512,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
 
       case physics::Entity::BOX_SHAPE:
       {
-        Vec3 hsz = SimbodyPhysics::Vector3ToVec3(
+        SimTK::Vec3 hsz = SimbodyPhysics::Vector3ToVec3(
           (boost::dynamic_pointer_cast<physics::BoxShape>(
           (*ci)->GetShape()))->Size())/2;
 
@@ -1522,12 +1521,12 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         // number times to chop the longest side.
         const int resolution = 6;
         // const int resolution = 10 * (int)(max(hsz)/min(hsz) + 0.5);
-        const PolygonalMesh mesh = PolygonalMesh::
+        const SimTK::PolygonalMesh mesh = SimTK::PolygonalMesh::
             createBrickMesh(hsz, resolution);
-        const ContactGeometry::TriangleMesh triMesh(mesh);
-        ContactSurface surface(triMesh, material, 1 /*Thickness*/);
+        const SimTK::ContactGeometry::TriangleMesh triMesh(mesh);
+        SimTK::ContactSurface surface(triMesh, material, 1 /*Thickness*/);
 
-        // ContactSurface surface(ContactGeometry::Ellipsoid(hsz),
+        // SimTK::ContactSurface surface(SimTK::ContactGeometry::Ellipsoid(hsz),
         //                        material);
 
         if (addModelClique)
