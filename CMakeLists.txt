@@ -193,7 +193,7 @@ set(GAZEBO_MODEL_DATABASE_URI http://models.gazebosim.org)
 set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
 # Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
 # we pass it to the compiler later.
-string(REPLACE "\n" "" OGRE_RESOURCE_PATH ${OGRE_RESOURCE_PATH})
+string(REPLACE "\n" "" OGRE_RESOURCE_PATH "${OGRE_RESOURCE_PATH}")
 FILE(TO_CMAKE_PATH "${OGRE_RESOURCE_PATH}" OGRE_RESOURCE_PATH)
 
 

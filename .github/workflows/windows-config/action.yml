@@ -1,0 +1,51 @@
+name: windows-config
+description: configure windows
+inputs:
+  arch:
+    required: true
+    type: choice
+    options: 
+    - x86
+    - x64
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: deps\vcpkg\cache\windows
+        key: windows-${{ inputs.arch }}-${{ hashFiles('.github\workflows\windows-config\action.yml', 'deps\vcpkg\manifest\vcpkg.json') }}
+
+    - name: Setup msbuild
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ inputs.arch }}
+
+    - name: Fix vcpkg
+      shell: cmd
+      run: vcpkg.exe integrate remove
+
+    - name: Clone vcpkg
+      shell: cmd
+      run: |
+        git clone https://github.com/microsoft/vcpkg/
+
+    - name: Configure Gazebo
+      shell: cmd
+      run: |
+        set VCPKG_BINARY_SOURCES=clear;files,%CD%\deps\vcpkg\cache\windows,readwrite;
+        cmake . -G Ninja -B build ^
+            -DCMAKE_BUILD_TYPE=Release ^
+            -DCMAKE_TOOLCHAIN_FILE=vcpkg\scripts\buildsystems\vcpkg.cmake ^
+            -DVCPKG_MANIFEST_DIR=deps\vcpkg\manifest ^
+            -DVCPKG_OVERLAY_TRIPLETS=deps\vcpkg\triplets ^
+            -DVCPKG_INSTALLED_DIR=%CD%\vcpkg\installed ^
+            -DVCPKG_TARGET_TRIPLET=${{ inputs.arch }}-windows-release ^
+            -DVCPKG_HOST_TRIPLET=${{ inputs.arch }}-windows-release ^
+            -DVCPKG_INSTALL_OPTIONS=--clean-after-build ^
+            -DUSE_EXTERNAL_TINYXML=ON ^
+            -DUSE_EXTERNAL_TINYXML2=ON ^
+            -DUSE_EXTERNAL_TINY_PROCESS_LIBRARY=ON ^
+            -DGZ_PROTOBUF_USE_CMAKE_CONFIG=ON ^
+            -DCMAKE_INSTALL_PREFIX=%CD%\vcpkg\installed\${{ inputs.arch }}-windows-release

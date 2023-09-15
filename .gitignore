@@ -4,6 +4,7 @@ build
 build_*
 build-*
 Ogre.log
+deps/vcpkg/cache
 .DS_Store
 *.swp
 *.orig

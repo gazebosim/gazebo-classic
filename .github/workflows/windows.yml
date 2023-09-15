@@ -1,0 +1,95 @@
+name: 🪟 Windows-vcpkg
+on:
+  push:
+    branches: [ gazebo11 ]
+  pull_request:
+    branches: [ gazebo11 ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  config:
+    name: ${{ matrix.arch }}-config
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false  
+      matrix:
+        include:
+        - arch: x64
+        - arch: x86
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Config Gazebo
+        uses: ./.github/workflows/windows-config/
+        with:
+          arch: ${{ matrix.arch }}
+
+      - name: Prepare logs on failure
+        if: failure()
+        shell: cmd
+        run: |
+          7z a -t7z -r -mx=9 logs.7z ^
+              vcpkg/buildtrees/*.log
+              
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows_logs_${{matrix.arch}}_${{github.event.pull_request.head.sha}}
+          path: logs.7z
+
+  build:
+    name: ${{ matrix.arch }}-build
+    needs: config
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false  
+      matrix:
+        include:
+        - arch: x64
+        - arch: x86
+    steps:
+      - uses: actions/checkout@v3     
+
+      - name: Config Gazebo
+        uses: ./.github/workflows/windows-config/
+        with:
+          arch: ${{ matrix.arch }}
+              
+      - name: Build Gazebo
+        shell: cmd
+        run: |
+          set /a proc=%NUMBER_OF_PROCESSORS%
+          echo proc=%proc%
+          cmake --build build --config Release -j %proc%
+
+      - name: Install Gazebo
+        shell: cmd
+        run: |
+          cmake --install build --config Release
+          
+      - name: Tests suite compilation
+        shell: cmd
+        run: |
+          echo compile and run tests here
+
+      - name: Prepare logs on failure
+        if: failure()
+        shell: cmd
+        run: |
+          7z a -t7z -r -mx=9 logs.7z ^
+              vcpkg/buildtrees/*.log ^
+              build/.ninja_log ^
+              build/build.ninja ^
+              build/install_manifest.txt ^
+              build/vcpkg-manifest-install.log
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows_logs_${{matrix.arch}}_${{github.event.pull_request.head.sha}}
+          path: logs.7z
