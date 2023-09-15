@@ -102,7 +102,10 @@ class QGVCore
       rdr.len = strlen(cp);
       rdr.cur = 0;
 
+#ifdef GRAPHVIZ_VERSION_LT_9
+      // This variable only exists for versions before Graphviz 9.0
       disc.mem = &AgMemDisc;
+#endif
       disc.id = &AgIdDisc;
       disc.io = &memIoDisc;
       g = agread(&rdr, &disc);

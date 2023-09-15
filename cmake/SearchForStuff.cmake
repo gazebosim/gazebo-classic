@@ -781,6 +781,9 @@ if (NOT GRAPHVIZ_FOUND)
 else ()
   message (STATUS "Looking for libgraphviz-dev - found")
   set (HAVE_GRAPHVIZ ON CACHE BOOL "HAVE GRAPHVIZ" FORCE)
+  if (${GRAPHVIZ_CGRAPH_PKG_VERSION} VERSION_LESS 9.0)
+    set(GRAPHVIZ_VERSION_LT_9 TRUE)
+  endif ()
 endif ()
 
 ########################################
