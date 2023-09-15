@@ -199,7 +199,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("record_resources", "Recording with model meshes and materials.")
     ("seed",  po::value<double>(), "Start with a given random number seed.")
     ("initial_sim_time", po::value<double>(),
-     "Initial simulation time (seconds).")
+     "Initial simulation time (seconds). This time is also used after reset.")
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
@@ -412,8 +412,10 @@ bool Server::ParseArgs(int _argc, char **_argv)
   {
     try
     {
-      physics::get_world()->SetSimTime(
-          common::Time(this->dataPtr->vm["initial_sim_time"].as<double>()));
+      common::Time initialSimTime {
+        this->dataPtr->vm["initial_sim_time"].as<double>()};
+      physics::get_world()->SetSimTime(initialSimTime);
+      physics::get_world()->SetInitialSimTime(initialSimTime);
       gzmsg << "Setting initial sim time to [" <<
         physics::get_world()->SimTime() << "]\n" << std::endl;
     }
