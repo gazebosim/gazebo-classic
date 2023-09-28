@@ -3,7 +3,7 @@
   "description": "Open source robotics simulator.",
   "homepage": "http://gazebosim.org",
   "license": "Apache-2.0",
-  "builtin-baseline": "19af97cba8ca48474e4ad15a24ed50271a9ecdac",
+  "builtin-baseline": "db0473513e5dc73ec6b6f431ff05d2f398eea042",
   "dependencies": [
     "boost-asio",
     "boost-date-time",
@@ -146,11 +146,6 @@
     {
       "name": "qwt",
       "version": "6.1.5"
-    },
-    {
-      "name": "graphviz",
-      "version": "2.49.1",
-      "port-version": 4
     }
   ]
 }
