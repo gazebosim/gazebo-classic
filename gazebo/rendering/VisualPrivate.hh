@@ -93,6 +93,7 @@ namespace gazebo
 
       /// \brief The SDF element for the visual.
       public: sdf::ElementPtr sdf;
+      public: sdf::ElementPtr poseElem;
 
       /// \brief The unique name for the visual's material.
       public: std::string myMaterialName;
