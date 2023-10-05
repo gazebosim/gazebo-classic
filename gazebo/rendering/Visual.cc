@@ -243,6 +243,8 @@ void Visual::Fini()
   }
   this->dataPtr->scene.reset();
 
+  dataPtr->poseElem.reset();
+
   if (this->dataPtr->sdf)
     this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
@@ -458,6 +460,7 @@ void Visual::Load()
   }
 
   // Set the pose of the scene node
+  this->dataPtr->poseElem.reset();
   this->SetPose(pose);
   this->dataPtr->initialRelativePose = pose;
 
@@ -1984,14 +1987,25 @@ void Visual::SetRotation(const ignition::math::Quaterniond &_rot)
   this->dataPtr->sceneNode->setOrientation(
       Ogre::Quaternion(_rot.W(), _rot.X(), _rot.Y(), _rot.Z()));
 
-  this->dataPtr->sdf->GetElement("pose")->Set(this->Pose());
+  if(!dataPtr->poseElem)
+  {
+    dataPtr->poseElem = this->dataPtr->sdf->GetElement("pose");
+  }
+
+  dataPtr->poseElem->Set(this->Pose());
 }
 
 //////////////////////////////////////////////////
 void Visual::SetPose(const ignition::math::Pose3d &_pose)
 {
-  this->SetPosition(_pose.Pos());
-  this->SetRotation(_pose.Rot());
+  this->dataPtr->sceneNode->setPosition(_pose.Pos().X(), _pose.Pos().Y(), _pose.Pos().Z());
+  this->dataPtr->sceneNode->setOrientation(
+      Ogre::Quaternion(_pose.Rot().W(), _pose.Rot().X(), _pose.Rot().Y(), _pose.Rot().Z()));
+  if(!dataPtr->poseElem)
+  {
+    dataPtr->poseElem = this->dataPtr->sdf->GetElement("pose");
+  }
+  dataPtr->poseElem->Set(this->Pose());
 }
 
 //////////////////////////////////////////////////

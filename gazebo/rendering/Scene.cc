@@ -2142,8 +2142,7 @@ void Scene::PreRender()
           ignition::math::Pose3d pose = msgs::ConvertIgn(pIter->second);
           GZ_ASSERT(iter->second, "Visual pointer is NULL");
           iter->second->SetPose(pose);
-          PoseMsgs_M::iterator prev = pIter++;
-          this->dataPtr->poseMsgs.erase(prev);
+          pIter = this->dataPtr->poseMsgs.erase(pIter);
         }
         else
           ++pIter;
@@ -2157,8 +2156,7 @@ void Scene::PreRender()
           ignition::math::Pose3d pose = msgs::ConvertIgn(pIter->second);
           lIter->second->SetPosition(pose.Pos());
           lIter->second->SetRotation(pose.Rot());
-          auto prev = pIter++;
-          this->dataPtr->poseMsgs.erase(prev);
+          pIter = this->dataPtr->poseMsgs.erase(pIter);
         }
         else
           ++pIter;
