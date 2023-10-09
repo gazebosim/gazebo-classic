@@ -1,5 +1,45 @@
 ## Gazebo 11
 
+## Gazebo 11.14.0 (2023-10-06)
+
+1. Visual::SetPose performance improvement / minor fixes
+    * [Pull request #3350](https://github.com/gazebosim/gazebo/pull/3350)
+   * A contribution from Janosch Machowinski
+
+1. Apply initial sim time also after a reset.
+    * [Pull request #3340](https://github.com/gazebosim/gazebo/pull/3340)
+   * A contribution from Martin Pecka
+
+1. Remove using namespace SimTK
+    * [Pull request #3347](https://github.com/gazebosim/gazebo/pull/3347)
+    * A contrubition from Silvio Traversaro
+
+1. Fix build with graphviz 9
+    * [Pull request #3345](https://github.com/gazebosim/gazebo/pull/3345)
+
+1. Add support for compiling on windows x64 and x86 with vcpkg-provided dependencies
+    * [Pull request #3320](https://github.com/gazebosim/gazebo/pull/3320)
+    * [Pull request #3349](https://github.com/gazebosim/gazebo/pull/3349)
+   * A contribution from talregev
+
+1. gzclient: improve startup reliability
+    * [Pull request #3338](https://github.com/gazebosim/gazebo/pull/3338)
+
+1. CI: add non concurrency to all GitHub workflows
+    * [Pull request #3337](https://github.com/gazebosim/gazebo/pull/3337)
+   * A contribution from talregev
+
+1. Set `HOME_ENV` according the OS
+    * [Pull request #3334](https://github.com/gazebosim/gazebo/pull/3334)
+   * A contribution from talregev
+
+1. Allow usage of lambdas as transport subscription callbacks
+    * [Pull request #3309](https://github.com/gazebosim/gazebo/pull/3309)
+   * A contribution from Patrick Roncagliolo
+
+1. Fix for finding new versions of protobuf
+    * [Pull request #3331](https://github.com/gazebosim/gazebo/pull/3331)
+
 ## Gazebo 11.13.0 (2023-05-17)
 
 1. Fix wide-angle lens flare occlusion lag
