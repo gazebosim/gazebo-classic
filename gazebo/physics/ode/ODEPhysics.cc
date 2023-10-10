@@ -1301,17 +1301,15 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // number of contact points (numc).
   // To eliminate this dependence on numc, the inverse damping
   // is multipled by numc.
-  contact.surface.slip1 *= numc;
-  contact.surface.slip2 *= numc;
-  contact.surface.slip3 *= numc;
+  if (!wheelPlowing.disableScalingSlipByNumberOfContactPoints)
+  {
+    contact.surface.slip1 *= numc;
+    contact.surface.slip2 *= numc;
+    contact.surface.slip3 *= numc;
+  }
 
   if (meanSlopeDegrees.Count() > 0)
   {
-    // multiplying by numc has issues with plowing so undo that operation
-    contact.surface.slip1 /= numc;
-    contact.surface.slip2 /= numc;
-    contact.surface.slip3 /= numc;
-
     // Increase slip compliance at a specified rate above and below thresholds
     // modify slip2 value to affect longitudinal slip
     if (meanSlopeDegrees.Value() > wheelPlowing.nonlinearSlipUpperDegree)

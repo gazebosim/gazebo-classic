@@ -105,6 +105,15 @@ bool ODECollision::ParseWheelPlowingParams(
   }
   sdf::ElementPtr wheelElem = _sdf->GetElement(kPlowingWheel);
 
+  // Check if scaling slip by number of contact points should be disabled.
+  const std::string kDisableScaling =
+    "disable_scaling_slip_by_number_of_contact_points";
+  if (wheelElem->HasElement(kDisableScaling))
+  {
+    _plowing.disableScalingSlipByNumberOfContactPoints =
+      wheelElem->Get<bool>(kDisableScaling);
+  }
+
   // Check for required elements: max_degrees and saturation velocity
   const std::string kPlowingMaxDegrees = "max_degrees";
   if (!wheelElem->HasElement(kPlowingMaxDegrees))

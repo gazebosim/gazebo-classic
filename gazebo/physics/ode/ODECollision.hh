@@ -39,6 +39,13 @@ namespace gazebo
     /// \brief Data structure for wheel plowing parameters.
     class ODECollisionWheelPlowingParams
     {
+      /// \brief Flag to disable scaling of slip parameters by the number
+      /// of contact points. This behavior was added in bitbucket PR 2965,
+      /// but it can interact poorly with wheels on heightmap collisions.
+      /// Keep current behavior (scaling on) as default.
+      /// https://osrf-migration.github.io/gazebo-gh-pages/#!/osrf/gazebo/pull-requests/2965
+      public: bool disableScalingSlipByNumberOfContactPoints = false;
+
       /// \brief Maximum angle by which wheel contact points are rotated.
       public: ignition::math::Angle maxAngle;
 
