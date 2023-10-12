@@ -246,6 +246,7 @@ void Sensor::Update(const bool _force)
 
       if (this->UpdateImpl(_force))
       {
+        std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
         this->lastUpdateTime = this->world->SimTime();;
         this->updated();
       }
