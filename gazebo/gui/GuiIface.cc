@@ -408,9 +408,11 @@ bool gui::run(int _argc, char **_argv)
 
   mainWindow->RenderWidget()->AddPlugins(g_plugins_to_load);
 
-#ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
+#ifdef _WIN32
+  signal(SIGINT, signal_handler);
+#else
   struct sigaction sigact;
   sigact.sa_flags = 0;
   sigact.sa_handler = signal_handler;

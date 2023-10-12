@@ -643,9 +643,11 @@ void Server::Fini()
 /////////////////////////////////////////////////
 void Server::Run()
 {
-#ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
+#ifdef _WIN32
+  signal(SIGINT, Server::SigInt);
+#else
   struct sigaction sigact;
   sigact.sa_flags = 0;
   sigact.sa_handler = Server::SigInt;

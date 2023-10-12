@@ -22,6 +22,7 @@
 #include <sys/types.h>
 #else
 #include <process.hpp>
+#include <signal.h>
 #endif
 
 #include "gazebo/common/Console.hh"
@@ -227,6 +228,11 @@ int main(int _argc, char **_argv)
 
 std::atomic<bool> g_shouldExit = false;
 
+void sig_handler(int /*signo*/)
+{
+  g_shouldExit = true;
+}
+
 int main(int _argc, char **_argv)
 {
   if (_argc >= 2 &&
@@ -234,6 +240,8 @@ int main(int _argc, char **_argv)
     help();
     return 0;
   }
+
+  signal(SIGINT, sig_handler);
 
   std::vector<std::string> argvServer;
   std::vector<std::string> argvClient;
@@ -272,7 +280,6 @@ int main(int _argc, char **_argv)
     {
       g_shouldExit = true;
     }
-
   }
 
   // Cleanup
