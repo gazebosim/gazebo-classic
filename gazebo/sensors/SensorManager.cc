@@ -207,7 +207,7 @@ void PublishPerformanceMetrics()
   if (ignition::math::equal(diffSimTime.Double(), 0.0))
     return;
 
-  if (realTime == 0)
+  if (diffRealtime == common::Time::Zero)
     realTimeFactor = 0;
   else
     realTimeFactor = diffSimTime / diffRealtime;
