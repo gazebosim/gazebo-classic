@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 #include <mutex>
+#include <tinyxml2.h>
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
@@ -29,6 +31,14 @@
 
 using namespace gazebo;
 using namespace gui;
+
+using namespace tinyxml2;
+#ifndef XMLCheckResult
+#define XMLCheckResult(a_eResult)	if (a_eResult != XML_SUCCESS) { \
+										printf("Error: %i\n", a_eResult); \
+										return a_eResult; \
+									}
+#endif
 
 namespace gazebo
 {
@@ -117,9 +127,37 @@ PlotWindow::PlotWindow(QWidget *_parent)
   exportPlotButton->setGraphicsEffect(exportPlotShadow);
   connect(exportPlotButton, SIGNAL(clicked()), this, SLOT(OnExport()));
 
+  // save button
+  QPushButton *saveCanvasButton = new QPushButton("Save");
+  saveCanvasButton->setObjectName("plotSaveCanvas");
+  saveCanvasButton->setDefault(false);
+  saveCanvasButton->setAutoDefault(false);
+  saveCanvasButton->setToolTip("Save canvas");
+  QGraphicsDropShadowEffect *saveCanvasShadow =
+      new QGraphicsDropShadowEffect();
+  saveCanvasShadow->setBlurRadius(8);
+  saveCanvasShadow->setOffset(0, 0);
+  saveCanvasButton->setGraphicsEffect(saveCanvasShadow);
+  connect(saveCanvasButton, SIGNAL(clicked()), this, SLOT(OnSaveCanvas()));
+
+  // load button
+  QPushButton *loadCanvasButton = new QPushButton("Load");
+  loadCanvasButton->setObjectName("plotLoadCanvas");
+  loadCanvasButton->setDefault(false);
+  loadCanvasButton->setAutoDefault(false);
+  loadCanvasButton->setToolTip("Load canvas");
+  QGraphicsDropShadowEffect *loadCanvasShadow =
+      new QGraphicsDropShadowEffect();
+  loadCanvasShadow->setBlurRadius(8);
+  loadCanvasShadow->setOffset(0, 0);
+  loadCanvasButton->setGraphicsEffect(loadCanvasShadow);
+  connect(loadCanvasButton, SIGNAL(clicked()), this, SLOT(OnLoadCanvas()));
+
   QHBoxLayout *addButtonLayout = new QHBoxLayout;
   addButtonLayout->addWidget(exportPlotButton);
   addButtonLayout->addStretch();
+  addButtonLayout->addWidget(saveCanvasButton);
+  addButtonLayout->addWidget(loadCanvasButton);
   addButtonLayout->addWidget(addCanvasButton);
   addButtonLayout->setAlignment(Qt::AlignRight | Qt::AlignBottom);
   addButtonLayout->setContentsMargins(0, 0, 0, 0);
@@ -187,6 +225,137 @@ PlotCanvas *PlotWindow::AddCanvas()
 }
 
 /////////////////////////////////////////////////
+void PlotWindow::SavePlotLayout() {
+	QString _fileName = "";
+
+	XMLError _XMLError;
+	XMLDocument _plotLayout_XMLDocument;
+	XMLNode *_rootNode = nullptr;
+	XMLElement *_canvas_XMLElement = nullptr;
+	XMLElement *_plot_XMLElement = nullptr;
+	XMLElement *_variable_XMLElement = nullptr;
+
+	PlotCanvas *_canvas = nullptr;
+
+	_fileName = QFileDialog::getSaveFileName(this, tr("Save Plot Layout"), "~",
+			tr("XML File (*.xml)"));
+
+	_rootNode = _plotLayout_XMLDocument.NewElement("PlotLayout");
+	_plotLayout_XMLDocument.InsertFirstChild(_rootNode);
+
+	for (int _canvasIndex = 0;
+			_canvasIndex < this->dataPtr->canvasSplitter->count();
+			++_canvasIndex) {
+		_canvas = qobject_cast<PlotCanvas*>(
+				this->dataPtr->canvasSplitter->widget(_canvasIndex));
+		if (!_canvas) {
+			continue;
+		}
+
+		_canvas_XMLElement = _plotLayout_XMLDocument.NewElement("Canvas");
+		_rootNode->InsertEndChild(_canvas_XMLElement);
+
+		for (const auto &_plot : _canvas->Plots()) {
+			_plot_XMLElement = _plotLayout_XMLDocument.NewElement("Plot");
+			_canvas_XMLElement->InsertEndChild(_plot_XMLElement);
+
+			for (const auto &_curve : _plot->Curves()) {
+				auto _tempCurve = _curve.lock();
+				if (!_tempCurve)
+					continue;
+
+				std::string _label = _tempCurve->Label();
+
+				_variable_XMLElement = _plotLayout_XMLDocument.NewElement(
+						"Variable");
+
+				_variable_XMLElement->SetAttribute("Label", _label.c_str());
+
+				_plot_XMLElement->InsertEndChild(_variable_XMLElement);
+			} // for (const auto &_curve : _plot->Curves()) {}
+		} // for (const auto &_plot : _canvas->Plots()) {
+	} // for (int _canvasIndex = 0; ...
+
+	  // todo: treat XMLError
+	_XMLError = _plotLayout_XMLDocument.SaveFile(_fileName.toLocal8Bit());
+} // void PlotWindow::SavePlotLayout() {
+
+/////////////////////////////////////////////////
+void PlotWindow::LoadPlotLayout() {
+	QString _fileName = "";
+
+	XMLError _XMLError;
+	XMLDocument _plotLayout_XMLDocument;
+	XMLNode *_rootNode = nullptr;
+	XMLElement *_canvas_XMLElement = nullptr;
+	XMLElement *_plot_XMLElement = nullptr;
+	XMLElement *_variable_XMLElement = nullptr;
+
+	PlotCanvas *_canvas = nullptr;
+
+	std::string _label;
+
+	std::vector<IncrementalPlot*> _plotVector;
+	IncrementalPlot *_plot = nullptr;
+	int _size = 0;
+
+	_fileName = QFileDialog::getOpenFileName(this, tr("Load Plot Layout"), "~",
+			tr("XML File (*.xml)"));
+
+	if (_fileName == "") {
+		return;
+	}
+
+	this->Clear();
+
+	_XMLError = _plotLayout_XMLDocument.LoadFile(_fileName.toLocal8Bit());
+
+	_rootNode = _plotLayout_XMLDocument.FirstChild();
+	if (_rootNode == nullptr)
+		return;
+
+	_canvas_XMLElement = _rootNode->FirstChildElement("Canvas");
+	while (_canvas_XMLElement != nullptr) {
+		_canvas = this->AddCanvas();
+
+		if (!_canvas) {
+			return;
+		}
+
+		_plot_XMLElement = _canvas_XMLElement->FirstChildElement("Plot");
+		while (_plot_XMLElement != nullptr) {
+			_variable_XMLElement = _plot_XMLElement->FirstChildElement(
+					"Variable");
+			while (_variable_XMLElement != nullptr) {
+
+				const char *tempChars = _variable_XMLElement->Attribute(
+						"Label");
+				if (tempChars != nullptr) {
+					std::string _label = tempChars;
+
+					_plotVector = _canvas->Plots();
+					_size = _plotVector.size();
+
+					if (_size == 0) {
+						_canvas->AddVariable(_label);
+					} else { // if (_size == 0) {
+						_plot = _plotVector.back();
+						_canvas->AddVariable(_label, _plot);
+					} // } else { // if (_size == 0) {
+				} // if (tempChars != nullptr) {
+
+				_variable_XMLElement = _variable_XMLElement->NextSiblingElement(
+						"Variable");
+			} // while (_variable_XMLElement != nullptr) {
+
+			_plot_XMLElement = _plot_XMLElement->NextSiblingElement("Plot");
+		} // while (_plot_XMLElement != nullptr)
+
+		_canvas_XMLElement = _canvas_XMLElement->NextSiblingElement("Canvas");
+	} // while (_canvas_XMLElement != nullptr)
+} // void PlotWindow::LoadPlotLayout() {
+
+/////////////////////////////////////////////////
 void PlotWindow::RemoveCanvas(PlotCanvas *_canvas)
 {
   int idx = this->dataPtr->canvasSplitter->indexOf(_canvas);
@@ -219,6 +388,18 @@ unsigned int PlotWindow::CanvasCount() const
 void PlotWindow::OnAddCanvas()
 {
   this->AddCanvas();
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::OnSaveCanvas()
+{
+  this->SavePlotLayout();
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::OnLoadCanvas()
+{
+  this->LoadPlotLayout();
 }
 
 /////////////////////////////////////////////////
