@@ -238,8 +238,18 @@ void Sensor::Update(const bool _force)
   {
     if (this->useStrictRate)
     {
+      // rendering sensors (IMAGE category) has its own mechanism
+      // for throttling and lockstepping with physics. So throttle just
+      // physics sensors
+      if (this->dataPtr->category != IMAGE && !this->NeedsUpdate() && !_force)
+        return;
+
       if (this->UpdateImpl(_force))
+      {
+        std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
+        this->lastUpdateTime = this->world->SimTime();;
         this->updated();
+      }
     }
     else
     {
