@@ -195,140 +195,158 @@ bool ODECollision::ParseWheelPlowingParams(
   }
 
   // Parse nonlinear slip parameters
-  const std::string kNonlinearSlip = "nonlinear_slip";
-  if (wheelElem->HasElement(kNonlinearSlip))
+  auto parseNonlinearSlipParams = [&](
+      const std::string &_nonlinearSlipElementName,
+      ODECollisionWheelPlowingParams::NonlinearSlipParams &_nonlinearParams)
+      -> bool
   {
-    auto parse_degrees_perDegrees =
-      [](const std::string &_elementName, sdf::ElementPtr _nonlinearSlipElem,
-         std::vector<double> &_parsedDegrees,
-         std::vector<double> &_parsedPerDegrees) -> void
-      {
-        if (_nonlinearSlipElem->HasElement(_elementName))
-        {
-          sdf::ElementPtr elem = _nonlinearSlipElem->GetElement(_elementName);
-          while (elem)
-          {
-            _parsedDegrees.push_back(elem->Get<double>("degree"));
-            _parsedPerDegrees.push_back(elem->Get<double>("per_degree"));
-            elem = elem->GetNextElement(_elementName);
-          }
-        }
-      };
-
-    sdf::ElementPtr nonlinearSlipElem = wheelElem->GetElement(kNonlinearSlip);
-    if (nonlinearSlipElem->HasElement("lower"))
+    if (wheelElem->HasElement(_nonlinearSlipElementName))
     {
-      // In XML, all //lower/degree and //upper/degree values should be in
-      // ascending order, but the //lower/degree values should be in
-      // descending order in the c++ data structures. So parse them first
-      // and then iterate over the values in reverse order.
-      std::vector<double> parsedDegrees;
-      std::vector<double> parsedPerDegrees;
-      parse_degrees_perDegrees(
-          "lower", nonlinearSlipElem, parsedDegrees, parsedPerDegrees);
-      //
-      std::optional<double> lastDegree, lastPerDegree;
-      double multiplier = 1.0;
-      for (std::size_t i = 0; i < parsedDegrees.size(); ++i)
-      {
-        // reversed index
-        std::size_t r = parsedDegrees.size() - 1 - i;
-        double degree = parsedDegrees[r];
-        double perDegree = parsedPerDegrees[r];
-
-        if (!lastDegree)
+      auto parse_degrees_perDegrees =
+        [](const std::string &_elementName, sdf::ElementPtr _nonlinearSlipElem,
+           std::vector<double> &_parsedDegrees,
+           std::vector<double> &_parsedPerDegrees) -> void
         {
-          // This is the first pair of parameters.
-          // Replace the first vector values.
-          _plowing.nonlinearSlipLowerDegreesMultipliers[0] = {degree, 1.0};
-          _plowing.nonlinearSlipLowerPerDegrees[0] = perDegree;
-        }
-        else
-        {
-          // Verify that slope values are in order
-          if (degree >= *lastDegree)
+          if (_nonlinearSlipElem->HasElement(_elementName))
           {
-            if (verbose)
+            sdf::ElementPtr elem = _nonlinearSlipElem->GetElement(_elementName);
+            while (elem)
             {
-              gzerr << "Element <" << kPlowingWheel << "> in collision with name ["
-                    << _scopedNameForErrorMessages << "] has a //nonlinear_slip/lower "
-                    << "parameter with unsorted <degree> values: "
-                    << degree << " should be less than " << *lastDegree
-                    << std::endl;
+              _parsedDegrees.push_back(elem->Get<double>("degree"));
+              _parsedPerDegrees.push_back(elem->Get<double>("per_degree"));
+              elem = elem->GetNextElement(_elementName);
             }
-            return false;
           }
-          double degreesBelowThreshold = *lastDegree - degree;
-          multiplier += *lastPerDegree * degreesBelowThreshold;
-          _plowing.nonlinearSlipLowerDegreesMultipliers.push_back(
-              {degree, multiplier});
-          _plowing.nonlinearSlipLowerPerDegrees.push_back(perDegree);
+        };
+
+      sdf::ElementPtr nonlinearSlipElem =
+          wheelElem->GetElement(_nonlinearSlipElementName);
+      if (nonlinearSlipElem->HasElement("lower"))
+      {
+        // In XML, all //lower/degree and //upper/degree values should be in
+        // ascending order, but the //lower/degree values should be in
+        // descending order in the c++ data structures. So parse them first
+        // and then iterate over the values in reverse order.
+        std::vector<double> parsedDegrees;
+        std::vector<double> parsedPerDegrees;
+        parse_degrees_perDegrees(
+            "lower", nonlinearSlipElem, parsedDegrees, parsedPerDegrees);
+        //
+        std::optional<double> lastDegree, lastPerDegree;
+        double multiplier = 1.0;
+        for (std::size_t i = 0; i < parsedDegrees.size(); ++i)
+        {
+          // reversed index
+          std::size_t r = parsedDegrees.size() - 1 - i;
+          double degree = parsedDegrees[r];
+          double perDegree = parsedPerDegrees[r];
+
+          if (!lastDegree)
+          {
+            // This is the first pair of parameters.
+            // Replace the first vector values.
+            _nonlinearParams.lowerDegreesMultipliers[0] = {degree, 1.0};
+            _nonlinearParams.lowerPerDegrees[0] = perDegree;
+          }
+          else
+          {
+            // Verify that slope values are in order
+            if (degree >= *lastDegree)
+            {
+              if (verbose)
+              {
+                gzerr << "Element <" << kPlowingWheel << "> in collision with name ["
+                      << _scopedNameForErrorMessages << "] has a //nonlinear_slip/lower "
+                      << "parameter with unsorted <degree> values: "
+                      << degree << " should be less than " << *lastDegree
+                      << std::endl;
+              }
+              return false;
+            }
+            double degreesBelowThreshold = *lastDegree - degree;
+            multiplier += *lastPerDegree * degreesBelowThreshold;
+            _nonlinearParams.lowerDegreesMultipliers.push_back(
+                {degree, multiplier});
+            _nonlinearParams.lowerPerDegrees.push_back(perDegree);
+          }
+          lastDegree = degree;
+          lastPerDegree = perDegree;
         }
-        lastDegree = degree;
-        lastPerDegree = perDegree;
+      }
+      if (nonlinearSlipElem->HasElement("upper"))
+      {
+        std::vector<double> parsedDegrees;
+        std::vector<double> parsedPerDegrees;
+        parse_degrees_perDegrees(
+            "upper", nonlinearSlipElem, parsedDegrees, parsedPerDegrees);
+
+        std::optional<double> lastDegree, lastPerDegree;
+        double multiplier = 1.0;
+        for (std::size_t i = 0; i < parsedDegrees.size(); ++i)
+        {
+          double degree = parsedDegrees[i];
+          double perDegree = parsedPerDegrees[i];
+
+          if (!lastDegree)
+          {
+            // This is the first pair of parameters.
+            // Replace the first vector values.
+            _nonlinearParams.upperDegreesMultipliers[0] = {degree, 1.0};
+            _nonlinearParams.upperPerDegrees[0] = perDegree;
+          }
+          else
+          {
+            // Verify that slope values are in order
+            if (degree <= *lastDegree)
+            {
+              if (verbose)
+              {
+                gzerr << "Element <" << kPlowingWheel << "> in collision with name ["
+                      << _scopedNameForErrorMessages << "] has a //nonlinear_slip/upper "
+                      << "parameter with unsorted <degree> values: "
+                      << degree << " should be greater than " << *lastDegree
+                      << std::endl;
+              }
+              return false;
+            }
+            double degreesAboveThreshold = degree - *lastDegree;
+            multiplier += *lastPerDegree * degreesAboveThreshold;
+            _nonlinearParams.upperDegreesMultipliers.push_back(
+                {degree, multiplier});
+            _nonlinearParams.upperPerDegrees.push_back(perDegree);
+          }
+          lastDegree = degree;
+          lastPerDegree = perDegree;
+        }
       }
     }
-    if (nonlinearSlipElem->HasElement("upper"))
-    {
-      std::vector<double> parsedDegrees;
-      std::vector<double> parsedPerDegrees;
-      parse_degrees_perDegrees(
-          "upper", nonlinearSlipElem, parsedDegrees, parsedPerDegrees);
+    return true;
+  };
+  bool longitudinalParseResult, lateralParseResult;
+  longitudinalParseResult = parseNonlinearSlipParams(
+      "nonlinear_slip", _plowing.longitudinalNonlinearSlipParams);
+  lateralParseResult = parseNonlinearSlipParams(
+      "nonlinear_lateral_slip", _plowing.lateralNonlinearSlipParams);
 
-      std::optional<double> lastDegree, lastPerDegree;
-      double multiplier = 1.0;
-      for (std::size_t i = 0; i < parsedDegrees.size(); ++i)
-      {
-        double degree = parsedDegrees[i];
-        double perDegree = parsedPerDegrees[i];
-
-        if (!lastDegree)
-        {
-          // This is the first pair of parameters.
-          // Replace the first vector values.
-          _plowing.nonlinearSlipUpperDegreesMultipliers[0] = {degree, 1.0};
-          _plowing.nonlinearSlipUpperPerDegrees[0] = perDegree;
-        }
-        else
-        {
-          // Verify that slope values are in order
-          if (degree <= *lastDegree)
-          {
-            if (verbose)
-            {
-              gzerr << "Element <" << kPlowingWheel << "> in collision with name ["
-                    << _scopedNameForErrorMessages << "] has a //nonlinear_slip/upper "
-                    << "parameter with unsorted <degree> values: "
-                    << degree << " should be greater than " << *lastDegree
-                    << std::endl;
-            }
-            return false;
-          }
-          double degreesAboveThreshold = degree - *lastDegree;
-          multiplier += *lastPerDegree * degreesAboveThreshold;
-          _plowing.nonlinearSlipUpperDegreesMultipliers.push_back(
-              {degree, multiplier});
-          _plowing.nonlinearSlipUpperPerDegrees.push_back(perDegree);
-        }
-        lastDegree = degree;
-        lastPerDegree = perDegree;
-      }
-    }
+  if (!longitudinalParseResult || !lateralParseResult)
+  {
+    return false;
   }
 
   if (verbose)
   {
+    const auto &nonlinearParams = _plowing.longitudinalNonlinearSlipParams;
     gzdbg << "Plowing params for " << _scopedNameForErrorMessages << ":\n"
           << "  Lower:\n"
-          << "    " << _plowing.nonlinearSlipLowerDegreesMultipliers.back().X() << " deg"
-          << ", " << _plowing.nonlinearSlipLowerDegreesMultipliers.back().Y() << '\n'
-          << "    " << _plowing.nonlinearSlipLowerDegreesMultipliers.front().X() << " deg"
-          << ", " << _plowing.nonlinearSlipLowerDegreesMultipliers.front().Y() << '\n'
+          << "    " << nonlinearParams.lowerDegreesMultipliers.back().X() << " deg"
+          << ", " << nonlinearParams.lowerDegreesMultipliers.back().Y() << '\n'
+          << "    " << nonlinearParams.lowerDegreesMultipliers.front().X() << " deg"
+          << ", " << nonlinearParams.lowerDegreesMultipliers.front().Y() << '\n'
           << "  Upper:\n"
-          << "    " << _plowing.nonlinearSlipUpperDegreesMultipliers.front().X() << " deg"
-          << ", " << _plowing.nonlinearSlipUpperDegreesMultipliers.front().Y() << '\n'
-          << "    " << _plowing.nonlinearSlipUpperDegreesMultipliers.back().X() << " deg"
-          << ", " << _plowing.nonlinearSlipUpperDegreesMultipliers.back().Y() << '\n'
+          << "    " << nonlinearParams.upperDegreesMultipliers.front().X() << " deg"
+          << ", " << nonlinearParams.upperDegreesMultipliers.front().Y() << '\n'
+          << "    " << nonlinearParams.upperDegreesMultipliers.back().X() << " deg"
+          << ", " << nonlinearParams.upperDegreesMultipliers.back().Y() << '\n'
           << std::endl;
   }
 

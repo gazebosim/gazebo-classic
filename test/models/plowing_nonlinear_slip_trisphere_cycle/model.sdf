@@ -258,6 +258,24 @@
               <per_degree>0.0</per_degree>
             </upper>
           </nonlinear_slip>
+          <nonlinear_lateral_slip>
+            <lower>
+              <degree>-10</degree>
+              <per_degree>0.0</per_degree>
+            </lower>
+            <lower>
+              <degree>-6</degree>
+              <per_degree>0.25</per_degree>
+            </lower>
+            <upper>
+              <degree>6</degree>
+              <per_degree>0.25</per_degree>
+            </upper>
+            <upper>
+              <degree>10</degree>
+              <per_degree>0.0</per_degree>
+            </upper>
+          </nonlinear_lateral_slip>
         </gz:plowing_wheel>
         <geometry>
           <sphere>
@@ -353,6 +371,24 @@
               <per_degree>0.0</per_degree>
             </upper>
           </nonlinear_slip>
+          <nonlinear_lateral_slip>
+            <lower>
+              <degree>-10</degree>
+              <per_degree>0.0</per_degree>
+            </lower>
+            <lower>
+              <degree>-6</degree>
+              <per_degree>0.25</per_degree>
+            </lower>
+            <upper>
+              <degree>6</degree>
+              <per_degree>0.25</per_degree>
+            </upper>
+            <upper>
+              <degree>10</degree>
+              <per_degree>0.0</per_degree>
+            </upper>
+          </nonlinear_lateral_slip>
         </gz:plowing_wheel>
         <geometry>
           <sphere>
@@ -434,6 +470,24 @@
               <per_degree>0.0</per_degree>
             </upper>
           </nonlinear_slip>
+          <nonlinear_lateral_slip>
+            <lower>
+              <degree>-10</degree>
+              <per_degree>0.0</per_degree>
+            </lower>
+            <lower>
+              <degree>-6</degree>
+              <per_degree>0.25</per_degree>
+            </lower>
+            <upper>
+              <degree>6</degree>
+              <per_degree>0.25</per_degree>
+            </upper>
+            <upper>
+              <degree>10</degree>
+              <per_degree>0.0</per_degree>
+            </upper>
+          </nonlinear_lateral_slip>
         </gz:plowing_wheel>
         <geometry>
           <sphere>

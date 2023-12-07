@@ -133,25 +133,34 @@ namespace gazebo
       /// order, such that each //lower/degree value is larger than the
       /// previous value.
 
-      /// \brief The pairs of slope in degrees and slip multipliers that
-      /// define the piecewise linear behavior for the lower slope values.
-      public: std::vector<ignition::math::Vector2d>
-          nonlinearSlipLowerDegreesMultipliers{{-361.0, 1.0}};
+      class NonlinearSlipParams
+      {
+        /// \brief The pairs of slope in degrees and slip multipliers that
+        /// define the piecewise linear behavior for the lower slope values.
+        public: std::vector<ignition::math::Vector2d>
+            lowerDegreesMultipliers{{-361.0, 1.0}};
 
-      /// \brief The pairs of slope in degrees and slip multipliers that
-      /// define the piecewise linear behavior for the upper slope values.
-      public: std::vector<ignition::math::Vector2d>
-          nonlinearSlipUpperDegreesMultipliers{{361.0, 1.0}};
+        /// \brief The pairs of slope in degrees and slip multipliers that
+        /// define the piecewise linear behavior for the upper slope values.
+        public: std::vector<ignition::math::Vector2d>
+            upperDegreesMultipliers{{361.0, 1.0}};
 
-      /// \brief The rates of change in slip compliance multiplier per degree
-      /// of slope in slope below the lower degrees[i] value for each
-      /// piecewise linear segment.
-      public: std::vector<double> nonlinearSlipLowerPerDegrees{0.0};
+        /// \brief The rates of change in slip compliance multiplier per degree
+        /// of slope in slope below the lower degrees[i] value for each
+        /// piecewise linear segment.
+        public: std::vector<double> lowerPerDegrees{0.0};
 
-      /// \brief The rates of change in slip compliance multiplier per degree
-      /// of slope in slope above the upper degrees[i] value for each
-      /// piecewise linear segment.
-      public: std::vector<double> nonlinearSlipUpperPerDegrees{0.0};
+        /// \brief The rates of change in slip compliance multiplier per degree
+        /// of slope in slope above the upper degrees[i] value for each
+        /// piecewise linear segment.
+        public: std::vector<double> upperPerDegrees{0.0};
+      };
+
+      /// \brief Nonlinear parameters for longitudinal wheel slip.
+      public: NonlinearSlipParams longitudinalNonlinearSlipParams;
+
+      /// \brief Nonlinear parameters for lateral wheel slip.
+      public: NonlinearSlipParams lateralNonlinearSlipParams;
     };
 
     /// \brief Base class for all ODE collisions.

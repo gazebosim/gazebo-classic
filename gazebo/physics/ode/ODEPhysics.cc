@@ -1160,8 +1160,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     ///         << " from surface with smaller mu1\n";
   }
 
-  // Longitudinal slope angle in degrees averaged over each contact point.
-  ignition::math::SignalMean meanSlopeDegrees;
+  // Slope angle in degrees averaged over each contact point computed in both
+  // the longitudinal/contact normal and lateral/contact normal planes.
+  ignition::math::SignalMean meanLongitudinalSlopeDegrees;
+  ignition::math::SignalMean meanLateralSlopeDegrees;
   ODECollisionWheelPlowingParams wheelPlowing;
 
   if (fd != ignition::math::Vector3d::Zero)
@@ -1230,19 +1232,33 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
         contactNormalCopy.Set(
           contactNormal[0], contactNormal[1], contactNormal[2]);
 
+        // Compute lateral unit vector as normalized component of fdir1
+        // orthogonal to contact normal
+        ignition::math::Vector3d unitLateral =
+          fdir1 - fdir1.Dot(contactNormalCopy) * contactNormalCopy;
+        unitLateral.Normalize();
+
         // Compute longitudinal unit vector as normal cross fdir1
         ignition::math::Vector3d unitLongitudinal =
-          contactNormalCopy.Cross(fdir1);
+          contactNormalCopy.Cross(unitLateral);
 
         // Compute normal and longitudinal forces (before plowing)
         double normalForce = -worldForce.Dot(contactNormalCopy);
         double longitudinalForce = worldForce.Dot(unitLongitudinal);
+        double lateralForce = worldForce.Dot(unitLateral);
 
         // Estimate slope angle from world force in longitudinal/normal plane
-        ignition::math::Angle slopeAngle(atan2(longitudinalForce, normalForce));
+        // and in lateral/normal plane
+        ignition::math::Angle longitudinalSlopeAngle(
+            atan2(longitudinalForce, normalForce));
+        ignition::math::Angle lateralSlopeAngle(
+            atan2(lateralForce, normalForce));
 
         // Store average slope degrees
-        meanSlopeDegrees.InsertData(slopeAngle.Degree());
+        meanLongitudinalSlopeDegrees.InsertData(
+            longitudinalSlopeAngle.Degree());
+        meanLateralSlopeDegrees.InsertData(
+            lateralSlopeAngle.Degree());
 
         // Compute longitudinal speed (dot product)
         double wheelSpeedLongitudinal =
@@ -1308,15 +1324,16 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     contact.surface.slip3 *= numc;
   }
 
-  if (meanSlopeDegrees.Count() > 0)
+  // nonlinear longitudinal wheel slip effects
+  if (meanLongitudinalSlopeDegrees.Count() > 0)
   {
-    const double slopeDegrees = meanSlopeDegrees.Value();
+    const double slopeDegrees = meanLongitudinalSlopeDegrees.Value();
     // Increase slip compliance at a specified rate above and below thresholds
     // modify slip2 value to affect longitudinal slip
     const auto &upperDegreesMultipliers =
-        wheelPlowing.nonlinearSlipUpperDegreesMultipliers;
+        wheelPlowing.longitudinalNonlinearSlipParams.upperDegreesMultipliers;
     const auto &lowerDegreesMultipliers =
-        wheelPlowing.nonlinearSlipLowerDegreesMultipliers;
+        wheelPlowing.longitudinalNonlinearSlipParams.lowerDegreesMultipliers;
     if (slopeDegrees > upperDegreesMultipliers[0].X())
     {
       std::size_t i = 0;
@@ -1325,10 +1342,12 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       {
         ++i;
       }
+      const auto &upperPerDegrees =
+          wheelPlowing.longitudinalNonlinearSlipParams.upperPerDegrees;
       const double degreesAboveThreshold =
           slopeDegrees - upperDegreesMultipliers[i].X();
       const double multiplier = upperDegreesMultipliers[i].Y() +
-          wheelPlowing.nonlinearSlipUpperPerDegrees[i] * degreesAboveThreshold;
+          upperPerDegrees[i] * degreesAboveThreshold;
       contact.surface.slip2 *= multiplier;
     }
     else if (slopeDegrees < lowerDegreesMultipliers[0].X())
@@ -1339,11 +1358,57 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       {
         ++i;
       }
+      const auto &lowerPerDegrees =
+          wheelPlowing.longitudinalNonlinearSlipParams.lowerPerDegrees;
       const double degreesBelowThreshold =
           lowerDegreesMultipliers[i].X() - slopeDegrees;
       const double multiplier = lowerDegreesMultipliers[i].Y() +
-          wheelPlowing.nonlinearSlipLowerPerDegrees[i] * degreesBelowThreshold;
+          lowerPerDegrees[i] * degreesBelowThreshold;
       contact.surface.slip2 *= multiplier;
+    }
+  }
+
+  // nonlinear lateral wheel slip effects
+  if (meanLateralSlopeDegrees.Count() > 0)
+  {
+    const double slopeDegrees = meanLateralSlopeDegrees.Value();
+    // Increase slip compliance at a specified rate above and below thresholds
+    // modify slip1 value to affect lateral slip
+    const auto &upperDegreesMultipliers =
+        wheelPlowing.lateralNonlinearSlipParams.upperDegreesMultipliers;
+    const auto &lowerDegreesMultipliers =
+        wheelPlowing.lateralNonlinearSlipParams.lowerDegreesMultipliers;
+    if (slopeDegrees > upperDegreesMultipliers[0].X())
+    {
+      std::size_t i = 0;
+      while (i + 1 < upperDegreesMultipliers.size() &&
+             slopeDegrees > upperDegreesMultipliers[i + 1].X())
+      {
+        ++i;
+      }
+      const auto &upperPerDegrees =
+          wheelPlowing.lateralNonlinearSlipParams.upperPerDegrees;
+      const double degreesAboveThreshold =
+          slopeDegrees - upperDegreesMultipliers[i].X();
+      const double multiplier = upperDegreesMultipliers[i].Y() +
+          upperPerDegrees[i] * degreesAboveThreshold;
+      contact.surface.slip1 *= multiplier;
+    }
+    else if (slopeDegrees < lowerDegreesMultipliers[0].X())
+    {
+      std::size_t i = 0;
+      while (i + 1 < lowerDegreesMultipliers.size() &&
+             slopeDegrees < lowerDegreesMultipliers[i + 1].X())
+      {
+        ++i;
+      }
+      const auto &lowerPerDegrees =
+          wheelPlowing.lateralNonlinearSlipParams.lowerPerDegrees;
+      const double degreesBelowThreshold =
+          lowerDegreesMultipliers[i].X() - slopeDegrees;
+      const double multiplier = lowerDegreesMultipliers[i].Y() +
+          lowerPerDegrees[i] * degreesBelowThreshold;
+      contact.surface.slip1 *= multiplier;
     }
   }
 
