@@ -1310,19 +1310,40 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   if (meanSlopeDegrees.Count() > 0)
   {
+    const double slopeDegrees = meanSlopeDegrees.Value();
     // Increase slip compliance at a specified rate above and below thresholds
     // modify slip2 value to affect longitudinal slip
-    if (meanSlopeDegrees.Value() > wheelPlowing.nonlinearSlipUpperDegree)
+    const auto &upperDegreesMultipliers =
+        wheelPlowing.nonlinearSlipUpperDegreesMultipliers;
+    const auto &lowerDegreesMultipliers =
+        wheelPlowing.nonlinearSlipLowerDegreesMultipliers;
+    if (slopeDegrees > upperDegreesMultipliers[0].X())
     {
+      std::size_t i = 0;
+      while (i + 1 < upperDegreesMultipliers.size() &&
+             slopeDegrees > upperDegreesMultipliers[i + 1].X())
+      {
+        ++i;
+      }
       const double degreesAboveThreshold =
-          meanSlopeDegrees.Value() - wheelPlowing.nonlinearSlipUpperDegree;
-      contact.surface.slip2 *= (1 + wheelPlowing.nonlinearSlipUpperPerDegree * degreesAboveThreshold);
+          slopeDegrees - upperDegreesMultipliers[i].X();
+      const double multiplier = upperDegreesMultipliers[i].Y() +
+          wheelPlowing.nonlinearSlipUpperPerDegrees[i] * degreesAboveThreshold;
+      contact.surface.slip2 *= multiplier;
     }
-    else if (meanSlopeDegrees.Value() < wheelPlowing.nonlinearSlipLowerDegree)
+    else if (slopeDegrees < lowerDegreesMultipliers[0].X())
     {
+      std::size_t i = 0;
+      while (i + 1 < lowerDegreesMultipliers.size() &&
+             slopeDegrees < lowerDegreesMultipliers[i + 1].X())
+      {
+        ++i;
+      }
       const double degreesBelowThreshold =
-          wheelPlowing.nonlinearSlipLowerDegree - meanSlopeDegrees.Value();
-      contact.surface.slip2 *= (1 + wheelPlowing.nonlinearSlipLowerPerDegree * degreesBelowThreshold);
+          lowerDegreesMultipliers[i].X() - slopeDegrees;
+      const double multiplier = lowerDegreesMultipliers[i].Y() +
+          wheelPlowing.nonlinearSlipLowerPerDegrees[i] * degreesBelowThreshold;
+      contact.surface.slip2 *= multiplier;
     }
   }
 

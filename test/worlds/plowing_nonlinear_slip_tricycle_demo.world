@@ -35,23 +35,84 @@
 
     <include>
       <uri>model://plowing_effect_trisphere_cycle</uri>
+      <name>plowing_tricycle_no_slip</name>
+      <pose>0 -2 0  0 0 0</pose>
+
+      <plugin name="wheel_slip" filename="libWheelSlipPlugin.so">
+        <wheel link_name="wheel_front">
+          <slip_compliance_lateral>0</slip_compliance_lateral>
+          <slip_compliance_longitudinal>0</slip_compliance_longitudinal>
+          <wheel_normal_force>32</wheel_normal_force>
+        </wheel>
+        <wheel link_name="wheel_rear_left">
+          <slip_compliance_lateral>0</slip_compliance_lateral>
+          <slip_compliance_longitudinal>0</slip_compliance_longitudinal>
+          <wheel_normal_force>32</wheel_normal_force>
+        </wheel>
+        <wheel link_name="wheel_rear_right">
+          <slip_compliance_lateral>0</slip_compliance_lateral>
+          <slip_compliance_longitudinal>0</slip_compliance_longitudinal>
+          <wheel_normal_force>32</wheel_normal_force>
+        </wheel>
+      </plugin>
+
+      <plugin name="joint_control" filename="libJointControlPlugin.so">
+        <controller type="position">
+          <joint>wheel_front_steer</joint>
+          <target>0</target>
+          <pid_gains>9 0 0.1</pid_gains>
+        </controller>
+        <controller type="velocity">
+          <joint>wheel_rear_left_spin</joint>
+          <joint>wheel_rear_right_spin</joint>
+          <joint>wheel_front_spin</joint>
+          <target>6.0</target>
+          <pid_gains>9 0 0</pid_gains>
+        </controller>
+        <controller type="force">
+          <joint>wheel_rear_left_spin</joint>
+          <joint>wheel_rear_right_spin</joint>
+          <target>2.15</target>
+        </controller>
+      </plugin>
+
+      <!-- enable these plugins if using ros2
+      <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
+        <alwaysOn>true</alwaysOn>
+        <frameName>world</frameName>
+        <body_name>frame</body_name>
+        <topicName>odom</topicName>
+        <updateRate>30.0</updateRate>
+      </plugin>
+
+      <plugin name="wheel_rotation" filename="libgazebo_ros_joint_state_publisher.so">
+        <updateRate>30.0</updateRate>
+        <joint_name>wheel_rear_left_spin</joint_name>
+        <joint_name>wheel_rear_right_spin</joint_name>
+      </plugin>
+      -->
+
+    </include>
+
+    <include>
+      <uri>model://plowing_effect_trisphere_cycle</uri>
       <name>plowing_tricycle</name>
       <pose>0 0 0  0 0 0</pose>
 
       <plugin name="wheel_slip" filename="libWheelSlipPlugin.so">
         <wheel link_name="wheel_front">
-          <slip_compliance_lateral>3.0</slip_compliance_lateral>
-          <slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
+          <slip_compliance_lateral>1.5</slip_compliance_lateral>
+          <slip_compliance_longitudinal>1.5</slip_compliance_longitudinal>
           <wheel_normal_force>32</wheel_normal_force>
         </wheel>
         <wheel link_name="wheel_rear_left">
-          <slip_compliance_lateral>3.0</slip_compliance_lateral>
-          <slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
+          <slip_compliance_lateral>1.5</slip_compliance_lateral>
+          <slip_compliance_longitudinal>1.5</slip_compliance_longitudinal>
           <wheel_normal_force>32</wheel_normal_force>
         </wheel>
         <wheel link_name="wheel_rear_right">
-          <slip_compliance_lateral>3.0</slip_compliance_lateral>
-          <slip_compliance_longitudinal>3.0</slip_compliance_longitudinal>
+          <slip_compliance_lateral>1.5</slip_compliance_lateral>
+          <slip_compliance_longitudinal>1.5</slip_compliance_longitudinal>
           <wheel_normal_force>32</wheel_normal_force>
         </wheel>
       </plugin>
@@ -98,6 +159,67 @@
       <uri>model://plowing_nonlinear_slip_trisphere_cycle</uri>
       <name>nonlinear_slip_tricycle</name>
       <pose>0 2 0  0 0 0</pose>
+
+      <plugin name="wheel_slip" filename="libWheelSlipPlugin.so">
+        <wheel link_name="wheel_front">
+          <slip_compliance_lateral>1.5</slip_compliance_lateral>
+          <slip_compliance_longitudinal>1.5</slip_compliance_longitudinal>
+          <wheel_normal_force>32</wheel_normal_force>
+        </wheel>
+        <wheel link_name="wheel_rear_left">
+          <slip_compliance_lateral>1.5</slip_compliance_lateral>
+          <slip_compliance_longitudinal>1.5</slip_compliance_longitudinal>
+          <wheel_normal_force>32</wheel_normal_force>
+        </wheel>
+        <wheel link_name="wheel_rear_right">
+          <slip_compliance_lateral>1.5</slip_compliance_lateral>
+          <slip_compliance_longitudinal>1.5</slip_compliance_longitudinal>
+          <wheel_normal_force>32</wheel_normal_force>
+        </wheel>
+      </plugin>
+
+      <plugin name="joint_control" filename="libJointControlPlugin.so">
+        <controller type="position">
+          <joint>wheel_front_steer</joint>
+          <target>0</target>
+          <pid_gains>9 0 0.1</pid_gains>
+        </controller>
+        <controller type="velocity">
+          <joint>wheel_rear_left_spin</joint>
+          <joint>wheel_rear_right_spin</joint>
+          <joint>wheel_front_spin</joint>
+          <target>6.0</target>
+          <pid_gains>9 0 0</pid_gains>
+        </controller>
+        <controller type="force">
+          <joint>wheel_rear_left_spin</joint>
+          <joint>wheel_rear_right_spin</joint>
+          <target>2.15</target>
+        </controller>
+      </plugin>
+
+      <!-- enable these plugins if using ros2
+      <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
+        <alwaysOn>true</alwaysOn>
+        <frameName>world</frameName>
+        <body_name>frame</body_name>
+        <topicName>odom</topicName>
+        <updateRate>30.0</updateRate>
+      </plugin>
+
+      <plugin name="wheel_rotation" filename="libgazebo_ros_joint_state_publisher.so">
+        <updateRate>30.0</updateRate>
+        <joint_name>wheel_rear_left_spin</joint_name>
+        <joint_name>wheel_rear_right_spin</joint_name>
+      </plugin>
+      -->
+
+    </include>
+
+    <include>
+      <uri>model://plowing_effect_trisphere_cycle</uri>
+      <name>plowing_tricycle_higher_slip_compliance</name>
+      <pose>0 4 0  0 0 0</pose>
 
       <plugin name="wheel_slip" filename="libWheelSlipPlugin.so">
         <wheel link_name="wheel_front">
