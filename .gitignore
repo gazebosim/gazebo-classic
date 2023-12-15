@@ -10,3 +10,7 @@ deps/vcpkg/cache
 *.orig
 *.gch
 *.pch
+
+# PyCharm
+.idea/
+
