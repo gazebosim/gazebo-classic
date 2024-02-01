@@ -3,7 +3,7 @@
   "description": "Open source robotics simulator.",
   "homepage": "http://gazebosim.org",
   "license": "Apache-2.0",
-  "builtin-baseline": "db0473513e5dc73ec6b6f431ff05d2f398eea042",
+  "builtin-baseline": "10e052511428d6b0c7fcc63a139e8024bb146032",
   "dependencies": [
     "boost-asio",
     "boost-date-time",
