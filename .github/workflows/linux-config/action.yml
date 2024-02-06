@@ -8,7 +8,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: deps/vcpkg/cache/linux
-        key: linux-x64-${{ hashFiles('.github/workflows/linux-config/action.yml', 'deps/vcpkg/manifest/vcpkg.json') }}
+        key: linux-x64-${{ hashFiles('.github/workflows/linux-config/action.yml', 'deps/vcpkg/manifest/vcpkg.json', 'deps/vcpkg/triplets/x64-linux-release.cmake') }}
 
     - name: Install dependencies
       shell: bash
