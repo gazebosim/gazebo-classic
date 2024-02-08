@@ -60,4 +60,6 @@ runs:
             -DUSE_EXTERNAL_TINYXML2=ON \
             -DUSE_EXTERNAL_TINY_PROCESS_LIBRARY=ON \
             -DGZ_PROTOBUF_USE_CMAKE_CONFIG=ON \
-            -DCMAKE_INSTALL_PREFIX=$PWD/vcpkg/installed/x64-linux-release
+            -DCMAKE_INSTALL_PREFIX=$PWD/vcpkg/installed/x64-linux-release \
+            -DUSE_UPSTREAM_CFLAGS=OFF \
+            -DCMAKE_CXX_FLAGS=--allow-multiple-definition
