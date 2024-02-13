@@ -24,6 +24,10 @@ if (HAVE_DART)
   link_directories(${DART_LIBRARY_DIRS})
 endif()
 
+if ("${GZ_CLI_EXECUTABLE_NAME}" STREQUAL "")
+  set(GZ_CLI_EXECUTABLE_NAME "gz")
+endif()
+
 if(NOT WIN32)
   # gz_TEST and gz_log_TEST use fork(), that is not available on Windows
   set (test_sources
@@ -32,19 +36,19 @@ if(NOT WIN32)
   )
 
   gz_build_tests(${test_sources} EXTRA_LIBS libgazebo_client gazebo_transport gazebo_util)
-  add_dependencies(${TEST_TYPE}_gz_log_TEST gz)
+  add_dependencies(${TEST_TYPE}_gz_log_TEST ${GZ_CLI_EXECUTABLE_NAME})
 endif()
 
-add_executable(gz gz.cc gz_topic.cc gz_log.cc gz_marker.cc)
+add_executable(${GZ_CLI_EXECUTABLE_NAME} gz.cc gz_topic.cc gz_log.cc gz_marker.cc)
 
 if (WIN32)
   # Force multiple definitions since there is a collision with sdformat GetAsEuler() function
   # https://github.com/osrf/sdformat/blob/master/include/sdf/Types.hh
   # it is defined inside an .hh file and bring to gz linking via sdformat and gazebo_gui/gazebo_common
-  set_target_properties(gz PROPERTIES LINK_FLAGS "/FORCE:MULTIPLE")
+  set_target_properties(${GZ_CLI_EXECUTABLE_NAME} PROPERTIES LINK_FLAGS "/FORCE:MULTIPLE")
 endif()
 
-target_link_libraries(gz
+target_link_libraries(${GZ_CLI_EXECUTABLE_NAME}
  libgazebo_client
  gazebo_gui
  gazebo_physics
@@ -57,13 +61,13 @@ target_link_libraries(gz
 )
 
 if (UNIX)
-  target_link_libraries(gz pthread)
+  target_link_libraries(${GZ_CLI_EXECUTABLE_NAME} pthread)
 endif()
 
-gz_install_executable(gz)
+gz_install_executable(${GZ_CLI_EXECUTABLE_NAME})
 
 if (NOT WIN32)
-  roffman(gz 1)
+  roffman(${GZ_CLI_EXECUTABLE_NAME} 1)
 endif()
 
 install (PROGRAMS gzprop DESTINATION ${BIN_INSTALL_DIR})
