@@ -67,7 +67,7 @@ endif()
 gz_install_executable(${GZ_CLI_EXECUTABLE_NAME})
 
 if (NOT WIN32)
-  roffman(${GZ_CLI_EXECUTABLE_NAME} 1)
+  roffman(gz 1 ${GZ_CLI_EXECUTABLE_NAME})
 endif()
 
 install (PROGRAMS gzprop DESTINATION ${BIN_INSTALL_DIR})
