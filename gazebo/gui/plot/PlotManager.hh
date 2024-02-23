@@ -46,7 +46,8 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~PlotManager();
 
-      /// \brief Callback when a world control message is received. It is used
+      /// \brief Callback when a world control message is received over
+      /// gazebo_transport using boost asio. It is used
       /// to detect simulation resets.
       /// \param[in] _data Message data containing world control commands
       public: void OnWorldControl(ConstWorldControlPtr &_data);
@@ -89,6 +90,11 @@ namespace gazebo
 
       /// \brief Returns a pointer to the unique (static) instance
       public: static PlotManager* Instance();
+
+      /// \brief Callback when a world control message is received over
+      /// gz-transport using ZeroMQ. It is used to detect simulation resets.
+      /// \param[in] _data Message data containing world control commands
+      private: void OnControl(const msgs::WorldControl &_data);
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<PlotManager>;
