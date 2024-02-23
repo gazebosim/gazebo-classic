@@ -37,5 +37,5 @@ if (NOT APPLE AND NOT WIN32)
   set(tool_tests
     gz_stress.cc
   )
-  gz_build_tests(${tool_tests} EXTRA_LIBS gazebo_transport)
+  gz_build_tests(${tool_tests} EXTRA_LIBS gazebo_transport ${IGNITION-TRANSPORT_LIBRARIES})
 endif()

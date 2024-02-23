@@ -20,6 +20,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem.hpp>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/common/CommonIface.hh>
 #include <gazebo/msgs/msgs.hh>
@@ -40,10 +41,10 @@ pid_t g_pid = -1;
 boost::condition_variable g_msgCondition;
 
 /////////////////////////////////////////////////
-void WorldControlCB(ConstWorldControlPtr &_msg)
+void WorldControlCB(const msgs::WorldControl &_msg)
 {
   boost::mutex::scoped_lock lock(g_mutex);
-  g_msgDebugOut = _msg->DebugString();
+  g_msgDebugOut = _msg.DebugString();
   g_msgCondition.notify_all();
 }
 
@@ -149,10 +150,8 @@ TEST_F(gzTest, Stress)
 {
   init();
 
-  gazebo::transport::NodePtr node(new gazebo::transport::Node());
-  node->Init();
-  gazebo::transport::SubscriberPtr sub =
-    node->Subscribe("~/world_control", &WorldControlCB, true);
+  ignition::transport::Node ignNode;
+  ignNode.Subscribe("/world_control", &WorldControlCB);
 
   // Run the transport loop: starts a new thread
   gazebo::transport::run();
