@@ -130,6 +130,15 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
 
   this->dataPtr->controlSub = this->dataPtr->node->Subscribe("~/world_control",
                                            &OculusCamera::OnControl, this);
+  {
+    // Also subscribe to WorldControl messages over ZeroMQ-based gz-transport
+    std::string worldControlTopic("/world_control");
+    if (!this->dataPtr->ignNode.Subscribe(worldControlTopic,
+                                          &OculusCamera::OnWorldControl, this))
+    {
+      gzerr << "Error advertising topic [" << worldControlTopic << "]\n";
+    }
+  }
 
   // Oculus is now ready.
   this->dataPtr->ready = true;
@@ -162,7 +171,13 @@ void OculusCamera::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void OculusCamera::OnControl(ConstWorldControlPtr &_data)
 {
-  if (_data->has_reset() && _data->reset().has_all() && _data->reset().all())
+  this->OnWorldControl(*_data);
+}
+
+//////////////////////////////////////////////////
+void OculusCamera::OnWorldControl(const msgs::WorldControl &_data)
+{
+  if (_data.has_reset() && _data.reset().has_all() && _data.reset().all())
   {
     this->ResetSensor();
   }

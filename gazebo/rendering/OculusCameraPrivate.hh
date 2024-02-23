@@ -18,6 +18,7 @@
 #define _GAZEBO_RENDERING_OCULUS_CAMERA_PRIVATE_HH_
 
 #include <OVR_CAPI.h>
+#include <ignition/transport.hh>
 #include "gazebo/util/system.hh"
 
 namespace Ogre
@@ -72,6 +73,9 @@ namespace gazebo
 
       /// \brief Subscriber used to receive updates on world_control topic.
       public: transport::SubscriberPtr controlSub;
+
+      /// \brief Node for ignition transport communication.
+      public: ignition::transport::Node ignNode;
 
       /// \brief True when Oculus is connected and ready to use.
       public: bool ready;
