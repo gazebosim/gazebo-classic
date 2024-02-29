@@ -22,6 +22,8 @@
 
 // Not Apple or Windows
 #if not defined(__APPLE__) && not defined(_WIN32)
+#define GL_GLEXT_LEGACY
+#define GLX_GLXEXT_LEGACY
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
 # include <GL/glx.h>

@@ -3,6 +3,7 @@ test/plugins/rest-web/node_modules
 build
 build_*
 build-*
+vcpkg
 Ogre.log
 deps/vcpkg/cache
 .DS_Store
