@@ -2870,6 +2870,9 @@ namespace gazebo
           }
         }
       }
+      else if (_msg.type() == msgs::Geometry::EMPTY)
+      {
+      }
       else
       {
         gzerr << "Unrecognized geometry type" << std::endl;
