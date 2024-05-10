@@ -414,8 +414,8 @@ common::Time LogPlay::LogEndTime() const
 /////////////////////////////////////////////////
 std::string LogPlay::Filename() const
 {
-  return boost::filesystem::basename(this->dataPtr->filename) +
-    boost::filesystem::extension(this->dataPtr->filename);
+  boost::filesystem::path path(this->dataPtr->filename);
+  return path.stem().string() + path.extension().string();
 }
 
 /////////////////////////////////////////////////
