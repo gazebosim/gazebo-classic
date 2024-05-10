@@ -221,7 +221,7 @@ void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
   if (boost::filesystem::is_directory(logPath))
     this->logDirectory = logPath.string();
   else
-    this->logDirectory = logPath.branch_path().string();
+    this->logDirectory = logPath.parent_path().string();
 }
 
 /////////////////////////////////////////////////
