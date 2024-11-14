@@ -19,6 +19,7 @@
 
 #include <ignition/math/Pose3.hh>
 #include <ignition/transport/Node.hh>
+#include <qlabel.h>
 #include <sdf/sdf.hh>
 #include <boost/algorithm/string.hpp>
 
@@ -626,7 +627,17 @@ void MainWindow::About()
     "<td>";
   helpTxt += GAZEBO_VERSION_HEADER;
   helpTxt += "</td></tr></table>";
-
+  helpTxt += R"(
+<table><tr>
+  <td style='background-color: #ffcc00;padding: 20px; font-weight: bold'>
+    This version of Gazebo, now called Gazebo classic, reaches end-of-life
+    in January 2025. Users are highly encouraged to migrate to the new Gazebo
+    using our <a style='color: #f58113'
+    href='https://gazebosim.org/docs/latest/gazebo_classic_migration/'>
+      migration guides
+    </a>
+  </td></tr></table>
+)";
   helpTxt += "<div style='margin-left: 10px'>"
   "<div>"
     "<table>"
@@ -1666,8 +1677,22 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 
   this->dataPtr->menuLayout->addWidget(this->dataPtr->menuBar);
 
-  this->dataPtr->menuLayout->addStretch(5);
+  if (!this->dataPtr->eolNotice) {
+    // Add Gazebo classic EOL notice label
+    this->dataPtr->eolNotice = new QLabel(this->dataPtr->menuBar);
+    this->dataPtr->eolNotice->setText(R"(<font color='#ff9966'>
+        This version of Gazebo reaches end-of-life in January 2025.
+        Consider <a style='color: #ffcc00' 
+        href='https://gazebosim.org/docs/latest/gazebo_classic_migration/
+        '>migrating to the new Gazebo</a></font>)");
+    this->dataPtr->menuLayout->addStretch(1);
+    this->dataPtr->menuLayout->addWidget(this->dataPtr->eolNotice);
+  }
+
+
+  this->dataPtr->menuLayout->addStretch(4);
   this->dataPtr->menuLayout->setContentsMargins(0, 0, 0, 0);
+
 
   // OSX:
   // There is a problem on osx with the qt5 menubar being out of focus when
