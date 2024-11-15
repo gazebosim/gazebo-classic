@@ -1,6 +1,33 @@
 ## Gazebo 11
 
-## Gazebo 11.15.0 (2024-02-14)
+## Gazebo 11.15.0 (2024-11-15)
+
+1. Add Gazebo classic end-of-life notice
+    * [Pull request #3405](https://github.com/gazebosim/gazebo/pull/3405)
+
+1. Add EOL information to README
+    * [Pull request #3404](https://github.com/gazebosim/gazebo/pull/3404)
+
+1. Boost 1.86 compatibility
+    * [Pull request #3397](https://github.com/gazebosim/gazebo/pull/3397)
+
+1. Fix build with boost 1.85.0
+    * [Pull request #3386](https://github.com/gazebosim/gazebo/pull/3386)
+
+1. Change to windows-2022
+    * [Pull request #3383](https://github.com/gazebosim/gazebo/pull/3383)
+
+1. AudioDecoder: support ffmpeg 7.0
+    * [Pull request #3380](https://github.com/gazebosim/gazebo/pull/3380)
+
+1. gz world: use gz-transport to fix unclosed sockets
+    * [Pull request #3374](https://github.com/gazebosim/gazebo/pull/3374)
+
+1. Fix manpage installation when GZ_CLI_EXECUTABLE_NAME is used
+    * [Pull request #3370](https://github.com/gazebosim/gazebo/pull/3370)
+
+1. Fix build with graphviz 10.0
+    * [Pull request #3373](https://github.com/gazebosim/gazebo/pull/3373)
 
 1. Set gz tool name via GZ_CLI_EXECUTABLE_NAME
     * [Pull request #3368](https://github.com/gazebosim/gazebo/pull/3368)
