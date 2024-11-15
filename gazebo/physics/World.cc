@@ -270,6 +270,15 @@ void World::Load(sdf::ElementPtr _sdf)
                                            &World::OnFactoryMsg, this);
   this->dataPtr->controlSub = this->dataPtr->node->Subscribe("~/world_control",
                                            &World::OnControl, this);
+  {
+    // Also subscribe to WorldControl messages over ZeroMQ-based gz-transport
+    std::string worldControlTopic("/world_control");
+    if (!this->dataPtr->ignNode.Subscribe(worldControlTopic,
+                                          &World::OnWorldControl, this))
+    {
+      gzerr << "Error advertising topic [" << worldControlTopic << "]\n";
+    }
+  }
   this->dataPtr->playbackControlSub = this->dataPtr->node->Subscribe(
       "~/playback_control", &World::OnPlaybackControl, this);
 
@@ -1609,32 +1618,38 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 //////////////////////////////////////////////////
 void World::OnControl(ConstWorldControlPtr &_data)
 {
-  if (_data->has_pause())
-    this->SetPaused(_data->pause());
+  this->OnWorldControl(*_data);
+}
 
-  if (_data->has_step())
+//////////////////////////////////////////////////
+void World::OnWorldControl(const msgs::WorldControl &_data)
+{
+  if (_data.has_pause())
+    this->SetPaused(_data.pause());
+
+  if (_data.has_step())
     this->OnStep();
 
-  if (_data->has_multi_step())
+  if (_data.has_multi_step())
   {
     // stepWorld is a blocking call so set stepInc directly so that world stats
     // will still be published
     this->SetPaused(true);
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->worldUpdateMutex);
-    this->dataPtr->stepInc = _data->multi_step();
+    this->dataPtr->stepInc = _data.multi_step();
   }
 
-  if (_data->has_seed())
+  if (_data.has_seed())
   {
-    ignition::math::Rand::Seed(_data->seed());
-    this->dataPtr->physicsEngine->SetSeed(_data->seed());
+    ignition::math::Rand::Seed(_data.seed());
+    this->dataPtr->physicsEngine->SetSeed(_data.seed());
   }
 
-  if (_data->has_reset())
+  if (_data.has_reset())
   {
     this->dataPtr->needsReset = true;
 
-    if (_data->reset().has_all() && _data->reset().all())
+    if (_data.reset().has_all() && _data.reset().all())
     {
       this->dataPtr->resetAll = true;
     }
@@ -1642,10 +1657,10 @@ void World::OnControl(ConstWorldControlPtr &_data)
     {
       this->dataPtr->resetAll = false;
 
-      if (_data->reset().has_time_only() && _data->reset().time_only())
+      if (_data.reset().has_time_only() && _data.reset().time_only())
         this->dataPtr->resetTimeOnly = true;
 
-      if (_data->reset().has_model_only() && _data->reset().model_only())
+      if (_data.reset().has_model_only() && _data.reset().model_only())
         this->dataPtr->resetModelOnly = true;
     }
   }

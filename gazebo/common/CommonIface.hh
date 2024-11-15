@@ -229,7 +229,7 @@ namespace gazebo
   std::string common::get_sha1(const T &_buffer)
   {
     boost::uuids::detail::sha1 sha1;
-    unsigned int hash[5];
+    boost::uuids::detail::sha1::digest_type hash;
     std::stringstream stream;
 
     if (_buffer.size() == 0)

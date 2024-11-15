@@ -238,12 +238,25 @@ bool WorldCommand::RunImpl()
   if (this->vm.count("world-name"))
     worldName = this->vm["world-name"].as<std::string>();
 
-  transport::NodePtr node(new transport::Node());
-  node->Init(worldName);
+  ignition::transport::Node ignNode;
 
-  transport::PublisherPtr pub =
-    node->Advertise<msgs::WorldControl>("~/world_control");
-  pub->WaitForConnection();
+  const std::string topic{"/world_control"};
+  auto pub = ignNode.Advertise<msgs::WorldControl>(topic);
+
+  // Wait for subscribers
+  unsigned int maxSleep = 30;
+  unsigned int sleep = 0;
+  unsigned int mSleep = 100;
+  for (; sleep < maxSleep && !pub.HasConnections(); ++sleep)
+  {
+    common::Time::MSleep(mSleep);
+  }
+  if (sleep == maxSleep)
+  {
+    gzerr << "No subscribers to topic [" << topic <<"], timed out after " <<
+        maxSleep * mSleep << "ms." << std::endl;
+    return false;
+  }
 
   msgs::WorldControl msg;
   bool good = false;
@@ -285,9 +298,13 @@ bool WorldCommand::RunImpl()
   }
 
   if (good)
-    pub->Publish(msg, true);
+  {
+    pub.Publish(msg);
+  }
   else
+  {
     this->Help();
+  }
 
   return true;
 }

@@ -123,9 +123,13 @@ namespace gazebo
       /// \return True if the camera is now tracking the visual.
       protected: virtual bool TrackVisualImpl(VisualPtr _visual);
 
-      /// \brief Receive world control messages. Used to reset the oculus
-      /// sensor.
+      /// \brief Receive world control messages over gazebo_transport using
+      /// boost asio. Used to reset the oculus sensor.
       private: void OnControl(ConstWorldControlPtr &_data);
+
+      /// \brief Receive world control messages over gz-transport using
+      /// ZeroMQ. Used to reset the oculus sensor.
+      private: void OnWorldControl(const msgs::WorldControl &_data);
 
       /// \brief Apply distorsion to the render target.
       private: void Oculus();

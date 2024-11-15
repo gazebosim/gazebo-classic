@@ -27,6 +27,26 @@
 void gazebo_shared::printVersion()
 {
   fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
+  const char* msg = R"(
+#     # ####### ####### ###  #####  #######
+##    # #     #    #     #  #     # #
+# #   # #     #    #     #  #       #
+#  #  # #     #    #     #  #       #####
+#   # # #     #    #     #  #       #
+#    ## #     #    #     #  #     # #
+#     # #######    #    ###  #####  #######
+
+This version of Gazebo, now called Gazebo classic, reaches end-of-life
+in January 2025. Users are highly encouraged to migrate to the new Gazebo
+using our migration guides (https://gazebosim.org/docs/latest/gazebo_classic_migration/)
+
+
+)";
+#ifndef _WIN32
+  fprintf(stderr, "\033[1;33m%s\033[0m", msg);
+#else
+  fprintf(stderr, "%s",msg);
+#endif
 }
 
 /////////////////////////////////////////////////

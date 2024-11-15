@@ -5,6 +5,14 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 11.14 to 11.15
+
+### Modifications
+
+The `gz world` tool now publishes a WorldControl message using gz-transport,
+and the `physics::World` class and other subscribers now subscribe to both
+`gz-transport` (ZeroMQ) and `gazebo_transport` (boost asio) topics.
+
 ## Gazebo 11.2 to 11.3
 
 ### Modifications

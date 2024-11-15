@@ -18,6 +18,7 @@
 #include <memory>
 #include <mutex>
 
+#include <ignition/transport.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -50,6 +51,9 @@ namespace gazebo
       /// \brief Subscriber to the world control topic
       public: transport::SubscriberPtr worldControlSub;
 
+      /// \brief Node for ignition transport communication.
+      public: ignition::transport::Node ignNode;
+
       /// \brief Handler for updating introspection curves
       public: IntrospectionCurveHandler introspectionCurve;
 
@@ -73,6 +77,15 @@ PlotManager::PlotManager()
   this->dataPtr->worldControlSub =
       this->dataPtr->node->Subscribe("~/world_control",
       &PlotManager::OnWorldControl, this);
+  {
+    // Also subscribe to WorldControl messages over ZeroMQ-based gz-transport
+    std::string worldControlTopic("/world_control");
+    if (!this->dataPtr->ignNode.Subscribe(worldControlTopic,
+                                          &PlotManager::OnControl, this))
+    {
+      gzerr << "Error advertising topic [" << worldControlTopic << "]\n";
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -84,10 +97,16 @@ PlotManager::~PlotManager()
 /////////////////////////////////////////////////
 void PlotManager::OnWorldControl(ConstWorldControlPtr &_data)
 {
-  if (_data->has_reset())
+  this->OnControl(*_data);
+}
+
+/////////////////////////////////////////////////
+void PlotManager::OnControl(const msgs::WorldControl &_data)
+{
+  if (_data.has_reset())
   {
-    if ((_data->reset().has_all() && _data->reset().all())  ||
-        (_data->reset().has_time_only() && _data->reset().time_only()))
+    if ((_data.reset().has_all() && _data.reset().all())  ||
+        (_data.reset().has_time_only() && _data.reset().time_only()))
     {
       std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
       for (auto &w : this->dataPtr->windows)

@@ -190,10 +190,10 @@ void FactoryCB(ConstFactoryPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void WorldControlCB(ConstWorldControlPtr &_msg)
+void WorldControlCB(const msgs::WorldControl &_msg)
 {
   boost::mutex::scoped_lock lock(g_mutex);
-  g_msgDebugOut = _msg->DebugString();
+  g_msgDebugOut = _msg.DebugString();
   g_msgCondition.notify_all();
 }
 
@@ -503,10 +503,8 @@ TEST_F(gzTest, World)
   std::string helpOutput = custom_exec_str("gz help world");
   EXPECT_NE(helpOutput.find("gz world"), std::string::npos);
 
-  gazebo::transport::NodePtr node(new gazebo::transport::Node());
-  node->Init();
-  gazebo::transport::SubscriberPtr sub =
-    node->Subscribe("~/world_control", &WorldControlCB);
+  ignition::transport::Node ignNode;
+  ignNode.Subscribe("/world_control", &WorldControlCB);
 
   // Test world pause
   {

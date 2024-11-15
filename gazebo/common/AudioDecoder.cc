@@ -138,12 +138,18 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
             return false;
         }
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 24, 100)
+        int numChannels = this->codecCtx->ch_layout.nb_channels;
+#else
+        int numChannels = this->codecCtx->channels;
+#endif
+
         // Total size of the data. Some padding can be added to
         // decodedFrame->data[0], which is why we can't use
         // decodedFrame->linesize[0].
         int size = decodedFrame->nb_samples *
           av_get_bytes_per_sample(this->codecCtx->sample_fmt) *
-          this->codecCtx->channels;
+          numChannels;
 
         // Resize the audio buffer as necessary
         if (*_outBufferSize + size > maxBufferSize)
@@ -330,22 +336,6 @@ bool AudioDecoder::SetFile(const std::string &_filename)
            << std::endl;
     return false;
   }
-
-  // This copy should be done by avcodec_parameters_to_context, but at least on
-  // conda-forge with 5.0.0 h594f047_1 this is not happening for some reason.
-  // As temporary workaround, we copy directly the data structures, taking the code from
-  // https://github.com/FFmpeg/FFmpeg/blob/n5.0/libavcodec/codec_par.c#L120
-  AVCodecParameters* par = this->formatCtx->streams[this->audioStream]->codecpar;
-  this->codecCtx->sample_fmt       = static_cast<AVSampleFormat>(par->format);
-  this->codecCtx->channel_layout   = par->channel_layout;
-  this->codecCtx->channels         = par->channels;
-  this->codecCtx->sample_rate      = par->sample_rate;
-  this->codecCtx->block_align      = par->block_align;
-  this->codecCtx->frame_size       = par->frame_size;
-  this->codecCtx->delay            =
-  this->codecCtx->initial_padding  = par->initial_padding;
-  this->codecCtx->trailing_padding = par->trailing_padding;
-  this->codecCtx->seek_preroll     = par->seek_preroll;
 
   // It would be better to just define codec as const AVCodec *,
   // but that is not done to avoid ABI problem. Anyhow, as codec

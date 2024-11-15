@@ -160,6 +160,9 @@ namespace gazebo
 
       // whether the file is atleast saved once or not.
       public: bool isSavedOnce = false;
+
+      /// \brief Label for displaying the Gazebo classic EOL notice.
+      public: QLabel *eolNotice = nullptr;
     };
   }
 }

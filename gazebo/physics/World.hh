@@ -538,9 +538,15 @@ namespace gazebo
       /// \brief Step callback.
       private: void OnStep();
 
-      /// \brief Called when a world control message is received.
+      /// \brief Called when a world control message is received on the
+      /// gazebo_transport topic using boost asio.
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
+
+      /// \brief Called when a world control message is received on the
+      /// gz-transport topic using ZeroMQ.
+      /// \param[in] _data The world control message.
+      private: void OnWorldControl(const msgs::WorldControl &_data);
 
       /// \brief Called when log playback control message is received.
       /// \param[in] _data The log playback control message.

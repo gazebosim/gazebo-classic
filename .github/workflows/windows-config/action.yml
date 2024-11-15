@@ -22,6 +22,9 @@ runs:
       with:
         arch: ${{ inputs.arch }}
 
+    - name: Configure cmake
+      uses: lukka/get-cmake@latest
+
     - name: Fix vcpkg
       shell: cmd
       run: vcpkg.exe integrate remove
