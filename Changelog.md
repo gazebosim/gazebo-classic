@@ -1,9 +1,11 @@
 ## Gazebo 11
 
-## Gazebo 11.15.0 (2024-11-15)
+## Gazebo 11.15.0 (2024-11-26)
 
 1. Add Gazebo classic end-of-life notice
+   Can be disabled by setting GAZEBO_SUPPRESS_EOL_WARNING
     * [Pull request #3405](https://github.com/gazebosim/gazebo/pull/3405)
+    * [Pull request #3406](https://github.com/gazebosim/gazebo-classic/pull/3406)
 
 1. Add EOL information to README
     * [Pull request #3404](https://github.com/gazebosim/gazebo/pull/3404)
