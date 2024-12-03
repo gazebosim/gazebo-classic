@@ -1,5 +1,11 @@
 ## Gazebo 11
 
+## Gazebo 11.15.1 (2024-12-03)
+
+1. Revert "Remove GZ_SINGLETON_DECLARE definition workaround (fix for armhf)"
+    * [Issue #3411](https://github.com/gazebosim/gazebo-classic/issues/3411)
+    * [Pull request #3412](https://github.com/gazebosim/gazebo-classic/pull/3412)
+
 ## Gazebo 11.15.0 (2024-11-26)
 
 1. Add Gazebo classic end-of-life notice
