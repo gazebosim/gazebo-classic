@@ -69,5 +69,23 @@ class SingletonT
            }
 };
 
+/// \brief Helper to declare typed SingletonT
+// clang doesn't compile if it explicitly specializes a type before
+// the type is defined. (forward declaration is not enough.)
+#ifdef __clang__
 #define GZ_SINGLETON_DECLARE(visibility, n1, n2, singletonType)
+#else
+#define GZ_SINGLETON_DECLARE(visibility, n1, n2, singletonType) \
+namespace n1 \
+{ \
+  namespace n2 \
+  { \
+    class singletonType; \
+  } \
+} \
+template class visibility ::SingletonT<n1::n2::singletonType>;
+#endif
+
+/// \}
+
 #endif
