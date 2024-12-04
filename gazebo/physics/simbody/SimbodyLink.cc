@@ -440,11 +440,15 @@ ignition::math::Vector3d SimbodyLink::WorldAngularVel() const
 //////////////////////////////////////////////////
 void SimbodyLink::SetForce(const ignition::math::Vector3d &_force)
 {
-  SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force));
+  auto wrench = this->simbodyPhysics->discreteForces.getOneBodyForce(
+    this->simbodyPhysics->integ->getState(), this->masterMobod);
+ 
+  // Set translational component
+  wrench[1] = SimbodyPhysics::Vector3ToVec3(_force);
 
   this->simbodyPhysics->discreteForces.setOneBodyForce(
     this->simbodyPhysics->integ->updAdvancedState(),
-    this->masterMobod, SimTK::SpatialVec(SimTK::Vec3(0), f));
+    this->masterMobod, wrench);
 }
 
 //////////////////////////////////////////////////
@@ -462,11 +466,15 @@ ignition::math::Vector3d SimbodyLink::WorldForce() const
 //////////////////////////////////////////////////
 void SimbodyLink::SetTorque(const ignition::math::Vector3d &_torque)
 {
-  SimTK::Vec3 t(SimbodyPhysics::Vector3ToVec3(_torque));
+  auto wrench = this->simbodyPhysics->discreteForces.getOneBodyForce(
+    this->simbodyPhysics->integ->getState(), this->masterMobod);
+ 
+  // Set rotational component
+  wrench[0] = SimbodyPhysics::Vector3ToVec3(_torque);
 
   this->simbodyPhysics->discreteForces.setOneBodyForce(
     this->simbodyPhysics->integ->updAdvancedState(),
-    this->masterMobod, SimTK::SpatialVec(t, SimTK::Vec3(0)));
+    this->masterMobod, wrench);
 }
 
 //////////////////////////////////////////////////
@@ -505,44 +513,69 @@ void SimbodyLink::AddForce(const ignition::math::Vector3d &_force)
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddRelativeForce(const ignition::math::Vector3d &/*_force*/)
+void SimbodyLink::AddRelativeForce(const ignition::math::Vector3d &_force)
 {
-  gzerr << "Not implemented.\n";
+  auto const worldForce = this->WorldPose().Rot().RotateVector(_force);
+  this->AddForce(worldForce);
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddForceAtWorldPosition(
-    const ignition::math::Vector3d &/*_force*/,
-    const ignition::math::Vector3d &/*_pos*/)
+    const ignition::math::Vector3d &_force,
+    const ignition::math::Vector3d &_pos)
 {
-  gzerr << "Not implemented.\n";
+  auto const relPos = this->WorldPose().Inverse().CoordPositionAdd(_pos);
+  this->AddForceAtRelativePosition(_force, relPos);
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddForceAtRelativePosition(
-    const ignition::math::Vector3d &/*_force*/,
-    const ignition::math::Vector3d &/*_relpos*/)
+    const ignition::math::Vector3d &_force,
+    const ignition::math::Vector3d &_relpos)
 {
-  gzerr << "Not implemented.\n";
+  auto const force = SimbodyPhysics::Vector3ToVec3(_force);
+  auto const position = SimbodyPhysics::Vector3ToVec3(_relpos);
+
+  this->simbodyPhysics->discreteForces.addForceToBodyPoint(
+    this->simbodyPhysics->integ->updAdvancedState(), this->masterMobod,
+    position,
+    force);
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::AddLinkForce(const ignition::math::Vector3d &/*_force*/,
-    const ignition::math::Vector3d &/*_offset*/)
+void SimbodyLink::AddLinkForce(const ignition::math::Vector3d &_force,
+    const ignition::math::Vector3d &_offset)
 {
-  gzlog << "SimbodyLink::AddLinkForce not yet implemented (issue #1478)."
-        << std::endl;
+  auto const worldForce = SimbodyPhysics::Vector3ToVec3(
+    this->WorldPose().Rot().RotateVector(_force));
+  auto const position = SimbodyPhysics::Vector3ToVec3(_offset - 
+    this->inertial->CoG());
+
+  this->simbodyPhysics->discreteForces.addForceToBodyPoint(
+    this->simbodyPhysics->integ->updAdvancedState(), this->masterMobod,
+    position,
+    worldForce);
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddTorque(const ignition::math::Vector3d &/*_torque*/)
+void SimbodyLink::AddTorque(const ignition::math::Vector3d &_torque)
 {
+  auto wrench = this->simbodyPhysics->discreteForces.getOneBodyForce(
+    this->simbodyPhysics->integ->getState(), this->masterMobod);
+ 
+  // Set rotational component
+  wrench[0] += SimbodyPhysics::Vector3ToVec3(_torque);
+
+  this->simbodyPhysics->discreteForces.setOneBodyForce(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    this->masterMobod, wrench);
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddRelativeTorque(const ignition::math::Vector3d &/*_torque*/)
+void SimbodyLink::AddRelativeTorque(const ignition::math::Vector3d &_torque)
 {
-  gzerr << "Not implemented.\n";
+  auto const worldTorque = this->WorldPose().Rot().RotateVector(_torque);
+  this->AddTorque(worldTorque);
 }
 
 /////////////////////////////////////////////////
