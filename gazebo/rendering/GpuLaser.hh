@@ -17,34 +17,30 @@
 #ifndef _GAZEBO_RENDERING_GPULASER_HH_
 #define _GAZEBO_RENDERING_GPULASER_HH_
 
+#include <map>
 #include <memory>
+#include <set>
 #include <string>
+#include <utility>
 
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/GpuLaserCubeFace.hh"
 #include "gazebo/rendering/GpuLaserDataIterator.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace Ogre
 {
-  class Material;
   class Renderable;
   class Pass;
   class AutoParamDataSource;
-  class Matrix4;
-  class MovableObject;
 }
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Mesh;
-  }
-
   namespace rendering
   {
     // Forward declare private data.
@@ -66,31 +62,31 @@ namespace gazebo
           ScenePtr _scene, const bool _autoRender = true);
 
       /// \brief Destructor
-      public: virtual ~GpuLaser();
+      public: ~GpuLaser() override;
 
       // Documentation inherited
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: void Load(sdf::ElementPtr _sdf) override;
 
       // Documentation inherited
-      public: virtual void Load();
+      public: void Load() override;
 
       // Documentation inherited
-      public: virtual void Init();
+      public: void Init() override;
 
       // Documentation inherited
-      public: virtual void Fini();
+      public: void Fini() override;
 
       /// \brief Create the texture which is used to render laser data.
       /// \param[in] _textureName Name of the new texture.
       public: void CreateLaserTexture(const std::string &_textureName);
 
       // Documentation inherited
-      public: virtual void PostRender();
+      public: void PostRender() override;
 
       /// \brief Constant iterator to access laser data
       public: typedef GpuLaserDataIterator<GpuLaser> DataIter;
 
-      /// \brief Return an iterator to the begining of the laser data
+      /// \brief Return an iterator to the beginning of the laser data
       public: DataIter LaserDataBegin() const;
 
       /// \brief Return an iterator to one past the end of the laser data
@@ -105,8 +101,7 @@ namespace gazebo
                   unsigned int _height, unsigned int _depth,
                   const std::string &_format)> _subscriber);
 
-      /// \brief Set the number of samples in the width and height for the
-      /// first pass texture.
+      /// \brief Set the number of samples in width and height.
       /// \param[in] _w Number of samples in the horizontal sweep
       /// \param[in] _h Number of samples in the vertical sweep
       public: void SetRangeCount(const unsigned int _w,
@@ -114,9 +109,9 @@ namespace gazebo
 
       /// \internal
       /// \brief Implementation of Ogre::RenderObjectListener
-      public: virtual void notifyRenderSingleObject(Ogre::Renderable *_rend,
+      public: void notifyRenderSingleObject(Ogre::Renderable *_rend,
               const Ogre::Pass *_p, const Ogre::AutoParamDataSource *_s,
-              const Ogre::LightList *_ll, bool _supp);
+              const Ogre::LightList *_ll, bool _supp) override;
 
       /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
       /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
@@ -194,10 +189,14 @@ namespace gazebo
       /// \return Number of cameras needed to generate the rays
       public: unsigned int CameraCount() const;
 
-      /// \brief Set the number of cameras required
+      /// \brief Set the number of cameras required. Has no effect for this
+      /// implementation since the number of cameras is calculated based on the
+      /// rays.
+      /// \deprecated The camera count cannot be set from here anymore since it
+      /// is determined automatically in GpuLaser::InitMapping.
       /// \param[in] _cameraCount The number of cameras required to generate
       /// the rays
-      public: void SetCameraCount(const unsigned int _cameraCount);
+      public: void SetCameraCount(const unsigned int _cameraCount) GAZEBO_DEPRECATED(11.10);
 
       /// \brief Get the ray count ratio (equivalent to aspect ratio)
       /// \return The ray count ratio (equivalent to aspect ratio)
@@ -207,49 +206,56 @@ namespace gazebo
       /// \param[in] _rayCountRatio ray count ratio (equivalent to aspect ratio)
       public: void SetRayCountRatio(const double _rayCountRatio);
 
+      /// \brief Initializes the mapping of ray angles to cube map coordinates.
+      /// Each combination of values (azimuth, elevation) corresponds to one
+      /// laser ray.
+      /// \param[in] _azimuth_values Set of azimuth angles (radians). The order matters!
+      /// \param[in] _elevation_values Set of elevation angles (radians). The order matters!
+      public: void InitMapping(const std::set<double> &_azimuth_values, const std::set<double> &_elevation_values);
+
+      /// \brief Finds the corresponding cube map face and the coordinates of
+      /// intersection of the view ray.
+      /// \note The azimuth must be specified relative to the minimum azimuth value!
+      /// \param[in] _azimuth Horizontal angle (radians) relative to minimum azimuth angle
+      /// \param[in] _elevation Vertical angle (radians) where zero is orthogonal to the spin axis
+      /// \returns Mapping for the given ray
+      public: static GpuLaserCubeMappingPoint FindCubeFaceMapping(const double _azimuth, const double _elevation);
+
+      /// \brief Finds the corresponding face of the cube map for a pair of
+      /// azimuth and elevation angles.
+      /// \note The azimuth must be specified relative to the minimum azimuth value!
+      /// \param[in] _azimuth Horizontal angle (radians) relative to minimum azimuth angle
+      /// \param[in] _elevation Vertical angle (radians) where zero is orthogonal to the spin axis
+      /// \returns Identifier for the corresponding face.
+      public: static GpuLaserCubeFaceId FindCubeFace(const double _azimuth, const double _elevation);
+
+      /// \brief Calculates a vector in the direction of the ray.
+      /// \note The azimuth must be specified relative to the minimum azimuth value!
+      /// \param[in] _azimuth Horizontal angle (radians) relative to minimum azimuth angle
+      /// \param[in] _elevation Vertical angle (radians) where zero is orthogonal to the spin axis
+      /// \returns Viewing ray vector
+      public: static ignition::math::Vector3d ViewingRay(const double _azimuth, const double _elevation);
+
       // Documentation inherited.
-      private: virtual void RenderImpl();
+      private: void RenderImpl() override;
 
       /// \brief Update a render target.
-      /// \param[in, out] _target Render target to update (render).
-      /// \param[in, out] _material Material used during render.
-      /// \param[in] _cam Camera to render from.
-      /// \param[in] _updateTex True to update the textures in the material
-      private: void UpdateRenderTarget(Ogre::RenderTarget *_target,
-                                       Ogre::Material *_material,
-                                       Ogre::Camera *_cam,
-                                       const bool _updateTex = false);
+      /// \param[in, out] _cube_face Cube face for which to update the render
+      /// target.
+      private: void UpdateRenderTarget(GpuLaserCubeFace &_cube_face);
 
-      /// \brief Create an ortho camera.
-      private: void CreateOrthoCam();
+      /// \brief Setup the render target for the specified cube face.
+      /// \param[in] cube_face The cube face.
+      private: virtual void SetUpRenderTarget(GpuLaserCubeFace &_cube_face);
 
-      /// \brief Create a mesh.
-      private: void CreateMesh();
+      /// \brief Applies the camera orientation offset by rotation in roll and yaw.
+      /// \param[in] _setting The camera orientation offset to apply.
+      private: void ApplyCameraSetting(const GpuLaserCameraOrientationOffset &_setting);
 
-      /// \brief Create a canvas.
-      private: void CreateCanvas();
-
-      /// \brief Builds scaled Orthogonal Matrix from parameters.
-      /// \param[in] _left Left clip.
-      /// \param[in] _right Right clip.
-      /// \param[in] _bottom Bottom clip.
-      /// \param[in] _top Top clip.
-      /// \param[in] _near Near clip.
-      /// \param[in] _far Far clip.
-      /// \return The Scaled orthogonal Ogre::Matrix4
-      private: Ogre::Matrix4 BuildScaledOrthoMatrix(const float _left,
-          const float _right, const float _bottom, const float _top,
-          const float _near, const float _far);
-
-      /// \brief Sets first pass target.
-      /// \param[in] _target Render target for the first pass.
-      /// \param[in] _index Index of the texture.
-      private: virtual void Set1stPassTarget(Ogre::RenderTarget *_target,
-                                             const unsigned int _index);
-
-      /// \brief Sets second pass target.
-      /// \param[in] _target Render target for the second pass.
-      private: virtual void Set2ndPassTarget(Ogre::RenderTarget *_target);
+      /// \brief Inverse of GpuLaser::ApplyCameraSetting(): Reverts the given
+      /// camera orientation offset.
+      /// \param[in] _setting The camera orientation offset to revert.
+      private: void RevertCameraSetting(const GpuLaserCameraOrientationOffset &_setting);
 
       /// \brief Horizontal half angle.
       protected: double horzHalfAngle;

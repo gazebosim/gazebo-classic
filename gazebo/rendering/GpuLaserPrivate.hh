@@ -18,31 +18,22 @@
 #ifndef _GAZEBO_RENDERING_GPULASER_PRIVATE_HH_
 #define _GAZEBO_RENDERING_GPULASER_PRIVATE_HH_
 
+#include <map>
 #include <string>
 #include <vector>
 
-#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/rendering/GpuLaserCubeFace.hh"
 
 #include "gazebo/common/Event.hh"
 
 namespace Ogre
 {
-  class Camera;
   class Material;
-  class MovableObject;
   class RenderTarget;
-  class SceneNode;
-  class Texture;
-  class Viewport;
 }
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Mesh;
-  }
-
   namespace rendering
   {
     /// \internal
@@ -60,79 +51,30 @@ namespace gazebo
                    const std::string &_format)> newLaserFrame;
 
       /// \brief Raw buffer of laser data.
-      public: float *laserBuffer;
+      public: std::vector<float> laserBuffer;
 
       /// \brief Outgoing laser data, used by newLaserFrame event.
-      public: float *laserScan;
+      public: std::vector<float> laserScan;
 
-      /// \brief Pointer to Ogre material for the first rendering pass.
-      public: Ogre::Material *matFirstPass;
+      /// \brief The cube faces that are used by the sensor.
+      public: std::map<GpuLaserCubeFaceId, GpuLaserCubeFace> cubeMapFaces;
 
-      /// \brief Pointer to Ogre material for the sencod rendering pass.
-      public: Ogre::Material *matSecondPass;
+      /// \brief Stores in a grid the mapping of lidar rays to cube map
+      /// coordinates. The first dimension of this grid is azimuth, the second
+      /// dimension is elevation.
+      public: std::vector<std::vector<GpuLaserCubeMappingPoint>> mapping;
 
-      /// \brief An array of first pass textures.
-      public: Ogre::Texture *firstPassTextures[3];
-
-      /// \brief Second pass texture.
-      public: Ogre::Texture *secondPassTexture;
-
-      /// \brief First pass render targets.
-      public: Ogre::RenderTarget *firstPassTargets[3];
-
-      /// \brief Second pass render target.
-      public: Ogre::RenderTarget *secondPassTarget;
-
-      /// \brief First pass viewports.
-      public: Ogre::Viewport *firstPassViewports[3];
-
-      /// \brief Second pass viewport
-      public: Ogre::Viewport *secondPassViewport;
-
-      /// \brief Number of first pass textures.
-      public: unsigned int textureCount;
-
-      /// \brief A list of camera angles for first pass rendering.
-      public: double cameraYaws[4];
+      /// \brief Pointer to Ogre material for the rendering pass.
+      public: Ogre::Material *material;
 
       /// \brief Temporary pointer to the current render target.
       public: Ogre::RenderTarget *currentTarget;
 
-      /// \brief Temporary pointer to the current material.
-      public: Ogre::Material *currentMat;
+      /// \brief Number of horizontal ranges.
+      public: unsigned int horizontalRangeCount;
 
-      /// \brief Ogre orthorgraphic camera used in the second pass for
-      /// undistortion.
-      public: Ogre::Camera *orthoCam;
-
-      /// \brief Ogre scenenode where the orthorgraphic camera is attached to.
-      public: Ogre::SceneNode *pitchNodeOrtho;
-
-      /// \brief Ogre mesh used to create a canvas for undistorting range values
-      /// in the second rendering pass.
-      public: common::Mesh *undistMesh;
-
-      /// \brief Ogre movable object created from the canvas mesh.
-      public: Ogre::MovableObject *object;
-
-      /// \brief Pointer to visual that holds the canvas.
-      public: VisualPtr visual;
-
-      /// \brief Image width of second pass.
-      public: unsigned int w2nd;
-
-      /// \brief Image height of second pass.
-      public: unsigned int h2nd;
-
-      /// \brief Time taken to complete the two rendering passes.
-      public: double lastRenderDuration;
-
-      /// \brief List of texture unit indices used during the second
-      /// rendering pass.
-      public: std::vector<int> texIdx;
-
-      /// Number of second pass texture units created.
-      public: static int texCount;
+      /// \brief Number of vertical ranges.
+      public: unsigned int verticalRangeCount;
     };
   }
 }

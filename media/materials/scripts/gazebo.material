@@ -101,14 +101,14 @@ material Gazebo/XYZNormals
   }
 }
 
-vertex_program Gazebo/LaserScan1stVS glsl
+vertex_program Gazebo/LaserScanVS glsl
 {
-  source laser_1st_pass.vert
+  source laser_pass.vert
 }
 
-fragment_program Gazebo/LaserScan1stFS glsl
+fragment_program Gazebo/LaserScanFS glsl
 {
-  source laser_1st_pass.frag
+  source laser_pass.frag
 
   default_params
   {
@@ -118,7 +118,7 @@ fragment_program Gazebo/LaserScan1stFS glsl
   }
 }
 
-material Gazebo/LaserScan1st
+material Gazebo/LaserScan
 {
   technique
   {
@@ -126,40 +126,8 @@ material Gazebo/LaserScan1st
     {
       separate_scene_blend one zero one zero
 
-      vertex_program_ref Gazebo/LaserScan1stVS { }
-      fragment_program_ref Gazebo/LaserScan1stFS { }
-    }
-  }
-}
-
-vertex_program Gazebo/LaserScan2ndVS glsl
-{
-  source laser_2nd_pass.vert
-}
-
-fragment_program Gazebo/LaserScan2ndFS glsl
-{
-  source laser_2nd_pass.frag
-
-  default_params
-  {
-    param_named tex1 int 0
-    param_named tex2 int 1
-    param_named tex3 int 2
-    param_named_auto texSize texture_size 0
-  }
-}
-
-material Gazebo/LaserScan2nd
-{
-  technique
-  {
-    pass laser_tex_2nd
-    {
-      separate_scene_blend one zero one zero
-
-      vertex_program_ref Gazebo/LaserScan2ndVS { }
-      fragment_program_ref Gazebo/LaserScan2ndFS { }
+      vertex_program_ref Gazebo/LaserScanVS { }
+      fragment_program_ref Gazebo/LaserScanFS { }
     }
   }
 }
