@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
 #include <map>
 #include <tuple>
@@ -268,8 +268,10 @@ unsigned int PlotCanvas::AddVariable(const std::string &_variable,
 
   // add to container and let the signals/slots do the work on adding the
   // a new plot with the curve in the overloaded AddVariable function
-  return this->dataPtr->yVariableContainer->AddVariablePill(_variable,
-      targetId);
+  unsigned int _retVal = this->dataPtr->yVariableContainer->AddVariablePill(
+			_variable, targetId);
+
+  return _retVal;
 }
 
 /////////////////////////////////////////////////
@@ -310,7 +312,6 @@ void PlotCanvas::AddVariable(const unsigned int _id,
     this->dataPtr->plotSplitter->setVisible(true);
   }
 
-
   if (common::URI::Valid(_variable))
   {
     common::URI uri(_variable);
@@ -327,6 +328,32 @@ void PlotCanvas::AddVariable(const unsigned int _id,
   else
   {
     PlotManager::Instance()->AddTopicCurve(_variable, curve);
+  }
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::AddVariable(const std::string &_variable,
+    IncrementalPlot *plot_in)
+{
+  if (!plot_in)
+    return;
+
+  if (plot_in == this->dataPtr->emptyPlot)
+  {
+    // add new variable to new plot
+    this->AddVariable(_variable);
+  }
+  else
+  {
+    for (const auto &it : this->dataPtr->plotData)
+    {
+      if (plot_in == it.second->plot)
+      {
+        // add to existing plot
+        this->AddVariable(_variable, it.second->id);
+        return;
+      }
+    }
   }
 }
 
@@ -487,6 +514,8 @@ unsigned int PlotCanvas::PlotByVariable(const unsigned int _variableId) const
 /////////////////////////////////////////////////
 void PlotCanvas::OnAddVariable(const std::string &_variable)
 {
+//  gzdbg << "PlotCanvas::OnAddVariable: " << _variable << std::endl;
+
   IncrementalPlot *plot =
       qobject_cast<IncrementalPlot *>(QObject::sender());
 

@@ -61,6 +61,11 @@ namespace gazebo
       public: unsigned int AddVariable(const std::string &_variable,
           const unsigned int _plotId = EmptyPlot);
 
+      /// \brief Add a new variable to a plot.
+      /// \param[in] _variable Name of the variable.
+      /// \param[in] _plot pointer to the plot to add the variable to.
+      public: void AddVariable(const std::string &_variable, IncrementalPlot *plot);
+
       /// \brief Remove a variable from a plot.
       /// \param[in] _id Unique id of the variable
       /// \param[in] _plotId Unique id of plot to remove the variable from.
