@@ -157,6 +157,9 @@ namespace gazebo
 
       /// \brief End position of the ray in global cs
       protected: ignition::math::Vector3d globalEndPos;
+      
+      /// \brief Direction of the ray, relative to the body
+      protected: ignition::math::Vector3d relativeDir;
 
       /// \brief Name of the object this ray collided with
       private: std::string collisionName;
