@@ -44,10 +44,10 @@ namespace gazebo
       public: GDALRasterBand *band;
 
       /// \brief Real width of the world in meters.
-      public: double worldWidth;
+      public: double worldWidth = 0;
 
       /// \brief Real height of the world in meters.
-      public: double worldHeight;
+      public: double worldHeight = 0;
 
       /// \brief Terrain's side (after the padding).
       public: unsigned int side;

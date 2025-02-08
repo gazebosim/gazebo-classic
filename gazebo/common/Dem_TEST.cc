@@ -180,8 +180,19 @@ TEST_F(DemTest, NegDem)
   // Check the heights and widths
   EXPECT_EQ(33, static_cast<int>(dem.GetHeight()));
   EXPECT_EQ(33, static_cast<int>(dem.GetWidth()));
-  EXPECT_FLOAT_EQ(293.51068, dem.GetWorldHeight());
-  EXPECT_FLOAT_EQ(293.51089, dem.GetWorldWidth());
+  // This DEM model is from the moon. Older versions
+  // of libproj will calculate the size assuming it
+  // is of the Earth, unless we specify the surface.
+  bool sizeSameAsEarth =
+    (std::abs(293.51089 - dem.GetWorldWidth()) < 0.1)
+    && (std::abs(293.51068 - dem.GetWorldHeight()) < 0.1);
+  // Newer versions give invalid sizes, 0 in this case.
+  bool invalidSize =
+    (dem.GetWorldHeight() < 0.001) &&
+    (dem.GetWorldWidth() < 0.001);
+
+  EXPECT_TRUE(sizeSameAsEarth || invalidSize);
+
   EXPECT_FLOAT_EQ(-212.29616, dem.GetMinElevation());
   EXPECT_FLOAT_EQ(-205.44009, dem.GetMaxElevation());
 }
@@ -236,8 +247,18 @@ TEST_F(DemTest, LunarDemLoad)
   // as the celestial bodies in DEM file and
   // default spherical coordinates do not match.
   EXPECT_EQ(dem.Load(path.string()), 0);
-  EXPECT_NEAR(293.51, dem.GetWorldWidth(), 0.1);
-  EXPECT_NEAR(293.51, dem.GetWorldHeight(), 0.1);
+  
+  // Older versions of libproj will default the size
+  // calculation to Earth's size.
+  bool sizeSameAsEarth =
+    (std::abs(293.51 - dem.GetWorldWidth()) < 0.1)
+    && (std::abs(293.51 - dem.GetWorldHeight()) < 0.1);
+  // Newer versions of libproj will output a zero.
+  bool invalidSize =
+    (dem.GetWorldWidth() < 0.001) &&
+    (dem.GetWorldHeight() < 0.001);
+
+  EXPECT_TRUE(sizeSameAsEarth || invalidSize);
 
   // Setting the spherical coordinates solves the
   // problem.
