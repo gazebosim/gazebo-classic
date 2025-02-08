@@ -50,6 +50,9 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data
       private: DARTBoxShapePrivate *dataPtr;
+
+      /// \brief True if this link is soft body.
+      private: bool isSoftBody;
     };
     /// \}
   }

@@ -179,6 +179,7 @@ namespace gazebo
       /// \brief Set pointer to DART BodyNode associated with this link.
       /// \param[in] Pointer to DART BodyNode.
       public: void SetDARTBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+      public: void SetDARTBodyNode(dart::dynamics::SoftBodyNode *_dtBodyNode);
 
       /// \brief Add pointer to a BodyNode representing a fragment of this link.
       /// \param[in] Pointer to DART BodyNode.

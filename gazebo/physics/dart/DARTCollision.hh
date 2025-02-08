@@ -77,6 +77,10 @@ namespace gazebo
       /// \return Pointer to the dart BodyNode.
       public: dart::dynamics::BodyNode *DARTBodyNode() const;
 
+      /// \brief Check is DART body is SoftBodyNode
+      /// \return True if this link is soft body.
+      public: bool IsSoftBody() const;
+
       /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
       /// \param[in] _placeable True to make the object movable.

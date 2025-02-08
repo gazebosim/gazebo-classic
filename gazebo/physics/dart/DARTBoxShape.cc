@@ -57,6 +57,8 @@ void DARTBoxShape::Init()
   this->dataPtr->CreateShape(bodyNode);
   _collisionParent->SetDARTCollisionShapeNode(
                       this->dataPtr->ShapeNode(), false);
+  
+  this->isSoftBody = _collisionParent->IsSoftBody();
 
   BoxShape::Init();
 }
@@ -96,6 +98,12 @@ void DARTBoxShape::SetSize(const ignition::math::Vector3d &_size)
   }
 
   BoxShape::SetSize(size);
+
+  // Rigid Bone at the core of the soft body which is 0.6 times smaller
+  if(this->isSoftBody)
+  {
+    size *= 0.6;
+  }
 
   GZ_ASSERT(this->dataPtr->Shape(),
             "Box shape node or shape itself is NULL");
