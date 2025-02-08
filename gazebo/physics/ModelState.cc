@@ -204,7 +204,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
   }
 
   // Set all the joints
-  /*this->jointStates.clear();
+  this->jointStates.clear();
   if (_elem->HasElement("joint"))
   {
     sdf::ElementPtr childElem = _elem->GetElement("joint");
@@ -215,7 +215,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
             JointState(childElem)));
       childElem = childElem->GetNextElement("joint");
     }
-  }*/
+  }
 }
 
 /////////////////////////////////////////////////

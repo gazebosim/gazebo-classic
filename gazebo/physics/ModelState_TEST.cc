@@ -165,6 +165,41 @@ TEST_F(ModelStateTest, Nested)
   }
 }
 
+TEST_F(ModelStateTest, JointState)
+{
+  std::ostringstream sdfStr;
+  sdfStr << "<sdf version ='" << SDF_VERSION << "'>"
+    << "<world name='default'>"
+    << "<state world_name='default'>"
+    << "<model name='model_00'>"
+    << "  <joint name='joint_00'>"
+    << "    <angle axis='0'>1.57</angle>"
+    << "  </joint>"
+    << "</model>"
+    << "</state>"
+    << "</world>"
+    << "</sdf>";
+  sdf::SDFPtr worldSDF(new sdf::SDF);
+  worldSDF->SetFromString(sdfStr.str());
+  EXPECT_TRUE(worldSDF->Root()->HasElement("world"));
+  sdf::ElementPtr worldElem = worldSDF->Root()->GetElement("world");
+  EXPECT_TRUE(worldElem->HasElement("state"));
+  sdf::ElementPtr stateElem = worldElem->GetElement("state");
+  EXPECT_TRUE(stateElem->HasElement("model"));
+  sdf::ElementPtr modelElem = stateElem->GetElement("model");
+  EXPECT_TRUE(modelElem != nullptr);
+
+  physics::ModelState const modelState(modelElem);
+
+  ASSERT_EQ(modelState.GetJointStateCount(), 1u);
+
+  physics::JointState const jointState = modelState.GetJointState(0);
+  EXPECT_EQ(1u, jointState.GetAngleCount());
+  EXPECT_EQ(1u, jointState.Positions().size());
+  EXPECT_DOUBLE_EQ(1.57, jointState.Position(0));
+  EXPECT_TRUE(ignition::math::isnan(jointState.Position(1)));
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

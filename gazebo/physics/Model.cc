@@ -294,6 +294,29 @@ void Model::LoadJoints()
   }
 }
 
+void SetInitialPositionForAxis(JointPtr const& joint, unsigned int axisIdx, std::string const& axisElementName)
+{
+  sdf::ElementPtr const jointSdf = joint->GetSDF();
+  if (joint->DOF() <= axisIdx || !jointSdf->HasElement(axisElementName))
+    return;
+
+  sdf::ElementPtr const axisElem = jointSdf->GetElement(axisElementName);
+  if (axisElem->HasElement("initial_position"))
+  {
+    double const initial_position = axisElem->Get<double>("initial_position");
+    if (!joint->SetPosition(axisIdx, initial_position))
+    {
+      gzerr << "Failed to set initial position " << initial_position << " for joint " << joint->GetScopedName() << std::endl;
+    }
+  }
+}
+
+void SetInitialPosition(JointPtr const& joint)
+{
+  SetInitialPositionForAxis(joint, 0, "axis");
+  SetInitialPositionForAxis(joint, 1, "axis2");
+}
+
 //////////////////////////////////////////////////
 void Model::Init()
 {
@@ -337,6 +360,13 @@ void Model::Init()
     msgs::Joint msg;
     (*iter)->FillMsg(msg);
     this->jointPub->Publish(msg);
+  }
+
+  // This needs to be done after the whole kinematic chain has been initialized.
+  // Doing this in the joint's Init method completely messes up the setup.
+  for (auto& joint : this->joints)
+  {
+    SetInitialPosition(joint);
   }
 
   for (std::vector<GripperPtr>::iterator iter = this->grippers.begin();
@@ -1399,14 +1429,14 @@ void Model::SetState(const ModelState &_state)
       gzerr << "Unable to find model[" << ms.first << "]\n";
   }
 
-  // For now we don't use the joint state values to set the state of
-  // simulation.
-  // for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
-  // {
-  //   JointState jointState = _state.GetJointState(i);
-  //   this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
-  //                          jointState.GetAngle(0).Radian());
-  // }
+  for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
+  {
+    JointState const jointState = _state.GetJointState(i);
+    for (unsigned int k = 0; k < jointState.GetAngleCount(); ++k) {
+      this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
+                            jointState.Position(k), k);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
